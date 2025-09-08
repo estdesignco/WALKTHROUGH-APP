@@ -7,24 +7,32 @@ const StatusOverview = ({ totalItems, statusBreakdown, itemStatuses }) => {
       'PICKED': '#FCD34D',           // Bright yellow
       'ORDERED': '#3B82F6',          // Blue
       'SHIPPED': '#F97316',          // Orange  
-      'DELIVERED TO RECEIVER': '#10B981',     // Green
-      'DELIVERED TO JOB SITE': '#059669',    // Dark green
+      'DELIVERED_TO_RECEIVER': '#10B981',     // Green
+      'DELIVERED TO RECEIVER': '#10B981',     // Green (alt format)
+      'DELIVERED_TO_JOB_SITE': '#059669',    // Dark green  
+      'DELIVERED TO JOB SITE': '#059669',    // Dark green (alt format)
       'INSTALLED': '#22C55E',        // Bright green
-      'PARTIALLY DELIVERED': '#8B5CF6',  // Purple
-      'ON HOLD': '#EF4444',          // Red
+      'PARTIALLY_DELIVERED': '#8B5CF6',  // Purple
+      'PARTIALLY DELIVERED': '#8B5CF6',  // Purple (alt format)
+      'ON_HOLD': '#EF4444',          // Red
+      'ON HOLD': '#EF4444',          // Red (alt format)
       'CANCELLED': '#6B7280',        // Gray
       'BACKORDERED': '#F59E0B',      // Amber
-      'IN TRANSIT': '#06B6D4',       // Cyan
-      'OUT FOR DELIVERY': '#84CC16', // Lime
+      'IN_TRANSIT': '#06B6D4',       // Cyan
+      'IN TRANSIT': '#06B6D4',       // Cyan (alt format)
+      'OUT_FOR_DELIVERY': '#84CC16', // Lime
+      'OUT FOR DELIVERY': '#84CC16', // Lime (alt format)
       'RETURNED': '#EC4899',         // Pink
       'DAMAGED': '#DC2626',          // Dark red
       'MISSING': '#7C2D12',          // Brown
-      'PENDING APPROVAL': '#D97706', // Dark orange
-      'QUOTE REQUESTED': '#7C3AED',  // Violet
+      'PENDING_APPROVAL': '#D97706', // Dark orange
+      'PENDING APPROVAL': '#D97706', // Dark orange (alt format)
+      'QUOTE_REQUESTED': '#7C3AED',  // Violet
+      'QUOTE REQUESTED': '#7C3AED',  // Violet (alt format)
       'APPROVED': '#16A34A',         // Dark green
       'REJECTED': '#991B1B'          // Dark red
     };
-    return colors[status] || '#6B7280';
+    return colors[status] || '#EF4444'; // Default to red if not found
   };
 
   const getStatusIcon = (status) => {
