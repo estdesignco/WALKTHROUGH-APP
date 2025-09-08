@@ -238,7 +238,7 @@ const FFESpreadsheet = ({
                           >
                             ADDITIONAL INFO.
                           </td>
-                          {/* PURPLE SECTION - SHIPPING INFO (spans 5 columns) - YOUR EXACT COLOR */}
+                          {/* PURPLE SECTION - SHIPPING INFO (spans 5 columns) - YOUR PURPLE COLOR */}
                           <td 
                             colSpan="5"
                             className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
