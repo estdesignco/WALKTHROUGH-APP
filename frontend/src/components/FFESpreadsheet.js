@@ -522,14 +522,15 @@ const FFEItemRow = ({
         />
       </td>
 
-      {/* Size - Always editable */}
-      <td className="p-2 border border-neutral-600 fit-text">
+      {/* Size - NO CONTAINER */}
+      <td className="p-1 border border-neutral-600 w-auto" style={{ width: 'fit-content' }}>
         <input
           type="text"
           value={formData.size}
           onChange={(e) => handleFieldChange('size', e.target.value)}
-          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          className="w-full bg-transparent text-neutral-200 text-sm border-0 outline-0 p-1"
           placeholder="Size..."
+          style={{ minWidth: `${Math.max((formData.size || '').length * 8, 60)}px` }}
         />
       </td>
 
