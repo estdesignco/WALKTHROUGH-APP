@@ -458,7 +458,9 @@ const FFEItemRow = ({
   onUpdate, 
   onDelete, 
   getStatusColor, 
-  itemStatuses, 
+  itemStatuses,
+  vendorTypes = [],
+  carrierTypes = [],
   isOffline 
 }) => {
   const [isEditing, setIsEditing] = useState(false);
