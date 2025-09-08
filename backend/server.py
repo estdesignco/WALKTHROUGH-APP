@@ -1220,12 +1220,12 @@ async def get_vendor_types():
 async def get_carrier_types():
     return [carrier.value for carrier in CarrierType]
 
-@api_router.get("/api/paint-colors")
+@api_router.get("/paint-colors")
 async def get_paint_colors():
     """Get comprehensive paint color catalog for interior design"""
     return {"data": PAINT_CATALOG}
 
-@api_router.get("/api/paint-suggestions/{room_type}")
+@api_router.get("/paint-suggestions/{room_type}")
 async def get_paint_suggestions(room_type: str):
     """Get paint color suggestions based on room type"""
     room_suggestions = {
