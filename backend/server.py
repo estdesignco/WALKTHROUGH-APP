@@ -197,6 +197,136 @@ ROOM_DEFAULT_STRUCTURE = {
         'Millwork, Trim, and Architectural Elements': {
             'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Wainscoting', 'Window Trim/Casings', 'Door Trim/Casings']
         }
+    },
+    'laundry room': {
+        'Lighting': {
+            'INSTALLED': ['Flush Mount Light', 'Recessed Lighting', 'Task Lighting (over counter)', 'Utility Light', 'Under Cabinet Lighting']
+        },
+        'Appliances': {
+            'UNIT': ['Washer (Front Load/Top Load)', 'Dryer (Electric/Gas)', 'Utility Sink', 'Steamer', 'Iron']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Base Cabinets', 'Wall Cabinets', 'Countertop (Folding Area)', 'Laundry Folding Table', 'Hanging Rod', 'Shelving Units', 'Laundry Sorter/Hampers', 'Ironing Board (Built-in/Foldable)', 'Drying Rack (Wall-mounted/Freestanding)']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Wall Art/Signage', 'Floor Mat', 'Storage Bins (Laundry Supplies)', 'Pegboard Organizer', 'Lint Bin', 'Cleaning Supplies Caddy']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish', 'Counter Tops']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Window Trim/Casings', 'Door Trim/Casings']
+        }
+    },
+    'home office': {
+        'Lighting': {
+            'INSTALLED': ['Flush Mount/Pendant', 'Recessed Lighting', 'Track Lighting', 'Sconces', 'Ceiling Fan w/ Light'],
+            'PORTABLE': ['Desk Lamp (Task Light)', 'Floor Lamp', 'Table Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Desk (Executive/L-shaped/Standing)', 'Office Chair (Ergonomic/Guest)', 'Bookcase', 'Filing Cabinet (Lateral/Vertical)', 'Credenza', 'Storage Cabinet', 'Guest Chairs (Pair)', 'Sofa/Loveseat (if space allows)', 'Coffee Table/Side Table']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Wall Art', 'Desk Organizers', 'Whiteboard/Corkboard', 'Plants', 'Curtains/Blinds/Shades', 'Photo Frames', 'Motivational Decor', 'Cable Management']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Built-in Columns', 'Built-in Niches', 'Window Trim/Casings', 'Door Trim/Casings', 'Panel Molding']
+        }
+    },
+    'guest bedroom': {
+        'Lighting': {
+            'INSTALLED': ['Ceiling Light', 'Recessed Lighting', 'Ceiling Fan w/ Light'],
+            'PORTABLE': ['Nightstand Lamps', 'Floor Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Bed (Queen/Full/Twin)', 'Nightstands (Pair)', 'Dresser', 'Mirror (Dresser/Wall)', 'Accent Chair', 'Small Desk/Table', 'Luggage Rack', 'Bench (Small)']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Bedding Set (Duvet, Sheets, Shams)', 'Throw Pillows', 'Wall Art', 'Curtains/Blinds/Shades', 'Alarm Clock', 'Water Carafe', 'Guest Wi-Fi Info Frame']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Chair Rails', 'Window Trim/Casings', 'Door Trim/Casings', 'Panel Molding']
+        }
+    },
+    'guest bathroom': {
+        'Lighting': {
+            'INSTALLED': ['Vanity Light', 'Recessed Light', 'Exhaust Fan w/ Light']
+        },
+        'Plumbing & Fixtures': {
+            'FIXTURE': ['Sink', 'Faucet', 'Toilet', 'Shower Head', 'Tub Faucet', 'Shower/Tub Combo']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Vanity Cabinet', 'Linen Closet/Cabinet', 'Small Storage Shelf']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Mirror', 'Bath Mat', 'Towels (Guest Set)', 'Soap Dispenser', 'Shower Curtain/Liner', 'Toilet Paper Holder', 'Towel Bar/Hooks', 'Waste Basket', 'Small Plant']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish', 'Counter Tops']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Window Trim/Casings', 'Door Trim/Casings']
+        }
+    },
+    'family room': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting (Dimmable)', 'Ceiling Fan w/ Light', 'Sconces', 'Track Lighting', 'Accent Lighting'],
+            'PORTABLE': ['Floor Lamp', 'Table Lamp', 'Console Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Sectional Sofa', 'Recliner (Single/Dual)', 'Sofa', 'Loveseat', 'Armchair', 'Ottoman (Large/Storage)', 'Coffee Table', 'End Table (Pair)', 'Media Console/TV Stand', 'Built-in Entertainment Center', 'Bookcase', 'Game Table', 'Game Chairs', 'Bar Cart', 'Display Cabinet']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Large Area Rug', 'Throw Pillows', 'Throw Blankets', 'Wall Art/Gallery Wall', 'Decorative Objects', 'Gaming Accessories Storage', 'Curtains/Blinds', 'DVD/Blu-ray Storage', 'Board Games']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Chair Rails', 'Built-in Columns', 'Coffered Ceilings', 'Built-in Niches', 'Window Trim/Casings', 'Door Trim/Casings', 'Panel Molding']
+        }
+    },
+    'home gym': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Track Lighting', 'LED Strip Lights']
+        },
+        'Equipment & Furniture': {
+            'PORTABLE': ['Floor Fan', 'Portable Speaker'],
+            'PIECE': ['Treadmill', 'Elliptical', 'Stationary Bike', 'Weight Rack', 'Dumbbells/Kettlebells', 'Exercise Bench', 'Yoga Mat', 'Resistance Bands', 'Stability Ball', 'Smart TV/Monitor', 'Sound System', 'Storage Shelves (for weights/gear)', 'Mini Fridge', 'Towel Rack', 'Water Cooler', 'Punching Bag', 'Rowing Machine']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Rubber Flooring/Mats', 'Large Wall Mirror', 'Motivational Art/Quotes', 'Clock/Timer', 'Water Bottle Holder', 'Workout Towels']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Window Trim/Casings', 'Door Trim/Casings']
+        }
+    },
+    'nursery': {
+        'Lighting': {
+            'INSTALLED': ['Ceiling Light/Pendant (Dimmable)', 'Recessed Lighting (Dimmable)', 'Night Light (Plug-in/Wall)'],
+            'PORTABLE': ['Table Lamp', 'Floor Lamp (for reading nook)']
+        },
+        'Furniture': {
+            'PIECE': ['Crib', 'Changing Table/Dresser Combo', 'Glider/Rocker', 'Ottoman (for glider)', 'Bookcase (Low)', 'Toy Storage Unit', 'Wardrobe/Armoire', 'Humidifier/Air Purifier', 'Toddler Bed', 'Daybed (Twin)']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug (Soft)', 'Blackout Curtains', 'Wall Art/Mural', 'Decorative Mobiles', 'Baby Monitor', 'Diaper Pail', 'Storage Baskets', 'Soft Toys/Plushies', 'Picture Frames', 'Crib Sheets/Bedding']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Chair Rails', 'Wainscoting', 'Window Trim/Casings', 'Door Trim/Casings']
+        }
     }
 }
 
