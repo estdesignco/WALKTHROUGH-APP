@@ -184,13 +184,18 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Vendor (Optional)
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.vendor}
                 onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
                 className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                placeholder="e.g., West Elm, IKEA, Local Vendor..."
-              />
+              >
+                <option value="">Select Vendor</option>
+                {vendorTypes.map(vendor => (
+                  <option key={vendor} value={vendor}>
+                    {vendor}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Cost and Link */}
