@@ -758,11 +758,11 @@ const FFEItemRow = ({
             className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
           >
             <option value="">Select Carrier</option>
-            <option value="UPS">UPS</option>
-            <option value="FedEx">FedEx</option>
-            <option value="USPS">USPS</option>
-            <option value="DHL">DHL</option>
-            <option value="Other">Other</option>
+            {carrierTypes.map(carrier => (
+              <option key={carrier} value={carrier}>
+                {carrier}
+              </option>
+            ))}
           </select>
         ) : (
           <span>{item.carrier || item.vendor || '-'}</span>
