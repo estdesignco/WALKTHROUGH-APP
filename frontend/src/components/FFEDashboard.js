@@ -272,87 +272,14 @@ const FFEDashboard = ({ isOffline }) => {
           <h2 className="text-xl font-semibold text-gray-200 mb-2">FF&E - {project?.name || 'PROJECT'}</h2>
         </div>
         
-        {/* Button Groups - EXACTLY AS USER'S UPLOADED IMAGES */}
-        <div className="grid grid-cols-3 gap-6">
-          
-          {/* Left Group - Import & Export */}
-          <div className="space-y-2">
-            <button
-              onClick={() => {/* TODO: Implement import */}}
-              style={{ backgroundColor: '#8b7355' }}
-              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>📥</span>
-              <span>IMPORT</span>
-            </button>
-            <button
-              onClick={() => {/* TODO: Implement export */}}
-              style={{ backgroundColor: '#8b7355' }}
-              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>📤</span>
-              <span>EXPORT</span>
-            </button>
-          </div>
-
-          {/* Center Group - Room Management */}
-          <div className="space-y-2">
-            <button
-              onClick={() => setShowAddRoom(true)}
-              style={{ backgroundColor: '#8b7355' }}
-              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>➕</span>
-              <span>ADD ROOM</span>
-            </button>
-            <button
-              onClick={() => {/* TODO: Implement delete room */}}
-              style={{ backgroundColor: '#8b7355' }}
-              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>🗑️</span>
-              <span>DELETE ROOM</span>
-            </button>
-          </div>
-
-          {/* Right Group - Actions */}
-          <div className="space-y-2">
-            <button
-              onClick={() => {/* TODO: Implement move to selection */}}
-              style={{ backgroundColor: '#8b7355' }}
-              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>▶️</span>
-              <span>MOVE TO SELECTION</span>
-            </button>
-            <button
-              onClick={() => {/* TODO: Implement add item */}}
-              style={{ backgroundColor: '#8b7355' }}
-              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>📋</span>
-              <span>ADD ITEM</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Secondary Button Row */}
-        <div className="flex justify-center space-x-4 mt-4">
+        {/* Simple Button Row - Like Your Layout */}
+        <div className="flex items-center space-x-4 mb-4">
           <button
-            onClick={() => {/* TODO: Implement add section */}}
+            onClick={() => setShowAddRoom(true)}
             style={{ backgroundColor: '#8b7355' }}
-            className="hover:opacity-90 text-black px-6 py-2 rounded-lg font-bold transition-colors flex items-center space-x-2"
+            className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors"
           >
-            <span>📂</span>
-            <span>ADD SECTION</span>
-          </button>
-          <button
-            onClick={() => {/* TODO: Implement delete section */}}
-            style={{ backgroundColor: '#8b7355' }}
-            className="hover:opacity-90 text-black px-6 py-2 rounded-lg font-bold transition-colors flex items-center space-x-2"
-          >
-            <span>🗂️</span>
-            <span>DELETE SECTION</span>
+            ➕ Add Room
           </button>
         </div>
       </div>
