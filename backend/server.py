@@ -471,6 +471,14 @@ async def get_subcategory_colors():
 async def get_item_statuses():
     return [status.value for status in ItemStatus]
 
+@api_router.get("/vendor-types")
+async def get_vendor_types():
+    return [vendor.value for vendor in VendorType]
+
+@api_router.get("/carrier-types")
+async def get_carrier_types():
+    return [carrier.value for carrier in CarrierType]
+
 # Include the router in the main app
 app.include_router(api_router)
 
