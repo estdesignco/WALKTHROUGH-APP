@@ -45,11 +45,10 @@ const FFEDashboard = ({ isOffline }) => {
   const [carrierTypes, setCarrierTypes] = useState([]);
 
   useEffect(() => {
-    console.log('🔍 DEBUG: useEffect triggered, projectId:', projectId);
-    if (projectId) {
+    if (projectId && !project) {
       loadProjectAndUtilityData();
     }
-  }, [projectId]);
+  }, [projectId, project]);
 
   const loadProjectAndUtilityData = async () => {
     try {
