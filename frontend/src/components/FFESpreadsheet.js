@@ -597,19 +597,23 @@ const FFEItemRow = ({
           placeholder="Product URL..."
         />
         {formData.link && (
-          <a 
-            href={formData.link} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="text-blue-400 hover:text-blue-300 text-xs ml-1"
+          <button 
+            type="button"
+            className="text-blue-400 hover:text-blue-300 text-xs ml-1 bg-transparent border-0 p-0"
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              window.open(formData.link, '_blank', 'noopener,noreferrer');
+              // Ensure URL has protocol
+              let url = formData.link;
+              if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+              }
+              window.open(url, '_blank', 'noopener,noreferrer');
             }}
+            title="Open link in new tab"
           >
             🔗
-          </a>
+          </button>
         )}
       </td>
 
