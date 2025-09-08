@@ -450,12 +450,14 @@ const FFEItemRow = ({
     quantity: item.quantity,
     size: item.size || '',
     status: item.status,
+    finish_color: item.finish_color || '',
     cost: item.cost || 0,
-    link: item.link || '',
-    tracking_number: item.tracking_number || '',
-    order_date: item.order_date || '',
+    image_url: item.image_url || '',
+    order_status: item.order_status || '',
     install_date: item.install_date || '',
-    remarks: item.remarks || ''
+    tracking_number: item.tracking_number || '',
+    carrier: item.carrier || '',
+    order_date: item.order_date || ''
   });
 
   const handleSave = async () => {
