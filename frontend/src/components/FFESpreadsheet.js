@@ -221,33 +221,98 @@ const FFESpreadsheet = ({
                       </td>
                     </tr>
 
-                    {/* 3. SUB-CATEGORIES for this category - RED like INSTALLED */}
+                    {/* 3. SUB-CATEGORIES with COLUMN HEADERS - RED like INSTALLED */}
                     {category.subcategories?.map((subcategory) => (
                       <React.Fragment key={subcategory.id}>
+                        {/* RED HEADER ROW WITH BOTH SUBCATEGORY NAME AND COLUMN HEADERS */}
                         <tr>
                           <td 
-                            colSpan="8" 
-                            className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text"
+                            className="w-48 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
                             style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}
                           >
-                            <div className="flex items-center justify-between">
-                              <span>{subcategory.name.toUpperCase()}</span>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedSubCategoryId(subcategory.id);
-                                  setShowAddItem(true);
-                                }}
-                                className="bg-neutral-800 bg-opacity-50 hover:bg-opacity-70 text-white px-2 py-1 rounded text-xs"
-                                title="Add Item"
-                              >
-                                ➕ Item
-                              </button>
-                            </div>
+                            {subcategory.name.toUpperCase()}
+                          </td>
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            ITEM
+                          </td>
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            VENDOR/SKU
+                          </td>
+                          <td 
+                            className="w-16 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            QTY
+                          </td>
+                          <td 
+                            className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            SIZE
+                          </td>
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            STATUS
+                          </td>
+                          <td 
+                            className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            COST
+                          </td>
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            LINK
+                          </td>
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            TRACKING #
+                          </td>
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            ORDER DATE
+                          </td>
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            INSTALL DATE
+                          </td>
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            REMARKS
+                          </td>
+                          <td 
+                            className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedSubCategoryId(subcategory.id);
+                                setShowAddItem(true);
+                              }}
+                              className="bg-neutral-800 bg-opacity-50 hover:bg-opacity-70 text-white px-2 py-1 rounded text-xs"
+                              title="Add Item"
+                            >
+                              ➕ Item
+                            </button>
                           </td>
                         </tr>
 
