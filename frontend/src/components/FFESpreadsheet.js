@@ -754,9 +754,41 @@ const FFEItemRow = ({
             value={editData.tracking_number}
             onChange={(e) => setEditData({ ...editData, tracking_number: e.target.value })}
             className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+            placeholder="Enter tracking #"
           />
         ) : (
-          <span>{item.tracking_number || '-'}</span>
+          item.tracking_number ? (
+            <div className="flex items-center space-x-2">
+              <span className="text-xs">{item.tracking_number}</span>
+              <button
+                onClick={() => {
+                  // Create tracking URL based on carrier
+                  let trackingUrl = '';
+                  const carrier = item.carrier || item.vendor || '';
+                  const trackingNum = item.tracking_number;
+                  
+                  if (carrier.toLowerCase().includes('ups')) {
+                    trackingUrl = `https://www.ups.com/track?loc=null&tracknum=${trackingNum}`;
+                  } else if (carrier.toLowerCase().includes('fedex')) {
+                    trackingUrl = `https://www.fedex.com/fedextrack/?trknbr=${trackingNum}`;
+                  } else if (carrier.toLowerCase().includes('usps')) {
+                    trackingUrl = `https://tools.usps.com/go/TrackConfirmAction?tRef=fullpage&tLc=2&text28777=&tLabels=${trackingNum}`;
+                  } else {
+                    // Generic Google search for tracking
+                    trackingUrl = `https://www.google.com/search?q=${encodeURIComponent(carrier + ' tracking ' + trackingNum)}`;
+                  }
+                  
+                  window.open(trackingUrl, '_blank');
+                }}
+                className="text-blue-400 hover:text-blue-300 text-xs underline"
+                title="Track Package"
+              >
+                🔗 Track
+              </button>
+            </div>
+          ) : (
+            <span>-</span>
+          )
         )}
       </td>
 
