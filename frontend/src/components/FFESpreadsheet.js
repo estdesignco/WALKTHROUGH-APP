@@ -20,43 +20,43 @@ const FFESpreadsheet = ({
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // EXACT colors from your screenshots - even more muted
+  // EXACT colors from your screenshots - MORE DISTINCT but SUBTLE
   const getRoomColor = (roomName) => {
     const mutedColors = {
-      'living room': '#7A5A8A',  // Purple like your screenshot
-      'kitchen': '#5A6A5A',      
-      'master bedroom': '#6A5A7A', 
-      'bedroom 2': '#7A5A5A',    
-      'bedroom 3': '#5A6A6A',
-      'bathroom': '#5A5A7A',     
-      'master bathroom': '#6A4A4A', 
-      'powder room': '#4A6A6A',  
-      'dining room': '#7A6A8A',     
-      'office': '#4A5A5A',          
-      'family room': '#5A6A8A',     
-      'basement': '#8A7A5A',        
-      'laundry room': '#4A4A6A',    
-      'mudroom': '#5A6A4A',         
-      'pantry': '#8A8A5A',          
-      'closet': '#6A7A6A',          
-      'guest room': '#8A5A7A',      
-      'playroom': '#8A8A5A',        
-      'library': '#4A6A8A',         
-      'wine cellar': '#4A4A6A',     
-      'garage': '#6A7A4A',          
-      'patio': '#7A7A5A'            
+      'living room': '#6B5B95',    // Muted purple - distinct but not bright
+      'kitchen': '#88A096',        // Muted teal-green - clearly different
+      'master bedroom': '#8E7AB5', // Lighter muted purple
+      'bedroom 2': '#A8756C',      // Muted brown-red
+      'bedroom 3': '#7B8794',      // Muted blue-gray
+      'bathroom': '#6A9BD1',       // Muted blue
+      'master bathroom': '#9C7A97', // Muted mauve
+      'powder room': '#7BA098',    // Muted sage green
+      'dining room': '#AD8B73',    // Muted tan
+      'office': '#6B8E7A',         // Muted forest green
+      'family room': '#8B7BA6',    // Muted lavender
+      'basement': '#A08B6B',       // Muted olive
+      'laundry room': '#7A8BA0',   // Muted steel blue
+      'mudroom': '#9A8B7A',        // Muted taupe
+      'pantry': '#8BA07A',         // Muted moss green
+      'closet': '#A07A8B',         // Muted dusty rose
+      'guest room': '#7AA08B',     // Muted mint
+      'playroom': '#A0A07A',       // Muted yellow-green
+      'library': '#7A7AA0',        // Muted periwinkle
+      'wine cellar': '#5A5A7A',    // Muted dark purple
+      'garage': '#8A8A6A',         // Muted olive drab
+      'patio': '#8A9A7A'           // Muted sage
     };
-    return mutedColors[roomName.toLowerCase()] || '#6A6A6A';
+    return mutedColors[roomName.toLowerCase()] || '#7A7A7A';
   };
 
-  // GREEN for categories (like LIGHTING)
+  // GREEN for categories - DISTINCT but not bright
   const getCategoryColor = (categoryName) => {
-    return '#5A7A5A'; // Muted green like your screenshot
+    return '#6B8E7A'; // Muted forest green - clearly different from room colors
   };
 
-  // RED for sub-categories - TONED DOWN from too bright
+  // RED for sub-categories - DISTINCT but SUBTLE
   const getSubCategoryColor = (subCategoryName) => {
-    return '#DC2626'; // Less bright red
+    return '#A8756C'; // Muted terracotta red - distinct but easy on eyes
   };
 
   const handleAddSubCategory = async (subCategoryData) => {
