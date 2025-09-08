@@ -1220,18 +1220,49 @@ async def get_vendor_types():
 async def get_carrier_types():
     return [carrier.value for carrier in CarrierType]
 
-@api_router.post("/scrape-product")
-async def scrape_product(data: dict):
-    """Scrape product information from a URL"""
-    url = data.get('url', '')
-    if not url:
-        raise HTTPException(status_code=400, detail="URL is required")
+@api_router.get("/api/paint-colors")
+async def get_paint_colors():
+    """Get comprehensive paint color catalog for interior design"""
+    return {"data": PAINT_CATALOG}
+
+@api_router.get("/api/paint-suggestions/{room_type}")
+async def get_paint_suggestions(room_type: str):
+    """Get paint color suggestions based on room type"""
+    room_suggestions = {
+        'living room': {
+            'recommended': ['Agreeable Gray (SW 7029)', 'Revere Pewter (HC-172)', 'White Dove (OC-17)', 'Accessible Beige (SW 7036)', 'Elephant\'s Breath (No.229)'],
+            'accent_colors': ['Naval (SW 6244)', 'Hague Blue (No.30)', 'Hunter Green (2041-10)', 'Caliente (AF-290)'],
+            'style_notes': 'Neutral base colors work best for living rooms, allowing flexibility with furniture and decor changes.'
+        },
+        'kitchen': {
+            'recommended': ['Pure White (SW 7005)', 'Chantilly Lace (OC-65)', 'Sea Salt (SW 6204)', 'Classic Gray (OC-23)', 'Pointing (No.2003)'],
+            'accent_colors': ['Evergreen Fog (SW 9130)', 'Hale Navy (HC-154)', 'Studio Green (No.93)', 'Calke Green (No.34)'],
+            'style_notes': 'Light, clean colors enhance the sense of cleanliness and space in kitchens.'
+        },
+        'primary bedroom': {
+            'recommended': ['Repose Gray (SW 7015)', 'Stonington Gray (HC-170)', 'Palladian Blue (HC-144)', 'Sulking Room Pink (No.295)', 'Setting Plaster (No.231)'],
+            'accent_colors': ['Indigo Batik (SW 7602)', 'Van Deusen Blue (HC-156)', 'Treron (No.292)', 'Calamine (No.230)'],
+            'style_notes': 'Calming, sophisticated colors promote rest and relaxation in bedrooms.'
+        },
+        'dining room': {
+            'recommended': ['Urbane Bronze (SW 7048)', 'Kendall Charcoal (HC-166)', 'London Clay (No.244)', 'Dorian Gray (SW 7017)', 'Pigeon (No.25)'],
+            'accent_colors': ['Dragon Fruit (SW 6855)', 'Picture Gallery Red (No.42)', 'Card Room Green (No.79)', 'India Yellow (No.66)'],
+            'style_notes': 'Deeper, more dramatic colors create an intimate dining atmosphere.'
+        },
+        'bathroom': {
+            'recommended': ['Rainwashed (SW 6211)', 'Borrowed Light (No.235)', 'Sea Salt (SW 6204)', 'Misty (SW 6232)', 'All White (No.2005)'],
+            'accent_colors': ['Lulworth Blue (No.89)', 'Stiffkey Blue (No.281)', 'Sleepy Blue (SW 6225)', 'Stone Blue (No.86)'],
+            'style_notes': 'Light, airy colors with spa-like qualities work well in bathrooms.'
+        }
+    }
     
-    try:
-        product_info = scrape_product_info(url)  # Remove async
-        return product_info
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to scrape URL: {str(e)}")
+    suggestions = room_suggestions.get(room_type.lower(), {
+        'recommended': ['Agreeable Gray (SW 7029)', 'White Dove (OC-17)', 'Revere Pewter (HC-172)'],
+        'accent_colors': ['Naval (SW 6244)', 'Hunter Green (2041-10)', 'Caliente (AF-290)'],
+        'style_notes': 'Classic neutral colors work well in most spaces.'
+    })
+    
+    return {"data": suggestions}
 
 # Include the router in the main app
 app.include_router(api_router)
