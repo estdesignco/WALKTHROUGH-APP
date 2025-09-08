@@ -6,7 +6,6 @@ import os
 import logging
 import requests
 from bs4 import BeautifulSoup
-from playwright.async_api import async_playwright
 import asyncio
 import re
 from urllib.parse import urljoin, urlparse
