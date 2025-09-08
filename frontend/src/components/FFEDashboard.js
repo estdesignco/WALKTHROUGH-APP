@@ -254,61 +254,7 @@ const FFEDashboard = ({ isOffline }) => {
         </div>
       )}
 
-      {/* STATUS OVERVIEW + BREAKDOWN + SHIPPING BREAKDOWN - IN CORRECT ORDER */}
-      <div className="mb-8">
-        <StatusOverview
-          totalItems={getTotalItems()}
-          statusBreakdown={getStatusBreakdown()}
-          itemStatuses={itemStatuses}
-        />
-        
-        {/* Shipping Carrier Breakdown - KEEP AS IS */}
-        <div className="bg-gray-800 rounded-xl p-6 mt-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Shipping Carrier Breakdown</h3>
-          
-          {Object.keys(getCarrierBreakdown()).length > 0 ? (
-            <div className="space-y-2">
-              {Object.entries(getCarrierBreakdown()).map(([carrier, count]) => (
-                <div key={carrier} className="flex justify-between items-center p-2 bg-gray-700 rounded">
-                  <span className="text-gray-300">{carrier}</span>
-                  <span className="text-gray-200 font-medium">{count}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-gray-500">
-              <div className="text-4xl mb-2">📦</div>
-              <p className="text-sm">No items with assigned carriers.</p>
-            </div>
-          )}
-        </div>
-
-        {/* SEARCH BAR AND ADD ROOM BUTTON */}
-        <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
-          <div className="flex items-center space-x-4 flex-1">
-            <input
-              type="text"
-              placeholder="Search Items..."
-              className="flex-1 bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500"
-            />
-            <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
-              <option>All Rooms</option>
-            </select>
-            <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
-              <option>All Statuses</option>
-            </select>
-          </div>
-          <button
-            onClick={() => setShowAddRoom(true)}
-            style={{ backgroundColor: '#8b7355' }}
-            className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors ml-4"
-          >
-            ➕ Add Room
-          </button>
-        </div>
-      </div>
-
-      {/* TOP HEADER - LARGE GREENE + ADDRESS */}
+      {/* TOP HEADER - LARGE GREENE + ADDRESS - FIRST! */}
       <div className="mb-6">
         <div className="text-center mb-4">
           <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
@@ -335,16 +281,17 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* BIG LOGO CONTAINER SPANNING FULL WIDTH */}
+        {/* BIG LOGO CONTAINER SPANNING FULL WIDTH - WITH ACTUAL LOGO */}
         <div className="w-full rounded-lg p-6 mb-6" style={{ backgroundColor: '#8b7355' }}>
-          <div className="text-center">
+          <div className="text-center flex items-center justify-center">
+            <img src="/api/static/logo.png" alt="Logo" className="h-12 mr-4" onError={(e) => {e.target.style.display='none'}} />
             <h2 className="text-2xl font-bold text-black">ESTABLISHED DESIGN CO.</h2>
           </div>
         </div>
 
         {/* FF&E TITLE WITH EXPORT BUTTONS */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-gray-200">FF&E - GREENE</h3>
+          <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>FF&E - GREENE</h3>
           <div className="flex space-x-4">
             <button
               style={{ backgroundColor: '#8b7355' }}
@@ -361,6 +308,58 @@ const FFEDashboard = ({ isOffline }) => {
               <span>Spec Sheet</span>
             </button>
           </div>
+        </div>
+
+        {/* PIE CHART AND STATUS BREAKDOWN - UNDER FF&E TITLE */}
+        <StatusOverview
+          totalItems={getTotalItems()}
+          statusBreakdown={getStatusBreakdown()}
+          itemStatuses={itemStatuses}
+        />
+
+        {/* SHIPPING CARRIER BREAKDOWN - UNDER STATUS */}
+        <div className="bg-gray-800 rounded-xl p-6 mt-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Shipping Carrier Breakdown</h3>
+          
+          {Object.keys(getCarrierBreakdown()).length > 0 ? (
+            <div className="space-y-2">
+              {Object.entries(getCarrierBreakdown()).map(([carrier, count]) => (
+                <div key={carrier} className="flex justify-between items-center p-2 bg-gray-700 rounded">
+                  <span className="text-gray-300">{carrier}</span>
+                  <span className="text-gray-200 font-medium">{count}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">
+              <div className="text-4xl mb-2">📦</div>
+              <p className="text-sm">No items with assigned carriers.</p>
+            </div>
+          )}
+        </div>
+
+        {/* SEARCH BAR AND ADD ROOM BUTTON - LAST */}
+        <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
+          <div className="flex items-center space-x-4 flex-1">
+            <input
+              type="text"
+              placeholder="Search Items..."
+              className="flex-1 bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500"
+            />
+            <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+              <option>All Rooms</option>
+            </select>
+            <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+              <option>All Statuses</option>
+            </select>
+          </div>
+          <button
+            onClick={() => setShowAddRoom(true)}
+            style={{ backgroundColor: '#8b7355' }}
+            className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors ml-4"
+          >
+            ➕ Add Room
+          </button>
         </div>
       </div>
 
