@@ -281,8 +281,8 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* LOGO BANNER - HUGE LOGO SPANS ENTIRE PAGE NO PADDING */}
-        <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* LOGO BANNER - ALMOST ZERO TOP/BOTTOM PADDING */}
+        <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '2px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <img 
             src="/established-logo.png" 
             alt="Established Design Co. Logo" 
