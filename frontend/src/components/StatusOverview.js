@@ -2,15 +2,27 @@ import React from 'react';
 
 const StatusOverview = ({ totalItems, statusBreakdown, itemStatuses }) => {
   const getStatusColor = (status) => {
+    // Complete status colors matching the spreadsheet - ALL 19 STATUS OPTIONS
     const colors = {
-      'PICKED': '#FFD966',     // Yellow
-      'ORDERED': '#3B82F6',    // Blue  
-      'SHIPPED': '#F97316',    // Orange
-      'DELIVERED': '#10B981',  // Green
-      'INSTALLED': '#22C55E',  // Bright Green
-      'PARTIALLY_DELIVERED': '#8B5CF6', // Purple
-      'ON_HOLD': '#EF4444',    // Red
-      'CANCELLED': '#6B7280'   // Gray
+      'PICKED': '#FCD34D',           // Bright yellow
+      'ORDERED': '#3B82F6',          // Blue
+      'SHIPPED': '#F97316',          // Orange  
+      'DELIVERED TO RECEIVER': '#10B981',     // Green
+      'DELIVERED TO JOB SITE': '#059669',    // Dark green
+      'INSTALLED': '#22C55E',        // Bright green
+      'PARTIALLY DELIVERED': '#8B5CF6',  // Purple
+      'ON HOLD': '#EF4444',          // Red
+      'CANCELLED': '#6B7280',        // Gray
+      'BACKORDERED': '#F59E0B',      // Amber
+      'IN TRANSIT': '#06B6D4',       // Cyan
+      'OUT FOR DELIVERY': '#84CC16', // Lime
+      'RETURNED': '#EC4899',         // Pink
+      'DAMAGED': '#DC2626',          // Dark red
+      'MISSING': '#7C2D12',          // Brown
+      'PENDING APPROVAL': '#D97706', // Dark orange
+      'QUOTE REQUESTED': '#7C3AED',  // Violet
+      'APPROVED': '#16A34A',         // Dark green
+      'REJECTED': '#991B1B'          // Dark red
     };
     return colors[status] || '#6B7280';
   };
