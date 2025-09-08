@@ -432,7 +432,7 @@ async def scrape_product_info(url: str) -> Dict[str, Any]:
                     product_info['price'] = price_match.group().replace(',', '')
                     break
         
-        # Try to extract main image
+        # Try to extract main image - ENHANCED FOR WHOLESALE SITES
         image_selectors = [
             'img[data-testid="product-image"]',
             '.product-image img',
@@ -440,6 +440,16 @@ async def scrape_product_info(url: str) -> Dict[str, Any]:
             '.hero-image img',
             '.primary-image img',
             'img.product-image',
+            # Wholesale site image selectors
+            '.product-gallery .main-image img',    # Four Hands
+            '.product-media .featured-image img',  # Uttermost
+            '.product-images .primary img',        # Bernhardt
+            '.product-slider .active img',         # Loloi, Visual Comfort
+            '.pdp-gallery .main img',             # Regina Andrew
+            '.product-photos .featured img',       # Gabby, Phillips Collection
+            '.zoom-image img',                     # Many wholesale sites
+            '.featured-image img',
+            '.main-product-image img',
             '.media img'
         ]
         
