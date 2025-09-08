@@ -156,15 +156,25 @@ body {
           width: 100%;
         }
         
-        /* ALL CELLS FIT TO TEXT */
+        /* ALL CELLS FIT TO TEXT - FORCE TIGHT SIZING */
         .fit-text {
           width: 1%;
           white-space: nowrap;
         }
         
         td, th {
-          width: fit-content;
-          min-width: fit-content;
+          width: fit-content !important;
+          min-width: fit-content !important;
+          max-width: fit-content !important;
+          padding: 4px 8px !important;
+        }
+        
+        /* SPREADSHEET TABLE TIGHT LAYOUT */
+        .ffe-table td {
+          width: auto !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
         }
 
 /* Status badges - muted colors */
