@@ -110,24 +110,10 @@ const FFEDashboard = ({ isOffline }) => {
         order_index: project.rooms.length
       };
       
-      // Create the room
+      // Create the room - backend will auto-populate categories and subcategories
       const roomResponse = await roomAPI.create(newRoom);
-      const createdRoom = roomResponse.data;
       
-      // Auto-create default categories for this room type
-      const roomType = roomData.name.toLowerCase();
-      const defaultCategories = ROOM_DEFAULT_CATEGORIES[roomType] || ['Lighting', 'Furniture & Storage'];
-      
-      for (let i = 0; i < defaultCategories.length; i++) {
-        const categoryData = {
-          name: defaultCategories[i],
-          room_id: createdRoom.id,
-          order_index: i,
-          description: `${defaultCategories[i]} items for ${roomData.name}`
-        };
-        await categoryAPI.create(categoryData);
-      }
-      
+      // Reload project to show the newly created room with full structure
       await loadProject();
       setShowAddRoom(false);
     } catch (err) {
