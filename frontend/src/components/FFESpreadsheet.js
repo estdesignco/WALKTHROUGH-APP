@@ -338,10 +338,10 @@ const FFESpreadsheet = ({
                           </tr>
                         )}
 
-                        {/* ACTION BUTTONS ROW - ADD ITEM AND DELETE SECTION */}
+                        {/* ACTION BUTTONS ROW - AFTER ALL ITEMS */}
                         <tr>
-                          <td colSpan="16" className="p-2 bg-gray-700 border border-neutral-600">
-                            <div className="flex items-center justify-center space-x-4">
+                          <td colSpan="16" className="p-4 bg-neutral-800 border border-neutral-600">
+                            <div className="flex items-center justify-center space-x-6">
                               <button
                                 onClick={() => {
                                   setSelectedRoomId(room.id);
@@ -350,7 +350,7 @@ const FFESpreadsheet = ({
                                   setShowAddItem(true);
                                 }}
                                 style={{ backgroundColor: '#8b7355' }}
-                                className="hover:opacity-90 text-white px-4 py-1 rounded text-sm font-medium transition-colors"
+                                className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors"
                               >
                                 ➕ Add Item
                               </button>
@@ -360,7 +360,7 @@ const FFESpreadsheet = ({
                                     // TODO: Implement delete section
                                   }
                                 }}
-                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded text-sm font-medium transition-colors"
+                                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded font-medium transition-colors"
                               >
                                 🗑️ Delete Section
                               </button>
