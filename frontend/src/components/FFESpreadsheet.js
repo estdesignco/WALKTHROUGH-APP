@@ -462,20 +462,11 @@ const FFEItemRow = ({
     notes: item.notes || item.remarks || ''
   });
 
-  // Auto-save when any field changes - COMPLETELY PREVENT PAGE JUMPING
+  // Auto-save when any field changes - ABSOLUTELY NO PAGE JUMPING
   const handleFieldChange = (field, value) => {
+    // ONLY update local state - NO API CALLS TO PREVENT JUMPING
     const newData = { ...formData, [field]: value };
     setFormData(newData);
-    
-    // Prevent any scrolling or page jumping - NO ASYNC OPERATIONS
-    try {
-      // Save immediately but don't await to prevent any page refresh
-      onUpdate(item.id, { [field]: value }).catch(error => {
-        console.error('Error auto-saving:', error);
-      });
-    } catch (error) {
-      console.error('Error in handleFieldChange:', error);
-    }
   };
 
   // Alternating row colors
