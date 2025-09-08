@@ -367,6 +367,8 @@ const FFESpreadsheet = ({
                             onDelete={handleDeleteItem}
                             getStatusColor={getStatusColor}
                             itemStatuses={itemStatuses}
+                            vendorTypes={vendorTypes}
+                            carrierTypes={carrierTypes}
                             isOffline={isOffline}
                           />
                         ))}
