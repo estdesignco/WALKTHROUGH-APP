@@ -28,10 +28,14 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
     setScrapeError('');
 
     try {
-      // Get backend URL from environment - FORCE CORRECT URL
-      const backendUrl = import.meta.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      console.log('Using backend URL:', backendUrl);
-      console.log('Scraping URL:', formData.link);
+      // FORCE WORKING BACKEND URL - TRY ALL POSSIBILITIES
+      let backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      if (!backendUrl) {
+        backendUrl = window.location.origin.includes('localhost') ? 'http://localhost:8001' : window.location.origin;
+      }
+      
+      console.log('SCRAPING - Using backend URL:', backendUrl);
+      console.log('SCRAPING - Target URL:', formData.link);
       
       const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',
@@ -40,6 +44,8 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
         },
         body: JSON.stringify({ url: formData.link })
       });
+      
+      console.log('SCRAPING - Response status:', response.status);
 
       if (!response.ok) {
         const errorData = await response.json();
