@@ -547,15 +547,16 @@ const FFEItemRow = ({
 
       {/* BROWN SECTION - Additional Info - Always editable */}
       
-      {/* Finish/Color */}
-      <td className="p-2 border border-neutral-600 fit-text">
-        <input
-          type="text"
-          value={formData.finish_color}
-          onChange={(e) => handleFieldChange('finish_color', e.target.value)}
-          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
-          placeholder="Finish/Color..."
-        />
+      {/* Finish/Color - PLAIN TEXT ONLY */}
+      <td className="p-2 border border-neutral-600 w-auto text-neutral-200 text-sm" style={{ width: 'fit-content' }}>
+        <div
+          contentEditable
+          suppressContentEditableWarning={true}
+          onBlur={(e) => handleFieldChange('finish_color', e.target.textContent)}
+          className="bg-transparent outline-none"
+        >
+          {formData.finish_color || 'Finish/Color...'}
+        </div>
       </td>
 
       {/* Cost/Price */}
