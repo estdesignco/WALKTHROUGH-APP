@@ -557,34 +557,37 @@ const FFEItemRow = ({
         />
       </td>
 
-      {/* LINK - Always editable */}
-      <td className="p-2 border border-neutral-600 fit-text">
-        <input
-          type="url"
-          value={formData.link}
-          onChange={(e) => handleFieldChange('link', e.target.value)}
-          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
-          placeholder="Product URL..."
-        />
-        {formData.link && (
-          <button 
-            type="button"
-            className="text-blue-400 hover:text-blue-300 text-xs ml-1 bg-transparent border-0 p-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              // Ensure URL has protocol
-              let url = formData.link;
-              if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                url = 'https://' + url;
-              }
-              window.open(url, '_blank', 'noopener,noreferrer');
-            }}
-            title="Open link in new tab"
+      {/* LINK - PLAIN TEXT BUT EDITABLE */}
+      <td className="p-2 border border-neutral-600 w-auto text-neutral-200 text-sm" style={{ width: 'fit-content' }}>
+        <div className="flex items-center space-x-2">
+          <div
+            contentEditable
+            suppressContentEditableWarning={true}
+            onBlur={(e) => handleFieldChange('link', e.target.textContent)}
+            className="bg-transparent outline-none flex-1"
           >
-            🔗
-          </button>
-        )}
+            {formData.link || 'Product URL...'}
+          </div>
+          {formData.link && (
+            <button 
+              type="button"
+              className="text-blue-400 hover:text-blue-300 text-xs bg-transparent border-0 p-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                // Ensure URL has protocol
+                let url = formData.link;
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                  url = 'https://' + url;
+                }
+                window.open(url, '_blank', 'noopener,noreferrer');
+              }}
+              title="Open link in new tab"
+            >
+              🔗
+            </button>
+          )}
+        </div>
       </td>
 
       {/* Image */}
