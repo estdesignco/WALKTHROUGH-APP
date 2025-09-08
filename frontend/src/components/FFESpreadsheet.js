@@ -571,7 +571,7 @@ const FFEItemRow = ({
         </div>
       </td>
 
-      {/* LINK - PLAIN TEXT BUT EDITABLE */}
+      {/* LINK - PLAIN TEXT WITH WORKING LINK */}
       <td className="p-2 border border-neutral-600 w-auto text-neutral-200 text-sm" style={{ width: 'fit-content' }}>
         <div className="flex items-center space-x-2">
           <div
@@ -583,23 +583,15 @@ const FFEItemRow = ({
             {formData.link || 'Product URL...'}
           </div>
           {formData.link && (
-            <button 
-              type="button"
-              className="text-blue-400 hover:text-blue-300 text-xs bg-transparent border-0 p-0"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                // Ensure URL has protocol
-                let url = formData.link;
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                  url = 'https://' + url;
-                }
-                window.open(url, '_blank', 'noopener,noreferrer');
-              }}
-              title="Open link in new tab"
+            <a 
+              href={formData.link.startsWith('http') ? formData.link : `https://${formData.link}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 text-xs"
+              onClick={(e) => e.stopPropagation()}
             >
               🔗
-            </button>
+            </a>
           )}
         </div>
       </td>
