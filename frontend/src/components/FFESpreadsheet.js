@@ -493,10 +493,7 @@ const FFEItemRow = ({
 
   return (
     <tr style={{ backgroundColor: bgColor }} className="text-neutral-200 text-sm">
-      {/* Subcategory name column (first column) */}
-      <td className="p-2 border border-neutral-600 fit-text">
-        <span className="text-xs text-neutral-400">{/* Empty or subcategory indicator */}</span>
-      </td>
+      {/* RED SECTION - Core Item Info */}
       
       {/* Item Name */}
       <td className="p-2 border border-neutral-600 fit-text">
@@ -555,7 +552,7 @@ const FFEItemRow = ({
         )}
       </td>
 
-      {/* Status */}
+      {/* Orders Status */}
       <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
           <select
@@ -588,7 +585,23 @@ const FFEItemRow = ({
         )}
       </td>
 
-      {/* Cost */}
+      {/* BROWN SECTION - Additional Info */}
+      
+      {/* Finish/Color */}
+      <td className="p-2 border border-neutral-600 fit-text">
+        {isEditing ? (
+          <input
+            type="text"
+            value={editData.finish_color}
+            onChange={(e) => setEditData({ ...editData, finish_color: e.target.value })}
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+          />
+        ) : (
+          <span>{item.finish_color || item.remarks || '-'}</span>
+        )}
+      </td>
+
+      {/* Cost/Price */}
       <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
           <input
@@ -603,23 +616,52 @@ const FFEItemRow = ({
         )}
       </td>
 
-      {/* Link */}
+      {/* Image */}
       <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
           <input
             type="url"
-            value={editData.link}
-            onChange={(e) => setEditData({ ...editData, link: e.target.value })}
+            value={editData.image_url}
+            onChange={(e) => setEditData({ ...editData, image_url: e.target.value })}
             className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+            placeholder="Image URL"
           />
         ) : (
-          item.link ? (
-            <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
-              🔗
-            </a>
+          item.image_url ? (
+            <img src={item.image_url} alt="Item" className="w-8 h-8 object-cover rounded" />
           ) : (
             <span>-</span>
           )
+        )}
+      </td>
+
+      {/* PURPLE SECTION - Shipping Info */}
+      
+      {/* Order Status / Est. Ship Date / Est. Delivery Date */}
+      <td className="p-2 border border-neutral-600 fit-text">
+        {isEditing ? (
+          <textarea
+            value={editData.order_status}
+            onChange={(e) => setEditData({ ...editData, order_status: e.target.value })}
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+            rows="2"
+          />
+        ) : (
+          <span className="text-xs">{item.order_status || '-'}</span>
+        )}
+      </td>
+
+      {/* Install Date / Shipping TO */}
+      <td className="p-2 border border-neutral-600 fit-text">
+        {isEditing ? (
+          <input
+            type="date"
+            value={editData.install_date}
+            onChange={(e) => setEditData({ ...editData, install_date: e.target.value })}
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+          />
+        ) : (
+          <span className="text-xs">{item.install_date || '-'}</span>
         )}
       </td>
 
@@ -637,6 +679,26 @@ const FFEItemRow = ({
         )}
       </td>
 
+      {/* Carrier */}
+      <td className="p-2 border border-neutral-600 fit-text">
+        {isEditing ? (
+          <select
+            value={editData.carrier}
+            onChange={(e) => setEditData({ ...editData, carrier: e.target.value })}
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+          >
+            <option value="">Select Carrier</option>
+            <option value="UPS">UPS</option>
+            <option value="FedEx">FedEx</option>
+            <option value="USPS">USPS</option>
+            <option value="DHL">DHL</option>
+            <option value="Other">Other</option>
+          </select>
+        ) : (
+          <span>{item.carrier || item.vendor || '-'}</span>
+        )}
+      </td>
+
       {/* Order Date */}
       <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
@@ -649,77 +711,6 @@ const FFEItemRow = ({
         ) : (
           <span>{item.order_date || '-'}</span>
         )}
-      </td>
-
-      {/* Install Date */}
-      <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <input
-            type="date"
-            value={editData.install_date}
-            onChange={(e) => setEditData({ ...editData, install_date: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-          />
-        ) : (
-          <span>{item.install_date || '-'}</span>
-        )}
-      </td>
-
-      {/* Remarks */}
-      <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <input
-            type="text"
-            value={editData.remarks}
-            onChange={(e) => setEditData({ ...editData, remarks: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-          />
-        ) : (
-          <span className="truncate" title={item.remarks}>
-            {item.remarks || '-'}
-          </span>
-        )}
-      </td>
-
-      {/* Actions */}
-      <td className="p-2 border border-neutral-600 text-center fit-text">
-        <div className="flex justify-center space-x-1">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="bg-green-700 hover:bg-green-600 text-neutral-200 px-2 py-1 rounded text-xs"
-                disabled={isOffline}
-              >
-                ✓
-              </button>
-              <button
-                onClick={handleCancel}
-                className="bg-neutral-600 hover:bg-neutral-500 text-neutral-200 px-2 py-1 rounded text-xs"
-              >
-                ✕
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => setIsEditing(true)}
-                className="bg-neutral-600 hover:bg-neutral-500 text-neutral-200 px-2 py-1 rounded text-xs"
-                title="Edit Item"
-              >
-                ✏️
-              </button>
-              <button
-                onClick={() => onDelete(item.id)}
-                className="bg-red-700 hover:bg-red-600 text-neutral-200 px-2 py-1 rounded text-xs"
-                title="Delete Item"
-                disabled={isOffline}
-              >
-                🗑️
-              </button>
-            </>
-          )}
-        </div>
       </td>
     </tr>
   );
