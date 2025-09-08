@@ -329,6 +329,12 @@ const FFESpreadsheet = ({
                             Cost/Price
                           </td>
                           <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: '#8B7355' }}
+                          >
+                            LINK
+                          </td>
+                          <td 
                             className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
                             style={{ backgroundColor: '#8B7355' }}
                           >
@@ -340,7 +346,7 @@ const FFESpreadsheet = ({
                             className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center"
                             style={{ backgroundColor: '#7B68A6' }}
                           >
-                            Order Status / Est.<br/>Ship Date / Est.<br/>Delivery Date
+                            Order Status /<br/>Ship Date /<br/>Delivery Date
                           </td>
                           <td 
                             className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center"
@@ -365,6 +371,20 @@ const FFESpreadsheet = ({
                             style={{ backgroundColor: '#7B68A6' }}
                           >
                             Order Date
+                          </td>
+                          
+                          {/* RED DELETE COLUMN */}
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            NOTES
+                          </td>
+                          <td 
+                            className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            DELETE
                           </td>
                         </tr>
 
