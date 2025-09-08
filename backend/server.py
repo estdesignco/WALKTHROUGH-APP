@@ -84,7 +84,44 @@ ROOM_DEFAULT_STRUCTURE = {
     'kitchen': {
         'Lighting': ['Installed', 'Portable'],
         'Plumbing & Fixtures': ['Faucets', 'Sinks'],
-        'Equipment & Furniture': ['Appliances', 'Cabinetry']
+        'Equipment & Furniture': ['Appliances', 'Cabinetry'],
+        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
+    },
+    'master bedroom': {
+        'Lighting': ['Installed', 'Portable'],
+        'Furniture & Storage': ['Seating', 'Storage'],
+        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
+    },
+    'bedroom 2': {
+        'Lighting': ['Installed', 'Portable'],
+        'Furniture & Storage': ['Storage'],
+        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
+    },
+    'bathroom': {
+        'Lighting': ['Installed'],
+        'Plumbing & Fixtures': ['Faucets', 'Sinks'],
+        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
+    },
+    'master bathroom': {
+        'Lighting': ['Installed'],
+        'Plumbing & Fixtures': ['Faucets', 'Sinks'],
+        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
+    },
+    'powder room': {
+        'Lighting': ['Installed'],
+        'Plumbing & Fixtures': ['Faucets', 'Sinks'],
+        'Decor & Accessories': ['Art & Decor']
+    },
+    'dining room': {
+        'Lighting': ['Installed', 'Portable'],
+        'Furniture & Storage': ['Seating', 'Storage'],
+        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
+    },
+    'office': {
+        'Lighting': ['Installed', 'Portable'],
+        'Furniture & Storage': ['Storage'],
+        'Equipment & Furniture': ['Appliances'],
+        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
     }
 }
 
