@@ -2,9 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
-import RoomSection from './RoomSection';
+import FFESpreadsheet from './FFESpreadsheet';
 import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
+
+// Default categories for each room type (from Google Sheets)
+const ROOM_DEFAULT_CATEGORIES = {
+  'living room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+  'kitchen': ['Lighting', 'Plumbing & Fixtures', 'Equipment & Furniture', 'Decor & Accessories'],
+  'master bedroom': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+  'bedroom 2': ['Lighting', 'Furniture & Storage', 'Decor & Accessories'],
+  'bedroom 3': ['Lighting', 'Furniture & Storage', 'Decor & Accessories'],
+  'bathroom': ['Lighting', 'Plumbing & Fixtures', 'Decor & Accessories'],
+  'master bathroom': ['Lighting', 'Plumbing & Fixtures', 'Decor & Accessories'],
+  'powder room': ['Lighting', 'Plumbing & Fixtures', 'Decor & Accessories'],
+  'dining room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+  'office': ['Lighting', 'Furniture & Storage', 'Equipment & Furniture', 'Decor & Accessories'],
+  'family room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+  'basement': ['Lighting', 'Furniture & Storage', 'Equipment & Furniture', 'Misc.'],
+  'laundry room': ['Lighting', 'Equipment & Furniture', 'Plumbing & Fixtures'],
+  'mudroom': ['Lighting', 'Furniture & Storage', 'Decor & Accessories'],
+  'pantry': ['Lighting', 'Furniture & Storage'],
+  'closet': ['Lighting', 'Furniture & Storage'],
+  'guest room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+  'playroom': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+  'library': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+  'wine cellar': ['Lighting', 'Equipment & Furniture', 'Furniture & Storage'],
+  'garage': ['Lighting', 'Equipment & Furniture'],
+  'patio': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating']
+};
 
 const FFEDashboard = ({ isOffline }) => {
   const { projectId } = useParams();
@@ -76,7 +102,24 @@ const FFEDashboard = ({ isOffline }) => {
         order_index: project.rooms.length
       };
       
-      await roomAPI.create(newRoom);
+      // Create the room
+      const roomResponse = await roomAPI.create(newRoom);
+      const createdRoom = roomResponse.data;
+      
+      // Auto-create default categories for this room type
+      const roomType = roomData.name.toLowerCase();
+      const defaultCategories = ROOM_DEFAULT_CATEGORIES[roomType] || ['Lighting', 'Furniture & Storage'];
+      
+      for (let i = 0; i < defaultCategories.length; i++) {
+        const categoryData = {
+          name: defaultCategories[i],
+          room_id: createdRoom.id,
+          order_index: i,
+          description: `${defaultCategories[i]} items for ${roomData.name}`
+        };
+        await categoryAPI.create(categoryData);
+      }
+      
       await loadProject();
       setShowAddRoom(false);
     } catch (err) {
@@ -128,38 +171,6 @@ const FFEDashboard = ({ isOffline }) => {
         // Revert on error
         await loadProject();
       }
-    } else if (type === 'category') {
-      // Handle category reordering within rooms
-      const roomId = result.source.droppableId.replace('categories-', '');
-      const room = project.rooms.find(r => r.id === roomId);
-      
-      if (room) {
-        const newCategories = Array.from(room.categories);
-        const [reorderedCategory] = newCategories.splice(source.index, 1);
-        newCategories.splice(destination.index, 0, reorderedCategory);
-        
-        // Update order indices
-        const updatedCategories = newCategories.map((category, index) => ({
-          ...category,
-          order_index: index
-        }));
-        
-        // Update project state
-        const updatedRooms = project.rooms.map(r => 
-          r.id === roomId ? { ...r, categories: updatedCategories } : r
-        );
-        setProject({ ...project, rooms: updatedRooms });
-        
-        // Update order in backend
-        try {
-          for (const category of updatedCategories) {
-            await categoryAPI.update(category.id, { order_index: category.order_index });
-          }
-        } catch (err) {
-          console.error('Error updating category order:', err);
-          await loadProject();
-        }
-      }
     }
   };
 
@@ -167,7 +178,7 @@ const FFEDashboard = ({ isOffline }) => {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
           <p className="text-gray-400 mt-4">Loading FF&E data...</p>
         </div>
       </div>
@@ -204,11 +215,43 @@ const FFEDashboard = ({ isOffline }) => {
     return breakdown;
   };
 
+  const getCarrierBreakdown = () => {
+    const carriers = {};
+    project.rooms.forEach(room => {
+      room.categories.forEach(category => {
+        category.items.forEach(item => {
+          if (item.tracking_number && item.vendor) {
+            // Extract carrier from tracking or vendor info
+            const carrier = extractCarrier(item.vendor, item.tracking_number);
+            if (carrier) {
+              carriers[carrier] = (carriers[carrier] || 0) + 1;
+            }
+          }
+        });
+      });
+    });
+    return carriers;
+  };
+
+  const extractCarrier = (vendor, trackingNumber) => {
+    if (!trackingNumber) return null;
+    
+    // Simple carrier detection based on tracking number patterns
+    if (trackingNumber.match(/^1Z/)) return 'UPS';
+    if (trackingNumber.match(/^\d{12,14}$/)) return 'FedEx';
+    if (trackingNumber.match(/^(94|92|93|95)/)) return 'USPS';
+    if (vendor && vendor.toLowerCase().includes('fedex')) return 'FedEx';
+    if (vendor && vendor.toLowerCase().includes('ups')) return 'UPS';
+    if (vendor && vendor.toLowerCase().includes('usps')) return 'USPS';
+    
+    return 'Other';
+  };
+
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-full mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <div className="bg-yellow-600 text-black p-6 rounded-xl">
+      <div className="mb-6">
+        <div className="bg-blue-900 text-white p-6 rounded-xl">
           <h1 className="text-3xl font-bold mb-2">
             FF&E - {project.client_info.full_name.split(' ').pop().toUpperCase()}
           </h1>
@@ -224,97 +267,56 @@ const FFEDashboard = ({ isOffline }) => {
         </div>
       )}
 
-      {/* Status Overview */}
-      <StatusOverview 
-        totalItems={getTotalItems()}
-        statusBreakdown={getStatusBreakdown()}
-        itemStatuses={itemStatuses}
-      />
-
-      {/* Search and Filters */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="🔍 Search items..."
-              className="bg-gray-800 text-white px-4 py-2 pl-10 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-            />
-          </div>
-          <select className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none">
-            <option>All Rooms</option>
-            {project.rooms.map(room => (
-              <option key={room.id} value={room.id}>{room.name}</option>
-            ))}
-          </select>
-          <select className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none">
-            <option>All Categories</option>
-            <option>Lighting</option>
-            <option>Furniture</option>
-            <option>Accessories</option>
-          </select>
-        </div>
+      {/* Status Overview - Two Row Layout */}
+      <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <StatusOverview 
+          totalItems={getTotalItems()}
+          statusBreakdown={getStatusBreakdown()}
+          itemStatuses={itemStatuses}
+        />
         
+        {/* Shipping Carrier Breakdown */}
+        <div className="bg-gray-800 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Shipping Carrier Breakdown</h3>
+          
+          {Object.keys(getCarrierBreakdown()).length > 0 ? (
+            <div className="space-y-2">
+              {Object.entries(getCarrierBreakdown()).map(([carrier, count]) => (
+                <div key={carrier} className="flex justify-between items-center p-2 bg-gray-700 rounded">
+                  <span className="text-gray-300">{carrier}</span>
+                  <span className="text-white font-medium">{count}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">
+              <div className="text-4xl mb-2">📦</div>
+              <p className="text-sm">No items with assigned carriers.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Add Room Button */}
+      <div className="mb-6 flex justify-end">
         <button
           onClick={() => setShowAddRoom(true)}
-          className="bg-yellow-600 hover:bg-yellow-700 text-black px-6 py-2 rounded-lg transition-colors font-medium"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors font-medium"
         >
           ➕ Add Room
         </button>
       </div>
 
-      {/* Rooms with Drag & Drop */}
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="rooms" type="room">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="space-y-6"
-            >
-              {project.rooms.map((room, index) => (
-                <Draggable key={room.id} draggableId={room.id} index={index}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className={`transition-transform ${
-                        snapshot.isDragging ? 'scale-105 shadow-2xl' : ''
-                      }`}
-                    >
-                      <RoomSection
-                        room={room}
-                        roomColors={roomColors}
-                        categoryColors={categoryColors}
-                        itemStatuses={itemStatuses}
-                        onDeleteRoom={handleDeleteRoom}
-                        onReload={loadProject}
-                        dragHandleProps={provided.dragHandleProps}
-                        isOffline={isOffline}
-                      />
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-
-      {project.rooms.length === 0 && (
-        <div className="bg-gray-800 rounded-xl p-12 text-center">
-          <div className="text-6xl mb-4">🏠</div>
-          <h3 className="text-xl font-semibold text-white mb-2">No Rooms Added</h3>
-          <p className="text-gray-400 mb-6">Start by adding rooms to organize your FF&E items</p>
-          <button
-            onClick={() => setShowAddRoom(true)}
-            className="bg-yellow-600 hover:bg-yellow-700 text-black px-8 py-3 rounded-lg transition-colors"
-          >
-            Add Your First Room
-          </button>
-        </div>
-      )}
+      {/* FF&E Spreadsheet */}
+      <FFESpreadsheet
+        project={project}
+        roomColors={roomColors}
+        categoryColors={categoryColors}
+        itemStatuses={itemStatuses}
+        onDeleteRoom={handleDeleteRoom}
+        onReload={loadProject}
+        isOffline={isOffline}
+      />
 
       {/* Add Room Modal */}
       {showAddRoom && (
