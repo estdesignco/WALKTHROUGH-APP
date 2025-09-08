@@ -556,28 +556,33 @@ const FFEItemRow = ({
 
       {/* PURPLE SECTION - Shipping Info - Always editable */}
       
-      {/* Order Status / Ship Date / Delivery Date - 3 separate fields */}
+      {/* Order Status / Ship Date / Delivery Date - BETTER SPACING */}
       <td className="p-2 border border-neutral-600 fit-text">
-        <div className="space-y-1">
-          <input
-            type="text"
+        <div className="space-y-2">
+          <select
             value={formData.order_status}
             onChange={(e) => handleFieldChange('order_status', e.target.value)}
-            className="w-full bg-transparent text-neutral-200 px-1 py-0.5 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
-            placeholder="Order Status"
-          />
+            className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          >
+            <option value="">Order Status</option>
+            {itemStatuses.map(status => (
+              <option key={status} value={status} className="bg-neutral-800">
+                {status.replace('_', ' ')}
+              </option>
+            ))}
+          </select>
           <input
             type="date"
             value={formData.ship_date}
             onChange={(e) => handleFieldChange('ship_date', e.target.value)}
-            className="w-full bg-transparent text-neutral-200 px-1 py-0.5 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+            className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
             title="Ship Date"
           />
           <input
             type="date"
             value={formData.delivery_date}
             onChange={(e) => handleFieldChange('delivery_date', e.target.value)}
-            className="w-full bg-transparent text-neutral-200 px-1 py-0.5 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+            className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
             title="Delivery Date"
           />
         </div>
