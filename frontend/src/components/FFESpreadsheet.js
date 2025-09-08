@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { categoryAPI, itemAPI } from '../App';
 import AddCategoryModal from './AddCategoryModal';
 import AddItemModal from './AddItemModal';
@@ -91,22 +90,10 @@ const FFESpreadsheet = ({
     }
   };
 
-  const scrapeProductInfo = async (url) => {
-    // Placeholder for link scraping functionality
-    // This would integrate with a web scraping service
-    console.log('Scraping product info from:', url);
-    return {
-      name: 'Scraped Product Name',
-      price: 299.99,
-      image: 'https://via.placeholder.com/100x100',
-      vendor: 'Vendor Name'
-    };
-  };
-
   const getStatusColor = (status) => {
     const colors = {
       'PICKED': '#FFD966',
-      'ORDERED': '#3B82F6',
+      'ORDERED': '#3B82F6', 
       'SHIPPED': '#F97316',
       'DELIVERED': '#10B981',
       'INSTALLED': '#22C55E',
@@ -128,98 +115,106 @@ const FFESpreadsheet = ({
   }
 
   return (
-    <div className="bg-gray-800 rounded-xl overflow-hidden">
-      {/* Spreadsheet Header */}
-      <div className="bg-gray-900 px-4 py-2 border-b border-gray-700">
-        <h3 className="text-lg font-semibold text-white">FF&E Spreadsheet</h3>
-      </div>
-
-      {/* Horizontal Scrollable Container */}
+    <div className="bg-white rounded-lg overflow-hidden shadow-lg">
+      {/* Fixed Table Headers - Exactly like your spreadsheet */}
       <div className="overflow-x-auto">
-        <div className="min-w-max">
-          {/* Table Headers */}
-          <div className="bg-gray-700 grid grid-cols-16 gap-px text-xs font-semibold text-gray-300 p-2 sticky top-0 z-10">
-            <div className="col-span-2 p-2">ITEM NAME</div>
-            <div className="col-span-1 p-2">VENDOR/SKU</div>
-            <div className="col-span-1 p-2">QTY</div>
-            <div className="col-span-1 p-2">SIZE</div>
-            <div className="col-span-1 p-2">ORDER STATUS</div>
-            <div className="col-span-1 p-2">FINISH/COLOR</div>
-            <div className="col-span-1 p-2">COST/PRICE</div>
-            <div className="col-span-1 p-2">IMAGE</div>
-            <div className="col-span-1 p-2">LINK</div>
-            <div className="col-span-1 p-2">INSTALL DATE</div>
-            <div className="col-span-1 p-2">TRACKING #</div>
-            <div className="col-span-1 p-2">CARRIER</div>
-            <div className="col-span-1 p-2">ORDER DATE</div>
-            <div className="col-span-1 p-2">NOTES</div>
-            <div className="col-span-1 p-2">ACTIONS</div>
-          </div>
-
-          {/* Room Data */}
-          <DragDropContext onDragEnd={() => {}}>
+        <table className="w-full min-w-[2000px]" style={{ tableLayout: 'fixed' }}>
+          <thead>
+            <tr className="bg-gray-200 text-black text-sm font-bold">
+              <th className="w-48 p-2 border border-gray-300 text-left">ITEM</th>
+              <th className="w-32 p-2 border border-gray-300 text-left">VENDOR/SKU</th>
+              <th className="w-16 p-2 border border-gray-300 text-center">QTY</th>
+              <th className="w-24 p-2 border border-gray-300 text-left">SIZE</th>
+              <th className="w-32 p-2 border border-gray-300 text-left">ORDER STATUS</th>
+              <th className="w-24 p-2 border border-gray-300 text-left">FINISH/COLOR</th>
+              <th className="w-24 p-2 border border-gray-300 text-right">COST/PRICE</th>
+              <th className="w-20 p-2 border border-gray-300 text-center">IMAGE</th>
+              <th className="w-20 p-2 border border-gray-300 text-center">LINK</th>
+              <th className="w-28 p-2 border border-gray-300 text-center">ORDER STATUS</th>
+              <th className="w-28 p-2 border border-gray-300 text-center">INSTALL STATUS</th>
+              <th className="w-28 p-2 border border-gray-300 text-center">INSTALL DATE</th>
+              <th className="w-32 p-2 border border-gray-300 text-left">TRACKING #</th>
+              <th className="w-24 p-2 border border-gray-300 text-left">CARRIER</th>
+              <th className="w-28 p-2 border border-gray-300 text-center">ORDER DATE</th>
+              <th className="w-48 p-2 border border-gray-300 text-left">NOTES</th>
+              <th className="w-24 p-2 border border-gray-300 text-center">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
             {project.rooms.map((room) => (
-              <div key={room.id} className="border-b border-gray-700">
-                {/* Room Header */}
-                <div 
-                  className="p-3 font-bold text-black text-lg cursor-pointer hover:opacity-90"
-                  style={{ backgroundColor: getRoomColor(room.name) }}
-                  onClick={(e) => e.preventDefault()} // Prevent scrolling to top
-                >
-                  <div className="flex items-center justify-between">
-                    <span>{room.name.toUpperCase()}</span>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedRoomId(room.id);
-                          setShowAddCategory(true);
-                        }}
-                        className="bg-black bg-opacity-20 hover:bg-opacity-30 text-black px-2 py-1 rounded text-sm"
-                        title="Add Category"
-                      >
-                        ➕ Category
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteRoom(room.id);
-                        }}
-                        className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm"
-                        title="Delete Room"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Categories and Items */}
-                {room.categories.map((category) => (
-                  <div key={category.id}>
-                    {/* Category Header */}
-                    <div 
-                      className="p-2 font-semibold text-white text-md cursor-pointer hover:opacity-90"
-                      style={{ backgroundColor: getCategoryColor(category.name) }}
-                      onClick={(e) => e.preventDefault()} // Prevent scrolling to top
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{category.name.toUpperCase()}</span>
+              <React.Fragment key={room.id}>
+                {/* Room Header Row - Exactly like your spreadsheet */}
+                <tr>
+                  <td 
+                    colSpan="17" 
+                    className="p-3 font-bold text-black text-lg border border-gray-300"
+                    style={{ backgroundColor: getRoomColor(room.name) }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>{room.name.toUpperCase()}</span>
+                      <div className="flex space-x-2">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedCategoryId(category.id);
-                            setShowAddItem(true);
+                            setSelectedRoomId(room.id);
+                            setShowAddCategory(true);
                           }}
-                          className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-2 py-1 rounded text-xs"
-                          title="Add Item"
+                          className="bg-black bg-opacity-20 hover:bg-opacity-30 text-black px-2 py-1 rounded text-sm"
+                          title="Add Category"
                         >
-                          ➕ Item
+                          ➕ Category
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteRoom(room.id);
+                          }}
+                          className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm"
+                          title="Delete Room"
+                        >
+                          🗑️
                         </button>
                       </div>
                     </div>
+                  </td>
+                </tr>
 
-                    {/* Items */}
+                {/* Categories and Items for this room */}
+                {room.categories.map((category) => (
+                  <React.Fragment key={category.id}>
+                    {/* Category Header Row */}
+                    <tr>
+                      <td 
+                        colSpan="17" 
+                        className="p-2 font-semibold text-white text-md border border-gray-300"
+                        style={{ backgroundColor: getCategoryColor(category.name) }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{category.name.toUpperCase()}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedCategoryId(category.id);
+                              setShowAddItem(true);
+                            }}
+                            className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-2 py-1 rounded text-xs"
+                            title="Add Item"
+                          >
+                            ➕ Item
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* Items for this category */}
                     {category.items.map((item, itemIndex) => (
                       <FFEItemRow
                         key={item.id}
@@ -235,43 +230,45 @@ const FFESpreadsheet = ({
 
                     {/* Empty state for category */}
                     {category.items.length === 0 && (
-                      <div className="grid grid-cols-16 gap-px bg-gray-600 p-2 text-center text-gray-400 text-sm">
-                        <div className="col-span-16">
+                      <tr>
+                        <td colSpan="17" className="p-4 text-center text-gray-500 border border-gray-300">
                           No items in this category. 
                           <button
                             onClick={() => {
                               setSelectedCategoryId(category.id);
                               setShowAddItem(true);
                             }}
-                            className="ml-2 text-blue-400 hover:text-blue-300"
+                            className="ml-2 text-blue-600 hover:text-blue-800 underline"
                           >
                             Add first item
                           </button>
-                        </div>
-                      </div>
+                        </td>
+                      </tr>
                     )}
-                  </div>
+                  </React.Fragment>
                 ))}
 
                 {/* Empty state for room */}
                 {room.categories.length === 0 && (
-                  <div className="p-8 text-center text-gray-400">
-                    <p>No categories in this room.</p>
-                    <button
-                      onClick={() => {
-                        setSelectedRoomId(room.id);
-                        setShowAddCategory(true);
-                      }}
-                      className="mt-2 text-blue-400 hover:text-blue-300"
-                    >
-                      Add first category
-                    </button>
-                  </div>
+                  <tr>
+                    <td colSpan="17" className="p-8 text-center text-gray-500 border border-gray-300">
+                      <p>No categories in this room.</p>
+                      <button
+                        onClick={() => {
+                          setSelectedRoomId(room.id);
+                          setShowAddCategory(true);
+                        }}
+                        className="mt-2 text-blue-600 hover:text-blue-800 underline"
+                      >
+                        Add first category
+                      </button>
+                    </td>
+                  </tr>
                 )}
-              </div>
+              </React.Fragment>
             ))}
-          </DragDropContext>
-        </div>
+          </tbody>
+        </table>
       </div>
 
       {/* Modals */}
@@ -302,7 +299,7 @@ const FFESpreadsheet = ({
   );
 };
 
-// Individual Item Row Component
+// Individual Item Row Component - Exactly matching your spreadsheet
 const FFEItemRow = ({ 
   item, 
   itemIndex, 
@@ -355,15 +352,13 @@ const FFEItemRow = ({
     setIsEditing(false);
   };
 
+  // Alternating row colors exactly like your spreadsheet
   const bgColor = itemIndex % 2 === 0 ? '#1A2B3A' : '#263D54';
 
   return (
-    <div 
-      className="grid grid-cols-16 gap-px text-sm text-yellow-100"
-      style={{ backgroundColor: bgColor }}
-    >
+    <tr style={{ backgroundColor: bgColor }} className="text-yellow-100 text-sm">
       {/* Item Name */}
-      <div className="col-span-2 p-2">
+      <td className="p-2 border border-gray-300">
         {isEditing ? (
           <input
             type="text"
@@ -374,10 +369,10 @@ const FFEItemRow = ({
         ) : (
           <span className="font-medium">{item.name}</span>
         )}
-      </div>
+      </td>
 
       {/* Vendor/SKU */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300">
         {isEditing ? (
           <input
             type="text"
@@ -388,10 +383,10 @@ const FFEItemRow = ({
         ) : (
           <span>{item.vendor || '-'}</span>
         )}
-      </div>
+      </td>
 
       {/* Quantity */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300 text-center">
         {isEditing ? (
           <input
             type="number"
@@ -403,10 +398,10 @@ const FFEItemRow = ({
         ) : (
           <span>{item.quantity}</span>
         )}
-      </div>
+      </td>
 
       {/* Size */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300">
         {isEditing ? (
           <input
             type="text"
@@ -417,10 +412,10 @@ const FFEItemRow = ({
         ) : (
           <span>{item.size || '-'}</span>
         )}
-      </div>
+      </td>
 
       {/* Order Status */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300">
         {isEditing ? (
           <select
             value={editData.status}
@@ -444,15 +439,15 @@ const FFEItemRow = ({
             {item.status.replace('_', ' ')}
           </span>
         )}
-      </div>
+      </td>
 
       {/* Finish/Color */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300">
         <span>-</span>
-      </div>
+      </td>
 
       {/* Cost/Price */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300 text-right">
         {isEditing ? (
           <input
             type="number"
@@ -464,25 +459,25 @@ const FFEItemRow = ({
         ) : (
           <span>${item.cost ? item.cost.toFixed(2) : '0.00'}</span>
         )}
-      </div>
+      </td>
 
       {/* Image */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300 text-center">
         {item.image_url ? (
           <img 
             src={item.image_url} 
             alt={item.name}
-            className="w-8 h-8 object-cover rounded"
+            className="w-12 h-12 object-cover rounded mx-auto"
           />
         ) : (
-          <div className="w-8 h-8 bg-gray-600 rounded flex items-center justify-center text-xs">
+          <div className="w-12 h-12 bg-gray-600 rounded flex items-center justify-center text-xs mx-auto">
             📷
           </div>
         )}
-      </div>
+      </td>
 
       {/* Link */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300 text-center">
         {isEditing ? (
           <input
             type="url"
@@ -504,10 +499,28 @@ const FFEItemRow = ({
             <span>-</span>
           )
         )}
-      </div>
+      </td>
+
+      {/* Order Status (duplicate column as per your layout) */}
+      <td className="p-2 border border-gray-300 text-center">
+        <span 
+          className="px-2 py-1 rounded text-xs font-medium"
+          style={{ 
+            backgroundColor: getStatusColor(item.status) + '20',
+            color: getStatusColor(item.status)
+          }}
+        >
+          {item.status.replace('_', ' ')}
+        </span>
+      </td>
+
+      {/* Install Status */}
+      <td className="p-2 border border-gray-300 text-center">
+        <span>-</span>
+      </td>
 
       {/* Install Date */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300 text-center">
         {isEditing ? (
           <input
             type="date"
@@ -518,10 +531,10 @@ const FFEItemRow = ({
         ) : (
           <span>{item.install_date ? new Date(item.install_date).toLocaleDateString() : '-'}</span>
         )}
-      </div>
+      </td>
 
       {/* Tracking # */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300">
         {isEditing ? (
           <input
             type="text"
@@ -532,15 +545,15 @@ const FFEItemRow = ({
         ) : (
           <span>{item.tracking_number || '-'}</span>
         )}
-      </div>
+      </td>
 
       {/* Carrier */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300">
         <span>-</span>
-      </div>
+      </td>
 
       {/* Order Date */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300 text-center">
         {isEditing ? (
           <input
             type="date"
@@ -551,10 +564,10 @@ const FFEItemRow = ({
         ) : (
           <span>{item.order_date ? new Date(item.order_date).toLocaleDateString() : '-'}</span>
         )}
-      </div>
+      </td>
 
       {/* Notes */}
-      <div className="col-span-1 p-2">
+      <td className="p-2 border border-gray-300">
         {isEditing ? (
           <input
             type="text"
@@ -567,23 +580,23 @@ const FFEItemRow = ({
             {item.remarks || '-'}
           </span>
         )}
-      </div>
+      </td>
 
       {/* Actions */}
-      <div className="col-span-1 p-2">
-        <div className="flex space-x-1">
+      <td className="p-2 border border-gray-300 text-center">
+        <div className="flex justify-center space-x-1">
           {isEditing ? (
             <>
               <button
                 onClick={handleSave}
-                className="bg-green-600 hover:bg-green-700 text-white px-1 py-1 rounded text-xs"
+                className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs"
                 disabled={isOffline}
               >
                 ✓
               </button>
               <button
                 onClick={handleCancel}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-1 py-1 rounded text-xs"
+                className="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs"
               >
                 ✕
               </button>
@@ -592,14 +605,14 @@ const FFEItemRow = ({
             <>
               <button
                 onClick={() => setIsEditing(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-1 py-1 rounded text-xs"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
                 title="Edit Item"
               >
                 ✏️
               </button>
               <button
                 onClick={() => onDelete(item.id)}
-                className="bg-red-600 hover:bg-red-700 text-white px-1 py-1 rounded text-xs"
+                className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
                 title="Delete Item"
                 disabled={isOffline}
               >
@@ -608,8 +621,8 @@ const FFEItemRow = ({
             </>
           )}
         </div>
-      </div>
-    </div>
+      </td>
+    </tr>
   );
 };
 

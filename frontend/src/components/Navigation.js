@@ -8,11 +8,13 @@ const Navigation = ({ currentProject, isOffline }) => {
     <nav className="bg-gray-800 border-b border-gray-700">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo/Brand */}
+          {/* Logo */}
           <div className="flex items-center space-x-4">
-            <div className="text-xl font-bold text-yellow-400">
-              ESTABLISHED DESIGN CO.
-            </div>
+            <img 
+              src="https://customer-assets.emergentagent.com/job_design-workflow/artifacts/77hyqwhu_Established%20logo.png" 
+              alt="Established Design Co." 
+              className="h-12 w-auto"
+            />
             {isOffline && (
               <div className="bg-orange-500 text-white px-2 py-1 rounded text-sm">
                 OFFLINE MODE
@@ -74,7 +76,7 @@ const Navigation = ({ currentProject, isOffline }) => {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            <button className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
               📤 Export FF&E
             </button>
             <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
