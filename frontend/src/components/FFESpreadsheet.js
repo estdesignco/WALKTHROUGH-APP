@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { categoryAPI, itemAPI } from '../App';
-import AddCategoryModal from './AddCategoryModal';
+import { itemAPI } from '../App';
+import AddSubCategoryModal from './AddSubCategoryModal';
 import AddItemModal from './AddItemModal';
 
 const FFESpreadsheet = ({ 
@@ -12,71 +12,73 @@ const FFESpreadsheet = ({
   onReload,
   isOffline 
 }) => {
-  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [showAddSubCategory, setShowAddSubCategory] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
-  const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Muted, professional colors
+  // EXACT colors from your screenshots - even more muted
   const getRoomColor = (roomName) => {
     const mutedColors = {
-      'living room': '#8B4444',  // Muted red
-      'kitchen': '#4A6B6B',      // Muted teal
-      'master bedroom': '#5A5A8B', // Muted purple
-      'bedroom 2': '#7A4A4A',    // Muted red variant
-      'bedroom 3': '#4A5A5A',    // Muted blue-gray
-      'bathroom': '#4A4A6B',     // Muted purple
-      'master bathroom': '#6B3A3A', // Muted dark red
-      'powder room': '#3A5A5A',  // Muted teal
-      'dining room': '#6B5A7A',  // Muted purple
-      'office': '#3A4A4A',       // Muted dark gray
-      'family room': '#4A5A7A',  // Muted blue
-      'basement': '#7A6A3A',     // Muted brown
-      'laundry room': '#3A3A5A', // Muted dark blue
-      'mudroom': '#4A5A3A',      // Muted green
-      'pantry': '#7A7A3A',       // Muted olive
-      'closet': '#5A6B5A',       // Muted green
-      'guest room': '#7A4A6B',   // Muted purple-red
-      'playroom': '#7A7A4A',     // Muted yellow
-      'library': '#3A5A7A',      // Muted blue
-      'wine cellar': '#3A3A5A',  // Muted dark purple
-      'garage': '#5A6B3A',       // Muted olive
-      'patio': '#6B6B4A'         // Muted tan
+      'living room': '#7A5A8A',  // Purple like your screenshot
+      'kitchen': '#5A6A5A',      
+      'master bedroom': '#6A5A7A', 
+      'bedroom 2': '#7A5A5A',    
+      'bedroom 3': '#5A6A6A',
+      'bathroom': '#5A5A7A',     
+      'master bathroom': '#6A4A4A', 
+      'powder room': '#4A6A6A',  
+      'dining room': '#7A6A8A',     
+      'office': '#4A5A5A',          
+      'family room': '#5A6A8A',     
+      'basement': '#8A7A5A',        
+      'laundry room': '#4A4A6A',    
+      'mudroom': '#5A6A4A',         
+      'pantry': '#8A8A5A',          
+      'closet': '#6A7A6A',          
+      'guest room': '#8A5A7A',      
+      'playroom': '#8A8A5A',        
+      'library': '#4A6A8A',         
+      'wine cellar': '#4A4A6A',     
+      'garage': '#6A7A4A',          
+      'patio': '#7A7A5A'            
     };
-    return mutedColors[roomName.toLowerCase()] || '#5A5A5A';
+    return mutedColors[roomName.toLowerCase()] || '#6A6A6A';
   };
 
+  // GREEN for categories (like LIGHTING)
   const getCategoryColor = (categoryName) => {
-    const mutedCategoryColors = {
-      'lighting': '#3A4A3A',           // Muted dark green
-      'furniture & storage': '#6B3A3A', // Muted red-brown
-      'plumbing & fixtures': '#3A4A3A',
-      'decor & accessories': '#6B3A3A',
-      'seating': '#3A4A3A',
-      'equipment & furniture': '#6B3A3A',
-      'installed': '#3A4A3A',
-      'portable': '#6B3A3A',
-      'misc.': '#4A4A4A'
-    };
-    return mutedCategoryColors[categoryName.toLowerCase()] || '#4A4A4A';
+    return '#5A7A5A'; // Muted green like your screenshot
   };
 
-  const handleAddCategory = async (categoryData) => {
+  // RED for sub-categories (like INSTALLED, MOLDING)
+  const getSubCategoryColor = (subCategoryName) => {
+    return '#8A5A5A'; // Muted red like your screenshot
+  };
+
+  const handleAddSubCategory = async (subCategoryData) => {
     try {
       setLoading(true);
-      const newCategory = {
-        ...categoryData,
-        room_id: selectedRoomId,
+      const newSubCategory = {
+        ...subCategoryData,
+        category_id: selectedCategoryId,
         order_index: 0
       };
       
-      await categoryAPI.create(newCategory);
-      await onReload();
-      setShowAddCategory(false);
-      setSelectedRoomId(null);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/subcategories`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newSubCategory)
+      });
+      
+      if (response.ok) {
+        await onReload();
+        setShowAddSubCategory(false);
+        setSelectedCategoryId(null);
+      }
     } catch (err) {
-      console.error('Error creating category:', err);
+      console.error('Error creating subcategory:', err);
     } finally {
       setLoading(false);
     }
@@ -87,13 +89,13 @@ const FFESpreadsheet = ({
       setLoading(true);
       const newItem = {
         ...itemData,
-        category_id: selectedCategoryId
+        subcategory_id: selectedSubCategoryId
       };
       
       await itemAPI.create(newItem);
       await onReload();
       setShowAddItem(false);
-      setSelectedCategoryId(null);
+      setSelectedSubCategoryId(null);
     } catch (err) {
       console.error('Error creating item:', err);
     } finally {
@@ -127,18 +129,18 @@ const FFESpreadsheet = ({
   };
 
   const getStatusColor = (status) => {
-    // Muted status colors
+    // Even more muted status colors
     const colors = {
-      'PICKED': '#B8A84A',      // Muted yellow
-      'ORDERED': '#4A6B8B',     // Muted blue
-      'SHIPPED': '#B86A4A',     // Muted orange
-      'DELIVERED': '#4A8B6A',   // Muted green
-      'INSTALLED': '#5A8B5A',   // Muted bright green
-      'PARTIALLY_DELIVERED': '#6A5A8B', // Muted purple
-      'ON_HOLD': '#8B4A4A',     // Muted red
-      'CANCELLED': '#5A5A5A'    // Muted gray
+      'PICKED': '#A69A5A',      // More muted yellow
+      'ORDERED': '#5A6A8A',     // More muted blue
+      'SHIPPED': '#A06A5A',     // More muted orange
+      'DELIVERED': '#5A8A6A',   // More muted green
+      'INSTALLED': '#6A8A6A',   // More muted bright green
+      'PARTIALLY_DELIVERED': '#7A6A8A', // More muted purple
+      'ON_HOLD': '#8A5A5A',     // More muted red
+      'CANCELLED': '#6A6A6A'    // More muted gray
     };
-    return colors[status] || '#5A5A5A';
+    return colors[status] || '#6A6A6A';
   };
 
   if (project.rooms.length === 0) {
@@ -152,77 +154,32 @@ const FFESpreadsheet = ({
   }
 
   return (
-    <div className="bg-gray-850 rounded-lg overflow-hidden shadow-lg">
+    <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
       {/* Horizontal Scrollable Container */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[2400px] border-collapse" style={{ tableLayout: 'fixed' }}>
           <thead>
-            {/* Main Header Row */}
-            <tr className="bg-gray-600 text-gray-200 text-sm font-bold">
-              <th className="w-48 p-3 border border-gray-500 text-left" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>ITEM</th>
-              <th className="w-32 p-3 border border-gray-500 text-left" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>VENDOR/SKU</th>
-              <th className="w-16 p-3 border border-gray-500 text-center" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>QTY</th>
-              <th className="w-24 p-3 border border-gray-500 text-left" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>SIZE</th>
-              <th className="w-32 p-3 border border-gray-500 text-left" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>ORDER STATUS</th>
-              
-              {/* ADDITIONAL INFO Section Header */}
-              <th colSpan="3" className="p-3 border border-gray-500 text-center" style={{ backgroundColor: '#A0704A', color: '#E5D5C5' }}>
-                ADDITIONAL INFO.
-              </th>
-              
-              <th className="w-20 p-3 border border-gray-500 text-center" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>LINK</th>
-              
-              {/* SHIPPING INFO Section Header */}
-              <th colSpan="5" className="p-3 border border-gray-500 text-center" style={{ backgroundColor: '#6B5B8B', color: '#E5D5E5' }}>
-                SHIPPING INFO.
-              </th>
-              
-              <th className="w-48 p-3 border border-gray-500 text-left" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>NOTES</th>
-              
-              {/* INSTALLED Section Header */}
-              <th colSpan="2" className="p-3 border border-gray-500 text-center" style={{ backgroundColor: '#8B4A4A', color: '#E5D5D5' }}>
-                INSTALLED
-              </th>
-            </tr>
-            
-            {/* Sub Header Row */}
-            <tr className="bg-gray-700 text-gray-300 text-xs font-semibold">
-              <th className="p-2 border border-gray-500"></th>
-              <th className="p-2 border border-gray-500"></th>
-              <th className="p-2 border border-gray-500"></th>
-              <th className="p-2 border border-gray-500"></th>
-              <th className="p-2 border border-gray-500"></th>
-              
-              {/* Additional Info Sub Headers */}
-              <th className="p-2 border border-gray-500 text-center" style={{ backgroundColor: '#A0704A', color: '#E5D5C5' }}>FINISH/Color</th>
-              <th className="p-2 border border-gray-500 text-center" style={{ backgroundColor: '#A0704A', color: '#E5D5C5' }}>Cost/Price</th>
-              <th className="p-2 border border-gray-500 text-center" style={{ backgroundColor: '#A0704A', color: '#E5D5C5' }}>Image</th>
-              
-              <th className="p-2 border border-gray-500"></th>
-              
-              {/* Shipping Info Sub Headers */}
-              <th className="p-2 border border-gray-500 text-center" style={{ backgroundColor: '#6B5B8B', color: '#E5D5E5' }}>Order Status / Est. Ship Date / Est. Delivery Date</th>
-              <th className="p-2 border border-gray-500 text-center" style={{ backgroundColor: '#6B5B8B', color: '#E5D5E5' }}>Install Date / Shipping TO</th>
-              <th className="p-2 border border-gray-500 text-center" style={{ backgroundColor: '#6B5B8B', color: '#E5D5E5' }}>TRACKING #</th>
-              <th className="p-2 border border-gray-500 text-center" style={{ backgroundColor: '#6B5B8B', color: '#E5D5E5' }}>Carrier</th>
-              <th className="p-2 border border-gray-500 text-center" style={{ backgroundColor: '#6B5B8B', color: '#E5D5E5' }}>Order Date</th>
-              
-              <th className="p-2 border border-gray-500"></th>
-              
-              {/* Installed Sub Headers */}
-              <th className="p-2 border border-gray-500 text-center" style={{ backgroundColor: '#8B4A4A', color: '#E5D5D5' }}>Status</th>
-              <th className="p-2 border border-gray-500 text-center" style={{ backgroundColor: '#8B4A4A', color: '#E5D5D5' }}>ACTIONS</th>
+            {/* Main Header Row - matching your screenshot EXACTLY */}
+            <tr className="bg-neutral-700 text-neutral-200 text-sm font-bold">
+              <th className="w-48 p-3 border border-neutral-600 text-left fit-text">ITEM</th>
+              <th className="w-32 p-3 border border-neutral-600 text-left fit-text">VENDOR/SKU</th>
+              <th className="w-16 p-3 border border-neutral-600 text-center fit-text">QTY</th>
+              <th className="w-24 p-3 border border-neutral-600 text-left fit-text">SIZE</th>
+              <th className="w-32 p-3 border border-neutral-600 text-left fit-text">STATUS</th>
+              <th className="w-24 p-3 border border-neutral-600 text-left fit-text">VENDOR/SKU</th>
+              <th className="w-48 p-3 border border-neutral-600 text-left fit-text">REMARKS</th>
+              <th className="w-24 p-3 border border-neutral-600 text-center fit-text">ACTIONS</th>
             </tr>
           </thead>
           <tbody>
             {project.rooms.map((room) => (
               <React.Fragment key={room.id}>
-                {/* Room Header Row */}
+                {/* 1. ROOM Header Row - PURPLE like LIVING ROOM */}
                 <tr>
                   <td 
-                    colSpan="17" 
-                    className="p-3 font-bold text-gray-200 text-lg border border-gray-500"
-                    style={{ backgroundColor: getRoomColor(room.name), whiteSpace: 'nowrap', width: 'fit-content' }}
+                    colSpan="8" 
+                    className="p-4 font-bold text-white text-lg border border-neutral-600 fit-text"
+                    style={{ backgroundColor: getRoomColor(room.name) }}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -234,20 +191,9 @@ const FFESpreadsheet = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedRoomId(room.id);
-                            setShowAddCategory(true);
-                          }}
-                          className="bg-gray-900 bg-opacity-30 hover:bg-opacity-50 text-gray-200 px-2 py-1 rounded text-sm"
-                          title="Add Category"
-                        >
-                          ➕ Category
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
                             onDeleteRoom(room.id);
                           }}
-                          className="bg-red-700 hover:bg-red-600 text-gray-200 px-2 py-1 rounded text-sm"
+                          className="bg-neutral-800 bg-opacity-50 hover:bg-opacity-70 text-white px-2 py-1 rounded text-sm"
                           title="Delete Room"
                         >
                           🗑️
@@ -257,15 +203,14 @@ const FFESpreadsheet = ({
                   </td>
                 </tr>
 
-                {/* Categories and Items for this room */}
+                {/* 2. CATEGORIES for this room - GREEN like LIGHTING */}
                 {room.categories.map((category) => (
                   <React.Fragment key={category.id}>
-                    {/* Category Header Row */}
                     <tr>
                       <td 
-                        colSpan="17" 
-                        className="p-2 font-semibold text-gray-200 text-md border border-gray-500"
-                        style={{ backgroundColor: getCategoryColor(category.name), whiteSpace: 'nowrap', width: 'fit-content' }}
+                        colSpan="8" 
+                        className="p-3 font-semibold text-white text-md border border-neutral-600 fit-text"
+                        style={{ backgroundColor: getCategoryColor(category.name) }}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -277,44 +222,91 @@ const FFESpreadsheet = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedCategoryId(category.id);
-                              setShowAddItem(true);
+                              setShowAddSubCategory(true);
                             }}
-                            className="bg-gray-900 bg-opacity-30 hover:bg-opacity-50 text-gray-200 px-2 py-1 rounded text-xs"
-                            title="Add Item"
+                            className="bg-neutral-800 bg-opacity-50 hover:bg-opacity-70 text-white px-2 py-1 rounded text-xs"
+                            title="Add Sub-Category"
                           >
-                            ➕ Item
+                            ➕ Section
                           </button>
                         </div>
                       </td>
                     </tr>
 
-                    {/* Items for this category */}
-                    {category.items.map((item, itemIndex) => (
-                      <FFEItemRow
-                        key={item.id}
-                        item={item}
-                        itemIndex={itemIndex}
-                        onUpdate={handleUpdateItem}
-                        onDelete={handleDeleteItem}
-                        getStatusColor={getStatusColor}
-                        itemStatuses={itemStatuses}
-                        isOffline={isOffline}
-                      />
-                    ))}
+                    {/* 3. SUB-CATEGORIES for this category - RED like INSTALLED */}
+                    {category.subcategories?.map((subcategory) => (
+                      <React.Fragment key={subcategory.id}>
+                        <tr>
+                          <td 
+                            colSpan="8" 
+                            className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span>{subcategory.name.toUpperCase()}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedSubCategoryId(subcategory.id);
+                                  setShowAddItem(true);
+                                }}
+                                className="bg-neutral-800 bg-opacity-50 hover:bg-opacity-70 text-white px-2 py-1 rounded text-xs"
+                                title="Add Item"
+                              >
+                                ➕ Item
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
 
-                    {/* Empty state for category */}
-                    {category.items.length === 0 && (
+                        {/* 4. ITEMS for this sub-category */}
+                        {subcategory.items?.map((item, itemIndex) => (
+                          <FFEItemRow
+                            key={item.id}
+                            item={item}
+                            itemIndex={itemIndex}
+                            onUpdate={handleUpdateItem}
+                            onDelete={handleDeleteItem}
+                            getStatusColor={getStatusColor}
+                            itemStatuses={itemStatuses}
+                            isOffline={isOffline}
+                          />
+                        ))}
+
+                        {/* Empty state for sub-category */}
+                        {(!subcategory.items || subcategory.items.length === 0) && (
+                          <tr>
+                            <td colSpan="8" className="p-4 text-center text-neutral-400 border border-neutral-600" style={{ backgroundColor: '#2A2A2A' }}>
+                              No items in {subcategory.name.toLowerCase()}. 
+                              <button
+                                onClick={() => {
+                                  setSelectedSubCategoryId(subcategory.id);
+                                  setShowAddItem(true);
+                                }}
+                                className="ml-2 text-neutral-300 hover:text-neutral-200 underline"
+                              >
+                                Add first item
+                              </button>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    )) || (
                       <tr>
-                        <td colSpan="17" className="p-4 text-center text-gray-400 border border-gray-500" style={{ backgroundColor: '#2A2A2A' }}>
-                          No items in this category. 
+                        <td colSpan="8" className="p-4 text-center text-neutral-400 border border-neutral-600" style={{ backgroundColor: '#2A2A2A' }}>
+                          No sections in {category.name.toLowerCase()}. 
                           <button
                             onClick={() => {
                               setSelectedCategoryId(category.id);
-                              setShowAddItem(true);
+                              setShowAddSubCategory(true);
                             }}
-                            className="ml-2 text-gray-300 hover:text-gray-200 underline"
+                            className="ml-2 text-neutral-300 hover:text-neutral-200 underline"
                           >
-                            Add first item
+                            Add first section
                           </button>
                         </td>
                       </tr>
@@ -325,17 +317,8 @@ const FFESpreadsheet = ({
                 {/* Empty state for room */}
                 {room.categories.length === 0 && (
                   <tr>
-                    <td colSpan="17" className="p-8 text-center text-gray-400 border border-gray-500" style={{ backgroundColor: '#2A2A2A' }}>
+                    <td colSpan="8" className="p-8 text-center text-neutral-400 border border-neutral-600" style={{ backgroundColor: '#2A2A2A' }}>
                       <p>No categories in this room.</p>
-                      <button
-                        onClick={() => {
-                          setSelectedRoomId(room.id);
-                          setShowAddCategory(true);
-                        }}
-                        className="mt-2 text-gray-300 hover:text-gray-200 underline"
-                      >
-                        Add first category
-                      </button>
                     </td>
                   </tr>
                 )}
@@ -346,14 +329,13 @@ const FFESpreadsheet = ({
       </div>
 
       {/* Modals */}
-      {showAddCategory && (
-        <AddCategoryModal
+      {showAddSubCategory && (
+        <AddSubCategoryModal
           onClose={() => {
-            setShowAddCategory(false);
-            setSelectedRoomId(null);
+            setShowAddSubCategory(false);
+            setSelectedCategoryId(null);
           }}
-          onSubmit={handleAddCategory}
-          categoryColors={categoryColors}
+          onSubmit={handleAddSubCategory}
           loading={loading}
         />
       )}
@@ -362,7 +344,7 @@ const FFESpreadsheet = ({
         <AddItemModal
           onClose={() => {
             setShowAddItem(false);
-            setSelectedCategoryId(null);
+            setSelectedSubCategoryId(null);
           }}
           onSubmit={handleAddItem}
           itemStatuses={itemStatuses}
@@ -373,7 +355,7 @@ const FFESpreadsheet = ({
   );
 };
 
-// Individual Item Row Component - Exactly matching your spreadsheet
+// Individual Item Row Component - matching your exact layout
 const FFEItemRow = ({ 
   item, 
   itemIndex, 
@@ -390,13 +372,7 @@ const FFEItemRow = ({
     quantity: item.quantity,
     size: item.size || '',
     status: item.status,
-    remarks: item.remarks || '',
-    cost: item.cost || 0,
-    link: item.link || '',
-    tracking_number: item.tracking_number || '',
-    install_date: item.install_date ? item.install_date.split('T')[0] : '',
-    order_date: item.order_date ? item.order_date.split('T')[0] : '',
-    image_url: item.image_url || ''
+    remarks: item.remarks || ''
   });
 
   const handleSave = async () => {
@@ -415,30 +391,24 @@ const FFEItemRow = ({
       quantity: item.quantity,
       size: item.size || '',
       status: item.status,
-      remarks: item.remarks || '',
-      cost: item.cost || 0,
-      link: item.link || '',
-      tracking_number: item.tracking_number || '',
-      install_date: item.install_date ? item.install_date.split('T')[0] : '',
-      order_date: item.order_date ? item.order_date.split('T')[0] : '',
-      image_url: item.image_url || ''
+      remarks: item.remarks || ''
     });
     setIsEditing(false);
   };
 
-  // Alternating row colors - much more muted
-  const bgColor = itemIndex % 2 === 0 ? '#2A3A4A' : '#3A4A5A';
+  // Alternating row colors - MUCH more muted
+  const bgColor = itemIndex % 2 === 0 ? '#3A4A5A' : '#4A5A6A';
 
   return (
-    <tr style={{ backgroundColor: bgColor }} className="text-gray-200 text-sm">
+    <tr style={{ backgroundColor: bgColor }} className="text-neutral-200 text-sm">
       {/* Item Name */}
-      <td className="p-2 border border-gray-500" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
+      <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
           <input
             type="text"
             value={editData.name}
             onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
           />
         ) : (
           <span className="font-medium">{item.name}</span>
@@ -446,13 +416,13 @@ const FFEItemRow = ({
       </td>
 
       {/* Vendor/SKU */}
-      <td className="p-2 border border-gray-500" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
+      <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
           <input
             type="text"
             value={editData.vendor}
             onChange={(e) => setEditData({ ...editData, vendor: e.target.value })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
           />
         ) : (
           <span>{item.vendor || '-'}</span>
@@ -460,13 +430,13 @@ const FFEItemRow = ({
       </td>
 
       {/* Quantity */}
-      <td className="p-2 border border-gray-500 text-center" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
+      <td className="p-2 border border-neutral-600 text-center fit-text">
         {isEditing ? (
           <input
             type="number"
             value={editData.quantity}
             onChange={(e) => setEditData({ ...editData, quantity: parseInt(e.target.value) || 1 })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
             min="1"
           />
         ) : (
@@ -475,26 +445,26 @@ const FFEItemRow = ({
       </td>
 
       {/* Size */}
-      <td className="p-2 border border-gray-500" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
+      <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
           <input
             type="text"
             value={editData.size}
             onChange={(e) => setEditData({ ...editData, size: e.target.value })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
           />
         ) : (
           <span>{item.size || '-'}</span>
         )}
       </td>
 
-      {/* Order Status */}
-      <td className="p-2 border border-gray-500" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
+      {/* Status - DROPDOWN MENU as requested */}
+      <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
           <select
             value={editData.status}
             onChange={(e) => setEditData({ ...editData, status: e.target.value })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
           >
             {itemStatuses.map(status => (
               <option key={status} value={status}>
@@ -503,146 +473,37 @@ const FFEItemRow = ({
             ))}
           </select>
         ) : (
-          <span 
-            className="px-2 py-1 rounded text-xs font-medium"
+          <select
+            value={item.status}
+            onChange={(e) => onUpdate(item.id, { status: e.target.value })}
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
             style={{ 
               backgroundColor: getStatusColor(item.status),
               color: '#2A2A2A'
             }}
           >
-            {item.status.replace('_', ' ')}
-          </span>
+            {itemStatuses.map(status => (
+              <option key={status} value={status}>
+                {status.replace('_', ' ')}
+              </option>
+            ))}
+          </select>
         )}
       </td>
 
-      {/* Finish/Color */}
-      <td className="p-2 border border-gray-500" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
-        <span>-</span>
+      {/* Vendor/SKU (duplicate column) */}
+      <td className="p-2 border border-neutral-600 fit-text">
+        <span>{item.vendor || '-'}</span>
       </td>
 
-      {/* Cost/Price */}
-      <td className="p-2 border border-gray-500 text-right" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
-        {isEditing ? (
-          <input
-            type="number"
-            value={editData.cost}
-            onChange={(e) => setEditData({ ...editData, cost: parseFloat(e.target.value) || 0 })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
-            step="0.01"
-          />
-        ) : (
-          <span>${item.cost ? item.cost.toFixed(2) : '0.00'}</span>
-        )}
-      </td>
-
-      {/* Image */}
-      <td className="p-2 border border-gray-500 text-center" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
-        {item.image_url ? (
-          <img 
-            src={item.image_url} 
-            alt={item.name}
-            className="w-12 h-12 object-cover rounded mx-auto border border-gray-600"
-          />
-        ) : (
-          <div className="w-12 h-12 bg-gray-700 rounded flex items-center justify-center text-xs mx-auto border border-gray-600">
-            📷
-          </div>
-        )}
-      </td>
-
-      {/* Link */}
-      <td className="p-2 border border-gray-500 text-center" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
-        {isEditing ? (
-          <input
-            type="url"
-            value={editData.link}
-            onChange={(e) => setEditData({ ...editData, link: e.target.value })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
-          />
-        ) : (
-          item.link ? (
-            <a 
-              href={item.link} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-gray-300"
-            >
-              🔗
-            </a>
-          ) : (
-            <span>-</span>
-          )
-        )}
-      </td>
-
-      {/* Order Status / Ship / Delivery */}
-      <td className="p-2 border border-gray-500 text-center" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
-        <span 
-          className="px-2 py-1 rounded text-xs font-medium"
-          style={{ 
-            backgroundColor: getStatusColor(item.status),
-            color: '#2A2A2A'
-          }}
-        >
-          {item.status.replace('_', ' ')}
-        </span>
-      </td>
-
-      {/* Install Date / Shipping TO */}
-      <td className="p-2 border border-gray-500 text-center" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
-        {isEditing ? (
-          <input
-            type="date"
-            value={editData.install_date}
-            onChange={(e) => setEditData({ ...editData, install_date: e.target.value })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
-          />
-        ) : (
-          <span>{item.install_date ? new Date(item.install_date).toLocaleDateString() : '-'}</span>
-        )}
-      </td>
-
-      {/* Tracking # */}
-      <td className="p-2 border border-gray-500" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
-        {isEditing ? (
-          <input
-            type="text"
-            value={editData.tracking_number}
-            onChange={(e) => setEditData({ ...editData, tracking_number: e.target.value })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
-          />
-        ) : (
-          <span>{item.tracking_number || 'Add Tracking #'}</span>
-        )}
-      </td>
-
-      {/* Carrier */}
-      <td className="p-2 border border-gray-500" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
-        <span>-</span>
-      </td>
-
-      {/* Order Date */}
-      <td className="p-2 border border-gray-500 text-center" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
-        {isEditing ? (
-          <input
-            type="date"
-            value={editData.order_date}
-            onChange={(e) => setEditData({ ...editData, order_date: e.target.value })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
-          />
-        ) : (
-          <span>{item.order_date ? new Date(item.order_date).toLocaleDateString() : '-'}</span>
-        )}
-      </td>
-
-      {/* Notes */}
-      <td className="p-2 border border-gray-500" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
+      {/* Remarks */}
+      <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
           <input
             type="text"
             value={editData.remarks}
             onChange={(e) => setEditData({ ...editData, remarks: e.target.value })}
-            className="w-full bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm border border-gray-600"
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
           />
         ) : (
           <span className="truncate" title={item.remarks}>
@@ -651,26 +512,21 @@ const FFEItemRow = ({
         )}
       </td>
 
-      {/* Install Status */}
-      <td className="p-2 border border-gray-500 text-center" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
-        <span>-</span>
-      </td>
-
       {/* Actions */}
-      <td className="p-2 border border-gray-500 text-center" style={{ whiteSpace: 'nowrap', width: 'fit-content' }}>
+      <td className="p-2 border border-neutral-600 text-center fit-text">
         <div className="flex justify-center space-x-1">
           {isEditing ? (
             <>
               <button
                 onClick={handleSave}
-                className="bg-green-700 hover:bg-green-600 text-gray-200 px-2 py-1 rounded text-xs"
+                className="bg-green-700 hover:bg-green-600 text-neutral-200 px-2 py-1 rounded text-xs"
                 disabled={isOffline}
               >
                 ✓
               </button>
               <button
                 onClick={handleCancel}
-                className="bg-gray-600 hover:bg-gray-500 text-gray-200 px-2 py-1 rounded text-xs"
+                className="bg-neutral-600 hover:bg-neutral-500 text-neutral-200 px-2 py-1 rounded text-xs"
               >
                 ✕
               </button>
@@ -679,14 +535,14 @@ const FFEItemRow = ({
             <>
               <button
                 onClick={() => setIsEditing(true)}
-                className="bg-gray-600 hover:bg-gray-500 text-gray-200 px-2 py-1 rounded text-xs"
+                className="bg-neutral-600 hover:bg-neutral-500 text-neutral-200 px-2 py-1 rounded text-xs"
                 title="Edit Item"
               >
                 ✏️
               </button>
               <button
                 onClick={() => onDelete(item.id)}
-                className="bg-red-700 hover:bg-red-600 text-gray-200 px-2 py-1 rounded text-xs"
+                className="bg-red-700 hover:bg-red-600 text-neutral-200 px-2 py-1 rounded text-xs"
                 title="Delete Item"
                 disabled={isOffline}
               >
