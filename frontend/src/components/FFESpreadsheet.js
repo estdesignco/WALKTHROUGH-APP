@@ -313,6 +313,8 @@ const FFESpreadsheet = ({
                               No items in {subcategory.name.toLowerCase()}. 
                               <button
                                 onClick={() => {
+                                  setSelectedRoomId(room.id);
+                                  setSelectedCategoryId(category.id);
                                   setSelectedSubCategoryId(subcategory.id);
                                   setShowAddItem(true);
                                 }}
@@ -323,6 +325,36 @@ const FFESpreadsheet = ({
                             </td>
                           </tr>
                         )}
+
+                        {/* ACTION BUTTONS ROW - ADD ITEM AND DELETE SECTION */}
+                        <tr>
+                          <td colSpan="16" className="p-2 bg-gray-700 border border-neutral-600">
+                            <div className="flex items-center justify-center space-x-4">
+                              <button
+                                onClick={() => {
+                                  setSelectedRoomId(room.id);
+                                  setSelectedCategoryId(category.id);
+                                  setSelectedSubCategoryId(subcategory.id);
+                                  setShowAddItem(true);
+                                }}
+                                style={{ backgroundColor: '#8b7355' }}
+                                className="hover:opacity-90 text-white px-4 py-1 rounded text-sm font-medium transition-colors"
+                              >
+                                ➕ Add Item
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (window.confirm('Delete this section and all its items?')) {
+                                    // TODO: Implement delete section
+                                  }
+                                }}
+                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded text-sm font-medium transition-colors"
+                              >
+                                🗑️ Delete Section
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
                       </React.Fragment>
                     )) || (
                       <tr>
