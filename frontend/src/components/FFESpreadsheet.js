@@ -552,7 +552,17 @@ const FFEItemRow = ({
           placeholder="Product URL..."
         />
         {formData.link && (
-          <a href={formData.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs ml-1">
+          <a 
+            href={formData.link} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-blue-400 hover:text-blue-300 text-xs ml-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              window.open(formData.link, '_blank', 'noopener,noreferrer');
+            }}
+          >
             🔗
           </a>
         )}
