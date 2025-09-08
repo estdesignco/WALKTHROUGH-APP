@@ -305,19 +305,19 @@ const FFESpreadsheet = ({
                           {/* BROWN SECTION COLUMNS */}
                           <td 
                             className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#8B6914' }}
+                            style={{ backgroundColor: '#92400E' }}
                           >
                             FINISH/Color
                           </td>
                           <td 
                             className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#8B6914' }}
+                            style={{ backgroundColor: '#92400E' }}
                           >
                             Cost/Price
                           </td>
                           <td 
                             className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#8B6914' }}
+                            style={{ backgroundColor: '#92400E' }}
                           >
                             Image
                           </td>
