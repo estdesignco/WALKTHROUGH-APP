@@ -54,9 +54,9 @@ const FFESpreadsheet = ({
     return '#5A7A5A'; // Muted green like your screenshot
   };
 
-  // RED for sub-categories (like INSTALLED) - BRIGHTER red
+  // RED for sub-categories - TONED DOWN from too bright
   const getSubCategoryColor = (subCategoryName) => {
-    return '#B91C1C'; // Brighter red like your screenshot
+    return '#DC2626'; // Less bright red
   };
 
   const handleAddSubCategory = async (subCategoryData) => {
