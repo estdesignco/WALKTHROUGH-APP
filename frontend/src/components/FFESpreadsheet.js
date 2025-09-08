@@ -131,18 +131,29 @@ const FFESpreadsheet = ({
   };
 
   const getStatusColor = (status) => {
-    // Even more muted status colors
+    // Status colors from your pictures - DISTINCT for each status
     const colors = {
-      'PICKED': '#A69A5A',      // More muted yellow
-      'ORDERED': '#5A6A8A',     // More muted blue
-      'SHIPPED': '#A06A5A',     // More muted orange
-      'DELIVERED': '#5A8A6A',   // More muted green
-      'INSTALLED': '#6A8A6A',   // More muted bright green
-      'PARTIALLY_DELIVERED': '#7A6A8A', // More muted purple
-      'ON_HOLD': '#8A5A5A',     // More muted red
-      'CANCELLED': '#6A6A6A'    // More muted gray
+      'PICKED': '#FCD34D',           // Bright yellow
+      'ORDERED': '#3B82F6',          // Blue
+      'SHIPPED': '#F97316',          // Orange  
+      'DELIVERED TO RECEIVER': '#10B981',     // Green
+      'DELIVERED TO JOB SITE': '#059669',    // Dark green
+      'INSTALLED': '#22C55E',        // Bright green
+      'PARTIALLY DELIVERED': '#8B5CF6',  // Purple
+      'ON HOLD': '#EF4444',          // Red
+      'CANCELLED': '#6B7280',        // Gray
+      'BACKORDERED': '#F59E0B',      // Amber
+      'IN TRANSIT': '#06B6D4',       // Cyan
+      'OUT FOR DELIVERY': '#84CC16', // Lime
+      'RETURNED': '#EC4899',         // Pink
+      'DAMAGED': '#DC2626',          // Dark red
+      'MISSING': '#7C2D12',          // Brown
+      'PENDING APPROVAL': '#D97706', // Dark orange
+      'QUOTE REQUESTED': '#7C3AED',  // Violet
+      'APPROVED': '#16A34A',         // Dark green
+      'REJECTED': '#991B1B'          // Dark red
     };
-    return colors[status] || '#6A6A6A';
+    return colors[status] || '#6B7280';
   };
 
   if (project.rooms.length === 0) {
