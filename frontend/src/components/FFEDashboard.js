@@ -306,7 +306,7 @@ const FFEDashboard = ({ isOffline }) => {
           <div className="space-y-2">
             <button
               onClick={() => setShowAddRoom(true)}
-              style={{ backgroundColor: '#D4AF37' }}
+              style={{ backgroundColor: '#8b7355' }}
               className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
             >
               <span>➕</span>
