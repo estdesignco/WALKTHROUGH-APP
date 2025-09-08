@@ -54,7 +54,6 @@ const FFEDashboard = ({ isOffline }) => {
 
   const loadProjectAndUtilityData = async () => {
     try {
-      console.log('🔍 DEBUG: Starting to load project and utility data...');
       setLoading(true);
       
       // Load both in parallel and wait for both to complete
@@ -63,16 +62,11 @@ const FFEDashboard = ({ isOffline }) => {
         loadUtilityDataAsync()
       ]);
       
-      console.log('🔍 DEBUG: Both project and utility data loaded');
-      console.log('🔍 DEBUG: Project data:', projectResponse.data);
-      console.log('🔍 DEBUG: Rooms structure:', projectResponse.data.rooms);
-      
       setProject(projectResponse.data);
       
       // Cache for offline use
       localStorage.setItem(`project_${projectId}`, JSON.stringify(projectResponse.data));
       setError(null);
-      console.log('🔍 DEBUG: All data set successfully, setting loading to false');
     } catch (err) {
       setError('Failed to load project');
       console.error('Error loading project:', err);
@@ -84,8 +78,8 @@ const FFEDashboard = ({ isOffline }) => {
         setError('Using cached data - changes may not be saved');
       }
     } finally {
-      console.log('🔍 DEBUG: Setting loading to false in finally block');
       setLoading(false);
+      loadingRef.current = false;
     }
   };
 
