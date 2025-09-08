@@ -17,6 +17,7 @@ const FFESpreadsheet = ({
   const [showAddSubCategory, setShowAddSubCategory] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // EXACT colors from your pictures - COMPLETELY UNIQUE FOR EACH ROOM
