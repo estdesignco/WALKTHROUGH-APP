@@ -79,54 +79,124 @@ SUBCATEGORY_COLORS = {
     "concrete": "#8A5A5A"
 }
 
-# Default room structure with 3-level hierarchy
+# Professional Interior Design Room Structure with Complete Templates
 ROOM_DEFAULT_STRUCTURE = {
     'living room': {
-        'Lighting': ['Installed', 'Portable'],
-        'Furniture & Storage': ['Seating', 'Storage'],
-        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
-    },
-    'kitchen': {
-        'Lighting': ['Installed', 'Portable'],
-        'Plumbing & Fixtures': ['Faucets', 'Sinks'],
-        'Equipment & Furniture': ['Appliances', 'Cabinetry'],
-        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
-    },
-    'master bedroom': {
-        'Lighting': ['Installed', 'Portable'],
-        'Furniture & Storage': ['Seating', 'Storage'],
-        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
-    },
-    'bedroom 2': {
-        'Lighting': ['Installed', 'Portable'],
-        'Furniture & Storage': ['Storage'],
-        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
-    },
-    'bathroom': {
-        'Lighting': ['Installed'],
-        'Plumbing & Fixtures': ['Faucets', 'Sinks'],
-        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
-    },
-    'master bathroom': {
-        'Lighting': ['Installed'],
-        'Plumbing & Fixtures': ['Faucets', 'Sinks'],
-        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
-    },
-    'powder room': {
-        'Lighting': ['Installed'],
-        'Plumbing & Fixtures': ['Faucets', 'Sinks'],
-        'Decor & Accessories': ['Art & Decor']
+        'Lighting': {
+            'INSTALLED': ['Chandelier', 'Recessed Lighting', 'Sconces', 'Track Lighting', 'Ceiling Fan w/ Light', 'Art Lights', 'Pendant Lights', 'Under Cabinet Lighting', 'Cove Lighting', 'Picture Lights'],
+            'PORTABLE': ['Table Lamp', 'Floor Lamp', 'Accent Lamp', 'Desk Lamp', 'Buffet Lamp', 'Reading Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Sofa', 'Sectional', 'Loveseat', 'Armchair', 'Accent Chair', 'Ottoman', 'Coffee Table', 'Side Table', 'Console Table', 'Media Console', 'Bookcase', 'Credenza', 'Display Cabinet', 'Bar Cart', 'Sofa Table', 'Storage Bench', 'Chaise Lounge', 'Daybed', 'Recliner', 'Storage Ottoman']
+        },
+        'Decor & Accessories': {
+            'Misc.': ['Area Rug', 'Throw Pillows', 'Throw Blanket', 'Wall Art', 'Mirror', 'Decorative Vases', 'Sculptures', 'Candle Holders', 'Greenery/Plants', 'Curtains/Drapery', 'Sheer Curtains', 'Custom Shades', 'Fireplace Tools', 'Decorative Boxes', 'Trays', 'Photo Frames', 'Coasters']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Chair Rails', 'Wainscoting', 'Built-in Columns', 'Coffered Ceilings', 'Tray Ceilings', 'Beam Work', 'Archways', 'Built-in Niches', 'Window Trim/Casings', 'Door Trim/Casings', 'Panel Molding', 'Ceiling Medallions']
+        }
     },
     'dining room': {
-        'Lighting': ['Installed', 'Portable'],
-        'Furniture & Storage': ['Seating', 'Storage'],
-        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
+        'Lighting': {
+            'INSTALLED': ['Chandelier', 'Pendant Lights', 'Sconces', 'Recessed Lighting', 'Art Lights', 'Ceiling Medallion'],
+            'PORTABLE': ['Buffet Lamp', 'Table Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Dining Table', 'Dining Chairs', 'Host Chairs', 'Dining Bench', 'Buffet', 'Credenza', 'China Cabinet', 'Bar Cart', 'Console Table', 'Sideboard', 'Wine Cabinet']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Wall Art', 'Mirror', 'Table Runner', 'Place Settings', 'Centerpiece', 'Curtains/Drapery', 'Sheer Curtains', 'Custom Shades', 'Decorative Bowls', 'Candle Holders', 'Serveware']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Chair Rails', 'Wainscoting', 'Built-in Columns', 'Built-in Niches', 'Window Trim/Casings', 'Door Trim/Casings', 'Panel Molding']
+        }
     },
-    'office': {
-        'Lighting': ['Installed', 'Portable'],
-        'Furniture & Storage': ['Storage'],
-        'Equipment & Furniture': ['Appliances'],
-        'Decor & Accessories': ['Window Treatments', 'Art & Decor']
+    'kitchen': {
+        'Lighting': {
+            'INSTALLED': ['Pendant Lights (Island/Bar)', 'Recessed Lighting', 'Under Cabinet Lighting', 'Chandelier (Nook)', 'Sconces', 'Toe-Kick Lighting', 'Over-Cabinet Lighting', 'Pot Rack Light']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish', 'Counter Tops']
+        },
+        'Appliances': {
+            'UNIT': ['Refrigerator (Built-in/Freestanding)', 'Dishwasher', 'Range/Oven', 'Microwave (Built-in/Countertop)', 'Cooktop', 'Wall Oven (Single/Double)', 'Wine Fridge', 'Beverage Cooler', 'Ice Maker', 'Coffee Machine (Built-in)', 'Trash Compactor', 'Garbage Disposal', 'Vent Hood/Range Hood', 'Warming Drawer']
+        },
+        'Plumbing': {
+            'FIXTURE': ['Kitchen Sink (Farmhouse/Undermount)', 'Prep Sink', 'Main Faucet', 'Prep Faucet', 'Pot Filler', 'Soap Dispenser (Built-in)', 'Water Filtration System']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Bar Stools', 'Counter Stools', 'Kitchen Island', 'Pantry Cabinet', 'Breakfast Nook Table', 'Breakfast Nook Chairs/Bench', 'Shelving', 'Floating Shelves', 'Wine Rack (Built-in/Freestanding)', 'Cutting Board Storage', 'Pull-out Pantry', 'Spice Drawer']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug/Runner', 'Wall Art', 'Decorative Bowls/Plates', 'Vases', 'Cookware Displays', 'Herb Garden', 'Curtains/Blinds/Shades', 'Dish Towels', 'Utensil Crocks', 'Fruit Bowls', 'Coffee Bar Accessories']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Built-in Columns', 'Window Trim/Casings', 'Door Trim/Casings', 'Panel Molding']
+        }
+    },
+    'primary bedroom': {
+        'Lighting': {
+            'INSTALLED': ['Chandelier/Ceiling Fixture', 'Recessed Lighting (Dimmable)', 'Sconces (Bedside)', 'Ceiling Fan w/ Light', 'Cove Lighting', 'Accent Lighting (Architectural)', 'Reading Lights (Wall Mounted)'],
+            'PORTABLE': ['Nightstand Lamps', 'Floor Lamp', 'Dresser Lamp', 'Desk Lamp', 'Buffet Lamp', 'Reading Lamp']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
+        },
+        'Furniture': {
+            'PIECE': ['Bed Frame (King/Queen/Cal King)', 'Mattress', 'Box Spring/Foundation', 'Nightstands (Pair)', 'Dresser (Long/Tall)', 'Armoire', 'Vanity', 'Vanity Stool', 'Bench (Foot of Bed)', 'Seating Area Sofa/Chairs (Pair)', 'Coffee Table (Seating Area)', 'Bookcase', 'Media Console/TV Stand', 'Desk', 'Desk Chair', 'Chaise Lounge', 'Daybed', 'Recliner']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Throw Pillows (Decorative)', 'Throw Blanket', 'Bedding Set (Duvet, Sheets, Shams)', 'Wall Art (Large Piece/Gallery)', 'Mirror (Full Length/Decorative)', 'Decorative Vases', 'Candles/Diffusers', 'Curtains/Drapery', 'Blackout Curtains', 'Sheer Curtains', 'Custom Shades (Roman/Roller)', 'Bedside Clock/Alarm', 'Trays (Nightstand/Dresser)', 'Jewelry Box', 'Plants/Faux Greenery']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Chair Rails', 'Wainscoting', 'Built-in Columns', 'Coffered Ceilings', 'Tray Ceilings', 'Built-in Niches', 'Window Trim/Casings', 'Door Trim/Casings', 'Panel Molding']
+        }
+    },
+    'primary bathroom': {
+        'Lighting': {
+            'INSTALLED': ['Vanity Lights (Over Mirror)', 'Sconces (Side of Mirror)', 'Recessed Lighting (Dimmable)', 'Shower Light', 'Toilet Area Light', 'Chandelier/Pendant (Freestanding Tub)', 'Exhaust Fan w/ Light', 'Under Vanity Lighting']
+        },
+        'Plumbing & Fixtures': {
+            'FIXTURE': ['Vanity Sinks (Undermount/Vessel)', 'Vanity Faucets', 'Shower Head (Rainfall/Standard)', 'Handheld Shower', 'Body Jets', 'Shower Valve Trim', 'Freestanding Tub', 'Drop-in Tub', 'Tub Faucet (Deck Mount/Wall Mount)', 'Toilet', 'Bidet/Bidet Seat', 'Towel Warmer']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Vanity Cabinet (Single/Double)', 'Linen Tower', 'Storage Cabinet', 'Accent Stool/Bench', 'Shower Bench (Built-in/Portable)', 'Hamper (Built-in/Freestanding)', 'Makeup Vanity/Desk']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Vanity Mirrors (Framed/Frameless)', 'Full Length Mirror', 'Area Rug/Bath Mats', 'Towels (Bath/Hand/Washcloth)', 'Soap Dispensers', 'Toothbrush Holder', 'Tray Organizers', 'Wall Art', 'Shower Curtains/Glass Door', 'Toilet Paper Holder', 'Towel Bar/Ring/Hooks', 'Robe Hooks', 'Plants/Greenery', 'Waste Basket']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish', 'Counter Tops']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Wainscoting', 'Built-in Niches', 'Window Trim/Casings', 'Door Trim/Casings', 'Panel Molding']
+        }
+    },
+    'powder bath': {
+        'Lighting': {
+            'INSTALLED': ['Vanity Light', 'Sconces', 'Recessed Lighting', 'Pendant Light', 'Exhaust Fan w/ Light']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish', 'Counter Tops']
+        },
+        'Plumbing & Fixtures': {
+            'FIXTURE': ['Pedestal Sink', 'Console Sink', 'Wall-mount Sink', 'Faucet', 'Toilet']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Small Vanity Cabinet', 'Small Storage Cabinet', 'Accent Stool']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Mirror (Decorative)', 'Wall Art', 'Small Area Rug/Bath Mat', 'Hand Towels', 'Soap Dispenser', 'Toilet Paper Holder', 'Towel Ring/Hooks', 'Waste Basket']
+        },
+        'Millwork, Trim, and Architectural Elements': {
+            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Wainscoting', 'Window Trim/Casings', 'Door Trim/Casings']
+        }
     }
 }
 
