@@ -429,20 +429,17 @@ const FFEItemRow = ({
     notes: item.notes || item.remarks || ''
   });
 
-  // Auto-save when any field changes - PREVENT PAGE JUMPING
+  // Auto-save when any field changes - NO PAGE JUMPING
   const handleFieldChange = async (field, value) => {
     const newData = { ...formData, [field]: value };
     setFormData(newData);
     
-    // Auto-save after 1 second delay - NO PAGE JUMPING
-    clearTimeout(window.autoSaveTimeout);
-    window.autoSaveTimeout = setTimeout(async () => {
-      try {
-        await onUpdate(item.id, { [field]: value });
-      } catch (error) {
-        console.error('Error auto-saving:', error);
-      }
-    }, 1000);
+    // Immediate save without timeout to prevent page jumping
+    try {
+      await onUpdate(item.id, { [field]: value });
+    } catch (error) {
+      console.error('Error auto-saving:', error);
+    }
   };
 
   // Alternating row colors
