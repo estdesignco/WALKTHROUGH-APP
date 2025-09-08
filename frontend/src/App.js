@@ -1,54 +1,112 @@
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
+import FFEDashboard from "./components/FFEDashboard";
+import ProjectList from "./components/ProjectList";
+import Navigation from "./components/Navigation";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: API,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
+// API functions
+export const projectAPI = {
+  getAll: () => api.get('/projects'),
+  getById: (id) => api.get(`/projects/${id}`),
+  create: (data) => api.post('/projects', data),
+  update: (id, data) => api.put(`/projects/${id}`, data),
+  delete: (id) => api.delete(`/projects/${id}`)
+};
+
+export const roomAPI = {
+  create: (data) => api.post('/rooms', data),
+  getById: (id) => api.get(`/rooms/${id}`),
+  update: (id, data) => api.put(`/rooms/${id}`, data),
+  delete: (id) => api.delete(`/rooms/${id}`)
+};
+
+export const categoryAPI = {
+  create: (data) => api.post('/categories', data),
+  getById: (id) => api.get(`/categories/${id}`),
+  update: (id, data) => api.put(`/categories/${id}`, data),
+  delete: (id) => api.delete(`/categories/${id}`)
+};
+
+export const itemAPI = {
+  create: (data) => api.post('/items', data),
+  getById: (id) => api.get(`/items/${id}`),
+  update: (id, data) => api.put(`/items/${id}`, data),
+  delete: (id) => api.delete(`/items/${id}`)
+};
+
+export const utilityAPI = {
+  getRoomColors: () => api.get('/room-colors'),
+  getCategoryColors: () => api.get('/category-colors'),
+  getItemStatuses: () => api.get('/item-statuses')
+};
+
+const App = () => {
+  const [currentProject, setCurrentProject] = useState(null);
+  const [isOffline, setIsOffline] = useState(false);
 
   useEffect(() => {
-    helloWorldApi();
+    // Check online/offline status for jobsite work
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    setIsOffline(!navigator.onLine);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
-
-function App() {
-  return (
-    <div className="App">
+    <div className="App min-h-screen bg-gray-900">
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <Navigation 
+          currentProject={currentProject} 
+          isOffline={isOffline}
+        />
+        
+        <main className="container mx-auto px-4 py-6">
+          <Routes>
+            <Route 
+              path="/" 
+              element={
+                <ProjectList 
+                  onSelectProject={setCurrentProject}
+                  isOffline={isOffline}
+                />
+              }
+            />
+            <Route 
+              path="/project/:projectId/ffe" 
+              element={
+                <FFEDashboard 
+                  project={currentProject}
+                  isOffline={isOffline}
+                />
+              }
+            />
+          </Routes>
+        </main>
       </BrowserRouter>
     </div>
   );
-}
+};
 
 export default App;
