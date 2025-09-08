@@ -788,6 +788,7 @@ const FFEItemRow = ({
             value={editData.order_date}
             onChange={(e) => setEditData({ ...editData, order_date: e.target.value })}
             className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+            title="Order Date - Click to open calendar"
           />
         ) : (
           <span>{item.order_date || '-'}</span>
