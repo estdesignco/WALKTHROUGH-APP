@@ -28,8 +28,11 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
     setScrapeError('');
 
     try {
-      // Use the same backend URL pattern as other API calls
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      // Get backend URL from environment - FORCE CORRECT URL
+      const backendUrl = import.meta.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      console.log('Using backend URL:', backendUrl);
+      console.log('Scraping URL:', formData.link);
+      
       const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',
         headers: {
