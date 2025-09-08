@@ -586,13 +586,13 @@ const FFEItemRow = ({
 
       {/* PURPLE SECTION - Shipping Info - Always editable */}
       
-      {/* Order Status / Ship Date / Delivery Date - BETTER SPACING */}
-      <td className="p-2 border border-neutral-600 fit-text">
-        <div className="space-y-2">
+      {/* Order Status / Ship Date / Delivery Date - PROPER SPACING */}
+      <td className="p-3 border border-neutral-600 fit-text">
+        <div className="space-y-3">
           <select
             value={formData.order_status}
             onChange={(e) => handleFieldChange('order_status', e.target.value)}
-            className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+            className="w-full bg-transparent text-neutral-200 px-3 py-2 rounded text-sm border border-neutral-500 focus:border-blue-500 focus:bg-neutral-800"
           >
             <option value="">Order Status</option>
             {itemStatuses.map(status => (
@@ -605,15 +605,15 @@ const FFEItemRow = ({
             type="date"
             value={formData.ship_date}
             onChange={(e) => handleFieldChange('ship_date', e.target.value)}
-            className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
-            title="Ship Date"
+            className="w-full bg-transparent text-neutral-200 px-3 py-2 rounded text-sm border border-neutral-500 focus:border-blue-500 focus:bg-neutral-800"
+            placeholder="Ship Date"
           />
           <input
             type="date"
             value={formData.delivery_date}
             onChange={(e) => handleFieldChange('delivery_date', e.target.value)}
-            className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
-            title="Delivery Date"
+            className="w-full bg-transparent text-neutral-200 px-3 py-2 rounded text-sm border border-neutral-500 focus:border-blue-500 focus:bg-neutral-800"
+            placeholder="Delivery Date"
           />
         </div>
       </td>
