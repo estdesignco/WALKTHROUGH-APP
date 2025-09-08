@@ -151,8 +151,14 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* Horizontal Scrollable Container - SIMPLE SCROLL */}
-      <div className="overflow-x-scroll overflow-y-visible">
+      {/* Horizontal Scrollable Container - SMOOTH FAST SCROLL */}
+      <div 
+        className="overflow-x-auto overflow-y-visible"
+        style={{ 
+          scrollBehavior: 'auto',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
         <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
           <tbody>
             {/* MAIN DATA STRUCTURE */}
