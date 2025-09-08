@@ -281,11 +281,10 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* BIG LOGO CONTAINER SPANNING FULL WIDTH - WITH ACTUAL LOGO */}
+        {/* BIG LOGO CONTAINER SPANNING FULL WIDTH - YOUR ACTUAL LOGO */}
         <div className="w-full rounded-lg p-6 mb-6" style={{ backgroundColor: '#8b7355' }}>
           <div className="text-center flex items-center justify-center">
-            <img src="/api/static/logo.png" alt="Logo" className="h-12 mr-4" onError={(e) => {e.target.style.display='none'}} />
-            <h2 className="text-2xl font-bold text-black">ESTABLISHED DESIGN CO.</h2>
+            <img src="/established-logo.png" alt="Established Design Co. Logo" className="h-16" />
           </div>
         </div>
 
