@@ -1262,7 +1262,243 @@ async def get_paint_suggestions(room_type: str):
         'style_notes': 'Classic neutral colors work well in most spaces.'
     })
     
-    return {"data": suggestions}
+from playwright.async_api import async_playwright
+import asyncio
+import re
+from typing import Dict, Optional
+
+# Advanced Product Scraping with Playwright for JavaScript-rendered content
+async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
+    """
+    Advanced product scraping using Playwright for JavaScript-rendered wholesale sites
+    Handles Four Hands, Uttermost, and other wholesale vendors with dynamic content
+    """
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context(
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        )
+        page = await context.new_page()
+        
+        try:
+            # Navigate to the URL with extended timeout
+            await page.goto(url, wait_until='networkidle', timeout=30000)
+            
+            # Wait for potential dynamic content to load
+            await page.wait_for_timeout(3000)
+            
+            # Initialize result structure
+            result = {
+                'name': None,
+                'vendor': None,
+                'cost': None,
+                'price': None,
+                'image_url': None,
+                'finish_color': None,
+                'size': None,
+                'description': None,
+                'sku': None,
+                'availability': None
+            }
+            
+            # Extract vendor from URL
+            domain = url.split('/')[2].lower()
+            vendor_mapping = {
+                'fourhands.com': 'Four Hands',
+                'uttermost.com': 'Uttermost',
+                'rowefurniture.com': 'Rowe Furniture',
+                'reginaandrew.com': 'Regina Andrew',
+                'bernhardt.com': 'Bernhardt',
+                'loloi.com': 'Loloi Rugs',
+                'vandh.com': 'Vandh',
+                'visualcomfort.com': 'Visual Comfort',
+                'hvlgroup.com': 'HVL Group',
+                'flowdecor.com': 'Flow Decor',
+                'classichome.com': 'Classic Home',
+                'crestviewcollection.com': 'Crestview Collection',
+                'bassettmirror.com': 'Bassett Mirror',
+                'eichholtz.com': 'Eichholtz'
+            }
+            
+            for domain_key, vendor_name in vendor_mapping.items():
+                if domain_key in domain:
+                    result['vendor'] = vendor_name
+                    break
+            
+            # Universal selectors for common product information
+            name_selectors = [
+                'h1[class*="product"], h1[class*="title"], h1.title, h1.product-title',
+                '[data-testid="product-title"], [data-test="product-title"]',
+                '.product-name, .product-title, .item-title, .page-title',
+                'h1, h2:first-of-type'
+            ]
+            
+            price_selectors = [
+                '[class*="price"]:not([class*="original"]):not([class*="old"])',
+                '[data-testid*="price"], [data-test*="price"]',
+                '.cost, .pricing, .product-price, .price-current',
+                'span:contains("$"), div:contains("$")'
+            ]
+            
+            image_selectors = [
+                'img[class*="product"], img[class*="hero"], img[class*="main"]',
+                '[data-testid*="image"] img, [data-test*="image"] img',
+                '.product-image img, .hero-image img, .main-image img',
+                'img[src*="product"], img[src*="item"]'
+            ]
+            
+            description_selectors = [
+                '[class*="description"], [class*="detail"]',
+                '[data-testid*="description"], [data-test*="description"]',
+                '.product-description, .item-details, .product-details',
+                'p:contains("Description"), div:contains("Description") + *'
+            ]
+            
+            # Try to extract product name
+            for selector in name_selectors:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        text = await element.inner_text()
+                        if text and len(text.strip()) > 0:
+                            result['name'] = text.strip()
+                            break
+                except:
+                    continue
+            
+            # Try to extract price
+            for selector in price_selectors:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        text = await element.inner_text()
+                        price_match = re.search(r'\$[\d,]+\.?\d*', text)
+                        if price_match:
+                            result['cost'] = price_match.group()
+                            result['price'] = price_match.group()
+                            break
+                except:
+                    continue
+            
+            # Try to extract main product image
+            for selector in image_selectors:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        src = await element.get_attribute('src')
+                        if src:
+                            # Convert relative URLs to absolute
+                            if src.startswith('//'):
+                                src = 'https:' + src
+                            elif src.startswith('/'):
+                                base_url = '/'.join(url.split('/')[:3])
+                                src = base_url + src
+                            result['image_url'] = src
+                            break
+                except:
+                    continue
+            
+            # Try to extract description
+            for selector in description_selectors:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        text = await element.inner_text()
+                        if text and len(text.strip()) > 10:
+                            result['description'] = text.strip()[:500]  # Limit length
+                            break
+                except:
+                    continue
+            
+            # Try to extract dimensions/size information
+            size_selectors = [
+                '[class*="dimension"], [class*="size"], [class*="measurement"]',
+                'span:contains("W"), span:contains("H"), span:contains("D")',
+                'div:contains("Dimensions"), p:contains("Size")'
+            ]
+            
+            for selector in size_selectors:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        text = await element.inner_text()
+                        # Look for dimension patterns like "24"W x 18"H x 12"D"
+                        size_match = re.search(r'[\d.]+"?\s*[WwHhDdLl][\s\x]*[\d.]+"?\s*[WwHhDdLl]', text)
+                        if size_match:
+                            result['size'] = size_match.group()
+                            break
+                except:
+                    continue
+            
+            # Try to extract SKU/Item Number
+            sku_selectors = [
+                '[class*="sku"], [class*="item-number"], [class*="product-id"]',
+                'span:contains("SKU"), span:contains("Item"), span:contains("Model")'
+            ]
+            
+            for selector in sku_selectors:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        text = await element.inner_text()
+                        sku_match = re.search(r'[A-Z0-9\-]{3,}', text)
+                        if sku_match:
+                            result['sku'] = sku_match.group()
+                            break
+                except:
+                    continue
+            
+            # Extract color/finish information
+            color_selectors = [
+                '[class*="color"], [class*="finish"], [class*="material"]',
+                'span:contains("Color"), span:contains("Finish"), div:contains("Material")'
+            ]
+            
+            for selector in color_selectors:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        text = await element.inner_text()
+                        if 'color' in text.lower() or 'finish' in text.lower():
+                            result['finish_color'] = text.strip()
+                            break
+                except:
+                    continue
+            
+            return result
+            
+        except Exception as e:
+            print(f"Error scraping {url}: {str(e)}")
+            return {
+                'name': None,
+                'vendor': result.get('vendor'),
+                'cost': None,
+                'price': None,
+                'image_url': None,
+                'finish_color': None,
+                'size': None,
+                'description': f"Error scraping product: {str(e)}",
+                'sku': None,
+                'availability': None
+            }
+        finally:
+            await browser.close()
+
+@api_router.post("/api/scrape-product")
+async def scrape_product_advanced(data: dict):
+    """
+    Advanced product scraping endpoint using Playwright
+    Handles JavaScript-rendered wholesale sites like Four Hands, Uttermost, etc.
+    """
+    url = data.get('url', '')
+    if not url:
+        raise HTTPException(status_code=400, detail="URL is required")
+    
+    try:
+        product_info = await scrape_product_with_playwright(url)
+        return {"success": True, "data": product_info}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to scrape URL: {str(e)}")
 
 # Include the router in the main app
 app.include_router(api_router)
