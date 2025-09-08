@@ -178,7 +178,7 @@ const FFEDashboard = ({ isOffline }) => {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto"></div>
           <p className="text-gray-400 mt-4">Loading FF&E data...</p>
         </div>
       </div>
@@ -189,7 +189,7 @@ const FFEDashboard = ({ isOffline }) => {
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">❌</div>
-        <h2 className="text-2xl font-bold text-white mb-2">Project Not Found</h2>
+        <h2 className="text-2xl font-bold text-gray-200 mb-2">Project Not Found</h2>
         <p className="text-gray-400">The project you're looking for doesn't exist or couldn't be loaded.</p>
       </div>
     );
@@ -248,27 +248,15 @@ const FFEDashboard = ({ isOffline }) => {
   };
 
   return (
-    <div className="max-w-full mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="bg-blue-900 text-white p-6 rounded-xl">
-          <h1 className="text-3xl font-bold mb-2">
-            FF&E - {project.client_info.full_name.split(' ').pop().toUpperCase()}
-          </h1>
-          <p className="text-lg">
-            {project.client_info.full_name} - {project.client_info.address}
-          </p>
-        </div>
-      </div>
-
+    <div className="max-w-full mx-auto bg-gray-950 min-h-screen">
       {error && (
         <div className="bg-red-900 border border-red-700 text-red-100 p-4 rounded-lg mb-6">
           {error}
         </div>
       )}
 
-      {/* Status Overview - Two Row Layout */}
-      <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Status Overview - Two Row Layout ABOVE client header */}
+      <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
         <StatusOverview 
           totalItems={getTotalItems()}
           statusBreakdown={getStatusBreakdown()}
@@ -277,14 +265,14 @@ const FFEDashboard = ({ isOffline }) => {
         
         {/* Shipping Carrier Breakdown */}
         <div className="bg-gray-800 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Shipping Carrier Breakdown</h3>
+          <h3 className="text-lg font-semibold text-gray-200 mb-4">Shipping Carrier Breakdown</h3>
           
           {Object.keys(getCarrierBreakdown()).length > 0 ? (
             <div className="space-y-2">
               {Object.entries(getCarrierBreakdown()).map(([carrier, count]) => (
                 <div key={carrier} className="flex justify-between items-center p-2 bg-gray-700 rounded">
                   <span className="text-gray-300">{carrier}</span>
-                  <span className="text-white font-medium">{count}</span>
+                  <span className="text-gray-200 font-medium">{count}</span>
                 </div>
               ))}
             </div>
@@ -297,26 +285,40 @@ const FFEDashboard = ({ isOffline }) => {
         </div>
       </div>
 
+      {/* Client Header - MOVED BELOW status overview */}
+      <div className="mb-6 px-6">
+        <div className="bg-gray-700 text-gray-200 p-6 rounded-xl">
+          <h1 className="text-3xl font-bold mb-2">
+            FF&E - {project.client_info.full_name.split(' ').pop().toUpperCase()}
+          </h1>
+          <p className="text-lg text-gray-300">
+            {project.client_info.full_name} - {project.client_info.address}
+          </p>
+        </div>
+      </div>
+
       {/* Add Room Button */}
-      <div className="mb-6 flex justify-end">
+      <div className="mb-6 flex justify-end px-6">
         <button
           onClick={() => setShowAddRoom(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors font-medium"
+          className="bg-gray-600 hover:bg-gray-500 text-gray-200 px-6 py-2 rounded-lg transition-colors font-medium"
         >
           ➕ Add Room
         </button>
       </div>
 
       {/* FF&E Spreadsheet */}
-      <FFESpreadsheet
-        project={project}
-        roomColors={roomColors}
-        categoryColors={categoryColors}
-        itemStatuses={itemStatuses}
-        onDeleteRoom={handleDeleteRoom}
-        onReload={loadProject}
-        isOffline={isOffline}
-      />
+      <div className="px-6">
+        <FFESpreadsheet
+          project={project}
+          roomColors={roomColors}
+          categoryColors={categoryColors}
+          itemStatuses={itemStatuses}
+          onDeleteRoom={handleDeleteRoom}
+          onReload={loadProject}
+          isOffline={isOffline}
+        />
+      </div>
 
       {/* Add Room Modal */}
       {showAddRoom && (
