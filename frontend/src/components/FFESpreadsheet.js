@@ -223,22 +223,45 @@ const FFESpreadsheet = ({
                       </td>
                     </tr>
 
-                    {/* 3. SUB-CATEGORIES with COLUMN HEADERS - RED like INSTALLED */}
+                    {/* 3. SUB-CATEGORIES with MULTI-SECTION HEADERS - EXACTLY like your screenshots */}
                     {category.subcategories?.map((subcategory) => (
                       <React.Fragment key={subcategory.id}>
-                        {/* RED HEADER ROW WITH BOTH SUBCATEGORY NAME AND COLUMN HEADERS */}
+                        {/* FIRST ROW: Section Headers - RED + BROWN + PURPLE */}
                         <tr>
+                          {/* RED SECTION - INSTALLED (spans 5 columns) */}
                           <td 
-                            className="w-48 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            colSpan="5"
+                            className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
                             style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
                           >
                             {subcategory.name.toUpperCase()}
                           </td>
+                          {/* BROWN SECTION - ADDITIONAL INFO (spans 3 columns) */}
+                          <td 
+                            colSpan="3"
+                            className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: '#8B6914' }}
+                          >
+                            ADDITIONAL INFO.
+                          </td>
+                          {/* PURPLE SECTION - SHIPPING INFO (spans 5 columns) */}
+                          <td 
+                            colSpan="5"
+                            className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: '#6B46C1' }}
+                          >
+                            SHIPPING INFO.
+                          </td>
+                        </tr>
+                        
+                        {/* SECOND ROW: Column Headers - Each in their section's color */}
+                        <tr>
+                          {/* RED SECTION COLUMNS */}
                           <td 
                             className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
                             style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
                           >
-                            ITEM
+                            ITEM NAME
                           </td>
                           <td 
                             className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
@@ -262,59 +285,59 @@ const FFESpreadsheet = ({
                             className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
                             style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
                           >
-                            STATUS
+                            ORDERS STATUS
+                          </td>
+                          
+                          {/* BROWN SECTION COLUMNS */}
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: '#8B6914' }}
+                          >
+                            FINISH/Color
+                          </td>
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: '#8B6914' }}
+                          >
+                            Cost/Price
                           </td>
                           <td 
                             className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                            style={{ backgroundColor: '#8B6914' }}
                           >
-                            COST
+                            Image
+                          </td>
+                          
+                          {/* PURPLE SECTION COLUMNS */}
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: '#6B46C1' }}
+                          >
+                            Order Status / Est.<br/>Ship Date / Est.<br/>Delivery Date
+                          </td>
+                          <td 
+                            className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: '#6B46C1' }}
+                          >
+                            Install Date /<br/>Shipping TO
                           </td>
                           <td 
                             className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                          >
-                            LINK
-                          </td>
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                            style={{ backgroundColor: '#6B46C1' }}
                           >
                             TRACKING #
                           </td>
                           <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                            className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: '#6B46C1' }}
                           >
-                            ORDER DATE
-                          </td>
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                          >
-                            INSTALL DATE
-                          </td>
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                          >
-                            REMARKS
+                            Carrier
                           </td>
                           <td 
                             className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                            style={{ backgroundColor: '#6B46C1' }}
                           >
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedSubCategoryId(subcategory.id);
-                                setShowAddItem(true);
-                              }}
-                              className="bg-neutral-800 bg-opacity-50 hover:bg-opacity-70 text-white px-2 py-1 rounded text-xs"
-                              title="Add Item"
-                            >
-                              ➕ Item
-                            </button>
+                            Order Date
                           </td>
                         </tr>
 
