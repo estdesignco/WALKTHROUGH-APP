@@ -28,7 +28,9 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
     setScrapeError('');
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/scrape-product`, {
+      // Use the same backend URL pattern as other API calls
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,10 +39,12 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       });
 
       if (!response.ok) {
-        throw new Error('Failed to scrape product information');
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to scrape product information');
       }
 
       const productInfo = await response.json();
+      console.log('Scraped data:', productInfo); // Debug log
 
       // Auto-fill form with scraped data
       setFormData(prev => ({
@@ -54,7 +58,9 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       }));
 
       setScrapeError('');
+      console.log('Scraping successful!'); // Debug log
     } catch (error) {
+      console.error('Scraping error:', error); // Debug log
       setScrapeError('Failed to scrape product information: ' + error.message);
     } finally {
       setIsScraping(false);
