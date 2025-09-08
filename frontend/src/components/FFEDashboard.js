@@ -198,7 +198,9 @@ const FFEDashboard = ({ isOffline }) => {
   const getTotalItems = () => {
     return project.rooms.reduce((total, room) => 
       total + room.categories.reduce((catTotal, category) => 
-        catTotal + category.items.length, 0
+        catTotal + (category.subcategories || []).reduce((subTotal, subcategory) =>
+          subTotal + (subcategory.items || []).length, 0
+        ), 0
       ), 0
     );
   };
@@ -207,8 +209,10 @@ const FFEDashboard = ({ isOffline }) => {
     const breakdown = {};
     project.rooms.forEach(room => {
       room.categories.forEach(category => {
-        category.items.forEach(item => {
-          breakdown[item.status] = (breakdown[item.status] || 0) + 1;
+        (category.subcategories || []).forEach(subcategory => {
+          (subcategory.items || []).forEach(item => {
+            breakdown[item.status] = (breakdown[item.status] || 0) + 1;
+          });
         });
       });
     });
@@ -219,14 +223,15 @@ const FFEDashboard = ({ isOffline }) => {
     const carriers = {};
     project.rooms.forEach(room => {
       room.categories.forEach(category => {
-        category.items.forEach(item => {
-          if (item.tracking_number && item.vendor) {
-            // Extract carrier from tracking or vendor info
-            const carrier = extractCarrier(item.vendor, item.tracking_number);
-            if (carrier) {
-              carriers[carrier] = (carriers[carrier] || 0) + 1;
+        (category.subcategories || []).forEach(subcategory => {
+          (subcategory.items || []).forEach(item => {
+            if (item.tracking_number && item.vendor) {
+              const carrier = extractCarrier(item.vendor, item.tracking_number);
+              if (carrier) {
+                carriers[carrier] = (carriers[carrier] || 0) + 1;
+              }
             }
-          }
+          });
         });
       });
     });
