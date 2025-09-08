@@ -338,10 +338,10 @@ const FFESpreadsheet = ({
                           </tr>
                         )}
 
-                        {/* ACTION BUTTONS ROW - AFTER ALL ITEMS */}
+                        {/* ACTION BUTTONS ROW - FAR LEFT */}
                         <tr>
                           <td colSpan="16" className="p-4 bg-neutral-800 border border-neutral-600">
-                            <div className="flex items-center justify-center space-x-6">
+                            <div className="flex items-center justify-start space-x-6">
                               <button
                                 onClick={() => {
                                   setSelectedRoomId(room.id);
