@@ -234,7 +234,21 @@ const FFESpreadsheet = ({
                             className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
                             style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
                           >
-                            {subcategory.name.toUpperCase()}
+                            <div className="flex items-center justify-between">
+                              <span></span>
+                              <span>{subcategory.name.toUpperCase()}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedSubCategoryId(subcategory.id);
+                                  setShowAddItem(true);
+                                }}
+                                className="bg-neutral-800 bg-opacity-50 hover:bg-opacity-70 text-white px-2 py-1 rounded text-xs"
+                                title="Add Item"
+                              >
+                                ➕ Item
+                              </button>
+                            </div>
                           </td>
                           {/* BROWN SECTION - ADDITIONAL INFO (spans 3 columns) */}
                           <td 
