@@ -429,14 +429,18 @@ const FFEItemRow = ({
     notes: item.notes || item.remarks || ''
   });
 
-  // Auto-save when any field changes - NO PAGE JUMPING
+  // Auto-save when any field changes - PREVENT ALL PAGE JUMPING
   const handleFieldChange = async (field, value) => {
     const newData = { ...formData, [field]: value };
     setFormData(newData);
     
-    // Immediate save without timeout to prevent page jumping
+    // Prevent any form submission or page refresh
     try {
-      await onUpdate(item.id, { [field]: value });
+      // Use debounced save to prevent rapid API calls
+      clearTimeout(window[`autoSave_${item.id}_${field}`]);
+      window[`autoSave_${item.id}_${field}`] = setTimeout(async () => {
+        await onUpdate(item.id, { [field]: value });
+      }, 500);
     } catch (error) {
       console.error('Error auto-saving:', error);
     }
