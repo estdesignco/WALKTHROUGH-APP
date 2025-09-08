@@ -1,21 +1,29 @@
 <analysis>
-The AI engineer initiated the project by analyzing a Google Sheets-based interior design workflow and converting it into a full-stack React/FastAPI application. The core task involved replicating the Google Sheet's Questionnaire, Walkthrough, Checklist, and FF&E (Furniture, Fixtures, and Equipment) functionalities, with a specific focus on the FF&E module.
-
-The development was iterative, driven by continuous user feedback on UI layout, color schemes, and structural hierarchy. Initially, a basic FF&E dashboard with collapsible sections was built, followed by extensive refinement to precisely match the Google Sheet's visual design, including specific column headers, alternating row colors, and a multi-level (Room > Category > Sub-category) organizational structure. Debugging focused on backend API integrity and frontend rendering issues, leading to successful data persistence but ongoing display problems in the UI.
+The previous AI engineer's work involved an iterative, user-driven development process to transform a Google Sheets-based interior design workflow into a full-stack React/FastAPI application. The primary focus was the FF&E (Furniture, Fixtures, and Equipment) module. Initially, the AI debugged a critical frontend rendering issue where backend data was not displayed, eventually identifying a project ID mismatch as the root cause. Subsequent work revolved around precisely replicating the Google Sheets UI, including a 3-level hierarchy (Room > Category > Sub-category), specific color schemes, centered headers, and column placement. The process involved extensive back-and-forth with the user, addressing detailed feedback on layout, missing features (like the link column), dropdown options, date pickers, link scraping for wholesale sites, and granular color adjustments. The AI also implemented auto-population of room structures and integrated tracking functionality. Challenges included persistent UI rendering issues, complex styling requirements, and ensuring all explicit user demands were met despite communication nuances.
 </analysis>
 
 <product_requirements>
-The user requires a web application to replace an existing Google Sheets-based interior design app. The application should manage a workflow from client questionnaire to three core sheets: Walkthrough, Checklist, and FF&E (Furniture, Fixtures & Equipment). Key requirements include:
-- Replicating the exact visual layout, color coding (including room-specific and item-specific colors), and headers of the original Google Sheets, particularly for the FF&E section, which needs horizontal scrolling.
+The user requires a web application to replace an existing Google Sheets-based interior design app. The application should manage a workflow including a client questionnaire, Walkthrough, Checklist, and FF&E (Furniture, Fixtures & Equipment) sheets.
+
+**Key requirements include:**
+- Replicating the exact visual layout, color coding (including unique room colors, specific green for categories, red for subcategories, custom gold/brown for additional info, and purple for shipping info), and headers of the original Google Sheets, particularly for the FF&E section, which needs horizontal scrolling.
 - Implementation of a 3-level hierarchy for organizing items: Room > Category > Sub-category.
-- Features for importing existing data and emailing questionnaires to clients.
-- Offline capability for job site usage.
-- Drag-and-drop functionality for rooms and categories, with the ability to minimize sections.
-- Auto-population of all appropriate categories when a new room is created.
-- Consolidation of categories with two or fewer items into another category.
-- Link scraping to auto-fill product information and display image thumbnails.
-- Fixing UI issues like headers jumping when clicked and ensuring a professional, muted color palette with an almost black background and no white anywhere.
-- All cells should utilize fit-to-text sizing.
+- Features for importing existing data and emailing questionnaires to clients (pending).
+- Offline capability for job site usage (pending).
+- Drag-and-drop functionality for rooms and categories, with the ability to minimize sections (pending refinement).
+- Auto-population of all appropriate categories and subcategories when a new room is created, with default items.
+- Consolidation of categories with two or fewer items into another category (pending).
+- Link scraping functionality for auto-filling product information (name, vendor, cost, image, finish/color) from product URLs, specifically for a list of 24 wholesale vendor sites.
+- Fixing UI issues like headers jumping (fixed) and ensuring a professional, muted color palette with distinct, subtle colors and an almost black background (no white anywhere).
+- All cells should utilize free-flow editing (directly editable without an explicit edit button) with auto-save.
+- Column headers (ITEM, VENDOR/SKU, QTY, etc.) must be placed on the red subcategory line, beneath higher-level colored sections (Red for core info, Brown for additional info, Purple for shipping info).
+- Inclusion of all necessary columns: Item Name, Vendor/SKU, QTY, Size, Orders Status, Finish/Color, Cost/Price, Link, Image, Order Status/Ship/Delivery (with 3 distinct input spaces), Install Date/Shipping TO, Tracking #, Carrier, Order Date, Notes, Delete.
+- Date picker functionality for all date fields (Order Date, Install Date, Ship Date, Delivery Date).
+- Smart tracking links that auto-open carrier websites based on tracking numbers.
+- A status overview section with a double-sized pie chart (with labels as per user's picture) and a status breakdown list, both reflecting real data and displaying unique colors for each of the 19 status options.
+- Carrier dropdown functionality with 18 specific carrier options.
+- Vendor dropdown functionality featuring only the 24 wholesale vendors provided by the user.
+- Removal of duplicate shipping containers in the header.
 </product_requirements>
 
 <key_technical_concepts>
@@ -23,9 +31,9 @@ The user requires a web application to replace an existing Google Sheets-based i
 - **React**: JavaScript library for building the frontend user interface.
 - **MongoDB**: NoSQL database for data storage.
 - **Tailwind CSS**: Utility-first CSS framework for styling.
-- ****: React library for drag and drop functionality.
-- **Google Apps Script**: Original source of logic and data structure reference.
-- **Environment Variables**:  for frontend API calls,  for backend database connection.
+- **BeautifulSoup4 & lxml**: Python libraries for web scraping.
+- **Environment Variables**: , , .
+- ****: React library for drag and drop functionality (partially implemented/pending).
 </key_technical_concepts>
 
 <code_architecture>
@@ -36,50 +44,68 @@ The application follows a full-stack architecture with a React frontend and a Fa
 
 -   **/app/backend/server.py**
     -   **Summary**: Main FastAPI application file. Defines API routes for managing projects, rooms, categories, and items within the FF&E system. It interacts with the MongoDB database.
-    -   **Changes**: Modified to include comprehensive data models and API endpoints for FF&E, supporting the 3-level hierarchy (Room, Category, Sub-category).
+    -   **Changes**: Modified extensively to include comprehensive data models and API endpoints for FF&E, supporting the 3-level hierarchy. Updated  enum, , and  with numerous options. Added  function for web scraping. Enhanced  for auto-population.
 -   **/app/backend/.env**
-    -   **Summary**: Stores environment variables for the backend, notably  and .
+    -   **Summary**: Stores environment variables for the backend, notably  and .  also configured.
+    -   **Changes**:  was set to .
+-   **/app/backend/requirements.txt**
+    -   **Summary**: Lists Python dependencies for the backend.
+    -   **Changes**: Added  and  for web scraping.
 -   **/app/frontend/src/App.js**
     -   **Summary**: The main React component, acting as the entry point and handling global layout and routing.
-    -   **Changes**: Updated to integrate the  component and manage overall application flow, including initial project creation.
+    -   **Changes**: Updated to integrate the  component, manage overall application flow, and pass utility data (vendors, carriers, statuses) as props.
 -   **/app/frontend/src/App.css**
     -   **Summary**: Global CSS file for the application's styling.
-    -   **Changes**: Heavily modified to implement the desired professional, muted color scheme (almost black background, no white), header styling, and to fix the header jumping issue.
+    -   **Changes**: Heavily modified to implement the desired professional, muted color scheme (almost black background, no white), header styling, and to fix the header jumping issue. Includes custom colors for various UI elements.
 -   **/app/frontend/src/components/FFEDashboard.js**
-    -   **Summary**: Orchestrates the FF&E view, displaying project details, status overview, and integrating the  component.
-    -   **Changes**: Adjusted for header structure (client header below status overview) and overall theme consistency.
+    -   **Summary**: Orchestrates the FF&E view, displaying project details, status overview, and integrating the  component. Handles loading utility data (vendors, carriers, statuses).
+    -   **Changes**: Adjusted for header structure, overall theme consistency, and fetching , , and  from the backend. Modified room creation to use backend auto-population logic.
 -   **/app/frontend/src/components/FFESpreadsheet.js**
-    -   **Summary**: A newly created component central to displaying the FF&E data in a spreadsheet-like, horizontally scrollable table, matching the Google Sheets layout precisely.
-    -   **Changes**: Implemented to support exact column headers, alternating row colors, cell fit-to-text, and the 3-level hierarchy.
--   **/app/frontend/src/components/RoomSection.js**
-    -   **Summary**: Renders individual room sections within the FF&E dashboard, intended to include collapsible functionality and manage categories.
-    -   **Changes**: Modified to support auto-population of categories when a room is added.
--   **/app/frontend/src/components/FFESection.js**
-    -   **Summary**: Likely handles the rendering of sub-sections (categories/sub-categories) within a room, working in conjunction with .
-    -   **Changes**: Updated to correctly display the 3-level hierarchy (Room > Category > Sub-category) with precise color coding.
--   **/app/frontend/src/components/AddRoomModal.js**, **/app/frontend/src/components/AddCategoryModal.js**, **/app/frontend/src/components/AddItemModal.js**
-    -   **Summary**: Modal components for user input to add new rooms, categories, and items respectively.
+    -   **Summary**: Displays the FF&E data in a spreadsheet-like, horizontally scrollable table. This is the core component for showing rooms, categories, subcategories, and items.
+    -   **Changes**: Extensively modified to support exact column headers, alternating row colors, cell fit-to-text, the 3-level hierarchy, and dynamic column structure with three colored sections (Red, Brown, Purple). Implemented custom colors, free-flow editing, date pickers, tracking links, and added Notes/Delete columns.
+-   **/app/frontend/src/components/FFEItemRow.js** (Implicitly part of FFESpreadsheet but often extracted for item rendering)
+    -   **Summary**: Renders individual item rows within the FF&E spreadsheet.
+    -   **Changes**: Modified to reflect the new 16-column structure, include all input fields (dropdowns, date pickers, text fields), apply status-specific colors, and support free-flow editing.
+-   **/app/frontend/src/components/AddRoomModal.js**
+    -   **Summary**: Modal component for user input to add new rooms.
+    -   **Changes**: Updated to support auto-population of categories when a room is added, and show quick-select room options with color previews.
+-   **/app/frontend/src/components/AddItemModal.js**
+    -   **Summary**: Modal component for user input to add new items.
+    -   **Changes**: Modified to include link scraping functionality with a Fill button, and to utilize backend for product info extraction. Updated to use new vendor/carrier dropdowns.
+-   **/app/frontend/src/components/StatusOverview.js**
+    -   **Summary**: Displays a summary of the project's FF&E status.
+    -   **Changes**: Updated to display a double-sized pie chart and a detailed status breakdown, incorporating actual data and custom colors for each status.
 -   **/app/frontend/.env**
     -   **Summary**: Stores environment variables for the frontend, primarily .
 -   **/app/frontend/tailwind.config.js**
     -   **Summary**: Configuration for Tailwind CSS.
-    -   **Changes**: Modified to integrate new theme colors and ensure Tailwind generates the required utility classes.
+    -   **Changes**: Modified to integrate new theme colors (custom gold, specific green, red, brown, purple, muted terracotta, taupe, lavender, forest green) and ensure Tailwind generates the required utility classes for the new color palette.
 </code_architecture>
 
 <pending_tasks>
-- Implement link scraping functionality to auto-fill product information and image thumbnails.
+- Implement import/export functionality for project data.
 - Refine drag and drop functionality for rooms and categories.
 - Develop logic for category consolidation (merging categories with two or fewer items).
 - Implement offline capability for job site usage.
-- Add import/export functionality for project data.
-- Fix the frontend bug preventing the display of newly created rooms and items in the UI.
+- Update the pie chart in StatusOverview to match the user's reference image with labels.
+- Address any remaining duplicate shipping containers.
+- Add all status colors to the status breakdown dots.
 </pending_tasks>
 
 <current_work>
-Currently, the AI engineer is debugging a critical frontend issue. Although backend API calls for creating projects, rooms, categories, and items are successful (confirmed by  tests and backend logs showing data persistence), the frontend UI is not displaying these newly created entities. The last known state shows a project (Greene Renovation) with data for Living Room, Lighting, and items like Crystal Chandelier and Floor Lamp successfully created in the backend, but the user reported no rooms created, and no example to see on the frontend. The AI engineer has verified that the backend data exists and suspects a JavaScript error in the browser console preventing proper rendering. The FF&E dashboard structure and styling have been updated to precisely match the user's Google Sheets screenshots, including the 3-level hierarchy (Room > Category > Sub-category), muted color scheme, and horizontal scrolling.
+Immediately prior to this summary request, the AI engineer was focused on resolving a comprehensive list of user-reported issues and refinements, mostly related to the FF&E spreadsheet's UI and data handling. The last major set of fixes addressed:
+1.  **Color corrections:** Applying user-specified hex codes for room headers, category headers (), subcategory headers (), additional info sections (), and shipping info sections (). The previous red for subcategories was also explicitly changed to .
+2.  **Free-flow editing:** Removing explicit edit buttons and making all fields directly editable with auto-save functionality.
+3.  **Link scraping:** Ensuring the link scraping functionality for 24 wholesale sites was correctly working and integrated into the , with a clickable Fill button.
+4.  **Vendor dropdown:** Corrected to display only the user's specified wholesale vendors, removing retail options.
+5.  **Date spacing:** Improving the layout and spacing for the three date fields (Order Status, Ship Date, Delivery Date) within a single cell.
+6.  **Navigation issues:** Fixing horizontal scrolling to prevent returning to the previous page and addressing link jumping to the top of the page.
+7.  **Missing columns:** Ensuring the Link, Notes, and Delete columns were correctly added to the FF&E spreadsheet.
+8.  **Carrier dropdown:** Confirming the carrier dropdown was working with all 18 options.
+
+The AI engineer presented a screenshot confirming these fixes, highlighting the correct colors, free-flow editing, fixed link scraping, proper status breakdown, and improved date spacing. The last action was asking the user if they would like to test the link scraping functionality.
 </current_work>
 
 <optional_next_step>
-Check the browser console and fix the JavaScript error.
+Test the link scraping functionality with one of the provided wholesale sites to confirm it is working as expected.
 </optional_next_step>
-
