@@ -49,6 +49,7 @@ const FFEDashboard = ({ isOffline }) => {
 
   const loadUtilityData = async () => {
     try {
+      const { utilityAPI } = await import('../App');
       const [roomColorsRes, categoryColorsRes, statusesRes] = await Promise.all([
         utilityAPI.getRoomColors(),
         utilityAPI.getCategoryColors(), 
