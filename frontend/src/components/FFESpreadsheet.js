@@ -444,6 +444,7 @@ const FFESpreadsheet = ({
           }}
           onSubmit={handleAddItem}
           itemStatuses={itemStatuses}
+          vendorTypes={vendorTypes}
           loading={loading}
         />
       )}
