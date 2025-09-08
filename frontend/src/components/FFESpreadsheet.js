@@ -485,14 +485,15 @@ const FFEItemRow = ({
     <tr style={{ backgroundColor: bgColor }} className="text-neutral-200 text-sm">
       {/* RED SECTION - Core Item Info - FREE FLOW EDITING */}
       
-      {/* Item Name - Always editable */}
-      <td className="p-2 border border-neutral-600 fit-text">
+      {/* Item Name - NO CONTAINER */}
+      <td className="p-1 border border-neutral-600 w-auto" style={{ width: 'fit-content' }}>
         <input
           type="text"
           value={formData.name}
           onChange={(e) => handleFieldChange('name', e.target.value)}
-          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          className="w-full bg-transparent text-neutral-200 text-sm border-0 outline-0 p-1"
           placeholder="Item name..."
+          style={{ minWidth: `${Math.max(formData.name.length * 8, 80)}px` }}
         />
       </td>
 
