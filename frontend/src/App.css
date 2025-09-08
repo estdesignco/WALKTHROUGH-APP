@@ -7,7 +7,169 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Room Color Variables - matching Google Sheets */
+/* Prevent header jumping to top when clicked */
+.room-header, .category-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.room-header:focus, .category-header:focus {
+  outline: none;
+}
+
+/* FF&E Spreadsheet exactly like Google Sheets */
+.ffe-table {
+  border-collapse: collapse;
+  width: 100%;
+  background: white;
+  font-family: 'Century Gothic', Arial, sans-serif;
+  font-size: 12px;
+}
+
+.ffe-table th {
+  background-color: #f3f3f3;
+  border: 1px solid #ccc;
+  padding: 8px;
+  font-weight: bold;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.ffe-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  vertical-align: top;
+}
+
+/* Room header styling exactly like Google Sheets */
+.room-header-cell {
+  font-weight: bold;
+  font-size: 14px;
+  padding: 12px 8px;
+  text-align: left;
+}
+
+/* Category header styling exactly like Google Sheets */
+.category-header-cell {
+  font-weight: bold;
+  font-size: 13px;
+  padding: 8px;
+  text-align: left;
+}
+
+/* Item row alternating colors exactly like Google Sheets */
+.item-row-even {
+  background-color: #1A2B3A;
+  color: #FFFFD0;
+}
+
+.item-row-odd {
+  background-color: #263D54;
+  color: #FFFFD0;
+}
+
+/* Horizontal scrolling for wide spreadsheet */
+.spreadsheet-container {
+  overflow-x: auto;
+  max-width: 100vw;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* Fixed table layout for consistent column widths */
+.fixed-table-layout {
+  table-layout: fixed;
+  min-width: 2000px;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Image thumbnails in table */
+.item-image {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.image-placeholder {
+  width: 48px;
+  height: 48px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #999;
+}
+
+/* Action buttons in table */
+.action-button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  margin: 0 2px;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  opacity: 0.8;
+}
+
+.edit-button {
+  background-color: #3B82F6;
+  color: white;
+}
+
+.save-button {
+  background-color: #10B981;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #6B7280;
+  color: white;
+}
+
+.delete-button {
+  background-color: #EF4444;
+  color: white;
+}
+
+/* Input fields in edit mode */
+.table-input {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333;
+}
+
+.table-input:focus {
+  outline: none;
+  border-color: #3B82F6;
+  background-color: white;
+}
+
+/* Room color variables - matching Google Sheets exactly */
 :root {
   --living-room: #B22222;
   --kitchen: #008080;
@@ -36,300 +198,75 @@
   --lighting: #104131;
   --furniture-storage: #B82F13;
   --category-alt: var(--lighting);
-
-  /* Item Row Colors - Alternating */
-  --item-row-odd: #1A2B3A;
-  --item-row-even: #263D54;
-  --item-text: #FFFFD0;
-
-  /* Status Colors */
-  --status-picked: #FFD966;
-  --status-ordered: #3B82F6;
-  --status-shipped: #F97316;
-  --status-delivered: #10B981;
-  --status-installed: #22C55E;
-  --status-partial: #8B5CF6;
-  --status-hold: #EF4444;
-  --status-cancelled: #6B7280;
 }
 
-/* Drag and Drop Styles */
-.dragging {
-  transform: rotate(5deg);
-  opacity: 0.8;
-  transition: all 0.2s ease;
+/* Links in table */
+.table-link {
+  color: #3B82F6;
+  text-decoration: none;
+  font-size: 16px;
 }
 
-.drop-zone {
-  border: 2px dashed #4F46E5;
-  background-color: rgba(79, 70, 229, 0.1);
-  transition: all 0.2s ease;
+.table-link:hover {
+  color: #1D4ED8;
 }
 
-.drag-handle {
-  cursor: grab;
-  transition: all 0.2s ease;
+/* Currency formatting */
+.currency {
+  text-align: right;
+  font-family: 'Courier New', monospace;
 }
 
-.drag-handle:active {
-  cursor: grabbing;
+/* Date formatting */
+.date-cell {
+  white-space: nowrap;
+  font-size: 11px;
 }
 
-/* Room Header Animations */
-.room-header {
-  transition: all 0.3s ease;
-}
-
-.room-header:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* Category Collapse Animation */
-.category-content {
-  transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+/* Notes/remarks cell */
+.notes-cell {
+  max-width: 200px;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.category-collapsed {
-  max-height: 0;
-  padding: 0;
-}
-
-.category-expanded {
-  max-height: 1000px;
-}
-
-/* Item Row Hover Effects */
-.item-row {
-  transition: all 0.2s ease;
-}
-
-.item-row:hover {
-  transform: translateX(4px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Status Badge Animations */
-.status-badge {
-  transition: all 0.2s ease;
-  border-radius: 12px;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.status-badge:hover {
-  transform: scale(1.05);
-}
-
-/* Modal Animations */
-.modal-backdrop {
-  backdrop-filter: blur(4px);
-  transition: all 0.3s ease;
-}
-
-.modal-content {
-  animation: modalSlideIn 0.3s ease-out;
-}
-
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-50px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Progress Ring Animation */
-.progress-ring {
-  transition: stroke-dashoffset 0.5s ease-in-out;
-}
-
-/* Loading Spinner */
-.spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Button Hover Effects */
-.btn-primary {
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* Offline Mode Styles */
-.offline-indicator {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-/* Table Header Styles */
-.table-header {
-  background: linear-gradient(135deg, #374151 0%, #4B5563 100%);
-  border-bottom: 2px solid #6B7280;
-}
-
-/* Brand Header */
-.brand-header {
-  background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
-  color: #000;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #374151;
-  border-radius: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #6B7280;
-  border-radius: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .room-header {
-    flex-direction: column;
-    align-items: stretch;
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .spreadsheet-container {
+    font-size: 11px;
   }
   
-  .room-actions {
-    margin-top: 1rem;
-    justify-content: center;
-  }
-  
-  .item-row {
-    font-size: 0.875rem;
-  }
-  
-  .modal-content {
-    margin: 1rem;
-    max-height: calc(100vh - 2rem);
+  .item-image, .image-placeholder {
+    width: 32px;
+    height: 32px;
   }
 }
 
-/* Print Styles */
+/* Print styles for spreadsheet */
 @media print {
-  .no-print {
-    display: none !important;
+  .spreadsheet-container {
+    overflow: visible;
+    max-width: none;
   }
   
-  .room-header {
-    page-break-inside: avoid;
+  .ffe-table {
+    page-break-inside: auto;
   }
   
-  .category-section {
+  .room-header-cell {
     page-break-inside: avoid;
+    page-break-after: avoid;
+  }
+  
+  .action-button {
+    display: none;
   }
 }
 
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
-  :root {
-    --item-row-odd: #000000;
-    --item-row-even: #1a1a1a;
-    --item-text: #ffffff;
-  }
-}
-
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* Focus Styles for Accessibility */
-.focus-ring:focus {
-  outline: 2px solid #3B82F6;
-  outline-offset: 2px;
-}
-
-/* Status Overview Chart Styles */
-.chart-container {
-  position: relative;
-}
-
-.chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
-
-/* Form Validation Styles */
-.form-error {
-  border-color: #EF4444 !important;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-}
-
-.error-message {
-  color: #EF4444;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-/* Success States */
-.success-message {
-  color: #10B981;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-/* Loading States  */
-.loading-shimmer {
-  background: linear-gradient(90deg, #374151 25%, #4B5563 50%, #374151 75%);
+/* Loading states for table cells */
+.loading-cell {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
@@ -342,3 +279,70 @@
     background-position: 200% 0;
   }
 }
+
+/* Focus states for accessibility */
+.table-input:focus,
+.action-button:focus {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* Drag handle styles (for future drag & drop) */
+.drag-handle {
+  cursor: grab;
+  padding: 4px;
+  color: #999;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle:hover {
+  color: #666;
+}
+
+/* Scrollbar styling for spreadsheet */
+.spreadsheet-container::-webkit-scrollbar {
+  height: 12px;
+}
+
+.spreadsheet-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.spreadsheet-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 6px;
+}
+
+.spreadsheet-container::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Logo styling */
+.logo {
+  max-height: 48px;
+  width: auto;
+}
+
+/* Remove focus outline on header clicks to prevent jumping */
+*:focus {
+  scroll-margin-top: 0;
+}
+
+/* Prevent scroll jumping on click */
+html {
+  scroll-behavior: auto;
+}
+
+/* Status colors exactly matching your system */
+.status-picked { background-color: #FFD966; color: #000; }
+.status-ordered { background-color: #3B82F6; color: #fff; }
+.status-shipped { background-color: #F97316; color: #fff; }
+.status-delivered { background-color: #10B981; color: #fff; }
+.status-installed { background-color: #22C55E; color: #fff; }
+.status-partial { background-color: #8B5CF6; color: #fff; }
+.status-hold { background-color: #EF4444; color: #fff; }
+.status-cancelled { background-color: #6B7280; color: #fff; }
