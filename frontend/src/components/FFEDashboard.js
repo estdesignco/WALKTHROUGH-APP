@@ -254,15 +254,58 @@ const FFEDashboard = ({ isOffline }) => {
         </div>
       )}
 
-      {/* Status Overview - Two Row Layout ABOVE client header */}
-      <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
-        <StatusOverview 
+      {/* STATUS OVERVIEW + BREAKDOWN + SHIPPING BREAKDOWN - IN CORRECT ORDER */}
+      <div className="mb-8">
+        <StatusOverview
           totalItems={getTotalItems()}
           statusBreakdown={getStatusBreakdown()}
           itemStatuses={itemStatuses}
         />
         
+        {/* Shipping Carrier Breakdown - KEEP AS IS */}
+        <div className="bg-gray-800 rounded-xl p-6 mt-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Shipping Carrier Breakdown</h3>
+          
+          {Object.keys(getCarrierBreakdown()).length > 0 ? (
+            <div className="space-y-2">
+              {Object.entries(getCarrierBreakdown()).map(([carrier, count]) => (
+                <div key={carrier} className="flex justify-between items-center p-2 bg-gray-700 rounded">
+                  <span className="text-gray-300">{carrier}</span>
+                  <span className="text-gray-200 font-medium">{count}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">
+              <div className="text-4xl mb-2">📦</div>
+              <p className="text-sm">No items with assigned carriers.</p>
+            </div>
+          )}
+        </div>
 
+        {/* SEARCH BAR AND ADD ROOM BUTTON */}
+        <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
+          <div className="flex items-center space-x-4 flex-1">
+            <input
+              type="text"
+              placeholder="Search Items..."
+              className="flex-1 bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500"
+            />
+            <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+              <option>All Rooms</option>
+            </select>
+            <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+              <option>All Statuses</option>
+            </select>
+          </div>
+          <button
+            onClick={() => setShowAddRoom(true)}
+            style={{ backgroundColor: '#8b7355' }}
+            className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors ml-4"
+          >
+            ➕ Add Room
+          </button>
+        </div>
       </div>
 
       {/* TOP HEADER - LARGE GREENE + ADDRESS */}
