@@ -345,6 +345,145 @@ def get_category_color(category_name: str) -> str:
 def get_subcategory_color(subcategory_name: str) -> str:
     return SUBCATEGORY_COLORS.get(subcategory_name.lower(), "#8A5A5A")
 
+# LINK SCRAPING FUNCTIONALITY
+async def scrape_product_info(url: str) -> Dict[str, Any]:
+    """Scrape product information from a URL"""
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Extract product information
+        product_info = {
+            'name': '',
+            'price': '',
+            'description': '',
+            'image_url': '',
+            'vendor': '',
+            'sku': '',
+            'size': '',
+            'color': ''
+        }
+        
+        # Try to extract product name
+        name_selectors = [
+            'h1[data-automation-id="product-title"]',  # Home Depot
+            'h1.product-title',
+            'h1#product-title', 
+            '.product-name h1',
+            'h1.a-size-large',  # Amazon
+            '[data-testid="product-title"]',
+            'h1',
+            '.product-title',
+            '.product-name'
+        ]
+        
+        for selector in name_selectors:
+            element = soup.select_one(selector)
+            if element and element.get_text(strip=True):
+                product_info['name'] = element.get_text(strip=True)[:100]  # Limit length
+                break
+        
+        # Try to extract price
+        price_selectors = [
+            '.price-current',
+            '.price .sr-only',
+            '.a-price-whole',  # Amazon
+            '[data-testid="price"]',
+            '.price-now',
+            '.current-price',
+            '.product-price',
+            '.price'
+        ]
+        
+        for selector in price_selectors:
+            element = soup.select_one(selector)
+            if element:
+                price_text = element.get_text(strip=True)
+                # Extract price using regex
+                price_match = re.search(r'\$[\d,]+\.?\d*', price_text)
+                if price_match:
+                    product_info['price'] = price_match.group().replace(',', '')
+                    break
+        
+        # Try to extract main image
+        image_selectors = [
+            'img[data-testid="product-image"]',
+            '.product-image img',
+            '#landingImage',  # Amazon
+            '.hero-image img',
+            '.primary-image img',
+            'img.product-image',
+            '.media img'
+        ]
+        
+        for selector in image_selectors:
+            element = soup.select_one(selector)
+            if element and element.get('src'):
+                img_url = element.get('src')
+                # Make sure it's a full URL
+                if img_url.startswith('//'):
+                    img_url = 'https:' + img_url
+                elif img_url.startswith('/'):
+                    img_url = urljoin(url, img_url)
+                
+                product_info['image_url'] = img_url
+                break
+        
+        # Try to extract vendor from URL
+        domain = urlparse(url).netloc.lower()
+        if 'homedepot' in domain:
+            product_info['vendor'] = 'Home Depot'
+        elif 'lowes' in domain:
+            product_info['vendor'] = "Lowe's"
+        elif 'amazon' in domain:
+            product_info['vendor'] = 'Amazon'
+        elif 'wayfair' in domain:
+            product_info['vendor'] = 'Wayfair'
+        elif 'potterybarn' in domain:
+            product_info['vendor'] = 'Pottery Barn'
+        elif 'restorationhardware' in domain:
+            product_info['vendor'] = 'Restoration Hardware'
+        elif 'westelm' in domain:
+            product_info['vendor'] = 'West Elm'
+        elif 'crateandbarrel' in domain:
+            product_info['vendor'] = 'Crate & Barrel'
+        
+        # Extract SKU/Model number
+        sku_selectors = [
+            '[data-testid="sku"]',
+            '.sku',
+            '.model-number',
+            '.product-sku'
+        ]
+        
+        for selector in sku_selectors:
+            element = soup.select_one(selector)
+            if element:
+                product_info['sku'] = element.get_text(strip=True)
+                break
+        
+        return product_info
+        
+    except Exception as e:
+        logging.error(f"Error scraping URL {url}: {e}")
+        return {
+            'name': '',
+            'price': '',
+            'description': '',
+            'image_url': '',
+            'vendor': '',
+            'sku': '',
+            'size': '',
+            'color': '',
+            'error': str(e)
+        }
+
 # PROJECT ENDPOINTS
 @api_router.post("/projects", response_model=Project)
 async def create_project(project: ProjectCreate):
