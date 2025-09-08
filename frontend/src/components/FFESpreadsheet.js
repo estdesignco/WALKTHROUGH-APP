@@ -151,19 +151,12 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* Horizontal Scrollable Container - ALLOW VERTICAL SCROLL */}
+      {/* Horizontal Scrollable Container - BOTH DIRECTIONS WORK */}
       <div 
         className="overflow-x-auto"
-        onWheel={(e) => {
-          // Only prevent horizontal wheel scrolling, allow vertical
-          if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-            e.stopPropagation();
-            e.preventDefault();
-          }
-        }}
         style={{ 
           overscrollBehaviorX: 'contain',
-          touchAction: 'pan-y'
+          overscrollBehaviorY: 'auto'
         }}
       >
         <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
