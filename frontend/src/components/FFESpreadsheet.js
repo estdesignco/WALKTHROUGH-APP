@@ -497,20 +497,16 @@ const FFEItemRow = ({
         />
       </td>
 
-      {/* Vendor/SKU - Always editable dropdown */}
-      <td className="p-2 border border-neutral-600 fit-text">
-        <select
+      {/* Vendor/SKU - NO CONTAINER */}
+      <td className="p-1 border border-neutral-600 w-auto" style={{ width: 'fit-content' }}>
+        <input
+          type="text"
           value={formData.vendor}
           onChange={(e) => handleFieldChange('vendor', e.target.value)}
-          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
-        >
-          <option value="">Select Vendor</option>
-          {vendorTypes.map(vendor => (
-            <option key={vendor} value={vendor} className="bg-neutral-800">
-              {vendor}
-            </option>
-          ))}
-        </select>
+          className="w-full bg-transparent text-neutral-200 text-sm border-0 outline-0 p-1"
+          placeholder="Vendor/SKU..."
+          style={{ minWidth: `${Math.max(formData.vendor.length * 8, 80)}px` }}
+        />
       </td>
 
       {/* Quantity - Always editable */}
