@@ -382,7 +382,7 @@ const FFESpreadsheet = ({
                 ))}
 
                 {/* Empty state for room */}
-                {room.categories.length === 0 && (
+                {(!room.categories || room.categories.length === 0) && (
                   <tr>
                     <td colSpan="16" className="p-8 text-center text-neutral-400 border border-neutral-600" style={{ backgroundColor: '#2A2A2A' }}>
                       <p>No categories in this room.</p>
