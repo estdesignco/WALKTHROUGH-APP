@@ -281,13 +281,13 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* LOGO CONTAINER - JUST BARELY BIGGER THAN LOGO */}
-        <div className="mx-auto rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '20px 40px', width: 'fit-content' }}>
+        {/* LOGO CONTAINER - WIDE RECTANGLE BANNER LIKE YOUR PICTURE */}
+        <div className="mx-auto rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '40px 80px', width: '70%', maxWidth: '900px' }}>
           <div className="flex items-center justify-center">
             <img 
               src="/established-logo.png" 
               alt="Established Design Co. Logo" 
-              style={{ height: '160px', width: 'auto', objectFit: 'contain' }}
+              style={{ height: '120px', width: '100%', objectFit: 'contain' }}
             />
           </div>
         </div>
