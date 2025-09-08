@@ -451,6 +451,11 @@ const FFEItemRow = ({
       quantity: item.quantity,
       size: item.size || '',
       status: item.status,
+      cost: item.cost || 0,
+      link: item.link || '',
+      tracking_number: item.tracking_number || '',
+      order_date: item.order_date || '',
+      install_date: item.install_date || '',
       remarks: item.remarks || ''
     });
     setIsEditing(false);
