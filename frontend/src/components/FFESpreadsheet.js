@@ -170,7 +170,7 @@ const FFESpreadsheet = ({
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
       {/* Horizontal Scrollable Container */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[3200px] border-collapse" style={{ tableLayout: 'fixed' }}>
+        <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
           {/* NO HEADER ROW - Headers go on the red subcategory lines as per your requirements */}
           <tbody>
             {project.rooms.map((room) => (
