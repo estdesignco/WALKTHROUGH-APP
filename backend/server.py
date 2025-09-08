@@ -999,7 +999,7 @@ async def scrape_product(data: dict):
         raise HTTPException(status_code=400, detail="URL is required")
     
     try:
-        product_info = await scrape_product_info(url)
+        product_info = scrape_product_info(url)  # Remove async
         return product_info
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to scrape URL: {str(e)}")
