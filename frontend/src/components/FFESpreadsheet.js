@@ -488,16 +488,16 @@ const FFEItemRow = ({
         </div>
       </td>
 
-      {/* Vendor/SKU - NO CONTAINER */}
-      <td className="p-1 border border-neutral-600 w-auto" style={{ width: 'fit-content' }}>
-        <input
-          type="text"
-          value={formData.vendor}
-          onChange={(e) => handleFieldChange('vendor', e.target.value)}
-          className="w-full bg-transparent text-neutral-200 text-sm border-0 outline-0 p-1"
-          placeholder="Vendor/SKU..."
-          style={{ minWidth: `${Math.max(formData.vendor.length * 8, 80)}px` }}
-        />
+      {/* Vendor/SKU - PLAIN TEXT ONLY */}
+      <td className="p-2 border border-neutral-600 w-auto text-neutral-200 text-sm" style={{ width: 'fit-content' }}>
+        <div
+          contentEditable
+          suppressContentEditableWarning={true}
+          onBlur={(e) => handleFieldChange('vendor', e.target.textContent)}
+          className="bg-transparent outline-none"
+        >
+          {formData.vendor || 'Vendor/SKU...'}
+        </div>
       </td>
 
       {/* Quantity - NO CONTAINER */}
