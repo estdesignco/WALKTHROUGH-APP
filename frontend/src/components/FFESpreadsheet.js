@@ -263,9 +263,9 @@ const FFESpreadsheet = ({
                               </button>
                             </div>
                           </td>
-                          {/* BROWN SECTION - ADDITIONAL INFO (spans 3 columns) */}
+                          {/* BROWN SECTION - ADDITIONAL INFO (spans 4 columns) */}
                           <td 
-                            colSpan="3"
+                            colSpan="4"
                             className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
                             style={{ backgroundColor: '#8B7355' }}
                           >
@@ -278,6 +278,14 @@ const FFESpreadsheet = ({
                             style={{ backgroundColor: '#7B68A6' }}
                           >
                             SHIPPING INFO.
+                          </td>
+                          {/* RED SECTION - NOTES & DELETE (spans 2 columns) */}
+                          <td 
+                            colSpan="2"
+                            className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
+                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
+                          >
+                            NOTES & DELETE
                           </td>
                         </tr>
                         
