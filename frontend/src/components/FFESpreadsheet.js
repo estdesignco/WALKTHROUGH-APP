@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { itemAPI } from '../App';
-import AddSubCategoryModal from './AddSubCategoryModal';
 import AddItemModal from './AddItemModal';
+import AddSubCategoryModal from './AddSubCategoryModal';
 
 const FFESpreadsheet = ({ 
   project, 
@@ -14,10 +13,10 @@ const FFESpreadsheet = ({
   onReload,
   isOffline 
 }) => {
-  const [showAddSubCategory, setShowAddSubCategory] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [showAddSubCategory, setShowAddSubCategory] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // EXACT colors from your pictures - COMPLETELY UNIQUE FOR EACH ROOM
@@ -59,77 +58,6 @@ const FFESpreadsheet = ({
     return '#A8756C'; // Muted terracotta red - distinct but easy on eyes
   };
 
-  const handleAddSubCategory = async (subCategoryData) => {
-    try {
-      setLoading(true);
-      const newSubCategory = {
-        ...subCategoryData,
-        category_id: selectedCategoryId,
-        order_index: 0
-      };
-      
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/subcategories`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newSubCategory)
-      });
-      
-      if (response.ok) {
-        await onReload();
-        setShowAddSubCategory(false);
-        setSelectedCategoryId(null);
-      }
-    } catch (err) {
-      console.error('Error creating subcategory:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddItem = async (itemData) => {
-    try {
-      setLoading(true);
-      const newItem = {
-        ...itemData,
-        subcategory_id: selectedSubCategoryId
-      };
-      
-      await itemAPI.create(newItem);
-      await onReload();
-      setShowAddItem(false);
-      setSelectedSubCategoryId(null);
-    } catch (err) {
-      console.error('Error creating item:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteItem = async (itemId) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) {
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      await itemAPI.delete(itemId);
-      await onReload();
-    } catch (err) {
-      console.error('Error deleting item:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUpdateItem = async (itemId, updateData) => {
-    try {
-      await itemAPI.update(itemId, updateData);
-      await onReload();
-    } catch (err) {
-      console.error('Error updating item:', err);
-    }
-  };
-
   const getStatusColor = (status) => {
     // Status colors from your pictures - DISTINCT for each status
     const colors = {
@@ -156,74 +84,114 @@ const FFESpreadsheet = ({
     return colors[status] || '#6B7280';
   };
 
-  if (project.rooms.length === 0) {
-    return (
-      <div className="bg-gray-800 rounded-xl p-12 text-center">
-        <div className="text-6xl mb-4">🏠</div>
-        <h3 className="text-xl font-semibold text-gray-200 mb-2">No Rooms Added</h3>
-        <p className="text-gray-400 mb-6">Start by adding rooms to organize your FF&E items</p>
-      </div>
-    );
-  }
+  const handleAddItem = async (itemData) => {
+    if (!selectedSubCategoryId) return;
+    
+    try {
+      setLoading(true);
+      const { itemAPI } = await import('../App');
+      await itemAPI.create({
+        ...itemData,
+        subcategory_id: selectedSubCategoryId
+      });
+      
+      await onReload();
+      setShowAddItem(false);
+      setSelectedSubCategoryId(null);
+    } catch (err) {
+      console.error('Error adding item:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddSubCategory = async (subCategoryData) => {
+    if (!selectedCategoryId) return;
+    
+    try {
+      setLoading(true);
+      const { subCategoryAPI } = await import('../App');
+      await subCategoryAPI.create({
+        ...subCategoryData,
+        category_id: selectedCategoryId
+      });
+      
+      await onReload();
+      setShowAddSubCategory(false);
+      setSelectedCategoryId(null);
+    } catch (err) {
+      console.error('Error adding sub-category:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateItem = async (itemId, updateData) => {
+    try {
+      const { itemAPI } = await import('../App');
+      await itemAPI.update(itemId, updateData);
+      await onReload();
+    } catch (err) {
+      console.error('Error updating item:', err);
+    }
+  };
+
+  const handleDeleteItem = async (itemId) => {
+    if (!window.confirm('Are you sure you want to delete this item?')) return;
+    
+    try {
+      const { itemAPI } = await import('../App');
+      await itemAPI.delete(itemId);
+      await onReload();
+    } catch (err) {
+      console.error('Error deleting item:', err);
+    }
+  };
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
       {/* Horizontal Scrollable Container */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
-          {/* NO HEADER ROW - Headers go on the red subcategory lines as per your requirements */}
           <tbody>
-            {project.rooms.map((room) => (
+            {/* MAIN DATA STRUCTURE */}
+            {project?.rooms?.map((room) => (
               <React.Fragment key={room.id}>
-                {/* 1. ROOM Header Row - PURPLE like LIVING ROOM - CENTERED */}
+                {/* 1. ROOM Header Row - UNIQUE COLORS FROM YOUR PICTURES - CENTERED */}
                 <tr>
                   <td 
                     colSpan="16" 
                     className="p-4 font-bold text-white text-lg border border-neutral-600 fit-text text-center"
                     style={{ backgroundColor: getRoomColor(room.name) }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
                   >
                     <div className="flex items-center justify-between">
                       <span></span>
                       <span>{room.name.toUpperCase()}</span>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onDeleteRoom(room.id);
-                          }}
-                          className="bg-neutral-800 bg-opacity-50 hover:bg-opacity-70 text-white px-2 py-1 rounded text-sm"
-                          title="Delete Room"
-                        >
-                          🗑️
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => onDeleteRoom(room.id)}
+                        className="bg-neutral-800 bg-opacity-50 hover:bg-opacity-70 text-white px-2 py-1 rounded text-sm"
+                        title="Delete Room"
+                      >
+                        🗑️
+                      </button>
                     </div>
                   </td>
                 </tr>
 
-                {/* 2. CATEGORIES for this room - GREEN like LIGHTING - CENTERED */}
+                {/* 2. CATEGORIES for this room - GREEN - CENTERED */}
                 {room.categories.map((category) => (
                   <React.Fragment key={category.id}>
                     <tr>
                       <td 
-                        colSpan="13" 
+                        colSpan="16" 
                         className="p-3 font-semibold text-white text-md border border-neutral-600 fit-text text-center"
                         style={{ backgroundColor: getCategoryColor(category.name) }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
                       >
                         <div className="flex items-center justify-between">
                           <span></span>
                           <span>{category.name.toUpperCase()}</span>
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
                               setSelectedCategoryId(category.id);
                               setShowAddSubCategory(true);
                             }}
@@ -236,10 +204,10 @@ const FFESpreadsheet = ({
                       </td>
                     </tr>
 
-                    {/* 3. SUB-CATEGORIES with MULTI-SECTION HEADERS - EXACTLY like your screenshots */}
+                    {/* 3. SUB-CATEGORIES with MULTI-SECTION HEADERS */}
                     {category.subcategories?.map((subcategory) => (
                       <React.Fragment key={subcategory.id}>
-                        {/* FIRST ROW: Section Headers - RED + BROWN + PURPLE */}
+                        {/* FIRST ROW: Section Headers - RED + BROWN + PURPLE + RED */}
                         <tr>
                           {/* RED SECTION - INSTALLED (spans 5 columns) */}
                           <td 
@@ -251,8 +219,7 @@ const FFESpreadsheet = ({
                               <span></span>
                               <span>{subcategory.name.toUpperCase()}</span>
                               <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
+                                onClick={() => {
                                   setSelectedSubCategoryId(subcategory.id);
                                   setShowAddItem(true);
                                 }}
@@ -292,108 +259,28 @@ const FFESpreadsheet = ({
                         {/* SECOND ROW: Column Headers - Each in their section's color */}
                         <tr>
                           {/* RED SECTION COLUMNS */}
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                          >
-                            ITEM NAME
-                          </td>
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                          >
-                            VENDOR/SKU
-                          </td>
-                          <td 
-                            className="w-16 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                          >
-                            QTY
-                          </td>
-                          <td 
-                            className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                          >
-                            SIZE
-                          </td>
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                          >
-                            ORDERS STATUS
-                          </td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}>ITEM NAME</td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}>VENDOR/SKU</td>
+                          <td className="w-16 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}>QTY</td>
+                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}>SIZE</td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}>ORDERS STATUS</td>
                           
                           {/* BROWN SECTION COLUMNS */}
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#8B7355' }}
-                          >
-                            FINISH/Color
-                          </td>
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#8B7355' }}
-                          >
-                            Cost/Price
-                          </td>
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#8B7355' }}
-                          >
-                            LINK
-                          </td>
-                          <td 
-                            className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#8B7355' }}
-                          >
-                            Image
-                          </td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8B7355' }}>FINISH/Color</td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8B7355' }}>Cost/Price</td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8B7355' }}>LINK</td>
+                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8B7355' }}>Image</td>
                           
                           {/* PURPLE SECTION COLUMNS */}
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#7B68A6' }}
-                          >
-                            Order Status /<br/>Ship Date /<br/>Delivery Date
-                          </td>
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#7B68A6' }}
-                          >
-                            Install Date /<br/>Shipping TO
-                          </td>
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#7B68A6' }}
-                          >
-                            TRACKING #
-                          </td>
-                          <td 
-                            className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#7B68A6' }}
-                          >
-                            Carrier
-                          </td>
-                          <td 
-                            className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#7B68A6' }}
-                          >
-                            Order Date
-                          </td>
+                          <td className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#7B68A6' }}>Order Status /<br/>Ship Date /<br/>Delivery Date</td>
+                          <td className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#7B68A6' }}>Install Date /<br/>Shipping TO</td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#7B68A6' }}>TRACKING #</td>
+                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#7B68A6' }}>Carrier</td>
+                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#7B68A6' }}>Order Date</td>
                           
                           {/* RED DELETE COLUMN */}
-                          <td 
-                            className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                          >
-                            NOTES
-                          </td>
-                          <td 
-                            className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}
-                          >
-                            DELETE
-                          </td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}>NOTES</td>
+                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}>DELETE</td>
                         </tr>
 
                         {/* 4. ITEMS for this sub-category */}
@@ -491,7 +378,7 @@ const FFESpreadsheet = ({
   );
 };
 
-// Individual Item Row Component - matching your exact layout
+// Individual Item Row Component - ALL COLUMNS INCLUDING LINK, NOTES, DELETE
 const FFEItemRow = ({ 
   item, 
   itemIndex, 
@@ -528,8 +415,8 @@ const FFEItemRow = ({
     try {
       await onUpdate(item.id, editData);
       setIsEditing(false);
-    } catch (err) {
-      console.error('Error updating item:', err);
+    } catch (error) {
+      console.error('Error saving item:', error);
     }
   };
 
@@ -651,7 +538,7 @@ const FFEItemRow = ({
         )}
       </td>
 
-      {/* BROWN SECTION - Additional Info */
+      {/* BROWN SECTION - Additional Info */}
       
       {/* Finish/Color */}
       <td className="p-2 border border-neutral-600 fit-text">
@@ -830,7 +717,7 @@ const FFEItemRow = ({
         )}
       </td>
 
-      {/* Carrier - FIX THE DROPDOWN */}
+      {/* Carrier - FIXED DROPDOWN */}
       <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
           <select
