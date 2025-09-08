@@ -32,11 +32,22 @@ const StatusOverview = ({ totalItems, statusBreakdown, itemStatuses }) => {
       'PICKED': '🟡',
       'ORDERED': '🔵', 
       'SHIPPED': '🟠',
-      'DELIVERED': '🟢',
+      'DELIVERED TO RECEIVER': '🟢',
+      'DELIVERED TO JOB SITE': '🟢',
       'INSTALLED': '✅',
-      'PARTIALLY_DELIVERED': '🟣',
-      'ON_HOLD': '🔴',
-      'CANCELLED': '⚫'
+      'PARTIALLY DELIVERED': '🟣',
+      'ON HOLD': '🔴',
+      'CANCELLED': '⚫',
+      'BACKORDERED': '🟠',
+      'IN TRANSIT': '🔵',
+      'OUT FOR DELIVERY': '🟢',
+      'RETURNED': '🔴',
+      'DAMAGED': '🔴',
+      'MISSING': '🔴',
+      'PENDING APPROVAL': '🟠',
+      'QUOTE REQUESTED': '🟣',
+      'APPROVED': '🟢',
+      'REJECTED': '🔴'
     };
     return icons[status] || '⚪';
   };
