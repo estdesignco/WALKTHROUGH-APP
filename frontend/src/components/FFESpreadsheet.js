@@ -151,16 +151,22 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* Fixed Scrollable Container - Proper Horizontal & Vertical Scrolling */}
+      {/* Scrollable Container with Fixed Scrolling Behavior */}
       <div 
-        className="overflow-x-auto overflow-y-auto max-h-[80vh]"
+        className="relative"
         style={{ 
-          overscrollBehaviorX: 'contain',
-          overscrollBehaviorY: 'auto'
+          maxHeight: '80vh',
+          overflowY: 'auto'
         }}
       >
-        <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
-          <tbody>
+        <div
+          className="overflow-x-auto"
+          style={{ 
+            overscrollBehaviorX: 'contain'
+          }}
+        >
+          <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
+            <tbody>
             {/* MAIN DATA STRUCTURE */}
             {project?.rooms?.map((room) => (
               <React.Fragment key={room.id}>
