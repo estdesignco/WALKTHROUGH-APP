@@ -79,6 +79,28 @@ SUBCATEGORY_COLORS = {
     "concrete": "#8A5A5A"
 }
 
+# Professional Paint Color Catalog for Interior Design
+PAINT_CATALOG = {
+    'Sherwin Williams': {
+        'Whites & Neutrals': ['Pure White (SW 7005)', 'Alabaster (SW 7008)', 'Creamy (SW 7012)', 'Natural Linen (SW 9109)', 'Accessible Beige (SW 7036)', 'Balanced Beige (SW 7037)', 'Diverse Beige (SW 6079)', 'Perfect Greige (SW 6073)', 'Agreeable Gray (SW 7029)', 'Repose Gray (SW 7015)', 'Mindful Gray (SW 7016)', 'Dorian Gray (SW 7017)', 'Cityscape (SW 7067)', 'Iron Ore (SW 7069)', 'Tricorn Black (SW 6258)'],
+        'Warm Colors': ['Coral Reef (SW 6606)', 'Cavern Clay (SW 7701)', 'Accessible Beige (SW 7036)', 'Latte (SW 6108)', 'Safari (SW 7040)', 'Ramie (SW 6156)', 'Warm Stone (SW 7032)', 'Mushroom (SW 7737)', 'Tony Taupe (SW 7038)', 'Virtual Taupe (SW 7039)'],
+        'Cool Colors': ['Sea Salt (SW 6204)', 'Rainwashed (SW 6211)', 'Misty (SW 6232)', 'Sleepy Blue (SW 6225)', 'Distance (SW 6243)', 'Krypton (SW 6247)', 'Storm Cloud (SW 6240)', 'Naval (SW 6244)', 'Indigo Batik (SW 7602)', 'In the Navy (SW 9178)'],
+        'Popular Colors': ['Urbane Bronze (SW 7048)', 'Black Magic (SW 6991)', 'Dragon Fruit (SW 6855)', 'Oceanside (SW 6496)', 'Clary Sage (SW 6178)', 'Sage Green Light (SW 2851)', 'Evergreen Fog (SW 9130)', 'Olive Grove (SW 7734)', 'Rosemary (SW 2851)', 'Back Bay Green (SW 9140)']
+    },
+    'Benjamin Moore': {
+        'Whites & Neutrals': ['White Dove (OC-17)', 'Cloud White (OC-130)', 'Chantilly Lace (OC-65)', 'Simply White (OC-117)', 'Swiss Coffee (OC-45)', 'Moonshine (OC-49)', 'Classic Gray (OC-23)', 'Edgecomb Gray (HC-173)', 'Revere Pewter (HC-172)', 'Stonington Gray (HC-170)', 'Nimbus Gray (2131-50)', 'Kendall Charcoal (HC-166)', 'Wrought Iron (2124-10)'],
+        'Warm Colors': ['Hawthorne Yellow (HC-4)', 'Windham Cream (HC-6)', 'Putnam Ivory (HC-39)', 'Manchester Tan (HC-81)', 'Brandon Beige (2151-50)', 'Shaker Beige (HC-45)', 'Sandy Hook Gray (HC-108)', 'Bleeker Beige (HC-80)', 'Grant Beige (HC-83)', 'Natural Wicker (OC-13)'],
+        'Cool Colors': ['Palladian Blue (HC-144)', 'Breath of Fresh Air (806)', 'Van Deusen Blue (HC-156)', 'Hale Navy (HC-154)', 'Newburyport Blue (HC-155)', 'Gentleman\'s Gray (2062-20)', 'Stratton Blue (HC-142)', 'Nimbus Gray (2131-50)', 'Gray Owl (OC-52)', 'Stonington Gray (HC-170)'],
+        'Popular Colors': ['First Light (2102-70)', 'Morning Dew (2125-50)', 'Hunter Green (2041-10)', 'Forest Green (2047-10)', 'Caliente (AF-290)', 'Sedona Clay (2174-30)', 'Autumn Orange (2156-10)', 'Raspberry Blush (2008-30)', 'Lavender Mist (2070-60)', 'Amethyst Shadow (2067-40)']
+    },
+    'Farrow & Ball': {
+        'Whites & Neutrals': ['All White (No.2005)', 'Pointing (No.2003)', 'Strong White (No.2001)', 'Wimborne White (No.239)', 'Slipper Satin (No.2004)', 'Skimming Stone (No.241)', 'Elephant\'s Breath (No.229)', 'Purbeck Stone (No.275)', 'London Clay (No.244)', 'Down Pipe (No.26)', 'Railings (No.31)', 'Off-Black (No.57)'],
+        'Warm Colors': ['Setting Plaster (No.231)', 'Pink Ground (No.202)', 'Red Earth (No.64)', 'Picture Gallery Red (No.42)', 'Incarnadine (No.248)', 'Calamine (No.230)', 'Dead Salmon (No.28)', 'India Yellow (No.66)', 'Sudbury Yellow (No.51)', 'Citron (No.74)'],
+        'Cool Colors': ['Borrowed Light (No.235)', 'Lulworth Blue (No.89)', 'Oval Room Blue (No.85)', 'Stiffkey Blue (No.281)', 'Hague Blue (No.30)', 'Inchyra Blue (No.289)', 'Stone Blue (No.86)', 'Parma Gray (No.27)', 'Pigeon (No.25)', 'Modern Eggshell'],
+        'Popular Colors': ['Sulking Room Pink (No.295)', 'Nancy\'s Blushes (No.278)', 'Green Blue (No.84)', 'Card Room Green (No.79)', 'Calke Green (No.34)', 'Studio Green (No.93)', 'Bancha (No.298)', 'Treron (No.292)', 'Terre D\'Egypte (No.247)', 'Tanner\'s Brown (No.255)']
+    }
+}
+
 # Professional Interior Design Room Structure with Complete Templates
 ROOM_DEFAULT_STRUCTURE = {
     'living room': {
