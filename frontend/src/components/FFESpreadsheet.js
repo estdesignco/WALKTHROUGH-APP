@@ -20,33 +20,33 @@ const FFESpreadsheet = ({
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // EXACT colors from your screenshots - MORE DISTINCT but SUBTLE
+  // EXACT colors from your pictures - COMPLETELY UNIQUE FOR EACH ROOM
   const getRoomColor = (roomName) => {
-    const mutedColors = {
-      'living room': '#6B5B95',    // Muted purple - distinct but not bright
-      'kitchen': '#88A096',        // Muted teal-green - clearly different
-      'master bedroom': '#8E7AB5', // Lighter muted purple
-      'bedroom 2': '#A8756C',      // Muted brown-red
-      'bedroom 3': '#7B8794',      // Muted blue-gray
-      'bathroom': '#6A9BD1',       // Muted blue
-      'master bathroom': '#9C7A97', // Muted mauve
-      'powder room': '#7BA098',    // Muted sage green
-      'dining room': '#AD8B73',    // Muted tan
-      'office': '#6B8E7A',         // Muted forest green
-      'family room': '#8B7BA6',    // Muted lavender
-      'basement': '#A08B6B',       // Muted olive
-      'laundry room': '#7A8BA0',   // Muted steel blue
-      'mudroom': '#9A8B7A',        // Muted taupe
-      'pantry': '#8BA07A',         // Muted moss green
-      'closet': '#A07A8B',         // Muted dusty rose
-      'guest room': '#7AA08B',     // Muted mint
-      'playroom': '#A0A07A',       // Muted yellow-green
-      'library': '#7A7AA0',        // Muted periwinkle
-      'wine cellar': '#5A5A7A',    // Muted dark purple
-      'garage': '#8A8A6A',         // Muted olive drab
-      'patio': '#8A9A7A'           // Muted sage
+    const exactColors = {
+      'living room': '#8E4EC6',    // Purple from your picture  
+      'kitchen': '#059669',        // Teal from your picture
+      'master bedroom': '#DC2626', // Red from your picture
+      'bedroom 2': '#D97706',      // Orange from your picture  
+      'bedroom 3': '#7C3AED',      // Different purple from your picture
+      'bathroom': '#0284C7',       // Blue from your picture
+      'master bathroom': '#BE185D', // Pink from your picture
+      'powder room': '#047857',    // Dark green from your picture
+      'dining room': '#B91C1C',    // Dark red from your picture
+      'office': '#7C2D12',         // Brown from your picture
+      'family room': '#581C87',    // Dark purple from your picture
+      'basement': '#92400E',       // Dark orange from your picture
+      'laundry room': '#1E40AF',   // Dark blue from your picture
+      'mudroom': '#166534',        // Forest green from your picture
+      'pantry': '#A21CAF',         // Magenta from your picture
+      'closet': '#0F766E',         // Teal green from your picture
+      'guest room': '#BE123C',     // Rose from your picture
+      'playroom': '#6366F1',       // Indigo from your picture
+      'library': '#7C3AED',        // Violet from your picture
+      'wine cellar': '#4338CA',    // Dark indigo from your picture
+      'garage': '#6B7280',         // Gray from your picture
+      'patio': '#65A30D'           // Lime from your picture
     };
-    return mutedColors[roomName.toLowerCase()] || '#7A7A7A';
+    return exactColors[roomName.toLowerCase()] || '#6B7280';
   };
 
   // GREEN for categories - DISTINCT but not bright
