@@ -1,34 +1,344 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Interior Design Management System Styles */
+.App {
+  font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* Room Color Variables - matching Google Sheets */
+:root {
+  --living-room: #B22222;
+  --kitchen: #008080;
+  --master-bedroom: #7B68EE;
+  --bedroom-2: #B52727;
+  --bedroom-3: #097474;
+  --bathroom: #574AA4;
+  --master-bathroom: #871C1C;
+  --powder-room: #1D7E7E;
+  --dining-room: #9186D3;
+  --office: #094949;
+  --family-room: #68B9EE;
+  --basement: #B28722;
+  --laundry-room: #0C0080;
+  --mudroom: #388A66;
+  --pantry: #B2B022;
+  --closet: #A0DBC1;
+  --guest-room: #A75183;
+  --playroom: #FFD966;
+  --library: #11A3C4;
+  --wine-cellar: #1A0A79;
+  --garage: #7F8F2B;
+  --patio: #AEA762;
+
+  /* Category Colors */
+  --lighting: #104131;
+  --furniture-storage: #B82F13;
+  --category-alt: var(--lighting);
+
+  /* Item Row Colors - Alternating */
+  --item-row-odd: #1A2B3A;
+  --item-row-even: #263D54;
+  --item-text: #FFFFD0;
+
+  /* Status Colors */
+  --status-picked: #FFD966;
+  --status-ordered: #3B82F6;
+  --status-shipped: #F97316;
+  --status-delivered: #10B981;
+  --status-installed: #22C55E;
+  --status-partial: #8B5CF6;
+  --status-hold: #EF4444;
+  --status-cancelled: #6B7280;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
+/* Drag and Drop Styles */
+.dragging {
+  transform: rotate(5deg);
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.drop-zone {
+  border: 2px dashed #4F46E5;
+  background-color: rgba(79, 70, 229, 0.1);
+  transition: all 0.2s ease;
+}
+
+.drag-handle {
+  cursor: grab;
+  transition: all 0.2s ease;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Room Header Animations */
+.room-header {
+  transition: all 0.3s ease;
+}
+
+.room-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Category Collapse Animation */
+.category-content {
+  transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.category-collapsed {
+  max-height: 0;
+  padding: 0;
+}
+
+.category-expanded {
+  max-height: 1000px;
+}
+
+/* Item Row Hover Effects */
+.item-row {
+  transition: all 0.2s ease;
+}
+
+.item-row:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Status Badge Animations */
+.status-badge {
+  transition: all 0.2s ease;
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge:hover {
+  transform: scale(1.05);
+}
+
+/* Modal Animations */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.modal-content {
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Progress Ring Animation */
+.progress-ring {
+  transition: stroke-dashoffset 0.5s ease-in-out;
+}
+
+/* Loading Spinner */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Button Hover Effects */
+.btn-primary {
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Offline Mode Styles */
+.offline-indicator {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Table Header Styles */
+.table-header {
+  background: linear-gradient(135deg, #374151 0%, #4B5563 100%);
+  border-bottom: 2px solid #6B7280;
+}
+
+/* Brand Header */
+.brand-header {
+  background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+  color: #000;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #6B7280;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .room-header {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+  }
+  
+  .room-actions {
+    margin-top: 1rem;
     justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+  }
+  
+  .item-row {
+    font-size: 0.875rem;
+  }
+  
+  .modal-content {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+  }
 }
 
-.App-link {
-    color: #61dafb;
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .room-header {
+    page-break-inside: avoid;
+  }
+  
+  .category-section {
+    page-break-inside: avoid;
+  }
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --item-row-odd: #000000;
+    --item-row-even: #1a1a1a;
+    --item-text: #ffffff;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus Styles for Accessibility */
+.focus-ring:focus {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* Status Overview Chart Styles */
+.chart-container {
+  position: relative;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+/* Form Validation Styles */
+.form-error {
+  border-color: #EF4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-message {
+  color: #EF4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Success States */
+.success-message {
+  color: #10B981;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Loading States  */
+.loading-shimmer {
+  background: linear-gradient(90deg, #374151 25%, #4B5563 50%, #374151 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
