@@ -327,6 +327,8 @@ const FFEDashboard = ({ isOffline }) => {
           roomColors={roomColors}
           categoryColors={categoryColors}
           itemStatuses={itemStatuses}
+          vendorTypes={vendorTypes}
+          carrierTypes={carrierTypes}
           onDeleteRoom={handleDeleteRoom}
           onReload={loadProject}
           isOffline={isOffline}
