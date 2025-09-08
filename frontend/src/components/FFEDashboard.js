@@ -281,8 +281,8 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* LOGO BANNER - EQUAL PADDING ALL SIDES */}
-        <div className="rounded-lg mb-6 mx-4" style={{ backgroundColor: '#8b7355', padding: '10px 20px', width: 'calc(100% - 32px)' }}>
+        {/* LOGO BANNER - VERY TIGHT PADDING LIKE YOUR REFERENCE */}
+        <div className="rounded-lg mb-6 mx-4" style={{ backgroundColor: '#8b7355', padding: '5px 20px', width: 'calc(100% - 32px)' }}>
           <div className="text-center">
             <img 
               src="/established-logo.png" 
