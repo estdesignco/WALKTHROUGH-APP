@@ -435,9 +435,58 @@ async def scrape_product_info(url: str) -> Dict[str, Any]:
                 product_info['image_url'] = img_url
                 break
         
-        # Try to extract vendor from URL
+        # Try to extract vendor from URL - YOUR WHOLESALE SITES
         domain = urlparse(url).netloc.lower()
-        if 'homedepot' in domain:
+        if 'fourhands.com' in domain:
+            product_info['vendor'] = 'Four Hands'
+        elif 'uttermost.com' in domain:
+            product_info['vendor'] = 'Uttermost'
+        elif 'rowefurniture.com' in domain:
+            product_info['vendor'] = 'Rowe Furniture'
+        elif 'reginaandrew.com' in domain:
+            product_info['vendor'] = 'Regina Andrew'
+        elif 'bernhardt.com' in domain:
+            product_info['vendor'] = 'Bernhardt'
+        elif 'loloirugs.com' in domain:
+            product_info['vendor'] = 'Loloi Rugs'
+        elif 'vandh.com' in domain:
+            product_info['vendor'] = 'Vandh'
+        elif 'visualcomfort.com' in domain:
+            product_info['vendor'] = 'Visual Comfort'
+        elif 'hvlgroup.com' in domain:
+            product_info['vendor'] = 'HVL Group'
+        elif 'flowdecor.com' in domain:
+            product_info['vendor'] = 'Flow Decor'
+        elif 'classichome.com' in domain:
+            product_info['vendor'] = 'Classic Home'
+        elif 'crestviewcollection.com' in domain:
+            product_info['vendor'] = 'Crestview Collection'
+        elif 'bassettmirror.com' in domain:
+            product_info['vendor'] = 'Bassett Mirror'
+        elif 'eichholtz.com' in domain:
+            product_info['vendor'] = 'Eichholtz'
+        elif 'yorkwallcoverings.com' in domain:
+            product_info['vendor'] = 'York Wallcoverings'
+        elif 'phillipscollection.com' in domain:
+            product_info['vendor'] = 'Phillips Collection'
+        elif 'phillipjeffries.com' in domain:
+            product_info['vendor'] = 'Phillip Jeffries'
+        elif 'hinkley.com' in domain:
+            product_info['vendor'] = 'Hinkley Lighting'
+        elif 'zeevlighting.com' in domain:
+            product_info['vendor'] = 'Zeev Lighting'
+        elif 'hubbardtonforge.com' in domain:
+            product_info['vendor'] = 'Hubbardton Forge'
+        elif 'curreyandcompany.com' in domain:
+            product_info['vendor'] = 'Currey and Company'
+        elif 'surya.com' in domain:
+            product_info['vendor'] = 'Surya'
+        elif 'myohamerica.com' in domain:
+            product_info['vendor'] = 'Myoh America'
+        elif 'gabby.com' in domain:
+            product_info['vendor'] = 'Gabby'
+        # Retail fallbacks (in case they're still used)
+        elif 'homedepot' in domain:
             product_info['vendor'] = 'Home Depot'
         elif 'lowes' in domain:
             product_info['vendor'] = "Lowe's"
