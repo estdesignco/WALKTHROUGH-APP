@@ -700,15 +700,16 @@ const FFEItemRow = ({
         />
       </td>
 
-      {/* NOTES COLUMN - RED SECTION */}
-      <td className="p-2 border border-neutral-600 fit-text">
-        <textarea
-          value={formData.notes}
-          onChange={(e) => handleFieldChange('notes', e.target.value)}
-          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
-          rows="2"
-          placeholder="Notes..."
-        />
+      {/* NOTES - PLAIN TEXT ONLY */}
+      <td className="p-2 border border-neutral-600 w-auto text-neutral-200 text-sm" style={{ width: 'fit-content' }}>
+        <div
+          contentEditable
+          suppressContentEditableWarning={true}
+          onBlur={(e) => handleFieldChange('notes', e.target.textContent)}
+          className="bg-transparent outline-none"
+        >
+          {formData.notes || 'Notes...'}
+        </div>
       </td>
 
       {/* DELETE COLUMN - RED SECTION - ONLY DELETE BUTTON */}
