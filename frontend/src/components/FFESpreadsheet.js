@@ -230,19 +230,19 @@ const FFESpreadsheet = ({
                               </button>
                             </div>
                           </td>
-                          {/* BROWN SECTION - ADDITIONAL INFO (spans 4 columns) */}
+                          {/* BROWN SECTION - ADDITIONAL INFO (spans 4 columns) - YOUR EXACT COLOR */}
                           <td 
                             colSpan="4"
                             className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#8B7355' }}
+                            style={{ backgroundColor: '#8b7355' }}
                           >
                             ADDITIONAL INFO.
                           </td>
-                          {/* PURPLE SECTION - SHIPPING INFO (spans 5 columns) */}
+                          {/* PURPLE SECTION - SHIPPING INFO (spans 5 columns) - YOUR EXACT COLOR */}
                           <td 
                             colSpan="5"
                             className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#7B68A6' }}
+                            style={{ backgroundColor: '#98935e' }}
                           >
                             SHIPPING INFO.
                           </td>
