@@ -281,14 +281,13 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* BIG LOGO CONTAINER SPANNING FULL WIDTH - MUCH BIGGER LOGO */}
-        <div className="w-full rounded-lg p-8 mb-6" style={{ backgroundColor: '#8b7355' }}>
+        {/* LOGO CONTAINER - EXACT SCALE FROM YOUR PICTURE */}
+        <div className="mx-auto rounded-lg p-6 mb-6" style={{ backgroundColor: '#8b7355', width: '80%', maxWidth: '1000px' }}>
           <div className="text-center flex items-center justify-center">
             <img 
               src="/established-logo.png" 
               alt="Established Design Co. Logo" 
-              className="w-full max-w-none"
-              style={{ height: '120px', objectFit: 'contain' }}
+              style={{ height: '160px', width: 'auto', objectFit: 'contain' }}
             />
           </div>
         </div>
