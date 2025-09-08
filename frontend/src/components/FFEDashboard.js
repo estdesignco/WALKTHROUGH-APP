@@ -55,6 +55,9 @@ const FFEDashboard = ({ isOffline }) => {
     try {
       setLoading(true);
       const response = await projectAPI.getById(projectId);
+      console.log('🔍 DEBUG: Project data loaded:', response.data);
+      console.log('🔍 DEBUG: Rooms structure:', response.data.rooms);
+      
       setProject(response.data);
       
       // Cache for offline use
