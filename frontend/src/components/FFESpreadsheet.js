@@ -683,42 +683,15 @@ const FFEItemRow = ({
         </div>
       </td>
 
-      {/* Tracking Number */}
+      {/* Tracking Number - NO CONTAINER */}
       <td className="p-2 border border-neutral-600 fit-text">
-        <div className="flex items-center space-x-1">
-          <input
-            type="text"
-            value={formData.tracking_number}
-            onChange={(e) => handleFieldChange('tracking_number', e.target.value)}
-            className="flex-1 bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
-            placeholder="Tracking #"
-          />
-          {formData.tracking_number && (
-            <button
-              onClick={() => {
-                let trackingUrl = '';
-                const carrier = formData.carrier || formData.vendor || '';
-                const trackingNum = formData.tracking_number;
-                
-                if (carrier.toLowerCase().includes('ups')) {
-                  trackingUrl = `https://www.ups.com/track?loc=null&tracknum=${trackingNum}`;
-                } else if (carrier.toLowerCase().includes('fedex')) {
-                  trackingUrl = `https://www.fedex.com/fedextrack/?trknbr=${trackingNum}`;
-                } else if (carrier.toLowerCase().includes('usps')) {
-                  trackingUrl = `https://tools.usps.com/go/TrackConfirmAction?tRef=fullpage&tLc=2&text28777=&tLabels=${trackingNum}`;
-                } else {
-                  trackingUrl = `https://www.google.com/search?q=${encodeURIComponent(carrier + ' tracking ' + trackingNum)}`;
-                }
-                
-                window.open(trackingUrl, '_blank');
-              }}
-              className="text-blue-400 hover:text-blue-300 text-xs"
-              title="Track Package"
-            >
-              🔗
-            </button>
-          )}
-        </div>
+        <input
+          type="text"
+          value={formData.tracking_number}
+          onChange={(e) => handleFieldChange('tracking_number', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          placeholder="Tracking #"
+        />
       </td>
 
       {/* Carrier */}
