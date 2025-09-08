@@ -97,7 +97,7 @@ const FFEDashboard = ({ isOffline }) => {
       setRoomColors({});
       setCategoryColors({});
       setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED', 'PARTIALLY DELIVERED', 'ON HOLD', 'CANCELLED', 'BACKORDERED', 'IN TRANSIT', 'OUT FOR DELIVERY', 'RETURNED', 'DAMAGED', 'MISSING', 'PENDING APPROVAL', 'QUOTE REQUESTED', 'APPROVED', 'REJECTED']);
-      setVendorTypes(['Classic Design', 'Est. Design Co.', 'Job Site', 'Vendor', 'Home Depot', "Lowe's", 'Wayfair', 'Pottery Barn', 'Restoration Hardware', 'West Elm', 'CB2', 'Crate & Barrel', 'Williams Sonoma', 'Amazon', 'Overstock', 'Direct from Manufacturer', 'Local Vendor', 'Custom Fabrication']);
+      setVendorTypes(['Four Hands', 'Uttermost', 'Rowe Furniture', 'Regina Andrew', 'Bernhardt', 'Loloi Rugs', 'Vandh', 'Visual Comfort', 'HVL Group', 'Flow Decor', 'Classic Home', 'Crestview Collection', 'Bassett Mirror', 'Eichholtz', 'York Wallcoverings', 'Phillips Collection', 'Phillip Jeffries', 'Hinkley Lighting', 'Zeev Lighting', 'Hubbardton Forge', 'Currey and Company', 'Surya', 'Myoh America', 'Gabby']);
       setCarrierTypes(['FedEx', 'FedEx Ground', 'FedEx Express', 'UPS', 'UPS Ground', 'UPS Express', 'USPS', 'DHL', 'White Glove Delivery', 'Freight', 'Local Delivery', 'Customer Pickup', 'Brooks', 'Zenith', 'Sunbelt', 'Specialized Carrier', 'Installation Crew', 'Other']);
     }
   };
