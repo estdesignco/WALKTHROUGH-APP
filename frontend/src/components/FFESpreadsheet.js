@@ -502,8 +502,8 @@ const FFEItemRow = ({
     setIsEditing(false);
   };
 
-  // Alternating row colors - MUCH more muted
-  const bgColor = itemIndex % 2 === 0 ? '#3A4A5A' : '#4A5A6A';
+  // Alternating row colors - MORE BLACK/CHARCOAL as requested
+  const bgColor = itemIndex % 2 === 0 ? '#1F2937' : '#374151';
 
   return (
     <tr style={{ backgroundColor: bgColor }} className="text-neutral-200 text-sm">
