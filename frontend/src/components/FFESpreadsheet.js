@@ -497,16 +497,60 @@ const FFEItemRow = ({
       
       {/* Item Name */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <input
-            type="text"
-            value={editData.name}
-            onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-          />
-        ) : (
-          <span className="font-medium">{item.name}</span>
-        )}
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            {isEditing ? (
+              <input
+                type="text"
+                value={editData.name}
+                onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+              />
+            ) : (
+              <span className="font-medium">{item.name}</span>
+            )}
+          </div>
+          {/* Actions in the first column */}
+          <div className="flex space-x-1 ml-2">
+            {isEditing ? (
+              <>
+                <button
+                  onClick={handleSave}
+                  className="bg-green-700 hover:bg-green-600 text-neutral-200 px-1 py-0.5 rounded text-xs"
+                  disabled={isOffline}
+                  title="Save"
+                >
+                  ✓
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="bg-neutral-600 hover:bg-neutral-500 text-neutral-200 px-1 py-0.5 rounded text-xs"
+                  title="Cancel"
+                >
+                  ✕
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="bg-neutral-600 hover:bg-neutral-500 text-neutral-200 px-1 py-0.5 rounded text-xs"
+                  title="Edit Item"
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={() => onDelete(item.id)}
+                  className="bg-red-700 hover:bg-red-600 text-neutral-200 px-1 py-0.5 rounded text-xs"
+                  title="Delete Item"
+                  disabled={isOffline}
+                >
+                  🗑️
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       </td>
 
       {/* Vendor/SKU */}
