@@ -53,9 +53,9 @@ const FFESpreadsheet = ({
     return '#0b4e38'; // Your exact green color
   };
 
-  // RED for sub-categories - YOUR CORRECTED COLOR  
+  // RED for sub-categories - USER'S NEW COLOR  
   const getSubCategoryColor = (subCategoryName) => {
-    return '#820303'; // Your corrected darker red color
+    return '#b43535'; // User's requested red color
   };
 
   const getStatusColor = (status) => {
