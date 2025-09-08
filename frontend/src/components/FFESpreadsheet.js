@@ -504,12 +504,16 @@ const FFEItemRow = ({
     status: item.status,
     finish_color: item.finish_color || '',
     cost: item.cost || 0,
+    link: item.link || '',
     image_url: item.image_url || '',
     order_status: item.order_status || '',
+    ship_date: item.ship_date || '',
+    delivery_date: item.delivery_date || '',
     install_date: item.install_date || '',
     tracking_number: item.tracking_number || '',
     carrier: item.carrier || '',
-    order_date: item.order_date || ''
+    order_date: item.order_date || '',
+    notes: item.notes || item.remarks || ''
   });
 
   const handleSave = async () => {
