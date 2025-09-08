@@ -619,19 +619,19 @@ const FFEItemRow = ({
       </td>
 
       {/* Install Date / Shipping TO */}
-      <td className="p-2 border border-neutral-600 fit-text">
-        <div className="flex flex-col space-y-1">
+      <td className="p-3 border border-neutral-600 fit-text">
+        <div className="space-y-3">
           <input
             type="date"
             value={formData.install_date}
             onChange={(e) => handleFieldChange('install_date', e.target.value)}
-            className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
-            title="Install Date"
+            className="w-full bg-transparent text-neutral-200 px-3 py-2 rounded text-sm border border-neutral-500 focus:border-blue-500 focus:bg-neutral-800"
+            placeholder="Install Date"
           />
           <input
             type="text"
             placeholder="Shipping TO"
-            className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+            className="w-full bg-transparent text-neutral-200 px-3 py-2 rounded text-sm border border-neutral-500 focus:border-blue-500 focus:bg-neutral-800"
           />
         </div>
       </td>
