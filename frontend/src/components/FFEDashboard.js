@@ -265,37 +265,101 @@ const FFEDashboard = ({ isOffline }) => {
 
       </div>
 
-      {/* Action Buttons - HEADER LAYOUT AS PER USER'S IMAGE */}
-      <div className="px-6 mb-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-200">FF&E - {project?.name || 'PROJECT'}</h2>
-          <p className="text-sm text-gray-400">{project?.client_info?.address || ''}</p>
+      {/* FF&E HEADER LAYOUT - EXACTLY AS USER'S IMAGE */}
+      <div className="px-6 mb-6">
+        {/* Top Header Row */}
+        <div className="flex items-center justify-between mb-6 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-lg p-4">
+          <div className="flex items-center space-x-4">
+            <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
+            <h1 className="text-2xl font-bold text-black">FF&E - {project?.name || 'PROJECT'}</h1>
+          </div>
+          <div className="text-right text-black">
+            <p className="font-semibold">{project?.client_info?.full_name || 'Client Name'}</p>
+            <p className="text-sm">{project?.client_info?.address || 'Address'}</p>
+          </div>
         </div>
         
-        {/* Button Row - Matching User's Layout */}
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => {/* TODO: Implement import */}}
-            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
-          >
-            <span>⬆️</span>
-            <span>Import</span>
-          </button>
+        {/* Button Groups - EXACTLY AS USER'S UPLOADED IMAGES */}
+        <div className="grid grid-cols-3 gap-6">
           
+          {/* Left Group - Import & Export */}
+          <div className="space-y-2">
+            <button
+              onClick={() => {/* TODO: Implement import */}}
+              style={{ backgroundColor: '#D4AF37' }}
+              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>📥</span>
+              <span>IMPORT</span>
+            </button>
+            <button
+              onClick={() => {/* TODO: Implement export */}}
+              style={{ backgroundColor: '#D4AF37' }}
+              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>📤</span>
+              <span>EXPORT</span>
+            </button>
+          </div>
+
+          {/* Center Group - Room Management */}
+          <div className="space-y-2">
+            <button
+              onClick={() => setShowAddRoom(true)}
+              style={{ backgroundColor: '#D4AF37' }}
+              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>➕</span>
+              <span>ADD ROOM</span>
+            </button>
+            <button
+              onClick={() => {/* TODO: Implement delete room */}}
+              style={{ backgroundColor: '#D4AF37' }}
+              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>🗑️</span>
+              <span>DELETE ROOM</span>
+            </button>
+          </div>
+
+          {/* Right Group - Actions */}
+          <div className="space-y-2">
+            <button
+              onClick={() => {/* TODO: Implement move to selection */}}
+              style={{ backgroundColor: '#D4AF37' }}
+              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>▶️</span>
+              <span>MOVE TO SELECTION</span>
+            </button>
+            <button
+              onClick={() => {/* TODO: Implement add item */}}
+              style={{ backgroundColor: '#D4AF37' }}
+              className="w-full hover:opacity-90 text-black px-4 py-3 rounded-lg font-bold transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>📋</span>
+              <span>ADD ITEM</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Secondary Button Row */}
+        <div className="flex justify-center space-x-4 mt-4">
           <button
-            onClick={() => setShowAddRoom(true)}
-            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+            onClick={() => {/* TODO: Implement add section */}}
+            style={{ backgroundColor: '#D4AF37' }}
+            className="hover:opacity-90 text-black px-6 py-2 rounded-lg font-bold transition-colors flex items-center space-x-2"
           >
-            <span>➕</span>
-            <span>Add Room</span>
+            <span>📂</span>
+            <span>ADD SECTION</span>
           </button>
-          
           <button
-            onClick={() => {/* TODO: Implement move to selection */}}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+            onClick={() => {/* TODO: Implement delete section */}}
+            style={{ backgroundColor: '#D4AF37' }}
+            className="hover:opacity-90 text-black px-6 py-2 rounded-lg font-bold transition-colors flex items-center space-x-2"
           >
-            <span>▶️</span>
-            <span>Move to Selection</span>
+            <span>🗂️</span>
+            <span>DELETE SECTION</span>
           </button>
         </div>
       </div>
