@@ -355,7 +355,7 @@ const FFEDashboard = ({ isOffline }) => {
           </button>
           <button
             onClick={() => {/* TODO: Implement delete section */}}
-            style={{ backgroundColor: '#D4AF37' }}
+            style={{ backgroundColor: '#8b7355' }}
             className="hover:opacity-90 text-black px-6 py-2 rounded-lg font-bold transition-colors flex items-center space-x-2"
           >
             <span>🗂️</span>
