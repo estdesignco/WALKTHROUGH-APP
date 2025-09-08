@@ -1266,14 +1266,7 @@ async def get_paint_suggestions(room_type: str):
         'style_notes': 'Classic neutral colors work well in most spaces.'
     })
     
-from playwright.async_api import async_playwright
-import asyncio
-import re
-import os
-from typing import Dict, Optional
-
-# Set Playwright browser path
-os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/pw-browsers'
+    return {"data": suggestions}
 
 # Advanced Product Scraping with Playwright for JavaScript-rendered content
 async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
