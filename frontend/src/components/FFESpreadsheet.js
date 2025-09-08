@@ -48,14 +48,14 @@ const FFESpreadsheet = ({
     return exactColors[roomName.toLowerCase()] || '#6B7280';
   };
 
-  // GREEN for categories - DISTINCT but not bright
+  // GREEN for categories - YOUR EXACT COLOR
   const getCategoryColor = (categoryName) => {
-    return '#6B8E7A'; // Muted forest green - clearly different from room colors
+    return '#0b4e38'; // Your exact green color
   };
 
-  // RED for sub-categories - DISTINCT but SUBTLE
+  // RED for sub-categories - YOUR EXACT COLOR  
   const getSubCategoryColor = (subCategoryName) => {
-    return '#A8756C'; // Muted terracotta red - distinct but easy on eyes
+    return '#a33923'; // Your exact red color
   };
 
   const getStatusColor = (status) => {
