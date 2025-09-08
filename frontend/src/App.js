@@ -51,7 +51,9 @@ export const itemAPI = {
 export const utilityAPI = {
   getRoomColors: () => api.get('/room-colors'),
   getCategoryColors: () => api.get('/category-colors'),
-  getItemStatuses: () => api.get('/item-statuses')
+  getItemStatuses: () => api.get('/item-statuses'),
+  getVendorTypes: () => api.get('/vendor-types'),
+  getCarrierTypes: () => api.get('/carrier-types')
 };
 
 const App = () => {
