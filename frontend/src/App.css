@@ -151,6 +151,22 @@ body {
   min-width: 2400px; /* Increased for all columns */
 }
 
+        table {
+          table-layout: auto;
+          width: 100%;
+        }
+        
+        /* ALL CELLS FIT TO TEXT */
+        .fit-text {
+          width: 1%;
+          white-space: nowrap;
+        }
+        
+        td, th {
+          width: fit-content;
+          min-width: fit-content;
+        }
+
 /* Status badges - muted colors */
 .status-badge {
   padding: 4px 8px;
