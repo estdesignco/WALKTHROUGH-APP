@@ -346,7 +346,223 @@ def get_subcategory_color(subcategory_name: str) -> str:
     return SUBCATEGORY_COLORS.get(subcategory_name.lower(), "#8A5A5A")
 
 # LINK SCRAPING FUNCTIONALITY
-async def scrape_product_info(url: str) -> Dict[str, Any]:
+def scrape_product_info(url: str) -> Dict[str, Any]:
+    """Scrape product information from a URL"""
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Extract product information
+        product_info = {
+            'name': '',
+            'price': '',
+            'description': '',
+            'image_url': '',
+            'vendor': '',
+            'sku': '',
+            'size': '',
+            'color': ''
+        }
+        
+        # Try to extract product name - ENHANCED FOR WHOLESALE SITES
+        name_selectors = [
+            'h1[data-automation-id="product-title"]',  # Home Depot
+            'h1.product-title',
+            'h1#product-title', 
+            '.product-name h1',
+            'h1.a-size-large',  # Amazon
+            '[data-testid="product-title"]',
+            # Wholesale site selectors
+            '.product-detail-title h1',  # Four Hands, Uttermost
+            '.product-info h1',          # Bernhardt, Loloi
+            '.product-header h1',        # Visual Comfort, Currey
+            '.pdp-title h1',             # Regina Andrew
+            '.item-name h1',             # Phillips Collection
+            '.product-name-wrapper h1',  # Gabby
+            'h1.entry-title',            # Many wholesale sites
+            'h1.page-title',
+            'h1.main-title',
+            'h1',
+            '.product-title',
+            '.product-name'
+        ]
+        
+        for selector in name_selectors:
+            element = soup.select_one(selector)
+            if element and element.get_text(strip=True):
+                product_info['name'] = element.get_text(strip=True)[:100]  # Limit length
+                break
+        
+        # Try to extract price - ENHANCED FOR WHOLESALE SITES
+        price_selectors = [
+            '.price-current',
+            '.price .sr-only',
+            '.a-price-whole',  # Amazon
+            '[data-testid="price"]',
+            '.price-now',
+            '.current-price',
+            '.product-price',
+            # Wholesale site price selectors
+            '.product-price-value',      # Four Hands, Uttermost
+            '.price-box .price',         # Bernhardt, Loloi
+            '.pricing .current-price',   # Visual Comfort
+            '.product-pricing .price',   # Regina Andrew
+            '.pdp-price',               # Many wholesale sites
+            '.retail-price',
+            '.wholesale-price',
+            '.trade-price',
+            '.net-price',
+            '.msrp-price',
+            '.price'
+        ]
+        
+        for selector in price_selectors:
+            element = soup.select_one(selector)
+            if element:
+                price_text = element.get_text(strip=True)
+                # Extract price using regex
+                price_match = re.search(r'\$[\d,]+\.?\d*', price_text)
+                if price_match:
+                    product_info['price'] = price_match.group().replace(',', '')
+                    break
+        
+        # Try to extract main image - ENHANCED FOR WHOLESALE SITES
+        image_selectors = [
+            'img[data-testid="product-image"]',
+            '.product-image img',
+            '#landingImage',  # Amazon
+            '.hero-image img',
+            '.primary-image img',
+            'img.product-image',
+            # Wholesale site image selectors
+            '.product-gallery .main-image img',    # Four Hands
+            '.product-media .featured-image img',  # Uttermost
+            '.product-images .primary img',        # Bernhardt
+            '.product-slider .active img',         # Loloi, Visual Comfort
+            '.pdp-gallery .main img',             # Regina Andrew
+            '.product-photos .featured img',       # Gabby, Phillips Collection
+            '.zoom-image img',                     # Many wholesale sites
+            '.featured-image img',
+            '.main-product-image img',
+            '.media img'
+        ]
+        
+        for selector in image_selectors:
+            element = soup.select_one(selector)
+            if element and element.get('src'):
+                img_url = element.get('src')
+                # Make sure it's a full URL
+                if img_url.startswith('//'):
+                    img_url = 'https:' + img_url
+                elif img_url.startswith('/'):
+                    img_url = urljoin(url, img_url)
+                
+                product_info['image_url'] = img_url
+                break
+        
+        # Try to extract vendor from URL - YOUR WHOLESALE SITES
+        domain = urlparse(url).netloc.lower()
+        if 'fourhands.com' in domain:
+            product_info['vendor'] = 'Four Hands'
+        elif 'uttermost.com' in domain:
+            product_info['vendor'] = 'Uttermost'
+        elif 'rowefurniture.com' in domain:
+            product_info['vendor'] = 'Rowe Furniture'
+        elif 'reginaandrew.com' in domain:
+            product_info['vendor'] = 'Regina Andrew'
+        elif 'bernhardt.com' in domain:
+            product_info['vendor'] = 'Bernhardt'
+        elif 'loloirugs.com' in domain:
+            product_info['vendor'] = 'Loloi Rugs'
+        elif 'vandh.com' in domain:
+            product_info['vendor'] = 'Vandh'
+        elif 'visualcomfort.com' in domain:
+            product_info['vendor'] = 'Visual Comfort'
+        elif 'hvlgroup.com' in domain:
+            product_info['vendor'] = 'HVL Group'
+        elif 'flowdecor.com' in domain:
+            product_info['vendor'] = 'Flow Decor'
+        elif 'classichome.com' in domain:
+            product_info['vendor'] = 'Classic Home'
+        elif 'crestviewcollection.com' in domain:
+            product_info['vendor'] = 'Crestview Collection'
+        elif 'bassettmirror.com' in domain:
+            product_info['vendor'] = 'Bassett Mirror'
+        elif 'eichholtz.com' in domain:
+            product_info['vendor'] = 'Eichholtz'
+        elif 'yorkwallcoverings.com' in domain:
+            product_info['vendor'] = 'York Wallcoverings'
+        elif 'phillipscollection.com' in domain:
+            product_info['vendor'] = 'Phillips Collection'
+        elif 'phillipjeffries.com' in domain:
+            product_info['vendor'] = 'Phillip Jeffries'
+        elif 'hinkley.com' in domain:
+            product_info['vendor'] = 'Hinkley Lighting'
+        elif 'zeevlighting.com' in domain:
+            product_info['vendor'] = 'Zeev Lighting'
+        elif 'hubbardtonforge.com' in domain:
+            product_info['vendor'] = 'Hubbardton Forge'
+        elif 'curreyandcompany.com' in domain:
+            product_info['vendor'] = 'Currey and Company'
+        elif 'surya.com' in domain:
+            product_info['vendor'] = 'Surya'
+        elif 'myohamerica.com' in domain:
+            product_info['vendor'] = 'Myoh America'
+        elif 'gabby.com' in domain:
+            product_info['vendor'] = 'Gabby'
+        # Retail fallbacks (in case they're still used)
+        elif 'homedepot' in domain:
+            product_info['vendor'] = 'Home Depot'
+        elif 'lowes' in domain:
+            product_info['vendor'] = "Lowe's"
+        elif 'amazon' in domain:
+            product_info['vendor'] = 'Amazon'
+        elif 'wayfair' in domain:
+            product_info['vendor'] = 'Wayfair'
+        elif 'potterybarn' in domain:
+            product_info['vendor'] = 'Pottery Barn'
+        elif 'restorationhardware' in domain:
+            product_info['vendor'] = 'Restoration Hardware'
+        elif 'westelm' in domain:
+            product_info['vendor'] = 'West Elm'
+        elif 'crateandbarrel' in domain:
+            product_info['vendor'] = 'Crate & Barrel'
+        
+        # Extract SKU/Model number
+        sku_selectors = [
+            '[data-testid="sku"]',
+            '.sku',
+            '.model-number',
+            '.product-sku'
+        ]
+        
+        for selector in sku_selectors:
+            element = soup.select_one(selector)
+            if element:
+                product_info['sku'] = element.get_text(strip=True)
+                break
+        
+        return product_info
+        
+    except Exception as e:
+        logging.error(f"Error scraping URL {url}: {e}")
+        return {
+            'name': '',
+            'price': '',
+            'description': '',
+            'image_url': '',
+            'vendor': '',
+            'sku': '',
+            'size': '',
+            'color': '',
+            'error': str(e)
+        }
     """Scrape product information from a URL"""
     try:
         headers = {
