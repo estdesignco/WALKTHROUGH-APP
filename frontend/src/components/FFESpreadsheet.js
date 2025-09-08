@@ -192,13 +192,13 @@ const FFESpreadsheet = ({
                   </td>
                 </tr>
 
-                {/* 2. CATEGORIES for this room - GREEN like LIGHTING */}
+                {/* 2. CATEGORIES for this room - GREEN like LIGHTING - CENTERED */}
                 {room.categories.map((category) => (
                   <React.Fragment key={category.id}>
                     <tr>
                       <td 
-                        colSpan="8" 
-                        className="p-3 font-semibold text-white text-md border border-neutral-600 fit-text"
+                        colSpan="13" 
+                        className="p-3 font-semibold text-white text-md border border-neutral-600 fit-text text-center"
                         style={{ backgroundColor: getCategoryColor(category.name) }}
                         onClick={(e) => {
                           e.preventDefault();
@@ -206,6 +206,7 @@ const FFESpreadsheet = ({
                         }}
                       >
                         <div className="flex items-center justify-between">
+                          <span></span>
                           <span>{category.name.toUpperCase()}</span>
                           <button
                             onClick={(e) => {
