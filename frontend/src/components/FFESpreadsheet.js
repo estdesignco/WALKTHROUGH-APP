@@ -559,16 +559,16 @@ const FFEItemRow = ({
         </div>
       </td>
 
-      {/* Cost/Price */}
-      <td className="p-2 border border-neutral-600 fit-text">
-        <input
-          type="number"
-          value={formData.cost}
-          onChange={(e) => handleFieldChange('cost', parseFloat(e.target.value) || 0)}
-          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
-          step="0.01"
-          placeholder="0.00"
-        />
+      {/* Cost/Price - PLAIN TEXT ONLY */}
+      <td className="p-2 border border-neutral-600 w-auto text-neutral-200 text-sm" style={{ width: 'fit-content' }}>
+        <div
+          contentEditable
+          suppressContentEditableWarning={true}
+          onBlur={(e) => handleFieldChange('cost', e.target.textContent)}
+          className="bg-transparent outline-none"
+        >
+          {formData.cost || '0.00'}
+        </div>
       </td>
 
       {/* LINK - PLAIN TEXT BUT EDITABLE */}
