@@ -192,7 +192,7 @@ const FFESpreadsheet = ({
                 </tr>
 
                 {/* 2. CATEGORIES for this room - GREEN - CENTERED */}
-                {room.categories.map((category) => (
+                {room.categories?.map((category) => (
                   <React.Fragment key={category.id}>
                     <tr>
                       <td 
