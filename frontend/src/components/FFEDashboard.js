@@ -281,15 +281,13 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* LOGO BANNER - ZERO TOP/BOTTOM PADDING */}
-        <div className="rounded-lg mb-6 mx-4" style={{ backgroundColor: '#8b7355', padding: '0px 20px', width: 'calc(100% - 32px)' }}>
-          <div className="text-center">
-            <img 
-              src="/established-logo.png" 
-              alt="Established Design Co. Logo" 
-              style={{ height: '200px', width: 'auto', objectFit: 'contain' }}
-            />
-          </div>
+        {/* LOGO BANNER - ABSOLUTELY NO PADDING */}
+        <div className="rounded-lg mb-6 mx-4" style={{ backgroundColor: '#8b7355', padding: '0', margin: '0', width: 'calc(100% - 32px)' }}>
+          <img 
+            src="/established-logo.png" 
+            alt="Established Design Co. Logo" 
+            style={{ height: '200px', width: 'auto', objectFit: 'contain', display: 'block', margin: '0', padding: '0' }}
+          />
         </div>
 
         {/* FF&E TITLE WITH EXPORT BUTTONS */}
