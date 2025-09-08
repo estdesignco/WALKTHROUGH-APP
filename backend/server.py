@@ -695,6 +695,19 @@ async def get_vendor_types():
 async def get_carrier_types():
     return [carrier.value for carrier in CarrierType]
 
+@api_router.post("/scrape-product")
+async def scrape_product(data: dict):
+    """Scrape product information from a URL"""
+    url = data.get('url', '')
+    if not url:
+        raise HTTPException(status_code=400, detail="URL is required")
+    
+    try:
+        product_info = await scrape_product_info(url)
+        return product_info
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to scrape URL: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
