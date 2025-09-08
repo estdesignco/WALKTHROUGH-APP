@@ -264,7 +264,7 @@ const FFESpreadsheet = ({
                           <td 
                             colSpan="5"
                             className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#6B46C1' }}
+                            style={{ backgroundColor: '#7B68A6' }}
                           >
                             SHIPPING INFO.
                           </td>
