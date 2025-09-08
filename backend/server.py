@@ -399,7 +399,7 @@ async def scrape_product_info(url: str) -> Dict[str, Any]:
                 product_info['name'] = element.get_text(strip=True)[:100]  # Limit length
                 break
         
-        # Try to extract price
+        # Try to extract price - ENHANCED FOR WHOLESALE SITES
         price_selectors = [
             '.price-current',
             '.price .sr-only',
@@ -408,6 +408,17 @@ async def scrape_product_info(url: str) -> Dict[str, Any]:
             '.price-now',
             '.current-price',
             '.product-price',
+            # Wholesale site price selectors
+            '.product-price-value',      # Four Hands, Uttermost
+            '.price-box .price',         # Bernhardt, Loloi
+            '.pricing .current-price',   # Visual Comfort
+            '.product-pricing .price',   # Regina Andrew
+            '.pdp-price',               # Many wholesale sites
+            '.retail-price',
+            '.wholesale-price',
+            '.trade-price',
+            '.net-price',
+            '.msrp-price',
             '.price'
         ]
         
