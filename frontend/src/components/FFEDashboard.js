@@ -180,7 +180,7 @@ const FFEDashboard = ({ isOffline }) => {
       } catch (err) {
         console.error('Error updating room order:', err);
         // Revert on error
-        await loadProject();
+        await loadProjectAndUtilityData();
       }
     }
   };
