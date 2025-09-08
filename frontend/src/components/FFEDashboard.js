@@ -46,10 +46,11 @@ const FFEDashboard = ({ isOffline }) => {
   const loadingRef = useRef(false);
 
   useEffect(() => {
-    if (projectId && !project) {
+    if (projectId && !loadingRef.current) {
+      loadingRef.current = true;
       loadProjectAndUtilityData();
     }
-  }, [projectId, project]);
+  }, [projectId]);
 
   const loadProjectAndUtilityData = async () => {
     try {
