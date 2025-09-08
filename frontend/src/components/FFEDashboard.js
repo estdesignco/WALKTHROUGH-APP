@@ -78,21 +78,27 @@ const FFEDashboard = ({ isOffline }) => {
   const loadUtilityData = async () => {
     try {
       const { utilityAPI } = await import('../App');
-      const [roomColorsRes, categoryColorsRes, statusesRes] = await Promise.all([
+      const [roomColorsRes, categoryColorsRes, statusesRes, vendorsRes, carriersRes] = await Promise.all([
         utilityAPI.getRoomColors(),
         utilityAPI.getCategoryColors(), 
-        utilityAPI.getItemStatuses()
+        utilityAPI.getItemStatuses(),
+        utilityAPI.getVendorTypes(),
+        utilityAPI.getCarrierTypes()
       ]);
       
       setRoomColors(roomColorsRes.data);
       setCategoryColors(categoryColorsRes.data);
       setItemStatuses(statusesRes.data);
+      setVendorTypes(vendorsRes.data);
+      setCarrierTypes(carriersRes.data);
     } catch (err) {
       console.error('Error loading utility data:', err);
       // Use default values
       setRoomColors({});
       setCategoryColors({});
-      setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED', 'INSTALLED']);
+      setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']);
+      setVendorTypes(['Classic Design', 'Est. Design Co.', 'Job Site', 'Vendor']);
+      setCarrierTypes(['FedEx', 'UPS', 'Brooks', 'Zenith', 'Sunbelt', 'Other']);
     }
   };
 
