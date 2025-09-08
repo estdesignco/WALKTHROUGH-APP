@@ -92,11 +92,28 @@ class ItemStatus(str, Enum):
     PICKED = "PICKED"
     ORDERED = "ORDERED"
     SHIPPED = "SHIPPED"
-    DELIVERED = "DELIVERED"
+    DELIVERED_TO_RECEIVER = "DELIVERED TO RECEIVER"
+    DELIVERED_TO_JOB_SITE = "DELIVERED TO JOB SITE"
     INSTALLED = "INSTALLED"
-    PARTIALLY_DELIVERED = "PARTIALLY_DELIVERED"
-    ON_HOLD = "ON_HOLD"
+    PARTIALLY_DELIVERED = "PARTIALLY DELIVERED"
+    ON_HOLD = "ON HOLD"
     CANCELLED = "CANCELLED"
+    
+# Vendor dropdown options from your screenshots
+class VendorType(str, Enum):
+    CLASSIC_DESIGN = "Classic Design"
+    EST_DESIGN_CO = "Est. Design Co."
+    JOB_SITE = "Job Site"
+    VENDOR = "Vendor"
+
+# Carrier dropdown options from your screenshots  
+class CarrierType(str, Enum):
+    FEDEX = "FedEx"
+    UPS = "UPS"
+    BROOKS = "Brooks"
+    ZENITH = "Zenith"
+    SUNBELT = "Sunbelt"
+    OTHER = "Other"
 
 class ProjectType(str, Enum):
     RENOVATION = "Renovation"
