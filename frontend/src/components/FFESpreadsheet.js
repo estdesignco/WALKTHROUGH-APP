@@ -155,8 +155,20 @@ const FFESpreadsheet = ({
         className="overflow-x-auto"
         onTouchStart={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
-        onWheel={(e) => e.stopPropagation()}
-        style={{ touchAction: 'pan-x' }}
+        onWheel={(e) => {
+          e.stopPropagation();
+          // Prevent horizontal wheel scrolling from triggering browser navigation
+          if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+            e.preventDefault();
+          }
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onMouseMove={(e) => e.stopPropagation()}
+        style={{ 
+          touchAction: 'pan-x',
+          overscrollBehaviorX: 'contain',
+          overscrollBehaviorY: 'auto'
+        }}
       >
         <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
           <tbody>
