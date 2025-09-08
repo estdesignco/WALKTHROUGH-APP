@@ -54,6 +54,7 @@ const FFEDashboard = ({ isOffline }) => {
 
   const loadProject = async () => {
     try {
+      console.log('🔍 DEBUG: Starting to load project...');
       setLoading(true);
       const response = await projectAPI.getById(projectId);
       console.log('🔍 DEBUG: Project data loaded:', response.data);
@@ -64,6 +65,7 @@ const FFEDashboard = ({ isOffline }) => {
       // Cache for offline use
       localStorage.setItem(`project_${projectId}`, JSON.stringify(response.data));
       setError(null);
+      console.log('🔍 DEBUG: Project set successfully, setting loading to false');
     } catch (err) {
       setError('Failed to load project');
       console.error('Error loading project:', err);
@@ -75,6 +77,7 @@ const FFEDashboard = ({ isOffline }) => {
         setError('Using cached data - changes may not be saved');
       }
     } finally {
+      console.log('🔍 DEBUG: Setting loading to false in finally block');
       setLoading(false);
     }
   };
