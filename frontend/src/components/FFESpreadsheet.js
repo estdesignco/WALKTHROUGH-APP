@@ -151,11 +151,24 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* Horizontal Scrollable Container - FORCE SCROLL TO STAY HERE */}
+      {/* Horizontal Scrollable Container - ABSOLUTELY PREVENT NAVIGATION */}
       <div 
-        className="overflow-x-scroll"
+        className="overflow-x-auto"
+        onWheel={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onTouchStart={(e) => {
+          e.stopPropagation();
+        }}
+        onTouchMove={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
         style={{ 
-          overscrollBehavior: 'contain'
+          overscrollBehaviorX: 'none',
+          overscrollBehaviorY: 'none',
+          touchAction: 'none'
         }}
       >
         <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
