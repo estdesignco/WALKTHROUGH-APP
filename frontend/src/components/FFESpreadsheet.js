@@ -7,7 +7,9 @@ const FFESpreadsheet = ({
   project, 
   roomColors, 
   categoryColors, 
-  itemStatuses, 
+  itemStatuses,
+  vendorTypes = [],
+  carrierTypes = [],
   onDeleteRoom, 
   onReload,
   isOffline 
