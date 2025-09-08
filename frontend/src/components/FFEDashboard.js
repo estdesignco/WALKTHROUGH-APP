@@ -47,25 +47,31 @@ const FFEDashboard = ({ isOffline }) => {
   useEffect(() => {
     console.log('🔍 DEBUG: useEffect triggered, projectId:', projectId);
     if (projectId) {
-      loadProject();
-      loadUtilityData();
+      loadProjectAndUtilityData();
     }
   }, [projectId]);
 
-  const loadProject = async () => {
+  const loadProjectAndUtilityData = async () => {
     try {
-      console.log('🔍 DEBUG: Starting to load project...');
+      console.log('🔍 DEBUG: Starting to load project and utility data...');
       setLoading(true);
-      const response = await projectAPI.getById(projectId);
-      console.log('🔍 DEBUG: Project data loaded:', response.data);
-      console.log('🔍 DEBUG: Rooms structure:', response.data.rooms);
       
-      setProject(response.data);
+      // Load both in parallel and wait for both to complete
+      const [projectResponse, utilityData] = await Promise.all([
+        projectAPI.getById(projectId),
+        loadUtilityDataAsync()
+      ]);
+      
+      console.log('🔍 DEBUG: Both project and utility data loaded');
+      console.log('🔍 DEBUG: Project data:', projectResponse.data);
+      console.log('🔍 DEBUG: Rooms structure:', projectResponse.data.rooms);
+      
+      setProject(projectResponse.data);
       
       // Cache for offline use
-      localStorage.setItem(`project_${projectId}`, JSON.stringify(response.data));
+      localStorage.setItem(`project_${projectId}`, JSON.stringify(projectResponse.data));
       setError(null);
-      console.log('🔍 DEBUG: Project set successfully, setting loading to false');
+      console.log('🔍 DEBUG: All data set successfully, setting loading to false');
     } catch (err) {
       setError('Failed to load project');
       console.error('Error loading project:', err);
@@ -82,7 +88,7 @@ const FFEDashboard = ({ isOffline }) => {
     }
   };
 
-  const loadUtilityData = async () => {
+  const loadUtilityDataAsync = async () => {
     try {
       console.log('🔍 DEBUG: Loading utility data...');
       const { utilityAPI } = await import('../App');
@@ -100,6 +106,7 @@ const FFEDashboard = ({ isOffline }) => {
       setItemStatuses(statusesRes.data);
       setVendorTypes(vendorsRes.data);
       setCarrierTypes(carriersRes.data);
+      return true;
     } catch (err) {
       console.error('🔍 DEBUG: Error loading utility data:', err);
       // Use default values
@@ -108,6 +115,7 @@ const FFEDashboard = ({ isOffline }) => {
       setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED', 'PARTIALLY DELIVERED', 'ON HOLD', 'CANCELLED', 'BACKORDERED', 'IN TRANSIT', 'OUT FOR DELIVERY', 'RETURNED', 'DAMAGED', 'MISSING', 'PENDING APPROVAL', 'QUOTE REQUESTED', 'APPROVED', 'REJECTED']);
       setVendorTypes(['Four Hands', 'Uttermost', 'Rowe Furniture', 'Regina Andrew', 'Bernhardt', 'Loloi Rugs', 'Vandh', 'Visual Comfort', 'HVL Group', 'Flow Decor', 'Classic Home', 'Crestview Collection', 'Bassett Mirror', 'Eichholtz', 'York Wallcoverings', 'Phillips Collection', 'Phillip Jeffries', 'Hinkley Lighting', 'Zeev Lighting', 'Hubbardton Forge', 'Currey and Company', 'Surya', 'Myoh America', 'Gabby']);
       setCarrierTypes(['FedEx', 'FedEx Ground', 'FedEx Express', 'UPS', 'UPS Ground', 'UPS Express', 'USPS', 'DHL', 'White Glove Delivery', 'Freight', 'Local Delivery', 'Customer Pickup', 'Brooks', 'Zenith', 'Sunbelt', 'Specialized Carrier', 'Installation Crew', 'Other']);
+      return true;
     }
   };
 
