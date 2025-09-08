@@ -1,0 +1,233 @@
+import React, { useState } from 'react';
+
+const AddItemModal = ({ onClose, onSubmit, itemStatuses, loading }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    quantity: 1,
+    size: '',
+    status: 'PICKED',
+    vendor: '',
+    remarks: '',
+    cost: 0,
+    link: '',
+    tracking_number: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim()) return;
+
+    try {
+      await onSubmit(formData);
+    } catch (err) {
+      console.error('Error submitting item:', err);
+    }
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      'PICKED': '#FFD966',     // Yellow
+      'ORDERED': '#3B82F6',    // Blue  
+      'SHIPPED': '#F97316',    // Orange
+      'DELIVERED': '#10B981',  // Green
+      'INSTALLED': '#22C55E',  // Bright Green
+      'PARTIALLY_DELIVERED': '#8B5CF6', // Purple
+      'ON_HOLD': '#EF4444',    // Red
+      'CANCELLED': '#6B7280'   // Gray
+    };
+    return colors[status] || '#6B7280';
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <form onSubmit={handleSubmit}>
+          {/* Header */}
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Add New Item</h2>
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-gray-400 hover:text-white transition-colors text-2xl"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-6 space-y-6">
+            {/* Item Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Item Name *
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                placeholder="e.g., Table Lamp, Sofa, Chandelier..."
+                required
+              />
+            </div>
+
+            {/* Quantity and Size */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Quantity *
+                </label>
+                <input
+                  type="number"
+                  value={formData.quantity}
+                  onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  min="1"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Size (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.size}
+                  onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  placeholder="e.g., 24x36, Large, Medium..."
+                />
+              </div>
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Status
+              </label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+              >
+                {itemStatuses.map(status => (
+                  <option key={status} value={status}>
+                    {status.replace('_', ' ')}
+                  </option>
+                ))}
+              </select>
+              
+              {/* Status Preview */}
+              <div className="mt-2 flex items-center space-x-2">
+                <div 
+                  className="w-4 h-4 rounded"
+                  style={{ backgroundColor: getStatusColor(formData.status) }}
+                ></div>
+                <span className="text-sm text-gray-400">
+                  Status color: {getStatusColor(formData.status)}
+                </span>
+              </div>
+            </div>
+
+            {/* Vendor */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Vendor (Optional)
+              </label>
+              <input
+                type="text"
+                value={formData.vendor}
+                onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
+                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                placeholder="e.g., West Elm, IKEA, Local Vendor..."
+              />
+            </div>
+
+            {/* Cost and Link */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Cost (Optional)
+                </label>
+                <input
+                  type="number"
+                  value={formData.cost}
+                  onChange={(e) => setFormData({ ...formData, cost: parseFloat(e.target.value) || 0 })}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Link (Optional)
+                </label>
+                <input
+                  type="url"
+                  value={formData.link}
+                  onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+
+            {/* Remarks */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Remarks (Optional)
+              </label>
+              <textarea
+                value={formData.remarks}
+                onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
+                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none resize-none"
+                rows="3"
+                placeholder="Add any special notes, installation requirements, or other details..."
+              />
+            </div>
+
+            {/* Tracking Number (conditional) */}
+            {(formData.status === 'SHIPPED' || formData.status === 'DELIVERED') && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Tracking Number (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.tracking_number}
+                  onChange={(e) => setFormData({ ...formData, tracking_number: e.target.value })}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  placeholder="Enter tracking number..."
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="p-6 border-t border-gray-700 flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2 text-gray-400 hover:text-white transition-colors"
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors font-medium disabled:opacity-50"
+              disabled={loading || !formData.name.trim()}
+            >
+              {loading ? 'Creating...' : 'Create Item'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AddItemModal;
