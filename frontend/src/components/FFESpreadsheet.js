@@ -157,20 +157,8 @@ const FFESpreadsheet = ({
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
       {/* Horizontal Scrollable Container */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[2400px] border-collapse" style={{ tableLayout: 'fixed' }}>
-          <thead>
-            {/* Main Header Row - matching your screenshot EXACTLY */}
-            <tr className="bg-neutral-700 text-neutral-200 text-sm font-bold">
-              <th className="w-48 p-3 border border-neutral-600 text-left fit-text">ITEM</th>
-              <th className="w-32 p-3 border border-neutral-600 text-left fit-text">VENDOR/SKU</th>
-              <th className="w-16 p-3 border border-neutral-600 text-center fit-text">QTY</th>
-              <th className="w-24 p-3 border border-neutral-600 text-left fit-text">SIZE</th>
-              <th className="w-32 p-3 border border-neutral-600 text-left fit-text">STATUS</th>
-              <th className="w-24 p-3 border border-neutral-600 text-left fit-text">VENDOR/SKU</th>
-              <th className="w-48 p-3 border border-neutral-600 text-left fit-text">REMARKS</th>
-              <th className="w-24 p-3 border border-neutral-600 text-center fit-text">ACTIONS</th>
-            </tr>
-          </thead>
+        <table className="w-full min-w-[3200px] border-collapse" style={{ tableLayout: 'fixed' }}>
+          {/* NO HEADER ROW - Headers go on the red subcategory lines as per your requirements */}
           <tbody>
             {project.rooms.map((room) => (
               <React.Fragment key={room.id}>
