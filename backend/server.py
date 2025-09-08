@@ -1484,7 +1484,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         finally:
             await browser.close()
 
-@api_router.post("/api/scrape-product")
+@api_router.post("/scrape-product")
 async def scrape_product_advanced(data: dict):
     """
     Advanced product scraping endpoint using Playwright
