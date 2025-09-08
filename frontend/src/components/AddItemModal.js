@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const AddItemModal = ({ onClose, onSubmit, itemStatuses, loading }) => {
+const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loading }) => {
   const [formData, setFormData] = useState({
     name: '',
     quantity: 1,
@@ -10,8 +10,56 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, loading }) => {
     remarks: '',
     cost: 0,
     link: '',
-    tracking_number: ''
+    tracking_number: '',
+    image_url: '',
+    finish_color: ''
   });
+
+  const [isScraping, setIsScraping] = useState(false);
+  const [scrapeError, setScrapeError] = useState('');
+
+  const handleLinkScraping = async () => {
+    if (!formData.link || !formData.link.startsWith('http')) {
+      setScrapeError('Please enter a valid URL starting with http:// or https://');
+      return;
+    }
+
+    setIsScraping(true);
+    setScrapeError('');
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/scrape-product`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: formData.link })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to scrape product information');
+      }
+
+      const productInfo = await response.json();
+
+      // Auto-fill form with scraped data
+      setFormData(prev => ({
+        ...prev,
+        name: productInfo.name || prev.name,
+        vendor: productInfo.vendor || prev.vendor,
+        cost: productInfo.price ? parseFloat(productInfo.price.replace(/[$,]/g, '')) : prev.cost,
+        image_url: productInfo.image_url || prev.image_url,
+        finish_color: productInfo.color || prev.finish_color,
+        remarks: productInfo.description ? productInfo.description.substring(0, 200) : prev.remarks
+      }));
+
+      setScrapeError('');
+    } catch (error) {
+      setScrapeError('Failed to scrape product information: ' + error.message);
+    } finally {
+      setIsScraping(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
