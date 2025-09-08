@@ -512,16 +512,16 @@ const FFEItemRow = ({
         </div>
       </td>
 
-      {/* Size - NO CONTAINER */}
-      <td className="p-1 border border-neutral-600 w-auto" style={{ width: 'fit-content' }}>
-        <input
-          type="text"
-          value={formData.size}
-          onChange={(e) => handleFieldChange('size', e.target.value)}
-          className="w-full bg-transparent text-neutral-200 text-sm border-0 outline-0 p-1"
-          placeholder="Size..."
-          style={{ minWidth: `${Math.max((formData.size || '').length * 8, 60)}px` }}
-        />
+      {/* Size - PLAIN TEXT ONLY */}
+      <td className="p-2 border border-neutral-600 w-auto text-neutral-200 text-sm" style={{ width: 'fit-content' }}>
+        <div
+          contentEditable
+          suppressContentEditableWarning={true}
+          onBlur={(e) => handleFieldChange('size', e.target.textContent)}
+          className="bg-transparent outline-none"
+        >
+          {formData.size || 'Size...'}
+        </div>
       </td>
 
       {/* Orders Status - Always editable with visible colors */}
