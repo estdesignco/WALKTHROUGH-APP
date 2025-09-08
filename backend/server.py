@@ -294,6 +294,32 @@ async def delete_project(project_id: str):
     
     return {"message": "Project deleted successfully"}
 
+# Default categories for each room type (from Google Sheets)
+ROOM_DEFAULT_CATEGORIES = {
+    'living room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+    'kitchen': ['Lighting', 'Plumbing & Fixtures', 'Equipment & Furniture', 'Decor & Accessories'],
+    'master bedroom': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+    'bedroom 2': ['Lighting', 'Furniture & Storage', 'Decor & Accessories'],
+    'bedroom 3': ['Lighting', 'Furniture & Storage', 'Decor & Accessories'],
+    'bathroom': ['Lighting', 'Plumbing & Fixtures', 'Decor & Accessories'],
+    'master bathroom': ['Lighting', 'Plumbing & Fixtures', 'Decor & Accessories'],
+    'powder room': ['Lighting', 'Plumbing & Fixtures', 'Decor & Accessories'],
+    'dining room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+    'office': ['Lighting', 'Furniture & Storage', 'Equipment & Furniture', 'Decor & Accessories'],
+    'family room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+    'basement': ['Lighting', 'Furniture & Storage', 'Equipment & Furniture', 'Misc.'],
+    'laundry room': ['Lighting', 'Equipment & Furniture', 'Plumbing & Fixtures'],
+    'mudroom': ['Lighting', 'Furniture & Storage', 'Decor & Accessories'],
+    'pantry': ['Lighting', 'Furniture & Storage'],
+    'closet': ['Lighting', 'Furniture & Storage'],
+    'guest room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+    'playroom': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+    'library': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
+    'wine cellar': ['Lighting', 'Equipment & Furniture', 'Furniture & Storage'],
+    'garage': ['Lighting', 'Equipment & Furniture'],
+    'patio': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating']
+}
+
 # ROOM ENDPOINTS
 @api_router.post("/rooms", response_model=Room)
 async def create_room(room: RoomCreate):
@@ -304,6 +330,24 @@ async def create_room(room: RoomCreate):
     result = await db.rooms.insert_one(room_obj.dict())
     
     if result.inserted_id:
+        # Auto-create default categories for this room type
+        room_type = room_obj.name.lower()
+        default_categories = ROOM_DEFAULT_CATEGORIES.get(room_type, ['Lighting', 'Furniture & Storage'])
+        
+        for i, category_name in enumerate(default_categories):
+            category_data = {
+                "id": str(uuid.uuid4()),
+                "name": category_name,
+                "room_id": room_obj.id,
+                "color": get_category_color(category_name),
+                "description": f"{category_name} items for {room_obj.name}",
+                "order_index": i,
+                "items": [],
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.categories.insert_one(category_data)
+        
         return room_obj
     raise HTTPException(status_code=400, detail="Failed to create room")
 
