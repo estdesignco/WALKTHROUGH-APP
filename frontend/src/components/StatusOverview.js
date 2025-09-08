@@ -168,7 +168,10 @@ const StatusOverview = ({ totalItems, statusBreakdown, itemStatuses }) => {
               return (
                 <div key={status} className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg">{getStatusIcon(status)}</span>
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: getStatusColor(status) }}
+                    ></div>
                     <span className="text-sm text-gray-300">
                       {status.replace('_', ' ')}
                     </span>
