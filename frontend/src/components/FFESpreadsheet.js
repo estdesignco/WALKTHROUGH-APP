@@ -52,9 +52,9 @@ const FFESpreadsheet = ({
     return '#5A7A5A'; // Muted green like your screenshot
   };
 
-  // RED for sub-categories (like INSTALLED, MOLDING)
+  // RED for sub-categories (like INSTALLED) - BRIGHTER red
   const getSubCategoryColor = (subCategoryName) => {
-    return '#8A5A5A'; // Muted red like your screenshot
+    return '#B91C1C'; // Brighter red like your screenshot
   };
 
   const handleAddSubCategory = async (subCategoryData) => {
