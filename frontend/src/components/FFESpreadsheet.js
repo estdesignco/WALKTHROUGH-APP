@@ -256,7 +256,7 @@ const FFESpreadsheet = ({
                           <td 
                             colSpan="3"
                             className="p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#92400E' }}
+                            style={{ backgroundColor: '#8B5A2B' }}
                           >
                             ADDITIONAL INFO.
                           </td>
