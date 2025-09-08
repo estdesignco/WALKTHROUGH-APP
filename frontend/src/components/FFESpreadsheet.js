@@ -162,11 +162,11 @@ const FFESpreadsheet = ({
           <tbody>
             {project.rooms.map((room) => (
               <React.Fragment key={room.id}>
-                {/* 1. ROOM Header Row - PURPLE like LIVING ROOM */}
+                {/* 1. ROOM Header Row - PURPLE like LIVING ROOM - CENTERED */}
                 <tr>
                   <td 
-                    colSpan="8" 
-                    className="p-4 font-bold text-white text-lg border border-neutral-600 fit-text"
+                    colSpan="13" 
+                    className="p-4 font-bold text-white text-lg border border-neutral-600 fit-text text-center"
                     style={{ backgroundColor: getRoomColor(room.name) }}
                     onClick={(e) => {
                       e.preventDefault();
@@ -174,6 +174,7 @@ const FFESpreadsheet = ({
                     }}
                   >
                     <div className="flex items-center justify-between">
+                      <span></span>
                       <span>{room.name.toUpperCase()}</span>
                       <div className="flex space-x-2">
                         <button
