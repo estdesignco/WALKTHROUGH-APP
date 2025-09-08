@@ -432,7 +432,7 @@ const FFESpreadsheet = ({
                       </React.Fragment>
                     )) || (
                       <tr>
-                        <td colSpan="13" className="p-4 text-center text-neutral-400 border border-neutral-600" style={{ backgroundColor: '#2A2A2A' }}>
+                        <td colSpan="16" className="p-4 text-center text-neutral-400 border border-neutral-600" style={{ backgroundColor: '#2A2A2A' }}>
                           No sections in {category.name.toLowerCase()}. 
                           <button
                             onClick={() => {
