@@ -265,26 +265,39 @@ const FFEDashboard = ({ isOffline }) => {
 
       </div>
 
-      {/* Client Header - MOVED BELOW status overview */}
-      <div className="mb-6 px-6">
-        <div className="bg-gray-700 text-gray-200 p-6 rounded-xl">
-          <h1 className="text-3xl font-bold mb-2">
-            FF&E - {project.client_info.full_name.split(' ').pop().toUpperCase()}
-          </h1>
-          <p className="text-lg text-gray-300">
-            {project.client_info.full_name} - {project.client_info.address}
-          </p>
+      {/* Action Buttons - HEADER LAYOUT AS PER USER'S IMAGE */}
+      <div className="px-6 mb-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-200">FF&E - {project?.name || 'PROJECT'}</h2>
+          <p className="text-sm text-gray-400">{project?.client_info?.address || ''}</p>
         </div>
-      </div>
-
-      {/* Add Room Button */}
-      <div className="mb-6 flex justify-end px-6">
-        <button
-          onClick={() => setShowAddRoom(true)}
-          className="bg-gray-600 hover:bg-gray-500 text-gray-200 px-6 py-2 rounded-lg transition-colors font-medium"
-        >
-          ➕ Add Room
-        </button>
+        
+        {/* Button Row - Matching User's Layout */}
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => {/* TODO: Implement import */}}
+            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+          >
+            <span>⬆️</span>
+            <span>Import</span>
+          </button>
+          
+          <button
+            onClick={() => setShowAddRoom(true)}
+            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+          >
+            <span>➕</span>
+            <span>Add Room</span>
+          </button>
+          
+          <button
+            onClick={() => {/* TODO: Implement move to selection */}}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+          >
+            <span>▶️</span>
+            <span>Move to Selection</span>
+          </button>
+        </div>
       </div>
 
       {/* FF&E Spreadsheet */}
