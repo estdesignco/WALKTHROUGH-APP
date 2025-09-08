@@ -347,7 +347,7 @@ const FFEDashboard = ({ isOffline }) => {
         <div className="flex justify-center space-x-4 mt-4">
           <button
             onClick={() => {/* TODO: Implement add section */}}
-            style={{ backgroundColor: '#D4AF37' }}
+            style={{ backgroundColor: '#8b7355' }}
             className="hover:opacity-90 text-black px-6 py-2 rounded-lg font-bold transition-colors flex items-center space-x-2"
           >
             <span>📂</span>
