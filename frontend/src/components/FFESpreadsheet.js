@@ -500,17 +500,16 @@ const FFEItemRow = ({
         </div>
       </td>
 
-      {/* Quantity - NO CONTAINER */}
-      <td className="p-1 border border-neutral-600 w-auto" style={{ width: 'fit-content' }}>
-        <input
-          type="number"
-          value={formData.quantity}
-          onChange={(e) => handleFieldChange('quantity', e.target.value)}
-          className="w-full bg-transparent text-neutral-200 text-sm border-0 outline-0 p-1"
-          placeholder="Qty"
-          min="0"
-          style={{ minWidth: `${Math.max((formData.quantity?.toString() || '').length * 8, 40)}px` }}
-        />
+      {/* Quantity - PLAIN TEXT ONLY */}
+      <td className="p-2 border border-neutral-600 w-auto text-neutral-200 text-sm" style={{ width: 'fit-content' }}>
+        <div
+          contentEditable
+          suppressContentEditableWarning={true}
+          onBlur={(e) => handleFieldChange('quantity', e.target.textContent)}
+          className="bg-transparent outline-none"
+        >
+          {formData.quantity || 'Qty'}
+        </div>
       </td>
 
       {/* Size - NO CONTAINER */}
