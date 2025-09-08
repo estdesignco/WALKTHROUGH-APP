@@ -41,6 +41,8 @@ const FFEDashboard = ({ isOffline }) => {
   const [roomColors, setRoomColors] = useState({});
   const [categoryColors, setCategoryColors] = useState({});
   const [itemStatuses, setItemStatuses] = useState([]);
+  const [vendorTypes, setVendorTypes] = useState([]);
+  const [carrierTypes, setCarrierTypes] = useState([]);
 
   useEffect(() => {
     if (projectId) {
