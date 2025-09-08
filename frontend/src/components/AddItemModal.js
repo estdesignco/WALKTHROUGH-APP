@@ -55,14 +55,14 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       const data = await response.json();
       console.log('SCRAPING SUCCESS - Scraped data:', data);
       
-      // FORCE UPDATE ALL FIELDS WITH SCRAPED DATA
+      // FORCE UPDATE ALL FIELDS WITH SCRAPED DATA - CORRECT FIELD MAPPING
       const updatedData = {
         ...formData,
         name: data.name || data.product_name || data.title || formData.name,
         vendor: data.vendor || data.brand || data.manufacturer || formData.vendor, 
-        cost: data.price || data.cost || data.regular_price || formData.cost,
+        cost: data.price ? parseFloat(data.price.toString().replace(/[$,]/g, '')) : (data.cost ? parseFloat(data.cost.toString().replace(/[$,]/g, '')) : formData.cost),
         finish_color: data.color || data.finish || data.finish_color || formData.finish_color,
-        image: data.image || data.image_url || data.thumbnail || formData.image,
+        image_url: data.image_url || data.image || data.thumbnail || formData.image_url,
         size: data.size || data.dimensions || data.specs || formData.size,
         remarks: data.description ? data.description.substring(0, 200) : formData.remarks
       };
