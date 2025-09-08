@@ -151,24 +151,19 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* Horizontal Scrollable Container - ABSOLUTELY PREVENT NAVIGATION */}
+      {/* Horizontal Scrollable Container - ALLOW VERTICAL SCROLL */}
       <div 
         className="overflow-x-auto"
         onWheel={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onTouchStart={(e) => {
-          e.stopPropagation();
-        }}
-        onTouchMove={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
+          // Only prevent horizontal wheel scrolling, allow vertical
+          if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+            e.stopPropagation();
+            e.preventDefault();
+          }
         }}
         style={{ 
-          overscrollBehaviorX: 'none',
-          overscrollBehaviorY: 'none',
-          touchAction: 'none'
+          overscrollBehaviorX: 'contain',
+          touchAction: 'pan-y'
         }}
       >
         <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
