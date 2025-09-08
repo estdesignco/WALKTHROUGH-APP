@@ -507,7 +507,12 @@ const FFEItemRow = ({
           style={{ backgroundColor: getStatusColor(formData.status) }}
         >
           {itemStatuses.map(status => (
-            <option key={status} value={status} className="bg-white text-black">
+            <option 
+              key={status} 
+              value={status} 
+              className="text-black"
+              style={{ backgroundColor: getStatusColor(status) }}
+            >
               {status.replace('_', ' ')}
             </option>
           ))}
