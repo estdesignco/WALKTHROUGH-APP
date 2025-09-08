@@ -466,6 +466,11 @@ const FFEItemRow = ({
 
   return (
     <tr style={{ backgroundColor: bgColor }} className="text-neutral-200 text-sm">
+      {/* Subcategory name column (first column) */}
+      <td className="p-2 border border-neutral-600 fit-text">
+        <span className="text-xs text-neutral-400">{/* Empty or subcategory indicator */}</span>
+      </td>
+      
       {/* Item Name */}
       <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
@@ -523,7 +528,7 @@ const FFEItemRow = ({
         )}
       </td>
 
-      {/* Status - DROPDOWN MENU as requested */}
+      {/* Status */}
       <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
           <select
@@ -556,9 +561,81 @@ const FFEItemRow = ({
         )}
       </td>
 
-      {/* Vendor/SKU (duplicate column) */}
+      {/* Cost */}
       <td className="p-2 border border-neutral-600 fit-text">
-        <span>{item.vendor || '-'}</span>
+        {isEditing ? (
+          <input
+            type="number"
+            value={editData.cost}
+            onChange={(e) => setEditData({ ...editData, cost: parseFloat(e.target.value) || 0 })}
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+            step="0.01"
+          />
+        ) : (
+          <span>${item.cost || '0.00'}</span>
+        )}
+      </td>
+
+      {/* Link */}
+      <td className="p-2 border border-neutral-600 fit-text">
+        {isEditing ? (
+          <input
+            type="url"
+            value={editData.link}
+            onChange={(e) => setEditData({ ...editData, link: e.target.value })}
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+          />
+        ) : (
+          item.link ? (
+            <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+              🔗
+            </a>
+          ) : (
+            <span>-</span>
+          )
+        )}
+      </td>
+
+      {/* Tracking Number */}
+      <td className="p-2 border border-neutral-600 fit-text">
+        {isEditing ? (
+          <input
+            type="text"
+            value={editData.tracking_number}
+            onChange={(e) => setEditData({ ...editData, tracking_number: e.target.value })}
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+          />
+        ) : (
+          <span>{item.tracking_number || '-'}</span>
+        )}
+      </td>
+
+      {/* Order Date */}
+      <td className="p-2 border border-neutral-600 fit-text">
+        {isEditing ? (
+          <input
+            type="date"
+            value={editData.order_date}
+            onChange={(e) => setEditData({ ...editData, order_date: e.target.value })}
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+          />
+        ) : (
+          <span>{item.order_date || '-'}</span>
+        )}
+      </td>
+
+      {/* Install Date */}
+      <td className="p-2 border border-neutral-600 fit-text">
+        {isEditing ? (
+          <input
+            type="date"
+            value={editData.install_date}
+            onChange={(e) => setEditData({ ...editData, install_date: e.target.value })}
+            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
+          />
+        ) : (
+          <span>{item.install_date || '-'}</span>
+        )}
       </td>
 
       {/* Remarks */}
