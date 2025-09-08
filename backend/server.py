@@ -370,7 +370,7 @@ async def scrape_product_info(url: str) -> Dict[str, Any]:
             'color': ''
         }
         
-        # Try to extract product name
+        # Try to extract product name - ENHANCED FOR WHOLESALE SITES
         name_selectors = [
             'h1[data-automation-id="product-title"]',  # Home Depot
             'h1.product-title',
@@ -378,6 +378,16 @@ async def scrape_product_info(url: str) -> Dict[str, Any]:
             '.product-name h1',
             'h1.a-size-large',  # Amazon
             '[data-testid="product-title"]',
+            # Wholesale site selectors
+            '.product-detail-title h1',  # Four Hands, Uttermost
+            '.product-info h1',          # Bernhardt, Loloi
+            '.product-header h1',        # Visual Comfort, Currey
+            '.pdp-title h1',             # Regina Andrew
+            '.item-name h1',             # Phillips Collection
+            '.product-name-wrapper h1',  # Gabby
+            'h1.entry-title',            # Many wholesale sites
+            'h1.page-title',
+            'h1.main-title',
             'h1',
             '.product-title',
             '.product-name'
