@@ -281,13 +281,15 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* LOGO BANNER - FULL WIDTH ACROSS ENTIRE PAGE */}
-        <div className="rounded-lg mb-6 mx-4" style={{ backgroundColor: '#8b7355', padding: '40px 20px', width: 'calc(100% - 32px)' }}>
-          <img 
-            src="/established-logo.png" 
-            alt="Established Design Co. Logo" 
-            style={{ height: '120px', width: '100%', objectFit: 'fill', display: 'block' }}
-          />
+        {/* LOGO BANNER - NARROWER CONTAINER WITH TALLER LETTERS */}
+        <div className="mx-auto rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '30px 40px', width: '80%' }}>
+          <div className="text-center">
+            <img 
+              src="/established-logo.png" 
+              alt="Established Design Co. Logo" 
+              style={{ height: '150px', width: 'auto', objectFit: 'contain' }}
+            />
+          </div>
         </div>
 
         {/* FF&E TITLE WITH EXPORT BUTTONS */}
