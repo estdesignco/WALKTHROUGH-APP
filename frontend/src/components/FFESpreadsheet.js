@@ -476,16 +476,16 @@ const FFEItemRow = ({
     <tr style={{ backgroundColor: bgColor }} className="text-neutral-200 text-sm">
       {/* RED SECTION - Core Item Info - FREE FLOW EDITING */}
       
-      {/* Item Name - NO CONTAINER */}
-      <td className="p-1 border border-neutral-600 w-auto" style={{ width: 'fit-content' }}>
-        <input
-          type="text"
-          value={formData.name}
-          onChange={(e) => handleFieldChange('name', e.target.value)}
-          className="w-full bg-transparent text-neutral-200 text-sm border-0 outline-0 p-1"
-          placeholder="Item name..."
-          style={{ minWidth: `${Math.max(formData.name.length * 8, 80)}px` }}
-        />
+      {/* Item Name - PLAIN TEXT ONLY */}
+      <td className="p-2 border border-neutral-600 w-auto text-neutral-200 text-sm" style={{ width: 'fit-content' }}>
+        <div
+          contentEditable
+          suppressContentEditableWarning={true}
+          onBlur={(e) => handleFieldChange('name', e.target.textContent)}
+          className="bg-transparent outline-none"
+        >
+          {formData.name || 'Item name...'}
+        </div>
       </td>
 
       {/* Vendor/SKU - NO CONTAINER */}
