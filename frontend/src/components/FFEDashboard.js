@@ -267,16 +267,9 @@ const FFEDashboard = ({ isOffline }) => {
 
       {/* FF&E HEADER LAYOUT - EXACTLY AS USER'S IMAGE */}
       <div className="px-6 mb-6">
-        {/* Top Header Row */}
-        <div className="flex items-center justify-between mb-6 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-lg p-4">
-          <div className="flex items-center space-x-4">
-            <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
-            <h1 className="text-2xl font-bold text-black">FF&E - {project?.name || 'PROJECT'}</h1>
-          </div>
-          <div className="text-right text-black">
-            <p className="font-semibold">{project?.client_info?.full_name || 'Client Name'}</p>
-            <p className="text-sm">{project?.client_info?.address || 'Address'}</p>
-          </div>
+        {/* Simple Header - Matching Your Layout */}
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold text-gray-200 mb-2">FF&E - {project?.name || 'PROJECT'}</h2>
         </div>
         
         {/* Button Groups - EXACTLY AS USER'S UPLOADED IMAGES */}
