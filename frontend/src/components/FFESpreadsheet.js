@@ -151,7 +151,7 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* Scrollable Container with Fixed Scrolling Behavior */}
+      {/* Proper Trackpad/Touchpad Scrolling Container */}
       <div 
         className="relative"
         style={{ 
@@ -161,8 +161,20 @@ const FFESpreadsheet = ({
       >
         <div
           className="overflow-x-auto"
+          onWheel={(e) => {
+            const container = e.currentTarget;
+            // Handle horizontal scrolling for trackpads/touchpads
+            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+              // Horizontal scroll gesture detected
+              e.preventDefault();
+              container.scrollLeft += e.deltaX;
+            }
+            // Allow vertical scrolling to pass through normally
+          }}
           style={{ 
-            overscrollBehaviorX: 'contain'
+            overscrollBehaviorX: 'contain',
+            overscrollBehaviorY: 'auto',
+            scrollBehavior: 'smooth'
           }}
         >
           <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
