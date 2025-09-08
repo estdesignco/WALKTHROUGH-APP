@@ -52,20 +52,23 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
         throw new Error(errorData.detail || 'Failed to scrape product information');
       }
 
-      const productInfo = await response.json();
-      console.log('Scraped data:', productInfo); // Debug log
-
-      // Auto-fill form with scraped data
-      setFormData(prev => ({
-        ...prev,
-        name: productInfo.name || prev.name,
-        vendor: productInfo.vendor || prev.vendor,
-        cost: productInfo.price ? parseFloat(productInfo.price.replace(/[$,]/g, '')) : prev.cost,
-        image_url: productInfo.image_url || prev.image_url,
-        finish_color: productInfo.color || prev.finish_color,
-        remarks: productInfo.description ? productInfo.description.substring(0, 200) : prev.remarks
-      }));
-
+      const data = await response.json();
+      console.log('SCRAPING SUCCESS - Scraped data:', data);
+      
+      // FORCE UPDATE ALL FIELDS WITH SCRAPED DATA
+      const updatedData = {
+        ...formData,
+        name: data.name || data.product_name || data.title || formData.name,
+        vendor: data.vendor || data.brand || data.manufacturer || formData.vendor, 
+        cost: data.price || data.cost || data.regular_price || formData.cost,
+        finish_color: data.color || data.finish || data.finish_color || formData.finish_color,
+        image: data.image || data.image_url || data.thumbnail || formData.image,
+        size: data.size || data.dimensions || data.specs || formData.size,
+        remarks: data.description ? data.description.substring(0, 200) : formData.remarks
+      };
+      
+      console.log('UPDATING FORM DATA:', updatedData);
+      setFormData(updatedData);
       setScrapeError('');
       console.log('Scraping successful!'); // Debug log
     } catch (error) {
