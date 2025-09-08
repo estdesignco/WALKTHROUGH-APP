@@ -146,7 +146,7 @@ const FFEDashboard = ({ isOffline }) => {
     
     try {
       await roomAPI.delete(roomId);
-      await loadProject();
+      await loadProjectAndUtilityData();
     } catch (err) {
       setError('Failed to delete room');
       console.error('Error deleting room:', err);
