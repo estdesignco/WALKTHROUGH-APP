@@ -151,12 +151,18 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* Horizontal Scrollable Container - SMOOTH FAST SCROLL */}
+      {/* Horizontal Scrollable Container - FORCE LEFT SCROLL TO WORK */}
       <div 
-        className="overflow-x-auto overflow-y-visible"
+        className="overflow-x-scroll"
+        onWheel={(e) => {
+          const container = e.currentTarget;
+          if (e.deltaY !== 0) {
+            e.preventDefault();
+            container.scrollLeft += e.deltaY;
+          }
+        }}
         style={{ 
-          scrollBehavior: 'auto',
-          WebkitOverflowScrolling: 'touch'
+          overscrollBehaviorX: 'none'
         }}
       >
         <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
