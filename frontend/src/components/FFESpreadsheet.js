@@ -265,18 +265,18 @@ const FFESpreadsheet = ({
                           <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}>SIZE</td>
                           <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}>ORDERS STATUS</td>
                           
-                          {/* BROWN SECTION COLUMNS */}
-                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8B7355' }}>FINISH/Color</td>
-                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8B7355' }}>Cost/Price</td>
-                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8B7355' }}>LINK</td>
-                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8B7355' }}>Image</td>
+                          {/* BROWN SECTION COLUMNS - YOUR EXACT COLOR */}
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8b7355' }}>FINISH/Color</td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8b7355' }}>Cost/Price</td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8b7355' }}>LINK</td>
+                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#8b7355' }}>Image</td>
                           
-                          {/* PURPLE SECTION COLUMNS */}
-                          <td className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#7B68A6' }}>Order Status /<br/>Ship Date /<br/>Delivery Date</td>
-                          <td className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#7B68A6' }}>Install Date /<br/>Shipping TO</td>
-                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#7B68A6' }}>TRACKING #</td>
-                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#7B68A6' }}>Carrier</td>
-                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#7B68A6' }}>Order Date</td>
+                          {/* PURPLE SECTION COLUMNS - YOUR EXACT COLOR */}
+                          <td className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#98935e' }}>Order Status /<br/>Ship Date /<br/>Delivery Date</td>
+                          <td className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#98935e' }}>Install Date /<br/>Shipping TO</td>
+                          <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#98935e' }}>TRACKING #</td>
+                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#98935e' }}>Carrier</td>
+                          <td className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: '#98935e' }}>Order Date</td>
                           
                           {/* RED DELETE COLUMN */}
                           <td className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center" style={{ backgroundColor: getSubCategoryColor(subcategory.name) }}>NOTES</td>
