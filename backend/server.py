@@ -1475,7 +1475,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             print(f"Error scraping {url}: {str(e)}")
             return {
                 'name': None,
-                'vendor': result.get('vendor'),
+                'vendor': None,
                 'cost': None,
                 'price': None,
                 'image_url': None,
