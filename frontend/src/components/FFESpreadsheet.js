@@ -576,12 +576,18 @@ const FFEItemRow = ({
       {/* Vendor/SKU */}
       <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
-          <input
-            type="text"
+          <select
             value={editData.vendor}
             onChange={(e) => setEditData({ ...editData, vendor: e.target.value })}
             className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-          />
+          >
+            <option value="">Select Vendor</option>
+            {vendorTypes.map(vendor => (
+              <option key={vendor} value={vendor}>
+                {vendor}
+              </option>
+            ))}
+          </select>
         ) : (
           <span>{item.vendor || '-'}</span>
         )}
