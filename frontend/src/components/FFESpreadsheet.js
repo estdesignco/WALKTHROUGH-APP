@@ -724,14 +724,25 @@ const FFEItemRow = ({
       {/* Install Date / Shipping TO */}
       <td className="p-2 border border-neutral-600 fit-text">
         {isEditing ? (
-          <input
-            type="date"
-            value={editData.install_date}
-            onChange={(e) => setEditData({ ...editData, install_date: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-          />
+          <div className="flex flex-col space-y-1">
+            <input
+              type="date"
+              value={editData.install_date}
+              onChange={(e) => setEditData({ ...editData, install_date: e.target.value })}
+              className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-xs border border-neutral-600"
+              title="Install Date"
+            />
+            <input
+              type="text"
+              placeholder="Shipping TO"
+              className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-xs border border-neutral-600"
+            />
+          </div>
         ) : (
-          <span className="text-xs">{item.install_date || '-'}</span>
+          <div className="text-xs">
+            <div>{item.install_date || '-'}</div>
+            <div className="text-neutral-400">Ship TO: -</div>
+          </div>
         )}
       </td>
 
