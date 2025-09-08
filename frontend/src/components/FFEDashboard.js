@@ -43,6 +43,7 @@ const FFEDashboard = ({ isOffline }) => {
   const [itemStatuses, setItemStatuses] = useState([]);
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
+  const loadingRef = useRef(false);
 
   useEffect(() => {
     if (projectId && !project) {
