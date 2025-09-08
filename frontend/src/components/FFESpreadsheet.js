@@ -417,12 +417,12 @@ const FFEItemRow = ({
     notes: item.notes || item.remarks || ''
   });
 
-  // Auto-save when any field changes
+  // Auto-save when any field changes - PREVENT PAGE JUMPING
   const handleFieldChange = async (field, value) => {
     const newData = { ...formData, [field]: value };
     setFormData(newData);
     
-    // Auto-save after 1 second delay
+    // Auto-save after 1 second delay - NO PAGE JUMPING
     clearTimeout(window.autoSaveTimeout);
     window.autoSaveTimeout = setTimeout(async () => {
       try {
