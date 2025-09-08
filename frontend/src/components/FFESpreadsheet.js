@@ -509,14 +509,16 @@ const FFEItemRow = ({
         />
       </td>
 
-      {/* Quantity - Always editable */}
-      <td className="p-2 border border-neutral-600 text-center fit-text">
+      {/* Quantity - NO CONTAINER */}
+      <td className="p-1 border border-neutral-600 w-auto" style={{ width: 'fit-content' }}>
         <input
           type="number"
           value={formData.quantity}
-          onChange={(e) => handleFieldChange('quantity', parseInt(e.target.value) || 1)}
-          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800 text-center"
-          min="1"
+          onChange={(e) => handleFieldChange('quantity', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 text-sm border-0 outline-0 p-1"
+          placeholder="Qty"
+          min="0"
+          style={{ minWidth: `${Math.max((formData.quantity?.toString() || '').length * 8, 40)}px` }}
         />
       </td>
 
