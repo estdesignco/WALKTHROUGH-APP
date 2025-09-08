@@ -327,31 +327,31 @@ const FFESpreadsheet = ({
                           {/* PURPLE SECTION COLUMNS */}
                           <td 
                             className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#6B46C1' }}
+                            style={{ backgroundColor: '#7B68A6' }}
                           >
                             Order Status / Est.<br/>Ship Date / Est.<br/>Delivery Date
                           </td>
                           <td 
                             className="w-32 p-2 font-semibold text-white text-xs border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#6B46C1' }}
+                            style={{ backgroundColor: '#7B68A6' }}
                           >
                             Install Date /<br/>Shipping TO
                           </td>
                           <td 
                             className="w-32 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#6B46C1' }}
+                            style={{ backgroundColor: '#7B68A6' }}
                           >
                             TRACKING #
                           </td>
                           <td 
                             className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#6B46C1' }}
+                            style={{ backgroundColor: '#7B68A6' }}
                           >
                             Carrier
                           </td>
                           <td 
                             className="w-24 p-2 font-semibold text-white text-sm border border-neutral-600 fit-text text-center"
-                            style={{ backgroundColor: '#6B46C1' }}
+                            style={{ backgroundColor: '#7B68A6' }}
                           >
                             Order Date
                           </td>
