@@ -211,15 +211,32 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Link (Optional)
+                  Product Link (Optional)
                 </label>
-                <input
-                  type="url"
-                  value={formData.link}
-                  onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                  placeholder="https://..."
-                />
+                <div className="flex space-x-2">
+                  <input
+                    type="url"
+                    value={formData.link}
+                    onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                    className="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                    placeholder="https://homedepot.com/product-link..."
+                  />
+                  <button
+                    type="button"
+                    onClick={handleLinkScraping}
+                    disabled={isScraping || !formData.link}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg transition-colors font-medium"
+                    title="Auto-fill product information from link"
+                  >
+                    {isScraping ? '🔍...' : '🔍 Fill'}
+                  </button>
+                </div>
+                {scrapeError && (
+                  <p className="text-red-400 text-sm mt-2">{scrapeError}</p>
+                )}
+                {isScraping && (
+                  <p className="text-blue-400 text-sm mt-2">🔍 Scraping product information...</p>
+                )}
               </div>
             </div>
 
