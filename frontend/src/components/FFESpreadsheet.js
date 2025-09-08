@@ -432,366 +432,261 @@ const FFEItemRow = ({
 
   return (
     <tr style={{ backgroundColor: bgColor }} className="text-neutral-200 text-sm">
-      {/* RED SECTION - Core Item Info */}
+      {/* RED SECTION - Core Item Info - FREE FLOW EDITING */}
       
-      {/* Item Name */}
+      {/* Item Name - Always editable */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <input
-            type="text"
-            value={editData.name}
-            onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-          />
-        ) : (
-          <span className="font-medium">{item.name}</span>
-        )}
+        <input
+          type="text"
+          value={formData.name}
+          onChange={(e) => handleFieldChange('name', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          placeholder="Item name..."
+        />
       </td>
 
-      {/* Vendor/SKU */}
+      {/* Vendor/SKU - Always editable dropdown */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <select
-            value={editData.vendor}
-            onChange={(e) => setEditData({ ...editData, vendor: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-          >
-            <option value="">Select Vendor</option>
-            {vendorTypes.map(vendor => (
-              <option key={vendor} value={vendor}>
-                {vendor}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <span>{item.vendor || '-'}</span>
-        )}
+        <select
+          value={formData.vendor}
+          onChange={(e) => handleFieldChange('vendor', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+        >
+          <option value="">Select Vendor</option>
+          {vendorTypes.map(vendor => (
+            <option key={vendor} value={vendor} className="bg-neutral-800">
+              {vendor}
+            </option>
+          ))}
+        </select>
       </td>
 
-      {/* Quantity */}
+      {/* Quantity - Always editable */}
       <td className="p-2 border border-neutral-600 text-center fit-text">
-        {isEditing ? (
-          <input
-            type="number"
-            value={editData.quantity}
-            onChange={(e) => setEditData({ ...editData, quantity: parseInt(e.target.value) || 1 })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-            min="1"
-          />
-        ) : (
-          <span>{item.quantity}</span>
-        )}
+        <input
+          type="number"
+          value={formData.quantity}
+          onChange={(e) => handleFieldChange('quantity', parseInt(e.target.value) || 1)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800 text-center"
+          min="1"
+        />
       </td>
 
-      {/* Size */}
+      {/* Size - Always editable */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <input
-            type="text"
-            value={editData.size}
-            onChange={(e) => setEditData({ ...editData, size: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-          />
-        ) : (
-          <span>{item.size || '-'}</span>
-        )}
+        <input
+          type="text"
+          value={formData.size}
+          onChange={(e) => handleFieldChange('size', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          placeholder="Size..."
+        />
       </td>
 
-      {/* Orders Status - WITH VISIBLE COLORS */}
+      {/* Orders Status - Always editable with visible colors */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <select
-            value={editData.status}
-            onChange={(e) => setEditData({ ...editData, status: e.target.value })}
-            className="w-full text-black px-2 py-1 rounded text-sm border border-neutral-600 font-medium"
-            style={{ backgroundColor: getStatusColor(editData.status) }}
-          >
-            {itemStatuses.map(status => (
-              <option key={status} value={status}>
-                {status.replace('_', ' ')}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <div 
-            className="px-2 py-1 rounded text-center text-black font-medium text-xs"
-            style={{ backgroundColor: getStatusColor(item.status) }}
-          >
-            {item.status.replace('_', ' ')}
-          </div>
-        )}
+        <select
+          value={formData.status}
+          onChange={(e) => handleFieldChange('status', e.target.value)}
+          className="w-full text-black px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 font-medium"
+          style={{ backgroundColor: getStatusColor(formData.status) }}
+        >
+          {itemStatuses.map(status => (
+            <option key={status} value={status} className="bg-white text-black">
+              {status.replace('_', ' ')}
+            </option>
+          ))}
+        </select>
       </td>
 
-      {/* BROWN SECTION - Additional Info */}
+      {/* BROWN SECTION - Additional Info - Always editable */}
       
       {/* Finish/Color */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <input
-            type="text"
-            value={editData.finish_color}
-            onChange={(e) => setEditData({ ...editData, finish_color: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-          />
-        ) : (
-          <span>{item.finish_color || item.remarks || '-'}</span>
-        )}
+        <input
+          type="text"
+          value={formData.finish_color}
+          onChange={(e) => handleFieldChange('finish_color', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          placeholder="Finish/Color..."
+        />
       </td>
 
       {/* Cost/Price */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <input
-            type="number"
-            value={editData.cost}
-            onChange={(e) => setEditData({ ...editData, cost: parseFloat(e.target.value) || 0 })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-            step="0.01"
-          />
-        ) : (
-          <span>${item.cost || '0.00'}</span>
-        )}
+        <input
+          type="number"
+          value={formData.cost}
+          onChange={(e) => handleFieldChange('cost', parseFloat(e.target.value) || 0)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          step="0.01"
+          placeholder="0.00"
+        />
       </td>
 
-      {/* LINK - MOST IMPORTANT COLUMN */}
+      {/* LINK - Always editable */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <input
-            type="url"
-            value={editData.link}
-            onChange={(e) => setEditData({ ...editData, link: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-            placeholder="Product URL"
-          />
-        ) : (
-          item.link ? (
-            <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs">
-              🔗 View
-            </a>
-          ) : (
-            <span>-</span>
-          )
+        <input
+          type="url"
+          value={formData.link}
+          onChange={(e) => handleFieldChange('link', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          placeholder="Product URL..."
+        />
+        {formData.link && (
+          <a href={formData.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs ml-1">
+            🔗
+          </a>
         )}
       </td>
 
       {/* Image */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <input
-            type="url"
-            value={editData.image_url}
-            onChange={(e) => setEditData({ ...editData, image_url: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-            placeholder="Image URL"
-          />
-        ) : (
-          item.image_url ? (
-            <img src={item.image_url} alt="Item" className="w-8 h-8 object-cover rounded" />
-          ) : (
-            <span>-</span>
-          )
+        <input
+          type="url"
+          value={formData.image_url}
+          onChange={(e) => handleFieldChange('image_url', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          placeholder="Image URL..."
+        />
+        {formData.image_url && (
+          <img src={formData.image_url} alt="Item" className="w-8 h-8 object-cover rounded mt-1" />
         )}
       </td>
 
-      {/* PURPLE SECTION - Shipping Info */}
+      {/* PURPLE SECTION - Shipping Info - Always editable */}
       
-      {/* Order Status / Ship Date / Delivery Date - 3 SEPARATE SPACES */}
+      {/* Order Status / Ship Date / Delivery Date - 3 separate fields */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <div className="space-y-1">
-            <input
-              type="text"
-              value={editData.order_status}
-              onChange={(e) => setEditData({ ...editData, order_status: e.target.value })}
-              className="w-full bg-neutral-800 text-neutral-200 px-1 py-0.5 rounded text-xs border border-neutral-600"
-              placeholder="Order Status"
-            />
-            <input
-              type="date"
-              value={editData.ship_date}
-              onChange={(e) => setEditData({ ...editData, ship_date: e.target.value })}
-              className="w-full bg-neutral-800 text-neutral-200 px-1 py-0.5 rounded text-xs border border-neutral-600"
-              title="Ship Date"
-            />
-            <input
-              type="date"
-              value={editData.delivery_date}
-              onChange={(e) => setEditData({ ...editData, delivery_date: e.target.value })}
-              className="w-full bg-neutral-800 text-neutral-200 px-1 py-0.5 rounded text-xs border border-neutral-600"
-              title="Delivery Date"
-            />
-          </div>
-        ) : (
-          <div className="text-xs space-y-1">
-            <div>{item.order_status || '-'}</div>
-            <div>{item.ship_date || '-'}</div>
-            <div>{item.delivery_date || '-'}</div>
-          </div>
-        )}
+        <div className="space-y-1">
+          <input
+            type="text"
+            value={formData.order_status}
+            onChange={(e) => handleFieldChange('order_status', e.target.value)}
+            className="w-full bg-transparent text-neutral-200 px-1 py-0.5 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+            placeholder="Order Status"
+          />
+          <input
+            type="date"
+            value={formData.ship_date}
+            onChange={(e) => handleFieldChange('ship_date', e.target.value)}
+            className="w-full bg-transparent text-neutral-200 px-1 py-0.5 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+            title="Ship Date"
+          />
+          <input
+            type="date"
+            value={formData.delivery_date}
+            onChange={(e) => handleFieldChange('delivery_date', e.target.value)}
+            className="w-full bg-transparent text-neutral-200 px-1 py-0.5 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+            title="Delivery Date"
+          />
+        </div>
       </td>
 
       {/* Install Date / Shipping TO */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <div className="flex flex-col space-y-1">
-            <input
-              type="date"
-              value={editData.install_date}
-              onChange={(e) => setEditData({ ...editData, install_date: e.target.value })}
-              className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-xs border border-neutral-600"
-              title="Install Date"
-            />
-            <input
-              type="text"
-              placeholder="Shipping TO"
-              className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-xs border border-neutral-600"
-            />
-          </div>
-        ) : (
-          <div className="text-xs">
-            <div>{item.install_date || '-'}</div>
-            <div className="text-neutral-400">Ship TO: -</div>
-          </div>
-        )}
+        <div className="flex flex-col space-y-1">
+          <input
+            type="date"
+            value={formData.install_date}
+            onChange={(e) => handleFieldChange('install_date', e.target.value)}
+            className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+            title="Install Date"
+          />
+          <input
+            type="text"
+            placeholder="Shipping TO"
+            className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-xs border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          />
+        </div>
       </td>
 
       {/* Tracking Number */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
+        <div className="flex items-center space-x-1">
           <input
             type="text"
-            value={editData.tracking_number}
-            onChange={(e) => setEditData({ ...editData, tracking_number: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-            placeholder="Enter tracking #"
+            value={formData.tracking_number}
+            onChange={(e) => handleFieldChange('tracking_number', e.target.value)}
+            className="flex-1 bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+            placeholder="Tracking #"
           />
-        ) : (
-          item.tracking_number ? (
-            <div className="flex items-center space-x-2">
-              <span className="text-xs">{item.tracking_number}</span>
-              <button
-                onClick={() => {
-                  // Create tracking URL based on carrier
-                  let trackingUrl = '';
-                  const carrier = item.carrier || item.vendor || '';
-                  const trackingNum = item.tracking_number;
-                  
-                  if (carrier.toLowerCase().includes('ups')) {
-                    trackingUrl = `https://www.ups.com/track?loc=null&tracknum=${trackingNum}`;
-                  } else if (carrier.toLowerCase().includes('fedex')) {
-                    trackingUrl = `https://www.fedex.com/fedextrack/?trknbr=${trackingNum}`;
-                  } else if (carrier.toLowerCase().includes('usps')) {
-                    trackingUrl = `https://tools.usps.com/go/TrackConfirmAction?tRef=fullpage&tLc=2&text28777=&tLabels=${trackingNum}`;
-                  } else {
-                    // Generic Google search for tracking
-                    trackingUrl = `https://www.google.com/search?q=${encodeURIComponent(carrier + ' tracking ' + trackingNum)}`;
-                  }
-                  
-                  window.open(trackingUrl, '_blank');
-                }}
-                className="text-blue-400 hover:text-blue-300 text-xs underline"
-                title="Track Package"
-              >
-                🔗 Track
-              </button>
-            </div>
-          ) : (
-            <span>-</span>
-          )
-        )}
+          {formData.tracking_number && (
+            <button
+              onClick={() => {
+                let trackingUrl = '';
+                const carrier = formData.carrier || formData.vendor || '';
+                const trackingNum = formData.tracking_number;
+                
+                if (carrier.toLowerCase().includes('ups')) {
+                  trackingUrl = `https://www.ups.com/track?loc=null&tracknum=${trackingNum}`;
+                } else if (carrier.toLowerCase().includes('fedex')) {
+                  trackingUrl = `https://www.fedex.com/fedextrack/?trknbr=${trackingNum}`;
+                } else if (carrier.toLowerCase().includes('usps')) {
+                  trackingUrl = `https://tools.usps.com/go/TrackConfirmAction?tRef=fullpage&tLc=2&text28777=&tLabels=${trackingNum}`;
+                } else {
+                  trackingUrl = `https://www.google.com/search?q=${encodeURIComponent(carrier + ' tracking ' + trackingNum)}`;
+                }
+                
+                window.open(trackingUrl, '_blank');
+              }}
+              className="text-blue-400 hover:text-blue-300 text-xs"
+              title="Track Package"
+            >
+              🔗
+            </button>
+          )}
+        </div>
       </td>
 
-      {/* Carrier - FIXED DROPDOWN */}
+      {/* Carrier */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <select
-            value={editData.carrier}
-            onChange={(e) => setEditData({ ...editData, carrier: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-          >
-            <option value="">Select Carrier</option>
-            {carrierTypes.map(carrier => (
-              <option key={carrier} value={carrier}>
-                {carrier}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <span>{item.carrier || '-'}</span>
-        )}
+        <select
+          value={formData.carrier}
+          onChange={(e) => handleFieldChange('carrier', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+        >
+          <option value="">Select Carrier</option>
+          {carrierTypes.map(carrier => (
+            <option key={carrier} value={carrier} className="bg-neutral-800">
+              {carrier}
+            </option>
+          ))}
+        </select>
       </td>
 
       {/* Order Date */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <input
-            type="date"
-            value={editData.order_date}
-            onChange={(e) => setEditData({ ...editData, order_date: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-            title="Order Date - Click to open calendar"
-          />
-        ) : (
-          <span>{item.order_date || '-'}</span>
-        )}
+        <input
+          type="date"
+          value={formData.order_date}
+          onChange={(e) => handleFieldChange('order_date', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          title="Order Date"
+        />
       </td>
 
       {/* NOTES COLUMN - RED SECTION */}
       <td className="p-2 border border-neutral-600 fit-text">
-        {isEditing ? (
-          <textarea
-            value={editData.notes}
-            onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
-            className="w-full bg-neutral-800 text-neutral-200 px-2 py-1 rounded text-sm border border-neutral-600"
-            rows="2"
-            placeholder="Notes..."
-          />
-        ) : (
-          <span className="text-xs">{item.notes || item.remarks || '-'}</span>
-        )}
+        <textarea
+          value={formData.notes}
+          onChange={(e) => handleFieldChange('notes', e.target.value)}
+          className="w-full bg-transparent text-neutral-200 px-2 py-1 rounded text-sm border-0 focus:border focus:border-blue-500 focus:bg-neutral-800"
+          rows="2"
+          placeholder="Notes..."
+        />
       </td>
 
-      {/* DELETE COLUMN - RED SECTION */}
+      {/* DELETE COLUMN - RED SECTION - ONLY DELETE BUTTON */}
       <td className="p-2 border border-neutral-600 text-center fit-text">
-        <div className="flex justify-center space-x-1">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="bg-green-700 hover:bg-green-600 text-neutral-200 px-2 py-1 rounded text-xs"
-                disabled={isOffline}
-                title="Save Changes"
-              >
-                ✓
-              </button>
-              <button
-                onClick={handleCancel}
-                className="bg-neutral-600 hover:bg-neutral-500 text-neutral-200 px-2 py-1 rounded text-xs"
-                title="Cancel"
-              >
-                ✕
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => setIsEditing(true)}
-                className="bg-neutral-600 hover:bg-neutral-500 text-neutral-200 px-1 py-0.5 rounded text-xs"
-                title="Edit Item"
-              >
-                ✏️
-              </button>
-              <button
-                onClick={() => onDelete(item.id)}
-                className="bg-red-700 hover:bg-red-600 text-neutral-200 px-1 py-0.5 rounded text-xs"
-                title="Delete Item"
-                disabled={isOffline}
-              >
-                🗑️
-              </button>
-            </>
-          )}
-        </div>
+        <button
+          onClick={() => onDelete(item.id)}
+          className="bg-red-700 hover:bg-red-600 text-neutral-200 px-2 py-1 rounded text-xs"
+          title="Delete Item"
+          disabled={isOffline}
+        >
+          🗑️
+        </button>
       </td>
     </tr>
   );
