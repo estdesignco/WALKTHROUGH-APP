@@ -189,3 +189,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "CRITICAL FINDING: Frontend was working all along! Issue was duplicate 'Greene Renovation' projects. User was accessing empty project instead of one with actual data. Correct project URL: /project/bb060596-85c2-455f-860a-cf9fa23dfacf/ffe shows all items perfectly. Backend API, data structure, frontend rendering, and status overview all functional."
+  - agent: "user"
+    message: "FINAL FIXES NEEDED: 1) Red color change to #b43535, 2) Purple color for shipping info header, 3) Fix mouse sweep scrolling going to next page, 4) Links not working and causing page jumps, 5) Status breakdown missing colors, 6) Remove extra containers except dates/dropdowns, 7) Add new buttons/actions from uploaded images"
