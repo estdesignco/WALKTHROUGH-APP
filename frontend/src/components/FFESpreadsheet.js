@@ -150,8 +150,14 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* Horizontal Scrollable Container */}
-      <div className="overflow-x-auto">
+      {/* Horizontal Scrollable Container - PREVENT NAVIGATION BACK */}
+      <div 
+        className="overflow-x-auto"
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onWheel={(e) => e.stopPropagation()}
+        style={{ touchAction: 'pan-x' }}
+      >
         <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
           <tbody>
             {/* MAIN DATA STRUCTURE */}
