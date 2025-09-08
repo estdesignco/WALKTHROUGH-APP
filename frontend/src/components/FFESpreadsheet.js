@@ -150,63 +150,12 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* Horizontal Scrollable Container - COMPLETELY FIX LEFT SCROLL */}
+      {/* Horizontal Scrollable Container - FORCE LEFT SCROLL TO WORK */}
       <div 
-        className="overflow-x-auto overflow-y-visible"
-        onWheel={(e) => {
-          const container = e.currentTarget;
-          // Force horizontal scrolling to work properly
-          if (e.deltaX !== 0) {
-            e.preventDefault();
-            container.scrollLeft += e.deltaX;
-          } else if (e.deltaY !== 0 && (e.shiftKey || Math.abs(e.deltaY) > Math.abs(e.deltaX))) {
-            e.preventDefault();
-            container.scrollLeft += e.deltaY;
-          }
-        }}
-        onMouseDown={(e) => {
-          // Allow drag scrolling
-          const container = e.currentTarget;
-          let isDown = false;
-          let startX;
-          let scrollLeft;
-
-          const handleMouseDown = (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
-            isDown = true;
-            startX = e.pageX - container.offsetLeft;
-            scrollLeft = container.scrollLeft;
-            container.style.cursor = 'grabbing';
-          };
-
-          const handleMouseLeave = () => {
-            isDown = false;
-            container.style.cursor = 'grab';
-          };
-
-          const handleMouseUp = () => {
-            isDown = false;
-            container.style.cursor = 'grab';
-          };
-
-          const handleMouseMove = (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - container.offsetLeft;
-            const walk = (x - startX) * 2;
-            container.scrollLeft = scrollLeft - walk;
-          };
-
-          container.addEventListener('mousedown', handleMouseDown);
-          container.addEventListener('mouseleave', handleMouseLeave);
-          container.addEventListener('mouseup', handleMouseUp);
-          container.addEventListener('mousemove', handleMouseMove);
-        }}
+        className="overflow-x-scroll overflow-y-visible"
         style={{ 
-          touchAction: 'pan-x',
           overscrollBehaviorX: 'contain',
-          overscrollBehaviorY: 'auto',
-          cursor: 'grab'
+          overscrollBehaviorY: 'auto'
         }}
       >
         <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
