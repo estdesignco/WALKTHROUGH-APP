@@ -281,12 +281,12 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* LOGO CONTAINER - TINY CONTAINER JUST AROUND LOGO */}
-        <div className="mx-auto rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '15px 25px', display: 'inline-block' }}>
+        {/* LOGO BANNER - FULL WIDTH LIKE YOUR PICTURES */}
+        <div className="mx-auto rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '30px', width: '95%' }}>
           <img 
             src="/established-logo.png" 
             alt="Established Design Co. Logo" 
-            style={{ height: '80px', width: 'auto', objectFit: 'contain', display: 'block' }}
+            style={{ height: '100px', width: '100%', objectFit: 'contain', display: 'block' }}
           />
         </div>
 
