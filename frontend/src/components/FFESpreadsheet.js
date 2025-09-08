@@ -378,7 +378,7 @@ const FFESpreadsheet = ({
   );
 };
 
-// Individual Item Row Component - ALL COLUMNS INCLUDING LINK, NOTES, DELETE
+// Individual Item Row Component - FREE FLOW EDITING (NO EDIT BUTTONS)
 const FFEItemRow = ({ 
   item, 
   itemIndex, 
@@ -390,8 +390,8 @@ const FFEItemRow = ({
   carrierTypes = [],
   isOffline 
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({
+  // Always in edit mode for quick access - NO EDIT BUTTON NEEDED
+  const [formData, setFormData] = useState({
     name: item.name,
     vendor: item.vendor || '',
     quantity: item.quantity,
@@ -411,39 +411,23 @@ const FFEItemRow = ({
     notes: item.notes || item.remarks || ''
   });
 
-  const handleSave = async () => {
-    try {
-      await onUpdate(item.id, editData);
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error saving item:', error);
-    }
+  // Auto-save when any field changes
+  const handleFieldChange = async (field, value) => {
+    const newData = { ...formData, [field]: value };
+    setFormData(newData);
+    
+    // Auto-save after 1 second delay
+    clearTimeout(window.autoSaveTimeout);
+    window.autoSaveTimeout = setTimeout(async () => {
+      try {
+        await onUpdate(item.id, { [field]: value });
+      } catch (error) {
+        console.error('Error auto-saving:', error);
+      }
+    }, 1000);
   };
 
-  const handleCancel = () => {
-    setEditData({
-      name: item.name,
-      vendor: item.vendor || '',
-      quantity: item.quantity,
-      size: item.size || '',
-      status: item.status,
-      finish_color: item.finish_color || '',
-      cost: item.cost || 0,
-      link: item.link || '',
-      image_url: item.image_url || '',
-      order_status: item.order_status || '',
-      ship_date: item.ship_date || '',
-      delivery_date: item.delivery_date || '',
-      install_date: item.install_date || '',
-      tracking_number: item.tracking_number || '',
-      carrier: item.carrier || '',
-      order_date: item.order_date || '',
-      notes: item.notes || item.remarks || ''
-    });
-    setIsEditing(false);
-  };
-
-  // Alternating row colors - MORE BLACK/CHARCOAL as requested
+  // Alternating row colors
   const bgColor = itemIndex % 2 === 0 ? '#1F2937' : '#374151';
 
   return (
