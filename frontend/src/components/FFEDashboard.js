@@ -265,22 +265,59 @@ const FFEDashboard = ({ isOffline }) => {
 
       </div>
 
-      {/* FF&E HEADER LAYOUT - EXACTLY AS USER'S IMAGE */}
-      <div className="px-6 mb-6">
-        {/* Simple Header - Matching Your Layout */}
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold text-gray-200 mb-2">FF&E - {project?.name || 'PROJECT'}</h2>
+      {/* TOP HEADER - LARGE GREENE + ADDRESS */}
+      <div className="mb-6">
+        <div className="text-center mb-4">
+          <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
+          <p className="text-gray-300">Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
         </div>
-        
-        {/* Simple Button Row - Like Your Layout */}
-        <div className="flex items-center space-x-4 mb-4">
-          <button
-            onClick={() => setShowAddRoom(true)}
-            style={{ backgroundColor: '#8b7355' }}
-            className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors"
-          >
-            ➕ Add Room
-          </button>
+
+        {/* SHEET NAVIGATION TABS */}
+        <div className="flex justify-center space-x-8 mb-6">
+          <div className="flex items-center space-x-2 text-gray-400">
+            <span>📋</span>
+            <span>Questionnaire</span>
+          </div>
+          <div className="flex items-center space-x-2 text-gray-400">
+            <span>🚶</span>
+            <span>Walkthrough</span>
+          </div>
+          <div className="flex items-center space-x-2 text-gray-400">
+            <span>✅</span>
+            <span>Checklist</span>
+          </div>
+          <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
+            <span>📊</span>
+            <span className="font-semibold">FF&E</span>
+          </div>
+        </div>
+
+        {/* BIG LOGO CONTAINER SPANNING FULL WIDTH */}
+        <div className="w-full rounded-lg p-6 mb-6" style={{ backgroundColor: '#8b7355' }}>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-black">ESTABLISHED DESIGN CO.</h2>
+          </div>
+        </div>
+
+        {/* FF&E TITLE WITH EXPORT BUTTONS */}
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-gray-200">FF&E - GREENE</h3>
+          <div className="flex space-x-4">
+            <button
+              style={{ backgroundColor: '#8b7355' }}
+              className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
+            >
+              <span>📥</span>
+              <span>Export FF&E</span>
+            </button>
+            <button
+              style={{ backgroundColor: '#8b7355' }}
+              className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
+            >
+              <span>📋</span>
+              <span>Spec Sheet</span>
+            </button>
+          </div>
         </div>
       </div>
 
