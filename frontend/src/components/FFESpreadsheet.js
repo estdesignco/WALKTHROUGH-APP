@@ -178,7 +178,7 @@ const FFESpreadsheet = ({
                 {/* 1. ROOM Header Row - PURPLE like LIVING ROOM - CENTERED */}
                 <tr>
                   <td 
-                    colSpan="13" 
+                    colSpan="16" 
                     className="p-4 font-bold text-white text-lg border border-neutral-600 fit-text text-center"
                     style={{ backgroundColor: getRoomColor(room.name) }}
                     onClick={(e) => {
