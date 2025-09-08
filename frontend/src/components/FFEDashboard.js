@@ -85,7 +85,6 @@ const FFEDashboard = ({ isOffline }) => {
 
   const loadUtilityDataAsync = async () => {
     try {
-      console.log('🔍 DEBUG: Loading utility data...');
       const { utilityAPI } = await import('../App');
       const [roomColorsRes, categoryColorsRes, statusesRes, vendorsRes, carriersRes] = await Promise.all([
         utilityAPI.getRoomColors(),
@@ -95,7 +94,6 @@ const FFEDashboard = ({ isOffline }) => {
         utilityAPI.getCarrierTypes()
       ]);
       
-      console.log('🔍 DEBUG: Utility data loaded successfully');
       setRoomColors(roomColorsRes.data);
       setCategoryColors(categoryColorsRes.data);
       setItemStatuses(statusesRes.data);
@@ -103,7 +101,7 @@ const FFEDashboard = ({ isOffline }) => {
       setCarrierTypes(carriersRes.data);
       return true;
     } catch (err) {
-      console.error('🔍 DEBUG: Error loading utility data:', err);
+      console.error('Error loading utility data:', err);
       // Use default values
       setRoomColors({});
       setCategoryColors({});
