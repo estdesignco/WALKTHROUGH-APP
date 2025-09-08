@@ -468,20 +468,19 @@ const FFEItemRow = ({
     notes: item.notes || item.remarks || ''
   });
 
-  // Auto-save when any field changes - PREVENT ALL PAGE JUMPING
-  const handleFieldChange = async (field, value) => {
+  // Auto-save when any field changes - COMPLETELY PREVENT PAGE JUMPING
+  const handleFieldChange = (field, value) => {
     const newData = { ...formData, [field]: value };
     setFormData(newData);
     
-    // Prevent any form submission or page refresh
+    // Prevent any scrolling or page jumping - NO ASYNC OPERATIONS
     try {
-      // Use debounced save to prevent rapid API calls
-      clearTimeout(window[`autoSave_${item.id}_${field}`]);
-      window[`autoSave_${item.id}_${field}`] = setTimeout(async () => {
-        await onUpdate(item.id, { [field]: value });
-      }, 500);
+      // Save immediately but don't await to prevent any page refresh
+      onUpdate(item.id, { [field]: value }).catch(error => {
+        console.error('Error auto-saving:', error);
+      });
     } catch (error) {
-      console.error('Error auto-saving:', error);
+      console.error('Error in handleFieldChange:', error);
     }
   };
 
