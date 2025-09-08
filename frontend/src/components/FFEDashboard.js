@@ -96,9 +96,9 @@ const FFEDashboard = ({ isOffline }) => {
       // Use default values
       setRoomColors({});
       setCategoryColors({});
-      setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']);
-      setVendorTypes(['Classic Design', 'Est. Design Co.', 'Job Site', 'Vendor']);
-      setCarrierTypes(['FedEx', 'UPS', 'Brooks', 'Zenith', 'Sunbelt', 'Other']);
+      setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED', 'PARTIALLY DELIVERED', 'ON HOLD', 'CANCELLED', 'BACKORDERED', 'IN TRANSIT', 'OUT FOR DELIVERY', 'RETURNED', 'DAMAGED', 'MISSING', 'PENDING APPROVAL', 'QUOTE REQUESTED', 'APPROVED', 'REJECTED']);
+      setVendorTypes(['Classic Design', 'Est. Design Co.', 'Job Site', 'Vendor', 'Home Depot', "Lowe's", 'Wayfair', 'Pottery Barn', 'Restoration Hardware', 'West Elm', 'CB2', 'Crate & Barrel', 'Williams Sonoma', 'Amazon', 'Overstock', 'Direct from Manufacturer', 'Local Vendor', 'Custom Fabrication']);
+      setCarrierTypes(['FedEx', 'FedEx Ground', 'FedEx Express', 'UPS', 'UPS Ground', 'UPS Express', 'USPS', 'DHL', 'White Glove Delivery', 'Freight', 'Local Delivery', 'Customer Pickup', 'Brooks', 'Zenith', 'Sunbelt', 'Specialized Carrier', 'Installation Crew', 'Other']);
     }
   };
 
