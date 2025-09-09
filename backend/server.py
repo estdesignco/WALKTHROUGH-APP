@@ -2210,28 +2210,31 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            # Try to extract main product image with better filtering
+            # Try to extract the MAIN PRODUCT IMAGE (largest/best quality)
+            best_image_url = None
+            best_image_score = 0
+            
             for selector in image_selectors:
                 try:
-                    if selector == 'img':  # Special handling for all images
+                    if selector == 'img[src*="product"], img[src*="item"], img[src*="cdn"]':  # Last resort - filter for best image
                         elements = await page.query_selector_all(selector)
                         for element in elements:
                             try:
                                 src = await element.get_attribute('src')
-                                if src and _is_product_image(src):
-                                    # Convert relative URLs to absolute
-                                    if src.startswith('//'):
-                                        src = 'https:' + src
-                                    elif src.startswith('/'):
-                                        base_url = '/'.join(url.split('/')[:3])
-                                        src = base_url + src
-                                    result['image_url'] = src
-                                    break
+                                if src and _is_main_product_image(src):
+                                    # Score images based on size indicators in URL
+                                    score = _score_image_quality(src)
+                                    if score > best_image_score:
+                                        best_image_score = score
+                                        if src.startswith('//'):
+                                            src = 'https:' + src
+                                        elif src.startswith('/'):
+                                            base_url = '/'.join(url.split('/')[:3])
+                                            src = base_url + src
+                                        best_image_url = src
                             except:
                                 continue
-                        if result['image_url']:  # If found, break outer loop
-                            break
-                    else:  # Regular selector handling
+                    else:  # Regular selector handling - prioritize first match
                         element = await page.query_selector(selector)
                         if element:
                             src = await element.get_attribute('src')
@@ -2242,10 +2245,21 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                 elif src.startswith('/'):
                                     base_url = '/'.join(url.split('/')[:3])
                                     src = base_url + src
-                                result['image_url'] = src
-                                break
+                                
+                                # Score this image
+                                score = _score_image_quality(src)
+                                if score > best_image_score:
+                                    best_image_score = score
+                                    best_image_url = src
+                                    
+                                # If this is a high-priority selector and good quality, use it
+                                if score >= 50:  # Good quality threshold
+                                    break
                 except:
                     continue
+            
+            if best_image_url:
+                result['image_url'] = best_image_url
             
             # Try to extract description with enhanced filtering
             for selector in description_selectors:
