@@ -122,7 +122,7 @@ const FFEDashboard = ({ isOffline }) => {
       const roomResponse = await roomAPI.create(newRoom);
       
       // Reload project to show the newly created room with full structure
-      await loadProjectAndUtilityData();
+      await loadSimpleProject();
       setShowAddRoom(false);
     } catch (err) {
       setError('Failed to create room');
