@@ -105,6 +105,10 @@ const App = () => {
                 />
               }
             />
+            <Route 
+              path="/scraping-test" 
+              element={<ScrapingTestPage />}
+            />
           </Routes>
         </main>
       </BrowserRouter>
