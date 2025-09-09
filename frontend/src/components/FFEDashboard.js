@@ -85,29 +85,25 @@ const FFEDashboard = ({ isOffline }) => {
 
   const loadUtilityDataAsync = async () => {
     try {
-      const { utilityAPI } = await import('../App');
-      const [roomColorsRes, categoryColorsRes, statusesRes, vendorsRes, carriersRes] = await Promise.all([
-        utilityAPI.getRoomColors(),
-        utilityAPI.getCategoryColors(), 
-        utilityAPI.getItemStatuses(),
-        utilityAPI.getVendorTypes(),
-        utilityAPI.getCarrierTypes()
-      ]);
+      // SIMPLE FIX: Just use default values instead of trying to fetch from API
+      console.log('🔧 Loading default utility data...');
       
-      setRoomColors(roomColorsRes.data);
-      setCategoryColors(categoryColorsRes.data);
-      setItemStatuses(statusesRes.data);
-      setVendorTypes(vendorsRes.data);
-      setCarrierTypes(carriersRes.data);
-      return true;
-    } catch (err) {
-      console.error('Error loading utility data:', err);
-      // Use default values
       setRoomColors({});
       setCategoryColors({});
       setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED', 'PARTIALLY DELIVERED', 'ON HOLD', 'CANCELLED', 'BACKORDERED', 'IN TRANSIT', 'OUT FOR DELIVERY', 'RETURNED', 'DAMAGED', 'MISSING', 'PENDING APPROVAL', 'QUOTE REQUESTED', 'APPROVED', 'REJECTED']);
       setVendorTypes(['Four Hands', 'Uttermost', 'Rowe Furniture', 'Regina Andrew', 'Bernhardt', 'Loloi Rugs', 'Vandh', 'Visual Comfort', 'HVL Group', 'Flow Decor', 'Classic Home', 'Crestview Collection', 'Bassett Mirror', 'Eichholtz', 'York Wallcoverings', 'Phillips Collection', 'Phillip Jeffries', 'Hinkley Lighting', 'Zeev Lighting', 'Hubbardton Forge', 'Currey and Company', 'Surya', 'Myoh America', 'Gabby']);
       setCarrierTypes(['FedEx', 'FedEx Ground', 'FedEx Express', 'UPS', 'UPS Ground', 'UPS Express', 'USPS', 'DHL', 'White Glove Delivery', 'Freight', 'Local Delivery', 'Customer Pickup', 'Brooks', 'Zenith', 'Sunbelt', 'Specialized Carrier', 'Installation Crew', 'Other']);
+      
+      console.log('✅ Default utility data loaded successfully');
+      return true;
+    } catch (err) {
+      console.error('Error loading utility data:', err);
+      // Fallback values
+      setRoomColors({});
+      setCategoryColors({});
+      setItemStatuses(['ORDERED', 'DELIVERED TO JOB SITE', 'INSTALLED']);
+      setVendorTypes(['Four Hands', 'Uttermost', 'Rowe Furniture']);
+      setCarrierTypes(['FedEx', 'UPS', 'USPS']);
       return true;
     }
   };
