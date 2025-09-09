@@ -60,6 +60,94 @@ ROOM_COLORS = {
     "patio": "#7A7A5A"
 }
 
+# Enhanced Item Status Options with Colors for Sophisticated Tracking
+ITEM_STATUSES = [
+    # Planning Phase
+    {'status': 'TO BE SELECTED', 'color': '#D4A574', 'phase': 'planning'},
+    {'status': 'RESEARCHING', 'color': '#B8860B', 'phase': 'planning'}, 
+    {'status': 'PENDING APPROVAL', 'color': '#DAA520', 'phase': 'planning'},
+    
+    # Procurement Phase  
+    {'status': 'APPROVED', 'color': '#9ACD32', 'phase': 'procurement'},
+    {'status': 'ORDERED', 'color': '#32CD32', 'phase': 'procurement'},
+    {'status': 'PICKED', 'color': '#FFD700', 'phase': 'procurement'},  # YELLOW like your image
+    {'status': 'CONFIRMED', 'color': '#228B22', 'phase': 'procurement'},
+    
+    # Fulfillment Phase
+    {'status': 'IN PRODUCTION', 'color': '#FF8C00', 'phase': 'fulfillment'},
+    {'status': 'SHIPPED', 'color': '#4169E1', 'phase': 'fulfillment'},
+    {'status': 'IN TRANSIT', 'color': '#6495ED', 'phase': 'fulfillment'},
+    {'status': 'OUT FOR DELIVERY', 'color': '#87CEEB', 'phase': 'fulfillment'},
+    
+    # Delivery Phase
+    {'status': 'DELIVERED TO RECEIVER', 'color': '#9370DB', 'phase': 'delivery'},
+    {'status': 'DELIVERED TO JOB SITE', 'color': '#8A2BE2', 'phase': 'delivery'},
+    {'status': 'RECEIVED', 'color': '#DDA0DD', 'phase': 'delivery'},
+    
+    # Installation Phase
+    {'status': 'READY FOR INSTALL', 'color': '#20B2AA', 'phase': 'installation'},
+    {'status': 'INSTALLING', 'color': '#48D1CC', 'phase': 'installation'},
+    {'status': 'INSTALLED', 'color': '#00CED1', 'phase': 'installation'},
+    
+    # Issues & Exceptions
+    {'status': 'ON HOLD', 'color': '#DC143C', 'phase': 'exception'},
+    {'status': 'BACKORDERED', 'color': '#B22222', 'phase': 'exception'},
+    {'status': 'DAMAGED', 'color': '#8B0000', 'phase': 'exception'},
+    {'status': 'RETURNED', 'color': '#CD5C5C', 'phase': 'exception'},
+    {'status': 'CANCELLED', 'color': '#A52A2A', 'phase': 'exception'}
+]
+
+# Enhanced Carrier Options with Colors like your screenshots
+CARRIER_OPTIONS = [
+    {'name': 'FedEx', 'color': '#FF6600', 'tracking_url': 'https://www.fedex.com/apps/fedextrack/?tracknumbers='},
+    {'name': 'UPS', 'color': '#8B4513', 'tracking_url': 'https://www.ups.com/track?tracknum='},
+    {'name': 'Brooks', 'color': '#4682B4', 'tracking_url': 'https://www.brooksdelivery.com/track/'},
+    {'name': 'Zenith', 'color': '#20B2AA', 'tracking_url': 'https://zenithdelivery.com/tracking/'},
+    {'name': 'Sunbelt', 'color': '#DC143C', 'tracking_url': 'https://sunbeltdelivery.com/track/'},
+    {'name': 'R+L Carriers', 'color': '#8A2BE2', 'tracking_url': 'https://www.rlcarriers.com/tracking/'},
+    {'name': 'Yellow Freight', 'color': '#FFD700', 'tracking_url': 'https://my.yrc.com/dynamic/national/servlet'},
+    {'name': 'XPO Logistics', 'color': '#FF1493', 'tracking_url': 'https://www.xpo.com/tracking/'},
+    {'name': 'Old Dominion', 'color': '#228B22', 'tracking_url': 'https://www.odfl.com/Freight-Tracking/'},
+    {'name': 'ABF Freight', 'color': '#B22222', 'tracking_url': 'https://arcb.com/tools/tracking.html'},
+    {'name': 'Estes Express', 'color': '#4B0082', 'tracking_url': 'https://www.estes-express.com/resources/shipment-tracking'},
+    {'name': 'Saia LTL', 'color': '#2E8B57', 'tracking_url': 'https://www.saia.com/track/'},
+    {'name': 'TForce Freight', 'color': '#FF4500', 'tracking_url': 'https://www.tforcefreight.com/tracking/'},
+    {'name': 'Roadrunner', 'color': '#6B8E23', 'tracking_url': 'https://www.roadrunner.com/tracking/'},
+    {'name': 'Central Transport', 'color': '#8B008B', 'tracking_url': 'https://www.centraltransport.com/tracking/'},
+    {'name': 'Southeastern Freight', 'color': '#D2691E', 'tracking_url': 'https://www.sefl.com/tools/track-shipment/'},
+    {'name': 'Averitt Express', 'color': '#CD853F', 'tracking_url': 'https://www.averittexpress.com/tracking/'},
+    {'name': 'Holland', 'color': '#F4A460', 'tracking_url': 'https://www.hollandregional.com/tracking/'},
+    {'name': 'OTHER', 'color': '#9370DB', 'tracking_url': ''}
+]
+
+# Wholesale Vendor Database - Enhanced for Scraping
+VENDOR_DATABASE = [
+    {'name': 'Four Hands', 'url': 'fourhands.com', 'scraping_supported': True, 'category': 'Furniture'},
+    {'name': 'Restoration Hardware', 'url': 'rh.com', 'scraping_supported': True, 'category': 'Furniture & Decor'},
+    {'name': 'West Elm', 'url': 'westelm.com', 'scraping_supported': True, 'category': 'Furniture & Decor'},
+    {'name': 'CB2', 'url': 'cb2.com', 'scraping_supported': True, 'category': 'Modern Furniture'},
+    {'name': 'Arteriors', 'url': 'arteriorshome.com', 'scraping_supported': True, 'category': 'Lighting & Decor'},
+    {'name': 'Visual Comfort', 'url': 'visualcomfort.com', 'scraping_supported': True, 'category': 'Lighting'},
+    {'name': 'Circa Lighting', 'url': 'circalighting.com', 'scraping_supported': True, 'category': 'Lighting'},
+    {'name': 'Rejuvenation', 'url': 'rejuvenation.com', 'scraping_supported': True, 'category': 'Lighting & Hardware'},
+    {'name': 'Urban Electric', 'url': 'urbanelectric.com', 'scraping_supported': True, 'category': 'Lighting'},
+    {'name': 'Hubbardton Forge', 'url': 'hubbardtonforge.com', 'scraping_supported': True, 'category': 'Lighting'},
+    {'name': 'Troy Lighting', 'url': 'troylighting.com', 'scraping_supported': True, 'category': 'Lighting'},
+    {'name': 'Hinkley Lighting', 'url': 'hinkley.com', 'scraping_supported': True, 'category': 'Lighting'},
+    {'name': 'Kichler', 'url': 'kichler.com', 'scraping_supported': True, 'category': 'Lighting'},
+    {'name': 'Minka Aire', 'url': 'minkaaire.com', 'scraping_supported': True, 'category': 'Ceiling Fans'},
+    {'name': 'Monte Carlo', 'url': 'montecarlofans.com', 'scraping_supported': True, 'category': 'Ceiling Fans'},
+    {'name': 'Hunter Fan', 'url': 'hunterfan.com', 'scraping_supported': True, 'category': 'Ceiling Fans'},
+    {'name': 'Kohler', 'url': 'kohler.com', 'scraping_supported': True, 'category': 'Plumbing'},
+    {'name': 'Delta Faucet', 'url': 'deltafaucet.com', 'scraping_supported': True, 'category': 'Plumbing'},
+    {'name': 'Moen', 'url': 'moen.com', 'scraping_supported': True, 'category': 'Plumbing'},
+    {'name': 'Ferguson', 'url': 'ferguson.com', 'scraping_supported': True, 'category': 'Plumbing & HVAC'},
+    {'name': 'Home Depot', 'url': 'homedepot.com', 'scraping_supported': True, 'category': 'General'},
+    {'name': 'Lowes', 'url': 'lowes.com', 'scraping_supported': True, 'category': 'General'},
+    {'name': 'Build.com', 'url': 'build.com', 'scraping_supported': True, 'category': 'Building Materials'},
+    {'name': 'Wayfair', 'url': 'wayfair.com', 'scraping_supported': True, 'category': 'Furniture & Decor'}
+]
+
 # Category colors - GREEN like your screenshots
 CATEGORY_COLORS = {
     "lighting": "#5A7A5A",           # Muted green
