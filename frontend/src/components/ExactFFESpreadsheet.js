@@ -138,7 +138,7 @@ const ExactFFESpreadsheet = ({
             <thead></thead>
             
             <tbody>
-              {/* HIERARCHICAL STRUCTURE AS ROW HEADERS - Like your images */}
+              {/* HIERARCHICAL STRUCTURE AS ROW HEADERS */}
               {project.rooms.map((room) => (
                 <React.Fragment key={room.id}>
                   
