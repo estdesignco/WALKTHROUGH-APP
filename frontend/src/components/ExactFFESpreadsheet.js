@@ -462,12 +462,12 @@ const ExactFFESpreadsheet = ({
                                 )}
                               </td>
                               
-                              {/* SHIP TO - COLOR-CODED DROPDOWN */}
+                              {/* SHIP TO - COLOR-CODED DROPDOWN WITH REAL VALUES */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.ship_to || 'Client'}
                                   onChange={(e) => {
-                                    console.log(`Ship To changed to: ${e.target.value}`);
+                                    console.log(`Ship To changed to: ${e.target.value} with color: ${getShipToColor(e.target.value)}`);
                                   }}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
@@ -475,10 +475,10 @@ const ExactFFESpreadsheet = ({
                                     color: '#000'
                                   }}
                                 >
-                                  <option value="Client">Client</option>
-                                  <option value="Receiver">Receiver</option>
-                                  <option value="Store">Store</option>
-                                  <option value="Jobsite">Jobsite</option>
+                                  <option value="Client" style={{backgroundColor: '#FFD700', color: '#000'}}>Client</option>
+                                  <option value="Receiver" style={{backgroundColor: '#87CEEB', color: '#000'}}>Receiver</option>
+                                  <option value="Store" style={{backgroundColor: '#DDA0DD', color: '#000'}}>Store</option>
+                                  <option value="Jobsite" style={{backgroundColor: '#98FB98', color: '#000'}}>Jobsite</option>
                                 </select>
                               </td>
                               
