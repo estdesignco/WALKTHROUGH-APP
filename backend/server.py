@@ -1340,18 +1340,22 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'h1, h2:first-of-type'
             ]
             
-            # Try to extract price with more specific Four Hands selectors
+            # Enhanced price selectors for JavaScript-rendered content
             price_selectors = [
-                # Four Hands specific selectors
+                # Four Hands specific selectors (JavaScript-rendered)
                 '.price .money, .product-price .money, [data-price], .price-current',
                 '.product-form__price, .product__price, .price__sale, .price__regular',
+                '.price-item--regular, .price__regular, .price--highlight',
+                'span[class*="price"], div[class*="price"]',
+                # Shopify common selectors
+                '.product__price .money, .product-form__price .money',
+                '.price-list .price-item, .product-price-wrap .price',
                 # Generic selectors
                 '[class*="price"]:not([class*="original"]):not([class*="old"])',
                 '[data-testid*="price"], [data-test*="price"]',
                 '.cost, .pricing, .product-price, .price-current',
-                'span:contains("$"), div:contains("$")',
-                # More aggressive selectors
-                '*:contains("$")'
+                # Text-based approach for dynamic content
+                'span, div, p'  # Will filter for $ content in code
             ]
             
             image_selectors = [
