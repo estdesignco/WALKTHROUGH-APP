@@ -171,7 +171,7 @@ class EnhancedScrapeProductTester:
             
         # Test 6: JavaScript Enhancement Check
         # Check if we're getting timeout errors (indicates Playwright issues)
-        description = product_data.get('description', '')
+        description = product_data.get('description', '') or ''
         if 'timeout' in description.lower() or 'exceeded' in description.lower():
             self.log_result("Four Hands - JavaScript Enhancement", False, "Playwright timeout - JavaScript rendering not working")
         elif analysis['extraction_score'] > 50:
