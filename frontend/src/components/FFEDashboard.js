@@ -399,8 +399,15 @@ const FFEDashboard = ({ isOffline }) => {
           </h2>
           <p className="text-white mt-2">Use 2-finger gestures on your Mac trackpad to scroll horizontally through the table below</p>
         </div>
-        <SimpleSpreadsheet
+        <FFESpreadsheet
           project={project}
+          roomColors={roomColors}
+          categoryColors={categoryColors}
+          itemStatuses={itemStatuses}
+          vendorTypes={vendorTypes}
+          carrierTypes={carrierTypes}
+          onDeleteRoom={handleDeleteRoom}
+          onReload={loadProjectAndUtilityData}
         />
       </div>
 
