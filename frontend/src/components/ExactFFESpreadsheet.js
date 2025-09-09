@@ -459,7 +459,7 @@ const ExactFFESpreadsheet = ({
                                     <input 
                                       type="text"
                                       value={item.tracking_number}
-                                      className="w-full bg-gray-700 text-white text-xs rounded px-1"
+                                      className="w-full bg-transparent text-white border-0 outline-none p-0 m-0"
                                       placeholder="Tracking #..."
                                     />
                                     <button 
