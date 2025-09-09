@@ -1611,10 +1611,15 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            # Try to extract SKU/Item Number
+            # Enhanced SKU/Item Number selectors for JavaScript-rendered content
             sku_selectors = [
+                # Shopify and modern e-commerce selectors
+                '.product-form__sku, .product__sku, .sku-value',
+                '.product-meta .sku, .product-info .sku',
                 '[class*="sku"], [class*="item-number"], [class*="product-id"]',
-                'span:contains("SKU"), span:contains("Item"), span:contains("Model")'
+                '[class*="model"], [class*="part-number"]',
+                '[data-testid*="sku"], [data-test*="sku"]',
+                'span, div, p'  # Will filter for SKU-like content
             ]
             
             for selector in sku_selectors:
