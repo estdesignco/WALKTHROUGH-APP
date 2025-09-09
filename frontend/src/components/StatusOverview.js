@@ -164,57 +164,60 @@ const StatusOverview = ({ totalItems, statusBreakdown, itemStatuses, carrierBrea
           )}
         </div>
 
-        {/* STATUS BREAKDOWN - Show ALL statuses with colors */}
-        <div className="mt-6">
-          <h4 className="text-sm font-medium text-gray-300 mb-3">Status Breakdown</h4>
-          <div className="space-y-2">
-            {Object.entries(statusBreakdown)
-              .filter(([status, count]) => count > 0)  // Only show statuses with items
-              .map(([status, count]) => {
-                const statusColors = {
-                  // Planning Phase
-                  'TO BE SELECTED': '#D4A574',
-                  'RESEARCHING': '#B8860B', 
-                  'PENDING APPROVAL': '#DAA520',
-                  
-                  // Procurement Phase  
-                  'APPROVED': '#9ACD32',
-                  'ORDERED': '#32CD32',
-                  'PICKED': '#FFD700',
-                  'CONFIRMED': '#228B22',
-                  
-                  // Fulfillment Phase
-                  'IN PRODUCTION': '#FF8C00',
-                  'SHIPPED': '#4169E1',
-                  'IN TRANSIT': '#6495ED',
-                  'OUT FOR DELIVERY': '#87CEEB',
-                  
-                  // Delivery Phase
-                  'DELIVERED TO RECEIVER': '#9370DB',
-                  'DELIVERED TO JOB SITE': '#8A2BE2',
-                  'RECEIVED': '#DDA0DD',
-                  
-                  // Installation Phase
-                  'READY FOR INSTALL': '#20B2AA',
-                  'INSTALLING': '#48D1CC',
-                  'INSTALLED': '#00CED1',
-                  
-                  // Issues & Exceptions
-                  'ON HOLD': '#DC143C',
-                  'BACKORDERED': '#B22222',
-                  'DAMAGED': '#8B0000',
-                  'RETURNED': '#CD5C5C',
-                  'CANCELLED': '#A52A2A'
-                };
-                
-                return (
-                  <div key={status} className="flex items-center justify-between p-2 rounded text-xs" 
-                       style={{ backgroundColor: statusColors[status] || '#6B7280', color: '#000' }}>
-                    <span className="font-medium">{status}</span>
-                    <span className="font-bold">{count}</span>
+        {/* STATUS BREAKDOWN - BACK TO OLD DESIGN YOU LIKED WITH ALL ITEMS */}
+        <div className="bg-gray-800 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Status Breakdown</h3>
+          
+          <div className="space-y-3">
+            {/* Show ALL status options with colors */}
+            {[
+              'TO BE SELECTED', 'RESEARCHING', 'PENDING APPROVAL',
+              'APPROVED', 'ORDERED', 'PICKED', 'CONFIRMED',
+              'IN PRODUCTION', 'SHIPPED', 'IN TRANSIT', 'OUT FOR DELIVERY',
+              'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'RECEIVED',
+              'READY FOR INSTALL', 'INSTALLING', 'INSTALLED',
+              'ON HOLD', 'BACKORDERED', 'DAMAGED', 'RETURNED', 'CANCELLED'
+            ].map(status => {
+              const count = statusBreakdown[status] || 0;
+              const percentage = totalItems > 0 ? (count / totalItems) * 100 : 0;
+              
+              const statusColors = {
+                'TO BE SELECTED': '#D4A574', 'RESEARCHING': '#B8860B', 'PENDING APPROVAL': '#DAA520',
+                'APPROVED': '#9ACD32', 'ORDERED': '#32CD32', 'PICKED': '#FFD700', 'CONFIRMED': '#228B22',
+                'IN PRODUCTION': '#FF8C00', 'SHIPPED': '#4169E1', 'IN TRANSIT': '#6495ED', 'OUT FOR DELIVERY': '#87CEEB',
+                'DELIVERED TO RECEIVER': '#9370DB', 'DELIVERED TO JOB SITE': '#8A2BE2', 'RECEIVED': '#DDA0DD',
+                'READY FOR INSTALL': '#20B2AA', 'INSTALLING': '#48D1CC', 'INSTALLED': '#00CED1',
+                'ON HOLD': '#DC143C', 'BACKORDERED': '#B22222', 'DAMAGED': '#8B0000', 'RETURNED': '#CD5C5C', 'CANCELLED': '#A52A2A'
+              };
+              
+              return (
+                <div key={status} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: statusColors[status] }}
+                    ></div>
+                    <span className="text-sm text-gray-300">
+                      {status}
+                    </span>
                   </div>
-                );
-              })}
+                  <div className="flex items-center space-x-2">
+                    <div className="bg-gray-700 rounded-full h-2 w-16">
+                      <div
+                        className="h-2 rounded-full transition-all duration-300"
+                        style={{
+                          backgroundColor: statusColors[status],
+                          width: `${percentage}%`
+                        }}
+                      />
+                    </div>
+                    <span className="text-sm font-medium text-white w-8 text-right">
+                      {count}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
