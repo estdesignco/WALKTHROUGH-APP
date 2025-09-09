@@ -1650,15 +1650,29 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'span, div, p'  # Will filter for SKU-like content
             ]
             
+            # Try to extract SKU/Item Number with enhanced filtering
             for selector in sku_selectors:
                 try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        text = await element.inner_text()
-                        sku_match = re.search(r'[A-Z0-9\-]{3,}', text)
-                        if sku_match:
-                            result['sku'] = sku_match.group()
+                    if selector == 'span, div, p':  # Special handling for generic elements
+                        elements = await page.query_selector_all(selector)
+                        for element in elements:
+                            try:
+                                text = await element.inner_text()
+                                if text and _extract_sku_from_text(text):
+                                    result['sku'] = _extract_sku_from_text(text)
+                                    break
+                            except:
+                                continue
+                        if result['sku']:  # If found, break outer loop
                             break
+                    else:  # Regular selector handling
+                        element = await page.query_selector(selector)
+                        if element:
+                            text = await element.inner_text()
+                            sku_match = re.search(r'[A-Z0-9\-]{3,}', text)
+                            if sku_match:
+                                result['sku'] = sku_match.group()
+                                break
                 except:
                     continue
             
