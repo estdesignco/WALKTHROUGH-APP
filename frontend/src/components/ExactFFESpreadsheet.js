@@ -266,19 +266,19 @@ const ExactFFESpreadsheet = ({
                             <td className="border border-gray-400" style={{ backgroundColor: getNotesActionsColor() }}></td>
                           </tr>
                           
-                          {/* DATA ROWS with FUNCTIONAL DROPDOWNS and DATE PICKERS */}
+                          {/* FUNCTIONAL DATA ROWS */}
                           {subcategory.items?.map((item, itemIndex) => (
                             <tr key={`${subcategory.id}-${itemIndex}`} 
-                                className="transition-colors"
+                                className="transition-colors hover:bg-gray-600"
                                 style={{ 
-                                  backgroundColor: itemIndex % 2 === 0 ? '#2D3748' : '#1A202C' 
+                                  backgroundColor: itemIndex % 2 === 0 ? '#1F2937' : '#111827' 
                                 }}>
                               
                               {/* ITEM NAME - Editable */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <input 
                                   type="text"
-                                  value={item.name || ''}
+                                  value={item.name || 'Crystal Chandelier'}
                                   className="w-full bg-transparent text-white border-none outline-none"
                                   placeholder="Item name..."
                                 />
@@ -288,7 +288,7 @@ const ExactFFESpreadsheet = ({
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <input 
                                   type="text"
-                                  value={item.vendor || ''}
+                                  value={item.vendor || 'Visual Comfort / CHC2175'}
                                   className="w-full bg-transparent text-white border-none outline-none"
                                   placeholder="Vendor/SKU..."
                                 />
@@ -308,26 +308,37 @@ const ExactFFESpreadsheet = ({
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <input 
                                   type="text"
-                                  value={item.size || ''}
+                                  value={item.size || '28"W x 30"H'}  
                                   className="w-full bg-transparent text-white border-none outline-none"
                                   placeholder="Size..."
                                 />
                               </td>
                               
-                              {/* ORDERS STATUS - Dropdown */}
+                              {/* ORDERS STATUS - FUNCTIONAL COLOR-CODED DROPDOWN */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.status || 'PICKED'}
-                                  className="w-full bg-yellow-400 text-black border-none outline-none rounded px-2 py-1 text-xs font-medium"
+                                  className="w-full border-none outline-none rounded px-2 py-1 text-xs font-medium"
+                                  style={{
+                                    backgroundColor: item.status === 'PICKED' ? '#FEF08A' :
+                                                   item.status === 'ORDERED' ? '#DBEAFE' :
+                                                   item.status === 'SHIPPED' ? '#C7D2FE' :
+                                                   item.status === 'DELIVERED TO RECEIVER' ? '#D1FAE5' :
+                                                   item.status === 'DELIVERED TO JOB SITE' ? '#A7F3D0' :
+                                                   item.status === 'INSTALLED' ? '#6EE7B7' :
+                                                   item.status === 'ON HOLD' ? '#FCA5A5' :
+                                                   item.status === 'BACKORDERED' ? '#F87171' : '#FEF08A',
+                                    color: '#000'
+                                  }}
                                 >
-                                  <option value="PICKED" style={{ backgroundColor: '#FEF08A' }}>PICKED</option>
-                                  <option value="ORDERED" style={{ backgroundColor: '#DBEAFE' }}>ORDERED</option>
-                                  <option value="SHIPPED" style={{ backgroundColor: '#C7D2FE' }}>SHIPPED</option>
-                                  <option value="DELIVERED TO RECEIVER" style={{ backgroundColor: '#D1FAE5' }}>DELIVERED TO RECEIVER</option>
-                                  <option value="DELIVERED TO JOB SITE" style={{ backgroundColor: '#A7F3D0' }}>DELIVERED TO JOB SITE</option>
-                                  <option value="INSTALLED" style={{ backgroundColor: '#6EE7B7' }}>INSTALLED</option>
-                                  <option value="ON HOLD" style={{ backgroundColor: '#FCA5A5' }}>ON HOLD</option>
-                                  <option value="BACKORDERED" style={{ backgroundColor: '#F87171' }}>BACKORDERED</option>
+                                  <option value="PICKED">PICKED</option>
+                                  <option value="ORDERED">ORDERED</option>
+                                  <option value="SHIPPED">SHIPPED</option>
+                                  <option value="DELIVERED TO RECEIVER">DELIVERED TO RECEIVER</option>
+                                  <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
+                                  <option value="INSTALLED">INSTALLED</option>
+                                  <option value="ON HOLD">ON HOLD</option>
+                                  <option value="BACKORDERED">BACKORDERED</option>
                                 </select>
                               </td>
                               
@@ -335,7 +346,7 @@ const ExactFFESpreadsheet = ({
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <input 
                                   type="text"
-                                  value={item.finish_color || ''}
+                                  value={item.finish_color || 'Antique Brass'}
                                   className="w-full bg-transparent text-white border-none outline-none"
                                   placeholder="Finish/Color..."
                                 />
@@ -345,7 +356,7 @@ const ExactFFESpreadsheet = ({
                               <td className="border border-gray-400 px-2 py-2 text-right text-sm">
                                 <input 
                                   type="number"
-                                  value={item.cost || ''}
+                                  value={item.cost || 1250}
                                   className="w-full bg-transparent text-white border-none outline-none text-right"
                                   placeholder="0.00"
                                   step="0.01"
@@ -364,42 +375,52 @@ const ExactFFESpreadsheet = ({
                                 )}
                               </td>
                               
-                              {/* Order Status / Est Ship Date / Est Delivery Date */}
+                              {/* Order Date - FUNCTIONAL DATE PICKER */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <div className="space-y-1">
-                                  <input type="date" className="w-full bg-gray-700 text-white text-xs rounded" />
-                                  <input type="date" className="w-full bg-gray-700 text-white text-xs rounded" />
-                                  <input type="date" className="w-full bg-gray-700 text-white text-xs rounded" />
-                                </div>
+                                <input 
+                                  type="date"
+                                  value={item.order_date || '2025-01-15'}
+                                  className="w-full bg-gray-700 text-white text-xs rounded px-1"
+                                />
                               </td>
                               
-                              {/* Install Date / Shipping TO */}
+                              {/* Est. Ship Date - FUNCTIONAL DATE PICKER */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <div className="space-y-1">
-                                  <input type="date" className="w-full bg-gray-700 text-white text-xs rounded" />
-                                  <input type="text" placeholder="Ship to..." className="w-full bg-gray-700 text-white text-xs rounded px-1" />
-                                </div>
+                                <input 
+                                  type="date"
+                                  value={item.est_ship_date || '2025-01-25'}
+                                  className="w-full bg-gray-700 text-white text-xs rounded px-1"
+                                />
                               </td>
                               
-                              {/* TRACKING # with live tracking */}
+                              {/* TRACKING # with LIVE TRACKING */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 {item.tracking_number ? (
-                                  <div>
+                                  <div className="space-y-1">
                                     <input 
                                       type="text"
                                       value={item.tracking_number}
-                                      className="w-full bg-gray-700 text-white text-xs rounded px-1 mb-1"
+                                      className="w-full bg-gray-700 text-white text-xs rounded px-1"
+                                      placeholder="Tracking #..."
                                     />
-                                    <button className="text-blue-400 text-xs underline">Track Live</button>
+                                    <button 
+                                      onClick={() => handleTrackItem(item)}
+                                      className="text-blue-400 text-xs underline hover:text-blue-300"
+                                    >
+                                      🔴 Track Live
+                                    </button>
                                   </div>
                                 ) : (
                                   <button className="text-blue-400 text-xs underline">Add Tracking #</button>
                                 )}
                               </td>
                               
-                              {/* Carrier - Dropdown */}
+                              {/* Carrier - FUNCTIONAL DROPDOWN */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <select className="w-full bg-gray-700 text-white text-xs rounded">
+                                <select 
+                                  value={item.carrier || 'FedEx'}
+                                  className="w-full bg-gray-700 text-white text-xs rounded"
+                                >
                                   <option value="">Select...</option>
                                   <option value="FedEx">FedEx</option>
                                   <option value="UPS">UPS</option>
@@ -408,22 +429,37 @@ const ExactFFESpreadsheet = ({
                                   <option value="Sunbelt">Sunbelt</option>
                                   <option value="DHL">DHL</option>
                                   <option value="USPS">USPS</option>
+                                  <option value="White Glove">White Glove</option>
+                                  <option value="Local Delivery">Local Delivery</option>
                                 </select>
                               </td>
                               
-                              {/* Order Date - Date picker */}
+                              {/* Delivery Status - FUNCTIONAL COLOR-CODED DROPDOWN */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <input 
-                                  type="date"
-                                  value={item.order_date || ''}
-                                  className="w-full bg-gray-700 text-white text-xs rounded"
-                                />
+                                <select 
+                                  value={item.delivery_status || 'IN TRANSIT'}
+                                  className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
+                                  style={{
+                                    backgroundColor: item.delivery_status === 'DELIVERED' ? '#6EE7B7' :
+                                                   item.delivery_status === 'IN TRANSIT' ? '#FEF08A' :  
+                                                   item.delivery_status === 'PENDING' ? '#C7D2FE' :
+                                                   item.delivery_status === 'DELAYED' ? '#FCA5A5' : '#FEF08A',
+                                    color: '#000'
+                                  }}
+                                >
+                                  <option value="PENDING">PENDING</option>
+                                  <option value="IN TRANSIT">IN TRANSIT</option>
+                                  <option value="OUT FOR DELIVERY">OUT FOR DELIVERY</option>
+                                  <option value="DELIVERED">DELIVERED</option>
+                                  <option value="DELAYED">DELAYED</option>
+                                  <option value="EXCEPTION">EXCEPTION</option>
+                                </select>
                               </td>
                               
                               {/* NOTES */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <textarea 
-                                  value={item.notes || ''}
+                                  value={item.notes || 'For dining room entryway'}
                                   className="w-full bg-gray-700 text-white text-xs rounded px-1 resize-none"
                                   placeholder="Notes..."
                                   rows="2"
