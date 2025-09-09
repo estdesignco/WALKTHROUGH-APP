@@ -471,25 +471,13 @@ const ExactFFESpreadsheet = ({
                                 </select>
                               </td>
                               
-                              {/* CARRIER - COLOR-CODED DROPDOWN */}
+                              {/* CARRIER - ALL COLOR-CODED OPTIONS */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.carrier || 'FedEx'}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
-                                    backgroundColor: item.carrier === 'FedEx' ? '#DDD6FE' :
-                                                   item.carrier === 'UPS' ? '#FEF08A' :
-                                                   item.carrier === 'USPS' ? '#BFDBFE' :
-                                                   item.carrier === 'DHL' ? '#FEF08A' :
-                                                   item.carrier === 'Brooks' ? '#BFDBFE' :
-                                                   item.carrier === 'Zenith' ? '#A5F3FC' :
-                                                   item.carrier === 'Sunbelt' ? '#FCA5A5' :
-                                                   item.carrier === 'OnTrac' ? '#A5F3FC' :
-                                                   item.carrier === 'XPO' ? '#FCA5A5' :
-                                                   item.carrier === 'R+L' ? '#BFDBFE' :
-                                                   item.carrier === 'Pilot' ? '#FED7AA' :
-                                                   item.carrier === 'Estes' ? '#FCA5A5' :
-                                                   item.carrier === 'Other' ? '#E5E7EB' : '#DDD6FE',
+                                    backgroundColor: getCarrierColor(item.carrier || 'FedEx'),
                                     color: '#000'
                                   }}
                                 >
@@ -500,12 +488,20 @@ const ExactFFESpreadsheet = ({
                                   <option value="Brooks">Brooks</option>
                                   <option value="Zenith">Zenith</option>
                                   <option value="Sunbelt">Sunbelt</option>
-                                  <option value="OnTrac">OnTrac</option>
-                                  <option value="XPO">XPO</option>
-                                  <option value="R+L">R+L</option>
-                                  <option value="Pilot">Pilot</option>
-                                  <option value="Estes">Estes</option>
-                                  <option value="Other">Other</option>
+                                  <option value="R+L Carriers">R+L Carriers</option>
+                                  <option value="Yellow Freight">Yellow Freight</option>
+                                  <option value="XPO Logistics">XPO Logistics</option>
+                                  <option value="Old Dominion">Old Dominion</option>
+                                  <option value="ABF Freight">ABF Freight</option>
+                                  <option value="Estes Express">Estes Express</option>
+                                  <option value="Saia LTL">Saia LTL</option>
+                                  <option value="TForce Freight">TForce Freight</option>
+                                  <option value="Roadrunner">Roadrunner</option>
+                                  <option value="Central Transport">Central Transport</option>
+                                  <option value="Southeastern Freight">Southeastern Freight</option>
+                                  <option value="Averitt Express">Averitt Express</option>
+                                  <option value="Holland">Holland</option>
+                                  <option value="OTHER">OTHER</option>
                                 </select>
                               </td>
                               
