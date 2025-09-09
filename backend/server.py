@@ -1320,6 +1320,55 @@ def _is_product_image(src: str) -> bool:
     # Default to True if no exclusion patterns found
     return True
 
+# Helper function to filter description text
+def _is_description_text(text: str) -> bool:
+    """
+    Filter function to identify likely product description text
+    """
+    if not text or len(text.strip()) <= 10:
+        return False
+    
+    text_lower = text.lower().strip()
+    
+    # Exclude common non-description patterns
+    exclude_patterns = [
+        'add to cart', 'buy now', 'purchase', 'checkout', 'price', 'shipping',
+        'return policy', 'warranty', 'guarantee', 'contact us', 'customer service',
+        'sign up', 'newsletter', 'subscribe', 'follow us', 'social media',
+        'copyright', '©', 'all rights reserved', 'terms', 'privacy',
+        'menu', 'navigation', 'search', 'filter', 'sort by', 'view all',
+        'related products', 'you may also like', 'recently viewed',
+        'breadcrumb', 'home >', 'category >', 'product >', 
+        'quantity', 'size guide', 'color options', 'select option',
+        'out of stock', 'in stock', 'availability', 'sku:', 'model:',
+        'share this', 'print', 'email', 'wishlist', 'compare'
+    ]
+    
+    # Check if any exclude pattern is in the text
+    for pattern in exclude_patterns:
+        if pattern in text_lower:
+            return False
+    
+    # Prefer text with description-related keywords
+    description_indicators = [
+        'description', 'details', 'features', 'specifications', 'about',
+        'overview', 'product information', 'made from', 'crafted',
+        'designed', 'perfect for', 'ideal for', 'suitable for',
+        'dimensions', 'material', 'finish', 'style', 'collection'
+    ]
+    
+    # Give preference to text with description keywords
+    for indicator in description_indicators:
+        if indicator in text_lower:
+            return True
+    
+    # Check for reasonable description length (not too short, not too long)
+    word_count = len(text.split())
+    if 5 <= word_count <= 100:  # Reasonable description length
+        return True
+    
+    return False
+
 # Advanced Product Scraping with Playwright for JavaScript-rendered content
 async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     """
