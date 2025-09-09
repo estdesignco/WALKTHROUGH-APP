@@ -285,44 +285,24 @@ const ExactFFESpreadsheet = ({
                                   backgroundColor: itemIndex % 2 === 0 ? '#1F2937' : '#111827' 
                                 }}>
                               
-                              {/* ITEM NAME - Clean, no border */}
-                              <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <input 
-                                  type="text"
-                                  value={item.name || 'Crystal Chandelier'}
-                                  className="w-full bg-transparent text-white border-0 outline-none p-0 m-0"
-                                  placeholder="Item name..."
-                                />
+                              {/* ITEM NAME - Plain text, no input container */}
+                              <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                {item.name || 'Crystal Chandelier'}
                               </td>
                               
-                              {/* VENDOR/SKU - Clean, no border */}
-                              <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <input 
-                                  type="text"
-                                  value={item.vendor || 'Visual Comfort / CHC2175'}
-                                  className="w-full bg-transparent text-white border-0 outline-none p-0 m-0"
-                                  placeholder="Vendor/SKU..."
-                                />
+                              {/* VENDOR/SKU - Plain text, no input container */}
+                              <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                {item.vendor || 'Visual Comfort / CHC2175'}
                               </td>
                               
-                              {/* QTY - Number input, no border */}
-                              <td className="border border-gray-400 px-2 py-2 text-center text-sm">
-                                <input 
-                                  type="number"
-                                  value={item.quantity || 1}
-                                  className="w-full bg-transparent text-white border-0 outline-none text-center p-0 m-0"
-                                  min="1"
-                                />
+                              {/* QTY - Plain text, no input container */}
+                              <td className="border border-gray-400 px-2 py-2 text-center text-sm text-white">
+                                {item.quantity || 1}
                               </td>
                               
-                              {/* SIZE - Clean, no border */}
-                              <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <input 
-                                  type="text"
-                                  value={item.size || '28"W x 30"H'}  
-                                  className="w-full bg-transparent text-white border-0 outline-none p-0 m-0"
-                                  placeholder="Size..."
-                                />
+                              {/* SIZE - Plain text, no input container */}
+                              <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                {item.size || '28"W x 30"H'}
                               </td>
                               
                               {/* ORDERS STATUS - COLOR-CODED DROPDOWN */}
