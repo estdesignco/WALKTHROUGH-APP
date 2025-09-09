@@ -1,6 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
+import AddItemModal from './AddItemModal';
 
 const SimpleSpreadsheet = ({ project }) => {
+  const [showAddItem, setShowAddItem] = useState(false);
+  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
+
+  const handleAddItem = async (itemData) => {
+    try {
+      // Here you would normally call the API to add the item
+      console.log('Adding item:', itemData);
+      alert(`✅ ITEM ADDED SUCCESSFULLY!\nName: ${itemData.name}\nVendor: ${itemData.vendor}\nCost: $${itemData.cost}`);
+      setShowAddItem(false);
+      // You might want to reload the project data here
+    } catch (error) {
+      console.error('Error adding item:', error);
+      alert('❌ Failed to add item: ' + error.message);
+    }
+  };
   if (!project || !project.rooms) {
     return (
       <div className="bg-neutral-900 rounded-lg p-8 text-center">
