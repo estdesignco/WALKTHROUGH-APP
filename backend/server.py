@@ -2025,19 +2025,32 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'span, div, p'  # Will filter for $ content in code
             ]
             
-            # Enhanced image selectors for JavaScript-rendered content  
+            # Enhanced image selectors for the MAIN PRODUCT IMAGE (not thumbnails)
             image_selectors = [
-                # Four Hands and Shopify specific selectors
-                '.product__media img[src*="product"], .product-media img[src*="product"]',
-                '.product-gallery img[src*="product"], .hero-image img[src*="product"]',
-                'img[class*="product"][src*="product"], img[class*="hero"][src*="product"]',
-                'img[class*="featured"][src*="product"], img[class*="primary"][src*="product"]',
-                # Generic product image selectors
-                '[data-testid*="image"] img, [data-test*="image"] img',
-                '.product-image img, .hero-image img, .main-image img',
-                'img[src*="product"], img[src*="item"], img[src*="cdn"]',
-                # Last resort - all images, will filter for product images
-                'img'
+                # Target the MAIN/HERO product images first
+                '.product__media img[src*="cdn"]:not([src*="thumb"]):not([src*="small"])',
+                '.product-media img[src*="images"]:not([src*="thumbnail"])',
+                '.hero-image img, .main-image img, .primary-image img',
+                '.product-gallery img:first-child, .gallery-main img',
+                '.product-photos img:first-child',
+                
+                # Four Hands and Shopify specific MAIN image selectors
+                '.product__media .media img[src*="1024"], .product__media .media img[src*="master"]',
+                '.product-single__photo img[src*="large"], .product-single__photo img[src*="master"]',
+                
+                # Generic selectors for LARGE product images (avoid thumbnails/small images)
+                'img[class*="product"]:not([class*="thumb"]):not([class*="small"])',
+                'img[class*="hero"]:not([class*="thumb"])',
+                'img[class*="main"]:not([class*="thumb"])',
+                'img[class*="featured"]:not([class*="small"])',
+                'img[class*="primary"]:not([class*="thumbnail"])',
+                
+                # Data attribute selectors for main images
+                'img[data-main-image], img[data-product-image], img[data-featured-image]',
+                '[data-testid*="main-image"] img, [data-test*="product-image"] img',
+                
+                # Last resort - but filter for larger images in code
+                'img[src*="product"], img[src*="item"], img[src*="cdn"]'
             ]
             
             # Enhanced description selectors for JavaScript-rendered content
