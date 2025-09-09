@@ -457,10 +457,7 @@ const ExactFFESpreadsheet = ({
                                   value={item.ship_to || 'Client'}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
-                                    backgroundColor: item.ship_to === 'Client' ? '#FEF08A' :
-                                                   item.ship_to === 'Receiver' ? '#BFDBFE' :
-                                                   item.ship_to === 'Store' ? '#FBCFE8' :
-                                                   item.ship_to === 'Jobsite' ? '#A7F3D0' : '#FEF08A',
+                                    backgroundColor: getShipToColor(item.ship_to || 'Client'),
                                     color: '#000'
                                   }}
                                 >
