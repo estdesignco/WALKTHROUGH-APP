@@ -381,7 +381,6 @@ const FFESpreadsheet = ({
             ))}
           </tbody>
         </table>
-        </div>
       </div>
 
       {/* Modals */}
