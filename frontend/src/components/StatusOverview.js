@@ -181,5 +181,3 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
 };
 
 export default StatusOverview;
-
-export default StatusOverview;
