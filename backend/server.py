@@ -121,8 +121,36 @@ ROOM_DEFAULT_STRUCTURE = {
         'Paint, Wallpaper, and Finishes': {
             'Misc.': ['Paint color', 'Wallpaper', 'Finish']
         },
-        'Millwork, Trim, and Architectural Elements': {
-            'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Chair Rails', 'Wainscoting', 'Built-in Columns', 'Coffered Ceilings', 'Tray Ceilings', 'Beam Work', 'Archways', 'Built-in Niches', 'Window Trim/Casings', 'Door Trim/Casings', 'Panel Molding', 'Ceiling Medallions']
+        'Millwork, Architectural Elements, and Trim': {
+            'TRIM WORK': ['Crown Molding', 'Chair Rail', 'Wainscoting', 'Shoe Molding', 'Window Trim', 'Door Trim', 'Ceiling Medallions', 'Rosettes', 'Baseboards', 'Panel Molding', 'Coffered Ceiling Trim'],
+            'ARCHITECTURAL': ['Built-in Columns', 'Coffered Ceilings', 'Tray Ceilings', 'Beam Work', 'Archways', 'Built-in Niches', 'Window Casings', 'Door Casings', 'Pilasters', 'Corbels']
+        },
+        'HVAC & Mechanical': {
+            'UNIT': ['Air Vents', 'Thermostat', 'Air Purifier', 'Humidifier', 'Dehumidifier', 'Ceiling Fan', 'HVAC Return', 'Smart Home Hub']
+        },
+        'Security Systems': {
+            'INSTALLED': ['Security Cameras', 'Motion Sensors', 'Door/Window Sensors', 'Smart Locks', 'Alarm Panel', 'Smoke Detectors', 'Carbon Monoxide Detectors']
+        },
+        'Smart Home Technology': {
+            'UNIT': ['Smart Switches', 'Smart Outlets', 'Voice Assistant', 'Smart Thermostat', 'Automated Blinds', 'Smart Lighting Controls', 'Wifi Extenders']
+        },
+        'Flooring': {
+            'HARDWOOD': ['Oak Flooring', 'Maple Flooring', 'Cherry Flooring', 'Bamboo Flooring', 'Engineered Wood'],
+            'TILE': ['Ceramic Tile', 'Porcelain Tile', 'Natural Stone', 'Mosaic Tile', 'Luxury Vinyl Tile'],
+            'CARPET': ['Wall-to-Wall Carpet', 'Area Rugs', 'Runners', 'Custom Rugs'],
+            'OTHER': ['Laminate', 'Vinyl Plank', 'Cork', 'Concrete', 'Epoxy']
+        },
+        'Window Treatments': {
+            'CURTAINS': ['Drapery Panels', 'Sheer Curtains', 'Blackout Curtains', 'Valances', 'Tiebacks'],
+            'BLINDS': ['Venetian Blinds', 'Vertical Blinds', 'Mini Blinds', 'Wood Blinds'],
+            'SHADES': ['Roman Shades', 'Cellular Shades', 'Roller Shades', 'Motorized Shades'],
+            'SHUTTERS': ['Plantation Shutters', 'Interior Shutters', 'Café Shutters']
+        },
+        'Ceiling Treatments': {
+            'DECORATIVE': ['Coffered Ceilings', 'Tray Ceilings', 'Exposed Beams', 'Ceiling Medallions', 'Tin Ceilings', 'Wood Planks']
+        },
+        'Built-ins': {
+            'CUSTOM': ['Built-in Shelving', 'Window Seats', 'Storage Benches', 'Custom Cabinetry', 'Built-in Desks', 'Nooks']
         }
     },
     'dining room': {
