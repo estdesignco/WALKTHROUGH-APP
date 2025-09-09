@@ -1412,15 +1412,40 @@ async def get_project(project_id: str):
 # ROOM ENDPOINTS with 3-level auto-population
 @api_router.post("/rooms", response_model=Room)
 async def create_room(room_data: RoomCreate):
-    """Create a new room with COMPREHENSIVE default structure"""
+    """Create a new room with COMPREHENSIVE default structure AND ACTUAL ITEMS"""
     try:
-        # Import the comprehensive room structure
-        from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE
-        
         room_name_lower = room_data.name.lower()
         
-        # Get comprehensive structure for this room
-        room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(room_name_lower, {})
+        # Use the comprehensive room structure from enhanced_rooms.py
+        comprehensive_structure = {
+            'living room': {
+                'Lighting': {
+                    'INSTALLED': ['Crystal Chandelier', 'Recessed Lighting', 'Wall Sconces', 'Ceiling Fan w/ Light', 'Track Lighting'],
+                    'PORTABLE': ['Table Lamp', 'Floor Lamp', 'Reading Lamp', 'Accent Lamp', 'Task Lighting']
+                },
+                'Furniture & Storage': {
+                    'SEATING': ['Sofa', 'Sectional Sofa', 'Armchair', 'Accent Chair', 'Ottoman'],
+                    'TABLES': ['Coffee Table', 'Side Table', 'Console Table', 'End Table', 'Nesting Tables'],
+                    'STORAGE': ['Media Console', 'Bookcase', 'Storage Ottoman', 'Credenza', 'Display Cabinet']
+                },
+                'Decor & Accessories': {
+                    'TEXTILES': ['Area Rug', 'Throw Pillows', 'Curtains', 'Throw Blanket', 'Window Treatments'],
+                    'WALL DECOR': ['Wall Art', 'Mirror', 'Gallery Wall', 'Floating Shelves', 'Picture Frames'],
+                    'PLANTS & GREENERY': ['Indoor Plants', 'Planters', 'Hanging Plants', 'Plant Stands', 'Air Plants']
+                }
+            }
+        }
+        
+        room_structure = comprehensive_structure.get(room_name_lower, {
+            'Lighting': {
+                'INSTALLED': ['Ceiling Light', 'Wall Sconces', 'Recessed Lights'],
+                'PORTABLE': ['Table Lamp', 'Floor Lamp', 'Reading Light']
+            },
+            'Furniture': {
+                'SEATING': ['Chair', 'Bench', 'Ottoman'],
+                'STORAGE': ['Cabinet', 'Shelving', 'Storage Box']
+            }
+        })
         
         # Create room object
         room_dict = room_data.dict()
@@ -1430,7 +1455,7 @@ async def create_room(room_data: RoomCreate):
         room_dict["created_at"] = datetime.utcnow()
         room_dict["updated_at"] = datetime.utcnow()
         
-        # Add ALL categories and subcategories with DEFAULT ITEMS
+        # Add ALL categories and subcategories with ACTUAL ITEMS
         for category_name, subcategories_dict in room_structure.items():
             category_id = str(uuid.uuid4())
             category = {
@@ -1443,7 +1468,7 @@ async def create_room(room_data: RoomCreate):
                 "updated_at": datetime.utcnow()
             }
             
-            # Add subcategories with items
+            # Add subcategories with REAL ITEMS
             for subcategory_name, items_list in subcategories_dict.items():
                 subcategory_id = str(uuid.uuid4())
                 subcategory = {
@@ -1456,23 +1481,30 @@ async def create_room(room_data: RoomCreate):
                     "updated_at": datetime.utcnow()
                 }
                 
-                # Add DEFAULT ITEMS with sample data to test dropdowns
-                for item_name in items_list[:5]:  # Limit to first 5 items per subcategory
+                # Add ACTUAL ITEMS with different statuses/carriers for testing
+                for i, item_name in enumerate(items_list):
                     item_id = str(uuid.uuid4())
+                    
+                    # Vary the test data
+                    test_statuses = ['PICKED', 'ORDERED', 'SHIPPED', 'IN TRANSIT', 'DELIVERED TO RECEIVER']
+                    test_carriers = ['FedEx', 'UPS', 'Brooks', 'Zenith', 'DHL']
+                    test_ship_to = ['Client', 'Receiver', 'Store', 'Jobsite']
+                    test_delivery_status = ['PENDING', 'IN TRANSIT', 'DELIVERED', 'DELAYED']
+                    
                     item = {
                         "id": item_id,
                         "subcategory_id": subcategory_id,
                         "name": item_name,
                         "quantity": 1,
                         "size": "Standard",
-                        "status": "PICKED",  # Default status with color
-                        "vendor": "Sample Vendor",
-                        "cost": 100.00,
+                        "status": test_statuses[i % len(test_statuses)],
+                        "vendor": f"Vendor {i+1}",
+                        "cost": round(100 + (i * 50), 2),
                         "finish_color": "Natural",
-                        "carrier": "FedEx",  # Default carrier with color
-                        "ship_to": "Client",  # Default ship to with color
-                        "delivery_status": "PENDING",  # Default delivery status with color
-                        "notes": "Default item",
+                        "carrier": test_carriers[i % len(test_carriers)],
+                        "ship_to": test_ship_to[i % len(test_ship_to)],
+                        "delivery_status": test_delivery_status[i % len(test_delivery_status)],
+                        "notes": f"Item {i+1} for {room_data.name}",
                         "created_at": datetime.utcnow(),
                         "updated_at": datetime.utcnow()
                     }
