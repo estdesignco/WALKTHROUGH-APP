@@ -1430,11 +1430,18 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     Handles Four Hands, Uttermost, and other wholesale vendors with dynamic content
     """
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+        )
         context = await browser.new_context(
-            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            viewport={'width': 1920, 'height': 1080}
         )
         page = await context.new_page()
+        
+        # Set reasonable timeouts
+        page.set_default_timeout(30000)
         
         try:
             # Navigate to the URL with better wait strategy for wholesale sites
