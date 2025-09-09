@@ -14,7 +14,7 @@ const ExactFFESpreadsheet = ({
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
 
-  // Handle adding new items
+  // Handle adding new items with proper scraping
   const handleAddItem = async (itemData) => {
     if (!selectedSubCategoryId) {
       alert('❌ No subcategory selected');
@@ -39,7 +39,8 @@ const ExactFFESpreadsheet = ({
       });
 
       if (response.ok) {
-        alert(`✅ ITEM ADDED!\nName: ${itemData.name}\nVendor: ${itemData.vendor}`);
+        const result = await response.json();
+        alert(`✅ ITEM ADDED!\nName: ${result.data?.name || itemData.name}\nVendor: ${result.data?.vendor || itemData.vendor}`);
         setShowAddItem(false);
         setSelectedSubCategoryId(null);
         
@@ -55,48 +56,67 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // MUTED COLORS FOR EACH ROOM - Much more subtle!
+  // Handle tracking items
+  const handleTrackItem = async (item) => {
+    if (!item.tracking_number) {
+      alert('❌ No tracking number available');
+      return;
+    }
+
+    try {
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${backendUrl}/api/track-shipment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tracking_number: item.tracking_number,
+          carrier: item.carrier || 'auto-detect'
+        })
+      });
+
+      if (response.ok) {
+        const trackingData = await response.json();
+        alert(`📦 TRACKING INFO:\n${JSON.stringify(trackingData, null, 2)}`);
+      } else {
+        alert('❌ Failed to get tracking information');
+      }
+    } catch (error) {
+      console.error('❌ Tracking error:', error);
+      alert('❌ Tracking service unavailable');
+    }
+  };
+
+  // MUTED COLORS - Much more subtle!
   const getRoomColor = (roomName) => {
     const roomColors = {
       'living room': '#6B7280',      // Muted Gray
-      'dining room': '#7C2D12',      // Muted Brown-Red  
-      'kitchen': '#78716C',          // Muted Stone
-      'primary bedroom': '#6B7280',  // Muted Gray
-      'primary bathroom': '#64748B', // Muted Slate
-      'powder room': '#78716C',      // Muted Stone
-      'guest room': '#71717A',       // Muted Zinc
-      'office': '#6B7280',           // Muted Gray
-      'laundry room': '#78716C',     // Muted Stone
+      'dining room': '#78716C',      // Muted Stone  
+      'kitchen': '#71717A',          // Muted Zinc
+      'primary bedroom': '#64748B',  // Muted Slate
+      'primary bathroom': '#57534E', // Muted Stone-600
+      'powder room': '#52525B',      // Muted Gray-600
+      'guest room': '#6B7280',       // Muted Gray
+      'office': '#78716C',           // Muted Stone
+      'laundry room': '#71717A',     // Muted Zinc
       'mudroom': '#64748B',          // Muted Slate
-      'family room': '#71717A',      // Muted Zinc
-      'basement': '#52525B',         // Dark Muted Gray
-      'attic storage': '#57534E',    // Dark Muted Stone
-      'garage': '#3F3F46',           // Very Dark Muted
+      'family room': '#57534E',      // Muted Stone-600
+      'basement': '#52525B',         // Muted Gray-600
+      'garage': '#475569',           // Muted Slate-600
       'balcony': '#6B7280',          // Muted Gray
-      'screened porch': '#78716C',   // Muted Stone
-      'pool house': '#64748B',       // Muted Slate
-      'guest house': '#71717A',      // Muted Zinc
-      'butler\'s pantry': '#78716C', // Muted Stone
-      'conservatory': '#6B7280',     // Muted Gray
-      'formal living room': '#57534E', // Dark Muted Stone
-      'great room': '#52525B',       // Dark Muted Gray
-      'billiards room': '#3F3F46',   // Very Dark Muted
-      'study': '#374151',            // Dark Gray
-      'sitting room': '#475569'      // Dark Slate
     };
     return roomColors[roomName.toLowerCase()] || '#6B7280';
   };
 
   // MUTED category color
-  const getCategoryColor = () => {
-    return '#4B5563'; // Muted gray for categories
-  };
+  const getCategoryColor = () => '#4B5563'; // Muted gray-600
 
-  // MUTED header colors - much more subtle
-  const getInstalledColor = () => '#525252';        // Muted Gray-600 
-  const getAdditionalInfoColor = () => '#57534E';   // Muted Stone-600 
-  const getShippingInfoColor = () => '#4C4C4C';     // Muted Gray-700
-  const getNotesActionsColor = () => '#4B5563';     // Muted Gray-600
+  // MUTED header colors - very subtle
+  const getInstalledColor = () => '#374151';        // Muted Gray-700 
+  const getAdditionalInfoColor = () => '#44403C';   // Muted Stone-700 
+  const getShippingInfoColor = () => '#3F3F46';     // Muted Zinc-700
+  const getNotesActionsColor = () => '#374151';     // Muted Gray-700
 
   if (!project || !project.rooms) {
     return (
