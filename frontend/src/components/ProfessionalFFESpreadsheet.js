@@ -551,28 +551,15 @@ const ProfessionalFFESpreadsheet = ({
         </div>
       </div>
       
-      {/* ADD ITEM MODAL - Your existing working modal */}
+      {/* ADD ITEM MODAL - Your sophisticated working modal with scraping */}
       {showAddItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-neutral-800 p-6 rounded-lg border border-neutral-600 w-96">
-            <h3 className="text-xl font-bold text-white mb-4">Add New Item</h3>
-            {/* Your existing AddItemModal content would go here */}
-            <div className="flex space-x-4">
-              <button
-                onClick={() => setShowAddItem(false)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleAddItem({ name: 'Test Item', vendor: 'Test Vendor' })}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-              >
-                Add Item
-              </button>
-            </div>
-          </div>
-        </div>
+        <AddItemModal
+          onClose={() => setShowAddItem(false)}
+          onSubmit={handleAddItem}
+          itemStatuses={enhancedItemStatuses}
+          vendorTypes={vendorTypes}
+          loading={false}
+        />
       )}
     </div>
   );
