@@ -1815,6 +1815,106 @@ def _is_product_image(src: str) -> bool:
     # Default to True if no exclusion patterns found and has reasonable length
     return len(src) > 20  # Reasonable URL length
 
+# Enhanced helper function to identify main product images
+def _is_main_product_image(src: str) -> bool:
+    """
+    Enhanced filter function to identify the main/primary product image
+    """
+    if not src:
+        return False
+    
+    src_lower = src.lower()
+    
+    # Exclude common non-product image patterns
+    exclude_patterns = [
+        'logo', 'icon', 'banner', 'header', 'footer', 'nav', 'menu',
+        'social', 'facebook', 'twitter', 'instagram', 'pinterest',
+        'badge', 'award', 'certification', 'payment', 'shipping',
+        'thumbnail', 'avatar', 'profile', 'user', 'author',
+        'advertisement', 'ad', 'promo', 'sale', 'discount',
+        'background', 'bg', 'pattern', 'texture', 'watermark',
+        'placeholder', 'loading', 'spinner', 'arrow', 'button',
+        'star', 'rating', 'review', 'comment', 'share',
+        'bing.com', 'bat.bing', 'tracking', 'analytics', 'pixel'
+    ]
+    
+    # Check if any exclude pattern is in the image source
+    for pattern in exclude_patterns:
+        if pattern in src_lower:
+            return False
+    
+    # Prefer images with main product keywords
+    main_product_patterns = [
+        'main', 'hero', 'primary', 'featured', 'large', 'zoom',
+        'product', 'item', 'gallery', 'detail', 'view'
+    ]
+    
+    # Give high preference to images with main product keywords
+    for pattern in main_product_patterns:
+        if pattern in src_lower:
+            return True
+    
+    # Check for CDN patterns which often indicate main product images
+    if 'cdn' in src_lower and any(p in src_lower for p in ['product', 'item', 'main']):
+        return True
+    
+    return False
+
+# Helper function to score image quality based on URL indicators
+def _score_image_quality(src: str) -> int:
+    """
+    Score image quality based on URL patterns and size indicators
+    Higher score = better quality/more likely to be main product image
+    """
+    if not src:
+        return 0
+    
+    score = 0
+    src_lower = src.lower()
+    
+    # High priority indicators
+    if 'main' in src_lower or 'hero' in src_lower:
+        score += 100
+    if 'primary' in src_lower or 'featured' in src_lower:
+        score += 90
+    if 'large' in src_lower or 'zoom' in src_lower:
+        score += 80
+    if 'product' in src_lower:
+        score += 70
+    if 'gallery' in src_lower:
+        score += 60
+    
+    # Size indicators in URL
+    dimension_match = re.search(r'(\d+)x(\d+)', src_lower)
+    if dimension_match:
+        width, height = int(dimension_match.group(1)), int(dimension_match.group(2))
+        if width >= 800 and height >= 600:
+            score += 50
+        elif width >= 400 and height >= 300:
+            score += 30
+        elif width >= 200 and height >= 200:
+            score += 20
+    
+    # CDN indicators
+    if 'cdn' in src_lower:
+        score += 40
+    
+    # File format preferences
+    if src_lower.endswith('.jpg') or src_lower.endswith('.jpeg'):
+        score += 10
+    elif src_lower.endswith('.png'):
+        score += 8
+    elif src_lower.endswith('.webp'):
+        score += 12
+    
+    # Penalize thumbnails and small images
+    if 'thumb' in src_lower or 'small' in src_lower:
+        score -= 30
+    if 'icon' in src_lower or 'logo' in src_lower:
+        score -= 50
+    
+    return max(0, score)  # Ensure non-negative score
+
 # Helper function to filter description text
 def _is_description_text(text: str) -> bool:
     """
