@@ -97,39 +97,97 @@ const ExactFFESpreadsheet = ({
           
           <table className="w-full border-collapse border border-gray-400">
             
-            {/* CORRECT HEADER HIERARCHY - Individual columns on TOP, section headers on BOTTOM */}
+            {/* EXACT HEADER STRUCTURE FROM YOUR IMAGES - WITH STACKED HEADERS */}
             <thead>
-              {/* Individual column headers FIRST (TOP) */}
-              <tr className="bg-gray-100">
-                {/* ADDITIONAL INFO columns */}
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[200px]">ITEM NAME</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[150px]">VENDOR/SKU</th>
-                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-gray-800 min-w-[60px]">QTY</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[100px]">SIZE</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[120px]">ORDER STATUS</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[120px]">FINISH/Color</th>
-                <th className="border border-gray-400 px-2 py-2 text-right text-xs font-bold text-gray-800 min-w-[100px]">Cost/Price</th>
-                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-gray-800 min-w-[120px]">LINK</th>
-                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-gray-800 min-w-[80px]">Image</th>
-                
-                {/* SHIPPING INFO columns */}
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[100px]">CARRIER</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[140px]">TRACKING #</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[110px]">ORDER DATE</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[120px]">DELIVERY DATE</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[110px]">INSTALL DATE</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[150px]">NOTES</th>
-              </tr>
-
-              {/* Section headers SECOND (BOTTOM) - Different muted colors */}
+              {/* Row 1: Section headers spanning column groups */}
               <tr>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white text-center" 
-                    style={{ backgroundColor: '#B8A890' }} colSpan="9">
+                <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                    style={{ backgroundColor: '#8B6F47' }} colSpan="8">
                   ADDITIONAL INFO.
                 </th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white text-center" 
-                    style={{ backgroundColor: '#A890B8' }} colSpan="6">
+                <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                    style={{ backgroundColor: '#7A6B9A' }} colSpan="5">
                   SHIPPING INFO.
+                </th>
+                <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                    style={{ backgroundColor: '#B85A5A' }}>
+                  NOTES
+                </th>
+                <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                    style={{ backgroundColor: '#B85A5A' }}>
+                  ACTIONS
+                </th>
+              </tr>
+              
+              {/* Row 2: Individual column headers with stacked text */}
+              <tr>
+                {/* ADDITIONAL INFO columns */}
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
+                    style={{ backgroundColor: '#B85A5A' }}>
+                  ITEM NAME
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                    style={{ backgroundColor: '#B85A5A' }}>
+                  VENDOR/SKU
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[50px]" 
+                    style={{ backgroundColor: '#B85A5A' }}>
+                  QTY
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[80px]" 
+                    style={{ backgroundColor: '#B85A5A' }}>
+                  SIZE
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
+                    style={{ backgroundColor: '#B85A5A' }}>
+                  ORDERS STATUS
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
+                    style={{ backgroundColor: '#8B6F47' }}>
+                  FINISH/Color
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-right text-xs font-bold text-white min-w-[80px]" 
+                    style={{ backgroundColor: '#8B6F47' }}>
+                  Cost/Price
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[80px]" 
+                    style={{ backgroundColor: '#8B6F47' }}>
+                  Image
+                </th>
+                
+                {/* SHIPPING INFO columns - with stacked headers */}
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                    style={{ backgroundColor: '#7A6B9A' }}>
+                  <div>Order Status / Est.</div>
+                  <div>Ship Date / Est.</div>
+                  <div>Delivery Date</div>
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                    style={{ backgroundColor: '#7A6B9A' }}>
+                  <div>Install Date /</div>
+                  <div>Shipping TO</div>
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                    style={{ backgroundColor: '#7A6B9A' }}>
+                  TRACKING #
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[80px]" 
+                    style={{ backgroundColor: '#7A6B9A' }}>
+                  Carrier
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
+                    style={{ backgroundColor: '#7A6B9A' }}>
+                  Order Date
+                </th>
+                
+                {/* NOTES and ACTIONS columns */}
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
+                    style={{ backgroundColor: '#B85A5A' }}>
+                  {/* NOTES content */}
+                </th>
+                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[80px]" 
+                    style={{ backgroundColor: '#B85A5A' }}>
+                  {/* ACTIONS content */}
                 </th>
               </tr>
             </thead>
