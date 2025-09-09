@@ -1717,30 +1717,30 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             ]
             
             # Try to extract SKU/Item Number with enhanced filtering
-            for selector in sku_selectors:
-                try:
-                    if selector == 'span, div, p':  # Special handling for generic elements
-                        elements = await page.query_selector_all(selector)
-                        for element in elements:
-                            try:
+            # First try to extract from URL (Four Hands uses product ID in URL)
+            url_parts = url.split('/')
+            if len(url_parts) > 0:
+                potential_sku = url_parts[-1]
+                # Check if it looks like a SKU (contains numbers and possibly letters/dashes)
+                if re.match(r'^[A-Z0-9\-]{3,}$', potential_sku, re.IGNORECASE):
+                    result['sku'] = potential_sku
+            
+            # If no SKU from URL, try selectors
+            if not result['sku']:
+                for selector in sku_selectors:
+                    try:
+                        if 'contains' in selector:  # Special handling for text search
+                            continue  # Skip for now, complex selector
+                        else:  # Regular selector handling
+                            element = await page.query_selector(selector)
+                            if element:
                                 text = await element.inner_text()
-                                if text and _extract_sku_from_text(text):
-                                    result['sku'] = _extract_sku_from_text(text)
+                                extracted_sku = _extract_sku_from_text(text)
+                                if extracted_sku and extracted_sku.lower() not in ['products', 'product', 'nav', 'menu']:
+                                    result['sku'] = extracted_sku
                                     break
-                            except:
-                                continue
-                        if result['sku']:  # If found, break outer loop
-                            break
-                    else:  # Regular selector handling
-                        element = await page.query_selector(selector)
-                        if element:
-                            text = await element.inner_text()
-                            sku_match = re.search(r'[A-Z0-9\-]{3,}', text)
-                            if sku_match:
-                                result['sku'] = sku_match.group()
-                                break
-                except:
-                    continue
+                    except:
+                        continue
             
             # Extract color/finish information
             color_selectors = [
