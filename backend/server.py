@@ -1518,6 +1518,21 @@ async def get_paint_colors():
     """Get comprehensive paint color catalog for interior design"""
     return {"data": PAINT_CATALOG}
 
+@api_router.get("/item-statuses-enhanced")
+async def get_item_statuses_enhanced():
+    """Get enhanced item statuses with colors and phases"""
+    return {"data": ITEM_STATUSES}
+
+@api_router.get("/carrier-options")
+async def get_carrier_options():
+    """Get carrier options with colors and tracking URLs"""
+    return {"data": CARRIER_OPTIONS}
+
+@api_router.get("/vendor-database")
+async def get_vendor_database():
+    """Get wholesale vendor database with scraping support info"""
+    return {"data": VENDOR_DATABASE}
+
 @api_router.get("/paint-suggestions/{room_type}")
 async def get_paint_suggestions(room_type: str):
     """Get paint color suggestions based on room type"""
