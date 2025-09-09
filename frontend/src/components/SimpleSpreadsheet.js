@@ -71,27 +71,21 @@ const SimpleSpreadsheet = ({
         🎉 SPREADSHEET IS WORKING! Project: {project.name}
       </h2>
       
-      {/* HORIZONTAL SCROLLING CONTAINER - COMPLETELY REBUILT */}
+      {/* FORCED HORIZONTAL SCROLLING - COMPLETELY REBUILT */}
       <div 
-        className="relative w-full border border-neutral-600"
+        className="relative w-full border border-neutral-600 overflow-hidden"
         style={{ 
-          height: '60vh',
-          overflow: 'hidden'
+          height: '60vh'
         }}
       >
         <div
-          className="w-full h-full"
+          className="w-full h-full overflow-scroll"
+          id="ffe-scroll-container"
           style={{
             overflowX: 'scroll',
             overflowY: 'scroll', 
-            scrollBehavior: 'smooth',
-            WebkitOverflowScrolling: 'touch',
-            msOverflowStyle: 'scrollbar',
-            scrollbarWidth: 'thin'
-          }}
-          onWheel={(e) => {
-            // Allow all scrolling - don't interfere
-            e.stopPropagation();
+            scrollBehavior: 'auto',
+            WebkitOverflowScrolling: 'touch'
           }}
         >
         <table 
