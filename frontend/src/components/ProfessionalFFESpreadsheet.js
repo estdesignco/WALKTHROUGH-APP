@@ -365,7 +365,7 @@ const ProfessionalFFESpreadsheet = ({
                                             className="w-full bg-neutral-700 text-white border-none outline-none p-1 rounded"
                                             style={{ backgroundColor: getStatusColor(item.status) }}
                                           >
-                                            {itemStatuses.map((status) => (
+                                            {enhancedItemStatuses.map((status) => (
                                               <option 
                                                 key={status.status} 
                                                 value={status.status}
