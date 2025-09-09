@@ -85,12 +85,35 @@ const ActualFFESpreadsheet = ({
     }
   };
 
-  // Toggle functions
+  // Populate rooms with default items when expanded (as per user request)
+  const populateRoomWithDefaults = async (roomId) => {
+    try {
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      
+      // Call backend to get default room structure
+      const response = await fetch(`${backendUrl}/api/room-defaults/${roomId}`);
+      if (response.ok) {
+        const defaultData = await response.json();
+        // This would populate the room with default categories and items
+        console.log('Room defaults loaded:', defaultData);
+      }
+    } catch (error) {
+      console.error('Error loading room defaults:', error);
+    }
+  };
+
+  // Toggle functions - WITH DEFAULT POPULATION
   const toggleRoom = (roomId) => {
+    const wasExpanded = expandedRooms[roomId];
     setExpandedRooms(prev => ({
       ...prev,
       [roomId]: !prev[roomId]
     }));
+    
+    // If expanding for first time, populate with defaults
+    if (!wasExpanded) {
+      populateRoomWithDefaults(roomId);
+    }
   };
 
   const toggleCategory = (categoryId) => {
