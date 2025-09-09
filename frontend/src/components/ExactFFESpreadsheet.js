@@ -241,29 +241,26 @@ const ExactFFESpreadsheet = ({
                               Image
                             </th>
                             
-                            {/* SHIPPING INFO columns with stacked headers */}
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                            {/* SHIPPING INFO columns */}
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getShippingInfoColor() }}>
-                              <div>Order Status / Est.</div>
-                              <div>Ship Date / Est.</div>
-                              <div>Delivery Date</div>
+                              Order Date
                             </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getShippingInfoColor() }}>
-                              <div>Install Date /</div>
-                              <div>Shipping TO</div>
+                              Est. Ship Date
                             </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getShippingInfoColor() }}>
-                              TRACKING #
+                              TRACKING # 
                             </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[80px]" 
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getShippingInfoColor() }}>
                               Carrier
                             </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getShippingInfoColor() }}>
-                              Order Date
+                              Delivery Status
                             </th>
                             
                             {/* Empty cells for NOTES/ACTIONS */}
