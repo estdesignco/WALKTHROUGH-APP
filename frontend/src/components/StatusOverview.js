@@ -218,29 +218,45 @@ const StatusOverview = ({ totalItems, statusBreakdown, itemStatuses }) => {
           </div>
         </div>
 
-        {/* Shipping Carrier Breakdown */}
-        <div className="bg-gray-800 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Shipping Carrier Breakdown</h3>
-          
-          <div className="text-center text-gray-500">
-            <div className="text-4xl mb-2">📦</div>
-            <p className="text-sm">No items with assigned carriers.</p>
-          </div>
-          
-          {/* Placeholder for when we have shipping data */}
-          <div className="hidden space-y-2">
-            <div className="flex justify-between items-center p-2 bg-gray-700 rounded">
-              <span className="text-gray-300">FedEx</span>
-              <span className="text-white font-medium">12</span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-gray-700 rounded">
-              <span className="text-gray-300">UPS</span>
-              <span className="text-white font-medium">8</span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-gray-700 rounded">
-              <span className="text-gray-300">USPS</span>
-              <span className="text-white font-medium">3</span>
-            </div>
+        {/* SHIPPING CARRIER BREAKDOWN - Show ALL carriers with colors */}
+        <div className="mt-6">
+          <h4 className="text-sm font-medium text-gray-300 mb-3">Shipping Carrier Breakdown</h4>
+          <div className="space-y-2">
+            {Object.entries(carrierBreakdown)
+              .filter(([carrier, count]) => count > 0)  // Only show carriers with items
+              .map(([carrier, count]) => {
+                const carrierColors = {
+                  'FedEx': '#FF6600',
+                  'UPS': '#8B4513',
+                  'Brooks': '#4682B4',
+                  'Zenith': '#20B2AA',
+                  'Sunbelt': '#DC143C',
+                  'R+L Carriers': '#8A2BE2',
+                  'Yellow Freight': '#FFD700',
+                  'XPO Logistics': '#FF1493',
+                  'Old Dominion': '#228B22',
+                  'ABF Freight': '#B22222',
+                  'Estes Express': '#4B0082',
+                  'Saia LTL': '#2E8B57',
+                  'TForce Freight': '#FF4500',
+                  'Roadrunner': '#6B8E23',
+                  'Central Transport': '#8B008B',
+                  'Southeastern Freight': '#D2691E',
+                  'Averitt Express': '#CD853F',
+                  'Holland': '#F4A460',
+                  'USPS': '#0047AB',
+                  'DHL': '#FFCC00',
+                  'OTHER': '#9370DB'
+                };
+                
+                return (
+                  <div key={carrier} className="flex items-center justify-between p-2 rounded text-xs" 
+                       style={{ backgroundColor: carrierColors[carrier] || '#6B7280', color: '#000' }}>
+                    <span className="font-medium">{carrier}</span>
+                    <span className="font-bold">{count}</span>
+                  </div>
+                );
+              })}
           </div>
         </div>
       </div>
