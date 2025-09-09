@@ -463,19 +463,20 @@ const ExactFFESpreadsheet = ({
                                 )}
                               </td>
                               
-                              {/* SHIP TO - WITH COLORED DOTS IN OPTIONS */}
+                              {/* SHIP TO - BLANK DEFAULT */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
-                                  value={item.ship_to || 'Client'}
+                                  value={item.ship_to || ''}
                                   onChange={(e) => {
                                     console.log(`Ship To changed to: ${e.target.value} with color: ${getShipToColor(e.target.value)}`);
                                   }}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
-                                    backgroundColor: getShipToColor(item.ship_to || 'Client'),
+                                    backgroundColor: item.ship_to ? getShipToColor(item.ship_to) : '#374151',
                                     color: '#000'
                                   }}
                                 >
+                                  <option value="">Select Ship To...</option>
                                   <option value="Client">🟡 Client</option>
                                   <option value="Receiver">🔵 Receiver</option>
                                   <option value="Store">🟣 Store</option>
@@ -483,19 +484,20 @@ const ExactFFESpreadsheet = ({
                                 </select>
                               </td>
                               
-                              {/* CARRIER - WITH COLORED DOTS IN OPTIONS */}
+                              {/* CARRIER - BLANK DEFAULT */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
-                                  value={item.carrier || 'FedEx'}
+                                  value={item.carrier || ''}
                                   onChange={(e) => {
                                     console.log(`Carrier changed to: ${e.target.value} with color: ${getCarrierColor(e.target.value)}`);
                                   }}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
-                                    backgroundColor: getCarrierColor(item.carrier || 'FedEx'),
+                                    backgroundColor: item.carrier ? getCarrierColor(item.carrier) : '#374151',
                                     color: '#000'
                                   }}
                                 >
+                                  <option value="">Select Carrier...</option>
                                   <option value="FedEx">🟠 FedEx</option>
                                   <option value="UPS">🟫 UPS</option>
                                   <option value="USPS">🔵 USPS</option>
