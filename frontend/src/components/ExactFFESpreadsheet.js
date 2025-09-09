@@ -508,11 +508,11 @@ const ExactFFESpreadsheet = ({
                                 </select>
                               </td>
                               
-                              {/* NOTES */}
+                              {/* NOTES - Clean, no border */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <textarea 
                                   value={item.notes || 'For dining room entryway'}
-                                  className="w-full bg-gray-700 text-white text-xs rounded px-1 resize-none"
+                                  className="w-full bg-transparent text-white border-0 outline-none resize-none p-0 m-0"
                                   placeholder="Notes..."
                                   rows="2"
                                 />
