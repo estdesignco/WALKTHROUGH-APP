@@ -382,7 +382,7 @@ const FFEDashboard = ({ isOffline }) => {
           vendorTypes={vendorTypes}
           carrierTypes={carrierTypes}
           onDeleteRoom={handleDeleteRoom}
-          onReload={loadProjectAndUtilityData}
+          onReload={loadSimpleProject}
           isOffline={isOffline}
         />
       </div>
