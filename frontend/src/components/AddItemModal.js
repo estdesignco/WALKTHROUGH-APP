@@ -91,10 +91,6 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       setIsScraping(false);
     }
   };
-    } finally {
-      setIsScraping(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
