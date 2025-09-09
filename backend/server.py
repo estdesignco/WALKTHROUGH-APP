@@ -1437,17 +1437,21 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         page = await context.new_page()
         
         try:
-            # Navigate to the URL with extended timeout and different wait strategy
-            await page.goto(url, wait_until='domcontentloaded', timeout=60000)
+            # Navigate to the URL with extended timeout for wholesale sites
+            await page.goto(url, wait_until='networkidle', timeout=60000)
             
-            # Wait for potential dynamic content to load
-            await page.wait_for_timeout(5000)
+            # Wait for potential dynamic content to load - extended for JS-heavy sites
+            await page.wait_for_timeout(8000)
             
             # Try to wait for common product elements to appear
             try:
-                await page.wait_for_selector('h1, [class*="title"], [class*="product"]', timeout=10000)
+                await page.wait_for_selector('h1, [class*="title"], [class*="product"], .product-form, .product-info', timeout=15000)
             except:
-                pass  # Continue even if specific selectors don't appear
+                # If specific selectors don't appear, try a more general approach
+                try:
+                    await page.wait_for_selector('body', timeout=5000)
+                except:
+                    pass  # Continue even if page doesn't fully load
             
             # Initialize result structure
             result = {
