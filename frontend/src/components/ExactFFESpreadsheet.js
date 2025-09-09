@@ -459,6 +459,9 @@ const ExactFFESpreadsheet = ({
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.ship_to || 'Client'}
+                                  onChange={(e) => {
+                                    console.log(`Ship To changed to: ${e.target.value}`);
+                                  }}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
                                     backgroundColor: getShipToColor(item.ship_to || 'Client'),
@@ -476,6 +479,9 @@ const ExactFFESpreadsheet = ({
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.carrier || 'FedEx'}
+                                  onChange={(e) => {
+                                    console.log(`Carrier changed to: ${e.target.value}`);
+                                  }}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
                                     backgroundColor: getCarrierColor(item.carrier || 'FedEx'),
