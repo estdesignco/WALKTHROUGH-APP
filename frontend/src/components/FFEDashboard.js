@@ -221,34 +221,67 @@ const FFEDashboard = ({ isOffline }) => {
 
   const getStatusBreakdown = () => {
     const breakdown = {};
+    
+    // Include ALL possible status values with colors
+    const allStatuses = [
+      'TO BE SELECTED', 'RESEARCHING', 'PENDING APPROVAL', 
+      'APPROVED', 'ORDERED', 'PICKED', 'CONFIRMED',
+      'IN PRODUCTION', 'SHIPPED', 'IN TRANSIT', 'OUT FOR DELIVERY',
+      'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'RECEIVED',
+      'READY FOR INSTALL', 'INSTALLING', 'INSTALLED',
+      'ON HOLD', 'BACKORDERED', 'DAMAGED', 'RETURNED', 'CANCELLED'
+    ];
+    
+    // Initialize all statuses with 0
+    allStatuses.forEach(status => {
+      breakdown[status] = 0;
+    });
+    
+    // Count actual items
     project.rooms.forEach(room => {
       room.categories.forEach(category => {
         (category.subcategories || []).forEach(subcategory => {
           (subcategory.items || []).forEach(item => {
-            breakdown[item.status] = (breakdown[item.status] || 0) + 1;
+            const status = item.status || 'TO BE SELECTED';
+            breakdown[status] = (breakdown[status] || 0) + 1;
           });
         });
       });
     });
+    
     return breakdown;
   };
 
   const getCarrierBreakdown = () => {
     const carriers = {};
+    
+    // Include ALL possible carriers with colors
+    const allCarriers = [
+      'FedEx', 'UPS', 'USPS', 'DHL', 'Brooks', 'Zenith', 'Sunbelt',
+      'R+L Carriers', 'Yellow Freight', 'XPO Logistics', 'Old Dominion',
+      'ABF Freight', 'Estes Express', 'Saia LTL', 'TForce Freight',
+      'Roadrunner', 'Central Transport', 'Southeastern Freight',
+      'Averitt Express', 'Holland', 'OTHER'
+    ];
+    
+    // Initialize all carriers with 0
+    allCarriers.forEach(carrier => {
+      carriers[carrier] = 0;
+    });
+    
+    // Count actual items
     project.rooms.forEach(room => {
       room.categories.forEach(category => {
         (category.subcategories || []).forEach(subcategory => {
           (subcategory.items || []).forEach(item => {
-            if (item.tracking_number && item.vendor) {
-              const carrier = extractCarrier(item.vendor, item.tracking_number);
-              if (carrier) {
-                carriers[carrier] = (carriers[carrier] || 0) + 1;
-              }
+            if (item.carrier) {
+              carriers[item.carrier] = (carriers[item.carrier] || 0) + 1;
             }
           });
         });
       });
     });
+    
     return carriers;
   };
 
