@@ -402,19 +402,20 @@ const ExactFFESpreadsheet = ({
                                 {item.size || '28"W x 30"H'}
                               </td>
                               
-                              {/* ORDERS STATUS - WITH COLORED DOTS IN OPTIONS */}
+                              {/* ORDERS STATUS - BLANK DEFAULT */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
-                                  value={item.status || 'PICKED'}
+                                  value={item.status || ''}
                                   onChange={(e) => {
                                     console.log(`Status changed to: ${e.target.value} with color: ${getStatusColor(e.target.value)}`);
                                   }}
                                   className="w-full border-none outline-none rounded px-2 py-1 text-xs font-medium"
                                   style={{
-                                    backgroundColor: getStatusColor(item.status || 'PICKED'),
+                                    backgroundColor: item.status ? getStatusColor(item.status) : '#374151',
                                     color: '#000'
                                   }}
                                 >
+                                  <option value="">Select Status...</option>
                                   <option value="TO BE SELECTED">🟤 TO BE SELECTED</option>
                                   <option value="RESEARCHING">🟫 RESEARCHING</option>
                                   <option value="PENDING APPROVAL">🟡 PENDING APPROVAL</option>
