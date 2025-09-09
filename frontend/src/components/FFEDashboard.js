@@ -46,40 +46,42 @@ const FFEDashboard = ({ isOffline }) => {
   const loadingRef = useRef(false);
 
   useEffect(() => {
-    if (projectId && !loadingRef.current) {
-      loadingRef.current = true;
-      loadProjectAndUtilityData();
+    if (projectId) {
+      // FORCE SIMPLE LOADING - NO COMPLEX LOGIC
+      console.log('🚀 FORCE LOADING PROJECT:', projectId);
+      
+      setLoading(true);
+      loadSimpleProject();
     }
   }, [projectId]);
 
-  const loadProjectAndUtilityData = async () => {
+  const loadSimpleProject = async () => {
     try {
-      setLoading(true);
+      console.log('🚀 Loading project data...');
+      const response = await fetch(`${import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://furnishpro.preview.emergentagent.com'}/api/projects/${projectId}`);
       
-      // Load both in parallel and wait for both to complete
-      const [projectResponse, utilityData] = await Promise.all([
-        projectAPI.getById(projectId),
-        loadUtilityDataAsync()
-      ]);
-      
-      setProject(projectResponse.data);
-      
-      // Cache for offline use
-      localStorage.setItem(`project_${projectId}`, JSON.stringify(projectResponse.data));
-      setError(null);
-    } catch (err) {
-      setError('Failed to load project');
-      console.error('Error loading project:', err);
-      
-      // Try to load from cache
-      const cachedProject = localStorage.getItem(`project_${projectId}`);
-      if (cachedProject) {
-        setProject(JSON.parse(cachedProject));
-        setError('Using cached data - changes may not be saved');
+      if (response.ok) {
+        const projectData = await response.json();
+        console.log('🚀 Project loaded:', projectData.name);
+        setProject(projectData);
+        setError(null);
+      } else {
+        console.error('🚀 Failed to load project:', response.status);
+        setError('Failed to load project');
       }
+    } catch (err) {
+      console.error('🚀 Error loading project:', err);
+      setError('Error loading project: ' + err.message);
     } finally {
+      console.log('🚀 FORCE SETTING LOADING = FALSE');
       setLoading(false);
-      loadingRef.current = false;
+      
+      // Set default utility data
+      setRoomColors({});
+      setCategoryColors({});
+      setItemStatuses(['ORDERED', 'DELIVERED TO JOB SITE', 'INSTALLED']);
+      setVendorTypes(['Four Hands', 'Uttermost']);
+      setCarrierTypes(['FedEx', 'UPS']);
     }
   };
 
