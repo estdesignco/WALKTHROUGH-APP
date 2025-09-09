@@ -24,7 +24,7 @@ const SimpleScrapeTest = () => {
     setScrapeError('');
 
     try {
-      const backendUrl = 'https://furnishpro.preview.emergentagent.com';
+      const backendUrl = 'https://interior-design-app-3.preview.emergentagent.com';
       
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);

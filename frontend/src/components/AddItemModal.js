@@ -29,7 +29,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
 
     try {
       // FORCE CORRECT BACKEND URL
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://furnishpro.preview.emergentagent.com';
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://interior-design-app-3.preview.emergentagent.com';
       
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);
