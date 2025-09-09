@@ -124,6 +124,17 @@ const SimpleSpreadsheet = ({ project }) => {
                             style={{ backgroundColor: '#b43535' }}
                           >
                             📋 {subcategory.name.toUpperCase()}
+                            <div className="mt-2">
+                              <button
+                                onClick={() => {
+                                  setSelectedSubCategoryId(subcategory.id);
+                                  setShowAddItem(true);
+                                }}
+                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold"
+                              >
+                                ➕ ADD ITEM (Test Scraping!)
+                              </button>
+                            </div>
                           </td>
                         </tr>
                         
