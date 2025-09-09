@@ -246,7 +246,9 @@ class CriticalBugTester:
             self.log_test("CRITICAL: Carrier Colors Endpoint", False, f"Carrier options endpoint failed: {carriers_data} (Status: {status_code})", is_critical=True)
             colors_working = False
         else:
-            if isinstance(carriers_data, list) and len(carriers_data) > 0:
+            # Handle wrapped response format
+            actual_data = carriers_data.get('data', carriers_data) if isinstance(carriers_data, dict) else carriers_data
+            if isinstance(actual_data, list) and len(actual_data) > 0:
                 # Check if carriers have color information
                 carriers_with_colors = [c for c in carriers_data if isinstance(c, dict) and 'color' in c and c.get('color')]
                 
