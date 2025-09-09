@@ -1437,15 +1437,21 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         page = await context.new_page()
         
         try:
-            # Navigate to the URL with extended timeout for wholesale sites
-            await page.goto(url, wait_until='networkidle', timeout=60000)
+            # Navigate to the URL with better wait strategy for wholesale sites
+            await page.goto(url, wait_until='domcontentloaded', timeout=45000)
             
-            # Wait for potential dynamic content to load - extended for JS-heavy sites
-            await page.wait_for_timeout(8000)
+            # Try to wait for network idle, but don't fail if it times out
+            try:
+                await page.wait_for_load_state('networkidle', timeout=20000)
+            except:
+                pass  # Continue even if network doesn't become idle
+            
+            # Wait for potential dynamic content to load
+            await page.wait_for_timeout(3000)
             
             # Try to wait for common product elements to appear
             try:
-                await page.wait_for_selector('h1, [class*="title"], [class*="product"], .product-form, .product-info', timeout=15000)
+                await page.wait_for_selector('h1, [class*="title"], [class*="product"], .product-form, .product-info', timeout=10000)
             except:
                 # If specific selectors don't appear, try a more general approach
                 try:
