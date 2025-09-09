@@ -28,14 +28,11 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
     setScrapeError('');
 
     try {
-      // FORCE WORKING BACKEND URL - TRY ALL POSSIBILITIES
-      let backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
-      if (!backendUrl) {
-        backendUrl = window.location.origin.includes('localhost') ? 'http://localhost:8001' : window.location.origin;
-      }
+      // FORCE CORRECT BACKEND URL
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://furnishpro.preview.emergentagent.com';
       
-      console.log('SCRAPING - Using backend URL:', backendUrl);
-      console.log('SCRAPING - Target URL:', formData.link);
+      console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
+      console.log('🔗 SCRAPING START - Target URL:', formData.link);
       
       const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',
@@ -45,21 +42,27 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
         body: JSON.stringify({ url: formData.link })
       });
       
-      console.log('SCRAPING - Response status:', response.status);
+      console.log('🔗 SCRAPING - Response status:', response.status);
+      console.log('🔗 SCRAPING - Response headers:', response.headers);
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to scrape product information');
+        const errorData = await response.text(); // Get text first
+        console.error('🔗 SCRAPING ERROR - Response:', errorData);
+        throw new Error(`HTTP ${response.status}: ${errorData}`);
       }
 
       const responseData = await response.json();
-      console.log('SCRAPING SUCCESS - Raw response:', responseData);
+      console.log('🔗 SCRAPING SUCCESS - Raw response:', responseData);
       
       // Handle the new response format: {success: true, data: {...}}
       const data = responseData.success ? responseData.data : responseData;
-      console.log('SCRAPING SUCCESS - Extracted data:', data);
+      console.log('🔗 SCRAPING SUCCESS - Extracted data:', data);
       
-      // FORCE UPDATE ALL FIELDS WITH SCRAPED DATA - CORRECT FIELD MAPPING
+      if (!data || (!data.name && !data.vendor && !data.price && !data.cost)) {
+        throw new Error('No product data could be extracted from this URL');
+      }
+      
+      // FORCE UPDATE ALL FIELDS WITH SCRAPED DATA
       const updatedData = {
         ...formData,
         name: data.name || data.product_name || data.title || formData.name,
@@ -71,13 +74,23 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
         remarks: data.description ? data.description.substring(0, 200) : formData.remarks
       };
       
-      console.log('UPDATING FORM DATA:', updatedData);
+      console.log('🔗 UPDATING FORM DATA:', updatedData);
       setFormData(updatedData);
       setScrapeError('');
-      console.log('Scraping successful!'); // Debug log
+      
+      // VISUAL FEEDBACK
+      alert(`✅ SCRAPING SUCCESS!\nName: ${updatedData.name}\nVendor: ${updatedData.vendor}\nCost: ${updatedData.cost}`);
+      
     } catch (error) {
-      console.error('Scraping error:', error); // Debug log
-      setScrapeError('Failed to scrape product information: ' + error.message);
+      console.error('🔗 SCRAPING ERROR:', error);
+      setScrapeError('SCRAPING FAILED: ' + error.message);
+      
+      // VISUAL ERROR FEEDBACK  
+      alert(`❌ SCRAPING FAILED: ${error.message}`);
+    } finally {
+      setIsScraping(false);
+    }
+  };
     } finally {
       setIsScraping(false);
     }
