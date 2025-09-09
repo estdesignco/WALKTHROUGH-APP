@@ -220,12 +220,12 @@ const ExactFFESpreadsheet = ({
                           
                           {/* ROW 2: Individual column headers for ADDITIONAL INFO and SHIPPING INFO */}
                           <tr>
-                            {/* Empty cells for red columns already defined above */}
-                            <td className="border border-gray-400" style={{ backgroundColor: getItemNameColor() }}></td>
-                            <td className="border border-gray-400" style={{ backgroundColor: getItemNameColor() }}></td>
-                            <td className="border border-gray-400" style={{ backgroundColor: getItemNameColor() }}></td>
-                            <td className="border border-gray-400" style={{ backgroundColor: getItemNameColor() }}></td>
-                            <td className="border border-gray-400" style={{ backgroundColor: getItemNameColor() }}></td>
+                            {/* Empty cells for main columns */}
+                            <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
                             
                             {/* ADDITIONAL INFO columns */}
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
