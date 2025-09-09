@@ -277,7 +277,7 @@ const ExactFFESpreadsheet = ({
                             </th>
                           </tr>
                           
-                          {/* FUNCTIONAL DATA ROWS */}
+                          {/* CLEAN DATA ROWS - No extra containers */}
                           {subcategory.items?.map((item, itemIndex) => (
                             <tr key={`${subcategory.id}-${itemIndex}`} 
                                 className="transition-colors hover:bg-gray-600"
@@ -285,7 +285,7 @@ const ExactFFESpreadsheet = ({
                                   backgroundColor: itemIndex % 2 === 0 ? '#1F2937' : '#111827' 
                                 }}>
                               
-                              {/* ITEM NAME - Editable */}
+                              {/* ITEM NAME - Clean, no container */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <input 
                                   type="text"
@@ -295,7 +295,7 @@ const ExactFFESpreadsheet = ({
                                 />
                               </td>
                               
-                              {/* VENDOR/SKU - Editable */}
+                              {/* VENDOR/SKU - Clean, no container */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <input 
                                   type="text"
@@ -315,7 +315,7 @@ const ExactFFESpreadsheet = ({
                                 />
                               </td>
                               
-                              {/* SIZE - Editable */}
+                              {/* SIZE - Clean, no container */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <input 
                                   type="text"
@@ -325,31 +325,39 @@ const ExactFFESpreadsheet = ({
                                 />
                               </td>
                               
-                              {/* ORDERS STATUS - FUNCTIONAL COLOR-CODED DROPDOWN */}
+                              {/* ORDERS STATUS - COLOR-CODED DROPDOWN */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.status || 'PICKED'}
                                   className="w-full border-none outline-none rounded px-2 py-1 text-xs font-medium"
                                   style={{
                                     backgroundColor: item.status === 'PICKED' ? '#FEF08A' :
-                                                   item.status === 'ORDERED' ? '#DBEAFE' :
-                                                   item.status === 'SHIPPED' ? '#C7D2FE' :
-                                                   item.status === 'DELIVERED TO RECEIVER' ? '#D1FAE5' :
-                                                   item.status === 'DELIVERED TO JOB SITE' ? '#A7F3D0' :
-                                                   item.status === 'INSTALLED' ? '#6EE7B7' :
-                                                   item.status === 'ON HOLD' ? '#FCA5A5' :
-                                                   item.status === 'BACKORDERED' ? '#F87171' : '#FEF08A',
+                                                   item.status === 'APPROVED' ? '#A7F3D0' :
+                                                   item.status === 'ORDERED' ? '#FED7AA' :
+                                                   item.status === 'SHIPPED' ? '#FEF08A' :
+                                                   item.status === 'DELIVERED TO RECEIVER' ? '#C7D2FE' :
+                                                   item.status === 'DELIVERED TO STORE' ? '#DDD6FE' :
+                                                   item.status === 'DELIVERED TO JOBSITE' ? '#BFDBFE' :
+                                                   item.status === 'ON HOLD' ? '#A5F3FC' :
+                                                   item.status === 'PARTIALLY DELIVERED' ? '#A7F3D0' :
+                                                   item.status === 'DAMAGED' ? '#FED7AA' :
+                                                   item.status === 'BACKORDERED' ? '#FCA5A5' :
+                                                   item.status === 'AT WORKROOM' ? '#DDD6FE' : '#FEF08A',
                                     color: '#000'
                                   }}
                                 >
                                   <option value="PICKED">PICKED</option>
+                                  <option value="APPROVED">APPROVED</option>
                                   <option value="ORDERED">ORDERED</option>
                                   <option value="SHIPPED">SHIPPED</option>
                                   <option value="DELIVERED TO RECEIVER">DELIVERED TO RECEIVER</option>
-                                  <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
-                                  <option value="INSTALLED">INSTALLED</option>
+                                  <option value="DELIVERED TO STORE">DELIVERED TO STORE</option>
+                                  <option value="DELIVERED TO JOBSITE">DELIVERED TO JOBSITE</option>
                                   <option value="ON HOLD">ON HOLD</option>
+                                  <option value="PARTIALLY DELIVERED">PARTIALLY DELIVERED</option>
+                                  <option value="DAMAGED">DAMAGED</option>
                                   <option value="BACKORDERED">BACKORDERED</option>
+                                  <option value="AT WORKROOM">AT WORKROOM</option>
                                 </select>
                               </td>
                               
@@ -386,22 +394,62 @@ const ExactFFESpreadsheet = ({
                                 )}
                               </td>
                               
-                              {/* Order Date - FUNCTIONAL DATE PICKER */}
+                              {/* SHIP TO - COLOR-CODED DROPDOWN */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <input 
-                                  type="date"
-                                  value={item.order_date || '2025-01-15'}
-                                  className="w-full bg-gray-700 text-white text-xs rounded px-1"
-                                />
+                                <select 
+                                  value={item.ship_to || 'Client'}
+                                  className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
+                                  style={{
+                                    backgroundColor: item.ship_to === 'Client' ? '#FEF08A' :
+                                                   item.ship_to === 'Receiver' ? '#BFDBFE' :
+                                                   item.ship_to === 'Store' ? '#FBCFE8' :
+                                                   item.ship_to === 'Jobsite' ? '#A7F3D0' : '#FEF08A',
+                                    color: '#000'
+                                  }}
+                                >
+                                  <option value="Client">Client</option>
+                                  <option value="Receiver">Receiver</option>
+                                  <option value="Store">Store</option>
+                                  <option value="Jobsite">Jobsite</option>
+                                </select>
                               </td>
                               
-                              {/* Est. Ship Date - FUNCTIONAL DATE PICKER */}
+                              {/* CARRIER - COLOR-CODED DROPDOWN */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <input 
-                                  type="date"
-                                  value={item.est_ship_date || '2025-01-25'}
-                                  className="w-full bg-gray-700 text-white text-xs rounded px-1"
-                                />
+                                <select 
+                                  value={item.carrier || 'FedEx'}
+                                  className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
+                                  style={{
+                                    backgroundColor: item.carrier === 'FedEx' ? '#DDD6FE' :
+                                                   item.carrier === 'UPS' ? '#FEF08A' :
+                                                   item.carrier === 'USPS' ? '#BFDBFE' :
+                                                   item.carrier === 'DHL' ? '#FEF08A' :
+                                                   item.carrier === 'Brooks' ? '#BFDBFE' :
+                                                   item.carrier === 'Zenith' ? '#A5F3FC' :
+                                                   item.carrier === 'Sunbelt' ? '#FCA5A5' :
+                                                   item.carrier === 'OnTrac' ? '#A5F3FC' :
+                                                   item.carrier === 'XPO' ? '#FCA5A5' :
+                                                   item.carrier === 'R+L' ? '#BFDBFE' :
+                                                   item.carrier === 'Pilot' ? '#FED7AA' :
+                                                   item.carrier === 'Estes' ? '#FCA5A5' :
+                                                   item.carrier === 'Other' ? '#E5E7EB' : '#DDD6FE',
+                                    color: '#000'
+                                  }}
+                                >
+                                  <option value="FedEx">FedEx</option>
+                                  <option value="UPS">UPS</option>
+                                  <option value="USPS">USPS</option>
+                                  <option value="DHL">DHL</option>
+                                  <option value="Brooks">Brooks</option>
+                                  <option value="Zenith">Zenith</option>
+                                  <option value="Sunbelt">Sunbelt</option>
+                                  <option value="OnTrac">OnTrac</option>
+                                  <option value="XPO">XPO</option>
+                                  <option value="R+L">R+L</option>
+                                  <option value="Pilot">Pilot</option>
+                                  <option value="Estes">Estes</option>
+                                  <option value="Other">Other</option>
+                                </select>
                               </td>
                               
                               {/* TRACKING # with LIVE TRACKING */}
@@ -426,35 +474,28 @@ const ExactFFESpreadsheet = ({
                                 )}
                               </td>
                               
-                              {/* Carrier - FUNCTIONAL DROPDOWN */}
+                              {/* Order Date - DATE PICKER in container */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <select 
-                                  value={item.carrier || 'FedEx'}
-                                  className="w-full bg-gray-700 text-white text-xs rounded"
-                                >
-                                  <option value="">Select...</option>
-                                  <option value="FedEx">FedEx</option>
-                                  <option value="UPS">UPS</option>
-                                  <option value="Brooks">Brooks</option>
-                                  <option value="Zenith">Zenith</option>
-                                  <option value="Sunbelt">Sunbelt</option>
-                                  <option value="DHL">DHL</option>
-                                  <option value="USPS">USPS</option>
-                                  <option value="White Glove">White Glove</option>
-                                  <option value="Local Delivery">Local Delivery</option>
-                                </select>
+                                <div>
+                                  <input 
+                                    type="date"
+                                    value={item.order_date || '2025-01-15'}
+                                    className="w-full bg-gray-700 text-white text-xs rounded px-1"
+                                  />
+                                </div>
                               </td>
                               
-                              {/* Delivery Status - FUNCTIONAL COLOR-CODED DROPDOWN */}
+                              {/* DELIVERY STATUS - COLOR-CODED DROPDOWN */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.delivery_status || 'IN TRANSIT'}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
-                                    backgroundColor: item.delivery_status === 'DELIVERED' ? '#6EE7B7' :
+                                    backgroundColor: item.delivery_status === 'DELIVERED' ? '#A7F3D0' :
                                                    item.delivery_status === 'IN TRANSIT' ? '#FEF08A' :  
                                                    item.delivery_status === 'PENDING' ? '#C7D2FE' :
-                                                   item.delivery_status === 'DELAYED' ? '#FCA5A5' : '#FEF08A',
+                                                   item.delivery_status === 'DELAYED' ? '#FCA5A5' :
+                                                   item.delivery_status === 'OUT FOR DELIVERY' ? '#BFDBFE' : '#FEF08A',
                                     color: '#000'
                                   }}
                                 >
