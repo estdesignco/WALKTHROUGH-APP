@@ -549,7 +549,7 @@ const ExactFFESpreadsheet = ({
                                 </div>
                               </td>
                               
-                              {/* DELIVERY STATUS - ALL COLOR-CODED OPTIONS WITH REAL VALUES */}
+                              {/* DELIVERY STATUS - WITH COLORED DOTS IN OPTIONS */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.delivery_status || 'PENDING'}
@@ -562,20 +562,20 @@ const ExactFFESpreadsheet = ({
                                     color: '#000'
                                   }}
                                 >
-                                  <option value="PENDING" style={{backgroundColor: '#C7D2FE', color: '#000'}}>PENDING</option>
-                                  <option value="SCHEDULED" style={{backgroundColor: '#E0E7FF', color: '#000'}}>SCHEDULED</option>
-                                  <option value="PROCESSING" style={{backgroundColor: '#FEF3C7', color: '#000'}}>PROCESSING</option>
-                                  <option value="IN TRANSIT" style={{backgroundColor: '#FEF08A', color: '#000'}}>IN TRANSIT</option>
-                                  <option value="OUT FOR DELIVERY" style={{backgroundColor: '#BFDBFE', color: '#000'}}>OUT FOR DELIVERY</option>
-                                  <option value="ATTEMPTED DELIVERY" style={{backgroundColor: '#FECACA', color: '#000'}}>ATTEMPTED DELIVERY</option>
-                                  <option value="DELIVERED" style={{backgroundColor: '#A7F3D0', color: '#000'}}>DELIVERED</option>
-                                  <option value="DELIVERED TO RECEIVER" style={{backgroundColor: '#86EFAC', color: '#000'}}>DELIVERED TO RECEIVER</option>
-                                  <option value="AVAILABLE FOR PICKUP" style={{backgroundColor: '#D1FAE5', color: '#000'}}>AVAILABLE FOR PICKUP</option>
-                                  <option value="DELAYED" style={{backgroundColor: '#FCA5A5', color: '#000'}}>DELAYED</option>
-                                  <option value="EXCEPTION" style={{backgroundColor: '#F87171', color: '#000'}}>EXCEPTION</option>
-                                  <option value="DAMAGED" style={{backgroundColor: '#EF4444', color: '#000'}}>DAMAGED</option>
-                                  <option value="LOST" style={{backgroundColor: '#DC2626', color: '#000'}}>LOST</option>
-                                  <option value="RETURNED TO SENDER" style={{backgroundColor: '#B91C1C', color: '#000'}}>RETURNED TO SENDER</option>
+                                  <option value="PENDING">🔵 PENDING</option>
+                                  <option value="SCHEDULED">🔵 SCHEDULED</option>
+                                  <option value="PROCESSING">🟡 PROCESSING</option>
+                                  <option value="IN TRANSIT">🟡 IN TRANSIT</option>
+                                  <option value="OUT FOR DELIVERY">🔵 OUT FOR DELIVERY</option>
+                                  <option value="ATTEMPTED DELIVERY">🔴 ATTEMPTED DELIVERY</option>
+                                  <option value="DELIVERED">🟢 DELIVERED</option>
+                                  <option value="DELIVERED TO RECEIVER">🟢 DELIVERED TO RECEIVER</option>
+                                  <option value="AVAILABLE FOR PICKUP">🟢 AVAILABLE FOR PICKUP</option>
+                                  <option value="DELAYED">🔴 DELAYED</option>
+                                  <option value="EXCEPTION">🔴 EXCEPTION</option>
+                                  <option value="DAMAGED">🔴 DAMAGED</option>
+                                  <option value="LOST">🔴 LOST</option>
+                                  <option value="RETURNED TO SENDER">🔴 RETURNED TO SENDER</option>
                                 </select>
                               </td>
                               
