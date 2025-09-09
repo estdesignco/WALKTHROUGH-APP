@@ -720,7 +720,7 @@ class ProjectType(str, Enum):
     DESIGN_CONSULTATION = "Design Consultation"
     FURNITURE_ONLY = "Furniture Only"
 
-# Pydantic Models
+# Enhanced Pydantic Models with Advanced Tracking
 class ItemBase(BaseModel):
     name: str
     quantity: int = 1
@@ -734,6 +734,32 @@ class ItemBase(BaseModel):
     order_date: Optional[datetime] = None
     install_date: Optional[datetime] = None
     image_url: Optional[str] = ""
+    
+    # NEW ENHANCED TRACKING FIELDS
+    sku: Optional[str] = ""
+    finish_color: Optional[str] = ""
+    price: Optional[float] = 0.0  # Retail price vs cost
+    description: Optional[str] = ""
+    availability: Optional[str] = ""
+    carrier: Optional[str] = ""
+    expected_delivery: Optional[datetime] = None
+    actual_delivery: Optional[datetime] = None
+    po_number: Optional[str] = ""
+    invoice_number: Optional[str] = ""
+    photos: List[str] = []  # Array of photo URLs
+    notes: Optional[str] = ""
+    priority: str = "Medium"  # High, Medium, Low
+    lead_time_weeks: int = 0
+    warranty_info: Optional[str] = ""
+    installation_notes: Optional[str] = ""
+    room_location: Optional[str] = ""
+    category_location: Optional[str] = ""
+    subcategory_location: Optional[str] = ""
+    
+    # GOOGLE CALENDAR INTEGRATION FIELDS
+    calendar_event_id: Optional[str] = ""  # Google Calendar event ID
+    delivery_calendar_id: Optional[str] = ""  # Delivery event ID
+    installation_calendar_id: Optional[str] = ""  # Installation event ID
 
 class ItemCreate(ItemBase):
     subcategory_id: str
