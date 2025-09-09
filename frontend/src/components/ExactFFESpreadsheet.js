@@ -88,46 +88,46 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // DIFFERENT COLORS FOR EACH ROOM - Never the same!
+  // MUTED COLORS FOR EACH ROOM - Reduced from 10 to 7 intensity!
   const getRoomColor = (roomName) => {
     const roomColors = {
-      'living room': '#8B5CF6',      // Purple
-      'dining room': '#EF4444',      // Red  
-      'kitchen': '#F59E0B',          // Orange
-      'primary bedroom': '#10B981',  // Emerald
-      'primary bathroom': '#3B82F6', // Blue
-      'powder room': '#8B5A2B',      // Brown
-      'guest room': '#EC4899',       // Pink
-      'office': '#6366F1',           // Indigo
-      'laundry room': '#84CC16',     // Lime
-      'mudroom': '#06B6D4',          // Cyan
-      'family room': '#F97316',      // Orange-red
-      'basement': '#6B7280',         // Gray
-      'attic storage': '#92400E',    // Brown-700
-      'garage': '#1F2937',           // Gray-800
-      'balcony': '#7C3AED',          // Violet
-      'screened porch': '#059669',   // Emerald-600
-      'pool house': '#0EA5E9',       // Sky
-      'guest house': '#DC2626',      // Red-600
-      'butler\'s pantry': '#D97706', // Amber-600
-      'conservatory': '#65A30D',     // Lime-600
-      'formal living room': '#7C2D12', // Orange-900
-      'great room': '#4338CA',       // Indigo-700
-      'billiards room': '#BE185D',   // Pink-700
-      'study': '#374151',            // Gray-700
-      'sitting room': '#1E40AF'      // Blue-700
+      'living room': '#7C3AED',      // Muted Purple (was #8B5CF6)
+      'dining room': '#DC2626',      // Muted Red (was #EF4444)  
+      'kitchen': '#D97706',          // Muted Orange (was #F59E0B)
+      'primary bedroom': '#059669',  // Muted Emerald (was #10B981)
+      'primary bathroom': '#2563EB', // Muted Blue (was #3B82F6)
+      'powder room': '#78716C',      // Muted Brown (was #8B5A2B)
+      'guest room': '#DB2777',       // Muted Pink (was #EC4899)
+      'office': '#4F46E5',           // Muted Indigo (was #6366F1)
+      'laundry room': '#65A30D',     // Muted Lime (was #84CC16)
+      'mudroom': '#0891B2',          // Muted Cyan (was #06B6D4)
+      'family room': '#EA580C',      // Muted Orange-red (was #F97316)
+      'basement': '#6B7280',         // Keep Gray
+      'attic storage': '#78716C',    // Muted Brown-700 (was #92400E)
+      'garage': '#374151',           // Keep Gray-800
+      'balcony': '#6D28D9',          // Muted Violet (was #7C3AED)
+      'screened porch': '#047857',   // Muted Emerald-600 (was #059669)
+      'pool house': '#0284C7',       // Muted Sky (was #0EA5E9)
+      'guest house': '#B91C1C',      // Muted Red-600 (was #DC2626)
+      'butler\'s pantry': '#B45309', // Muted Amber-600 (was #D97706)
+      'conservatory': '#4D7C0F',     // Muted Lime-600 (was #65A30D)
+      'formal living room': '#92400E', // Keep Orange-900
+      'great room': '#3730A3',       // Muted Indigo-700 (was #4338CA)
+      'billiards room': '#A21CAF',   // Muted Pink-700 (was #BE185D)
+      'study': '#374151',            // Keep Gray-700
+      'sitting room': '#1E40AF'      // Keep Blue-700
     };
-    return roomColors[roomName.toLowerCase()] || '#8B5CF6';
+    return roomColors[roomName.toLowerCase()] || '#7C3AED';
   };
 
-  // LIGHTING always darker green and consistent
-  const getCategoryColor = () => '#166534'; // Darker green for LIGHTING - always the same
+  // LIGHTING muted darker green
+  const getCategoryColor = () => '#14532D'; // Muted darker green (was #166534)
 
-  // Different header colors - RED, BROWN, PURPLE like we worked on!
-  const getInstalledColor = () => '#B91C1C';         // Red-700 - darkest
-  const getAdditionalInfoColor = () => '#A16207';    // Amber-700 - brown
-  const getShippingInfoColor = () => '#7C3AED';      // Violet-600 - purple  
-  const getNotesActionsColor = () => '#DC2626';      // Red-600 - medium red
+  // MUTED header colors - reduced intensity
+  const getMainHeaderColor = () => '#991B1B';        // Muted Red-800 (was #B91C1C)
+  const getAdditionalInfoColor = () => '#92400E';    // Muted Amber-800 (was #A16207)
+  const getShippingInfoColor = () => '#6B21A8';      // Muted Violet-800 (was #7C3AED)  
+  const getNotesActionsColor = () => '#B91C1C';      // Muted Red-700 (was #DC2626)
 
   if (!project || !project.rooms) {
     return (
