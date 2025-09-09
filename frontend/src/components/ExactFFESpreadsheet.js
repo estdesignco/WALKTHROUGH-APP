@@ -55,51 +55,48 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // DIFFERENT COLORS FOR EACH ROOM - Never the same!
+  // MUTED COLORS FOR EACH ROOM - Much more subtle!
   const getRoomColor = (roomName) => {
     const roomColors = {
-      'living room': '#8B5CF6',      // Purple
-      'dining room': '#EF4444',      // Red  
-      'kitchen': '#F59E0B',          // Orange
-      'primary bedroom': '#10B981',  // Emerald
-      'primary bathroom': '#3B82F6', // Blue
-      'powder room': '#8B5A2B',      // Brown
-      'guest room': '#EC4899',       // Pink
-      'office': '#6366F1',           // Indigo
-      'laundry room': '#84CC16',     // Lime
-      'mudroom': '#06B6D4',          // Cyan
-      'family room': '#F97316',      // Orange-red
-      'basement': '#6B7280',         // Gray
-      'attic storage': '#92400E',    // Brown-700
-      'garage': '#1F2937',           // Gray-800
-      'balcony': '#7C3AED',          // Violet
-      'screened porch': '#059669',   // Emerald-600
-      'pool house': '#0EA5E9',       // Sky
-      'guest house': '#DC2626',      // Red-600
-      'butler\'s pantry': '#D97706', // Amber-600
-      'conservatory': '#65A30D',     // Lime-600
-      'formal living room': '#7C2D12', // Orange-900
-      'great room': '#4338CA',       // Indigo-700
-      'billiards room': '#BE185D',   // Pink-700
-      'study': '#374151',            // Gray-700
-      'sitting room': '#1E40AF'      // Blue-700
+      'living room': '#6B7280',      // Muted Gray
+      'dining room': '#7C2D12',      // Muted Brown-Red  
+      'kitchen': '#78716C',          // Muted Stone
+      'primary bedroom': '#6B7280',  // Muted Gray
+      'primary bathroom': '#64748B', // Muted Slate
+      'powder room': '#78716C',      // Muted Stone
+      'guest room': '#71717A',       // Muted Zinc
+      'office': '#6B7280',           // Muted Gray
+      'laundry room': '#78716C',     // Muted Stone
+      'mudroom': '#64748B',          // Muted Slate
+      'family room': '#71717A',      // Muted Zinc
+      'basement': '#52525B',         // Dark Muted Gray
+      'attic storage': '#57534E',    // Dark Muted Stone
+      'garage': '#3F3F46',           // Very Dark Muted
+      'balcony': '#6B7280',          // Muted Gray
+      'screened porch': '#78716C',   // Muted Stone
+      'pool house': '#64748B',       // Muted Slate
+      'guest house': '#71717A',      // Muted Zinc
+      'butler\'s pantry': '#78716C', // Muted Stone
+      'conservatory': '#6B7280',     // Muted Gray
+      'formal living room': '#57534E', // Dark Muted Stone
+      'great room': '#52525B',       // Dark Muted Gray
+      'billiards room': '#3F3F46',   // Very Dark Muted
+      'study': '#374151',            // Dark Gray
+      'sitting room': '#475569'      // Dark Slate
     };
-    return roomColors[roomName.toLowerCase()] || '#8B5CF6';
+    return roomColors[roomName.toLowerCase()] || '#6B7280';
   };
 
-  // LIGHTING always darker green and consistent
+  // MUTED category color
   const getCategoryColor = () => {
-    return '#166534'; // Darker green for LIGHTING - always the same
+    return '#4B5563'; // Muted gray for categories
   };
 
-  // Subcategory color - subtle gray-blue
-  const getSubcategoryColor = () => '#4B5563';   // Gray-600 - subcategory
-
-  // Different red shades for headers - NO BLOB!
-  const getItemNameColor = () => '#B91C1C';     // Red-700 - darkest
-  const getAdditionalInfoColor = () => '#A16207'; // Amber-700 - brown
-  const getShippingInfoColor = () => '#7C3AED';   // Violet-600 - purple  
-  const getNotesActionsColor = () => '#DC2626';   // Red-600 - medium red
+  // MUTED header colors - much more subtle
+  const getInstalledColor = () => '#525252';        // Muted Gray-600 
+  const getAdditionalInfoColor = () => '#57534E';   // Muted Stone-600 
+  const getShippingInfoColor = () => '#4C4C4C';     // Muted Gray-700
+  const getNotesActionsColor = () => '#4B5563';     // Muted Gray-600
 
   if (!project || !project.rooms) {
     return (
