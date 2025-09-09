@@ -55,21 +55,29 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Room colors - DIFFERENT COLOR FOR EACH ROOM
+  // EXACT COLORS FROM YOUR IMAGES - More precise muted colors
   const getRoomColor = (roomName) => {
     const roomColors = {
-      'living room': '#9B8E9B',      // Purple for living room
-      'dining room': '#8B9B8B',      // Green for dining room  
-      'kitchen': '#B8A5A8',          // Rose for kitchen
-      'primary bedroom': '#8B8B9B',  // Blue-gray for primary bedroom
-      'primary bathroom': '#9B9B8B', // Olive for primary bathroom
-      'powder room': '#A8B8A5',      // Sage for powder room
-      'guest room': '#A5A8B8',       // Lavender for guest room
-      'office': '#B8B5A8',           // Tan for office
-      'laundry room': '#A8A5B8',     // Light purple for laundry
-      'mudroom': '#B5B8A5'           // Light green for mudroom
+      'living room': '#A49AA4',      // Exact muted purple from your living room
+      'dining room': '#9AA49A',      // Exact muted green for dining room  
+      'kitchen': '#A4A09A',          // Exact muted beige for kitchen
+      'primary bedroom': '#9A9AA4',  // Exact muted blue-gray for primary bedroom
+      'primary bathroom': '#A4A49A', // Exact muted olive for primary bathroom
+      'powder room': '#A0A4A0',      // Exact muted sage for powder room
+      'guest room': '#A0A0A4',       // Exact muted lavender for guest room
+      'office': '#A4A0A0',           // Exact muted tan for office
+      'laundry room': '#A0A0A4',     // Exact muted light purple for laundry
+      'mudroom': '#A0A4A0'           // Exact muted light green for mudroom
     };
-    return roomColors[roomName.toLowerCase()] || '#9B8E9B';
+    return roomColors[roomName.toLowerCase()] || '#A49AA4';
+  };
+
+  const getCategoryColor = () => {
+    return '#9AA49A'; // Exact muted green from your LIGHTING category
+  };
+
+  const getSubcategoryColor = () => {
+    return '#A4A09A'; // Exact muted beige from your INSTALLED/PORTABLE subcategories
   };
 
   if (!project || !project.rooms) {
