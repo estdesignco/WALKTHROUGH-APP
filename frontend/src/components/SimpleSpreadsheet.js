@@ -15,14 +15,45 @@ const SimpleSpreadsheet = ({
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
 
   const handleAddItem = async (itemData) => {
+    if (!selectedSubCategoryId) {
+      alert('❌ No subcategory selected');
+      return;
+    }
+
     try {
-      // Here you would normally call the API to add the item
-      console.log('Adding item:', itemData);
-      alert(`✅ ITEM ADDED SUCCESSFULLY!\nName: ${itemData.name}\nVendor: ${itemData.vendor}\nCost: $${itemData.cost}`);
-      setShowAddItem(false);
-      // You might want to reload the project data here
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      
+      const newItem = {
+        ...itemData,
+        subcategory_id: selectedSubCategoryId,
+        id: `item-${Date.now()}`, // Generate temporary ID
+      };
+
+      console.log('🔥 Adding item to backend:', newItem);
+
+      const response = await fetch(`${backendUrl}/api/items`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newItem)
+      });
+
+      if (response.ok) {
+        console.log('✅ Item added successfully');
+        alert(`✅ ITEM ADDED SUCCESSFULLY!\nName: ${itemData.name}\nVendor: ${itemData.vendor}\nCost: $${itemData.cost}`);
+        setShowAddItem(false);
+        setSelectedSubCategoryId(null);
+        
+        // Reload project data if available
+        if (onReload) {
+          await onReload();
+        }
+      } else {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
     } catch (error) {
-      console.error('Error adding item:', error);
+      console.error('❌ Error adding item:', error);
       alert('❌ Failed to add item: ' + error.message);
     }
   };
