@@ -181,28 +181,14 @@ const ExactFFESpreadsheet = ({
                           
                           {/* NO SEPARATE SUBCATEGORY HEADER ROW - DELETED COMPLETELY */}
                           
-                          {/* COLUMN HEADERS - INSTALLED (subcategory name) replaces ITEM NAME */}
+                          {/* FIXED HEADER STRUCTURE - Only section headers on top */}
                           <tr>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
-                                style={{ backgroundColor: getInstalledColor() }}>
-                              {subcategory.name.toUpperCase()}
-                            </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
-                                style={{ backgroundColor: getInstalledColor() }}>
-                              VENDOR/SKU
-                            </th>
-                            <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[50px]" 
-                                style={{ backgroundColor: getInstalledColor() }}>
-                              QTY
-                            </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[80px]" 
-                                style={{ backgroundColor: getInstalledColor() }}>
-                              SIZE
-                            </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
-                                style={{ backgroundColor: getInstalledColor() }}>
-                              ORDERS STATUS
-                            </th>
+                            {/* Empty cells for main data columns */}
+                            <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
                             
                             {/* ADDITIONAL INFO section header */}
                             <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
@@ -216,25 +202,33 @@ const ExactFFESpreadsheet = ({
                               SHIPPING INFO.
                             </th>
                             
-                            {/* NOTES and ACTIONS */}
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
-                                style={{ backgroundColor: getNotesActionsColor() }}>
-                              NOTES
-                            </th>
-                            <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[80px]" 
-                                style={{ backgroundColor: getNotesActionsColor() }}>
-                              ACTIONS
-                            </th>
+                            {/* Empty cells for notes/actions */}
+                            <td className="border border-gray-400" style={{ backgroundColor: getNotesActionsColor() }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: getNotesActionsColor() }}></td>
                           </tr>
                           
-                          {/* ROW 2: Individual column headers for sections */}
+                          {/* COLUMN HEADERS - All moved down here */}
                           <tr>
-                            {/* Empty cells for main columns */}
-                            <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
-                            <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
-                            <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
-                            <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
-                            <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
+                                style={{ backgroundColor: getMainHeaderColor() }}>
+                              {subcategory.name.toUpperCase()}
+                            </th>
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                                style={{ backgroundColor: getMainHeaderColor() }}>
+                              VENDOR/SKU
+                            </th>
+                            <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[50px]" 
+                                style={{ backgroundColor: getMainHeaderColor() }}>
+                              QTY
+                            </th>
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[80px]" 
+                                style={{ backgroundColor: getMainHeaderColor() }}>
+                              SIZE
+                            </th>
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
+                                style={{ backgroundColor: getMainHeaderColor() }}>
+                              ORDERS STATUS
+                            </th>
                             
                             {/* ADDITIONAL INFO columns */}
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
@@ -253,11 +247,11 @@ const ExactFFESpreadsheet = ({
                             {/* SHIPPING INFO columns */}
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getShippingInfoColor() }}>
-                              Order Date
+                              SHIP TO
                             </th>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getShippingInfoColor() }}>
-                              Est. Ship Date
+                              CARRIER
                             </th>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getShippingInfoColor() }}>
@@ -265,16 +259,22 @@ const ExactFFESpreadsheet = ({
                             </th>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getShippingInfoColor() }}>
-                              Carrier
+                              Order Date
                             </th>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getShippingInfoColor() }}>
-                              Delivery Status
+                              DELIVERY STATUS
                             </th>
                             
-                            {/* Empty cells for NOTES/ACTIONS */}
-                            <td className="border border-gray-400" style={{ backgroundColor: getNotesActionsColor() }}></td>
-                            <td className="border border-gray-400" style={{ backgroundColor: getNotesActionsColor() }}></td>
+                            {/* NOTES and ACTIONS */}
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
+                                style={{ backgroundColor: getNotesActionsColor() }}>
+                              NOTES
+                            </th>
+                            <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[80px]" 
+                                style={{ backgroundColor: getNotesActionsColor() }}>
+                              ACTIONS
+                            </th>
                           </tr>
                           
                           {/* FUNCTIONAL DATA ROWS */}
