@@ -92,6 +92,9 @@ const ExactFFESpreadsheet = ({
     return '#166534'; // Darker green for LIGHTING - always the same
   };
 
+  // Subcategory color - subtle gray-blue
+  const getSubcategoryColor = () => '#4B5563';   // Gray-600 - subcategory
+
   // Different red shades for headers - NO BLOB!
   const getItemNameColor = () => '#B91C1C';     // Red-700 - darkest
   const getAdditionalInfoColor = () => '#A16207'; // Amber-700 - brown
