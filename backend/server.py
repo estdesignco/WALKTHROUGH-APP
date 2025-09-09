@@ -1369,6 +1369,34 @@ def _is_description_text(text: str) -> bool:
     
     return False
 
+# Helper function to extract SKU from text
+def _extract_sku_from_text(text: str) -> Optional[str]:
+    """
+    Extract SKU/Item Number from text with enhanced filtering
+    """
+    if not text or len(text.strip()) <= 2:
+        return None
+    
+    text = text.strip()
+    
+    # Look for common SKU patterns
+    sku_patterns = [
+        r'(?:SKU|Item|Model|Part)[\s#:]*([A-Z0-9\-]{3,})',  # SKU: ABC123
+        r'([A-Z]{2,}[0-9]{2,}[A-Z0-9\-]*)',  # ABC123, AB12CD
+        r'([0-9]{3,}[A-Z]{1,}[0-9A-Z\-]*)',  # 123A, 123ABC
+        r'([A-Z0-9\-]{5,})'  # Generic alphanumeric 5+ chars
+    ]
+    
+    for pattern in sku_patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            sku = match.group(1) if match.groups() else match.group()
+            # Filter out common non-SKU patterns
+            if not re.match(r'^(ADD|BUY|CART|SHOP|VIEW|MORE|LESS|SIZE|COLOR)$', sku, re.IGNORECASE):
+                return sku
+    
+    return None
+
 # Advanced Product Scraping with Playwright for JavaScript-rendered content
 async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     """
