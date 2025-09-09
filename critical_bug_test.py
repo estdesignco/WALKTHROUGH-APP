@@ -297,15 +297,16 @@ class CriticalBugTester:
             return False
         
         # Extract status names
-        if isinstance(statuses_data, list):
+        actual_data = statuses_data.get('data', statuses_data) if isinstance(statuses_data, dict) else statuses_data
+        if isinstance(actual_data, list):
             status_names = []
-            for status_obj in statuses_data:
+            for status_obj in actual_data:
                 if isinstance(status_obj, dict) and 'status' in status_obj:
                     status_names.append(status_obj['status'])
                 elif isinstance(status_obj, str):
                     status_names.append(status_obj)
         else:
-            status_names = statuses_data if isinstance(statuses_data, list) else []
+            status_names = actual_data if isinstance(actual_data, list) else []
         
         # Check for essential delivery status options
         essential_delivery_statuses = [
