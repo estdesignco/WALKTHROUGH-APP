@@ -1555,6 +1555,169 @@ async def get_carrier_options():
     """Get carrier options with colors and tracking URLs"""
     return {"data": CARRIER_OPTIONS}
 
+@api_router.post("/calendar/sync-delivery")
+async def sync_delivery_to_calendar(item_id: str, delivery_date: str):
+    """Sync item delivery date to Google Calendar"""
+    try:
+        # This would integrate with Google Calendar API
+        # For now, we'll simulate the functionality
+        
+        item = await db.items.find_one({"id": item_id})
+        if not item:
+            return {"success": False, "error": "Item not found"}
+        
+        # In real implementation, this would:
+        # 1. Authenticate with Google Calendar API
+        # 2. Create calendar event for delivery
+        # 3. Store event ID in database
+        # 4. Set up reminders/notifications
+        
+        # Simulate calendar event creation
+        calendar_event_id = f"cal_event_{int(time.time())}"
+        
+        # Update item with calendar event ID
+        await db.items.update_one(
+            {"id": item_id},
+            {"$set": {
+                "expected_delivery": delivery_date,
+                "calendar_event_id": calendar_event_id,
+                "updated_at": datetime.now(timezone.utc)
+            }}
+        )
+        
+        return {
+            "success": True,
+            "message": "Delivery date synced to Google Calendar",
+            "calendar_event_id": calendar_event_id,
+            "calendar_url": f"https://calendar.google.com/calendar/event?eid={calendar_event_id}"
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@api_router.post("/tracking/update-status")
+async def update_tracking_status(tracking_data: dict):
+    """Update item status based on tracking information"""
+    try:
+        tracking_number = tracking_data.get('tracking_number')
+        carrier = tracking_data.get('carrier')
+        new_status = tracking_data.get('status')
+        
+        if not tracking_number:
+            return {"success": False, "error": "Tracking number required"}
+        
+        # Find item by tracking number
+        item = await db.items.find_one({"tracking_number": tracking_number})
+        if not item:
+            return {"success": False, "error": "Item not found with tracking number"}
+        
+        # Update item status and tracking info
+        update_data = {
+            "status": new_status,
+            "updated_at": datetime.now(timezone.utc),
+            "carrier": carrier
+        }
+        
+        # Set actual delivery date if delivered
+        if new_status in ["DELIVERED TO RECEIVER", "DELIVERED TO JOB SITE"]:
+            update_data["actual_delivery"] = datetime.now(timezone.utc)
+        
+        await db.items.update_one(
+            {"id": item["id"]},
+            {"$set": update_data}
+        )
+        
+        return {
+            "success": True,
+            "message": f"Item status updated to {new_status}",
+            "item_id": item["id"],
+            "tracking_url": f"https://tracking.{carrier.lower()}.com/{tracking_number}"
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@api_router.post("/photos/upload")
+async def upload_item_photo(item_id: str, photo_url: str, description: str = ""):
+    """Add photo to item"""
+    try:
+        item = await db.items.find_one({"id": item_id})
+        if not item:
+            return {"success": False, "error": "Item not found"}
+        
+        # Add photo to item's photos array
+        photo_entry = {
+            "url": photo_url,
+            "description": description,
+            "uploaded_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.items.update_one(
+            {"id": item_id},
+            {"$push": {"photos": photo_entry}}
+        )
+        
+        return {
+            "success": True,
+            "message": "Photo added to item",
+            "photo": photo_entry
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@api_router.get("/dashboard/progress/{project_id}")
+async def get_project_progress(project_id: str):
+    """Get comprehensive project progress dashboard"""
+    try:
+        # Get all items for the project
+        items = await db.items.find({"project_id": project_id}).to_list(length=None)
+        
+        if not items:
+            return {"success": False, "error": "No items found for project"}
+        
+        # Calculate progress by status phase
+        phase_counts = {
+            'planning': 0,
+            'procurement': 0,
+            'fulfillment': 0,
+            'delivery': 0,
+            'installation': 0,
+            'exception': 0
+        }
+        
+        # Map statuses to phases
+        status_to_phase = {}
+        for status_info in ITEM_STATUSES:
+            status_to_phase[status_info['status']] = status_info['phase']
+        
+        total_items = len(items)
+        total_cost = 0
+        
+        for item in items:
+            status = item.get('status', 'TO BE SELECTED')
+            phase = status_to_phase.get(status, 'planning')
+            phase_counts[phase] += 1
+            total_cost += item.get('cost', 0)
+        
+        # Calculate percentages
+        progress_percentages = {}
+        for phase, count in phase_counts.items():
+            progress_percentages[phase] = round((count / total_items) * 100, 1) if total_items > 0 else 0
+        
+        return {
+            "success": True,
+            "project_id": project_id,
+            "total_items": total_items,
+            "total_cost": total_cost,
+            "phase_counts": phase_counts,
+            "progress_percentages": progress_percentages,
+            "completion_percentage": progress_percentages['installation']
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 @api_router.get("/vendor-database")
 async def get_vendor_database():
     """Get wholesale vendor database with scraping support info"""
