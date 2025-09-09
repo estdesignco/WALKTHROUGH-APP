@@ -546,6 +546,9 @@ const ExactFFESpreadsheet = ({
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.delivery_status || 'IN TRANSIT'}
+                                  onChange={(e) => {
+                                    console.log(`Delivery Status changed to: ${e.target.value}`);
+                                  }}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
                                     backgroundColor: getDeliveryStatusColor(item.delivery_status || 'IN TRANSIT'),
