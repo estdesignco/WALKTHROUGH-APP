@@ -70,8 +70,12 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           </div>
         </div>
 
-        {/* SUMMARY COUNTS */}
+        {/* SUMMARY COUNTS - PUT BACK THE TOTALS! */}
         <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400">Total Items</span>
+            <span className="text-white font-medium">{totalItems}</span>
+          </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Completed</span>
             <span className="text-green-400 font-medium">{getCompletedItems()}</span>
@@ -83,6 +87,18 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Pending</span>
             <span className="text-yellow-400 font-medium">{getPendingItems()}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400">On Hold</span>
+            <span className="text-red-400 font-medium">{statusBreakdown['ON HOLD'] || 0}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400">Backordered</span>
+            <span className="text-red-400 font-medium">{statusBreakdown['BACKORDERED'] || 0}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400">Damaged</span>
+            <span className="text-red-400 font-medium">{statusBreakdown['DAMAGED'] || 0}</span>
           </div>
         </div>
       </div>
