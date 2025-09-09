@@ -412,6 +412,21 @@ const FFEDashboard = ({ isOffline }) => {
           roomColors={roomColors}
         />
       )}
+      
+      {/* SCRAPING TEST MODAL */}
+      {showScrapingTest && (
+        <AddItemModal
+          onClose={() => setShowScrapingTest(false)}
+          onSubmit={(itemData) => {
+            // For testing, just show the data
+            alert(`✅ SCRAPING TEST COMPLETE!\n\nData Extracted:\n${JSON.stringify(itemData, null, 2)}`);
+            setShowScrapingTest(false);
+          }}
+          itemStatuses={itemStatuses}
+          vendorTypes={vendorTypes}
+          loading={false}
+        />
+      )}
     </div>
   );
 };
