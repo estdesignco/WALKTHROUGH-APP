@@ -45,6 +45,9 @@ const FFEDashboard = ({ isOffline }) => {
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
   const loadingRef = useRef(false);
+  
+  // SCRAPING TEST STATE
+  const [showScrapingTest, setShowScrapingTest] = useState(false);
 
   useEffect(() => {
     if (projectId) {
