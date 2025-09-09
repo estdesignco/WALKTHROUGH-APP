@@ -52,8 +52,12 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
         throw new Error(errorData.detail || 'Failed to scrape product information');
       }
 
-      const data = await response.json();
-      console.log('SCRAPING SUCCESS - Scraped data:', data);
+      const responseData = await response.json();
+      console.log('SCRAPING SUCCESS - Raw response:', responseData);
+      
+      // Handle the new response format: {success: true, data: {...}}
+      const data = responseData.success ? responseData.data : responseData;
+      console.log('SCRAPING SUCCESS - Extracted data:', data);
       
       // FORCE UPDATE ALL FIELDS WITH SCRAPED DATA - CORRECT FIELD MAPPING
       const updatedData = {
