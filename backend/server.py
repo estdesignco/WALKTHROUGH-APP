@@ -1551,12 +1551,14 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 # Shopify and modern e-commerce selectors
                 '.product__description, .product-description, .product-content',
                 '.product-single__description, .product-form__description',
-                '[class*="description"], [class*="detail"], [class*="content"]',
+                '[class*="description"]:not([class*="nav"]):not([class*="menu"])',
+                '[class*="detail"]:not([class*="nav"]):not([class*="menu"])',
+                '[class*="content"]:not([class*="nav"]):not([class*="menu"])',
                 '[data-testid*="description"], [data-test*="description"]',
                 '.rte, .rich-text, .formatted-text',
                 # Generic selectors
                 '.product-description, .item-details, .product-details',
-                'p, div'  # Will filter for description-like content
+                'p:not([class*="nav"]):not([class*="menu"])'  # Will filter for description-like content
             ]
             
             # Try to extract product name
