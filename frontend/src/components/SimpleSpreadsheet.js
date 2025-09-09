@@ -186,6 +186,20 @@ const SimpleSpreadsheet = ({ project }) => {
           ✅ Mac-friendly horizontal scrolling enabled - Use 2-finger gestures on trackpad
         </p>
       </div>
+      
+      {/* ADD ITEM MODAL */}
+      {showAddItem && (
+        <AddItemModal
+          onClose={() => {
+            setShowAddItem(false);
+            setSelectedSubCategoryId(null);
+          }}
+          onSubmit={handleAddItem}
+          itemStatuses={['ORDERED', 'DELIVERED TO JOB SITE', 'INSTALLED']}
+          vendorTypes={['Four Hands', 'Uttermost', 'Rowe Furniture', 'Regina Andrew']}
+          loading={false}
+        />
+      )}
     </div>
   );
 };
