@@ -5,6 +5,7 @@ import axios from "axios";
 import FFEDashboard from "./components/FFEDashboard";
 import ProjectList from "./components/ProjectList";
 import Navigation from "./components/Navigation";
+import ScrapingTestPage from "./components/ScrapingTestPage";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
