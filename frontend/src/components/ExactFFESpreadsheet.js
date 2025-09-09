@@ -216,7 +216,7 @@ const ExactFFESpreadsheet = ({
                             </th>
                           </tr>
                           
-                          {/* ROW 2: Individual column headers for ADDITIONAL INFO and SHIPPING INFO */}
+                          {/* ROW 2: Individual column headers for sections */}
                           <tr>
                             {/* Empty cells for main columns */}
                             <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
