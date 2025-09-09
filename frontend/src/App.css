@@ -129,11 +129,42 @@ body {
   color: #E0E0E0;
 }
 
-/* Cell fit-to-text styling */
+/* FORCE ALL TABLE CELLS TO FIT TEXT CONTENT - NO FIXED WIDTHS */
 .fit-text {
-  white-space: nowrap;
-  width: fit-content;
-  padding: 8px 12px;
+  width: auto !important;
+  min-width: fit-content !important;
+  max-width: none !important;
+  white-space: nowrap !important;
+  padding: 8px 12px !important;
+}
+
+/* SPECIFIC OVERRIDES FOR TABLE CELLS */
+table td, table th {
+  width: auto !important;
+  min-width: fit-content !important;
+  white-space: nowrap !important;
+  text-align: left !important;
+  padding: 8px 12px !important;
+}
+
+/* INPUT FIELDS SHOULD ALSO FIT CONTENT */
+table input, table select, table textarea {
+  width: auto !important;
+  min-width: 80px !important;
+  max-width: 200px !important;
+  padding: 4px 8px !important;
+}
+
+/* DATE INPUTS SPECIFIC SIZE */
+table input[type="date"] {
+  width: 120px !important;
+  min-width: 120px !important;
+}
+
+/* LINK INPUTS WIDER */
+table input[type="url"], table input[placeholder*="link"], table input[placeholder*="Link"] {
+  min-width: 150px !important;
+  max-width: 300px !important;
 }
 
 /* Horizontal scrolling for wide spreadsheet */
