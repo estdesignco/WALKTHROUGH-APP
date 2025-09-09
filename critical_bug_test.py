@@ -213,7 +213,7 @@ class CriticalBugTester:
             actual_data = statuses_data.get('data', statuses_data) if isinstance(statuses_data, dict) else statuses_data
             if isinstance(actual_data, list) and len(actual_data) > 0:
                 # Check if statuses have color information
-                statuses_with_colors = [s for s in statuses_data if isinstance(s, dict) and 'color' in s and s.get('color')]
+                statuses_with_colors = [s for s in actual_data if isinstance(s, dict) and 'color' in s and s.get('color')]
                 
                 if len(statuses_with_colors) > 0:
                     self.log_test("Status Colors Data", True, f"Found {len(statuses_with_colors)} statuses with colors")
