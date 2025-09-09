@@ -155,8 +155,8 @@ const ExactFFESpreadsheet = ({
                       {/* CATEGORY HEADER ROW */}
                       <tr>
                         <td colSpan="15" 
-                            className="border border-gray-400 px-4 py-2 text-white text-sm font-medium"
-                            style={{ backgroundColor: '#8B9B8B' }}>
+                            className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
+                            style={{ backgroundColor: getCategoryColor() }}>
                           {category.name.toUpperCase()}
                         </td>
                       </tr>
