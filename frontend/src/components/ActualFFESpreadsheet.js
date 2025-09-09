@@ -148,11 +148,21 @@ const ActualFFESpreadsheet = ({
 
   if (!project || !project.rooms) {
     return (
-      <div className="p-8 text-center text-white">
-        <h2 className="text-2xl font-bold mb-4">Loading FF&E Project...</h2>
+      <div className="p-8 text-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Loading FF&E Project...</h2>
+        <p className="text-gray-600">Waiting for project data to load...</p>
+        {project && (
+          <div className="mt-4 text-sm text-gray-500">
+            <p>Project: {project.name || 'Unknown'}</p>
+            <p>Rooms: {project.rooms ? project.rooms.length : 'No rooms data'}</p>
+          </div>
+        )}
       </div>
     );
   }
+
+  console.log('🏠 PROJECT DATA:', project);
+  console.log('📊 ROOMS COUNT:', project.rooms?.length || 'No rooms');
 
   return (
     <div className="w-full bg-white flex" style={{ height: '80vh' }}>
