@@ -474,12 +474,12 @@ const ExactFFESpreadsheet = ({
                                 </select>
                               </td>
                               
-                              {/* CARRIER - ALL COLOR-CODED OPTIONS */}
+                              {/* CARRIER - ALL COLOR-CODED OPTIONS WITH REAL VALUES */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.carrier || 'FedEx'}
                                   onChange={(e) => {
-                                    console.log(`Carrier changed to: ${e.target.value}`);
+                                    console.log(`Carrier changed to: ${e.target.value} with color: ${getCarrierColor(e.target.value)}`);
                                   }}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
@@ -487,27 +487,27 @@ const ExactFFESpreadsheet = ({
                                     color: '#000'
                                   }}
                                 >
-                                  <option value="FedEx">FedEx</option>
-                                  <option value="UPS">UPS</option>
-                                  <option value="USPS">USPS</option>
-                                  <option value="DHL">DHL</option>
-                                  <option value="Brooks">Brooks</option>
-                                  <option value="Zenith">Zenith</option>
-                                  <option value="Sunbelt">Sunbelt</option>
-                                  <option value="R+L Carriers">R+L Carriers</option>
-                                  <option value="Yellow Freight">Yellow Freight</option>
-                                  <option value="XPO Logistics">XPO Logistics</option>
-                                  <option value="Old Dominion">Old Dominion</option>
-                                  <option value="ABF Freight">ABF Freight</option>
-                                  <option value="Estes Express">Estes Express</option>
-                                  <option value="Saia LTL">Saia LTL</option>
-                                  <option value="TForce Freight">TForce Freight</option>
-                                  <option value="Roadrunner">Roadrunner</option>
-                                  <option value="Central Transport">Central Transport</option>
-                                  <option value="Southeastern Freight">Southeastern Freight</option>
-                                  <option value="Averitt Express">Averitt Express</option>
-                                  <option value="Holland">Holland</option>
-                                  <option value="OTHER">OTHER</option>
+                                  <option value="FedEx" style={{backgroundColor: '#FF6600', color: '#000'}}>FedEx</option>
+                                  <option value="UPS" style={{backgroundColor: '#8B4513', color: '#000'}}>UPS</option>
+                                  <option value="USPS" style={{backgroundColor: '#0047AB', color: '#000'}}>USPS</option>
+                                  <option value="DHL" style={{backgroundColor: '#FFCC00', color: '#000'}}>DHL</option>
+                                  <option value="Brooks" style={{backgroundColor: '#4682B4', color: '#000'}}>Brooks</option>
+                                  <option value="Zenith" style={{backgroundColor: '#20B2AA', color: '#000'}}>Zenith</option>
+                                  <option value="Sunbelt" style={{backgroundColor: '#DC143C', color: '#000'}}>Sunbelt</option>
+                                  <option value="R+L Carriers" style={{backgroundColor: '#8A2BE2', color: '#000'}}>R+L Carriers</option>
+                                  <option value="Yellow Freight" style={{backgroundColor: '#FFD700', color: '#000'}}>Yellow Freight</option>
+                                  <option value="XPO Logistics" style={{backgroundColor: '#FF1493', color: '#000'}}>XPO Logistics</option>
+                                  <option value="Old Dominion" style={{backgroundColor: '#228B22', color: '#000'}}>Old Dominion</option>
+                                  <option value="ABF Freight" style={{backgroundColor: '#B22222', color: '#000'}}>ABF Freight</option>
+                                  <option value="Estes Express" style={{backgroundColor: '#4B0082', color: '#000'}}>Estes Express</option>
+                                  <option value="Saia LTL" style={{backgroundColor: '#2E8B57', color: '#000'}}>Saia LTL</option>
+                                  <option value="TForce Freight" style={{backgroundColor: '#FF4500', color: '#000'}}>TForce Freight</option>
+                                  <option value="Roadrunner" style={{backgroundColor: '#6B8E23', color: '#000'}}>Roadrunner</option>
+                                  <option value="Central Transport" style={{backgroundColor: '#8B008B', color: '#000'}}>Central Transport</option>
+                                  <option value="Southeastern Freight" style={{backgroundColor: '#D2691E', color: '#000'}}>Southeastern Freight</option>
+                                  <option value="Averitt Express" style={{backgroundColor: '#CD853F', color: '#000'}}>Averitt Express</option>
+                                  <option value="Holland" style={{backgroundColor: '#F4A460', color: '#000'}}>Holland</option>
+                                  <option value="OTHER" style={{backgroundColor: '#9370DB', color: '#000'}}>OTHER</option>
                                 </select>
                               </td>
                               
