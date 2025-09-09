@@ -305,6 +305,7 @@ const FFESpreadsheet = ({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
