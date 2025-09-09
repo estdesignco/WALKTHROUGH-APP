@@ -170,7 +170,7 @@ const ExactFFESpreadsheet = ({
                           
                           {/* NO SEPARATE SUBCATEGORY HEADER ROW - DELETED COMPLETELY */}
                           
-                          {/* COLUMN HEADERS - INSTALLED replaces ITEM NAME */}
+                          {/* COLUMN HEADERS - INSTALLED (subcategory name) replaces ITEM NAME */}
                           <tr>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
                                 style={{ backgroundColor: getInstalledColor() }}>
