@@ -250,7 +250,7 @@ class CriticalBugTester:
             actual_data = carriers_data.get('data', carriers_data) if isinstance(carriers_data, dict) else carriers_data
             if isinstance(actual_data, list) and len(actual_data) > 0:
                 # Check if carriers have color information
-                carriers_with_colors = [c for c in carriers_data if isinstance(c, dict) and 'color' in c and c.get('color')]
+                carriers_with_colors = [c for c in actual_data if isinstance(c, dict) and 'color' in c and c.get('color')]
                 
                 if len(carriers_with_colors) > 0:
                     self.log_test("Carrier Colors Data", True, f"Found {len(carriers_with_colors)} carriers with colors")
