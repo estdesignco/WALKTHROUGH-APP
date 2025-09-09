@@ -150,22 +150,13 @@ const ExactFFESpreadsheet = ({
                       {category.subcategories?.map((subcategory) => (
                         <React.Fragment key={subcategory.id}>
                           
-                          {/* SUBCATEGORY HEADER ROW */}
-                          <tr>
-                            <td colSpan="15" 
-                                className="border border-gray-400 px-5 py-1 text-white text-xs font-bold"
-                                style={{ backgroundColor: getSubcategoryColor() }}>
-                              {subcategory.name.toUpperCase()}
-                            </td>
-                          </tr>
+                          {/* NO SEPARATE SUBCATEGORY HEADER ROW - DELETED COMPLETELY */}
                           
-                          {/* NO SEPARATE INSTALLED HEADER - Goes directly to item headers */}
-                          
-                          {/* ROW 1: ITEM NAME through ORDERS STATUS (Red - darkest) */}
+                          {/* COLUMN HEADERS - INSTALLED replaces ITEM NAME */}
                           <tr>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
-                                style={{ backgroundColor: getItemNameColor() }}>
-                              ITEM NAME
+                                style={{ backgroundColor: getInstalledColor() }}>
+                              {subcategory.name.toUpperCase()}
                             </th>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
                                 style={{ backgroundColor: getItemNameColor() }}>
