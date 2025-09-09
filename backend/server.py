@@ -1474,21 +1474,40 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            # Try to extract main product image
+            # Try to extract main product image with better filtering
             for selector in image_selectors:
                 try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        src = await element.get_attribute('src')
-                        if src:
-                            # Convert relative URLs to absolute
-                            if src.startswith('//'):
-                                src = 'https:' + src
-                            elif src.startswith('/'):
-                                base_url = '/'.join(url.split('/')[:3])
-                                src = base_url + src
-                            result['image_url'] = src
+                    if selector == 'img':  # Special handling for all images
+                        elements = await page.query_selector_all(selector)
+                        for element in elements:
+                            try:
+                                src = await element.get_attribute('src')
+                                if src and _is_product_image(src):
+                                    # Convert relative URLs to absolute
+                                    if src.startswith('//'):
+                                        src = 'https:' + src
+                                    elif src.startswith('/'):
+                                        base_url = '/'.join(url.split('/')[:3])
+                                        src = base_url + src
+                                    result['image_url'] = src
+                                    break
+                            except:
+                                continue
+                        if result['image_url']:  # If found, break outer loop
                             break
+                    else:  # Regular selector handling
+                        element = await page.query_selector(selector)
+                        if element:
+                            src = await element.get_attribute('src')
+                            if src:
+                                # Convert relative URLs to absolute
+                                if src.startswith('//'):
+                                    src = 'https:' + src
+                                elif src.startswith('/'):
+                                    base_url = '/'.join(url.split('/')[:3])
+                                    src = base_url + src
+                                result['image_url'] = src
+                                break
                 except:
                     continue
             
