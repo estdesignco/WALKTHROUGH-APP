@@ -353,6 +353,179 @@ ROOM_DEFAULT_STRUCTURE = {
         'Millwork, Trim, and Architectural Elements': {
             'ARCHITECTURAL': ['Crown Molding', 'Baseboards', 'Chair Rails', 'Wainscoting', 'Window Trim/Casings', 'Door Trim/Casings']
         }
+    },
+    'balcony': {
+        'Outdoor Lighting': {
+            'INSTALLED': ['String Lights', 'Wall Sconces', 'Ceiling Fan w/ Light', 'LED Strip Lights', 'Post Lights'],
+            'PORTABLE': ['Solar Lanterns', 'Battery Lanterns', 'Citronella Torches']
+        },
+        'Outdoor Furniture': {
+            'PIECE': ['Bistro Table', 'Balcony Chairs', 'Storage Bench', 'Small Sofa', 'Side Table', 'Plant Stands', 'Outdoor Bar Cart', 'Privacy Screen']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Outdoor Rug', 'Outdoor Pillows', 'Planters', 'Wind Chimes', 'Outdoor Curtains', 'Privacy Screens', 'String Light Hooks', 'Weather Protection Covers']
+        },
+        'Plants & Greenery': {
+            'LIVE': ['Potted Plants', 'Herb Garden', 'Flowers', 'Succulents', 'Climbing Vines'],
+            'ARTIFICIAL': ['Faux Plants', 'Seasonal Arrangements']
+        }
+    },
+    'screened porch': {
+        'Lighting': {
+            'INSTALLED': ['Ceiling Fan w/ Light', 'Recessed Lighting', 'String Lights', 'Wall Sconces'],
+            'PORTABLE': ['Floor Lamps', 'Table Lamps', 'Lanterns']
+        },
+        'Furniture': {
+            'PIECE': ['Outdoor Sofa', 'Lounge Chairs', 'Dining Table', 'Dining Chairs', 'Coffee Table', 'Side Tables', 'Swinging Bench', 'Rocking Chairs', 'Ottoman']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Outdoor Rug', 'Weather-Resistant Pillows', 'Curtains/Screens', 'Wall Art', 'Plants', 'Wind Chimes', 'Ceiling Fans']
+        }
+    },
+    'pool house': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Ceiling Fan w/ Light', 'Exterior Lighting', 'Underwater Pool Lights'],
+            'PORTABLE': ['Poolside Lamps', 'Solar Lights']
+        },
+        'Furniture': {
+            'PIECE': ['Poolside Loungers', 'Outdoor Dining Set', 'Bar Stools', 'Storage Cabinet', 'Pool Float Storage', 'Towel Rack', 'Mini Fridge', 'Outdoor Bar']
+        },
+        'Pool Equipment': {
+            'UNIT': ['Pool Pump', 'Pool Heater', 'Filtration System', 'Pool Cover', 'Pool Vacuum', 'Chemical Dispensers']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Pool Towels', 'Outdoor Speakers', 'Pool Games', 'Umbrellas', 'Outdoor Rug', 'Safety Equipment']
+        }
+    },
+    'guest house': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Ceiling Fan w/ Light', 'Sconces', 'Pendant Lights'],
+            'PORTABLE': ['Table Lamps', 'Floor Lamps']
+        },
+        'Furniture': {
+            'PIECE': ['Sofa Bed', 'Dining Table', 'Dining Chairs', 'Coffee Table', 'Kitchenette', 'Bed', 'Nightstand', 'Dresser', 'Desk', 'Chair']
+        },
+        'Appliances': {
+            'UNIT': ['Mini Fridge', 'Microwave', 'Coffee Maker', 'Small Cooktop', 'Dishwasher (Compact)']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Curtains', 'Wall Art', 'Bedding', 'Towels', 'Kitchen Essentials', 'Welcome Basket']
+        }
+    },
+    'butler\'s pantry': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Under Cabinet Lighting', 'Pendant Lights'],
+            'PORTABLE': ['Task Lighting']
+        },
+        'Storage & Furniture': {
+            'PIECE': ['Built-in Cabinets', 'Floating Shelves', 'Wine Storage', 'Serving Cart', 'Counter Space', 'Display Cabinet']
+        },
+        'Appliances': {
+            'UNIT': ['Wine Fridge', 'Ice Maker', 'Coffee Station', 'Warming Drawer', 'Small Sink', 'Dishwasher (Drawer Style)']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Serving Pieces', 'Glassware Storage', 'Table Linens', 'Seasonal Decor Storage']
+        }
+    },
+    'conservatory': {
+        'Lighting': {
+            'INSTALLED': ['Ceiling Fan w/ Light', 'Track Lighting', 'Recessed Lighting'],
+            'PORTABLE': ['Floor Lamps', 'Table Lamps']
+        },
+        'Furniture': {
+            'PIECE': ['Wicker Seating', 'Plant Stands', 'Potting Bench', 'Storage Benches', 'Small Tables', 'Garden Stools']
+        },
+        'Plants & Greenery': {
+            'LIVE': ['Large Palms', 'Citrus Trees', 'Orchids', 'Ferns', 'Tropical Plants', 'Herb Garden'],
+            'PLANTERS': ['Large Planters', 'Hanging Baskets', 'Window Boxes', 'Tiered Plant Stands']
+        },
+        'Climate Control': {
+            'UNIT': ['Humidifier', 'Heating System', 'Ventilation Fans', 'Thermostats']
+        }
+    },
+    'formal living room': {
+        'Lighting': {
+            'INSTALLED': ['Crystal Chandelier', 'Recessed Lighting', 'Wall Sconces', 'Picture Lights'],
+            'PORTABLE': ['Table Lamps', 'Floor Lamps', 'Accent Lighting']
+        },
+        'Furniture': {
+            'PIECE': ['Formal Sofa', 'Wingback Chairs', 'Chesterfield', 'Antique Coffee Table', 'Side Tables', 'Secretary Desk', 'Curio Cabinet', 'Piano', 'Formal Dining Chairs']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Persian Rug', 'Fine Art', 'Sculptures', 'Formal Drapery', 'Decorative Mirrors', 'Antique Vases', 'Candlesticks', 'Books', 'Family Portraits']
+        }
+    },
+    'great room': {
+        'Lighting': {
+            'INSTALLED': ['Statement Chandelier', 'Recessed Lighting', 'Ceiling Fan w/ Light', 'Track Lighting', 'Accent Lighting'],
+            'PORTABLE': ['Floor Lamps', 'Table Lamps']
+        },
+        'Furniture': {
+            'PIECE': ['Large Sectional', 'Multiple Seating Areas', 'Coffee Tables', 'End Tables', 'Media Console', 'Bookcases', 'Bar Cart', 'Ottoman', 'Accent Chairs']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Large Area Rugs', 'Wall Art Gallery', 'Plants', 'Throw Pillows', 'Blankets', 'Window Treatments', 'Decorative Objects']
+        }
+    },
+    'billiards room': {
+        'Lighting': {
+            'INSTALLED': ['Pool Table Light', 'Recessed Lighting', 'Pendant Lights', 'Accent Lighting'],
+            'PORTABLE': ['Bar Lighting', 'Accent Lamps']
+        },
+        'Furniture & Equipment': {
+            'PIECE': ['Pool Table', 'Bar', 'Bar Stools', 'Leather Chairs', 'Side Tables', 'Cue Rack', 'Score Board', 'Mini Fridge', 'Wine Storage']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Pool Accessories', 'Wall Art', 'Leather Decor', 'Area Rug', 'Bar Accessories', 'Games Storage']
+        }
+    },
+    'study': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Pendant Lights', 'Sconces'],
+            'PORTABLE': ['Desk Lamp', 'Floor Lamp', 'Table Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Executive Desk', 'Leather Chair', 'Bookcases', 'Filing Cabinet', 'Reading Chair', 'Side Table', 'Library Ladder']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Books', 'Desk Accessories', 'Wall Art', 'Area Rug', 'Window Treatments', 'Desk Organizers', 'Artwork']
+        }
+    },
+    'sitting room': {
+        'Lighting': {
+            'INSTALLED': ['Chandelier', 'Sconces', 'Recessed Lighting'],
+            'PORTABLE': ['Table Lamps', 'Floor Lamps']
+        },
+        'Furniture': {
+            'PIECE': ['Loveseat', 'Accent Chairs', 'Small Coffee Table', 'Side Tables', 'Ottoman', 'Small Bookcase']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Wall Art', 'Decorative Objects', 'Throw Pillows', 'Curtains', 'Plants']
+        }
+    },
+    'attic storage': {
+        'Lighting': {
+            'INSTALLED': ['Flush Mount Lights', 'LED Strip Lights', 'Pull Chain Lights'],
+            'PORTABLE': ['Work Lights', 'Flashlights']
+        },
+        'Storage Solutions': {
+            'PIECE': ['Shelving Units', 'Storage Bins', 'Garment Racks', 'Cedar Chests', 'File Cabinets', 'Holiday Storage', 'Seasonal Storage']
+        },
+        'Climate Control': {
+            'UNIT': ['Dehumidifier', 'Ventilation Fan', 'Insulation', 'Temperature Monitor']
+        }
+    },
+    'garage': {
+        'Lighting': {
+            'INSTALLED': ['Fluorescent Lights', 'LED Shop Lights', 'Motion Sensor Lights', 'Task Lighting'],
+            'PORTABLE': ['Work Lights', 'Flashlights']
+        },
+        'Storage & Organization': {
+            'PIECE': ['Garage Cabinets', 'Tool Storage', 'Shelving Systems', 'Pegboard', 'Bike Racks', 'Sports Equipment Storage', 'Workbench']
+        },
+        'Equipment': {
+            'UNIT': ['Garage Door Opener', 'Air Compressor', 'Shop Vacuum', 'Tool Chest', 'Car Care Equipment']
+        }
     }
 }
 
