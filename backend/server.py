@@ -1566,15 +1566,28 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            # Try to extract description
+            # Try to extract description with enhanced filtering
             for selector in description_selectors:
                 try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        text = await element.inner_text()
-                        if text and len(text.strip()) > 10:
-                            result['description'] = text.strip()[:500]  # Limit length
+                    if selector == 'p, div':  # Special handling for generic elements
+                        elements = await page.query_selector_all(selector)
+                        for element in elements:
+                            try:
+                                text = await element.inner_text()
+                                if text and _is_description_text(text):
+                                    result['description'] = text.strip()[:500]  # Limit length
+                                    break
+                            except:
+                                continue
+                        if result['description']:  # If found, break outer loop
                             break
+                    else:  # Regular selector handling
+                        element = await page.query_selector(selector)
+                        if element:
+                            text = await element.inner_text()
+                            if text and len(text.strip()) > 10:
+                                result['description'] = text.strip()[:500]  # Limit length
+                                break
                 except:
                     continue
             
