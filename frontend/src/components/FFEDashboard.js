@@ -374,16 +374,8 @@ const FFEDashboard = ({ isOffline }) => {
 
       {/* FF&E Spreadsheet */}
       <div className="px-6">
-        <FFESpreadsheet
+        <SimpleSpreadsheet
           project={project}
-          roomColors={roomColors}
-          categoryColors={categoryColors}
-          itemStatuses={itemStatuses}
-          vendorTypes={vendorTypes}
-          carrierTypes={carrierTypes}
-          onDeleteRoom={handleDeleteRoom}
-          onReload={loadSimpleProject}
-          isOffline={isOffline}
         />
       </div>
 
