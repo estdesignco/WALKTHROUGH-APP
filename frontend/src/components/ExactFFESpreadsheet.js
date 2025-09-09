@@ -135,9 +135,7 @@ const ExactFFESpreadsheet = ({
           
           <table className="w-full border-collapse border border-gray-400">
             
-            {/* EMPTY THEAD - Headers are now in tbody under subcategories */}
-            <thead>
-            </thead>
+            <thead></thead>
             
             <tbody>
               {/* HIERARCHICAL STRUCTURE AS ROW HEADERS - Like your images */}
