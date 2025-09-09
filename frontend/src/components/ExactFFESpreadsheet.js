@@ -129,7 +129,7 @@ const ExactFFESpreadsheet = ({
   return (
     <div className="w-full bg-white">
       
-      {/* ONE CONTINUOUS SPREADSHEET - Exactly like your images */}
+      {/* ONE CONTINUOUS SPREADSHEET */}
       <div className="w-full overflow-auto" style={{ height: '80vh' }}>
         <div style={{ minWidth: '2500px' }}>
           
