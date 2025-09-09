@@ -56,8 +56,94 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Handle tracking items
-  const handleTrackItem = async (item) => {
+  // COMPLETE COLOR MAPPING FOR ALL DROPDOWN VALUES
+  const getStatusColor = (status) => {
+    const statusColors = {
+      // Planning Phase
+      'TO BE SELECTED': '#D4A574',
+      'RESEARCHING': '#B8860B', 
+      'PENDING APPROVAL': '#DAA520',
+      
+      // Procurement Phase  
+      'APPROVED': '#9ACD32',
+      'ORDERED': '#32CD32',
+      'PICKED': '#FFD700',  // YELLOW like your image
+      'CONFIRMED': '#228B22',
+      
+      // Fulfillment Phase
+      'IN PRODUCTION': '#FF8C00',
+      'SHIPPED': '#4169E1',
+      'IN TRANSIT': '#6495ED',
+      'OUT FOR DELIVERY': '#87CEEB',
+      
+      // Delivery Phase
+      'DELIVERED TO RECEIVER': '#9370DB',
+      'DELIVERED TO JOB SITE': '#8A2BE2',
+      'RECEIVED': '#DDA0DD',
+      
+      // Installation Phase
+      'READY FOR INSTALL': '#20B2AA',
+      'INSTALLING': '#48D1CC',
+      'INSTALLED': '#00CED1',
+      
+      // Issues & Exceptions
+      'ON HOLD': '#DC143C',
+      'BACKORDERED': '#B22222',
+      'DAMAGED': '#8B0000',
+      'RETURNED': '#CD5C5C',
+      'CANCELLED': '#A52A2A'
+    };
+    return statusColors[status] || '#FFD700';
+  };
+
+  const getCarrierColor = (carrier) => {
+    const carrierColors = {
+      'FedEx': '#FF6600',
+      'UPS': '#8B4513',
+      'Brooks': '#4682B4',
+      'Zenith': '#20B2AA',
+      'Sunbelt': '#DC143C',
+      'R+L Carriers': '#8A2BE2',
+      'Yellow Freight': '#FFD700',
+      'XPO Logistics': '#FF1493',
+      'Old Dominion': '#228B22',
+      'ABF Freight': '#B22222',
+      'Estes Express': '#4B0082',
+      'Saia LTL': '#2E8B57',
+      'TForce Freight': '#FF4500',
+      'Roadrunner': '#6B8E23',
+      'Central Transport': '#8B008B',
+      'Southeastern Freight': '#D2691E',
+      'Averitt Express': '#CD853F',
+      'Holland': '#F4A460',
+      'USPS': '#0047AB',
+      'DHL': '#FFCC00',
+      'OTHER': '#9370DB'
+    };
+    return carrierColors[carrier] || '#9370DB';
+  };
+
+  const getShipToColor = (shipTo) => {
+    const shipToColors = {
+      'Client': '#FFD700',      // Yellow
+      'Receiver': '#87CEEB',    // Sky Blue  
+      'Store': '#DDA0DD',       // Plum
+      'Jobsite': '#98FB98'      // Pale Green
+    };
+    return shipToColors[shipTo] || '#FFD700';
+  };
+
+  const getDeliveryStatusColor = (status) => {
+    const deliveryColors = {
+      'PENDING': '#C7D2FE',        // Light Blue
+      'IN TRANSIT': '#FEF08A',     // Light Yellow
+      'OUT FOR DELIVERY': '#BFDBFE', // Light Blue
+      'DELIVERED': '#A7F3D0',      // Light Green
+      'DELAYED': '#FCA5A5',        // Light Red
+      'EXCEPTION': '#F87171'       // Red
+    };
+    return deliveryColors[status] || '#FEF08A';
+  };
     if (!item.tracking_number) {
       alert('❌ No tracking number available');
       return;
