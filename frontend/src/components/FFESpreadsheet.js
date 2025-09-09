@@ -168,10 +168,39 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* SIMPLE SCROLLING CONTAINER THAT WORKS */}
-      <div className="overflow-auto" style={{ maxHeight: '80vh' }}>
-        <table className="w-full min-w-[4200px] border-collapse">
-          <tbody>
+      {/* MAC-FRIENDLY SCROLLING - REBUILD FROM SCRATCH */}
+      <div 
+        className="relative w-full"
+        style={{ 
+          height: '70vh',
+          overflow: 'hidden'
+        }}
+      >
+        {/* HORIZONTAL + VERTICAL SCROLL CONTAINER */}
+        <div
+          className="w-full h-full overflow-auto"
+          onWheel={(e) => {
+            // MAC TRACKPAD: Handle 2-finger horizontal gestures
+            if (Math.abs(e.deltaX) > 0) {
+              // Let browser handle horizontal scrolling naturally
+              e.stopPropagation();
+            }
+          }}
+          style={{
+            overflowX: 'auto',
+            overflowY: 'auto',
+            scrollBehavior: 'smooth',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
+          <table 
+            className="min-w-max border-collapse bg-neutral-900"
+            style={{ 
+              width: '4200px', // Fixed wide width to force horizontal scroll
+              borderCollapse: 'collapse'
+            }}
+          >
+            <tbody>
             {/* TEST: Just show one simple row to verify rendering */}
             <tr>
               <td className="p-4 text-white border border-neutral-600">
