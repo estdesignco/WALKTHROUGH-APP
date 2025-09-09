@@ -1287,7 +1287,8 @@ def _is_product_image(src: str) -> bool:
         'advertisement', 'ad', 'promo', 'sale', 'discount',
         'background', 'bg', 'pattern', 'texture', 'watermark',
         'placeholder', 'loading', 'spinner', 'arrow', 'button',
-        'star', 'rating', 'review', 'comment', 'share'
+        'star', 'rating', 'review', 'comment', 'share',
+        'bing.com', 'bat.bing', 'tracking', 'analytics', 'pixel'  # Added tracking exclusions
     ]
     
     # Check if any exclude pattern is in the image source
@@ -1298,7 +1299,7 @@ def _is_product_image(src: str) -> bool:
     # Prefer images with product-related keywords
     product_patterns = [
         'product', 'item', 'main', 'hero', 'primary', 'featured',
-        'gallery', 'zoom', 'large', 'detail', 'view'
+        'gallery', 'zoom', 'large', 'detail', 'view', 'cdn'
     ]
     
     # Give preference to images with product keywords
@@ -1317,8 +1318,8 @@ def _is_product_image(src: str) -> bool:
         elif width < 100 or height < 100:  # Too small, likely icon
             return False
     
-    # Default to True if no exclusion patterns found
-    return True
+    # Default to True if no exclusion patterns found and has reasonable length
+    return len(src) > 20  # Reasonable URL length
 
 # Helper function to filter description text
 def _is_description_text(text: str) -> bool:
