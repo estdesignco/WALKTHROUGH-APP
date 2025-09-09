@@ -135,12 +135,20 @@ const ExactFFESpreadsheet = ({
 
   const getDeliveryStatusColor = (status) => {
     const deliveryColors = {
-      'PENDING': '#C7D2FE',        // Light Blue
-      'IN TRANSIT': '#FEF08A',     // Light Yellow
-      'OUT FOR DELIVERY': '#BFDBFE', // Light Blue
-      'DELIVERED': '#A7F3D0',      // Light Green
-      'DELAYED': '#FCA5A5',        // Light Red
-      'EXCEPTION': '#F87171'       // Red
+      'PENDING': '#C7D2FE',                  // Light Blue
+      'SCHEDULED': '#E0E7FF',               // Very Light Blue
+      'PROCESSING': '#FEF3C7',              // Light Yellow
+      'IN TRANSIT': '#FEF08A',              // Light Yellow
+      'OUT FOR DELIVERY': '#BFDBFE',        // Light Blue
+      'ATTEMPTED DELIVERY': '#FECACA',      // Light Red
+      'DELIVERED': '#A7F3D0',               // Light Green
+      'DELIVERED TO RECEIVER': '#86EFAC',   // Green
+      'AVAILABLE FOR PICKUP': '#D1FAE5',   // Very Light Green
+      'DELAYED': '#FCA5A5',                 // Light Red
+      'EXCEPTION': '#F87171',               // Red
+      'DAMAGED': '#EF4444',                 // Dark Red
+      'LOST': '#DC2626',                    // Darker Red
+      'RETURNED TO SENDER': '#B91C1C'       // Darkest Red
     };
     return deliveryColors[status] || '#FEF08A';
   };
