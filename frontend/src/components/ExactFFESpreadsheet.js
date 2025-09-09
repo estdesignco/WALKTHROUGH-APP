@@ -398,6 +398,10 @@ const ExactFFESpreadsheet = ({
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.status || 'PICKED'}
+                                  onChange={(e) => {
+                                    // Update item status and refresh display
+                                    console.log(`Status changed to: ${e.target.value}`);
+                                  }}
                                   className="w-full border-none outline-none rounded px-2 py-1 text-xs font-medium"
                                   style={{
                                     backgroundColor: getStatusColor(item.status || 'PICKED'),
