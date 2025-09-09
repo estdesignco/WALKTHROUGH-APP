@@ -151,7 +151,7 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* Proper Trackpad/Touchpad Scrolling Container */}
+      {/* ROBUST TRACKPAD SCROLLING - FORCE 2-FINGER GESTURES TO WORK */}
       <div 
         className="relative"
         style={{ 
@@ -163,21 +163,40 @@ const FFESpreadsheet = ({
           className="overflow-x-auto"
           onWheel={(e) => {
             const container = e.currentTarget;
-            // Handle horizontal scrolling for trackpads/touchpads
-            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-              // Horizontal scroll gesture detected
+            
+            // CRITICAL: Handle all trackpad gestures
+            if (e.deltaX !== 0) {
+              // Direct horizontal scroll from trackpad
+              e.preventDefault();
+              container.scrollLeft += e.deltaX;
+            } else if (e.shiftKey && e.deltaY !== 0) {
+              // Shift + vertical scroll = horizontal scroll
+              e.preventDefault();
+              container.scrollLeft += e.deltaY;
+            } else if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) {
+              // Horizontal gesture detected
               e.preventDefault();
               container.scrollLeft += e.deltaX;
             }
-            // Allow vertical scrolling to pass through normally
+            // Let normal vertical scrolling pass through
+          }}
+          onPointerMove={(e) => {
+            // Additional trackpad support
+            if (e.pointerType === 'pen' || e.pointerType === 'touch') {
+              const container = e.currentTarget;
+              if (e.movementX !== 0) {
+                container.scrollLeft -= e.movementX;
+              }
+            }
           }}
           style={{ 
-            overscrollBehaviorX: 'contain',
+            overscrollBehaviorX: 'none',
             overscrollBehaviorY: 'auto',
-            scrollBehavior: 'smooth'
+            scrollBehavior: 'smooth',
+            WebkitOverflowScrolling: 'touch' // iOS support
           }}
         >
-          <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'fixed' }}>
+          <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'auto' }}>
             <tbody>
             {/* MAIN DATA STRUCTURE */}
             {project?.rooms?.map((room) => (
