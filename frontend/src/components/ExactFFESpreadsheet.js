@@ -142,7 +142,7 @@ const ExactFFESpreadsheet = ({
               {project.rooms.map((room) => (
                 <React.Fragment key={room.id}>
                   
-                  {/* ROOM HEADER ROW - Different color for each room */}
+                  {/* ROOM HEADER ROW - Muted colors */}
                   <tr>
                     <td colSpan="15" 
                         className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
