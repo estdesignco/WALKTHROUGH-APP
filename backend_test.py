@@ -303,31 +303,90 @@ class FFEAPITester:
             self.log_test("Get Carrier Types", False, f"Failed to get carriers: {carriers}")
 
     def test_link_scraping(self):
-        """Test link scraping functionality"""
+        """Test link scraping functionality with specific URLs"""
         print("\n=== Testing Link Scraping Functionality ===")
         
-        # Test with a simple URL (we'll use a test URL that should work)
-        scrape_data = {
-            "url": "https://www.example.com"
-        }
+        # Test URLs as requested in the review
+        test_urls = [
+            {
+                "url": "https://fourhands.com/product/248067-003",
+                "name": "Four Hands - Fenn Chair",
+                "expected_vendor": "Four Hands"
+            },
+            {
+                "url": "https://example.com",
+                "name": "Simple test site",
+                "expected_vendor": None
+            },
+            {
+                "url": "https://uttermost.com/product/24278",
+                "name": "Uttermost product test",
+                "expected_vendor": "Uttermost"
+            }
+        ]
         
-        success, data, status_code = self.make_request('POST', '/scrape-product', scrape_data)
-        
-        if success:
-            # Check if response has expected fields
-            expected_fields = ['name', 'price', 'vendor', 'image_url']
-            has_fields = any(field in data for field in expected_fields)
+        for test_case in test_urls:
+            print(f"\n--- Testing: {test_case['name']} ---")
             
-            if has_fields:
-                self.log_test("Link Scraping", True, "Scraping endpoint working - returns product info structure")
+            scrape_data = {"url": test_case["url"]}
+            success, data, status_code = self.make_request('POST', '/scrape-product', scrape_data)
+            
+            # Log the response details
+            print(f"URL: {test_case['url']}")
+            print(f"Status Code: {status_code}")
+            print(f"Success: {success}")
+            
+            if success:
+                # Check response format
+                if isinstance(data, dict) and 'success' in data and 'data' in data:
+                    self.log_test(f"Scrape {test_case['name']} - Response Format", True, "Correct {success: true, data: {...}} format")
+                    
+                    # Analyze the data fields
+                    product_data = data.get('data', {})
+                    expected_fields = ['name', 'price', 'vendor', 'image_url', 'description', 'sku', 'size', 'color']
+                    
+                    populated_fields = []
+                    empty_fields = []
+                    
+                    for field in expected_fields:
+                        value = product_data.get(field, '')
+                        if value and str(value).strip():
+                            populated_fields.append(f"{field}: '{value}'")
+                        else:
+                            empty_fields.append(field)
+                    
+                    # Log detailed field analysis
+                    print(f"   Populated fields: {populated_fields}")
+                    print(f"   Empty fields: {empty_fields}")
+                    
+                    # Check vendor detection
+                    detected_vendor = product_data.get('vendor', '')
+                    if test_case['expected_vendor']:
+                        if detected_vendor == test_case['expected_vendor']:
+                            self.log_test(f"Scrape {test_case['name']} - Vendor Detection", True, f"Correctly detected: {detected_vendor}")
+                        else:
+                            self.log_test(f"Scrape {test_case['name']} - Vendor Detection", False, f"Expected: {test_case['expected_vendor']}, Got: {detected_vendor}")
+                    
+                    # Overall data extraction assessment
+                    if len(populated_fields) > 0:
+                        self.log_test(f"Scrape {test_case['name']} - Data Extraction", True, f"Extracted {len(populated_fields)}/{len(expected_fields)} fields")
+                    else:
+                        self.log_test(f"Scrape {test_case['name']} - Data Extraction", False, "No product data extracted")
+                        
+                else:
+                    self.log_test(f"Scrape {test_case['name']} - Response Format", False, f"Incorrect response format: {data}")
+                    
             else:
-                self.log_test("Link Scraping", True, "Scraping endpoint accessible but no product info extracted (expected for example.com)")
-        else:
-            # Check if it's a validation error (expected) vs server error
-            if status_code == 400 and "URL" in str(data):
-                self.log_test("Link Scraping", True, "Scraping endpoint working - proper validation")
-            else:
-                self.log_test("Link Scraping", False, f"Scraping endpoint failed: {data} (Status: {status_code})")
+                # Check if it's a validation error vs server error
+                if status_code == 400:
+                    self.log_test(f"Scrape {test_case['name']} - Endpoint", True, f"Endpoint accessible, validation error (expected): {data}")
+                elif status_code == 200:
+                    self.log_test(f"Scrape {test_case['name']} - Endpoint", True, f"Endpoint accessible: {data}")
+                else:
+                    self.log_test(f"Scrape {test_case['name']} - Endpoint", False, f"Endpoint failed: {data} (Status: {status_code})")
+            
+            print(f"Raw response: {json.dumps(data, indent=2)}")
+            print("-" * 50)
 
     def test_data_persistence(self):
         """Test that data persists correctly"""
