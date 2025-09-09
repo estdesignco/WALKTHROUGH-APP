@@ -176,10 +176,13 @@ const FFEDashboard = ({ isOffline }) => {
     }
   };
 
-  // FORCE LOADING TO FALSE - PREVENT LOADING LOOP
-  if (loading && project) {
-    setLoading(false);
-  }
+  // PREVENT LOADING LOOP WITH useEffect
+  useEffect(() => {
+    if (loading && project) {
+      console.log('🔧 FORCE STOPPING LOADING LOOP');
+      setLoading(false);
+    }
+  }, [loading, project]);
 
   if (loading) {
     return (
