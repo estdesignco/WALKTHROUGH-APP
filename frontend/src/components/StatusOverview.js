@@ -132,9 +132,24 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* RIGHT COLUMN - CARRIER BREAKDOWN */}
+      {/* RIGHT COLUMN - CARRIER BREAKDOWN WITH PIE CHART */}
       <div className="bg-gray-800 rounded-xl p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Shipping Carrier Breakdown</h3>
+        
+        {/* CARRIER PIE CHART */}
+        <div className="flex items-center justify-center h-32 mb-4">
+          <div className="relative w-24 h-24">
+            <div className="absolute inset-0 rounded-full border-8 border-gray-600"></div>
+            <div className="absolute inset-0 rounded-full border-8 border-orange-500 border-r-transparent border-b-transparent" 
+                 style={{ transform: 'rotate(90deg)' }}></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-lg font-bold text-white">{Object.values(carrierBreakdown).reduce((a, b) => a + b, 0)}</div>
+                <div className="text-xs text-gray-400">Shipments</div>
+              </div>
+            </div>
+          </div>
+        </div>
         
         <div className="space-y-3">
           {[
