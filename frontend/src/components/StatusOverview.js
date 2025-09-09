@@ -1,6 +1,6 @@
 import React from 'react';
 
-const StatusOverview = ({ totalItems, statusBreakdown, itemStatuses }) => {
+const StatusOverview = ({ totalItems, statusBreakdown, itemStatuses, carrierBreakdown }) => {
   const getStatusColor = (status) => {
     // Complete status colors matching the spreadsheet - ALL 19 STATUS OPTIONS
     const colors = {
