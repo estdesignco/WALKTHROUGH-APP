@@ -141,7 +141,9 @@ const ExactFFESpreadsheet = ({
                             </td>
                           </tr>
                           
-                          {/* INDIVIDUAL COLUMN HEADERS - RIGHT UNDER INSTALLED, ABOVE CHANDELIER */}
+                          {/* EXACT STRUCTURE FROM YOUR SCREENSHOTS */}
+                          
+                          {/* RED COLUMN HEADERS - ITEM NAME through ORDERS STATUS */}
                           <tr>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
                                 style={{ backgroundColor: '#B85A5A' }}>
@@ -163,30 +165,20 @@ const ExactFFESpreadsheet = ({
                                 style={{ backgroundColor: '#B85A5A' }}>
                               ORDERS STATUS
                             </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
-                                style={{ backgroundColor: '#B85A5A' }}>
-                              FINISH/Color
+                            
+                            {/* BROWN SECTION HEADER spanning brown columns */}
+                            <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                style={{ backgroundColor: '#8B6F47' }} colSpan="3">
+                              ADDITIONAL INFO.
                             </th>
-                            <th className="border border-gray-400 px-2 py-2 text-right text-xs font-bold text-white min-w-[80px]" 
-                                style={{ backgroundColor: '#B85A5A' }}>
-                              Cost/Price
+                            
+                            {/* PURPLE SECTION HEADER spanning purple columns */}
+                            <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                style={{ backgroundColor: '#7A6B9A' }} colSpan="5">
+                              SHIPPING INFO.
                             </th>
-                            <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[80px]" 
-                                style={{ backgroundColor: '#B85A5A' }}>
-                              Image
-                            </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
-                                style={{ backgroundColor: '#B85A5A' }}>
-                              TRACKING #
-                            </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[80px]" 
-                                style={{ backgroundColor: '#B85A5A' }}>
-                              Carrier
-                            </th>
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
-                                style={{ backgroundColor: '#B85A5A' }}>
-                              Order Date
-                            </th>
+                            
+                            {/* RED SECTION - NOTES, ACTIONS */}
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
                                 style={{ backgroundColor: '#B85A5A' }}>
                               NOTES
@@ -197,24 +189,65 @@ const ExactFFESpreadsheet = ({
                             </th>
                           </tr>
                           
-                          {/* SECTION HEADERS - RIGHT ABOVE DATA ROWS */}
+                          {/* SECOND ROW - Individual column headers for brown and purple sections */}
                           <tr>
-                            <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                style={{ backgroundColor: '#8B6F47' }} colSpan="8">
-                              ADDITIONAL INFO.
+                            {/* Empty cells for red columns already defined above */}
+                            <td className="border border-gray-400" style={{ backgroundColor: '#B85A5A' }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: '#B85A5A' }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: '#B85A5A' }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: '#B85A5A' }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: '#B85A5A' }}></td>
+                            
+                            {/* BROWN columns */}
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
+                                style={{ backgroundColor: '#8B6F47' }}>
+                              FINISH/Color
                             </th>
-                            <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                style={{ backgroundColor: '#7A6B9A' }} colSpan="5">
-                              SHIPPING INFO.
+                            <th className="border border-gray-400 px-2 py-2 text-right text-xs font-bold text-white min-w-[80px]" 
+                                style={{ backgroundColor: '#8B6F47' }}>
+                              Cost/Price
                             </th>
+                            <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[80px]" 
+                                style={{ backgroundColor: '#8B6F47' }}>
+                              Image
+                            </th>
+                            
+                            {/* PURPLE columns with stacked headers */}
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                                style={{ backgroundColor: '#7A6B9A' }}>
+                              <div>Order Status / Est.</div>
+                              <div>Ship Date / Est.</div>
+                              <div>Delivery Date</div>
+                            </th>
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                                style={{ backgroundColor: '#7A6B9A' }}>
+                              <div>Install Date /</div>
+                              <div>Shipping TO</div>
+                            </th>
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                                style={{ backgroundColor: '#7A6B9A' }}>
+                              TRACKING #
+                            </th>
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[80px]" 
+                                style={{ backgroundColor: '#7A6B9A' }}>
+                              Carrier
+                            </th>
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
+                                style={{ backgroundColor: '#7A6B9A' }}>
+                              Order Date
+                            </th>
+                            
+                            {/* Empty cells for red NOTES/ACTIONS already defined above */}
+                            <td className="border border-gray-400" style={{ backgroundColor: '#B85A5A' }}></td>
+                            <td className="border border-gray-400" style={{ backgroundColor: '#B85A5A' }}></td>
                           </tr>
                           
-                          {/* ITEMS ROWS with subtle darker shade alternating colors */}
+                          {/* DATA ROWS with subtle dark alternating colors */}
                           {subcategory.items?.map((item, itemIndex) => (
                             <tr key={`${subcategory.id}-${itemIndex}`} 
                                 className="transition-colors"
                                 style={{ 
-                                  backgroundColor: itemIndex % 2 === 0 ? '#2A2A2A' : '#1F1F1F' 
+                                  backgroundColor: itemIndex % 2 === 0 ? '#2D3748' : '#1A202C' 
                                 }}>
                               
                               <td className="border border-gray-400 px-2 py-2 text-sm text-white">
@@ -232,9 +265,10 @@ const ExactFFESpreadsheet = ({
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <span className="px-2 py-1 rounded text-xs font-medium"
                                       style={{ 
-                                        backgroundColor: item.status === 'PICKED' ? '#FEF3C7' : 
+                                        backgroundColor: item.status === 'PICKED' ? '#FEF08A' : 
                                                         item.status === 'ORDERED' ? '#DBEAFE' :
-                                                        item.status === 'DELIVERED TO JOB SITE' ? '#D1FAE5' : '#F3F4F6'
+                                                        item.status === 'DELIVERED TO JOB SITE' ? '#D1FAE5' : '#F3F4F6',
+                                        color: '#000'
                                       }}>
                                   {item.status || 'PICKED'}
                                 </span>
@@ -256,8 +290,14 @@ const ExactFFESpreadsheet = ({
                                 )}
                               </td>
                               <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                {/* Shipping status info */}
+                              </td>
+                              <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                {/* Install date / Shipping TO */}
+                              </td>
+                              <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                 {item.tracking_number || (
-                                  <span className="text-blue-400 text-xs cursor-pointer">Add Tracking #</span>
+                                  <span className="text-blue-400 text-xs cursor-pointer underline">Add Tracking #</span>
                                 )}
                               </td>
                               <td className="border border-gray-400 px-2 py-2 text-sm text-white">
@@ -271,7 +311,7 @@ const ExactFFESpreadsheet = ({
                               </td>
                               <td className="border border-gray-400 px-2 py-2 text-center">
                                 <button className="text-red-400 hover:text-red-300 text-xs">
-                                  Delete
+                                  🗑️
                                 </button>
                               </td>
                             </tr>
