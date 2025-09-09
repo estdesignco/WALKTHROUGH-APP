@@ -1358,11 +1358,19 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'span, div, p'  # Will filter for $ content in code
             ]
             
+            # Enhanced image selectors for JavaScript-rendered content  
             image_selectors = [
+                # Four Hands and Shopify specific selectors
+                '.product__media img, .product-media img, .product-photos img',
+                '.product-gallery img, .hero-image img, .main-image img',
                 'img[class*="product"], img[class*="hero"], img[class*="main"]',
+                'img[class*="featured"], img[class*="primary"]',
+                # Generic product image selectors
                 '[data-testid*="image"] img, [data-test*="image"] img',
                 '.product-image img, .hero-image img, .main-image img',
-                'img[src*="product"], img[src*="item"]'
+                'img[src*="product"], img[src*="item"], img[src*="cdn"]',
+                # Last resort - all images, will filter for product images
+                'img'
             ]
             
             description_selectors = [
