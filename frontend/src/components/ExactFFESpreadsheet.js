@@ -538,11 +538,7 @@ const ExactFFESpreadsheet = ({
                                   value={item.delivery_status || 'IN TRANSIT'}
                                   className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                   style={{
-                                    backgroundColor: item.delivery_status === 'DELIVERED' ? '#A7F3D0' :
-                                                   item.delivery_status === 'IN TRANSIT' ? '#FEF08A' :  
-                                                   item.delivery_status === 'PENDING' ? '#C7D2FE' :
-                                                   item.delivery_status === 'DELAYED' ? '#FCA5A5' :
-                                                   item.delivery_status === 'OUT FOR DELIVERY' ? '#BFDBFE' : '#FEF08A',
+                                    backgroundColor: getDeliveryStatusColor(item.delivery_status || 'IN TRANSIT'),
                                     color: '#000'
                                   }}
                                 >
