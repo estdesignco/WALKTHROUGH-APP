@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import AddItemModal from './AddItemModal';
 
 const ProfessionalFFESpreadsheet = ({ 
   project, 
   roomColors, 
   categoryColors, 
-  itemStatuses,
+  itemStatuses = [],
   vendorTypes = [],
   carrierTypes = [],
   onDeleteRoom, 
@@ -15,7 +16,7 @@ const ProfessionalFFESpreadsheet = ({
   const [expandedSubcategories, setExpandedSubcategories] = useState({});
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
-  const [itemStatuses, setItemStatuses] = useState([]);
+  const [enhancedItemStatuses, setEnhancedItemStatuses] = useState([]);
   const [carrierOptions, setCarrierOptions] = useState([]);
 
   // Load enhanced data on component mount
@@ -28,7 +29,7 @@ const ProfessionalFFESpreadsheet = ({
         const statusRes = await fetch(`${backendUrl}/api/item-statuses-enhanced`);
         if (statusRes.ok) {
           const statusData = await statusRes.json();
-          setItemStatuses(statusData.data || []);
+          setEnhancedItemStatuses(statusData.data || []);
         }
         
         // Load carrier options
