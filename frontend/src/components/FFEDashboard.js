@@ -5,6 +5,7 @@ import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
 import SimpleSpreadsheet from './SimpleSpreadsheet';
 import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
+import AddItemModal from './AddItemModal';
 
 // Default categories for each room type (from Google Sheets)
 const ROOM_DEFAULT_CATEGORIES = {
