@@ -151,53 +151,10 @@ const FFESpreadsheet = ({
 
   return (
     <div className="bg-neutral-900 rounded-lg overflow-hidden shadow-lg">
-      {/* ROBUST TRACKPAD SCROLLING - FORCE 2-FINGER GESTURES TO WORK */}
-      <div 
-        className="relative"
-        style={{ 
-          maxHeight: '80vh',
-          overflowY: 'auto'
-        }}
-      >
-        <div
-          className="overflow-x-auto"
-          onWheel={(e) => {
-            const container = e.currentTarget;
-            
-            // CRITICAL: Handle all trackpad gestures
-            if (e.deltaX !== 0) {
-              // Direct horizontal scroll from trackpad
-              e.preventDefault();
-              container.scrollLeft += e.deltaX;
-            } else if (e.shiftKey && e.deltaY !== 0) {
-              // Shift + vertical scroll = horizontal scroll
-              e.preventDefault();
-              container.scrollLeft += e.deltaY;
-            } else if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) {
-              // Horizontal gesture detected
-              e.preventDefault();
-              container.scrollLeft += e.deltaX;
-            }
-            // Let normal vertical scrolling pass through
-          }}
-          onPointerMove={(e) => {
-            // Additional trackpad support
-            if (e.pointerType === 'pen' || e.pointerType === 'touch') {
-              const container = e.currentTarget;
-              if (e.movementX !== 0) {
-                container.scrollLeft -= e.movementX;
-              }
-            }
-          }}
-          style={{ 
-            overscrollBehaviorX: 'none',
-            overscrollBehaviorY: 'auto',
-            scrollBehavior: 'smooth',
-            WebkitOverflowScrolling: 'touch' // iOS support
-          }}
-        >
-          <table className="w-full min-w-[4200px] border-collapse" style={{ tableLayout: 'auto' }}>
-            <tbody>
+      {/* SIMPLE WORKING SCROLLING - NO COMPLEX HANDLERS */}
+      <div className="overflow-auto" style={{ maxHeight: '80vh' }}>
+        <table className="w-full min-w-[4200px] border-collapse">
+          <tbody>
             {/* MAIN DATA STRUCTURE */}
             {project?.rooms?.map((room) => (
               <React.Fragment key={room.id}>
