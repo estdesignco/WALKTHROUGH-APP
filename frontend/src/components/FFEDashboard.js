@@ -368,6 +368,7 @@ const FFEDashboard = ({ isOffline }) => {
         <StatusOverview
           totalItems={getTotalItems()}
           statusBreakdown={getStatusBreakdown()}
+          carrierBreakdown={getCarrierBreakdown()}
           itemStatuses={itemStatuses}
         />
 
