@@ -1268,6 +1268,58 @@ async def get_paint_suggestions(room_type: str):
     
     return {"data": suggestions}
 
+# Helper function to filter product images
+def _is_product_image(src: str) -> bool:
+    """
+    Filter function to identify likely product images and exclude common non-product images
+    """
+    if not src:
+        return False
+    
+    src_lower = src.lower()
+    
+    # Exclude common non-product image patterns
+    exclude_patterns = [
+        'logo', 'icon', 'banner', 'header', 'footer', 'nav', 'menu',
+        'social', 'facebook', 'twitter', 'instagram', 'pinterest',
+        'badge', 'award', 'certification', 'payment', 'shipping',
+        'thumbnail', 'avatar', 'profile', 'user', 'author',
+        'advertisement', 'ad', 'promo', 'sale', 'discount',
+        'background', 'bg', 'pattern', 'texture', 'watermark',
+        'placeholder', 'loading', 'spinner', 'arrow', 'button',
+        'star', 'rating', 'review', 'comment', 'share'
+    ]
+    
+    # Check if any exclude pattern is in the image source
+    for pattern in exclude_patterns:
+        if pattern in src_lower:
+            return False
+    
+    # Prefer images with product-related keywords
+    product_patterns = [
+        'product', 'item', 'main', 'hero', 'primary', 'featured',
+        'gallery', 'zoom', 'large', 'detail', 'view'
+    ]
+    
+    # Give preference to images with product keywords
+    for pattern in product_patterns:
+        if pattern in src_lower:
+            return True
+    
+    # Check image dimensions if available in URL (some sites include dimensions)
+    # Prefer larger images (likely product images)
+    dimension_match = re.search(r'(\d+)x(\d+)', src_lower)
+    if dimension_match:
+        width, height = int(dimension_match.group(1)), int(dimension_match.group(2))
+        # Prefer images larger than 200x200 but not too large (banners)
+        if 200 <= width <= 2000 and 200 <= height <= 2000:
+            return True
+        elif width < 100 or height < 100:  # Too small, likely icon
+            return False
+    
+    # Default to True if no exclusion patterns found
+    return True
+
 # Advanced Product Scraping with Playwright for JavaScript-rendered content
 async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     """
