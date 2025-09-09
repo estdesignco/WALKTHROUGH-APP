@@ -1384,17 +1384,33 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            # Try to extract price
+            # Try to extract price with enhanced JavaScript handling
             for selector in price_selectors:
                 try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        text = await element.inner_text()
-                        price_match = re.search(r'\$[\d,]+\.?\d*', text)
-                        if price_match:
-                            result['cost'] = price_match.group()
-                            result['price'] = price_match.group()
+                    if selector == 'span, div, p':  # Special handling for text-based search
+                        elements = await page.query_selector_all(selector)
+                        for element in elements[:50]:  # Limit to first 50 elements for performance
+                            try:
+                                text = await element.inner_text()
+                                if '$' in text:
+                                    price_match = re.search(r'\$[\d,]+\.?\d*', text)
+                                    if price_match:
+                                        result['cost'] = price_match.group()
+                                        result['price'] = price_match.group()
+                                        break
+                            except:
+                                continue
+                        if result['price']:  # If found, break outer loop
                             break
+                    else:  # Regular selector handling
+                        element = await page.query_selector(selector)
+                        if element:
+                            text = await element.inner_text()
+                            price_match = re.search(r'\$[\d,]+\.?\d*', text)
+                            if price_match:
+                                result['cost'] = price_match.group()
+                                result['price'] = price_match.group()
+                                break
                 except:
                     continue
             
