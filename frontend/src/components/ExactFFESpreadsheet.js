@@ -223,10 +223,10 @@ const ExactFFESpreadsheet = ({
                             </td>
                           </tr>
                           
-                          {/* ITEMS ROWS */}
+                          {/* ITEMS ROWS with alternating colors */}
                           {subcategory.items?.map((item, itemIndex) => (
                             <tr key={`${subcategory.id}-${itemIndex}`} 
-                                className="hover:bg-gray-50">
+                                className={`${itemIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 transition-colors`}>
                               
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 {item.name || ''}
@@ -255,14 +255,6 @@ const ExactFFESpreadsheet = ({
                               </td>
                               <td className="border border-gray-400 px-2 py-2 text-right text-sm">
                                 {item.cost ? `$${item.cost}` : ''}
-                              </td>
-                              <td className="border border-gray-400 px-2 py-2 text-center text-sm">
-                                {item.link ? (
-                                  <a href={item.link} target="_blank" rel="noopener noreferrer"
-                                     className="text-blue-600 hover:text-blue-800 underline text-xs">
-                                    View Link
-                                  </a>
-                                ) : ''}
                               </td>
                               <td className="border border-gray-400 px-2 py-2 text-center">
                                 {item.image_url ? (
@@ -293,6 +285,11 @@ const ExactFFESpreadsheet = ({
                               </td>
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 {item.notes || ''}
+                              </td>
+                              <td className="border border-gray-400 px-2 py-2 text-center">
+                                <button className="text-red-600 hover:text-red-800 text-xs">
+                                  Delete
+                                </button>
                               </td>
                             </tr>
                           ))}
