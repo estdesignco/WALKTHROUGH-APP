@@ -1708,10 +1708,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 # Shopify and modern e-commerce selectors
                 '.product-form__sku, .product__sku, .sku-value',
                 '.product-meta .sku, .product-info .sku',
-                '[class*="sku"], [class*="item-number"], [class*="product-id"]',
+                '[class*="sku"]:not([class*="nav"]):not([class*="menu"])',
+                '[class*="item-number"], [class*="product-id"]',
                 '[class*="model"], [class*="part-number"]',
                 '[data-testid*="sku"], [data-test*="sku"]',
-                'span, div, p'  # Will filter for SKU-like content
+                # Look for text that contains the product ID from URL
+                f'*:contains("{url.split("/")[-1]}")'  # Extract ID from URL
             ]
             
             # Try to extract SKU/Item Number with enhanced filtering
