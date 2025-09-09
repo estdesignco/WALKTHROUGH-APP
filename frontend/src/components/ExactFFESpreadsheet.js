@@ -228,15 +228,15 @@ const ExactFFESpreadsheet = ({
                             <td className="border border-gray-400" style={{ backgroundColor: getInstalledColor() }}></td>
                             
                             {/* ADDITIONAL INFO columns */}
-                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
+                            <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
                                 style={{ backgroundColor: getAdditionalInfoColor() }}>
                               FINISH/Color
                             </th>
-                            <th className="border border-gray-400 px-2 py-2 text-right text-xs font-bold text-white min-w-[80px]" 
+                            <th className="border border-gray-400 px-2 py-2 text-right text-xs font-bold text-white" 
                                 style={{ backgroundColor: getAdditionalInfoColor() }}>
                               Cost/Price
                             </th>
-                            <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[80px]" 
+                            <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white" 
                                 style={{ backgroundColor: getAdditionalInfoColor() }}>
                               Image
                             </th>
