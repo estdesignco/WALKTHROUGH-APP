@@ -167,7 +167,7 @@ const ProfessionalFFESpreadsheet = ({
 
   // Get status color
   const getStatusColor = (status) => {
-    const statusItem = itemStatuses.find(s => s.status === status);
+    const statusItem = enhancedItemStatuses.find(s => s.status === status);
     return statusItem ? statusItem.color : '#999999';
   };
 
