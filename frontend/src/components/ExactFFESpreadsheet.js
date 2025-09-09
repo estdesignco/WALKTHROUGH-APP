@@ -361,22 +361,22 @@ const ExactFFESpreadsheet = ({
                                 </select>
                               </td>
                               
-                              {/* FINISH/Color */}
+                              {/* FINISH/Color - Clean, no border */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <input 
                                   type="text"
                                   value={item.finish_color || 'Antique Brass'}
-                                  className="w-full bg-transparent text-white border-none outline-none"
+                                  className="w-full bg-transparent text-white border-0 outline-none p-0 m-0"
                                   placeholder="Finish/Color..."
                                 />
                               </td>
                               
-                              {/* Cost/Price */}
+                              {/* Cost/Price - Clean, no border */}
                               <td className="border border-gray-400 px-2 py-2 text-right text-sm">
                                 <input 
                                   type="number"
                                   value={item.cost || 1250}
-                                  className="w-full bg-transparent text-white border-none outline-none text-right"
+                                  className="w-full bg-transparent text-white border-0 outline-none text-right p-0 m-0"
                                   placeholder="0.00"
                                   step="0.01"
                                 />
