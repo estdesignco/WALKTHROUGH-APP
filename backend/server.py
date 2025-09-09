@@ -1656,16 +1656,30 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'span, div, p'  # Will filter for dimension-like content
             ]
             
+            # Try to extract dimensions/size information with enhanced filtering
             for selector in size_selectors:
                 try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        text = await element.inner_text()
-                        # Look for dimension patterns like "24"W x 18"H x 12"D"
-                        size_match = re.search(r'[\d.]+"?\s*[WwHhDdLl][\s\x]*[\d.]+"?\s*[WwHhDdLl]', text)
-                        if size_match:
-                            result['size'] = size_match.group()
+                    if selector == 'span, div, p':  # Special handling for generic elements
+                        elements = await page.query_selector_all(selector)
+                        for element in elements:
+                            try:
+                                text = await element.inner_text()
+                                if text and _extract_dimensions_from_text(text):
+                                    result['size'] = _extract_dimensions_from_text(text)
+                                    break
+                            except:
+                                continue
+                        if result['size']:  # If found, break outer loop
                             break
+                    else:  # Regular selector handling
+                        element = await page.query_selector(selector)
+                        if element:
+                            text = await element.inner_text()
+                            # Look for dimension patterns like "24"W x 18"H x 12"D"
+                            size_match = re.search(r'[\d.]+"?\s*[WwHhDdLl][\s\x]*[\d.]+"?\s*[WwHhDdLl]', text)
+                            if size_match:
+                                result['size'] = size_match.group()
+                                break
                 except:
                     continue
             
