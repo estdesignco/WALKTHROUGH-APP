@@ -144,6 +144,9 @@ const ExactFFESpreadsheet = ({
     };
     return deliveryColors[status] || '#FEF08A';
   };
+
+  // Handle tracking items
+  const handleTrackItem = async (item) => {
     if (!item.tracking_number) {
       alert('❌ No tracking number available');
       return;
