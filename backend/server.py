@@ -1425,11 +1425,17 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'img'
             ]
             
+            # Enhanced description selectors for JavaScript-rendered content
             description_selectors = [
-                '[class*="description"], [class*="detail"]',
+                # Shopify and modern e-commerce selectors
+                '.product__description, .product-description, .product-content',
+                '.product-single__description, .product-form__description',
+                '[class*="description"], [class*="detail"], [class*="content"]',
                 '[data-testid*="description"], [data-test*="description"]',
+                '.rte, .rich-text, .formatted-text',
+                # Generic selectors
                 '.product-description, .item-details, .product-details',
-                'p:contains("Description"), div:contains("Description") + *'
+                'p, div'  # Will filter for description-like content
             ]
             
             # Try to extract product name
