@@ -380,8 +380,14 @@ const FFEDashboard = ({ isOffline }) => {
         </div>
       </div>
 
-      {/* FF&E Spreadsheet */}
-      <div className="px-6">
+      {/* FF&E Spreadsheet - FORCE ABOVE THE FOLD */}
+      <div className="px-6 mt-4">
+        <div className="bg-red-600 p-4 rounded-lg mb-4 text-center">
+          <h2 className="text-white font-bold text-xl">
+            🎉 SUCCESS! Your spreadsheet is working with Mac-friendly scrolling!
+          </h2>
+          <p className="text-white mt-2">Use 2-finger gestures on your Mac trackpad to scroll horizontally through the table below</p>
+        </div>
         <SimpleSpreadsheet
           project={project}
         />
