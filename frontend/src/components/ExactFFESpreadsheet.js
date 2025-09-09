@@ -425,12 +425,9 @@ const ExactFFESpreadsheet = ({
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 {item.tracking_number ? (
                                   <div className="space-y-1">
-                                    <input 
-                                      type="text"
-                                      value={item.tracking_number}
-                                      className="w-full bg-transparent text-white border-0 outline-none p-0 m-0"
-                                      placeholder="Tracking #..."
-                                    />
+                                    <div className="text-white text-xs">
+                                      {item.tracking_number}
+                                    </div>
                                     <button 
                                       onClick={() => handleTrackItem(item)}
                                       className="text-blue-400 text-xs underline hover:text-blue-300"
@@ -443,7 +440,7 @@ const ExactFFESpreadsheet = ({
                                 )}
                               </td>
                               
-                              {/* Order Date - DATE PICKER in container */}
+                              {/* Order Date - DATE PICKER in container (KEEP CONTAINER) */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <div>
                                   <input 
