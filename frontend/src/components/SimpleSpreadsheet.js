@@ -71,14 +71,29 @@ const SimpleSpreadsheet = ({
         🎉 SPREADSHEET IS WORKING! Project: {project.name}
       </h2>
       
-      {/* MAC-FRIENDLY SCROLLING CONTAINER */}
+      {/* HORIZONTAL SCROLLING CONTAINER - COMPLETELY REBUILT */}
       <div 
-        className="w-full overflow-auto border border-neutral-600"
+        className="relative w-full border border-neutral-600"
         style={{ 
           height: '60vh',
-          overscrollBehaviorX: 'contain'
+          overflow: 'hidden'
         }}
       >
+        <div
+          className="w-full h-full"
+          style={{
+            overflowX: 'scroll',
+            overflowY: 'scroll', 
+            scrollBehavior: 'smooth',
+            WebkitOverflowScrolling: 'touch',
+            msOverflowStyle: 'scrollbar',
+            scrollbarWidth: 'thin'
+          }}
+          onWheel={(e) => {
+            // Allow all scrolling - don't interfere
+            e.stopPropagation();
+          }}
+        >
         <table 
           className="border-collapse bg-neutral-800"
           style={{ 
