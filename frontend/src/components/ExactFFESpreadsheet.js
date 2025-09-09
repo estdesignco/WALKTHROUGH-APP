@@ -97,37 +97,40 @@ const ExactFFESpreadsheet = ({
           
           <table className="w-full border-collapse border border-gray-400">
             
-            {/* COLUMN HEADERS spanning across horizontally */}
+            {/* COLUMN HEADERS spanning across horizontally - EXACT STRUCTURE FROM YOUR IMAGES */}
             <thead>
-              {/* Main section headers */}
+              {/* Main section headers - Exact colors from your images */}
               <tr>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-white text-center" 
-                    style={{ backgroundColor: '#8B7355' }} colSpan="8">
+                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white text-center" 
+                    style={{ backgroundColor: '#8B7355' }} colSpan="9">
                   ADDITIONAL INFO.
                 </th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-white text-center" 
-                    style={{ backgroundColor: '#9B8E9B' }} colSpan="7">
+                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white text-center" 
+                    style={{ backgroundColor: '#A49AA4' }} colSpan="6">
                   SHIPPING INFO.
                 </th>
               </tr>
               
-              {/* Individual column headers */}
+              {/* Individual column headers - Exact structure from your images */}
               <tr className="bg-gray-100">
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[200px]">ITEM NAME</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[150px]">VENDOR/SKU</th>
-                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-semibold text-gray-800 min-w-[60px]">QTY</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[100px]">SIZE</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[120px]">ORDER STATUS</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[120px]">FINISH/Color</th>
-                <th className="border border-gray-400 px-2 py-2 text-right text-xs font-semibold text-gray-800 min-w-[100px]">Cost/Price</th>
-                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-semibold text-gray-800 min-w-[120px]">LINK</th>
-                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-semibold text-gray-800 min-w-[80px]">Image</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[100px]">CARRIER</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[140px]">TRACKING #</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[110px]">ORDER DATE</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[120px]">DELIVERY DATE</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[110px]">INSTALL DATE</th>
-                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-semibold text-gray-800 min-w-[150px]">NOTES</th>
+                {/* ADDITIONAL INFO columns */}
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[200px]">ITEM NAME</th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[150px]">VENDOR/SKU</th>
+                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-gray-800 min-w-[60px]">QTY</th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[100px]">SIZE</th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[120px]">ORDER STATUS</th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[120px]">FINISH/Color</th>
+                <th className="border border-gray-400 px-2 py-2 text-right text-xs font-bold text-gray-800 min-w-[100px]">Cost/Price</th>
+                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-gray-800 min-w-[120px]">LINK</th>
+                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-gray-800 min-w-[80px]">Image</th>
+                
+                {/* SHIPPING INFO columns */}
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[100px]">CARRIER</th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[140px]">TRACKING #</th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[110px]">ORDER DATE</th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[120px]">DELIVERY DATE</th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[110px]">INSTALL DATE</th>
+                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-gray-800 min-w-[150px]">NOTES</th>
               </tr>
             </thead>
             
