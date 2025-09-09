@@ -142,7 +142,7 @@ const ExactFFESpreadsheet = ({
                   {/* ROOM HEADER ROW - Different color for each room */}
                   <tr>
                     <td colSpan="15" 
-                        className="border border-gray-400 px-3 py-2 text-white text-sm font-semibold"
+                        className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                         style={{ backgroundColor: getRoomColor(room.name) }}>
                       {room.name.toUpperCase()}
                     </td>
