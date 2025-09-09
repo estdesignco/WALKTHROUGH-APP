@@ -1411,52 +1411,90 @@ async def get_project(project_id: str):
 
 # ROOM ENDPOINTS with 3-level auto-population
 @api_router.post("/rooms", response_model=Room)
-async def create_room(room: RoomCreate):
-    room_dict = room.dict()
-    room_obj = Room(**room_dict)
-    room_obj.color = get_room_color(room_obj.name)
-    
-    result = await db.rooms.insert_one(room_obj.dict())
-    
-    if result.inserted_id:
-        # Auto-create 3-level structure
-        room_type = room_obj.name.lower()
-        structure = ROOM_DEFAULT_STRUCTURE.get(room_type, {
-            'Lighting': ['Installed', 'Portable']
-        })
+async def create_room(room_data: RoomCreate):
+    """Create a new room with COMPREHENSIVE default structure"""
+    try:
+        # Import the comprehensive room structure
+        from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE
         
-        for cat_index, (category_name, subcategories) in enumerate(structure.items()):
-            # Create category (GREEN level)
-            category_data = {
-                "id": str(uuid.uuid4()),
+        room_name_lower = room_data.name.lower()
+        
+        # Get comprehensive structure for this room
+        room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(room_name_lower, {})
+        
+        # Create room object
+        room_dict = room_data.dict()
+        room_dict["id"] = str(uuid.uuid4())
+        room_dict["color"] = get_room_color(room_data.name)
+        room_dict["categories"] = []
+        room_dict["created_at"] = datetime.utcnow()
+        room_dict["updated_at"] = datetime.utcnow()
+        
+        # Add ALL categories and subcategories with DEFAULT ITEMS
+        for category_name, subcategories_dict in room_structure.items():
+            category_id = str(uuid.uuid4())
+            category = {
+                "id": category_id,
+                "room_id": room_dict["id"],
                 "name": category_name,
-                "room_id": room_obj.id,
                 "color": get_category_color(category_name),
-                "description": f"{category_name} for {room_obj.name}",
-                "order_index": cat_index,
                 "subcategories": [],
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
-            await db.categories.insert_one(category_data)
             
-            # Create subcategories (RED level)
-            for sub_index, subcategory_name in enumerate(subcategories):
-                subcategory_data = {
-                    "id": str(uuid.uuid4()),
+            # Add subcategories with items
+            for subcategory_name, items_list in subcategories_dict.items():
+                subcategory_id = str(uuid.uuid4())
+                subcategory = {
+                    "id": subcategory_id,
+                    "category_id": category_id,
                     "name": subcategory_name,
-                    "category_id": category_data["id"],
                     "color": get_subcategory_color(subcategory_name),
-                    "description": f"{subcategory_name} items",
-                    "order_index": sub_index,
                     "items": [],
                     "created_at": datetime.utcnow(),
                     "updated_at": datetime.utcnow()
                 }
-                await db.subcategories.insert_one(subcategory_data)
+                
+                # Add DEFAULT ITEMS with sample data to test dropdowns
+                for item_name in items_list[:5]:  # Limit to first 5 items per subcategory
+                    item_id = str(uuid.uuid4())
+                    item = {
+                        "id": item_id,
+                        "subcategory_id": subcategory_id,
+                        "name": item_name,
+                        "quantity": 1,
+                        "size": "Standard",
+                        "status": "PICKED",  # Default status with color
+                        "vendor": "Sample Vendor",
+                        "cost": 100.00,
+                        "finish_color": "Natural",
+                        "carrier": "FedEx",  # Default carrier with color
+                        "ship_to": "Client",  # Default ship to with color
+                        "delivery_status": "PENDING",  # Default delivery status with color
+                        "notes": "Default item",
+                        "created_at": datetime.utcnow(),
+                        "updated_at": datetime.utcnow()
+                    }
+                    subcategory["items"].append(item)
+                
+                category["subcategories"].append(subcategory)
+            
+            room_dict["categories"].append(category)
         
-        return room_obj
-    raise HTTPException(status_code=400, detail="Failed to create room")
+        # Insert into database
+        result = await db.rooms.insert_one(room_dict)
+        
+        # Retrieve and return the created room
+        created_room = await db.rooms.find_one({"_id": result.inserted_id})
+        created_room["id"] = str(created_room["_id"])
+        del created_room["_id"]
+        
+        return Room(**created_room)
+        
+    except Exception as e:
+        logger.error(f"Error creating room: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create room: {str(e)}")
 
 # SUBCATEGORY ENDPOINTS
 @api_router.post("/subcategories", response_model=SubCategory)
