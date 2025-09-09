@@ -394,39 +394,38 @@ const ExactFFESpreadsheet = ({
                                 {item.size || '28"W x 30"H'}
                               </td>
                               
-                              {/* ORDERS STATUS - COLOR-CODED DROPDOWN */}
+                              {/* ORDERS STATUS - ALL COLOR-CODED OPTIONS */}
                               <td className="border border-gray-400 px-2 py-2 text-sm">
                                 <select 
                                   value={item.status || 'PICKED'}
                                   className="w-full border-none outline-none rounded px-2 py-1 text-xs font-medium"
                                   style={{
-                                    backgroundColor: item.status === 'PICKED' ? '#FEF08A' :
-                                                   item.status === 'APPROVED' ? '#A7F3D0' :
-                                                   item.status === 'ORDERED' ? '#FED7AA' :
-                                                   item.status === 'SHIPPED' ? '#FEF08A' :
-                                                   item.status === 'DELIVERED TO RECEIVER' ? '#C7D2FE' :
-                                                   item.status === 'DELIVERED TO STORE' ? '#DDD6FE' :
-                                                   item.status === 'DELIVERED TO JOBSITE' ? '#BFDBFE' :
-                                                   item.status === 'ON HOLD' ? '#A5F3FC' :
-                                                   item.status === 'PARTIALLY DELIVERED' ? '#A7F3D0' :
-                                                   item.status === 'DAMAGED' ? '#FED7AA' :
-                                                   item.status === 'BACKORDERED' ? '#FCA5A5' :
-                                                   item.status === 'AT WORKROOM' ? '#DDD6FE' : '#FEF08A',
+                                    backgroundColor: getStatusColor(item.status || 'PICKED'),
                                     color: '#000'
                                   }}
                                 >
-                                  <option value="PICKED">PICKED</option>
+                                  <option value="TO BE SELECTED">TO BE SELECTED</option>
+                                  <option value="RESEARCHING">RESEARCHING</option>
+                                  <option value="PENDING APPROVAL">PENDING APPROVAL</option>
                                   <option value="APPROVED">APPROVED</option>
                                   <option value="ORDERED">ORDERED</option>
+                                  <option value="PICKED">PICKED</option>
+                                  <option value="CONFIRMED">CONFIRMED</option>
+                                  <option value="IN PRODUCTION">IN PRODUCTION</option>
                                   <option value="SHIPPED">SHIPPED</option>
+                                  <option value="IN TRANSIT">IN TRANSIT</option>
+                                  <option value="OUT FOR DELIVERY">OUT FOR DELIVERY</option>
                                   <option value="DELIVERED TO RECEIVER">DELIVERED TO RECEIVER</option>
-                                  <option value="DELIVERED TO STORE">DELIVERED TO STORE</option>
-                                  <option value="DELIVERED TO JOBSITE">DELIVERED TO JOBSITE</option>
+                                  <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
+                                  <option value="RECEIVED">RECEIVED</option>
+                                  <option value="READY FOR INSTALL">READY FOR INSTALL</option>
+                                  <option value="INSTALLING">INSTALLING</option>
+                                  <option value="INSTALLED">INSTALLED</option>
                                   <option value="ON HOLD">ON HOLD</option>
-                                  <option value="PARTIALLY DELIVERED">PARTIALLY DELIVERED</option>
-                                  <option value="DAMAGED">DAMAGED</option>
                                   <option value="BACKORDERED">BACKORDERED</option>
-                                  <option value="AT WORKROOM">AT WORKROOM</option>
+                                  <option value="DAMAGED">DAMAGED</option>
+                                  <option value="RETURNED">RETURNED</option>
+                                  <option value="CANCELLED">CANCELLED</option>
                                 </select>
                               </td>
                               
