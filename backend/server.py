@@ -1619,11 +1619,15 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            # Try to extract dimensions/size information
+            # Enhanced dimensions/size selectors for JavaScript-rendered content
             size_selectors = [
+                # Specific dimension/size selectors
+                '.product-dimensions, .product-size, .dimensions, .size-info',
                 '[class*="dimension"], [class*="size"], [class*="measurement"]',
-                'span:contains("W"), span:contains("H"), span:contains("D")',
-                'div:contains("Dimensions"), p:contains("Size")'
+                '[data-testid*="dimension"], [data-test*="size"]',
+                '.product-details .dimensions, .product-specs .size',
+                # Generic elements that might contain size info
+                'span, div, p'  # Will filter for dimension-like content
             ]
             
             for selector in size_selectors:
