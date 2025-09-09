@@ -341,25 +341,14 @@ const ExactFFESpreadsheet = ({
                                 </select>
                               </td>
                               
-                              {/* FINISH/Color - Clean, no border */}
-                              <td className="border border-gray-400 px-2 py-2 text-sm">
-                                <input 
-                                  type="text"
-                                  value={item.finish_color || 'Antique Brass'}
-                                  className="w-full bg-transparent text-white border-0 outline-none p-0 m-0"
-                                  placeholder="Finish/Color..."
-                                />
+                              {/* FINISH/Color - Plain text, no container */}
+                              <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                {item.finish_color || 'Antique Brass'}
                               </td>
                               
-                              {/* Cost/Price - Clean, no border */}
-                              <td className="border border-gray-400 px-2 py-2 text-right text-sm">
-                                <input 
-                                  type="number"
-                                  value={item.cost || 1250}
-                                  className="w-full bg-transparent text-white border-0 outline-none text-right p-0 m-0"
-                                  placeholder="0.00"
-                                  step="0.01"
-                                />
+                              {/* Cost/Price - Plain text, no container */}
+                              <td className="border border-gray-400 px-2 py-2 text-right text-sm text-white">
+                                ${item.cost || 1250}
                               </td>
                               
                               {/* Image */}
