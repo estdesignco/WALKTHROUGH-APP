@@ -234,6 +234,7 @@ const SimpleSpreadsheet = ({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
       
       <div className="p-4 text-center">
