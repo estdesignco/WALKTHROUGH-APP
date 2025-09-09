@@ -1397,6 +1397,32 @@ def _extract_sku_from_text(text: str) -> Optional[str]:
     
     return None
 
+# Helper function to extract dimensions from text
+def _extract_dimensions_from_text(text: str) -> Optional[str]:
+    """
+    Extract dimension information from text with enhanced filtering
+    """
+    if not text or len(text.strip()) <= 5:
+        return None
+    
+    text = text.strip()
+    
+    # Look for dimension patterns like "24"W x 18"H x 12"D", "12 x 8 x 6 inches", etc.
+    dimension_patterns = [
+        r'[\d.]+"?\s*[WwHhDdLl][\s\x]*[\d.]+"?\s*[WwHhDdLl][\s\x]*[\d.]+"?\s*[WwHhDdLl]',  # 24"W x 18"H x 12"D
+        r'[\d.]+"?\s*[WwHhDdLl][\s\x]*[\d.]+"?\s*[WwHhDdLl]',  # 24"W x 18"H
+        r'\d+\.?\d*\s*[x×]\s*\d+\.?\d*\s*[x×]\s*\d+\.?\d*\s*(?:inches?|in\.?|cm|mm)',  # 12 x 8 x 6 inches
+        r'\d+\.?\d*\s*[x×]\s*\d+\.?\d*\s*(?:inches?|in\.?|cm|mm)',  # 12 x 8 inches
+        r'(?:dimensions?|size):\s*[\d.]+"?\s*[WwHhDdLl][\s\x]*[\d.]+"?\s*[WwHhDdLl]',  # Dimensions: 24"W x 18"H
+    ]
+    
+    for pattern in dimension_patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            return match.group().strip()
+    
+    return None
+
 # Advanced Product Scraping with Playwright for JavaScript-rendered content
 async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     """
