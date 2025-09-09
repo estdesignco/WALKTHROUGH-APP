@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import AddItemModal from './AddItemModal';
 
-const SimpleSpreadsheet = ({ project }) => {
+const SimpleSpreadsheet = ({ 
+  project, 
+  roomColors, 
+  categoryColors, 
+  itemStatuses,
+  vendorTypes = [],
+  carrierTypes = [],
+  onDeleteRoom, 
+  onReload
+}) => {
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
 
