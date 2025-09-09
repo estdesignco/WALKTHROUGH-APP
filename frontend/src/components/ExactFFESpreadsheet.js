@@ -159,19 +159,19 @@ const ExactFFESpreadsheet = ({
                               {subcategory.name.toUpperCase()}
                             </th>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
-                                style={{ backgroundColor: getItemNameColor() }}>
+                                style={{ backgroundColor: getInstalledColor() }}>
                               VENDOR/SKU
                             </th>
                             <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[50px]" 
-                                style={{ backgroundColor: getItemNameColor() }}>
+                                style={{ backgroundColor: getInstalledColor() }}>
                               QTY
                             </th>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[80px]" 
-                                style={{ backgroundColor: getItemNameColor() }}>
+                                style={{ backgroundColor: getInstalledColor() }}>
                               SIZE
                             </th>
                             <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
-                                style={{ backgroundColor: getItemNameColor() }}>
+                                style={{ backgroundColor: getInstalledColor() }}>
                               ORDERS STATUS
                             </th>
                             
