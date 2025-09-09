@@ -209,7 +209,9 @@ class CriticalBugTester:
             self.log_test("CRITICAL: Status Colors Endpoint", False, f"Enhanced status endpoint failed: {statuses_data} (Status: {status_code})", is_critical=True)
             colors_working = False
         else:
-            if isinstance(statuses_data, list) and len(statuses_data) > 0:
+            # Handle wrapped response format
+            actual_data = statuses_data.get('data', statuses_data) if isinstance(statuses_data, dict) else statuses_data
+            if isinstance(actual_data, list) and len(actual_data) > 0:
                 # Check if statuses have color information
                 statuses_with_colors = [s for s in statuses_data if isinstance(s, dict) and 'color' in s and s.get('color')]
                 
