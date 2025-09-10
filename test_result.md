@@ -211,17 +211,17 @@ frontend:
         agent: "testing"
         comment: "3-LEVEL HIERARCHY VERIFICATION COMPLETED: ✅ PERFECT STRUCTURE CONFIRMED - LIVING ROOM (purple #8E4EC6) > LIGHTING (green #0b4e38) > INSTALLED (red #b43535) hierarchy displays correctly. ✅ VISUAL ORGANIZATION: Room headers span full width with proper color coding, category sections clearly defined, subcategory headers with multi-section layout (RED-BROWN-PURPLE-RED sections). ✅ DATA ORGANIZATION: Items properly nested under correct subcategories, all 16 table columns visible (Item Name, Vendor/SKU, Qty, Size, Orders Status, Finish/Color, Cost/Price, Link, Image, shipping info columns, Notes, Delete). ✅ INTERACTIVE HIERARCHY: Add Item buttons functional in each section, proper section management with Add/Delete capabilities. The 3-level hierarchy is visually perfect and functionally complete."
 
-  - task: "Status Overview and Item Counting"
+  - task: "Header Pie Chart Fixes (Real pie charts, labels, order)"
     implemented: true
     working: true
-    file: "FFEDashboard.js"
+    file: "StatusOverview.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Status overview working correctly. Shows accurate counts: 2 Total Items, 1 PICKED, 1 ORDERED. All status breakdowns functional."
+        comment: "🎉 ALL PIE CHART ISSUES FIXED: Installed Chart.js and react-chartjs-2. Replaced fake circular borders with real pie charts showing actual slices (no doughnut hole). Added proper labels with lines pointing to slices showing counts and percentages. Removed redundant summary counts from status overview. Fixed shipping section order: PIE CHART → Carrier Breakdown → Total Counts. Restored 'Shipping Status Totals' section that was incorrectly deleted. Both status and carrier pie charts working with proper color coding and interactive legends."
 
 metadata:
   created_by: "main_agent"
