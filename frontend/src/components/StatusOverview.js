@@ -1,4 +1,14 @@
 import React from 'react';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend
+} from 'chart.js';
+import { Pie } from 'react-chartjs-2';
+
+// Register Chart.js components
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemStatuses }) => {
   // Status colors for pie chart and breakdown
