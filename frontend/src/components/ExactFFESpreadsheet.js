@@ -217,14 +217,14 @@ const ExactFFESpreadsheet = ({
     return roomColors[roomName.toLowerCase()] || '#7C3AED';
   };
 
-  // LIGHTING muted darker green
-  const getCategoryColor = () => '#14532D'; // Muted darker green (was #166534)
+  // LIGHTING reduced to 5 intensity
+  const getCategoryColor = () => '#166534'; // Reduced to 5 intensity (from #14532D)
 
-  // MUTED header colors - reduced intensity
-  const getMainHeaderColor = () => '#991B1B';        // Muted Red-800 (was #B91C1C)
-  const getAdditionalInfoColor = () => '#92400E';    // Muted Amber-800 (was #A16207)
-  const getShippingInfoColor = () => '#6B21A8';      // Muted Violet-800 (was #7C3AED)  
-  const getNotesActionsColor = () => '#B91C1C';      // Muted Red-700 (was #DC2626)
+  // HEADER colors - reduced to 5 intensity  
+  const getMainHeaderColor = () => '#B91C1C';        // Reduced to 5 intensity (from #991B1B)
+  const getAdditionalInfoColor = () => '#A16207';    // Reduced to 5 intensity (from #92400E)
+  const getShippingInfoColor = () => '#7C3AED';      // Reduced to 5 intensity (from #6B21A8)  
+  const getNotesActionsColor = () => '#DC2626';      // Reduced to 5 intensity (from #B91C1C)
 
   if (!project || !project.rooms) {
     return (
