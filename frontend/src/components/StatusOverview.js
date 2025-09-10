@@ -154,63 +154,27 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       
-      {/* LEFT COLUMN - PIE CHART */}
+      {/* LEFT COLUMN - STATUS PIE CHART */}
       <div className="bg-gray-800 rounded-xl p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Status Overview</h3>
         
-        {/* PIE CHART PLACEHOLDER - Restore this! */}
-        <div className="flex items-center justify-center h-48 mb-4">
-          <div className="relative w-32 h-32">
-            <div className="absolute inset-0 rounded-full border-8 border-gray-600"></div>
-            <div className="absolute inset-0 rounded-full border-8 border-green-500 border-r-transparent border-b-transparent" 
-                 style={{ transform: 'rotate(45deg)' }}></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">{totalItems}</div>
-                <div className="text-sm text-gray-400">Total Items</div>
-              </div>
+        {/* REAL PIE CHART WITH LABELS AND LINES */}
+        <div className="h-64 mb-4">
+          {totalItems > 0 ? (
+            <Pie data={statusPieData} options={pieOptions} />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-400">
+              No items to display
             </div>
-          </div>
-        </div>
-
-        {/* SUMMARY COUNTS - PUT BACK THE TOTALS! */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Total Items</span>
-            <span className="text-white font-medium">{totalItems}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Completed</span>
-            <span className="text-green-400 font-medium">{getCompletedItems()}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-400">In Transit</span>
-            <span className="text-orange-400 font-medium">{getInTransitItems()}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Pending</span>
-            <span className="text-yellow-400 font-medium">{getPendingItems()}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-400">On Hold</span>
-            <span className="text-red-400 font-medium">{statusBreakdown['ON HOLD'] || 0}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Backordered</span>
-            <span className="text-red-400 font-medium">{statusBreakdown['BACKORDERED'] || 0}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Damaged</span>
-            <span className="text-red-400 font-medium">{statusBreakdown['DAMAGED'] || 0}</span>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* MIDDLE COLUMN - STATUS BREAKDOWN */}
+      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST */}
       <div className="bg-gray-800 rounded-xl p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Status Breakdown</h3>
         
-        <div className="space-y-3">
+        <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
             'TO BE SELECTED', 'RESEARCHING', 'PENDING APPROVAL',
             'APPROVED', 'ORDERED', 'PICKED', 'CONFIRMED',
@@ -251,62 +215,88 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* RIGHT COLUMN - CARRIER BREAKDOWN WITH PIE CHART */}
+      {/* RIGHT COLUMN - SHIPPING SECTION */}
       <div className="bg-gray-800 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Shipping Carrier Breakdown</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">Shipping Information</h3>
         
-        {/* CARRIER PIE CHART */}
-        <div className="flex items-center justify-center h-32 mb-4">
-          <div className="relative w-24 h-24">
-            <div className="absolute inset-0 rounded-full border-8 border-gray-600"></div>
-            <div className="absolute inset-0 rounded-full border-8 border-orange-500 border-r-transparent border-b-transparent" 
-                 style={{ transform: 'rotate(90deg)' }}></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-lg font-bold text-white">{Object.values(carrierBreakdown).reduce((a, b) => a + b, 0)}</div>
-                <div className="text-xs text-gray-400">Shipments</div>
+        {/* 1. CARRIER PIE CHART */}
+        <div className="mb-6">
+          <h4 className="text-md font-medium text-gray-300 mb-3">Carrier Distribution</h4>
+          <div className="h-48">
+            {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
+              <Pie data={carrierPieData} options={pieOptions} />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-400">
+                No carrier data
               </div>
-            </div>
+            )}
           </div>
         </div>
-        
-        <div className="space-y-3">
-          {[
-            'FedEx', 'UPS', 'USPS', 'DHL', 'Brooks', 'Zenith', 'Sunbelt',
-            'R+L Carriers', 'Yellow Freight', 'XPO Logistics', 'Old Dominion',
-            'ABF Freight', 'Estes Express', 'Saia LTL', 'TForce Freight',
-            'Roadrunner', 'Central Transport', 'Southeastern Freight',
-            'Averitt Express', 'Holland', 'OTHER'
-          ].map(carrier => {
-            const count = carrierBreakdown[carrier] || 0;
-            const percentage = totalItems > 0 ? (count / totalItems) * 100 : 0;
-            
-            return (
-              <div key={carrier} className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: getCarrierColor(carrier) }}
-                  ></div>
-                  <span className="text-sm text-gray-300">{carrier}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="bg-gray-700 rounded-full h-2 w-16">
-                    <div
-                      className="h-2 rounded-full transition-all duration-300"
-                      style={{
-                        backgroundColor: getCarrierColor(carrier),
-                        width: `${percentage}%`
-                      }}
-                    />
+
+        {/* 2. SHIPPING CARRIER BREAKDOWN */}
+        <div className="mb-6">
+          <h4 className="text-md font-medium text-gray-300 mb-3">Carrier Breakdown</h4>
+          <div className="space-y-2 max-h-40 overflow-y-auto">
+            {[
+              'FedEx', 'UPS', 'USPS', 'DHL', 'Brooks', 'Zenith', 'Sunbelt',
+              'R+L Carriers', 'Yellow Freight', 'XPO Logistics', 'Old Dominion',
+              'ABF Freight', 'Estes Express', 'Saia LTL', 'TForce Freight',
+              'Roadrunner', 'Central Transport', 'Southeastern Freight',
+              'Averitt Express', 'Holland', 'OTHER'
+            ].filter(carrier => carrierBreakdown[carrier] > 0).map(carrier => {
+              const count = carrierBreakdown[carrier] || 0;
+              
+              return (
+                <div key={carrier} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: getCarrierColor(carrier) }}
+                    ></div>
+                    <span className="text-sm text-gray-300">{carrier}</span>
                   </div>
-                  <span className="text-sm font-medium text-white w-8 text-right">
+                  <span className="text-sm font-medium text-white">
                     {count}
                   </span>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 3. TOTAL COUNTS (SHIPPED, IN TRANSIT, ETC.) - PUT BACK! */}
+        <div>
+          <h4 className="text-md font-medium text-gray-300 mb-3">Shipping Status Totals</h4>
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Total Items</span>
+              <span className="text-white font-medium">{totalItems}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Completed</span>
+              <span className="text-green-400 font-medium">{getCompletedItems()}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">In Transit</span>
+              <span className="text-orange-400 font-medium">{getInTransitItems()}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Pending</span>
+              <span className="text-yellow-400 font-medium">{getPendingItems()}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">On Hold</span>
+              <span className="text-red-400 font-medium">{statusBreakdown['ON HOLD'] || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Backordered</span>
+              <span className="text-red-400 font-medium">{statusBreakdown['BACKORDERED'] || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Damaged</span>
+              <span className="text-red-400 font-medium">{statusBreakdown['DAMAGED'] || 0}</span>
+            </div>
+          </div>
         </div>
       </div>
       
