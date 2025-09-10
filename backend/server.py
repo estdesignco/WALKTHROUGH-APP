@@ -1471,7 +1471,7 @@ async def create_room(room_data: RoomCreate):
                     "updated_at": datetime.utcnow()
                 }
                 
-                # Add ALL ITEMS from the comprehensive list with BLANK defaults
+                # Add ALL ITEMS from the comprehensive list with VALID defaults
                 for item_name in items_list:  # ALL items, not just first 5
                     item_id = str(uuid.uuid4())
                     item = {
@@ -1480,7 +1480,7 @@ async def create_room(room_data: RoomCreate):
                         "name": item_name,
                         "quantity": 1,
                         "size": "",
-                        "status": "",  # BLANK default
+                        "status": "PICKED",  # Valid default status
                         "vendor": "",
                         "cost": 0,
                         "finish_color": "",
