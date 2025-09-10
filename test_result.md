@@ -164,6 +164,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "🚨 CRITICAL BUG RESOLUTION CONFIRMED: Comprehensive testing of reported scraping issues shows ALL SYSTEMS OPERATIONAL. ✅ WHOLESALE VENDOR SCRAPING: Tested Four Hands (https://fourhands.com/product/248067-003), Visual Comfort, Uttermost, and Bernhardt URLs - all return 200 OK with proper JSON structure. Four Hands correctly extracts name='Fenn Chair', vendor='Four Hands', sku='248067-003'. ✅ VENDOR DETECTION: All 24 wholesale vendors properly detected from URLs. ✅ API STRUCTURE: Perfect {success: true, data: {...}} response format with all 8 expected fields (name, price, vendor, image_url, description, sku, size, color). ✅ ERROR HANDLING: Graceful handling of invalid URLs, timeouts, and network issues. ✅ INTEGRATION: Successfully integrates with item creation workflow. The reported 'scraping not working' issue is RESOLVED - the scraping system is fully operational and ready for production use with wholesale furniture vendors."
+      - working: true
+        agent: "testing"
+        comment: "🎯 OVERNIGHT SCRAPING VERIFICATION COMPLETED: Four Hands URL (https://fourhands.com/product/248067-003) successfully extracts name='Fenn Chair', vendor='Four Hands', sku='248067-003' as requested in review. Enhanced selectors working correctly for wholesale vendor detection. Scraping returns proper JSON structure with all expected fields. Backend logs confirm successful vendor detection and data extraction. Core scraping functionality operational and ready for production use with wholesale furniture vendors."
 
   - task: "Dropdown Colors and Status Options (Critical Bug Fix)"
     implemented: true
