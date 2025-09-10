@@ -76,14 +76,14 @@ class FFEAPITester:
         except Exception as e:
             return False, f"Unexpected error: {str(e)}", 0
 
-    def test_project_retrieval(self):
-        """Test GET /api/projects/{project_id} - Main FF&E endpoint"""
-        print("\n=== Testing Project Retrieval (Main FF&E Endpoint) ===")
+    def test_project_data_structure(self):
+        """Test Project Data Structure - verify 3-level hierarchy (Room > Category > Subcategory > Items)"""
+        print("\n=== Testing Project Data Structure (Review Request) ===")
         
         success, data, status_code = self.make_request('GET', f'/projects/{PROJECT_ID}')
         
         if not success:
-            self.log_test("GET Project", False, f"Failed to retrieve project: {data} (Status: {status_code})")
+            self.log_test("GET Project Data Structure", False, f"Failed to retrieve project: {data} (Status: {status_code})")
             return False
             
         # Verify project structure
@@ -91,38 +91,105 @@ class FFEAPITester:
         missing_fields = [field for field in required_fields if field not in data]
         
         if missing_fields:
-            self.log_test("GET Project", False, f"Missing required fields: {missing_fields}")
+            self.log_test("Project Structure - Required Fields", False, f"Missing required fields: {missing_fields}")
             return False
+        else:
+            self.log_test("Project Structure - Required Fields", True, "All required fields present")
             
-        # Check if project has rooms with FF&E structure
+        # Analyze 3-level hierarchy in detail
         rooms = data.get('rooms', [])
         if not rooms:
-            self.log_test("GET Project", True, "Project retrieved but no rooms found")
-            return True
+            self.log_test("Project Structure - Rooms", False, "No rooms found in project")
+            return False
             
-        # Verify 3-level hierarchy: Room > Category > Sub-category > Items
-        hierarchy_valid = True
+        # Detailed hierarchy analysis
+        hierarchy_stats = {
+            'rooms': len(rooms),
+            'categories': 0,
+            'subcategories': 0,
+            'items': 0
+        }
+        
         hierarchy_details = []
+        room_colors = set()
+        category_colors = set()
+        subcategory_colors = set()
         
         for room in rooms:
             room_name = room.get('name', 'Unknown')
+            room_color = room.get('color', 'No color')
+            room_colors.add(room_color)
             categories = room.get('categories', [])
+            hierarchy_stats['categories'] += len(categories)
             
             for category in categories:
                 cat_name = category.get('name', 'Unknown')
+                cat_color = category.get('color', 'No color')
+                category_colors.add(cat_color)
                 subcategories = category.get('subcategories', [])
+                hierarchy_stats['subcategories'] += len(subcategories)
                 
                 for subcategory in subcategories:
                     subcat_name = subcategory.get('name', 'Unknown')
+                    subcat_color = subcategory.get('color', 'No color')
+                    subcategory_colors.add(subcat_color)
                     items = subcategory.get('items', [])
+                    hierarchy_stats['items'] += len(items)
                     
-                    hierarchy_details.append(f"{room_name} > {cat_name} > {subcat_name} ({len(items)} items)")
+                    if items:  # Only show subcategories with items for clarity
+                        hierarchy_details.append(f"{room_name} > {cat_name} > {subcat_name} ({len(items)} items)")
         
-        if hierarchy_details:
-            self.log_test("GET Project", True, f"Project with FF&E hierarchy found. Structure: {'; '.join(hierarchy_details[:3])}")
+        # Log hierarchy statistics
+        self.log_test("Project 3-Level Hierarchy", True, 
+                     f"Structure: {hierarchy_stats['rooms']} rooms → {hierarchy_stats['categories']} categories → {hierarchy_stats['subcategories']} subcategories → {hierarchy_stats['items']} items")
+        
+        # Verify color coding
+        if len(room_colors) > 1 or (len(room_colors) == 1 and 'No color' not in room_colors):
+            self.log_test("Room Color Coding", True, f"Room colors: {list(room_colors)}")
         else:
-            self.log_test("GET Project", True, "Project retrieved with room structure but no items yet")
+            self.log_test("Room Color Coding", False, "Rooms missing color coding")
             
+        if len(category_colors) > 1 or (len(category_colors) == 1 and 'No color' not in category_colors):
+            self.log_test("Category Color Coding", True, f"Category colors: {list(category_colors)}")
+        else:
+            self.log_test("Category Color Coding", False, "Categories missing color coding")
+            
+        if len(subcategory_colors) > 1 or (len(subcategory_colors) == 1 and 'No color' not in subcategory_colors):
+            self.log_test("Subcategory Color Coding", True, f"Subcategory colors: {list(subcategory_colors)}")
+        else:
+            self.log_test("Subcategory Color Coding", False, "Subcategories missing color coding")
+        
+        # Show sample hierarchy
+        if hierarchy_details:
+            sample_hierarchy = "; ".join(hierarchy_details[:3])  # Show first 3 for brevity
+            self.log_test("Hierarchy Sample", True, f"Sample: {sample_hierarchy}")
+        
+        # Verify items have proper structure
+        if hierarchy_stats['items'] > 0:
+            # Check a sample item for required fields
+            sample_item = None
+            for room in rooms:
+                for category in room.get('categories', []):
+                    for subcategory in category.get('subcategories', []):
+                        items = subcategory.get('items', [])
+                        if items:
+                            sample_item = items[0]
+                            break
+                    if sample_item:
+                        break
+                if sample_item:
+                    break
+            
+            if sample_item:
+                item_fields = list(sample_item.keys())
+                expected_item_fields = ['id', 'name', 'status', 'vendor', 'cost']
+                found_fields = [f for f in expected_item_fields if f in item_fields]
+                
+                if len(found_fields) >= 3:
+                    self.log_test("Item Structure", True, f"Items have proper structure. Sample fields: {item_fields[:8]}")
+                else:
+                    self.log_test("Item Structure", False, f"Items missing key fields. Found: {found_fields}")
+        
         return True
 
     def test_add_room_functionality(self):
