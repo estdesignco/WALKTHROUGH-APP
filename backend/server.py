@@ -2194,6 +2194,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'h1, h2:first-of-type'
             ]
             
+            # ✅ ENHANCED FOUR HANDS SPECIFIC SELECTORS FOR IMAGE, COST, SIZE
             # Enhanced price selectors for JavaScript-rendered content
             price_selectors = [
                 # Four Hands specific selectors (JavaScript-rendered)
@@ -2201,6 +2202,10 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 '.product-form__price, .product__price, .price__sale, .price__regular',
                 '.price-item--regular, .price__regular, .price--highlight',
                 'span[class*="price"], div[class*="price"]',
+                # Four Hands specific price patterns
+                '.product-meta .price, .product-info .price, .pricing .price',
+                '.variant-picker .price, .product-form .price',
+                '[data-product-price], [data-variant-price]',
                 # Shopify common selectors
                 '.product__price .money, .product-form__price .money',
                 '.price-list .price-item, .product-price-wrap .price',
