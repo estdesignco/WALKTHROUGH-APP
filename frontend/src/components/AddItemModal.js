@@ -63,27 +63,49 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
         throw new Error('No product data could be extracted from this URL');
       }
       
-      // ✅ FORCE IMMEDIATE STATE UPDATE WITH SCRAPED DATA
+      // ✅ IMMEDIATE DOM UPDATE (WORKAROUND FOR REACT STATE ISSUE)
+      setTimeout(() => {
+        // Direct DOM updates to force field population
+        const nameField = document.querySelector('input[placeholder*="Table Lamp"]');
+        const vendorField = document.querySelector('input[placeholder*="Four Hands"]');
+        const skuField = document.querySelector('input[placeholder*="248067"]');
+        
+        if (nameField && data.name) {
+          nameField.value = data.name;
+          nameField.dispatchEvent(new Event('input', { bubbles: true }));
+          console.log('🔗 FORCE UPDATED NAME FIELD');
+        }
+        
+        if (vendorField && data.vendor) {
+          vendorField.value = data.vendor;
+          vendorField.dispatchEvent(new Event('input', { bubbles: true }));
+          console.log('🔗 FORCE UPDATED VENDOR FIELD');
+        }
+        
+        if (skuField && data.sku) {
+          skuField.value = data.sku;
+          skuField.dispatchEvent(new Event('input', { bubbles: true }));
+          console.log('🔗 FORCE UPDATED SKU FIELD');
+        }
+      }, 500);
+      
+      // Also update React state
       const updatedData = {
-        name: data.name || data.product_name || data.title || '',
+        name: data.name || '',
         quantity: formData.quantity,
-        size: data.size || data.dimensions || data.specs || formData.size,
+        size: data.size || formData.size,
         status: formData.status,
-        vendor: data.vendor || data.brand || data.manufacturer || '',
-        sku: data.sku || data.model || data.item_number || '',
+        vendor: data.vendor || '',
+        sku: data.sku || '',
         remarks: data.description ? data.description.substring(0, 200) : formData.remarks,
-        cost: data.price ? parseFloat(data.price.toString().replace(/[$,]/g, '')) : (data.cost ? parseFloat(data.cost.toString().replace(/[$,]/g, '')) : formData.cost),
+        cost: data.price ? parseFloat(data.price.toString().replace(/[$,]/g, '')) : formData.cost,
         link: formData.link,
         tracking_number: formData.tracking_number,
-        image_url: data.image_url || data.image || data.thumbnail || formData.image_url,
-        finish_color: data.color || data.finish || data.finish_color || formData.finish_color
+        image_url: data.image_url || formData.image_url,
+        finish_color: data.color || data.finish || formData.finish_color
       };
       
-      console.log('🔗 FORCE UPDATING WITH:', updatedData);
-      
-      // IMMEDIATE FORCED UPDATE
       setFormData(updatedData);
-      
       setScrapeError('');
       
       // ✅ SUCCESS BANNER REMOVED AS REQUESTED
