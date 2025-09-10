@@ -602,13 +602,14 @@ class FFEAPITester:
         print("🚀 Starting FF&E Backend API Tests")
         print("=" * 50)
         
-        # Run tests in logical order
-        self.test_project_retrieval()
-        self.test_room_operations()
-        self.test_item_operations()
-        self.test_enum_endpoints()
-        self.test_link_scraping()
-        self.test_data_persistence()
+        # Run tests in logical order based on review request
+        self.test_project_data_structure()  # Test #5: Project Data Structure
+        self.test_add_room_functionality()  # Test #1: Add Room Functionality  
+        self.test_dropdown_endpoints()      # Test #2: Dropdown Data Endpoints
+        self.test_link_scraping()          # Test #3: Web Scraping Endpoint
+        self.test_item_operations()        # Test #4: Item CRUD Operations
+        self.test_enum_endpoints()         # Additional: Basic enum endpoints
+        self.test_data_persistence()       # Additional: Data persistence
         
         # Clean up
         self.cleanup_test_data()
