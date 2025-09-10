@@ -231,11 +231,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "CRITICAL BUG TESTING COMPLETED - All 3 reported issues resolved"
-    - "Scraping functionality working with wholesale vendor URLs"
-    - "Dropdown colors available from backend APIs with proper color coding" 
-    - "All delivery status options present and functional"
-    - "Backend APIs 100% operational (23/23 tests passed)"
+    - "Header Pie Chart Fixes - Real pie charts with labels and correct order implemented"
+    - "All backend functionality working (scraping, dropdowns, data structure)"
+    - "Frontend displaying correctly with proper 3-level hierarchy"
   stuck_tasks: []
   test_all: false
   test_priority: "critical_bugs_resolved"
