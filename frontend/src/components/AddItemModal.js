@@ -77,14 +77,18 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       };
       
       console.log('🔗 UPDATING FORM DATA:', updatedData);
-      setFormData(updatedData);
-      setScrapeError('');
       
-      // FORCE RE-RENDER BY TRIGGERING A SMALL STATE CHANGE
+      // FORCE STATE UPDATE AND RE-RENDER
+      setFormData(updatedData);
+      
+      // Force a small delay to ensure state update completes
       setTimeout(() => {
-        console.log('🔗 FORCE RE-RENDER - Current form data:', updatedData);
-        setFormData(prev => ({ ...prev })); // Force re-render
+        console.log('🔗 FORCED RE-RENDER - Form state should be updated');
+        // Force re-render by updating state again with spread operator
+        setFormData(prev => ({ ...updatedData }));
       }, 100);
+      
+      setScrapeError('');
       
       // VISUAL FEEDBACK
       // ✅ SUCCESS BANNER REMOVED AS REQUESTED
