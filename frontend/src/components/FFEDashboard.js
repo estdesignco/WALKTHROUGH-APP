@@ -439,7 +439,7 @@ const FFEDashboard = ({ isOffline }) => {
           onClose={() => setShowScrapingTest(false)}
           onSubmit={(itemData) => {
             // For testing, just show the data
-            alert(`✅ SCRAPING TEST COMPLETE!\n\nData Extracted:\n${JSON.stringify(itemData, null, 2)}`);
+            // ✅ SUCCESS BANNER REMOVED AS REQUESTED
             setShowScrapingTest(false);
           }}
           itemStatuses={itemStatuses}
