@@ -2467,6 +2467,16 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
+            # Add final debug logging before return
+            print(f"🎉 SCRAPING COMPLETED for {url}")
+            print(f"📊 FINAL RESULT:")
+            print(f"   Name: {result.get('name', 'None')}")
+            print(f"   Vendor: {result.get('vendor', 'None')}")
+            print(f"   SKU: {result.get('sku', 'None')}")
+            print(f"   Price: {result.get('price', 'None')}")
+            print(f"   Cost: {result.get('cost', 'None')}")
+            print(f"   Image: {result.get('image_url', 'None')}")
+            
             return result
             
         except Exception as e:
