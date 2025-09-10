@@ -268,7 +268,9 @@ const ExactFFESpreadsheet = ({
             
             <tbody>
               {/* HIERARCHICAL STRUCTURE AS ROW HEADERS */}
-              {project.rooms.map((room) => (
+              {project.rooms.map((room, roomIndex) => {
+                console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
+                return (
                 <React.Fragment key={room.id}>
                   
                   {/* ROOM HEADER ROW - Muted colors */}
@@ -281,7 +283,9 @@ const ExactFFESpreadsheet = ({
                   </tr>
                   
                   {/* ROOM CATEGORIES */}
-                  {room.categories?.map((category) => (
+                  {room.categories?.map((category, catIndex) => {
+                    console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
+                    return (
                     <React.Fragment key={category.id}>
                       
                       {/* CATEGORY HEADER ROW */}
