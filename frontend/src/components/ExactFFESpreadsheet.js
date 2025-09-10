@@ -179,7 +179,8 @@ const ExactFFESpreadsheet = ({
         const trackingData = await response.json();
         // ✅ SUCCESS BANNER REMOVED AS REQUESTED
       } else {
-        alert('❌ Failed to get tracking information');
+        console.error('❌ Failed to get tracking information');
+        // ✅ ERROR BANNER REMOVED - NO MORE POPUPS
       }
     } catch (error) {
       console.error('❌ Tracking error:', error);
