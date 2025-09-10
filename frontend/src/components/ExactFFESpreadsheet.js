@@ -158,7 +158,7 @@ const ExactFFESpreadsheet = ({
   // Handle tracking items
   const handleTrackItem = async (item) => {
     if (!item.tracking_number) {
-      alert('❌ No tracking number available');
+      console.error('❌ No tracking number available');
       return;
     }
 
