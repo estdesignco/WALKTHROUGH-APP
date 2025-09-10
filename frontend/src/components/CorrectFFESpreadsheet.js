@@ -54,7 +54,7 @@ const CorrectFFESpreadsheet = ({
       }
     } catch (error) {
       console.error('❌ Error adding item:', error);
-      alert('❌ Failed to add item: ' + error.message);
+      console.error('❌ Failed to add item:', error.message);
     }
   };
 
