@@ -11,6 +11,11 @@ const ExactFFESpreadsheet = ({
   onDeleteRoom, 
   onReload 
 }) => {
+  // ✅ DEBUG LOGGING TO FIND EMPTY SPREADSHEET ISSUE
+  console.log('📊 ExactFFESpreadsheet - Project data:', project);
+  console.log('📊 ExactFFESpreadsheet - Rooms count:', project?.rooms?.length || 0);
+  console.log('📊 ExactFFESpreadsheet - First room:', project?.rooms?.[0] || 'No rooms');
+  
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
 
