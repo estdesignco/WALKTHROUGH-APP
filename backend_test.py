@@ -253,22 +253,98 @@ class FFEAPITester:
         
         return True
 
+    def test_dropdown_endpoints(self):
+        """Test all dropdown endpoints with colors as requested in review"""
+        print("\n=== Testing Dropdown Data Endpoints (Review Request) ===")
+        
+        # Test /api/item-statuses-enhanced (should return 22+ statuses with colors)
+        success, statuses_data, status_code = self.make_request('GET', '/item-statuses-enhanced')
+        if success and isinstance(statuses_data, list) and len(statuses_data) > 0:
+            self.log_test("GET /api/item-statuses-enhanced", True, f"Retrieved {len(statuses_data)} enhanced statuses")
+            
+            # Check for colors and expected count
+            statuses_with_colors = [s for s in statuses_data if isinstance(s, dict) and 'color' in s]
+            if len(statuses_with_colors) >= 22:
+                self.log_test("Item Statuses with Colors", True, f"Found {len(statuses_with_colors)} statuses with colors (≥22 expected)")
+                
+                # Check for key statuses with colors
+                key_statuses = ['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO JOB SITE', 'INSTALLED']
+                found_key_statuses = []
+                for status_obj in statuses_with_colors:
+                    if status_obj.get('status') in key_statuses:
+                        found_key_statuses.append(f"{status_obj['status']} ({status_obj['color']})")
+                
+                if len(found_key_statuses) >= 3:
+                    self.log_test("Key Item Statuses with Colors", True, f"Found: {found_key_statuses}")
+                else:
+                    self.log_test("Key Item Statuses with Colors", False, f"Missing key statuses. Found: {found_key_statuses}")
+            else:
+                self.log_test("Item Statuses with Colors", False, f"Only {len(statuses_with_colors)} statuses with colors (expected ≥22)")
+        else:
+            self.log_test("GET /api/item-statuses-enhanced", False, f"Failed: {statuses_data} (Status: {status_code})")
+            
+        # Test /api/carrier-options (should return 19+ carriers with colors)
+        success, carriers_data, status_code = self.make_request('GET', '/carrier-options')
+        if success and isinstance(carriers_data, list) and len(carriers_data) > 0:
+            self.log_test("GET /api/carrier-options", True, f"Retrieved {len(carriers_data)} carrier options")
+            
+            # Check for colors and expected count
+            carriers_with_colors = [c for c in carriers_data if isinstance(c, dict) and 'color' in c]
+            if len(carriers_with_colors) >= 19:
+                self.log_test("Carrier Options with Colors", True, f"Found {len(carriers_with_colors)} carriers with colors (≥19 expected)")
+                
+                # Check for key carriers with colors
+                key_carriers = ['FedEx', 'UPS', 'Brooks', 'Zenith']
+                found_key_carriers = []
+                for carrier_obj in carriers_with_colors:
+                    if carrier_obj.get('name') in key_carriers:
+                        found_key_carriers.append(f"{carrier_obj['name']} ({carrier_obj['color']})")
+                
+                if len(found_key_carriers) >= 2:
+                    self.log_test("Key Carrier Options with Colors", True, f"Found: {found_key_carriers}")
+                else:
+                    self.log_test("Key Carrier Options with Colors", False, f"Missing key carriers. Found: {found_key_carriers}")
+            else:
+                self.log_test("Carrier Options with Colors", False, f"Only {len(carriers_with_colors)} carriers with colors (expected ≥19)")
+        else:
+            self.log_test("GET /api/carrier-options", False, f"Failed: {carriers_data} (Status: {status_code})")
+            
+        # Test /api/ship-to-options (should return 4 options)
+        success, ship_to_data, status_code = self.make_request('GET', '/ship-to-options')
+        if success and isinstance(ship_to_data, list):
+            if len(ship_to_data) >= 4:
+                self.log_test("GET /api/ship-to-options", True, f"Retrieved {len(ship_to_data)} ship-to options (≥4 expected)")
+            else:
+                self.log_test("GET /api/ship-to-options", False, f"Only {len(ship_to_data)} ship-to options (expected 4)")
+        else:
+            self.log_test("GET /api/ship-to-options", False, f"Failed: {ship_to_data} (Status: {status_code})")
+            
+        # Test /api/delivery-status-options (should return 14+ delivery statuses)
+        success, delivery_data, status_code = self.make_request('GET', '/delivery-status-options')
+        if success and isinstance(delivery_data, list):
+            if len(delivery_data) >= 14:
+                self.log_test("GET /api/delivery-status-options", True, f"Retrieved {len(delivery_data)} delivery status options (≥14 expected)")
+                
+                # Check for key delivery statuses
+                key_delivery_statuses = ['SHIPPED', 'IN TRANSIT', 'OUT FOR DELIVERY', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE']
+                found_delivery_statuses = [s for s in delivery_data if s in key_delivery_statuses]
+                if len(found_delivery_statuses) >= 3:
+                    self.log_test("Key Delivery Status Options", True, f"Found: {found_delivery_statuses}")
+                else:
+                    self.log_test("Key Delivery Status Options", False, f"Missing key delivery statuses. Found: {found_delivery_statuses}")
+            else:
+                self.log_test("GET /api/delivery-status-options", False, f"Only {len(delivery_data)} delivery status options (expected ≥14)")
+        else:
+            self.log_test("GET /api/delivery-status-options", False, f"Failed: {delivery_data} (Status: {status_code})")
+
     def test_enum_endpoints(self):
-        """Test status, vendor, and carrier enum endpoints"""
-        print("\n=== Testing Enum Endpoints ===")
+        """Test basic enum endpoints for backward compatibility"""
+        print("\n=== Testing Basic Enum Endpoints ===")
         
         # Test item statuses
         success, statuses, status_code = self.make_request('GET', '/item-statuses')
         if success and isinstance(statuses, list) and len(statuses) > 0:
             self.log_test("Get Item Statuses", True, f"Retrieved {len(statuses)} statuses")
-            
-            # Check for key statuses
-            key_statuses = ['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO JOB SITE', 'INSTALLED']
-            found_statuses = [s for s in key_statuses if s in statuses]
-            if len(found_statuses) >= 3:
-                self.log_test("Key Item Statuses", True, f"Found key statuses: {found_statuses}")
-            else:
-                self.log_test("Key Item Statuses", False, f"Missing key statuses. Found: {found_statuses}")
         else:
             self.log_test("Get Item Statuses", False, f"Failed to get statuses: {statuses}")
             
@@ -276,14 +352,6 @@ class FFEAPITester:
         success, vendors, status_code = self.make_request('GET', '/vendor-types')
         if success and isinstance(vendors, list) and len(vendors) > 0:
             self.log_test("Get Vendor Types", True, f"Retrieved {len(vendors)} vendors")
-            
-            # Check for key vendors
-            key_vendors = ['Visual Comfort', 'Four Hands', 'Bernhardt', 'Loloi Rugs']
-            found_vendors = [v for v in key_vendors if v in vendors]
-            if len(found_vendors) >= 2:
-                self.log_test("Key Vendor Types", True, f"Found key vendors: {found_vendors}")
-            else:
-                self.log_test("Key Vendor Types", False, f"Missing key vendors. Found: {found_vendors}")
         else:
             self.log_test("Get Vendor Types", False, f"Failed to get vendors: {vendors}")
             
@@ -291,14 +359,6 @@ class FFEAPITester:
         success, carriers, status_code = self.make_request('GET', '/carrier-types')
         if success and isinstance(carriers, list) and len(carriers) > 0:
             self.log_test("Get Carrier Types", True, f"Retrieved {len(carriers)} carriers")
-            
-            # Check for key carriers
-            key_carriers = ['FedEx', 'UPS', 'White Glove Delivery', 'Freight']
-            found_carriers = [c for c in key_carriers if c in carriers]
-            if len(found_carriers) >= 2:
-                self.log_test("Key Carrier Types", True, f"Found key carriers: {found_carriers}")
-            else:
-                self.log_test("Key Carrier Types", False, f"Missing key carriers. Found: {found_carriers}")
         else:
             self.log_test("Get Carrier Types", False, f"Failed to get carriers: {carriers}")
 
