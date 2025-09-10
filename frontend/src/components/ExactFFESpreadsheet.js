@@ -238,7 +238,19 @@ const ExactFFESpreadsheet = ({
     <div className="w-full bg-white">
       
       {/* ONE CONTINUOUS SPREADSHEET */}
-      <div className="w-full overflow-auto" style={{ height: '80vh' }}>
+      {/* ✅ FIXED SCROLLING ISSUE - PROPER CONTAINMENT */}
+      <div 
+        className="w-full overflow-x-auto overflow-y-visible" 
+        style={{ 
+          height: '80vh',
+          overscrollBehavior: 'contain',
+          scrollBehavior: 'smooth'
+        }}
+        onScroll={(e) => {
+          // Prevent page navigation on scroll boundaries
+          e.stopPropagation();
+        }}
+      >
         <div style={{ minWidth: '2500px' }}>
           
           <table className="w-full border-collapse border border-gray-400">
