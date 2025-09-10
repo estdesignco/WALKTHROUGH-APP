@@ -79,7 +79,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       setScrapeError('');
       
       // VISUAL FEEDBACK
-      alert(`✅ SCRAPING SUCCESS!\nName: ${updatedData.name}\nVendor: ${updatedData.vendor}\nCost: ${updatedData.cost}`);
+      // ✅ SUCCESS BANNER REMOVED AS REQUESTED
       
     } catch (error) {
       console.error('🔗 SCRAPING ERROR:', error);
