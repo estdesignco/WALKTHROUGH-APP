@@ -231,6 +231,20 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
               </select>
             </div>
 
+            {/* ✅ SKU FIELD ADDED AS REQUESTED */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                SKU / Model Number (Optional)
+              </label>
+              <input
+                type="text"
+                value={formData.sku}
+                onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                placeholder="e.g., 248067-003, SKU-12345..."
+              />
+            </div>
+
             {/* Cost and Link */}
             <div className="grid grid-cols-2 gap-4">
               <div>
