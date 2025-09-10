@@ -184,7 +184,8 @@ const ExactFFESpreadsheet = ({
       }
     } catch (error) {
       console.error('❌ Tracking error:', error);
-      alert('❌ Tracking service unavailable');
+      console.error('❌ Tracking service unavailable');
+      // ✅ ERROR BANNER REMOVED - NO MORE POPUPS
     }
   };
 
