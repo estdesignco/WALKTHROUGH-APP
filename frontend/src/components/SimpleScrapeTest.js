@@ -78,7 +78,7 @@ const SimpleScrapeTest = () => {
     } catch (error) {
       console.error('🔗 SCRAPING ERROR:', error);
       setScrapeError('SCRAPING FAILED: ' + error.message);
-      alert(`❌ SCRAPING FAILED: ${error.message}`);
+      console.error(`❌ SCRAPING FAILED: ${error.message}`);
     } finally {
       setIsScraping(false);
     }
