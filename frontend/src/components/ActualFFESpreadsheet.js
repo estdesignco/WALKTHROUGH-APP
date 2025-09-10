@@ -69,7 +69,7 @@ const ActualFFESpreadsheet = ({
       });
 
       if (response.ok) {
-        alert(`✅ ITEM ADDED!\nName: ${itemData.name}\nVendor: ${itemData.vendor}`);
+        // ✅ SUCCESS BANNER REMOVED AS REQUESTED
         setShowAddItem(false);
         setSelectedSubCategoryId(null);
         
