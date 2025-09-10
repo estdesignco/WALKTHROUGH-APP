@@ -276,37 +276,31 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           </div>
         </div>
 
-        {/* 3. SHIPPING STATUS TOTALS */}
+        {/* 3. SHIPPING STATUS GRID - LIKE THE IMAGE! */}
         <div>
-          <h4 className="text-md font-medium text-gray-300 mb-3">Shipping Status Totals</h4>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Total Items</span>
-              <span className="text-white font-medium">{totalItems}</span>
+          <div className="grid grid-cols-2 gap-3">
+            {/* Total Items */}
+            <div className="bg-gray-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-white">{totalItems}</div>
+              <div className="text-sm text-gray-400">Total Items</div>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Completed</span>
-              <span className="text-green-400 font-medium">{getCompletedItems()}</span>
+            
+            {/* Delivered */}
+            <div className="bg-gray-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-green-400">0</div>
+              <div className="text-sm text-gray-400">Delivered</div>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">In Transit</span>
-              <span className="text-orange-400 font-medium">{getInTransitItems()}</span>
+            
+            {/* In Transit */}
+            <div className="bg-gray-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-orange-400">0</div>
+              <div className="text-sm text-gray-400">In Transit</div>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Pending</span>
-              <span className="text-yellow-400 font-medium">{getPendingItems()}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">On Hold</span>
-              <span className="text-red-400 font-medium">{statusBreakdown['ON HOLD'] || 0}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Backordered</span>
-              <span className="text-red-400 font-medium">{statusBreakdown['BACKORDERED'] || 0}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Damaged</span>
-              <span className="text-red-400 font-medium">{statusBreakdown['DAMAGED'] || 0}</span>
+            
+            {/* On Hold */}
+            <div className="bg-gray-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-red-400">0</div>
+              <div className="text-sm text-gray-400">On Hold</div>
             </div>
           </div>
         </div>
