@@ -2472,6 +2472,36 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
+            # ✅ ENHANCED SIZE/DIMENSION EXTRACTION FOR FOUR HANDS
+            size_selectors = [
+                # Four Hands specific dimension selectors
+                '[class*="dimension"], [class*="spec"], [class*="size"]',
+                '.product-info .dimensions, .product-meta .size',
+                '.specifications .dimensions, .specs .size',
+                'div:contains("Dimensions"), span:contains("Size"), p:contains("Dimensions")',
+                'div:contains("W "), div:contains("H "), div:contains("D ")',  # Width, Height, Depth
+                'div:contains("inches"), div:contains("\\""), span:contains("cm")',
+                # Common size patterns
+                '[data-dimensions], [data-size], [data-specs]',
+                '.product-dimensions, .item-size, .product-specs'
+            ]
+            
+            for selector in size_selectors:
+                try:
+                    if 'contains' in selector:
+                        # Skip complex selectors for now
+                        continue
+                    element = await page.query_selector(selector)
+                    if element:
+                        text = await element.inner_text()
+                        # Look for dimension patterns like "24W x 18D x 30H"
+                        if any(char in text.lower() for char in ['x', 'w', 'h', 'd', '"', 'inch', 'cm']):
+                            result['size'] = text.strip()
+                            print(f"📏 SIZE FOUND: {text.strip()}")
+                            break
+                except:
+                    continue
+            
             # Add final debug logging before return
             print(f"🎉 SCRAPING COMPLETED for {url}")
             print(f"📊 FINAL RESULT:")
