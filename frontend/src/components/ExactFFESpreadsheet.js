@@ -188,29 +188,29 @@ const ExactFFESpreadsheet = ({
   // MUTED COLORS FOR EACH ROOM - Reduced from 10 to 7 intensity!
   const getRoomColor = (roomName) => {
     const roomColors = {
-      'living room': '#8B5CF6',      // Reduced to 5 intensity (from #7C3AED)
-      'dining room': '#EF4444',      // Reduced to 5 intensity (from #DC2626)  
-      'kitchen': '#F59E0B',          // Reduced to 5 intensity (from #D97706)
-      'primary bedroom': '#10B981',  // Reduced to 5 intensity (from #059669)
-      'primary bathroom': '#3B82F6', // Reduced to 5 intensity (from #2563EB)
-      'powder room': '#8B5A2B',      // Reduced to 5 intensity (from #78716C)
-      'guest room': '#EC4899',       // Reduced to 5 intensity (from #DB2777)
-      'office': '#6366F1',           // Reduced to 5 intensity (from #4F46E5)
-      'laundry room': '#84CC16',     // Reduced to 5 intensity (from #65A30D)
-      'mudroom': '#06B6D4',          // Reduced to 5 intensity (from #0891B2)
-      'family room': '#F97316',      // Reduced to 5 intensity (from #EA580C)
+      'living room': '#6B46C1',      // More muted (intensity 8-9)
+      'dining room': '#B91C1C',      // More muted (intensity 8-9)  
+      'kitchen': '#B45309',          // More muted (intensity 8-9)
+      'primary bedroom': '#047857',  // More muted (intensity 8-9)
+      'primary bathroom': '#1E40AF', // More muted (intensity 8-9)
+      'powder room': '#78716C',      // More muted (intensity 8-9)
+      'guest room': '#BE185D',       // More muted (intensity 8-9)
+      'office': '#3730A3',           // More muted (intensity 8-9)
+      'laundry room': '#4D7C0F',     // More muted (intensity 8-9)
+      'mudroom': '#0E7490',          // More muted (intensity 8-9)
+      'family room': '#C2410C',      // More muted (intensity 8-9)
       'basement': '#6B7280',         // Keep Gray
-      'attic storage': '#92400E',    // Reduced to 5 intensity (from #78716C)
+      'attic storage': '#78716C',    // More muted (intensity 8-9)
       'garage': '#374151',           // Keep Gray-800
-      'balcony': '#7C3AED',          // Reduced to 5 intensity (from #6D28D9)
-      'screened porch': '#059669',   // Reduced to 5 intensity (from #047857)
-      'pool house': '#0EA5E9',       // Reduced to 5 intensity (from #0284C7)
-      'guest house': '#DC2626',      // Reduced to 5 intensity (from #B91C1C)
-      'butler\'s pantry': '#D97706', // Reduced to 5 intensity (from #B45309)
-      'conservatory': '#65A30D',     // Reduced to 5 intensity (from #4D7C0F)
+      'balcony': '#6D28D9',          // More muted (intensity 8-9)
+      'screened porch': '#047857',   // More muted (intensity 8-9)
+      'pool house': '#0284C7',       // More muted (intensity 8-9)
+      'guest house': '#B91C1C',      // More muted (intensity 8-9)
+      'butler\'s pantry': '#B45309', // More muted (intensity 8-9)
+      'conservatory': '#4D7C0F',     // More muted (intensity 8-9)
       'formal living room': '#92400E', // Keep Orange-900
-      'great room': '#4338CA',       // Reduced to 5 intensity (from #3730A3)
-      'billiards room': '#BE185D',   // Reduced to 5 intensity (from #A21CAF)
+      'great room': '#3730A3',       // More muted (intensity 8-9)
+      'billiards room': '#A21CAF',   // More muted (intensity 8-9)
       'study': '#374151',            // Keep Gray-700
       'sitting room': '#1E40AF'      // Keep Blue-700
     };
