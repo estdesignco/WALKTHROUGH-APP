@@ -97,8 +97,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       console.error('🔗 SCRAPING ERROR:', error);
       setScrapeError('SCRAPING FAILED: ' + error.message);
       
-      // VISUAL ERROR FEEDBACK  
-      alert(`❌ SCRAPING FAILED: ${error.message}`);
+      // ✅ ERROR BANNER REMOVED - NO MORE POPUPS
     } finally {
       setIsScraping(false);
     }
