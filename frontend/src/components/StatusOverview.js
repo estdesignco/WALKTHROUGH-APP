@@ -58,6 +58,99 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
            (statusBreakdown['PICKED'] || 0);
   };
 
+  // Prepare data for Status Overview pie chart
+  const statusPieData = {
+    labels: Object.keys(statusBreakdown).filter(status => statusBreakdown[status] > 0),
+    datasets: [
+      {
+        data: Object.keys(statusBreakdown)
+          .filter(status => statusBreakdown[status] > 0)
+          .map(status => statusBreakdown[status]),
+        backgroundColor: Object.keys(statusBreakdown)
+          .filter(status => statusBreakdown[status] > 0)
+          .map(status => getStatusColor(status)),
+        borderWidth: 0,
+        hoverBorderWidth: 2,
+        hoverBorderColor: '#ffffff'
+      }
+    ]
+  };
+
+  // Prepare data for Carrier pie chart
+  const carrierPieData = {
+    labels: Object.keys(carrierBreakdown).filter(carrier => carrierBreakdown[carrier] > 0),
+    datasets: [
+      {
+        data: Object.keys(carrierBreakdown)
+          .filter(carrier => carrierBreakdown[carrier] > 0)
+          .map(carrier => carrierBreakdown[carrier]),
+        backgroundColor: Object.keys(carrierBreakdown)
+          .filter(carrier => carrierBreakdown[carrier] > 0)
+          .map(carrier => getCarrierColor(carrier)),
+        borderWidth: 0,
+        hoverBorderWidth: 2,
+        hoverBorderColor: '#ffffff'
+      }
+    ]
+  };
+
+  // Chart options for real pie charts with labels and lines
+  const pieOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: {
+          color: '#ffffff',
+          font: {
+            size: 12
+          },
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 15,
+          generateLabels: function(chart) {
+            const data = chart.data;
+            if (data.labels.length && data.datasets.length) {
+              return data.labels.map((label, i) => {
+                const dataset = data.datasets[0];
+                const value = dataset.data[i];
+                const total = dataset.data.reduce((sum, val) => sum + val, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                
+                return {
+                  text: `${label} (${value}) ${percentage}%`,
+                  fillStyle: dataset.backgroundColor[i],
+                  strokeStyle: dataset.backgroundColor[i],
+                  pointStyle: 'circle',
+                  hidden: false,
+                  index: i
+                };
+              });
+            }
+            return [];
+          }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const label = context.label || '';
+            const value = context.parsed;
+            const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+            const percentage = ((value / total) * 100).toFixed(1);
+            return `${label}: ${value} items (${percentage}%)`;
+          }
+        }
+      }
+    },
+    elements: {
+      arc: {
+        borderWidth: 0
+      }
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       
