@@ -1414,28 +1414,46 @@ async def get_project(project_id: str):
 async def create_room(room_data: RoomCreate):
     """Create a new room with FULL COMPREHENSIVE structure from enhanced_rooms.py"""
     try:
-        # Import the comprehensive room structure
+        # Import comprehensive room structure
         import sys
         sys.path.append('/app/backend')
         from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE
         
-        room_name_lower = room_data.name.lower()
+        room_name_lower = room_data.name.lower().strip()
+        print(f"🏠 CREATING ROOM: {room_name_lower}")
         
         # Get FULL comprehensive structure for this room
-        room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(room_name_lower, {})
+        room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(room_name_lower)
         
-        # If room not found in comprehensive structure, still give it basic structure
+        # If exact match not found, try to find similar room or use living room as template
         if not room_structure:
-            room_structure = {
-                'Lighting': {
-                    'INSTALLED': ['Ceiling Light', 'Wall Sconces', 'Recessed Lights'],
-                    'PORTABLE': ['Table Lamp', 'Floor Lamp', 'Reading Light']
-                },
-                'Furniture': {
-                    'SEATING': ['Chair', 'Bench', 'Ottoman'],
-                    'STORAGE': ['Cabinet', 'Shelving', 'Storage Box']
+            print(f"⚠️ Room '{room_name_lower}' not found in comprehensive structure")
+            # Try to find any room with comprehensive structure or default to living room
+            if 'living room' in COMPREHENSIVE_ROOM_STRUCTURE:
+                room_structure = COMPREHENSIVE_ROOM_STRUCTURE['living room']
+                print(f"✅ Using living room structure as template")
+            else:
+                # Fallback basic structure
+                room_structure = {
+                    'Lighting': {
+                        'INSTALLED': ['Chandelier', 'Recessed Lighting', 'Wall Sconces', 'Track Lighting', 'Ceiling Fan w/ Light'],
+                        'PORTABLE': ['Table Lamp', 'Floor Lamp', 'Accent Lamp', 'Reading Lamp', 'Task Lighting']
+                    },
+                    'Furniture & Storage': {
+                        'SEATING': ['Sofa', 'Armchair', 'Ottoman', 'Accent Chair', 'Chaise Lounge'],
+                        'TABLES': ['Coffee Table', 'Side Table', 'Console Table', 'Accent Table', 'End Table'],
+                        'STORAGE': ['Bookcase', 'Media Console', 'Storage Ottoman', 'Decorative Baskets', 'Side Cabinet']
+                    }
                 }
-            }
+                print(f"🔄 Using fallback structure")
+        else:
+            print(f"✅ Found comprehensive structure for '{room_name_lower}' with {len(room_structure)} categories")
+        
+        print(f"📊 Room structure categories: {list(room_structure.keys())}")
+        
+        # Count total items that will be created
+        total_items = sum(len(items) for subcategories in room_structure.values() for items in subcategories.values())
+        print(f"🔢 Will create {total_items} items for this room")
         
         # Create room object
         room_dict = room_data.dict()
