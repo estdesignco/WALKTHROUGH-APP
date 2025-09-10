@@ -40,7 +40,7 @@ const ExactFFESpreadsheet = ({
 
       if (response.ok) {
         const result = await response.json();
-        alert(`✅ ITEM ADDED!\nName: ${result.data?.name || itemData.name}\nVendor: ${result.data?.vendor || itemData.vendor}`);
+        // ✅ SUCCESS BANNER REMOVED AS REQUESTED
         setShowAddItem(false);
         setSelectedSubCategoryId(null);
         
