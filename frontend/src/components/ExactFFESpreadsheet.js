@@ -17,7 +17,8 @@ const ExactFFESpreadsheet = ({
   // Handle adding new items with proper scraping
   const handleAddItem = async (itemData) => {
     if (!selectedSubCategoryId) {
-      alert('❌ No subcategory selected');
+      console.error('❌ No subcategory selected');
+      // ✅ ERROR BANNER REMOVED - NO MORE POPUPS
       return;
     }
 
