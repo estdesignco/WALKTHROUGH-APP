@@ -212,23 +212,18 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
               </div>
             </div>
 
-            {/* Vendor */}
+            {/* Vendor - CHANGED TO TEXT INPUT TO ACCEPT SCRAPED VALUES */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Vendor (Optional)
               </label>
-              <select
+              <input
+                type="text"
                 value={formData.vendor}
                 onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
                 className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-              >
-                <option value="">Select Vendor</option>
-                {vendorTypes.map(vendor => (
-                  <option key={vendor} value={vendor}>
-                    {vendor}
-                  </option>
-                ))}
-              </select>
+                placeholder="e.g., Four Hands, Uttermost, Visual Comfort..."
+              />
             </div>
 
             {/* ✅ SKU FIELD ADDED AS REQUESTED */}
