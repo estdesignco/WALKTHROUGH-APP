@@ -67,6 +67,8 @@ const FFEDashboard = ({ isOffline }) => {
       if (response.ok) {
         const projectData = await response.json();
         console.log('🚀 Project loaded:', projectData.name);
+        console.log('🚀 Project rooms count:', projectData.rooms?.length || 0);
+        console.log('🚀 First room data:', projectData.rooms?.[0] || 'No rooms');
         setProject(projectData);
         setError(null);
       } else {
