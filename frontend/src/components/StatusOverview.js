@@ -233,7 +233,50 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           </div>
         </div>
 
-        {/* 2. TOTAL COUNTS (SHIPPED, IN TRANSIT, ETC.) - PUT BACK! */}
+        {/* 2. SHIPPING BREAKDOWN - EXACTLY LIKE STATUS BREAKDOWN! */}
+        <div className="mb-6">
+          <h4 className="text-md font-medium text-gray-300 mb-3">Shipping Breakdown</h4>
+          <div className="space-y-3 max-h-40 overflow-y-auto">
+            {[
+              'FedEx', 'UPS', 'USPS', 'DHL', 'Brooks', 'Zenith', 'Sunbelt',
+              'R+L Carriers', 'Yellow Freight', 'XPO Logistics', 'Old Dominion',
+              'ABF Freight', 'Estes Express', 'Saia LTL', 'TForce Freight',
+              'Roadrunner', 'Central Transport', 'Southeastern Freight',
+              'Averitt Express', 'Holland', 'OTHER'
+            ].map(carrier => {
+              const count = carrierBreakdown[carrier] || 0;
+              const percentage = totalItems > 0 ? (count / totalItems) * 100 : 0;
+              
+              return (
+                <div key={carrier} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: getCarrierColor(carrier) }}
+                    ></div>
+                    <span className="text-sm text-gray-300">{carrier}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="bg-gray-700 rounded-full h-2 w-16">
+                      <div
+                        className="h-2 rounded-full transition-all duration-300"
+                        style={{
+                          backgroundColor: getCarrierColor(carrier),
+                          width: `${percentage}%`
+                        }}
+                      />
+                    </div>
+                    <span className="text-sm font-medium text-white w-8 text-right">
+                      {count}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 3. SHIPPING STATUS TOTALS */}
         <div>
           <h4 className="text-md font-medium text-gray-300 mb-3">Shipping Status Totals</h4>
           <div className="space-y-2">
