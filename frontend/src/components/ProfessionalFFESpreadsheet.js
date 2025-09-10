@@ -49,7 +49,7 @@ const ProfessionalFFESpreadsheet = ({
   // Handle adding new items
   const handleAddItem = async (itemData) => {
     if (!selectedSubCategoryId) {
-      alert('❌ No subcategory selected');
+      console.error('❌ No subcategory selected');
       return;
     }
 
