@@ -71,7 +71,7 @@ const ProfessionalFFESpreadsheet = ({
       });
 
       if (response.ok) {
-        alert(`✅ ITEM ADDED SUCCESSFULLY!\nName: ${itemData.name}\nVendor: ${itemData.vendor}`);
+        // ✅ SUCCESS BANNER REMOVED AS REQUESTED
         setShowAddItem(false);
         setSelectedSubCategoryId(null);
         
