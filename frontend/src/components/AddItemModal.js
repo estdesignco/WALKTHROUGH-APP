@@ -67,7 +67,8 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       const updatedData = {
         ...formData,
         name: data.name || data.product_name || data.title || formData.name,
-        vendor: data.vendor || data.brand || data.manufacturer || formData.vendor, 
+        vendor: data.vendor || data.brand || data.manufacturer || formData.vendor,
+        sku: data.sku || data.model || data.item_number || formData.sku,  // ✅ ADDED SKU EXTRACTION 
         cost: data.price ? parseFloat(data.price.toString().replace(/[$,]/g, '')) : (data.cost ? parseFloat(data.cost.toString().replace(/[$,]/g, '')) : formData.cost),
         finish_color: data.color || data.finish || data.finish_color || formData.finish_color,
         image_url: data.image_url || data.image || data.thumbnail || formData.image_url,
