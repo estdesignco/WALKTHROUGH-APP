@@ -80,6 +80,12 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       setFormData(updatedData);
       setScrapeError('');
       
+      // FORCE RE-RENDER BY TRIGGERING A SMALL STATE CHANGE
+      setTimeout(() => {
+        console.log('🔗 FORCE RE-RENDER - Current form data:', updatedData);
+        setFormData(prev => ({ ...prev })); // Force re-render
+      }, 100);
+      
       // VISUAL FEEDBACK
       // ✅ SUCCESS BANNER REMOVED AS REQUESTED
       
