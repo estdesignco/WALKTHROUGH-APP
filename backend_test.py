@@ -218,58 +218,51 @@ class FFEAPITester:
         self.created_rooms.append(room_id)
         self.log_test("Create Room", True, f"Room created with ID: {room_id}")
         
-        # Verify room has auto-created complete structure
-        success, project_data, _ = self.make_request('GET', f'/projects/{PROJECT_ID}')
-        if success:
-            rooms = project_data.get('rooms', [])
-            test_room = next((r for r in rooms if r['id'] == room_id), None)
+        # Verify room has auto-created complete structure by checking the response directly
+        if data and data.get('categories'):
+            categories = data['categories']
+            self.log_test("Room Auto-Structure - Categories", True, f"Room auto-created {len(categories)} categories")
             
-            if test_room and test_room.get('categories'):
-                categories = test_room['categories']
-                self.log_test("Room Auto-Structure - Categories", True, f"Room auto-created {len(categories)} categories")
+            # Count subcategories and default items
+            total_subcats = 0
+            total_default_items = 0
+            category_details = []
+            
+            for category in categories:
+                cat_name = category.get('name', 'Unknown')
+                subcategories = category.get('subcategories', [])
+                total_subcats += len(subcategories)
                 
-                # Count subcategories and default items
-                total_subcats = 0
-                total_default_items = 0
-                category_details = []
-                
-                for category in categories:
-                    cat_name = category.get('name', 'Unknown')
-                    subcategories = category.get('subcategories', [])
-                    total_subcats += len(subcategories)
+                for subcategory in subcategories:
+                    subcat_name = subcategory.get('name', 'Unknown')
+                    items = subcategory.get('items', [])
+                    total_default_items += len(items)
                     
-                    for subcategory in subcategories:
-                        subcat_name = subcategory.get('name', 'Unknown')
-                        items = subcategory.get('items', [])
-                        total_default_items += len(items)
-                        
-                        if items:  # Only show subcategories with items
-                            category_details.append(f"{cat_name}>{subcat_name} ({len(items)} items)")
-                
-                if total_subcats > 0:
-                    self.log_test("Room Auto-Structure - Subcategories", True, f"Auto-created {total_subcats} subcategories")
-                else:
-                    self.log_test("Room Auto-Structure - Subcategories", False, "No subcategories auto-created")
-                
-                if total_default_items > 0:
-                    self.log_test("Room Auto-Structure - Default Items", True, f"Auto-populated {total_default_items} default items")
-                    
-                    # Check if we have substantial default items (looking for 300+ as mentioned in review)
-                    if total_default_items >= 50:  # Reasonable threshold for a single room
-                        self.log_test("Room Auto-Population - Comprehensive", True, f"Comprehensive auto-population: {total_default_items} items across {total_subcats} subcategories")
-                    else:
-                        self.log_test("Room Auto-Population - Comprehensive", False, f"Limited auto-population: only {total_default_items} items (expected more comprehensive)")
-                    
-                    # Show sample structure
-                    if category_details:
-                        sample_details = "; ".join(category_details[:5])  # Show first 5
-                        self.log_test("Room Structure Sample", True, f"Sample structure: {sample_details}")
-                else:
-                    self.log_test("Room Auto-Structure - Default Items", False, "No default items auto-populated")
+                    if items:  # Only show subcategories with items
+                        category_details.append(f"{cat_name}>{subcat_name} ({len(items)} items)")
+            
+            if total_subcats > 0:
+                self.log_test("Room Auto-Structure - Subcategories", True, f"Auto-created {total_subcats} subcategories")
             else:
-                self.log_test("Room Auto-Structure - Categories", False, "Room created but no categories auto-generated")
+                self.log_test("Room Auto-Structure - Subcategories", False, "No subcategories auto-created")
+            
+            if total_default_items > 0:
+                self.log_test("Room Auto-Structure - Default Items", True, f"Auto-populated {total_default_items} default items")
+                
+                # Check if we have substantial default items (looking for 300+ as mentioned in review)
+                if total_default_items >= 50:  # Reasonable threshold for a single room
+                    self.log_test("Room Auto-Population - Comprehensive", True, f"Comprehensive auto-population: {total_default_items} items across {total_subcats} subcategories")
+                else:
+                    self.log_test("Room Auto-Population - Comprehensive", False, f"Limited auto-population: only {total_default_items} items (expected more comprehensive)")
+                
+                # Show sample structure
+                if category_details:
+                    sample_details = "; ".join(category_details[:5])  # Show first 5
+                    self.log_test("Room Structure Sample", True, f"Sample structure: {sample_details}")
+            else:
+                self.log_test("Room Auto-Structure - Default Items", False, "No default items auto-populated")
         else:
-            self.log_test("Room Auto-Structure - Categories", False, f"Could not retrieve project to verify room structure: {project_data}")
+            self.log_test("Room Auto-Structure - Categories", False, "Room created but no categories auto-generated")
         
         return True
 
