@@ -73,7 +73,7 @@ const SimpleScrapeTest = () => {
       setScrapeError('');
       
       // Visual success feedback
-      alert(`🎉 SCRAPING SUCCESS!\n\nName: ${updatedData.name}\nVendor: ${updatedData.vendor}\nCost: $${updatedData.cost}\n\nAll fields have been populated!`);
+      // ✅ SUCCESS BANNER REMOVED AS REQUESTED
       
     } catch (error) {
       console.error('🔗 SCRAPING ERROR:', error);
