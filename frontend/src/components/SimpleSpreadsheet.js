@@ -41,7 +41,7 @@ const SimpleSpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Item added successfully');
-        alert(`✅ ITEM ADDED SUCCESSFULLY!\nName: ${itemData.name}\nVendor: ${itemData.vendor}\nCost: $${itemData.cost}`);
+        // ✅ SUCCESS BANNER REMOVED AS REQUESTED
         setShowAddItem(false);
         setSelectedSubCategoryId(null);
         
