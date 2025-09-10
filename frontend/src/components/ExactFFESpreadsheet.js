@@ -640,9 +640,9 @@ const ExactFFESpreadsheet = ({
                         </React.Fragment>
                       ))}
                     </React.Fragment>
-                  ))}
+                  );})}
                 </React.Fragment>
-              )})}
+              );})}
             </tbody>
           </table>
 
