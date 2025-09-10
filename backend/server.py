@@ -2146,11 +2146,13 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'availability': None
             }
             
-            # Extract vendor from URL
+            # Extract vendor from URL with enhanced debugging
             domain = url.split('/')[2].lower()
+            print(f"🔍 EXTRACTING VENDOR - Domain: {domain}")
+            
             vendor_mapping = {
                 'fourhands.com': 'Four Hands',
-                'uttermost.com': 'Uttermost',
+                'uttermost.com': 'Uttermost', 
                 'rowefurniture.com': 'Rowe Furniture',
                 'reginaandrew.com': 'Regina Andrew',
                 'bernhardt.com': 'Bernhardt',
@@ -2162,13 +2164,27 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'classichome.com': 'Classic Home',
                 'crestviewcollection.com': 'Crestview Collection',
                 'bassettmirror.com': 'Bassett Mirror',
-                'eichholtz.com': 'Eichholtz'
+                'eichholtz.com': 'Eichholtz',
+                # ✅ ADDED MORE WHOLESALE VENDORS
+                'arteriorshome.com': 'Arteriors',
+                'phillipscollection.com': 'Phillips Collection',
+                'palecek.com': 'Palecek',
+                'theodorealexander.com': 'Theodore Alexander',
+                'currey.com': 'Currey & Company',
+                'worldsaway.com': 'Worlds Away',
+                'lexington.com': 'Lexington',
+                'caracole.com': 'Caracole',
+                'centuryfurniture.com': 'Century Furniture',
+                'hickorychair.com': 'Hickory Chair'
             }
             
             for domain_key, vendor_name in vendor_mapping.items():
                 if domain_key in domain:
                     result['vendor'] = vendor_name
+                    print(f"✅ VENDOR FOUND: {vendor_name} for domain {domain}")
                     break
+            else:
+                print(f"⚠️ VENDOR NOT FOUND for domain: {domain}")
             
             # Universal selectors for common product information
             name_selectors = [
