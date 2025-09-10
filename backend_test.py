@@ -268,6 +268,8 @@ class FFEAPITester:
                     self.log_test("Room Auto-Structure - Default Items", False, "No default items auto-populated")
             else:
                 self.log_test("Room Auto-Structure - Categories", False, "Room created but no categories auto-generated")
+        else:
+            self.log_test("Room Auto-Structure - Categories", False, f"Could not retrieve project to verify room structure: {project_data}")
         
         return True
 
