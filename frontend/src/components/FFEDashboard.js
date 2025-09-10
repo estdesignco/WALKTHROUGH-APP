@@ -123,10 +123,21 @@ const FFEDashboard = ({ isOffline }) => {
       };
       
       // Create the room - backend will auto-populate categories and subcategories
+      console.log('🏠 Creating room with data:', newRoom);
       const roomResponse = await roomAPI.create(newRoom);
+      console.log('🏠 Room created successfully:', roomResponse);
       
-      // Reload project to show the newly created room with full structure
+      // FORCE RELOAD PROJECT TO SHOW NEW ROOM STRUCTURE
+      console.log('🔄 Reloading project to show new room...');
       await loadSimpleProject();
+      console.log('🔄 Project reloaded successfully');
+      
+      // Force a small delay to ensure data is loaded
+      setTimeout(() => {
+        console.log('🔄 Delayed project reload complete');
+        setLoading(false);
+      }, 1000);
+      
       setShowAddRoom(false);
     } catch (err) {
       setError('Failed to create room');
