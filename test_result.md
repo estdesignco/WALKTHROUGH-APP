@@ -249,9 +249,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Header Pie Chart Fixes - Real pie charts with labels and correct order implemented"
-    - "All backend functionality working (scraping, dropdowns, data structure)"
-    - "Frontend displaying correctly with proper 3-level hierarchy"
+    - "🔧 SCRAPING FIXES IN PROGRESS: SKU field added successfully, vendor field changed to text input"
+    - "🔍 DEBUGGING: Backend working perfectly (returns vendor + SKU), frontend React state update issue being resolved" 
+    - "✅ UI IMPROVEMENTS: Colors made more muted (intensity 5), success banners removed, Add Room auto-population fixed"
   stuck_tasks: []
   test_all: false
   test_priority: "critical_bugs_resolved"
