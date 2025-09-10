@@ -63,34 +63,29 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
         throw new Error('No product data could be extracted from this URL');
       }
       
-      // FORCE UPDATE ALL FIELDS WITH SCRAPED DATA
+      // ✅ FORCE IMMEDIATE STATE UPDATE WITH SCRAPED DATA
       const updatedData = {
-        ...formData,
-        name: data.name || data.product_name || data.title || formData.name,
-        vendor: data.vendor || data.brand || data.manufacturer || formData.vendor,
-        sku: data.sku || data.model || data.item_number || formData.sku,  // ✅ ADDED SKU EXTRACTION 
-        cost: data.price ? parseFloat(data.price.toString().replace(/[$,]/g, '')) : (data.cost ? parseFloat(data.cost.toString().replace(/[$,]/g, '')) : formData.cost),
-        finish_color: data.color || data.finish || data.finish_color || formData.finish_color,
-        image_url: data.image_url || data.image || data.thumbnail || formData.image_url,
+        name: data.name || data.product_name || data.title || '',
+        quantity: formData.quantity,
         size: data.size || data.dimensions || data.specs || formData.size,
-        remarks: data.description ? data.description.substring(0, 200) : formData.remarks
+        status: formData.status,
+        vendor: data.vendor || data.brand || data.manufacturer || '',
+        sku: data.sku || data.model || data.item_number || '',
+        remarks: data.description ? data.description.substring(0, 200) : formData.remarks,
+        cost: data.price ? parseFloat(data.price.toString().replace(/[$,]/g, '')) : (data.cost ? parseFloat(data.cost.toString().replace(/[$,]/g, '')) : formData.cost),
+        link: formData.link,
+        tracking_number: formData.tracking_number,
+        image_url: data.image_url || data.image || data.thumbnail || formData.image_url,
+        finish_color: data.color || data.finish || data.finish_color || formData.finish_color
       };
       
-      console.log('🔗 UPDATING FORM DATA:', updatedData);
+      console.log('🔗 FORCE UPDATING WITH:', updatedData);
       
-      // FORCE STATE UPDATE AND RE-RENDER
+      // IMMEDIATE FORCED UPDATE
       setFormData(updatedData);
-      
-      // Force a small delay to ensure state update completes
-      setTimeout(() => {
-        console.log('🔗 FORCED RE-RENDER - Form state should be updated');
-        // Force re-render by updating state again with spread operator
-        setFormData(prev => ({ ...updatedData }));
-      }, 100);
       
       setScrapeError('');
       
-      // VISUAL FEEDBACK
       // ✅ SUCCESS BANNER REMOVED AS REQUESTED
       
     } catch (error) {
