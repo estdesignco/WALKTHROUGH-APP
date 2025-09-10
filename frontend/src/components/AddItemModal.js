@@ -5,9 +5,9 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
     name: '',
     quantity: 1,
     size: '',
-    status: 'PICKED',
+    status: '',          // ✅ CHANGED TO BLANK DEFAULT
     vendor: '',
-    sku: '',          // ✅ ADDED SKU FIELD AS REQUESTED
+    sku: '',
     remarks: '',
     cost: 0,
     link: '',
