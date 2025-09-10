@@ -372,27 +372,6 @@ const FFEDashboard = ({ isOffline }) => {
           itemStatuses={itemStatuses}
         />
 
-        {/* SHIPPING CARRIER BREAKDOWN - UNDER STATUS */}
-        <div className="bg-gray-800 rounded-xl p-6 mt-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Shipping Carrier Breakdown</h3>
-          
-          {Object.keys(getCarrierBreakdown()).length > 0 ? (
-            <div className="space-y-2">
-              {Object.entries(getCarrierBreakdown()).map(([carrier, count]) => (
-                <div key={carrier} className="flex justify-between items-center p-2 bg-gray-700 rounded">
-                  <span className="text-gray-300">{carrier}</span>
-                  <span className="text-gray-200 font-medium">{count}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-gray-500">
-              <div className="text-4xl mb-2">📦</div>
-              <p className="text-sm">No items with assigned carriers.</p>
-            </div>
-          )}
-        </div>
-
         {/* SEARCH BAR AND ADD ROOM BUTTON - LAST */}
         <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
           <div className="flex items-center space-x-4 flex-1">
