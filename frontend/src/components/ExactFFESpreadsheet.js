@@ -503,20 +503,31 @@ const ExactFFESpreadsheet = ({
                     </td>
                   </tr>
                   
-                  {/* ROOM CATEGORIES */}
-                  {room.categories?.map((category, catIndex) => {
-                    console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
-                    return (
-                    <React.Fragment key={category.id}>
-                      
-                      {/* CATEGORY HEADER ROW */}
-                      <tr>
-                        <td colSpan="15" 
-                            className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
-                            style={{ backgroundColor: getCategoryColor() }}>
-                          {category.name.toUpperCase()}
-                        </td>
-                      </tr>
+                  {/* ROOM CATEGORIES - Droppable within each room */}
+                  <Droppable droppableId={`categories-${room.id}`} type="category">
+                    {(provided) => (
+                      <div ref={provided.innerRef} {...provided.droppableProps}>
+                        {room.categories?.map((category, catIndex) => {
+                          console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
+                          return (
+                            <Draggable key={category.id} draggableId={category.id} index={catIndex}>
+                              {(provided, snapshot) => (
+                                <React.Fragment>
+                                  <tr
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={{
+                                      ...provided.draggableProps.style,
+                                      ...(snapshot.isDragging ? { boxShadow: '0 3px 10px rgba(0,0,0,0.2)' } : {})
+                                    }}
+                                  >
+                                    <td colSpan="15" 
+                                        className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
+                                        style={{ backgroundColor: getCategoryColor() }}>
+                                      📁 {category.name.toUpperCase()}
+                                    </td>
+                                  </tr>
                       
                       {/* SUBCATEGORIES */}
                       {category.subcategories?.map((subcategory) => (
