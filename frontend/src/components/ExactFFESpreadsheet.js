@@ -897,10 +897,6 @@ const ExactFFESpreadsheet = ({
                                             </Draggable>
                                           );
                                         })}
-                                        {provided.placeholder}
-                                      </div>
-                                    )}
-                                  </Droppable>
                                 )}
                               </React.Fragment>
                             )}
@@ -908,9 +904,6 @@ const ExactFFESpreadsheet = ({
                         );
                       })}
                       {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
               </tbody>
             </table>
           </DragDropContext>
