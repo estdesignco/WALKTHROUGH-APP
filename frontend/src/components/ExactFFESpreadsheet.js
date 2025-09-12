@@ -608,7 +608,6 @@ const ExactFFESpreadsheet = ({
                                                       <tr>
                                                         <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#7F1D1D', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
-                                                          ADDITIONAL INFO.
                                                         </td>
                                                         <td colSpan="3" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#8B4513' }}>
@@ -641,8 +640,7 @@ const ExactFFESpreadsheet = ({
                                                       </tr>
                                                       
                                                       {/* ITEMS GO DIRECTLY UNDER RED HEADER */}
-                                                      {category.subcategories?.map((subcategory) => (
-                                                        <React.Fragment key={subcategory.id}>
+                                                      {['Ceiling Fixture', 'Recessed Lighting', 'Wall Sconces'].map((itemName, itemIndex) => (
                                                       {/* ACTUAL ITEMS - DARK/BLACK BACKGROUND LIKE YOUR SCREENSHOTS */}
                                                       {['Ceiling Fixture', 'Recessed Lighting', 'Wall Sconces'].map((itemName, itemIndex) => (
                                                         <tr key={itemIndex} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
