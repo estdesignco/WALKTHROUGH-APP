@@ -630,15 +630,7 @@ const ExactFFESpreadsheet = ({
                   return (
                               <React.Fragment key={room.id}>
                                 {/* ROOM HEADER ROW - Full width like your screenshots */}
-                                <tr
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  style={{
-                                    ...provided.draggableProps.style,
-                                    ...(snapshot.isDragging ? { boxShadow: '0 5px 15px rgba(0,0,0,0.3)' } : {})
-                                  }}
-                                >
+                                <tr>
                                   <td colSpan="12" 
                                       className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                                       style={{ backgroundColor: getRoomColor(room.name) }}>
