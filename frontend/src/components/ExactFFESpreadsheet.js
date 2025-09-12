@@ -633,36 +633,11 @@ const ExactFFESpreadsheet = ({
                                                   {isCategoryExpanded && category.subcategories?.map((subcategory) => (
                                                     <React.Fragment key={subcategory.id}>
                                                       
-                                                      {/* SUBCATEGORY HEADER ROW - EXACTLY LIKE YOUR SCREENSHOTS */}
+                                                      {/* SUBCATEGORY HEADER ROW - MATCH YOUR SCREENSHOTS */}
                                                       <tr>
-                                                        <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getMainHeaderColor() }}>
+                                                        <td colSpan="17" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                            style={{ backgroundColor: '#A0522D' }}>
                                                           {subcategory.name.toUpperCase()}
-                                                        </td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
-                                                        <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getAdditionalInfoColor() }}>
-                                                          ADDITIONAL INFO.
-                                                        </td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getAdditionalInfoColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getAdditionalInfoColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getAdditionalInfoColor() }}></td>
-                                                        <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getShippingInfoColor() }}>
-                                                          SHIPPING INFO.
-                                                        </td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                        <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                        <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getNotesActionsColor() }}>
-                                                          NOTES
-                                                        </td>
-                                                        <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getNotesActionsColor() }}>
-                                                          ACTIONS
                                                         </td>
                                                       </tr>
 
