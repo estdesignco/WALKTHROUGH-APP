@@ -583,11 +583,7 @@ const ExactFFESpreadsheet = ({
                                 </tr>
 
                                 {/* ROOM CATEGORIES - Only show when expanded */}
-                                {isRoomExpanded && (
-                                  <Droppable droppableId={`categories-${room.id}`} type="category">
-                                    {(provided) => (
-                                      <div ref={provided.innerRef} {...provided.droppableProps}>
-                                        {room.categories?.map((category, catIndex) => {
+                                {isRoomExpanded && room.categories?.map((category, catIndex) => {
                                           const isCategoryExpanded = expandedCategories[category.id];
                                           console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
                                           
