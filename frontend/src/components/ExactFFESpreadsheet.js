@@ -842,7 +842,7 @@ const ExactFFESpreadsheet = ({
                                                           {/* ACTIONS - DELETE ITEM */}
                                                           <td className="border border-gray-400 px-2 py-2 text-center">
                                                             <button 
-                                                              onClick={() => handleDeleteItem(itemIndex)}
+                                                              onClick={() => handleDeleteItem(item.id)}
                                                               className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
                                                               title="Delete Item"
                                                             >
