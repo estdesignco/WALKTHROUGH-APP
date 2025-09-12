@@ -504,31 +504,33 @@ const ExactFFESpreadsheet = ({
         <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
           
           <DragDropContext onDragEnd={handleDragEnd}>
-            <table className="w-full border-collapse border border-gray-400">
-              
-              {/* TABLE HEADERS - Keep original structure */}
-              <thead>
-                <tr>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>ITEM</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>QTY</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>SIZE</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>REMARKS</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>VENDOR</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>STATUS</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>COST</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>ADDITIONAL INFO.</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>FINISH/COLOR</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>SHIPPING INFO.</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>CARRIER</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>SHIP TO</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>DELIVERY STATUS</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getNotesActionsColor() }}>NOTES</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getNotesActionsColor() }}>ACTION</th>
-                </tr>
-              </thead>
+            <Droppable droppableId="rooms" type="room">
+              {(provided) => (
+                <table className="w-full border-collapse border border-gray-400">
+                  
+                  {/* TABLE HEADERS - Keep original structure */}
+                  <thead>
+                    <tr>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>ITEM</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>QTY</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>SIZE</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>REMARKS</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>VENDOR</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>STATUS</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>COST</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>ADDITIONAL INFO.</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>FINISH/COLOR</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>SHIPPING INFO.</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>CARRIER</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>SHIP TO</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>DELIVERY STATUS</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getNotesActionsColor() }}>NOTES</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getNotesActionsColor() }}>ACTION</th>
+                    </tr>
+                  </thead>
 
-              {/* TABLE BODY - Keep original hierarchical structure */}
-              <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                  {/* TABLE BODY - Keep original hierarchical structure */}
+                  <tbody ref={provided.innerRef} {...provided.droppableProps}>
                 {/* HIERARCHICAL STRUCTURE AS ROW HEADERS - KEEP ORIGINAL */}
                 {project.rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
