@@ -758,12 +758,12 @@ const ExactFFESpreadsheet = ({
                                                               <option value="CREATE_NEW">+ Create New Category</option>
                                                             </select>
                                                             
-                                                            {/* Test Scraping Button - GOLD/AMBER COLOR */}
+                                                            {/* Delete Section Button - RED COLOR */}
                                                             <button
-                                                              onClick={() => setShowScrapingTest(true)}
-                                                              className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium"
+                                                              onClick={() => handleDeleteRoom(room.id)}
+                                                              className="bg-red-700 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
                                                             >
-                                                              🧪 Test Scraping
+                                                              🗑️ Delete Section
                                                             </button>
                                                           </div>
                                                         </td>
