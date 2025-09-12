@@ -266,69 +266,7 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Handle drag and drop for rooms and categories
-  const handleDragEnd = async (result) => {
-    const { destination, source, type } = result;
-
-    if (!destination) return;
-    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-
-    try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
-
-      if (type === 'room') {
-        const rooms = [...project.rooms];
-        const [reorderedRoom] = rooms.splice(source.index, 1);
-        rooms.splice(destination.index, 0, reorderedRoom);
-
-        for (let i = 0; i < rooms.length; i++) {
-          const response = await fetch(`${backendUrl}/api/rooms/${rooms[i].id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ order_index: i })
-          });
-          if (!response.ok) {
-            throw new Error(`Failed to update room order: ${response.status}`);
-          }
-        }
-        console.log('✅ Room order updated successfully');
-      }
-      
-      else if (type === 'category') {
-        const roomId = source.droppableId.replace('categories-', '');
-        const room = project.rooms.find(r => r.id === roomId);
-        
-        if (room) {
-          const categories = [...room.categories];
-          const [reorderedCategory] = categories.splice(source.index, 1);
-          categories.splice(destination.index, 0, reorderedCategory);
-
-          for (let i = 0; i < categories.length; i++) {
-            const response = await fetch(`${backendUrl}/api/categories/${categories[i].id}`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ order_index: i })
-            });
-            if (!response.ok) {
-              throw new Error(`Failed to update category order: ${response.status}`);
-            }
-          }
-          console.log('✅ Category order updated successfully');
-        }
-      }
-
-      if (onReload) {
-        await onReload();
-      }
-
-    } catch (error) {
-      console.error('❌ Error updating drag & drop order:', error);
-    }
-  };
+  // Drag and drop functionality removed
 
   // Toggle room expansion
   const toggleRoomExpansion = (roomId) => {
