@@ -468,12 +468,20 @@ const ExactFFESpreadsheet = ({
                               <React.Fragment>
                   
                   {/* ROOM HEADER ROW - Muted colors with Delete Button */}
-                  <tr>
+                  <tr
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={{
+                      ...provided.draggableProps.style,
+                      ...(snapshot.isDragging ? { boxShadow: '0 5px 15px rgba(0,0,0,0.3)' } : {})
+                    }}
+                  >
                     <td colSpan="14" 
                         className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                         style={{ backgroundColor: getRoomColor(room.name) }}>
                       <div className="flex justify-between items-center">
-                        <span>{room.name.toUpperCase()}</span>
+                        <span>🏠 {room.name.toUpperCase()}</span>
                         <button
                           onClick={() => handleDeleteRoom(room.id)}
                           className="text-red-300 hover:text-red-100 text-lg ml-2"
