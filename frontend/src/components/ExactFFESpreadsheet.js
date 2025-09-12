@@ -23,6 +23,13 @@ const ExactFFESpreadsheet = ({
   const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
+  
+  // ✅ Search and Filter State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedVendor, setSelectedVendor] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
 
   // Load available categories on component mount
   useEffect(() => {
