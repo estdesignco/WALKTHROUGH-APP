@@ -212,39 +212,57 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Handle adding a new category
+  // Handle adding a new category WITH ALL SUBCATEGORIES AND ITEMS
   const handleAddCategory = async (roomId, categoryName) => {
     if (!roomId || !categoryName) {
-      console.error('❌ Room ID and category name required');
+      console.error('❌ Missing roomId or categoryName');
       return;
     }
 
     try {
       const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
-      const newCategory = {
-        room_id: roomId,
-        name: categoryName,
-        order_index: 0
-      };
-
-      const response = await fetch(`${backendUrl}/api/categories`, {
+      const response = await fetch(`${backendUrl}/api/categories/comprehensive`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newCategory)
+        body: JSON.stringify({
+          name: categoryName,
+          room_id: roomId,
+          order_index: 0,
+          populate_comprehensive: true
+        })
       });
 
       if (response.ok) {
-        console.log('✅ Category added successfully');
-        if (onReload) {
-          await onReload();
-        }
+        console.log('✅ Category with full structure added successfully');
+        // Force reload to show the new category with all subcategories and items
+        window.location.reload();
       } else {
-        throw new Error(`HTTP ${response.status}`);
+        console.error('❌ Comprehensive category endpoint failed, trying basic endpoint');
+        // Fallback to basic category creation
+        const basicResponse = await fetch(`${backendUrl}/api/categories`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: categoryName,
+            room_id: roomId,
+            order_index: 0
+          })
+        });
+
+        if (basicResponse.ok) {
+          console.log('✅ Basic category added successfully');
+          window.location.reload();
+        } else {
+          throw new Error(`HTTP ${basicResponse.status}`);
+        }
       }
     } catch (error) {
       console.error('❌ Error adding category:', error);
+      alert('Failed to add category. Please try again.');
     }
   };
 
