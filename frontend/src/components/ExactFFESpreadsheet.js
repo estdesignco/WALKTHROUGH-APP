@@ -674,9 +674,9 @@ const ExactFFESpreadsheet = ({
                                                           {/* Spacer */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white"></td>
                                                           
-                                                          {/* RIGHT SIDE - EXACT MATCH TO YOUR SECOND SCREENSHOT */}
+                                                          {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
                                                           
-                                                          {/* Order Date */}
+                                                          {/* Order Date (ALONE) */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
                                                             <input 
                                                               type="date" 
@@ -685,94 +685,93 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
-                                                          {/* Order Status */}
+                                                          {/* Order Status/Order Number (STACKED) */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <select 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Order status changed:', e.target.value)}
-                                                            >
-                                                              <option value="">Status...</option>
-                                                              <option value="PENDING">PENDING</option>
-                                                              <option value="ORDERED">ORDERED</option>
-                                                              <option value="SHIPPED">SHIPPED</option>
-                                                              <option value="DELIVERED">DELIVERED</option>
-                                                            </select>
+                                                            <div className="space-y-1">
+                                                              <select 
+                                                                className="w-full bg-transparent border-none text-white text-xs"
+                                                                onChange={(e) => console.log('Order status changed:', e.target.value)}
+                                                              >
+                                                                <option value="">Status...</option>
+                                                                <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
+                                                                <option value="RECEIVED">RECEIVED</option>
+                                                                <option value="READY FOR INSTALL">READY FOR INSTALL</option>
+                                                                <option value="INSTALLING">INSTALLING</option>
+                                                                <option value="INSTALLED">INSTALLED</option>
+                                                                <option value="ON HOLD">ON HOLD</option>
+                                                                <option value="BACKORDERED">BACKORDERED</option>
+                                                                <option value="DAMAGED">DAMAGED</option>
+                                                                <option value="RETURNED">RETURNED</option>
+                                                                <option value="CANCELLED">CANCELLED</option>
+                                                              </select>
+                                                              <input 
+                                                                type="text" 
+                                                                placeholder="Order #"
+                                                                className="w-full bg-transparent border-none text-white text-xs"
+                                                                onChange={(e) => console.log('Order number changed:', e.target.value)}
+                                                              />
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* Order Number */}
+                                                          {/* Estimated Ship Date/Estimated Delivery Date (STACKED) */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <input 
-                                                              type="text" 
-                                                              placeholder="Order #"
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Order number changed:', e.target.value)}
-                                                            />
+                                                            <div className="space-y-1">
+                                                              <input 
+                                                                type="date" 
+                                                                className="w-full bg-transparent border-none text-white text-xs"
+                                                                onChange={(e) => console.log('Estimated ship date changed:', e.target.value)}
+                                                              />
+                                                              <input 
+                                                                type="date" 
+                                                                className="w-full bg-transparent border-none text-white text-xs"
+                                                                onChange={(e) => console.log('Estimated delivery date changed:', e.target.value)}
+                                                              />
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* Estimated Ship Date */}
+                                                          {/* Install Date/Ship To (STACKED) */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <input 
-                                                              type="date" 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Estimated ship date changed:', e.target.value)}
-                                                            />
+                                                            <div className="space-y-1">
+                                                              <input 
+                                                                type="date" 
+                                                                className="w-full bg-transparent border-none text-white text-xs"
+                                                                onChange={(e) => console.log('Install date changed:', e.target.value)}
+                                                              />
+                                                              <select 
+                                                                className="w-full bg-transparent border-none text-white text-xs"
+                                                                onChange={(e) => console.log('Ship to changed:', e.target.value)}
+                                                              >
+                                                                <option value="">Ship To...</option>
+                                                                <option value="CLIENT_HOME">CLIENT HOME</option>
+                                                                <option value="JOB_SITE">JOB SITE</option>
+                                                                <option value="WAREHOUSE">WAREHOUSE</option>
+                                                              </select>
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* Estimated Delivery Date */}
+                                                          {/* Tracking/Carrier (STACKED) - LIVE TRACKING */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <input 
-                                                              type="date" 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Estimated delivery date changed:', e.target.value)}
-                                                            />
+                                                            <div className="space-y-1">
+                                                              <input 
+                                                                type="text" 
+                                                                placeholder="Live Tracking #"
+                                                                className="w-full bg-transparent border-none text-white text-xs"
+                                                                onChange={(e) => console.log('Live tracking changed:', e.target.value)}
+                                                              />
+                                                              <select 
+                                                                className="w-full bg-transparent border-none text-white text-xs"
+                                                                onChange={(e) => console.log('Carrier changed:', e.target.value)}
+                                                              >
+                                                                <option value="">Carrier...</option>
+                                                                <option value="FedEx">FedEx</option>
+                                                                <option value="UPS">UPS</option>
+                                                                <option value="USPS">USPS</option>
+                                                                <option value="OTHER">OTHER</option>
+                                                              </select>
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* Install Date */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <input 
-                                                              type="date" 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Install date changed:', e.target.value)}
-                                                            />
-                                                          </td>
-                                                          
-                                                          {/* Ship To */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <select 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Ship to changed:', e.target.value)}
-                                                            >
-                                                              <option value="">Ship To...</option>
-                                                              <option value="CLIENT_HOME">CLIENT HOME</option>
-                                                              <option value="JOB_SITE">JOB SITE</option>
-                                                              <option value="WAREHOUSE">WAREHOUSE</option>
-                                                            </select>
-                                                          </td>
-                                                          
-                                                          {/* Tracking Number */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <input 
-                                                              type="text" 
-                                                              placeholder="Tracking #"
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Tracking number changed:', e.target.value)}
-                                                            />
-                                                          </td>
-                                                          
-                                                          {/* Carrier */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <select 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Carrier changed:', e.target.value)}
-                                                            >
-                                                              <option value="">Carrier...</option>
-                                                              <option value="FedEx">FedEx</option>
-                                                              <option value="UPS">UPS</option>
-                                                              <option value="OTHER">OTHER</option>
-                                                            </select>
-                                                          </td>
-                                                          
-                                                          {/* NOTES */}
+                                                          {/* NOTES - EDITABLE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
                                                             <input 
                                                               type="text" 
@@ -780,14 +779,6 @@ const ExactFFESpreadsheet = ({
                                                               className="w-full bg-transparent border-none text-white text-sm"
                                                               onChange={(e) => console.log('Notes changed:', e.target.value)}
                                                             />
-                                                          </td>
-                                                          
-                                                          {/* ACTIONS */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center">
-                                                            <div className="flex gap-1">
-                                                              <button className="bg-blue-600 text-white text-xs px-1 py-1 rounded">✏️</button>
-                                                              <button className="bg-red-600 text-white text-xs px-1 py-1 rounded">🗑️</button>
-                                                            </div>
                                                           </td>
                                                         </tr>
                                                       ))}
