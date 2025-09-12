@@ -642,9 +642,9 @@ const ExactFFESpreadsheet = ({
                                                       </tr>
 
                                                       {/* ITEMS - Each subcategory contains multiple items */}
-                                                      {/* ACTUAL ITEMS - RED BACKGROUND LIKE YOUR SCREENSHOTS */}
+                                                      {/* ACTUAL ITEMS - DARK/BLACK BACKGROUND LIKE YOUR SCREENSHOTS */}
                                                       {['Ceiling Fixture', 'Recessed Lighting', 'Wall Sconces'].map((itemName, itemIndex) => (
-                                                        <tr key={itemIndex} className="bg-red-900 text-white">
+                                                        <tr key={itemIndex} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}
                                                           {/* VENDOR/SKU - ACTUAL ITEM NAME */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             {itemName}
