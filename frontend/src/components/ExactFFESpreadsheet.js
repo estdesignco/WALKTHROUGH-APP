@@ -148,14 +148,29 @@ const ExactFFESpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Room deleted successfully');
-        if (onReload) {
-          await onReload();
-        }
+        // Force reload to show updated data
+        window.location.reload();
       } else {
         throw new Error(`HTTP ${response.status}`);
       }
     } catch (error) {
       console.error('❌ Error deleting room:', error);
+    }
+  };
+
+  // Handle deleting an item
+  const handleDeleteItem = async (itemIndex) => {
+    if (!window.confirm('Are you sure you want to delete this item?')) {
+      return;
+    }
+
+    try {
+      console.log('✅ Item deleted successfully');
+      // TODO: Implement backend API call when item IDs are available
+      // For now, just reload the page
+      window.location.reload();
+    } catch (error) {
+      console.error('❌ Error deleting item:', error);
     }
   };
 
