@@ -859,6 +859,7 @@ const ExactFFESpreadsheet = ({
                                                             </button>
                                                           </td>
                                                         </tr>
+                                                        ))
                                                       ))}
                                                       
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
