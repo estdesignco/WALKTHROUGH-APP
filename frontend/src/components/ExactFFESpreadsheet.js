@@ -857,7 +857,23 @@ const ExactFFESpreadsheet = ({
                                                           
                                                           {/* NOTES */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            Notes
+                                                            <input 
+                                                              type="text" 
+                                                              placeholder="Notes"
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Notes changed:', e.target.value)}
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* ACTIONS - DELETE ITEM */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-center">
+                                                            <button 
+                                                              onClick={() => handleDeleteItem(itemIndex)}
+                                                              className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
+                                                              title="Delete Item"
+                                                            >
+                                                              🗑️
+                                                            </button>
                                                           </td>
                                                         </tr>
                                                       ))}
