@@ -29,8 +29,8 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
     setScrapeError('');
 
     try {
-      // FORCE CORRECT BACKEND URL
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://designer-catalog-pro.preview.emergentagent.com';
+      // Get backend URL from environment
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
       
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);
@@ -43,78 +43,35 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
         body: JSON.stringify({ url: formData.link })
       });
       
-      console.log('🔗 SCRAPING - Response status:', response.status);
-      console.log('🔗 SCRAPING - Response headers:', response.headers);
-
+      console.log('🔗 SCRAPING RESPONSE STATUS:', response.status);
+      
       if (!response.ok) {
-        const errorData = await response.text(); // Get text first
-        console.error('🔗 SCRAPING ERROR - Response:', errorData);
-        throw new Error(`HTTP ${response.status}: ${errorData}`);
-      }
-
-      const responseData = await response.json();
-      console.log('🔗 SCRAPING SUCCESS - Raw response:', responseData);
-      
-      // Handle the new response format: {success: true, data: {...}}
-      const data = responseData.success ? responseData.data : responseData;
-      console.log('🔗 SCRAPING SUCCESS - Extracted data:', data);
-      
-      if (!data || (!data.name && !data.vendor && !data.price && !data.cost)) {
-        throw new Error('No product data could be extracted from this URL');
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
       
-      // ✅ IMMEDIATE DOM UPDATE (WORKAROUND FOR REACT STATE ISSUE)
-      setTimeout(() => {
-        // Direct DOM updates to force field population
-        const nameField = document.querySelector('input[placeholder*="Table Lamp"]');
-        const vendorField = document.querySelector('input[placeholder*="Four Hands"]');
-        const skuField = document.querySelector('input[placeholder*="248067"]');
-        
-        if (nameField && data.name) {
-          nameField.value = data.name;
-          nameField.dispatchEvent(new Event('input', { bubbles: true }));
-          console.log('🔗 FORCE UPDATED NAME FIELD');
-        }
-        
-        if (vendorField && data.vendor) {
-          vendorField.value = data.vendor;
-          vendorField.dispatchEvent(new Event('input', { bubbles: true }));
-          console.log('🔗 FORCE UPDATED VENDOR FIELD');
-        }
-        
-        if (skuField && data.sku) {
-          skuField.value = data.sku;
-          skuField.dispatchEvent(new Event('input', { bubbles: true }));
-          console.log('🔗 FORCE UPDATED SKU FIELD');
-        }
-      }, 500);
+      const data = await response.json();
+      console.log('🔗 SCRAPING SUCCESS - Data received:', data);
       
-      // Also update React state
+      // Enhanced data mapping with better field population
       const updatedData = {
-        name: data.name || '',
-        quantity: formData.quantity,
-        size: data.size || formData.size,
-        status: formData.status,
-        vendor: data.vendor || '',
-        sku: data.sku || '',
-        remarks: data.description ? data.description.substring(0, 200) : formData.remarks,
-        cost: data.price ? parseFloat(data.price.toString().replace(/[$,]/g, '')) : formData.cost,
-        link: formData.link,
-        tracking_number: formData.tracking_number,
-        image_url: data.image_url || formData.image_url,
-        finish_color: data.color || data.finish || formData.finish_color
+        ...formData,
+        name: data.name || data.title || data.product_name || formData.name,
+        vendor: data.vendor || data.brand || data.manufacturer || formData.vendor,
+        sku: data.sku || data.model || data.product_id || formData.sku,
+        cost: data.cost || data.price || formData.cost,
+        size: data.size || data.dimensions || formData.size,
+        image_url: data.image_url || data.image || data.main_image || formData.image_url,
+        finish_color: data.color || data.finish || data.finish_color || formData.finish_color
       };
       
+      console.log('🔗 UPDATED FORM DATA:', updatedData);
       setFormData(updatedData);
       setScrapeError('');
-      
-      // ✅ SUCCESS BANNER REMOVED AS REQUESTED
       
     } catch (error) {
       console.error('🔗 SCRAPING ERROR:', error);
       setScrapeError('SCRAPING FAILED: ' + error.message);
-      
-      // ✅ ERROR BANNER REMOVED - NO MORE POPUPS
     } finally {
       setIsScraping(false);
     }
