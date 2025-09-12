@@ -195,9 +195,9 @@ backend:
 frontend:
   - task: "FF&E Dashboard Display"
     implemented: true
-    working: true
-    file: "FFEDashboard.js, FFESpreadsheet.js"
-    stuck_count: 0
+    working: false
+    file: "FFEDashboard.js, ExactFFESpreadsheet.js"
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -210,6 +210,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "COMPREHENSIVE FF&E FRONTEND TESTING COMPLETED: ✅ CRITICAL BUG CONFIRMED RESOLVED - No 'Loading FF&E data...' issue exists. Page loads fully with complete FFESpreadsheet rendering (212 table rows, 122 room headers). ✅ DATA DISPLAY PERFECT: Both items (Crystal Chandelier: DELIVERED TO JOB SITE, LED Recessed Lights: ORDERED) visible in proper 3-level hierarchy (LIVING ROOM > LIGHTING > INSTALLED). ✅ ALL FUNCTIONALITY OPERATIONAL: Horizontal scrolling working (500px confirmed), status dropdowns (118 options), 16 editable fields, 44 Add Item buttons, color coding active, links with target='_blank'. ✅ STATUS OVERVIEW ACCURATE: Shows '2 Total Items' with correct breakdown. ✅ INTERACTIVE ELEMENTS: Form interactions, dropdown menus, editable content all functional. The FF&E dashboard is production-ready with zero critical issues."
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL FRONTEND ROUTING ISSUE IDENTIFIED: Comprehensive testing reveals ExactFFESpreadsheet component has CRITICAL routing problems. ✅ BACKEND DATA CONFIRMED: API endpoint /api/projects/bb060596-85c2-455f-860a-cf9fa23dfacf returns correct data with Crystal Chandelier (DELIVERED TO JOB SITE, Restoration Hardware) and LED Recessed Lights in Living Room > Lighting > Installed structure. ❌ FRONTEND ROUTING BROKEN: URL https://interior-ffe.preview.emergentagent.com/project/bb060596-85c2-455f-860a-cf9fa23dfacf/ffe redirects to project list instead of loading FF&E page. ❌ COMPONENT NOT LOADING: ExactFFESpreadsheet component not rendering - page stays on project list. ❌ ALL FF&E FEATURES INACCESSIBLE: Cannot test Add Item, Add Room, pie charts, delete buttons, or scraping functionality because routing prevents access to FF&E page. This is a CRITICAL blocking issue preventing user access to their FF&E data despite backend working perfectly."
 
   - task: "3-Level Hierarchy Display (Room > Category > Sub-category > Items)"
     implemented: true
