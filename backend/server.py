@@ -1658,6 +1658,7 @@ async def create_comprehensive_category(category: CategoryCreate):
             logger.info(f"📋 Found comprehensive data for category: {category_name}")
             
             # Create subcategories and their items
+            created_subcategories = []
             for subcategory_name, items_list in comprehensive_data.items():
                 # Create subcategory
                 subcategory_obj = SubCategory(
@@ -1670,8 +1671,10 @@ async def create_comprehensive_category(category: CategoryCreate):
                 subcategory_result = await db.subcategories.insert_one(subcategory_obj.dict())
                 if subcategory_result.inserted_id:
                     subcategory_id = str(subcategory_result.inserted_id)
+                    subcategory_obj.id = subcategory_id
                     
                     # Create items for this subcategory
+                    created_items = []
                     for item_name in items_list:
                         item_obj = Item(
                             name=item_name,
@@ -1681,9 +1684,17 @@ async def create_comprehensive_category(category: CategoryCreate):
                             order_index=0
                         )
                         
-                        await db.items.insert_one(item_obj.dict())
+                        item_result = await db.items.insert_one(item_obj.dict())
+                        if item_result.inserted_id:
+                            item_obj.id = str(item_result.inserted_id)
+                            created_items.append(item_obj)
+                    
+                    subcategory_obj.items = created_items
+                    created_subcategories.append(subcategory_obj)
                         
-            logger.info(f"✅ Successfully created comprehensive category: {category_name}")
+            # Add subcategories to the category object
+            category_obj.subcategories = created_subcategories
+            logger.info(f"✅ Successfully created comprehensive category: {category_name} with {len(created_subcategories)} subcategories")
         else:
             logger.warning(f"⚠️ No comprehensive data found for category: {category_name}")
         
