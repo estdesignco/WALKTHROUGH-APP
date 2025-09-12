@@ -311,7 +311,7 @@ const ExactFFESpreadsheet = ({
 
   // GREEN COLORS FOR CATEGORIES
   const getCategoryColor = () => {
-    return '#5A7A5A'; // Muted green consistent with design
+    return '#0F2A19'; // Muted green consistent with design
   };
 
   // BROWN/RED COLORS FOR MAIN HEADERS (ADDITIONAL INFO., SHIPPING INFO.)
