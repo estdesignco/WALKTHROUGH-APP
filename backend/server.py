@@ -1586,6 +1586,128 @@ async def delete_item(item_id: str):
     
     return {"message": "Item deleted successfully"}
 
+# MISSING DELETE ENDPOINTS THAT THE FRONTEND EXPECTS
+@api_router.delete("/rooms/{room_id}")
+async def delete_room(room_id: str):
+    """Delete a room and all its associated categories, subcategories, and items"""
+    try:
+        # First, get all categories for this room
+        categories = await db.categories.find({"room_id": room_id}).to_list(1000)
+        
+        # Delete all items and subcategories for each category
+        for category in categories:
+            # Get all subcategories for this category
+            subcategories = await db.subcategories.find({"category_id": category["id"]}).to_list(1000)
+            
+            # Delete all items for each subcategory
+            for subcategory in subcategories:
+                await db.items.delete_many({"subcategory_id": subcategory["id"]})
+            
+            # Delete all subcategories for this category
+            await db.subcategories.delete_many({"category_id": category["id"]})
+        
+        # Delete all categories for this room
+        await db.categories.delete_many({"room_id": room_id})
+        
+        # Finally, delete the room itself
+        result = await db.rooms.delete_one({"id": room_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Room not found")
+        
+        return {"message": "Room and all associated data deleted successfully"}
+        
+    except Exception as e:
+        logger.error(f"Error deleting room {room_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete room: {str(e)}")
+
+@api_router.delete("/categories/{category_id}")
+async def delete_category(category_id: str):
+    """Delete a category and all its associated subcategories and items"""
+    try:
+        # Get all subcategories for this category
+        subcategories = await db.subcategories.find({"category_id": category_id}).to_list(1000)
+        
+        # Delete all items for each subcategory
+        for subcategory in subcategories:
+            await db.items.delete_many({"subcategory_id": subcategory["id"]})
+        
+        # Delete all subcategories for this category
+        await db.subcategories.delete_many({"category_id": category_id})
+        
+        # Finally, delete the category itself
+        result = await db.categories.delete_one({"id": category_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Category not found")
+        
+        return {"message": "Category and all associated data deleted successfully"}
+        
+    except Exception as e:
+        logger.error(f"Error deleting category {category_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete category: {str(e)}")
+
+@api_router.delete("/subcategories/{subcategory_id}")
+async def delete_subcategory(subcategory_id: str):
+    """Delete a subcategory and all its associated items"""
+    try:
+        # Delete all items for this subcategory
+        await db.items.delete_many({"subcategory_id": subcategory_id})
+        
+        # Delete the subcategory itself
+        result = await db.subcategories.delete_one({"id": subcategory_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Subcategory not found")
+        
+        return {"message": "Subcategory and all associated items deleted successfully"}
+        
+    except Exception as e:
+        logger.error(f"Error deleting subcategory {subcategory_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete subcategory: {str(e)}")
+
+@api_router.delete("/projects/{project_id}")
+async def delete_project(project_id: str):
+    """Delete a project and all its associated rooms, categories, subcategories, and items"""
+    try:
+        # Get all rooms for this project
+        rooms = await db.rooms.find({"project_id": project_id}).to_list(1000)
+        
+        # Delete each room and all its associated data
+        for room in rooms:
+            # Get all categories for this room
+            categories = await db.categories.find({"room_id": room["id"]}).to_list(1000)
+            
+            # Delete all items and subcategories for each category
+            for category in categories:
+                # Get all subcategories for this category
+                subcategories = await db.subcategories.find({"category_id": category["id"]}).to_list(1000)
+                
+                # Delete all items for each subcategory
+                for subcategory in subcategories:
+                    await db.items.delete_many({"subcategory_id": subcategory["id"]})
+                
+                # Delete all subcategories for this category
+                await db.subcategories.delete_many({"category_id": category["id"]})
+            
+            # Delete all categories for this room
+            await db.categories.delete_many({"room_id": room["id"]})
+        
+        # Delete all rooms for this project
+        await db.rooms.delete_many({"project_id": project_id})
+        
+        # Finally, delete the project itself
+        result = await db.projects.delete_one({"id": project_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        return {"message": "Project and all associated data deleted successfully"}
+        
+    except Exception as e:
+        logger.error(f"Error deleting project {project_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete project: {str(e)}")
+
 # UTILITY ENDPOINTS
 @api_router.get("/room-colors")
 async def get_room_colors():
