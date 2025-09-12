@@ -667,8 +667,6 @@ const ExactFFESpreadsheet = ({
 
                                 {/* ROOM CATEGORIES - Only show when expanded */}
                                 {isRoomExpanded && (
-                                  <Droppable droppableId={`categories-${room.id}`} type="category">
-                                    {(provided) => (
                                       <React.Fragment>
                                         {room.categories?.map((category, catIndex) => {
                                           const isCategoryExpanded = expandedCategories[category.id];
