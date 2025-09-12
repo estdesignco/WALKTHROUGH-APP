@@ -273,12 +273,31 @@ const ExactFFESpreadsheet = ({
                 return (
                 <React.Fragment key={room.id}>
                   
-                  {/* ROOM HEADER ROW - Muted colors */}
+                  {/* ROOM HEADER ROW - Muted colors with Delete Button */}
                   <tr>
-                    <td colSpan="15" 
+                    <td colSpan="14" 
                         className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                         style={{ backgroundColor: getRoomColor(room.name) }}>
-                      {room.name.toUpperCase()}
+                      <div className="flex justify-between items-center">
+                        <span>{room.name.toUpperCase()}</span>
+                        <button
+                          onClick={() => handleDeleteRoom(room.id)}
+                          className="text-red-300 hover:text-red-100 text-lg ml-2"
+                          title="Delete Room"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </td>
+                    <td className="border border-gray-400 px-2 py-2 text-center"
+                        style={{ backgroundColor: getRoomColor(room.name) }}>
+                      <button
+                        onClick={() => handleAddRoom()}
+                        className="text-green-300 hover:text-green-100 text-sm font-bold"
+                        title="Add Room"
+                      >
+                        +
+                      </button>
                     </td>
                   </tr>
                   
