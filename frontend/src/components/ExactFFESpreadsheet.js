@@ -628,9 +628,7 @@ const ExactFFESpreadsheet = ({
                   console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
                   
                   return (
-                    <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
-                      {(provided, snapshot) => (
-                        <React.Fragment>
+                              <React.Fragment key={room.id}>
                                 {/* ROOM HEADER ROW - Full width like your screenshots */}
                                 <tr
                                   ref={provided.innerRef}
