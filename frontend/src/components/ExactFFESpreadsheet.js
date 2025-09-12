@@ -680,32 +680,24 @@ const ExactFFESpreadsheet = ({
                                                           {/* Spacer */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-black"></td>
                                                           
-                                                          {/* RIGHT SIDE - MATCHES SECOND SCREENSHOT EXACTLY */}
-                                                          
-                                                          {/* SHIPPING INFO */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white" style={{ backgroundColor: getShippingInfoColor() }}>
-                                                            {item.shipping_info || 'Shipping Info'}
-                                                          </td>
+                                                          {/* RIGHT SIDE - MATCHES YOUR SECOND SCREENSHOT EXACTLY */}
                                                           
                                                           {/* Order Date */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                             <input 
                                                               type="date" 
-                                                              value={item.order_date || ''} 
+                                                              className="w-full border-none bg-transparent text-black text-sm"
                                                               onChange={(e) => console.log('Order date changed:', e.target.value)}
-                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
-                                                              placeholder="mm/dd/yyyy"
                                                             />
                                                           </td>
                                                           
                                                           {/* Order Status */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                             <select 
-                                                              value={item.status || ''}
+                                                              className="w-full border-none bg-transparent text-black text-sm"
                                                               onChange={(e) => console.log('Order status changed:', e.target.value)}
-                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             >
-                                                              <option value="">Select Status...</option>
+                                                              <option value="">Status...</option>
                                                               <option value="PENDING">PENDING</option>
                                                               <option value="ORDERED">ORDERED</option>
                                                               <option value="SHIPPED">SHIPPED</option>
@@ -714,55 +706,47 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Order Number */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                             <input 
                                                               type="text" 
-                                                              value={item.order_number || ''} 
-                                                              onChange={(e) => console.log('Order number changed:', e.target.value)}
                                                               placeholder="Order #"
-                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
+                                                              className="w-full border-none bg-transparent text-black text-sm"
+                                                              onChange={(e) => console.log('Order number changed:', e.target.value)}
                                                             />
                                                           </td>
                                                           
                                                           {/* Estimated Ship Date */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                             <input 
                                                               type="date" 
-                                                              value={item.estimated_ship_date || ''} 
+                                                              className="w-full border-none bg-transparent text-black text-sm"
                                                               onChange={(e) => console.log('Estimated ship date changed:', e.target.value)}
-                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
-                                                              placeholder="mm/dd/yyyy"
                                                             />
                                                           </td>
                                                           
                                                           {/* Estimated Delivery Date */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                             <input 
                                                               type="date" 
-                                                              value={item.estimated_delivery_date || ''} 
+                                                              className="w-full border-none bg-transparent text-black text-sm"
                                                               onChange={(e) => console.log('Estimated delivery date changed:', e.target.value)}
-                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
-                                                              placeholder="mm/dd/yyyy"
                                                             />
                                                           </td>
                                                           
                                                           {/* Install Date */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                             <input 
                                                               type="date" 
-                                                              value={item.install_date || ''} 
+                                                              className="w-full border-none bg-transparent text-black text-sm"
                                                               onChange={(e) => console.log('Install date changed:', e.target.value)}
-                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
-                                                              placeholder="mm/dd/yyyy"
                                                             />
                                                           </td>
                                                           
                                                           {/* Ship To */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                             <select 
-                                                              value={item.ship_to || ''}
+                                                              className="w-full border-none bg-transparent text-black text-sm"
                                                               onChange={(e) => console.log('Ship to changed:', e.target.value)}
-                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             >
                                                               <option value="">Ship To...</option>
                                                               <option value="CLIENT_HOME">CLIENT HOME</option>
@@ -772,22 +756,20 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Tracking Number */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                             <input 
                                                               type="text" 
-                                                              value={item.tracking_number || ''} 
-                                                              onChange={(e) => console.log('Tracking number changed:', e.target.value)}
                                                               placeholder="Tracking #"
-                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
+                                                              className="w-full border-none bg-transparent text-black text-sm"
+                                                              onChange={(e) => console.log('Tracking number changed:', e.target.value)}
                                                             />
                                                           </td>
                                                           
                                                           {/* Carrier */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                             <select 
-                                                              value={item.carrier || ''}
+                                                              className="w-full border-none bg-transparent text-black text-sm"
                                                               onChange={(e) => console.log('Carrier changed:', e.target.value)}
-                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             >
                                                               <option value="">Carrier...</option>
                                                               <option value="FedEx">FedEx</option>
@@ -797,13 +779,12 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* NOTES */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                             <input 
                                                               type="text" 
-                                                              value={item.notes || ''} 
-                                                              onChange={(e) => console.log('Notes changed:', e.target.value)}
                                                               placeholder="Notes"
-                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
+                                                              className="w-full border-none bg-transparent text-black text-sm"
+                                                              onChange={(e) => console.log('Notes changed:', e.target.value)}
                                                             />
                                                           </td>
                                                           
@@ -811,12 +792,7 @@ const ExactFFESpreadsheet = ({
                                                           <td className="border border-gray-400 px-2 py-2 text-center">
                                                             <div className="flex gap-1">
                                                               <button className="bg-blue-600 text-white text-xs px-1 py-1 rounded">✏️</button>
-                                                              <button 
-                                                                onClick={() => handleDeleteItem(item.id)}
-                                                                className="bg-red-600 text-white text-xs px-1 py-1 rounded"
-                                                              >
-                                                                🗑️
-                                                              </button>
+                                                              <button className="bg-red-600 text-white text-xs px-1 py-1 rounded">🗑️</button>
                                                             </div>
                                                           </td>
                                                         </tr>
