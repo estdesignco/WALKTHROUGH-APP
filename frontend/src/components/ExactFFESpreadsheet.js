@@ -897,10 +897,18 @@ const ExactFFESpreadsheet = ({
                     </td>
                   </tr>
                   
-                </React.Fragment>
-              );})}
-            </tbody>
-          </table>
+                              </React.Fragment>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </tbody>
+            </table>
+          </DragDropContext>
 
         </div>
       </div>
