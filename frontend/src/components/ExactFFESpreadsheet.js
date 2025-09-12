@@ -621,7 +621,7 @@ const ExactFFESpreadsheet = ({
                                                       
                                                       {/* SUBCATEGORY HEADER ROW - RED COLOR LIKE YOUR SCREENSHOTS */}
                                                       <tr>
-                                                        <td colSpan="13" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                        <td colSpan="12" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#7F1D1D' }}>
                                                           {subcategory.name.toUpperCase()}
                                                         </td>
@@ -634,7 +634,7 @@ const ExactFFESpreadsheet = ({
                                                             style={{ backgroundColor: '#6B46C1' }}>
                                                           SHIPPING INFO.
                                                         </td>
-                                                        <td colSpan="2" className="border border-gray-400" style={{ backgroundColor: '#7F1D1D' }}></td>
+                                                        <td colSpan="1" className="border border-gray-400" style={{ backgroundColor: '#7F1D1D' }}></td>
                                                       </tr>
 
                                                       {/* ITEMS - Each subcategory contains multiple items */}
