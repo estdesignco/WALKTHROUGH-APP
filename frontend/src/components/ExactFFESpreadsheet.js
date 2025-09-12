@@ -636,38 +636,65 @@ const ExactFFESpreadsheet = ({
                                                       {/* ACTUAL ITEMS - DARK/BLACK BACKGROUND LIKE YOUR SCREENSHOTS */}
                                                       {['Ceiling Fixture', 'Recessed Lighting', 'Wall Sconces'].map((itemName, itemIndex) => (
                                                         <tr key={itemIndex} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                                          {/* VENDOR/SKU - ACTUAL ITEM NAME */}
+                                                          {/* INSTALLED - ITEM NAME GOES HERE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             {itemName}
                                                           </td>
                                                           
+                                                          {/* VENDOR/SKU */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            <input 
+                                                              type="text" 
+                                                              placeholder="Vendor/SKU"
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Vendor changed:', e.target.value)}
+                                                            />
+                                                          </td>
+                                                          
                                                           {/* QTY */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
-                                                            1
+                                                            <input 
+                                                              type="number" 
+                                                              defaultValue="1"
+                                                              className="w-full bg-transparent border-none text-white text-sm text-center"
+                                                              onChange={(e) => console.log('Qty changed:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
                                                           {/* SIZE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            Size
+                                                            <input 
+                                                              type="text" 
+                                                              placeholder="Size"
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Size changed:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
                                                           {/* FINISH/Color */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            Finish/Color
+                                                            <input 
+                                                              type="text" 
+                                                              placeholder="Finish/Color"
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Finish changed:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
                                                           {/* Cost/Price */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            $0.00
+                                                            <input 
+                                                              type="text" 
+                                                              placeholder="$0.00"
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Cost changed:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
                                                           {/* Image */}
                                                           <td className="border border-gray-400 px-2 py-2 text-center text-white">
                                                             📷 Image
                                                           </td>
-                                                          
-                                                          {/* Spacer */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white"></td>
                                                           
                                                           {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
                                                           
