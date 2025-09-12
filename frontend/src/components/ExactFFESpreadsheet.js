@@ -560,7 +560,7 @@ const ExactFFESpreadsheet = ({
                                     ...(snapshot.isDragging ? { boxShadow: '0 5px 15px rgba(0,0,0,0.3)' } : {})
                                   }}
                                 >
-                                  <td colSpan="12" 
+                                  <td colSpan="13" 
                                       className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                                       style={{ backgroundColor: getRoomColor(room.name) }}>
                                     <div className="flex justify-between items-center">
@@ -613,7 +613,7 @@ const ExactFFESpreadsheet = ({
                                                       ...(snapshot.isDragging ? { boxShadow: '0 3px 10px rgba(0,0,0,0.2)' } : {})
                                                     }}
                                                   >
-                                                    <td colSpan="12" 
+                                                    <td colSpan="13" 
                                                         className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
                                                         style={{ backgroundColor: getCategoryColor() }}>
                                                       <div className="flex items-center gap-2">
@@ -807,7 +807,7 @@ const ExactFFESpreadsheet = ({
                                                       
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
                                                       <tr>
-                                                        <td colSpan="12" className="border border-gray-400 px-6 py-2 bg-slate-900">
+                                                        <td colSpan="13" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                                           <div className="flex justify-start items-center space-x-4">
                                                             {/* Add Item Button - GOLD/AMBER COLOR */}
                                                             <button
