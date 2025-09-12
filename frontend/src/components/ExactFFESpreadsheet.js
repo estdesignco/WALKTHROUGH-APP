@@ -877,10 +877,10 @@ const ExactFFESpreadsheet = ({
                                                         </td>
                                                       </tr>
                                                       
+                                                        </React.Fragment>
+                                                      ))}
                                                     </React.Fragment>
-                                                  ))}
-                                                </React.Fragment>
-                                              )}
+                                                  )}
                                             </Draggable>
                                           );
                                         })}
