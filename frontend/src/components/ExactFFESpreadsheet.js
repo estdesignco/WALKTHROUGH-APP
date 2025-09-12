@@ -156,59 +156,10 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Handle adding a new room - WORKS LIKE ADD CATEGORY
-  const handleAddRoom = async () => {
-    const availableRooms = [
-      'Living Room', 'Master Bedroom', 'Guest Bedroom', 'Kitchen', 'Dining Room',
-      'Family Room', 'Office', 'Bathroom', 'Powder Room', 'Laundry Room',
-      'Entryway', 'Hallway', 'Closet', 'Basement', 'Attic', 'Garage'
-    ];
-    
-    let roomOptions = availableRooms.map((room, index) => `${index + 1}. ${room}`).join('\n');
-    roomOptions += '\n\n0. Enter custom room name';
-    
-    const choice = prompt(`Select a room to add:\n\n${roomOptions}\n\nEnter the number (0 for custom):`);
-    
-    if (!choice) return;
-    
-    let roomName;
-    const choiceNum = parseInt(choice);
-    
-    if (choiceNum === 0) {
-      roomName = prompt('Enter custom room name:');
-      if (!roomName || !roomName.trim()) return;
-      roomName = roomName.trim();
-    } else if (choiceNum >= 1 && choiceNum <= availableRooms.length) {
-      roomName = availableRooms[choiceNum - 1];
-    } else {
-      alert('Invalid selection');
-      return;
-    }
-
-    try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
-      const response = await fetch(`${backendUrl}/api/rooms`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: roomName,
-          project_id: project.id,
-          order_index: project.rooms.length
-        })
-      });
-
-      if (response.ok) {
-        console.log('✅ Room added successfully');
-        // Force reload to show new room with all categories
-        window.location.reload();
-      } else {
-        throw new Error(`HTTP ${response.status}`);
-      }
-    } catch (error) {
-      console.error('❌ Error adding room:', error);
-      alert('Failed to add room. Please try again.');
+  // Handle adding a new room - SIMPLE VERSION LIKE BEFORE
+  const handleAddRoom = () => {
+    if (onAddRoom) {
+      onAddRoom();
     }
   };
 
