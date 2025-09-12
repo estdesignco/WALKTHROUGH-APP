@@ -508,35 +508,8 @@ const ExactFFESpreadsheet = ({
               {(provided) => (
                 <table className="w-full border-collapse border border-gray-400">
                   
-                  {/* TABLE HEADERS - EXACT HIERARCHY AS USER SPECIFIED */}
                   <thead>
-                    {/* SUB-HEADERS ROW */}
-                    <tr>
-                      <th className="border border-gray-400 px-1 py-1" style={{ backgroundColor: '#7F1D1D' }}></th>
-                      <th className="border border-gray-400 px-1 py-1" style={{ backgroundColor: '#7F1D1D' }}></th>
-                      <th className="border border-gray-400 px-1 py-1" style={{ backgroundColor: '#7F1D1D' }}></th>
-                      <th className="border border-gray-400 px-1 py-1" style={{ backgroundColor: '#7F1D1D' }}></th>
-                      <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: '#8B4513' }} colSpan="3">ADDITIONAL INFO.</th>
-                      <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: '#6B46C1' }} colSpan="5">SHIPPING INFO.</th>
-                      <th className="border border-gray-400 px-1 py-1" style={{ backgroundColor: '#7F1D1D' }}></th>
-                    </tr>
-                    
-                    {/* MAIN HEADERS ROW - NO HORIZONTAL LINES IN RED SECTION */}
-                    <tr>
-                      <th className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>INSTALLED</th>
-                      <th className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>VENDOR/SKU</th>
-                      <th className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>QTY</th>
-                      <th className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>SIZE</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>FINISH/Color</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>Cost/Price</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>Image</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Order Date</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Order Status<br/>Order Number</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Estimated Ship Date<br/>Estimated Delivery Date</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Install Date<br/>Ship To</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Tracking<br/>Carrier</th>
-                      <th className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>NOTES</th>
-                    </tr>
+                    {/* EMPTY HEADER FOR STRUCTURE */}
                   </thead>
 
                   {/* TABLE BODY - Keep original hierarchical structure */}
