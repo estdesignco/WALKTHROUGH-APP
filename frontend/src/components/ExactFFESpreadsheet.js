@@ -802,6 +802,7 @@ const ExactFFESpreadsheet = ({
                                                             <input 
                                                               type="text" 
                                                               value={item.tracking_number || ''} 
+                                                              onChange={(e) => console.log('Tracking number changed:', e.target.value)}
                                                               placeholder="Tracking #"
                                                               className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             />
@@ -811,6 +812,7 @@ const ExactFFESpreadsheet = ({
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
                                                             <select 
                                                               value={item.carrier || ''}
+                                                              onChange={(e) => console.log('Carrier changed:', e.target.value)}
                                                               className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             >
                                                               <option value="">Carrier...</option>
