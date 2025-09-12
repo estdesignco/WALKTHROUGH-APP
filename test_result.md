@@ -214,20 +214,53 @@ frontend:
         agent: "testing"
         comment: "🚨 CRITICAL FRONTEND ROUTING ISSUE IDENTIFIED: Comprehensive testing reveals ExactFFESpreadsheet component has CRITICAL routing problems. ✅ BACKEND DATA CONFIRMED: API endpoint /api/projects/bb060596-85c2-455f-860a-cf9fa23dfacf returns correct data with Crystal Chandelier (DELIVERED TO JOB SITE, Restoration Hardware) and LED Recessed Lights in Living Room > Lighting > Installed structure. ❌ FRONTEND ROUTING BROKEN: URL https://interior-ffe.preview.emergentagent.com/project/bb060596-85c2-455f-860a-cf9fa23dfacf/ffe redirects to project list instead of loading FF&E page. ❌ COMPONENT NOT LOADING: ExactFFESpreadsheet component not rendering - page stays on project list. ❌ ALL FF&E FEATURES INACCESSIBLE: Cannot test Add Item, Add Room, pie charts, delete buttons, or scraping functionality because routing prevents access to FF&E page. This is a CRITICAL blocking issue preventing user access to their FF&E data despite backend working perfectly."
 
-  - task: "3-Level Hierarchy Display (Room > Category > Sub-category > Items)"
+  - task: "ExactFFESpreadsheet Component Testing (User's Original Design)"
     implemented: true
-    working: true
-    file: "FFESpreadsheet.js"
-    stuck_count: 0
+    working: false
+    file: "ExactFFESpreadsheet.js"
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
-      - working: true
-        agent: "main"
-        comment: "Perfect implementation. Shows LIVING ROOM (purple) > LIGHTING (green) > INSTALLED (red) > Items in proper table format with all columns."
-      - working: true
+      - working: false
         agent: "testing"
-        comment: "3-LEVEL HIERARCHY VERIFICATION COMPLETED: ✅ PERFECT STRUCTURE CONFIRMED - LIVING ROOM (purple #8E4EC6) > LIGHTING (green #0b4e38) > INSTALLED (red #b43535) hierarchy displays correctly. ✅ VISUAL ORGANIZATION: Room headers span full width with proper color coding, category sections clearly defined, subcategory headers with multi-section layout (RED-BROWN-PURPLE-RED sections). ✅ DATA ORGANIZATION: Items properly nested under correct subcategories, all 16 table columns visible (Item Name, Vendor/SKU, Qty, Size, Orders Status, Finish/Color, Cost/Price, Link, Image, shipping info columns, Notes, Delete). ✅ INTERACTIVE HIERARCHY: Add Item buttons functional in each section, proper section management with Add/Delete capabilities. The 3-level hierarchy is visually perfect and functionally complete."
+        comment: "🎯 COMPREHENSIVE EXACTFFESPREADSHEET TESTING COMPLETED - CRITICAL ROUTING ISSUE: User reverted from ProfessionalFFESpreadsheet back to ExactFFESpreadsheet component as requested. ✅ COMPONENT CONFIRMED: ExactFFESpreadsheet is being used (not ProfessionalFFESpreadsheet). ✅ BACKEND DATA VERIFIED: Project bb060596-85c2-455f-860a-cf9fa23dfacf contains correct data - Crystal Chandelier (DELIVERED TO JOB SITE, Restoration Hardware) and LED Recessed Lights in Living Room > Lighting > Installed structure. ❌ CRITICAL ROUTING FAILURE: URL https://interior-ffe.preview.emergentagent.com/project/bb060596-85c2-455f-860a-cf9fa23dfacf/ffe redirects to project list instead of loading FF&E page. ❌ CANNOT TEST REQUESTED FEATURES: Unable to test Add Item functionality, Four Hands scraping (https://fourhands.com/product/248067-003), delete buttons, shipping columns, pie charts, or Add Room functionality because routing prevents access to ExactFFESpreadsheet component. This is a BLOCKING issue preventing user from accessing their FF&E data despite backend working perfectly."
+
+  - task: "Add Item Modal and Scraping Functionality"
+    implemented: true
+    working: "NA"
+    file: "AddItemModal.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "🔗 SCRAPING FUNCTIONALITY CANNOT BE TESTED: Due to frontend routing issue preventing access to FF&E page, cannot test Add Item modal or Four Hands URL scraping (https://fourhands.com/product/248067-003). ✅ BACKEND SCRAPING CONFIRMED WORKING: Previous testing shows scraping endpoint functional with Four Hands URL extracting name='Fenn Chair', vendor='Four Hands', sku='248067-003'. ✅ COMPONENT CODE VERIFIED: AddItemModal.js contains proper scraping implementation with Fill button and Four Hands URL support. ❌ UI TESTING BLOCKED: Cannot verify modal opening, Fill button functionality, or Create Item button due to routing preventing access to Add Item buttons in ExactFFESpreadsheet."
+
+  - task: "Pie Charts and Status Overview"
+    implemented: true
+    working: "NA"
+    file: "StatusOverview.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "📊 PIE CHARTS CANNOT BE TESTED: Due to frontend routing issue, cannot access FF&E page to verify Chart.js pie charts. ✅ COMPONENT CODE VERIFIED: StatusOverview.js contains proper Chart.js implementation with real pie charts (not fake circular borders), proper labels with percentages, and color-coded status/carrier breakdowns. ✅ BACKEND DATA AVAILABLE: Status and carrier data endpoints working correctly. ❌ UI VERIFICATION BLOCKED: Cannot verify pie chart rendering, status overview display, or shipping information section due to routing preventing access to FF&E dashboard."
+
+  - task: "Delete Buttons and User Interface Elements"
+    implemented: true
+    working: "NA"
+    file: "ExactFFESpreadsheet.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "🗑️ DELETE BUTTONS CANNOT BE TESTED: Due to frontend routing issue, cannot access ExactFFESpreadsheet to verify delete buttons (🗑️) are visible and functional. ✅ COMPONENT CODE VERIFIED: ExactFFESpreadsheet.js contains delete button implementation in actions column. ✅ EXISTING ITEMS CONFIRMED: Backend shows Crystal Chandelier and LED Recessed Lights exist, so delete buttons should be present. ❌ UI VERIFICATION BLOCKED: Cannot test delete button visibility, functionality, or shipping info columns due to routing preventing access to spreadsheet component."
 
   - task: "Add Room Auto-Population Functionality"
     implemented: true
