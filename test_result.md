@@ -251,13 +251,16 @@ frontend:
     implemented: true
     working: "NA"
     file: "AddItemModal.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: true
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "🔗 SCRAPING FUNCTIONALITY CANNOT BE TESTED: Due to frontend routing issue preventing access to FF&E page, cannot test Add Item modal or Four Hands URL scraping (https://fourhands.com/product/248067-003). ✅ BACKEND SCRAPING CONFIRMED WORKING: Previous testing shows scraping endpoint functional with Four Hands URL extracting name='Fenn Chair', vendor='Four Hands', sku='248067-003'. ✅ COMPONENT CODE VERIFIED: AddItemModal.js contains proper scraping implementation with Fill button and Four Hands URL support. ❌ UI TESTING BLOCKED: Cannot verify modal opening, Fill button functionality, or Create Item button due to routing preventing access to Add Item buttons in ExactFFESpreadsheet."
+      - working: "NA"
+        agent: "testing"
+        comment: "🔗 REVIEW REQUEST SCRAPING TESTING BLOCKED: Attempted to test Add Item functionality with West Elm URL (https://www.westelm.com/products/andes-sectional-sofa/) as requested in review. ❌ ROUTING ISSUE PREVENTS TESTING: Cannot access Add Item buttons or modal due to FF&E page routing failure. ✅ BACKEND SCRAPING VERIFIED: /api/scrape-product endpoint working with West Elm, CB2, and Restoration Hardware URLs. ✅ COMPONENT IMPLEMENTATION CONFIRMED: AddItemModal.js contains URL input field, Fill button, and proper scraping integration. ❌ UI VERIFICATION IMPOSSIBLE: Cannot test modal opening, URL field population, Fill button functionality, or item creation workflow. All Add Item testing blocked by routing preventing access to ExactFFESpreadsheet component where Add Item buttons are located."
 
   - task: "Pie Charts and Status Overview"
     implemented: true
