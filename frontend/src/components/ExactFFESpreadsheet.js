@@ -276,7 +276,7 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // MUTED COLORS FOR EACH ROOM - Reduced from 10 to 7 intensity!
+  // ORIGINAL COLORS - EXACT MATCH
   const getRoomColor = (roomName) => {
     const roomColors = {
       'living room': '#553C9A',      // Much more muted (intensity 5)
@@ -285,16 +285,15 @@ const ExactFFESpreadsheet = ({
       'primary bedroom': '#065F46',  // Much more muted (intensity 5)
       'primary bathroom': '#1E3A8A', // Much more muted (intensity 5)
       'powder room': '#57534E',      // Much more muted (intensity 5)
-      'guest bedroom': '#7C2D12',    // Much more muted (intensity 5)
-      'guest bathroom': '#92400E',   // Much more muted (intensity 5)
-      'laundry room': '#374151',     // Much more muted (intensity 5)
-      'mudroom': '#44403C',          // Much more muted (intensity 5)
-      'basement': '#1F2937',         // Much more muted (intensity 5)
-      'garage': '#374151',           // Much more muted (intensity 5)
-      'home office': '#1E40AF',      // Much more muted (intensity 5)
-      'home gym': '#065F46',         // Much more muted (intensity 5)
-      'nursery': '#BE185D',          // Much more muted (intensity 5)
-      'balcony': '#065F46',          // Much more muted (intensity 5)
+      'guest room': '#9D174D',       // Much more muted (intensity 5)
+      'office': '#312E81',           // Much more muted (intensity 5)
+      'laundry room': '#365314',     // Much more muted (intensity 5)
+      'mudroom': '#164E63',          // Much more muted (intensity 5)
+      'family room': '#9A3412',      // Much more muted (intensity 5)
+      'basement': '#4B5563',         // Keep Gray
+      'attic storage': '#57534E',    // Much more muted (intensity 5)
+      'garage': '#374151',           // Keep Gray-800
+      'balcony': '#5B21B6',          // Much more muted (intensity 5)
       'screened porch': '#065F46',   // Much more muted (intensity 5)
       'pool house': '#0C4A6E',       // Much more muted (intensity 5)
       'guest house': '#991B1B',      // Much more muted (intensity 5)
@@ -306,30 +305,17 @@ const ExactFFESpreadsheet = ({
       'study': '#374151',            // Keep Gray-700
       'sitting room': '#1E3A8A'      // Keep Blue-700
     };
-    return roomColors[roomName.toLowerCase()] || '#553C9A';
+    return roomColors[roomName.toLowerCase()] || '#7C3AED';
   };
 
-  // GREEN COLORS FOR CATEGORIES
-  const getCategoryColor = () => {
-    return '#0F2A19'; // Muted green consistent with design
-  };
+  // ORIGINAL COLORS - EXACT MATCH
+  const getCategoryColor = () => '#0F2A19'; // Much more muted (intensity 5)
 
-  // BROWN/RED COLORS FOR MAIN HEADERS (ADDITIONAL INFO., SHIPPING INFO.)
-  const getMainHeaderColor = () => {
-    return '#7F1D1D'; // Muted red header
-  };
-
-  const getAdditionalInfoColor = () => {
-    return '#78350F'; // Brown for ADDITIONAL INFO.
-  };
-
-  const getShippingInfoColor = () => {
-    return '#581C87'; // Purple for SHIPPING INFO.
-
-  const getNotesActionsColor = () => {
-    return '#991B1B'; // Much more muted (intensity 5)
-  };
-  };
+  // ORIGINAL HEADER COLORS - EXACT MATCH  
+  const getMainHeaderColor = () => '#7F1D1D';        // Much more muted (intensity 5)
+  const getAdditionalInfoColor = () => '#78350F';    // Much more muted (intensity 5)
+  const getShippingInfoColor = () => '#581C87';      // Much more muted (intensity 5)  
+  const getNotesActionsColor = () => '#991B1B';      // Much more muted (intensity 5)
 
   // COMPLETE COLOR MAPPING FOR ALL DROPDOWN VALUES
   const getStatusColor = (status) => {
@@ -437,41 +423,34 @@ const ExactFFESpreadsheet = ({
   }
 
   return (
-    <div className="space-y-6">
-      {/* EXACT SPREADSHEET TABLE */}
-      <div className="bg-gray-900 border border-gray-600 rounded-lg shadow-lg overflow-hidden">
-        <div className="overflow-x-auto" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+    <div className="w-full bg-white">
+      
+      {/* ONE CONTINUOUS SPREADSHEET - ORIGINAL LAYOUT WITH DRAG & DROP */}
+      <div 
+        className="w-full overflow-x-auto overflow-y-visible" 
+        style={{ 
+          height: '80vh',
+          overscrollBehavior: 'contain',
+          scrollBehavior: 'smooth'
+        }}
+        onScroll={(e) => {
+          // Prevent page navigation on scroll boundaries
+          e.stopPropagation();
+        }}
+      >
+        <div style={{ minWidth: '2500px' }}>
           
           <DragDropContext onDragEnd={handleDragEnd}>
             <table className="w-full border-collapse border border-gray-400">
-              {/* TABLE HEADERS */}
-              <thead>
-                <tr>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>ITEM</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>QTY</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>SIZE</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>REMARKS</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>VENDOR</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>STATUS</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>COST</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>ADDITIONAL INFO.</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>FINISH/COLOR</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>SHIPPING INFO.</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>CARRIER</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>SHIP TO</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>DELIVERY STATUS</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>NOTES</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>ACTION</th>
-                </tr>
-              </thead>
-
-              {/* TABLE BODY WITH DRAG & DROP */}
+              
+              <thead></thead>
+              
               <tbody>
                 <Droppable droppableId="rooms" type="room">
                   {(provided) => (
                     <tr ref={provided.innerRef} {...provided.droppableProps}>
                       <td colSpan="15" style={{ padding: 0, border: 'none' }}>
-                        {/* ROOMS - Draggable */}
+                        {/* HIERARCHICAL STRUCTURE AS ROW HEADERS */}
                         {project.rooms.map((room, roomIndex) => {
                           console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
                           return (
@@ -488,13 +467,13 @@ const ExactFFESpreadsheet = ({
                                   }}
                                 >
                                   <tbody>
-                                    {/* ROOM HEADER ROW */}
+                                    {/* ROOM HEADER ROW - Muted colors with Delete Button */}
                                     <tr {...provided.dragHandleProps}>
                                       <td colSpan="14" 
                                           className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                                           style={{ backgroundColor: getRoomColor(room.name) }}>
                                         <div className="flex justify-between items-center">
-                                          <span>🏠 {room.name.toUpperCase()}</span>
+                                          <span>{room.name.toUpperCase()}</span>
                                           <button
                                             onClick={() => handleDeleteRoom(room.id)}
                                             className="text-red-300 hover:text-red-100 text-lg ml-2"
@@ -515,8 +494,8 @@ const ExactFFESpreadsheet = ({
                                         </button>
                                       </td>
                                     </tr>
-
-                                    {/* CATEGORIES - Droppable within each room */}
+                                    
+                                    {/* ROOM CATEGORIES */}
                                     <tr>
                                       <td colSpan="15" style={{ padding: 0, border: 'none' }}>
                                         <Droppable droppableId={`categories-${room.id}`} type="category">
@@ -546,66 +525,131 @@ const ExactFFESpreadsheet = ({
                                                             <td colSpan="15" 
                                                                 className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
                                                                 style={{ backgroundColor: getCategoryColor() }}>
-                                                              📁 {category.name.toUpperCase()}
+                                                              {category.name.toUpperCase()}
                                                             </td>
                                                           </tr>
-
-                                                          {/* SUBCATEGORIES AND ITEMS */}
+                                                          
+                                                          {/* SUBCATEGORIES */}
                                                           {category.subcategories?.map((subcategory) => (
                                                             <React.Fragment key={subcategory.id}>
                                                               
-                                                              {/* SUBCATEGORY HEADER ROW */}
+                                                              {/* FIXED HEADER STRUCTURE - Only section headers on top */}
                                                               <tr>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
+                                                                {/* Empty cells for main data columns */}
                                                                 <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
                                                                 <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
                                                                 <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
                                                                 <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
                                                                 <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
                                                                 
-                                                                <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getAdditionalInfoColor() }}>
+                                                                {/* ADDITIONAL INFO section header */}
+                                                                <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                                    style={{ backgroundColor: getAdditionalInfoColor() }} colSpan="3">
+                                                                  ADDITIONAL INFO.
+                                                                </th>
+                                                                
+                                                                {/* SHIPPING INFO section header */}
+                                                                <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                                    style={{ backgroundColor: getShippingInfoColor() }} colSpan="5">
+                                                                  SHIPPING INFO.
+                                                                </th>
+                                                                
+                                                                {/* Empty cells for notes/actions */}
+                                                                <td className="border border-gray-400" style={{ backgroundColor: getNotesActionsColor() }}></td>
+                                                                <td className="border border-gray-400" style={{ backgroundColor: getNotesActionsColor() }}></td>
+                                                              </tr>
+                                                              
+                                                              {/* COLUMN HEADERS - All moved down here */}
+                                                              <tr>
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
+                                                                    style={{ backgroundColor: getMainHeaderColor() }}>
                                                                   {subcategory.name.toUpperCase()}
-                                                                </td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getAdditionalInfoColor() }}></td>
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
+                                                                    style={{ backgroundColor: getMainHeaderColor() }}>
+                                                                  VENDOR/SKU
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[50px]" 
+                                                                    style={{ backgroundColor: getMainHeaderColor() }}>
+                                                                  QTY
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[80px]" 
+                                                                    style={{ backgroundColor: getMainHeaderColor() }}>
+                                                                  SIZE
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
+                                                                    style={{ backgroundColor: getMainHeaderColor() }}>
+                                                                  ORDERS STATUS
+                                                                </th>
                                                                 
-                                                                <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getShippingInfoColor() }}>
-                                                                  {subcategory.name.toUpperCase()}
-                                                                </td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getShippingInfoColor() }}></td>
+                                                                {/* ADDITIONAL INFO columns */}
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
+                                                                    style={{ backgroundColor: getAdditionalInfoColor() }}>
+                                                                  FINISH/Color
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-right text-xs font-bold text-white" 
+                                                                    style={{ backgroundColor: getAdditionalInfoColor() }}>
+                                                                  Cost/Price
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white" 
+                                                                    style={{ backgroundColor: getAdditionalInfoColor() }}>
+                                                                  Image
+                                                                </th>
                                                                 
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
+                                                                {/* SHIPPING INFO columns */}
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
+                                                                    style={{ backgroundColor: getShippingInfoColor() }}>
+                                                                  SHIP TO
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
+                                                                    style={{ backgroundColor: getShippingInfoColor() }}>
+                                                                  CARRIER
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
+                                                                    style={{ backgroundColor: getShippingInfoColor() }}>
+                                                                  TRACKING #
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
+                                                                    style={{ backgroundColor: getShippingInfoColor() }}>
+                                                                  ORDER DATE
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
+                                                                    style={{ backgroundColor: getShippingInfoColor() }}>
+                                                                  DELIVERY DATE
+                                                                </th>
+                                                                
+                                                                {/* NOTES & ACTIONS columns */}
+                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
+                                                                    style={{ backgroundColor: getNotesActionsColor() }}>
+                                                                  NOTES
+                                                                </th>
+                                                                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white" 
+                                                                    style={{ backgroundColor: getNotesActionsColor() }}>
+                                                                  ACTIONS
+                                                                </th>
                                                               </tr>
 
                                                               {/* ITEMS */}
                                                               {subcategory.items?.map((item) => (
                                                                 <tr key={item.id}>
                                                                   {/* ITEM NAME */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                                     {item.name || 'Chandelier'}
                                                                   </td>
                                                                   
+                                                                  {/* VENDOR/SKU */}
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                                    {item.vendor || 'Visual Comfort'}
+                                                                  </td>
+                                                                  
                                                                   {/* QTY */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-white text-center">
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black text-center">
                                                                     {item.quantity || '1'}
                                                                   </td>
                                                                   
                                                                   {/* SIZE */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
                                                                     {item.size || '24"W x 30"H'}
-                                                                  </td>
-                                                                  
-                                                                  {/* REMARKS */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                                    {item.remarks || 'Matches living room theme'}
-                                                                  </td>
-                                                                  
-                                                                  {/* VENDOR */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                                    {item.vendor || 'Visual Comfort'}
                                                                   </td>
                                                                   
                                                                   {/* STATUS - Color-coded dropdown */}
@@ -647,34 +691,50 @@ const ExactFFESpreadsheet = ({
                                                                     </select>
                                                                   </td>
                                                                   
+                                                                  {/* FINISH/COLOR */}
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                                    {item.finish_color || 'Aged Brass'}
+                                                                  </td>
+                                                                  
                                                                   {/* COST */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-white text-right">
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black text-right">
                                                                     ${item.cost || '450.00'}
                                                                   </td>
                                                                   
-                                                                  {/* ADDITIONAL INFO - Plain text, no container */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                                    {item.finish_color || 'Aged Brass'}
-                                                                  </td>
-                                                                  
-                                                                  {/* FINISH/COLOR - Plain text, no container */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                                    {item.finish_color || 'Aged Brass'}
-                                                                  </td>
-                                                                  
-                                                                  {/* SHIPPING INFO - Plain text, no container */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                                    {item.tracking_number ? (
-                                                                      <button
-                                                                        onClick={() => handleTrackItem(item)}
-                                                                        className="text-blue-400 hover:text-blue-300 underline"
-                                                                        title="Track Package"
-                                                                      >
-                                                                        Track: {item.tracking_number.substring(0, 8)}...
-                                                                      </button>
+                                                                  {/* IMAGE */}
+                                                                  <td className="border border-gray-400 px-2 py-2 text-center">
+                                                                    {item.image_url ? (
+                                                                      <img 
+                                                                        src={item.image_url} 
+                                                                        alt={item.name}
+                                                                        className="w-12 h-12 object-cover rounded cursor-pointer"
+                                                                        onClick={() => window.open(item.image_url, '_blank')}
+                                                                      />
                                                                     ) : (
-                                                                      'No tracking yet'
+                                                                      <button className="text-blue-600 hover:text-blue-800 text-xs">+ Image</button>
                                                                     )}
+                                                                  </td>
+                                                                  
+                                                                  {/* SHIP TO - Color-coded dropdown */}
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                                    <select 
+                                                                      value={item.ship_to || ''}
+                                                                      onChange={(e) => {
+                                                                        console.log(`Ship To changed to: ${e.target.value} with color: ${getShipToColor(e.target.value)}`);
+                                                                      }}
+                                                                      className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
+                                                                      style={{
+                                                                        backgroundColor: item.ship_to ? getShipToColor(item.ship_to) : '#374151',
+                                                                        color: '#000'
+                                                                      }}
+                                                                    >
+                                                                      <option value="">Select Location...</option>
+                                                                      <option value="CLIENT HOME">🏠 CLIENT HOME</option>
+                                                                      <option value="JOB SITE">🏗️ JOB SITE</option>
+                                                                      <option value="DESIGN CENTER">🏢 DESIGN CENTER</option>
+                                                                      <option value="WAREHOUSE">📦 WAREHOUSE</option>
+                                                                      <option value="VENDOR LOCATION">🏭 VENDOR LOCATION</option>
+                                                                    </select>
                                                                   </td>
                                                                   
                                                                   {/* CARRIER - Color-coded dropdown */}
@@ -705,62 +765,34 @@ const ExactFFESpreadsheet = ({
                                                                     </select>
                                                                   </td>
                                                                   
-                                                                  {/* SHIP TO - Color-coded dropdown */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                                    <select 
-                                                                      value={item.ship_to || ''}
-                                                                      onChange={(e) => {
-                                                                        console.log(`Ship To changed to: ${e.target.value} with color: ${getShipToColor(e.target.value)}`);
-                                                                      }}
-                                                                      className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
-                                                                      style={{
-                                                                        backgroundColor: item.ship_to ? getShipToColor(item.ship_to) : '#374151',
-                                                                        color: '#000'
-                                                                      }}
-                                                                    >
-                                                                      <option value="">Select Location...</option>
-                                                                      <option value="CLIENT HOME">🏠 CLIENT HOME</option>
-                                                                      <option value="JOB SITE">🏗️ JOB SITE</option>
-                                                                      <option value="DESIGN CENTER">🏢 DESIGN CENTER</option>
-                                                                      <option value="WAREHOUSE">📦 WAREHOUSE</option>
-                                                                      <option value="VENDOR LOCATION">🏭 VENDOR LOCATION</option>
-                                                                    </select>
+                                                                  {/* TRACKING # */}
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                                    {item.tracking_number ? (
+                                                                      <button
+                                                                        onClick={() => handleTrackItem(item)}
+                                                                        className="text-blue-600 hover:text-blue-800 underline"
+                                                                        title="Track Package"
+                                                                      >
+                                                                        Track: {item.tracking_number.substring(0, 8)}...
+                                                                      </button>
+                                                                    ) : (
+                                                                      'No tracking yet'
+                                                                    )}
                                                                   </td>
                                                                   
-                                                                  {/* DELIVERY STATUS - Color-coded dropdown */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                                    <select 
-                                                                      value={item.delivery_status || ''}
-                                                                      onChange={(e) => {
-                                                                        console.log(`Delivery Status changed to: ${e.target.value} with color: ${getDeliveryStatusColor(e.target.value)}`);
-                                                                      }}
-                                                                      className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
-                                                                      style={{
-                                                                        backgroundColor: item.delivery_status ? getDeliveryStatusColor(item.delivery_status) : '#374151',
-                                                                        color: '#000'
-                                                                      }}
-                                                                    >
-                                                                      <option value="">Select Delivery Status...</option>
-                                                                      <option value="PENDING">🔵 PENDING</option>
-                                                                      <option value="SCHEDULED">🔵 SCHEDULED</option>
-                                                                      <option value="PROCESSING">🟡 PROCESSING</option>
-                                                                      <option value="IN TRANSIT">🟡 IN TRANSIT</option>
-                                                                      <option value="OUT FOR DELIVERY">🔵 OUT FOR DELIVERY</option>
-                                                                      <option value="ATTEMPTED DELIVERY">🔴 ATTEMPTED DELIVERY</option>
-                                                                      <option value="DELIVERED">🟢 DELIVERED</option>
-                                                                      <option value="DELIVERED TO RECEIVER">🟢 DELIVERED TO RECEIVER</option>
-                                                                      <option value="AVAILABLE FOR PICKUP">🟢 AVAILABLE FOR PICKUP</option>
-                                                                      <option value="DELAYED">🔴 DELAYED</option>
-                                                                      <option value="EXCEPTION">🔴 EXCEPTION</option>
-                                                                      <option value="DAMAGED">🔴 DAMAGED</option>
-                                                                      <option value="LOST">🔴 LOST</option>
-                                                                      <option value="RETURNED TO SENDER">🔴 RETURNED TO SENDER</option>
-                                                                    </select>
+                                                                  {/* ORDER DATE */}
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                                    {item.order_date || 'Not set'}
+                                                                  </td>
+                                                                  
+                                                                  {/* DELIVERY DATE */}
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                                    {item.expected_delivery || 'Not set'}
                                                                   </td>
                                                                   
                                                                   {/* NOTES */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                                    {item.notes || 'For dining room entryway'}
+                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                                    {item.notes || item.remarks || 'For dining room entryway'}
                                                                   </td>
                                                                   
                                                                   {/* ACTIONS */}
@@ -770,7 +802,7 @@ const ExactFFESpreadsheet = ({
                                                                         // Handle delete item
                                                                         console.log('Delete item:', item.id);
                                                                       }}
-                                                                      className="text-red-400 hover:text-red-300 text-lg"
+                                                                      className="text-red-600 hover:text-red-800 text-lg"
                                                                     >
                                                                       🗑️
                                                                     </button>
