@@ -508,24 +508,31 @@ const ExactFFESpreadsheet = ({
               {(provided) => (
                 <table className="w-full border-collapse border border-gray-400">
                   
-                  {/* TABLE HEADERS - Keep original structure */}
+                  {/* TABLE HEADERS - EXACT MATCH TO USER'S SCREENSHOTS */}
                   <thead>
                     <tr>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>ITEM</th>
+                      {/* LEFT SIDE - First Screenshot */}
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>VENDOR/SKU</th>
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>QTY</th>
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>SIZE</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>REMARKS</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>VENDOR</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>STATUS</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>COST</th>
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>ADDITIONAL INFO.</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>FINISH/COLOR</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>FINISH/Color</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>Cost/Price</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>Image</th>
+                      
+                      {/* RIGHT SIDE - Second Screenshot */}
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>SHIPPING INFO.</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>CARRIER</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>SHIP TO</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>DELIVERY STATUS</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>Order Date</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>Order Status</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>Order Number</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>Estimated Ship Date</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>Estimated Delivery Date</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>Install Date</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>Ship To</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>Tracking Number</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>Carrier</th>
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getNotesActionsColor() }}>NOTES</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getNotesActionsColor() }}>ACTION</th>
+                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getNotesActionsColor() }}>ACTIONS</th>
                     </tr>
                   </thead>
 
