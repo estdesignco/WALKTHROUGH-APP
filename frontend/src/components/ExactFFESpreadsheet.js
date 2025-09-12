@@ -194,6 +194,80 @@ const ExactFFESpreadsheet = ({
     }
   };
 
+  // Handle deleting a room
+  const handleDeleteRoom = async (roomId) => {
+    if (!roomId) {
+      console.error('❌ No room ID provided');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to delete this room? This will delete all categories and items in this room.')) {
+      return;
+    }
+
+    try {
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        console.log('✅ Room deleted successfully');
+        if (onReload) {
+          await onReload();
+        }
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('❌ Error deleting room:', error);
+    }
+  };
+
+  // Handle adding a new room
+  const handleAddRoom = () => {
+    // This will be connected to the main ADD ROOM button functionality
+    if (onAddRoom) {
+      onAddRoom();
+    }
+  };
+
+  // Handle adding a new category
+  const handleAddCategory = async (roomId, categoryName) => {
+    if (!roomId || !categoryName) {
+      console.error('❌ Room ID and category name required');
+      return;
+    }
+
+    try {
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const newCategory = {
+        room_id: roomId,
+        name: categoryName,
+        order_index: 0
+      };
+
+      const response = await fetch(`${backendUrl}/api/categories`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newCategory)
+      });
+
+      if (response.ok) {
+        console.log('✅ Category added successfully');
+        if (onReload) {
+          await onReload();
+        }
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('❌ Error adding category:', error);
+    }
+  };
+
   // MUTED COLORS FOR EACH ROOM - Reduced from 10 to 7 intensity!
   const getRoomColor = (roomName) => {
     const roomColors = {
