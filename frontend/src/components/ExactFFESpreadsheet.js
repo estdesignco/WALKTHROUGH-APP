@@ -996,10 +996,7 @@ const ExactFFESpreadsheet = ({
                                                 </React.Fragment>
                                           );
                                         })}
-                                        {provided.placeholder}
                                       </React.Fragment>
-                                    )}
-                                  </Droppable>
                                 )}
                               </React.Fragment>
                         );
