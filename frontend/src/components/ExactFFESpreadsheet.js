@@ -9,6 +9,7 @@ const ExactFFESpreadsheet = ({
   vendorTypes = [],
   carrierTypes = [],
   onDeleteRoom, 
+  onAddRoom,
   onReload 
 }) => {
   // ✅ DEBUG LOGGING TO FIND EMPTY SPREADSHEET ISSUE
@@ -18,6 +19,9 @@ const ExactFFESpreadsheet = ({
   
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [selectedRoomId, setSelectedRoomId] = useState(null);
+  const [availableCategories, setAvailableCategories] = useState([]);
 
   // Handle adding new items with proper scraping
   const handleAddItem = async (itemData) => {
