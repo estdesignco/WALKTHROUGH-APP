@@ -676,7 +676,11 @@ const ExactFFESpreadsheet = ({
                                                           
                                                           {/* Image */}
                                                           <td className="border border-gray-400 px-2 py-2 text-center text-white">
-                                                            📷 Image
+                                                            {item.image_url ? (
+                                                              <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
+                                                            ) : (
+                                                              '📷 Image'
+                                                            )}
                                                           </td>
                                                           
                                                           {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
