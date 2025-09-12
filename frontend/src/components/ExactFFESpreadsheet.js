@@ -725,6 +725,18 @@ const ExactFFESpreadsheet = ({
                                                                 onChange={(e) => console.log('Order status changed:', e.target.value)}
                                                               >
                                                                 <option value="">Status...</option>
+                                                                <option value="TO BE SELECTED">TO BE SELECTED</option>
+                                                                <option value="RESEARCHING">RESEARCHING</option>
+                                                                <option value="PENDING APPROVAL">PENDING APPROVAL</option>
+                                                                <option value="APPROVED">APPROVED</option>
+                                                                <option value="ORDERED">ORDERED</option>
+                                                                <option value="PICKED">PICKED</option>
+                                                                <option value="CONFIRMED">CONFIRMED</option>
+                                                                <option value="IN PRODUCTION">IN PRODUCTION</option>
+                                                                <option value="SHIPPED">SHIPPED</option>
+                                                                <option value="IN TRANSIT">IN TRANSIT</option>
+                                                                <option value="OUT FOR DELIVERY">OUT FOR DELIVERY</option>
+                                                                <option value="DELIVERED TO RECEIVER">DELIVERED TO RECEIVER</option>
                                                                 <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
                                                                 <option value="RECEIVED">RECEIVED</option>
                                                                 <option value="READY FOR INSTALL">READY FOR INSTALL</option>
