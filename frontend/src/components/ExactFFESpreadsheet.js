@@ -521,12 +521,12 @@ const ExactFFESpreadsheet = ({
                       <th className="border border-gray-400 px-1 py-1" style={{ backgroundColor: '#7F1D1D' }}></th>
                     </tr>
                     
-                    {/* MAIN HEADERS ROW */}
+                    {/* MAIN HEADERS ROW - NO HORIZONTAL LINES IN RED SECTION */}
                     <tr>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>INSTALLED</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>VENDOR/SKU</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>QTY</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>SIZE</th>
+                      <th className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>INSTALLED</th>
+                      <th className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>VENDOR/SKU</th>
+                      <th className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>QTY</th>
+                      <th className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>SIZE</th>
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>FINISH/Color</th>
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>Cost/Price</th>
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>Image</th>
@@ -535,7 +535,7 @@ const ExactFFESpreadsheet = ({
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Estimated Ship Date<br/>Estimated Delivery Date</th>
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Install Date<br/>Ship To</th>
                       <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Tracking<br/>Carrier</th>
-                      <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>NOTES</th>
+                      <th className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>NOTES</th>
                     </tr>
                   </thead>
 
