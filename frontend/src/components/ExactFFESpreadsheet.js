@@ -675,9 +675,7 @@ const ExactFFESpreadsheet = ({
                                           console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
                                           
                                           return (
-                                            <Draggable key={category.id} draggableId={category.id} index={catIndex}>
-                                              {(provided, snapshot) => (
-                                                <React.Fragment>
+                                                <React.Fragment key={category.id}>
                                                   {/* CATEGORY HEADER ROW */}
                                                   <tr
                                                     ref={provided.innerRef}
