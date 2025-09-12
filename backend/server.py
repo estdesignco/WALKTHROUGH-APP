@@ -1409,6 +1409,60 @@ async def get_project(project_id: str):
     
     return Project(**project_data)
 
+# ROOM UPDATE ENDPOINT (for drag & drop)
+@api_router.put("/rooms/{room_id}", response_model=Room)
+async def update_room(room_id: str, room_update: RoomUpdate):
+    """Update room details (needed for drag & drop reordering)"""
+    try:
+        update_data = {k: v for k, v in room_update.dict().items() if v is not None}
+        update_data["updated_at"] = datetime.utcnow()
+        
+        result = await db.rooms.update_one(
+            {"id": room_id}, 
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Room not found")
+        
+        # Return updated room
+        room_data = await db.rooms.find_one({"id": room_id})
+        if not room_data:
+            raise HTTPException(status_code=404, detail="Room not found after update")
+        
+        return Room(**room_data)
+        
+    except Exception as e:
+        logger.error(f"Error updating room {room_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update room: {str(e)}")
+
+# CATEGORY UPDATE ENDPOINT (for drag & drop)
+@api_router.put("/categories/{category_id}", response_model=Category) 
+async def update_category(category_id: str, category_update: CategoryUpdate):
+    """Update category details (needed for drag & drop reordering)"""
+    try:
+        update_data = {k: v for k, v in category_update.dict().items() if v is not None}
+        update_data["updated_at"] = datetime.utcnow()
+        
+        result = await db.categories.update_one(
+            {"id": category_id}, 
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Category not found")
+        
+        # Return updated category
+        category_data = await db.categories.find_one({"id": category_id})
+        if not category_data:
+            raise HTTPException(status_code=404, detail="Category not found after update")
+        
+        return Category(**category_data)
+        
+    except Exception as e:
+        logger.error(f"Error updating category {category_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update category: {str(e)}")
+
 # ROOM ENDPOINTS with 3-level auto-population
 @api_router.post("/rooms", response_model=Room)
 async def create_room(room_data: RoomCreate):
