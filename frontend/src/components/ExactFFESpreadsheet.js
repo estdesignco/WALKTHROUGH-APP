@@ -650,7 +650,8 @@ const ExactFFESpreadsheet = ({
                                                       
                                                       {/* ITEMS GO DIRECTLY UNDER RED HEADER */}
                                                       {/* ACTUAL ITEMS FROM BACKEND DATA */}
-                                                      {subcategory.items?.map((item, itemIndex) => (
+                                                      {category.subcategories?.map((subcategory) => (
+                                                        subcategory.items?.map((item, itemIndex) => (
                                                         <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
                                                           {/* INSTALLED - ITEM NAME GOES HERE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
