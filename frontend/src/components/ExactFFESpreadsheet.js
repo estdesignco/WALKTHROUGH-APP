@@ -827,6 +827,7 @@ const ExactFFESpreadsheet = ({
                                                             <input 
                                                               type="text" 
                                                               value={item.notes || ''} 
+                                                              onChange={(e) => console.log('Notes changed:', e.target.value)}
                                                               placeholder="Notes"
                                                               className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             />
