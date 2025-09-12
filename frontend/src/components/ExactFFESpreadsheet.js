@@ -324,7 +324,7 @@ const ExactFFESpreadsheet = ({
   };
 
   const getShippingInfoColor = () => {
-    return '#553C9A'; // Purple for SHIPPING INFO.
+    return '#581C87'; // Purple for SHIPPING INFO.
   };
 
   // COMPLETE COLOR MAPPING FOR ALL DROPDOWN VALUES
