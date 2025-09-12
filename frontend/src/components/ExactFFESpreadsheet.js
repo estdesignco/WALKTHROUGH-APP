@@ -159,10 +159,41 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Handle adding a new room
-  const handleAddRoom = () => {
-    if (onAddRoom) {
-      onAddRoom();
+  // Handle adding a new room - WORKS LIKE ADD CATEGORY
+  const handleAddRoom = async () => {
+    const roomName = prompt('Enter new room name:');
+    if (!roomName || !roomName.trim()) {
+      return;
+    }
+
+    try {
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${backendUrl}/api/rooms`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: roomName.trim(),
+          project_id: project.id,
+          order_index: project.rooms.length
+        })
+      });
+
+      if (response.ok) {
+        console.log('✅ Room added successfully');
+        // Force reload the project to show the new room with all its categories
+        if (onAddRoom) {
+          onAddRoom();
+        }
+        // Reload the page to show new room structure
+        window.location.reload();
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('❌ Error adding room:', error);
+      alert('Failed to add room. Please try again.');
     }
   };
 
