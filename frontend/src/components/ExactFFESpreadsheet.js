@@ -744,6 +744,7 @@ const ExactFFESpreadsheet = ({
                                                             <input 
                                                               type="text" 
                                                               value={item.order_number || ''} 
+                                                              onChange={(e) => console.log('Order number changed:', e.target.value)}
                                                               placeholder="Order #"
                                                               className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             />
@@ -754,6 +755,7 @@ const ExactFFESpreadsheet = ({
                                                             <input 
                                                               type="date" 
                                                               value={item.estimated_ship_date || ''} 
+                                                              onChange={(e) => console.log('Estimated ship date changed:', e.target.value)}
                                                               className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                               placeholder="mm/dd/yyyy"
                                                             />
