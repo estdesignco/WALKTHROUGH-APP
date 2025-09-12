@@ -428,6 +428,7 @@ const FFEDashboard = ({ isOffline }) => {
           vendorTypes={vendorTypes}
           carrierTypes={carrierTypes}
           onDeleteRoom={handleDeleteRoom}
+          onAddRoom={() => setShowAddRoom(true)}
           onReload={loadSimpleProject}
         />
       </div>
