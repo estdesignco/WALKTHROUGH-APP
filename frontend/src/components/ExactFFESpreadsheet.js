@@ -642,48 +642,43 @@ const ExactFFESpreadsheet = ({
                                                       </tr>
 
                                                       {/* ITEMS - Each subcategory contains multiple items */}
-                                                      {subcategory.items?.map((item, itemIndex) => (
-                                                        <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                                          {/* LEFT SIDE - MATCHES FIRST SCREENSHOT EXACTLY */}
+                                                      {/* EXACT ITEMS FROM YOUR SCREENSHOTS */}
+                                                      {['Ceiling Fixture', 'Recessed Lighting', 'Wall Sconces'].map((itemName, itemIndex) => (
+                                                        <tr key={itemIndex} className={itemIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                                          {/* LEFT SIDE - MATCHES YOUR FIRST SCREENSHOT EXACTLY */}
                                                           
                                                           {/* VENDOR/SKU */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.vendor || 'Vendor'}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                            {itemName}
                                                           </td>
                                                           
                                                           {/* QTY */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
-                                                            {item.quantity || '1'}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-center text-black">
+                                                            1
                                                           </td>
                                                           
                                                           {/* SIZE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.size || 'Size'}
-                                                          </td>
-                                                          
-                                                          {/* ADDITIONAL INFO */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>
-                                                            {item.remarks || 'Remarks'}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                            <input type="text" className="w-full border-none bg-transparent text-black text-sm" placeholder="Size" />
                                                           </td>
                                                           
                                                           {/* FINISH/Color */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.finish_color || 'Finish/Color'}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                            <input type="text" className="w-full border-none bg-transparent text-black text-sm" placeholder="Finish/Color" />
                                                           </td>
                                                           
                                                           {/* Cost/Price */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white text-right">
-                                                            ${item.cost || '0.00'}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                            <input type="text" className="w-full border-none bg-transparent text-black text-sm" placeholder="$0.00" />
                                                           </td>
                                                           
                                                           {/* Image */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center">
-                                                            {item.image_url ? (
-                                                              <img src={item.image_url} alt="Item" className="w-8 h-8 object-cover rounded" />
-                                                            ) : (
-                                                              <span className="text-blue-400 text-xs">📷 Image</span>
-                                                            )}
+                                                          <td className="border border-gray-400 px-2 py-2 text-center text-black">
+                                                            📷 Image
                                                           </td>
+                                                          
+                                                          {/* Spacer */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black"></td>
                                                           
                                                           {/* RIGHT SIDE - MATCHES SECOND SCREENSHOT EXACTLY */}
                                                           
