@@ -420,7 +420,7 @@ const FFEDashboard = ({ isOffline }) => {
       {/* FF&E Spreadsheet - FORCE ABOVE THE FOLD */}
       <div className="px-6 mt-4">
         {/* ✅ SUCCESS BANNER REMOVED COMPLETELY */}
-        <ExactFFESpreadsheet
+        <ProfessionalFFESpreadsheet
           project={project}
           roomColors={roomColors}
           categoryColors={categoryColors}
