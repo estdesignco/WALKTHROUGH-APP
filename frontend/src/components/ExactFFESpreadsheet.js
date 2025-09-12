@@ -770,6 +770,8 @@ const ExactFFESpreadsheet = ({
                                                       </tr>
                                                     </React.Fragment>
                                                   )}
+                                                </React.Fragment>
+                                              )}
                                             </Draggable>
                                           );
                                         })}
