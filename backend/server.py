@@ -1605,6 +1605,74 @@ async def create_category(category: CategoryCreate):
         logger.error(f"Error creating category: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to create category: {str(e)}")
 
+@api_router.post("/categories/comprehensive", response_model=Category)
+async def create_comprehensive_category(category: CategoryCreate):
+    """Create a category with all its subcategories and items from comprehensive structure"""
+    try:
+        from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE
+        
+        # First create the basic category
+        category_dict = category.dict()
+        category_obj = Category(**category_dict)
+        category_obj.color = get_category_color(category_obj.name)
+        
+        result = await db.categories.insert_one(category_obj.dict())
+        
+        if not result.inserted_id:
+            raise HTTPException(status_code=400, detail="Failed to create category")
+        
+        category_id = str(result.inserted_id)
+        category_obj.id = category_id
+        
+        # Now populate with comprehensive structure
+        category_name = category.name
+        
+        # Find the category in the comprehensive structure
+        comprehensive_data = None
+        for room_name, room_structure in COMPREHENSIVE_ROOM_STRUCTURE.items():
+            if category_name in room_structure:
+                comprehensive_data = room_structure[category_name]
+                break
+        
+        if comprehensive_data:
+            logger.info(f"📋 Found comprehensive data for category: {category_name}")
+            
+            # Create subcategories and their items
+            for subcategory_name, items_list in comprehensive_data.items():
+                # Create subcategory
+                subcategory_obj = SubCategory(
+                    name=subcategory_name,
+                    category_id=category_id,
+                    order_index=0,
+                    color=get_subcategory_color(subcategory_name)
+                )
+                
+                subcategory_result = await db.subcategories.insert_one(subcategory_obj.dict())
+                if subcategory_result.inserted_id:
+                    subcategory_id = str(subcategory_result.inserted_id)
+                    
+                    # Create items for this subcategory
+                    for item_name in items_list:
+                        item_obj = Item(
+                            name=item_name,
+                            subcategory_id=subcategory_id,
+                            quantity=1,
+                            status="TO BE SELECTED",
+                            order_index=0
+                        )
+                        
+                        await db.items.insert_one(item_obj.dict())
+                        
+            logger.info(f"✅ Successfully created comprehensive category: {category_name}")
+        else:
+            logger.warning(f"⚠️ No comprehensive data found for category: {category_name}")
+        
+        return category_obj
+        
+    except Exception as e:
+        logger.error(f"Error creating comprehensive category: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create comprehensive category: {str(e)}")
+
 @api_router.get("/categories/available")
 async def get_available_categories():
     """Get all available category names from the comprehensive room structure"""
