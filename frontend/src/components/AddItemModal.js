@@ -30,7 +30,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
 
     try {
       // FORCE CORRECT BACKEND URL
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://interior-ffe.preview.emergentagent.com';
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://designer-catalog-pro.preview.emergentagent.com';
       
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);
