@@ -104,31 +104,6 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Handle deleting an item
-  const handleDeleteItem = async (itemId) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) {
-      return;
-    }
-
-    try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
-      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        console.log('✅ Item deleted successfully');
-        if (onReload) {
-          await onReload();
-        }
-      } else {
-        throw new Error(`HTTP ${response.status}`);
-      }
-    } catch (error) {
-      console.error('❌ Error deleting item:', error);
-    }
-  };
-
   // Handle deleting a room
   const handleDeleteRoom = async (roomId) => {
     if (!roomId) {
