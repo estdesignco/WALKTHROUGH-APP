@@ -71,21 +71,42 @@ const ExactFFESpreadsheet = ({
     }
   }, [project]);
 
-  // Handle adding new items with proper scraping
+  // Handle adding new items - FIX THE SUBCATEGORY SELECTION
   const handleAddItem = async (itemData) => {
-    if (!selectedSubCategoryId) {
-      console.error('❌ No subcategory selected');
-      return;
-    }
-
     try {
+      // Find the first available subcategory if none selected
+      let subcategoryId = selectedSubCategoryId;
+      
+      if (!subcategoryId) {
+        // Find the first subcategory from any expanded room/category
+        for (const room of project.rooms) {
+          if (expandedRooms[room.id]) {
+            for (const category of room.categories || []) {
+              if (expandedCategories[category.id] && category.subcategories?.length > 0) {
+                subcategoryId = category.subcategories[0].id;
+                console.log(`🔍 Auto-selected subcategory: ${category.subcategories[0].name}`);
+                break;
+              }
+            }
+            if (subcategoryId) break;
+          }
+        }
+      }
+
+      if (!subcategoryId) {
+        alert('Please expand a category first to add items to it.');
+        return;
+      }
+
       const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
       
       const newItem = {
         ...itemData,
-        subcategory_id: selectedSubCategoryId,
-        id: `item-${Date.now()}`,
+        subcategory_id: subcategoryId,
+        order_index: 0
       };
+
+      console.log('📤 Creating item:', newItem);
 
       const response = await fetch(`${backendUrl}/api/items`, {
         method: 'POST',
@@ -96,18 +117,18 @@ const ExactFFESpreadsheet = ({
       });
 
       if (response.ok) {
-        const result = await response.json();
+        console.log('✅ Item added successfully');
         setShowAddItem(false);
-        setSelectedSubCategoryId(null);
-        
-        if (onReload) {
-          await onReload();
-        }
+        // Force reload to show the new item
+        window.location.reload();
       } else {
-        throw new Error(`HTTP ${response.status}`);
+        const errorData = await response.text();
+        console.error('❌ Backend error:', errorData);
+        throw new Error(`HTTP ${response.status}: ${errorData}`);
       }
     } catch (error) {
       console.error('❌ Error adding item:', error);
+      alert(`Failed to add item: ${error.message}`);
     }
   };
 
