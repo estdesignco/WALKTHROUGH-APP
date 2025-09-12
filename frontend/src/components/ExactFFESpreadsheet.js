@@ -906,8 +906,10 @@ const ExactFFESpreadsheet = ({
                         );
                       })}
                       {provided.placeholder}
-              </tbody>
-            </table>
+                  </tbody>
+                </table>
+              )}
+            </Droppable>
           </DragDropContext>
 
         </div>
