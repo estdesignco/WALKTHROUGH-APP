@@ -718,6 +718,7 @@ const ExactFFESpreadsheet = ({
                                                             <input 
                                                               type="date" 
                                                               value={item.order_date || ''} 
+                                                              onChange={(e) => console.log('Order date changed:', e.target.value)}
                                                               className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                               placeholder="mm/dd/yyyy"
                                                             />
@@ -727,6 +728,7 @@ const ExactFFESpreadsheet = ({
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
                                                             <select 
                                                               value={item.status || ''}
+                                                              onChange={(e) => console.log('Order status changed:', e.target.value)}
                                                               className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             >
                                                               <option value="">Select Status...</option>
