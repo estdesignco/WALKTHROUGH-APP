@@ -730,10 +730,7 @@ const ExactFFESpreadsheet = ({
                                                           <div className="flex justify-start items-center space-x-4">
                                                             {/* Add Item Button - GOLD/AMBER COLOR */}
                                                             <button
-                                                              onClick={() => {
-                                                                setSelectedSubCategoryId(subcategory.id);
-                                                                setShowAddItem(true);
-                                                              }}
+                                                              onClick={() => setShowAddItem(true)}
                                                               className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium"
                                                             >
                                                               ✚ Add Item
@@ -755,20 +752,18 @@ const ExactFFESpreadsheet = ({
                                                               className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium border-none outline-none"
                                                             >
                                                               <option value="">Add Category ▼</option>
-                                                              {availableCategories.map((category) => (
-                                                                <option key={category} value={category}>
-                                                                  {category}
-                                                                </option>
-                                                              ))}
-                                                              <option value="CREATE_NEW">➕ Create New Category</option>
+                                                              <option value="Lighting">Lighting</option>
+                                                              <option value="Furniture">Furniture</option>
+                                                              <option value="Decor">Decor</option>
+                                                              <option value="CREATE_NEW">+ Create New Category</option>
                                                             </select>
                                                             
-                                                            {/* Delete Section Button - RED COLOR */}
+                                                            {/* Test Scraping Button - GOLD/AMBER COLOR */}
                                                             <button
-                                                              onClick={() => handleDeleteRoom(room.id)}
-                                                              className="bg-red-700 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
+                                                              onClick={() => setShowScrapingTest(true)}
+                                                              className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium"
                                                             >
-                                                              🗑️ Delete Section
+                                                              🧪 Test Scraping
                                                             </button>
                                                           </div>
                                                         </td>
