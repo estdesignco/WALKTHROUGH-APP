@@ -223,8 +223,15 @@ class ScrapingTester:
         """Test the /api/categories/comprehensive endpoint"""
         print("\n=== Testing /api/categories/comprehensive Endpoint ===")
         
-        # Test endpoint availability
-        success, data, status_code = self.make_request('GET', '/categories/comprehensive')
+        # Test endpoint availability with POST method (correct method)
+        test_data = {
+            "name": "Test Comprehensive Category",
+            "description": "Test category for comprehensive testing",
+            "room_id": "bb060596-85c2-455f-860a-cf9fa23dfacf",
+            "order_index": 0
+        }
+        
+        success, data, status_code = self.make_request('POST', '/categories/comprehensive', test_data)
         
         if status_code == 404:
             self.log_test("Categories Comprehensive Endpoint - Availability", False, "Endpoint /api/categories/comprehensive not found (404)")
@@ -237,29 +244,31 @@ class ScrapingTester:
             
             # Check response format
             if isinstance(data, dict):
-                if 'categories' in data or 'data' in data:
-                    categories_data = data.get('categories', data.get('data', []))
-                    if isinstance(categories_data, list):
-                        self.log_test("Categories Comprehensive - Response Format", True, f"Valid response format with {len(categories_data)} categories")
-                        
-                        # Check if categories have subcategories and items
-                        comprehensive_count = 0
-                        for category in categories_data:
-                            if isinstance(category, dict):
-                                subcategories = category.get('subcategories', [])
-                                if subcategories:
-                                    for subcat in subcategories:
-                                        if isinstance(subcat, dict) and subcat.get('items'):
-                                            comprehensive_count += 1
-                        
-                        if comprehensive_count > 0:
-                            self.log_test("Categories Comprehensive - Structure", True, f"Found {comprehensive_count} subcategories with items")
-                        else:
-                            self.log_test("Categories Comprehensive - Structure", False, "No subcategories with items found")
+                required_fields = ['id', 'name', 'room_id', 'color', 'subcategories']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("Categories Comprehensive - Response Format", True, f"Valid category response with all required fields")
+                    
+                    # Check if category was created with proper structure
+                    if data.get('name') == test_data['name']:
+                        self.log_test("Categories Comprehensive - Category Creation", True, f"Category created successfully: {data['name']}")
                     else:
-                        self.log_test("Categories Comprehensive - Response Format", False, "Categories data is not a list")
+                        self.log_test("Categories Comprehensive - Category Creation", False, "Category name mismatch")
+                    
+                    # Check color assignment
+                    if data.get('color'):
+                        self.log_test("Categories Comprehensive - Color Assignment", True, f"Category assigned color: {data['color']}")
+                    else:
+                        self.log_test("Categories Comprehensive - Color Assignment", False, "No color assigned to category")
+                        
+                    # Check subcategories structure (should be empty initially but structure should exist)
+                    if 'subcategories' in data and isinstance(data['subcategories'], list):
+                        self.log_test("Categories Comprehensive - Subcategories Structure", True, "Subcategories structure present")
+                    else:
+                        self.log_test("Categories Comprehensive - Subcategories Structure", False, "Subcategories structure missing")
                 else:
-                    self.log_test("Categories Comprehensive - Response Format", False, "Response missing 'categories' or 'data' field")
+                    self.log_test("Categories Comprehensive - Response Format", False, f"Missing required fields: {missing_fields}")
             else:
                 self.log_test("Categories Comprehensive - Response Format", False, "Response is not a dictionary")
         else:
