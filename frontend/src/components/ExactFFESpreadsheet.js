@@ -881,7 +881,7 @@ const ExactFFESpreadsheet = ({
                                                       
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
                                                       <tr>
-                                                        <td colSpan="13" className="border border-gray-400 px-6 py-2 bg-slate-900">
+                                                        <td colSpan="14" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                                           <div className="flex justify-start items-center space-x-4">
                                                             {/* Add Item Button - GOLD/AMBER COLOR */}
                                                             <button
