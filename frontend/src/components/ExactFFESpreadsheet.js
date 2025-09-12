@@ -450,16 +450,22 @@ const ExactFFESpreadsheet = ({
       >
         <div style={{ minWidth: '2500px' }}>
           
-          <table className="w-full border-collapse border border-gray-400">
-            
-            <thead></thead>
-            
-            <tbody>
-              {/* HIERARCHICAL STRUCTURE AS ROW HEADERS */}
-              {project.rooms.map((room, roomIndex) => {
-                console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
-                return (
-                <React.Fragment key={room.id}>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <table className="w-full border-collapse border border-gray-400">
+              
+              <thead></thead>
+              
+              <tbody>
+                <Droppable droppableId="rooms" type="room">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {/* HIERARCHICAL STRUCTURE AS ROW HEADERS */}
+                      {project.rooms.map((room, roomIndex) => {
+                        console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
+                        return (
+                          <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
+                            {(provided, snapshot) => (
+                              <React.Fragment>
                   
                   {/* ROOM HEADER ROW - Muted colors with Delete Button */}
                   <tr>
