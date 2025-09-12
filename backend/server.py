@@ -1589,15 +1589,59 @@ async def create_room(room_data: RoomCreate):
             
             room_dict["categories"].append(category)
         
-        # Insert into database
-        result = await db.rooms.insert_one(room_dict)
+        # Store room data in separate collections for consistency
+        room_id = room_dict["id"]
         
-        # Retrieve and return the created room
-        created_room = await db.rooms.find_one({"_id": result.inserted_id})
-        created_room["id"] = str(created_room["_id"])
-        del created_room["_id"]
+        # First, insert the room (without nested categories)
+        room_basic = {
+            "id": room_id,
+            "project_id": room_dict["project_id"],
+            "name": room_dict["name"],
+            "description": room_dict.get("description", ""),
+            "order_index": room_dict.get("order_index", 0),
+            "color": room_dict["color"],
+            "created_at": room_dict["created_at"],
+            "updated_at": room_dict["updated_at"]
+        }
         
-        return Room(**created_room)
+        await db.rooms.insert_one(room_basic)
+        
+        # Then insert categories, subcategories, and items separately
+        for category_data in room_dict["categories"]:
+            category_basic = {
+                "id": category_data["id"],
+                "room_id": room_id,
+                "name": category_data["name"],
+                "description": "",
+                "order_index": 0,
+                "color": category_data["color"],
+                "created_at": category_data["created_at"],
+                "updated_at": category_data["updated_at"]
+            }
+            
+            await db.categories.insert_one(category_basic)
+            
+            # Insert subcategories
+            for subcategory_data in category_data["subcategories"]:
+                subcategory_basic = {
+                    "id": subcategory_data["id"],
+                    "category_id": category_data["id"],
+                    "name": subcategory_data["name"],
+                    "description": "",
+                    "order_index": 0,
+                    "color": subcategory_data["color"],
+                    "created_at": subcategory_data["created_at"],
+                    "updated_at": subcategory_data["updated_at"]
+                }
+                
+                await db.subcategories.insert_one(subcategory_basic)
+                
+                # Insert items
+                for item_data in subcategory_data["items"]:
+                    await db.items.insert_one(item_data)
+        
+        # Return the room with full structure (as expected by the frontend)
+        return Room(**room_dict)
         
     except Exception as e:
         logger.error(f"Error creating room: {str(e)}")
