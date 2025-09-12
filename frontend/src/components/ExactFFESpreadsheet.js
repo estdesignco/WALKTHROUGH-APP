@@ -657,13 +657,15 @@ const ExactFFESpreadsheet = ({
                                                       {/* ITEMS - Each subcategory contains multiple items */}
                                                       {subcategory.items?.map((item, itemIndex) => (
                                                         <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                                          {/* ITEM NAME */}
+                                                          {/* LEFT SIDE - MATCHES FIRST SCREENSHOT EXACTLY */}
+                                                          
+                                                          {/* VENDOR/SKU */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.name || 'Item Name'}
+                                                            {item.vendor || 'Vendor'}
                                                           </td>
                                                           
                                                           {/* QTY */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white text-center">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
                                                             {item.quantity || '1'}
                                                           </td>
                                                           
@@ -672,179 +674,158 @@ const ExactFFESpreadsheet = ({
                                                             {item.size || 'Size'}
                                                           </td>
                                                           
-                                                          {/* REMARKS */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                          {/* ADDITIONAL INFO */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>
                                                             {item.remarks || 'Remarks'}
                                                           </td>
                                                           
-                                                          {/* VENDOR */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.vendor || 'Vendor'}
-                                                          </td>
-                                                          
-                                                          {/* STATUS - Color-coded dropdown */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <select 
-                                                              value={item.status || 'TO BE SELECTED'}
-                                                              onChange={(e) => {
-                                                                console.log(`Status changed to: ${e.target.value}`);
-                                                              }}
-                                                              className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
-                                                              style={{
-                                                                backgroundColor: getStatusColor(item.status || 'TO BE SELECTED'),
-                                                                color: '#000'
-                                                              }}
-                                                            >
-                                                              <option value="">Select Status...</option>
-                                                              <option value="TO BE SELECTED">🔵 TO BE SELECTED</option>
-                                                              <option value="RESEARCHING">🔵 RESEARCHING</option>
-                                                              <option value="PENDING APPROVAL">🟡 PENDING APPROVAL</option>
-                                                              <option value="APPROVED">🟢 APPROVED</option>
-                                                              <option value="ORDERED">🟢 ORDERED</option>
-                                                              <option value="PICKED">🟡 PICKED</option>
-                                                              <option value="CONFIRMED">🟢 CONFIRMED</option>
-                                                              <option value="IN PRODUCTION">🟠 IN PRODUCTION</option>
-                                                              <option value="SHIPPED">🔵 SHIPPED</option>
-                                                              <option value="IN TRANSIT">🔵 IN TRANSIT</option>
-                                                              <option value="OUT FOR DELIVERY">🔵 OUT FOR DELIVERY</option>
-                                                              <option value="DELIVERED TO RECEIVER">🟣 DELIVERED TO RECEIVER</option>
-                                                              <option value="DELIVERED TO JOB SITE">🟣 DELIVERED TO JOB SITE</option>
-                                                              <option value="RECEIVED">🟣 RECEIVED</option>
-                                                              <option value="READY FOR INSTALL">🟢 READY FOR INSTALL</option>
-                                                              <option value="INSTALLING">🟢 INSTALLING</option>
-                                                              <option value="INSTALLED">🟢 INSTALLED</option>
-                                                              <option value="ON HOLD">🔴 ON HOLD</option>
-                                                              <option value="BACKORDERED">🔴 BACKORDERED</option>
-                                                              <option value="DAMAGED">🔴 DAMAGED</option>
-                                                              <option value="RETURNED">🔴 RETURNED</option>
-                                                              <option value="CANCELLED">🔴 CANCELLED</option>
-                                                            </select>
-                                                          </td>
-                                                          
-                                                          {/* COST */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white text-right">
-                                                            ${item.cost || '0.00'}
-                                                          </td>
-                                                          
-                                                          {/* ADDITIONAL INFO - FINISH/COLOR */}
+                                                          {/* FINISH/Color */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             {item.finish_color || 'Finish/Color'}
                                                           </td>
                                                           
-                                                          {/* FINISH/COLOR */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.finish_color || 'Color'}
+                                                          {/* Cost/Price */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white text-right">
+                                                            ${item.cost || '0.00'}
                                                           </td>
                                                           
-                                                          {/* SHIPPING INFO */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.tracking_number ? (
-                                                              <button
-                                                                onClick={() => handleTrackItem(item)}
-                                                                className="text-blue-400 hover:text-blue-300 underline"
-                                                                title="Track Package"
-                                                              >
-                                                                Track: {item.tracking_number.substring(0, 8)}...
-                                                              </button>
+                                                          {/* Image */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-center">
+                                                            {item.image_url ? (
+                                                              <img src={item.image_url} alt="Item" className="w-8 h-8 object-cover rounded" />
                                                             ) : (
-                                                              'No tracking yet'
+                                                              <span className="text-blue-400 text-xs">📷 Image</span>
                                                             )}
                                                           </td>
                                                           
-                                                          {/* CARRIER - Color-coded dropdown */}
+                                                          {/* RIGHT SIDE - MATCHES SECOND SCREENSHOT EXACTLY */}
+                                                          
+                                                          {/* SHIPPING INFO */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white" style={{ backgroundColor: getShippingInfoColor() }}>
+                                                            {item.shipping_info || 'Shipping Info'}
+                                                          </td>
+                                                          
+                                                          {/* Order Date */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                            <input 
+                                                              type="date" 
+                                                              value={item.order_date || ''} 
+                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
+                                                              placeholder="mm/dd/yyyy"
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* Order Status */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
                                                             <select 
-                                                              value={item.carrier || ''}
-                                                              onChange={(e) => {
-                                                                console.log(`Carrier changed to: ${e.target.value}`);
-                                                              }}
-                                                              className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
-                                                              style={{
-                                                                backgroundColor: item.carrier ? getCarrierColor(item.carrier) : '#374151',
-                                                                color: '#000'
-                                                              }}
+                                                              value={item.status || ''}
+                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             >
-                                                              <option value="">Select Carrier...</option>
-                                                              <option value="FedEx">📦 FedEx</option>
-                                                              <option value="UPS">📦 UPS</option>
-                                                              <option value="Brooks">🚚 Brooks</option>
-                                                              <option value="Zenith">🚚 Zenith</option>
-                                                              <option value="Sunbelt">🚚 Sunbelt</option>
-                                                              <option value="R+L Carriers">🚚 R+L Carriers</option>
-                                                              <option value="Yellow Freight">🚚 Yellow Freight</option>
-                                                              <option value="XPO Logistics">🚚 XPO Logistics</option>
-                                                              <option value="Old Dominion">🚚 Old Dominion</option>
-                                                              <option value="ABF Freight">🚚 ABF Freight</option>
-                                                              <option value="OTHER">🚚 OTHER</option>
+                                                              <option value="">Select Status...</option>
+                                                              <option value="PENDING">PENDING</option>
+                                                              <option value="ORDERED">ORDERED</option>
+                                                              <option value="SHIPPED">SHIPPED</option>
+                                                              <option value="DELIVERED">DELIVERED</option>
                                                             </select>
                                                           </td>
                                                           
-                                                          {/* SHIP TO - Color-coded dropdown */}
+                                                          {/* Order Number */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.order_number || ''} 
+                                                              placeholder="Order #"
+                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* Estimated Ship Date */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                            <input 
+                                                              type="date" 
+                                                              value={item.estimated_ship_date || ''} 
+                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
+                                                              placeholder="mm/dd/yyyy"
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* Estimated Delivery Date */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                            <input 
+                                                              type="date" 
+                                                              value={item.estimated_delivery_date || ''} 
+                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
+                                                              placeholder="mm/dd/yyyy"
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* Install Date */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                            <input 
+                                                              type="date" 
+                                                              value={item.install_date || ''} 
+                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
+                                                              placeholder="mm/dd/yyyy"
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* Ship To */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
                                                             <select 
                                                               value={item.ship_to || ''}
-                                                              onChange={(e) => {
-                                                                console.log(`Ship To changed to: ${e.target.value}`);
-                                                              }}
-                                                              className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
-                                                              style={{
-                                                                backgroundColor: item.ship_to ? getShipToColor(item.ship_to) : '#374151',
-                                                                color: '#000'
-                                                              }}
+                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             >
-                                                              <option value="">Select Location...</option>
-                                                              <option value="CLIENT HOME">🏠 CLIENT HOME</option>
-                                                              <option value="JOB SITE">🏗️ JOB SITE</option>
-                                                              <option value="DESIGN CENTER">🏢 DESIGN CENTER</option>
-                                                              <option value="WAREHOUSE">📦 WAREHOUSE</option>
-                                                              <option value="VENDOR LOCATION">🏭 VENDOR LOCATION</option>
+                                                              <option value="">Ship To...</option>
+                                                              <option value="CLIENT_HOME">CLIENT HOME</option>
+                                                              <option value="JOB_SITE">JOB SITE</option>
+                                                              <option value="WAREHOUSE">WAREHOUSE</option>
                                                             </select>
                                                           </td>
                                                           
-                                                          {/* DELIVERY STATUS - Color-coded dropdown */}
+                                                          {/* Tracking Number */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.tracking_number || ''} 
+                                                              placeholder="Tracking #"
+                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* Carrier */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
                                                             <select 
-                                                              value={item.delivery_status || ''}
-                                                              onChange={(e) => {
-                                                                console.log(`Delivery Status changed to: ${e.target.value}`);
-                                                              }}
-                                                              className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
-                                                              style={{
-                                                                backgroundColor: item.delivery_status ? getDeliveryStatusColor(item.delivery_status) : '#374151',
-                                                                color: '#000'
-                                                              }}
+                                                              value={item.carrier || ''}
+                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             >
-                                                              <option value="">Select Delivery Status...</option>
-                                                              <option value="PENDING">🔵 PENDING</option>
-                                                              <option value="SCHEDULED">🔵 SCHEDULED</option>
-                                                              <option value="PROCESSING">🟡 PROCESSING</option>
-                                                              <option value="IN TRANSIT">🟡 IN TRANSIT</option>
-                                                              <option value="OUT FOR DELIVERY">🔵 OUT FOR DELIVERY</option>
-                                                              <option value="ATTEMPTED DELIVERY">🔴 ATTEMPTED DELIVERY</option>
-                                                              <option value="DELIVERED">🟢 DELIVERED</option>
-                                                              <option value="DELIVERED TO RECEIVER">🟢 DELIVERED TO RECEIVER</option>
-                                                              <option value="AVAILABLE FOR PICKUP">🟢 AVAILABLE FOR PICKUP</option>
-                                                              <option value="DELAYED">🔴 DELAYED</option>
-                                                              <option value="EXCEPTION">🔴 EXCEPTION</option>
-                                                              <option value="DAMAGED">🔴 DAMAGED</option>
-                                                              <option value="LOST">🔴 LOST</option>
-                                                              <option value="RETURNED TO SENDER">🔴 RETURNED TO SENDER</option>
+                                                              <option value="">Carrier...</option>
+                                                              <option value="FedEx">FedEx</option>
+                                                              <option value="UPS">UPS</option>
+                                                              <option value="OTHER">OTHER</option>
                                                             </select>
                                                           </td>
                                                           
                                                           {/* NOTES */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.notes || 'Notes'}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.notes || ''} 
+                                                              placeholder="Notes"
+                                                              className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
+                                                            />
                                                           </td>
                                                           
                                                           {/* ACTIONS */}
                                                           <td className="border border-gray-400 px-2 py-2 text-center">
-                                                            <button 
-                                                              onClick={() => handleDeleteItem(item.id)}
-                                                              className="text-red-400 hover:text-red-300 text-lg"
-                                                            >
-                                                              🗑️
-                                                            </button>
+                                                            <div className="flex gap-1">
+                                                              <button className="bg-blue-600 text-white text-xs px-1 py-1 rounded">✏️</button>
+                                                              <button 
+                                                                onClick={() => handleDeleteItem(item.id)}
+                                                                className="bg-red-600 text-white text-xs px-1 py-1 rounded"
+                                                              >
+                                                                🗑️
+                                                              </button>
+                                                            </div>
                                                           </td>
                                                         </tr>
                                                       ))}
