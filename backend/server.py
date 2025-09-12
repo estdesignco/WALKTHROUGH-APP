@@ -2465,7 +2465,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'lexington.com': 'Lexington',
                 'caracole.com': 'Caracole',
                 'centuryfurniture.com': 'Century Furniture',
-                'hickorychair.com': 'Hickory Chair'
+                'hickorychair.com': 'Hickory Chair',
+                # ✅ ADDED REVIEW REQUEST DOMAINS
+                'westelm.com': 'West Elm',
+                'cb2.com': 'CB2',
+                'restorationhardware.com': 'Restoration Hardware',
+                'rh.com': 'Restoration Hardware'
             }
             
             for domain_key, vendor_name in vendor_mapping.items():
