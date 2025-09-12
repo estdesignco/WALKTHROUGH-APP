@@ -50,8 +50,12 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
       
-      const data = await response.json();
-      console.log('🔗 SCRAPING SUCCESS - Data received:', data);
+      const responseData = await response.json();
+      console.log('🔗 SCRAPING SUCCESS - Data received:', responseData);
+      
+      // Extract the actual product data from the backend response structure
+      const data = responseData.success ? responseData.data : responseData;
+      console.log('🔗 EXTRACTED PRODUCT DATA:', data);
       
       // Enhanced data mapping with better field population
       const updatedData = {
