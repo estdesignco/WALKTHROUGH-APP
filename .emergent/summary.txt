@@ -1,73 +1,70 @@
 <analysis>
-The previous AI engineer worked on an interior design application, transitioning from a Google Sheets workflow to a React/FastAPI platform. Their primary focus was on replicating the UI/UX, fixing bugs, and implementing core features like web scraping, room templates, categories, and a paint catalog. The trajectory details an iterative and often challenging process, particularly in accurately replicating the complex FF&E spreadsheet design. The AI engineer frequently grappled with precise visual elements, leading to multiple rounds of feedback and corrections regarding header structures, color palettes, and functional dropdowns. Significant effort was also dedicated to ensuring web scraping functionality worked correctly and that newly added rooms automatically populated with comprehensive categories and items. The conversation reflects a back-and-forth, with the AI attempting to integrate user feedback while sometimes introducing regressions, necessitating repeated refinements of the frontend components and backend data structures.
+The AI engineer's trajectory involved an iterative development process for an FF&E management application, characterized by feature implementation, critical regressions, and extensive user feedback. Initially, the AI addressed UI, backend scraping, and comprehensive room population, but a significant regression occurred when the  was inadvertently replaced, leading to a visual and structural mismatch. User feedback repeatedly highlighted deviations from the desired design, particularly regarding colors, button placement, and the core spreadsheet structure. The AI engineer made multiple attempts to revert changes and re-implement features, facing challenges with screenshot interpretation and ensuring the 's original layout was preserved. Backend functionality for CRUD operations and scraping was robustly developed, but frontend integration and visual fidelity proved difficult, leading to a cycle of fixes and user-reported regressions. The AI's final action was to revert to the original spreadsheet structure while selectively applying visual and functional enhancements.
 </analysis>
 
 <product_requirements>
-The application aims to digitize an interior designer's workflow, primarily replacing Google Sheets for client processes like FF&E management. Key requirements include:
-*   **FF&E Spreadsheet UI**: Exact replication of a complex spreadsheet with a 3-level hierarchy (Room > Category > Sub-category) for row headers. It needs specific muted yet distinct colors for rooms (e.g., purple for Living Room), categories (e.g., dark green for Lighting), and column group headers (ADDITIONAL INFO. in brown, SHIPPING INFO. in purple). Main column headers (e.g., INSTALLED, VENDOR/SKU) should be red with good contrast, without white border rectangles around text fields.
-*   **Functionality**: Mac-friendly horizontal scrolling; free-flow editable cells; functional, color-coded dropdowns for 22 status options, 21 carrier options, 4 ship-to options, and 14 delivery status options, all defaulting to blank and displaying colored dots. Functional date pickers and smart tracking links.
-*   **Data Management**: Automatic population of all categories and items when a new room is added. Category consolidation logic for small categories.
-*   **Reporting**: A double-sized pie chart status overview with item counts (Completed, In Transit, etc.) and a separate shipping carrier breakdown with its own pie chart and colored lists.
-*   **Integrations**: Robust web scraping (Playwright) for product info from 24 wholesale vendors (including JavaScript-rendered sites). Google Calendar sync for dates, real-time tracking updates, photo uploads.
-*   **Future Expansion**: Apply structural improvements to Checklist and Walkthrough sheets. Implement drag-and-drop, minimize/expand features.
+The application aims to replace Google Sheets for interior designers' FF&E management. Key requirements include a 3-level hierarchical spreadsheet (Room > Category > Sub-category) with specific UI: muted colors (e.g., purple rooms, dark green categories, brown ADDITIONAL INFO., purple SHIPPING INFO., red main headers) and text fields without white borders. Functionality demands Mac-friendly horizontal scrolling, free-flow editable cells, color-coded dropdowns (status, carriers, ship-to, delivery status) with blank defaults and colored dots, functional date pickers, smart tracking links, and auto-population of hundreds of categories/items upon new room addition. Reporting requires true pie charts for status/carrier breakdowns. Integrations involve robust web scraping (Playwright) for 24 wholesale vendors (product info: name, vendor, SKU, image, cost, size), Google Calendar sync, real-time tracking, and photo uploads. The user explicitly requests delete/minimize buttons, working scraping, and an additional pie chart, all within the *original  design*, with a dark/black background, specific button placements (left side, brown/tan/gold colors), and expand/collapse arrows. Drag and drop for rooms and categories is also critical.
 </product_requirements>
 
 <key_technical_concepts>
--   **FastAPI**: Backend API development.
--   **React**: Frontend UI development using hooks.
--   **MongoDB**: Database for data persistence.
--   **Tailwind CSS**: Utility-first styling.
--   **Playwright**: Advanced web scraping.
+-   **FastAPI**: Backend API development for items, rooms, categories, scraping.
+-   **React**: Frontend UI development using hooks for state management and component rendering.
+-   **MongoDB**: NoSQL database used for data storage, with a preference for UUIDs over ObjectIDs.
+-   **Tailwind CSS**: Utility-first CSS framework for styling components.
+-   **Playwright**: Headless browser automation for robust web scraping.
+-   **React Router**: For client-side routing and navigation.
+-   **Chart.js / React-Chartjs-2**: For rendering data visualizations (pie charts).
+-   **React Beautiful DnD**: Library for implementing drag-and-drop functionality.
 </key_technical_concepts>
 
 <code_architecture>
-
 **Directory Structure:**
 
 
 -   ****
-    -   **Summary**: The core FastAPI application. Handles API endpoints for items, rooms, categories, scraping, and tracking.
-    -   **Changes**: Updated  selectors. Enhanced Pydantic models for item tracking and dates. Integrated  for comprehensive room creation. Contains definitions for statuses, carriers, and their associated colors.
+    -   **Summary**: The core FastAPI backend, exposing API endpoints for managing FF&E data (items, rooms, categories), web scraping, and project tracking.
+    -   **Changes**: Added missing DELETE endpoints for rooms and items, POST endpoint for category creation, and PUT/UPDATE endpoints for rooms and categories to support reordering. Includes Pydantic models for data validation.
 
 -   ****
-    -   **Summary**: A new file housing the extensive, detailed .
-    -   **Changes**: Created to hold the full hierarchical structure of rooms, categories, subcategories, and numerous default items, ensuring automatic population upon room creation.
+    -   **Summary**: Defines  which is a detailed hierarchical structure for automatically populating rooms with categories, subcategories, and default items upon creation.
+    -   **Changes**: Used to ensure new rooms are populated with extensive default content, improving data consistency.
 
 -   ****
-    -   **Summary**: Manages the overall FF&E view, including data loading and rendering the spreadsheet component.
-    -   **Changes**: Refactored  for data loading, integrated , and passed necessary data (like ) to subcomponents.
+    -   **Summary**: Main React component, sets up routing () and manages the top-level application state, including the .
+    -   **Changes**: Modified to correctly handle project loading when navigating directly to FF&E routes by introducing a  hook to load project data and a  component to manage this logic, resolving a critical routing/state management issue.
 
 -   ****
-    -   **Summary**: Displays summary information: pie charts, item totals, and breakdowns for status and carriers.
-    -   **Changes**: Restored the pie chart and detailed item totals (Completed, In Transit, etc.). Modified to display colored status bars and colored carrier breakdown sections with colored dots. Layout adjusted to place the pie chart above totals.
+    -   **Summary**: Orchestrates the FF&E view, loads project data, and renders  and .
+    -   **Changes**: Debugged project loading and passed  prop to  to enable new room functionality.
 
 -   ****
-    -   **Summary**: The central component for displaying and interacting with the FF&E spreadsheet. Underwent numerous modifications to align with precise UI/UX requirements.
-    -   **Changes**:
-        -   **Header Structure**: Removed a separate INSTALLED header. INSTALLED now replaces ITEM NAME as the first column header. ADDITIONAL INFO. and SHIPPING INFO. are top-level section headers. All other column headers are positioned below.
-        -   **Colors**: Implemented a muted, professional color palette (purple for Living Room, dark green for Lighting, red for column headers, brown for ADDITIONAL INFO., purple for SHIPPING INFO.).
-        -   **Input Fields**: Removed white border rectangles from text-based input fields (e.g., ITEM NAME, VENDOR/SKU, FINISH/Color, Tracking #, Notes). Only date pickers and dropdowns retain visible containers.
-        -   **Dropdowns**: Added color-coded dropdowns for Status, Carrier, Ship To, and Delivery Status. Dropdowns now default to blank options (e.g., Select Status...) and display a colored dot next to the selected item.  handlers added for proper state management and color display.
-        -   **Live Tracking**: Integrated Track Live buttons linked to the backend  endpoint.
+    -   **Summary**: Displays summary data using pie charts (status, carrier, location breakdowns) and total item counts.
+    -   **Changes**: Uses  for real-time charting; layout and color adjustments were made in previous iterations.
+
+-   ****
+    -   **Summary**: The primary component for displaying and interacting with the FF&E data in a hierarchical spreadsheet format, as preferred by the user. This file has been the main focus of changes and reversions.
+    -   **Changes**: This file underwent multiple significant changes and subsequent reverts. It was initially modified to add  function, state for category management,  for loading categories, and enhanced Add Category dropdown. Drag & drop functionality () was integrated. After user complaints about altered structure and colors, the file was completely rewritten multiple times to restore the original layout, and then selectively modified to add specific features (dark background, full-width headers, search filters, specific button colors/placement, minimize arrows) while aiming to preserve the exact original table structure.
+
+-   ****
+    -   **Summary**: A modal component for adding new items, including manual input and web scraping.
+    -   **Changes**: Fixed  function to ensure it calls the correct backend endpoint for web scraping and correctly populates form fields.
 
 </code_architecture>
 
 <pending_tasks>
--   Apply the comprehensive room structure and paint catalog to  and  sheets.
--   Refine drag-and-drop functionality for rooms and categories.
--   Develop logic for category consolidation (merging categories with two or fewer items).
--   Implement offline capability for job site usage.
--   Integrate with external platforms like Canva, AutoCAD, SketchUp, Leica Disto Plan, and Houzz Pro.
--   Plan and implement real-time collaboration features.
--   Further test live tracking functionality beyond the button.
+-   Ensure Add Room functionality fully works, visually populating the full comprehensive structure as expected on the frontend.
+-   Improve scraping to consistently extract image, cost, and size, directing data to correct fields.
+-   Apply comprehensive room structure to  and  sheets (these sheets have not been addressed).
+-   Refine drag-and-drop functionality for smooth operation without UI/structure issues.
+-   Implement minimize/expand arrows (▼ ▶) next to room and category names for collapsing/expanding sections.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer was addressing several critical user demands related to the FF&E spreadsheet's core functionality and visual presentation. The primary focus was on ensuring that the Add Room feature automatically populates a newly created room with its entire comprehensive structure, including all associated categories and items (demonstrated by a Living Room adding 389 items). Concurrently, the AI was tasked with ensuring that all dropdown menus within the spreadsheet defaulted to a blank state (e.g., Select Status..., Select Carrier...) and that selected options displayed their corresponding colored dots.
+Immediately before this summary request, the AI engineer was working on restoring the  component to its *original table structure* following repeated user complaints that previous modifications had corrupted the spreadsheet's layout and colors. The AI engineer explicitly stated, Let me immediately revert back to the ORIGINAL ExactFFESpreadsheet structure and ONLY make the specific changes you requested - keeping the table structure EXACTLY as it was.
 
-Furthermore, the Status Overview and Carrier Breakdown sections were refined: the previously removed pie chart was restored, positioned above the item totals (Completed, In Transit, etc.). The carrier breakdown list, along with its colored dots, was also moved to its correct location. The AI confirmed these changes, reporting that rooms are created with the full structure, dropdowns have blank defaults, and colored dots are visible. The final state is an FF&E spreadsheet with a correct hierarchical layout, muted colors, working dropdowns with color-coded options and blank defaults, and restored summary charts.
+The last action performed was writing  to achieve this reversion. The AI claims to have restored the original table structure while selectively applying visual and functional enhancements: changing the background to dark navy (), making room headers full width with expand/collapse functionality, adding a search section with five dropdowns and filter buttons, updating button colors to a gold/amber theme, moving buttons to the left side (), and adding minimize/expand arrows. The current state is that the AI believes the  now has the original table structure combined with the requested visual and interactive features, and it is about to test this updated version.
 </current_work>
 
 <optional_next_step>
-Verify the Add Room functionality successfully populates with all categories and items, and that all dropdowns default to blank and display colored dots.
+Test the current build of  to verify that the original table structure is preserved and all recently added visual and functional features (dark background, button placement, drag-and-drop, expand/collapse) are working as expected without regressions.
 </optional_next_step>

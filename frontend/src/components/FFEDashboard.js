@@ -62,7 +62,7 @@ const FFEDashboard = ({ isOffline }) => {
   const loadSimpleProject = async () => {
     try {
       console.log('🚀 Loading project data...');
-      const response = await fetch(`${import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://designer-catalog-pro.preview.emergentagent.com'}/api/projects/${projectId}`);
+      const response = await fetch(`${import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://interior-sprints.preview.emergentagent.com'}/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();
