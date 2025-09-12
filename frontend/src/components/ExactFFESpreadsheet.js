@@ -643,7 +643,7 @@ const ExactFFESpreadsheet = ({
                                     ...(snapshot.isDragging ? { boxShadow: '0 5px 15px rgba(0,0,0,0.3)' } : {})
                                   }}
                                 >
-                                  <td colSpan="14" 
+                                  <td colSpan="12" 
                                       className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                                       style={{ backgroundColor: getRoomColor(room.name) }}>
                                     <div className="flex justify-between items-center">
