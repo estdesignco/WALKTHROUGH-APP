@@ -236,13 +236,16 @@ frontend:
     implemented: true
     working: false
     file: "ExactFFESpreadsheet.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "🎯 COMPREHENSIVE EXACTFFESPREADSHEET TESTING COMPLETED - CRITICAL ROUTING ISSUE: User reverted from ProfessionalFFESpreadsheet back to ExactFFESpreadsheet component as requested. ✅ COMPONENT CONFIRMED: ExactFFESpreadsheet is being used (not ProfessionalFFESpreadsheet). ✅ BACKEND DATA VERIFIED: Project bb060596-85c2-455f-860a-cf9fa23dfacf contains correct data - Crystal Chandelier (DELIVERED TO JOB SITE, Restoration Hardware) and LED Recessed Lights in Living Room > Lighting > Installed structure. ❌ CRITICAL ROUTING FAILURE: URL https://interior-sprints.preview.emergentagent.com/project/bb060596-85c2-455f-860a-cf9fa23dfacf/ffe redirects to project list instead of loading FF&E page. ❌ CANNOT TEST REQUESTED FEATURES: Unable to test Add Item functionality, Four Hands scraping (https://fourhands.com/product/248067-003), delete buttons, shipping columns, pie charts, or Add Room functionality because routing prevents access to ExactFFESpreadsheet component. This is a BLOCKING issue preventing user from accessing their FF&E data despite backend working perfectly."
+      - working: false
+        agent: "testing"
+        comment: "🚨 REVIEW REQUEST TESTING BLOCKED BY ROUTING: Attempted comprehensive testing of all 8 requested FF&E functionalities from review request. ❌ CRITICAL ROUTING ISSUE PERSISTS: URL https://interior-sprints.preview.emergentagent.com/project/bb060596-85c2-455f-860a-cf9fa23dfacf/ffe continues to redirect to project list across multiple testing attempts. ❌ CANNOT TEST PRIORITY #1: Horizontal scrolling (2-finger swipe gestures) cannot be tested because spreadsheet table is inaccessible. ❌ CANNOT TEST SCRAPING: Add Item functionality with West Elm URL (https://www.westelm.com/products/andes-sectional-sofa/) cannot be tested. ❌ ALL OTHER FEATURES BLOCKED: Add Room, Add Category, Delete buttons, Filter functionality, Dropdowns, and Data display verification all blocked by routing issue. ✅ COMPONENT CODE VERIFIED: ExactFFESpreadsheet.js contains all required functionality including horizontal scrolling fixes, Add Item modals, comprehensive room creation, and proper data display. URGENT: Fix React Router to enable FF&E page access."
 
   - task: "Add Item Modal and Scraping Functionality"
     implemented: true
