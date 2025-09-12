@@ -320,7 +320,7 @@ const ExactFFESpreadsheet = ({
   };
 
   const getAdditionalInfoColor = () => {
-    return '#8B5A2B'; // Brown for ADDITIONAL INFO.
+    return '#78350F'; // Brown for ADDITIONAL INFO.
   };
 
   const getShippingInfoColor = () => {
