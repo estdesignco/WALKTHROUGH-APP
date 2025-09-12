@@ -407,13 +407,7 @@ const FFEDashboard = ({ isOffline }) => {
           >
             ➕ Add Room
           </button>
-          <button
-            onClick={() => setShowScrapingTest(true)}
-            style={{ backgroundColor: '#16a34a' }}
-            className="hover:opacity-90 text-white px-6 py-2 rounded font-bold transition-colors ml-4"
-          >
-            🔗 TEST SCRAPING
-          </button>
+          {/* TEST SCRAPING BUTTON REMOVED AS REQUESTED */}
         </div>
       </div>
 
