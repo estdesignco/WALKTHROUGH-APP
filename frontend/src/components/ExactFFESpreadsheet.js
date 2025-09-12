@@ -528,19 +528,16 @@ const ExactFFESpreadsheet = ({
               </thead>
 
               {/* TABLE BODY - Keep original hierarchical structure */}
-              <tbody>
-                <Droppable droppableId="rooms" type="room">
-                  {(provided) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps}>
-                      {/* HIERARCHICAL STRUCTURE AS ROW HEADERS - KEEP ORIGINAL */}
-                      {project.rooms.map((room, roomIndex) => {
-                        const isRoomExpanded = expandedRooms[room.id];
-                        console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
-                        
-                        return (
-                          <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
-                            {(provided, snapshot) => (
-                              <React.Fragment>
+              <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                {/* HIERARCHICAL STRUCTURE AS ROW HEADERS - KEEP ORIGINAL */}
+                {project.rooms.map((room, roomIndex) => {
+                  const isRoomExpanded = expandedRooms[room.id];
+                  console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
+                  
+                  return (
+                    <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
+                      {(provided, snapshot) => (
+                        <React.Fragment>
                                 {/* ROOM HEADER ROW - Full width like your screenshots */}
                                 <tr
                                   ref={provided.innerRef}
