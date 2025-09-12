@@ -619,25 +619,7 @@ const ExactFFESpreadsheet = ({
                                                   {isCategoryExpanded && category.subcategories?.map((subcategory) => (
                                                     <React.Fragment key={subcategory.id}>
                                                       
-                                                      {/* SUBCATEGORY HEADER ROW - RED COLOR LIKE YOUR SCREENSHOTS */}
-                                                      <tr>
-                                                        <td colSpan="12" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#7F1D1D' }}>
-                                                          {subcategory.name.toUpperCase()}
-                                                        </td>
-                                                      </tr>
-
-                                                      {/* SHIPPING INFO HEADER - MUTED PURPLE UNDER LIGHTING */}
-                                                      <tr>
-                                                        <td colSpan="6" className="border border-gray-400" style={{ backgroundColor: '#8B4513' }}></td>
-                                                        <td colSpan="5" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#6B46C1' }}>
-                                                          SHIPPING INFO.
-                                                        </td>
-                                                        <td colSpan="1" className="border border-gray-400" style={{ backgroundColor: '#7F1D1D' }}></td>
-                                                      </tr>
-
-                                                      {/* ITEMS - Each subcategory contains multiple items */}
+                                                      {/* ITEMS GO DIRECTLY UNDER LIGHTING - NO SEPARATE INSTALLED HEADER */}
                                                       {/* ACTUAL ITEMS - DARK/BLACK BACKGROUND LIKE YOUR SCREENSHOTS */}
                                                       {['Ceiling Fixture', 'Recessed Lighting', 'Wall Sconces'].map((itemName, itemIndex) => (
                                                         <tr key={itemIndex} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
