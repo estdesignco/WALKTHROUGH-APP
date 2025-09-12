@@ -1529,6 +1529,52 @@ async def create_room(room_data: RoomCreate):
         logger.error(f"Error creating room: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to create room: {str(e)}")
 
+# CATEGORY ENDPOINTS  
+@api_router.post("/categories", response_model=Category)
+async def create_category(category: CategoryCreate):
+    """Create a new category"""
+    try:
+        category_dict = category.dict()
+        category_dict["id"] = str(uuid.uuid4())
+        category_dict["color"] = get_category_color(category.name)
+        category_dict["subcategories"] = []
+        category_dict["created_at"] = datetime.utcnow()
+        category_dict["updated_at"] = datetime.utcnow()
+        
+        result = await db.categories.insert_one(category_dict)
+        
+        if result.inserted_id:
+            return Category(**category_dict)
+        raise HTTPException(status_code=400, detail="Failed to create category")
+        
+    except Exception as e:
+        logger.error(f"Error creating category: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create category: {str(e)}")
+
+@api_router.get("/categories/available")
+async def get_available_categories():
+    """Get all available category names from the comprehensive room structure"""
+    try:
+        from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE
+        
+        # Collect all unique category names from the comprehensive structure
+        all_categories = set()
+        for room_name, room_structure in COMPREHENSIVE_ROOM_STRUCTURE.items():
+            for category_name in room_structure.keys():
+                all_categories.add(category_name)
+        
+        # Sort alphabetically and return
+        return {"categories": sorted(list(all_categories))}
+        
+    except Exception as e:
+        logger.error(f"Error getting available categories: {str(e)}")
+        return {"categories": [
+            "Lighting", "Furniture & Storage", "Decor & Accessories", 
+            "Paint, Wallpaper & Finishes", "Architectural Elements, Built-ins & Trim",
+            "Flooring", "Window Treatments", "HVAC & Mechanical Systems",
+            "Security & Smart Home", "Appliances", "Plumbing & Fixtures"
+        ]}
+
 # SUBCATEGORY ENDPOINTS
 @api_router.post("/subcategories", response_model=SubCategory)
 async def create_subcategory(subcategory: SubCategoryCreate):
