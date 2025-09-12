@@ -651,27 +651,27 @@ const ExactFFESpreadsheet = ({
                                                           
                                                           {/* VENDOR/SKU */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            Vendor/SKU
+                                                            {item.vendor || 'Vendor/SKU'}
                                                           </td>
                                                           
                                                           {/* QTY */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
-                                                            1
+                                                            {item.quantity || 1}
                                                           </td>
                                                           
                                                           {/* SIZE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            Size
+                                                            {item.size || 'Size'}
                                                           </td>
                                                           
                                                           {/* FINISH/Color */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            Finish/Color
+                                                            {item.finish_color || 'Finish/Color'}
                                                           </td>
                                                           
                                                           {/* Cost/Price */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            $0.00
+                                                            ${item.cost || '0.00'}
                                                           </td>
                                                           
                                                           {/* Image */}
