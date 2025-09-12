@@ -89,6 +89,31 @@ const ExactFFESpreadsheet = ({
     }
   };
 
+  // Handle deleting an item
+  const handleDeleteItem = async (itemId) => {
+    if (!window.confirm('Are you sure you want to delete this item?')) {
+      return;
+    }
+
+    try {
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        console.log('✅ Item deleted successfully');
+        if (onReload) {
+          await onReload();
+        }
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('❌ Error deleting item:', error);
+    }
+  };
+
   // Handle deleting a room
   const handleDeleteRoom = async (roomId) => {
     if (!roomId) {
@@ -276,46 +301,46 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // ORIGINAL COLORS - EXACT MATCH
+  // ORIGINAL COLORS - EXACT MATCH FROM SCREENSHOTS
   const getRoomColor = (roomName) => {
     const roomColors = {
-      'living room': '#553C9A',      // Much more muted (intensity 5)
-      'dining room': '#991B1B',      // Much more muted (intensity 5)  
-      'kitchen': '#92400E',          // Much more muted (intensity 5)
-      'primary bedroom': '#065F46',  // Much more muted (intensity 5)
-      'primary bathroom': '#1E3A8A', // Much more muted (intensity 5)
-      'powder room': '#57534E',      // Much more muted (intensity 5)
-      'guest room': '#9D174D',       // Much more muted (intensity 5)
-      'office': '#312E81',           // Much more muted (intensity 5)
-      'laundry room': '#365314',     // Much more muted (intensity 5)
-      'mudroom': '#164E63',          // Much more muted (intensity 5)
-      'family room': '#9A3412',      // Much more muted (intensity 5)
-      'basement': '#4B5563',         // Keep Gray
-      'attic storage': '#57534E',    // Much more muted (intensity 5)
-      'garage': '#374151',           // Keep Gray-800
-      'balcony': '#5B21B6',          // Much more muted (intensity 5)
-      'screened porch': '#065F46',   // Much more muted (intensity 5)
-      'pool house': '#0C4A6E',       // Much more muted (intensity 5)
-      'guest house': '#991B1B',      // Much more muted (intensity 5)
-      'butler\'s pantry': '#92400E', // Much more muted (intensity 5)
-      'conservatory': '#365314',     // Much more muted (intensity 5)
-      'formal living room': '#92400E', // Keep Orange-900
-      'great room': '#312E81',       // Much more muted (intensity 5)
-      'billiards room': '#831843',   // Much more muted (intensity 5)
-      'study': '#374151',            // Keep Gray-700
-      'sitting room': '#1E3A8A'      // Keep Blue-700
+      'living room': '#553C9A',      
+      'dining room': '#991B1B',      
+      'kitchen': '#92400E',          
+      'primary bedroom': '#065F46',  
+      'primary bathroom': '#1E3A8A', 
+      'powder room': '#57534E',      
+      'guest room': '#9D174D',       
+      'office': '#312E81',           
+      'laundry room': '#365314',     
+      'mudroom': '#164E63',          
+      'family room': '#9A3412',      
+      'basement': '#4B5563',         
+      'attic storage': '#57534E',    
+      'garage': '#374151',           
+      'balcony': '#5B21B6',          
+      'screened porch': '#065F46',   
+      'pool house': '#0C4A6E',       
+      'guest house': '#991B1B',      
+      'butler\'s pantry': '#92400E', 
+      'conservatory': '#365314',     
+      'formal living room': '#92400E', 
+      'great room': '#312E81',       
+      'billiards room': '#831843',   
+      'study': '#374151',            
+      'sitting room': '#1E3A8A'      
     };
     return roomColors[roomName.toLowerCase()] || '#7C3AED';
   };
 
-  // ORIGINAL COLORS - EXACT MATCH
-  const getCategoryColor = () => '#0F2A19'; // Much more muted (intensity 5)
+  // ORIGINAL COLORS - EXACT MATCH FROM SCREENSHOTS
+  const getCategoryColor = () => '#0F2A19'; // Dark green from screenshots
 
-  // ORIGINAL HEADER COLORS - EXACT MATCH  
-  const getMainHeaderColor = () => '#7F1D1D';        // Much more muted (intensity 5)
-  const getAdditionalInfoColor = () => '#78350F';    // Much more muted (intensity 5)
-  const getShippingInfoColor = () => '#581C87';      // Much more muted (intensity 5)  
-  const getNotesActionsColor = () => '#991B1B';      // Much more muted (intensity 5)
+  // ORIGINAL HEADER COLORS - EXACT MATCH FROM SCREENSHOTS
+  const getMainHeaderColor = () => '#7F1D1D';        // Dark red for main headers
+  const getAdditionalInfoColor = () => '#78350F';    // Brown for ADDITIONAL INFO.
+  const getShippingInfoColor = () => '#581C87';      // Purple for SHIPPING INFO.  
+  const getNotesActionsColor = () => '#991B1B';      // Red for NOTES and ACTIONS
 
   // COMPLETE COLOR MAPPING FOR ALL DROPDOWN VALUES
   const getStatusColor = (status) => {
@@ -328,7 +353,7 @@ const ExactFFESpreadsheet = ({
       // Procurement Phase  
       'APPROVED': '#9ACD32',
       'ORDERED': '#32CD32',
-      'PICKED': '#FFD700',  // YELLOW like your image
+      'PICKED': '#FFD700',  
       'CONFIRMED': '#228B22',
       
       // Fulfillment Phase
@@ -369,14 +394,6 @@ const ExactFFESpreadsheet = ({
       'XPO Logistics': '#FF1493',
       'Old Dominion': '#228B22',
       'ABF Freight': '#B22222',
-      'Estes Express': '#4B0082',
-      'Saia LTL': '#2E8B57',
-      'TForce Freight': '#FF4500',
-      'Roadrunner': '#6B8E23',
-      'Central Transport': '#8B008B',
-      'Southeastern Freight': '#D2691E',
-      'Averitt Express': '#CD853F',
-      'Holland': '#F4A460',
       'OTHER': '#9370DB'
     };
     return carrierColors[carrier] || '#9370DB';
@@ -423,11 +440,11 @@ const ExactFFESpreadsheet = ({
   }
 
   return (
-    <div className="w-full bg-white">
+    <div className="w-full bg-gray-900">
       
-      {/* ONE CONTINUOUS SPREADSHEET - ORIGINAL LAYOUT WITH DRAG & DROP */}
+      {/* DARK BACKGROUND SPREADSHEET - ORIGINAL DESIGN WITH DRAG & DROP */}
       <div 
-        className="w-full overflow-x-auto overflow-y-visible" 
+        className="w-full overflow-x-auto overflow-y-visible bg-gray-900" 
         style={{ 
           height: '80vh',
           overscrollBehavior: 'contain',
@@ -448,448 +465,352 @@ const ExactFFESpreadsheet = ({
               <tbody>
                 <Droppable droppableId="rooms" type="room">
                   {(provided) => (
-                    <tr ref={provided.innerRef} {...provided.droppableProps}>
-                      <td colSpan="15" style={{ padding: 0, border: 'none' }}>
-                        {/* HIERARCHICAL STRUCTURE AS ROW HEADERS */}
-                        {project.rooms.map((room, roomIndex) => {
-                          console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
-                          return (
-                            <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
-                              {(provided, snapshot) => (
-                                <table 
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {/* HIERARCHICAL STRUCTURE AS ROW HEADERS */}
+                      {project.rooms.map((room, roomIndex) => {
+                        console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
+                        return (
+                          <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
+                            {(provided, snapshot) => (
+                              <React.Fragment>
+                                {/* ROOM HEADER ROW - With Delete Button */}
+                                <tr
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
                                   style={{
                                     ...provided.draggableProps.style,
-                                    width: '100%',
-                                    borderCollapse: 'collapse',
                                     ...(snapshot.isDragging ? { boxShadow: '0 5px 15px rgba(0,0,0,0.3)' } : {})
                                   }}
                                 >
-                                  <tbody>
-                                    {/* ROOM HEADER ROW - Muted colors with Delete Button */}
-                                    <tr {...provided.dragHandleProps}>
-                                      <td colSpan="14" 
-                                          className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
-                                          style={{ backgroundColor: getRoomColor(room.name) }}>
-                                        <div className="flex justify-between items-center">
-                                          <span>{room.name.toUpperCase()}</span>
-                                          <button
-                                            onClick={() => handleDeleteRoom(room.id)}
-                                            className="text-red-300 hover:text-red-100 text-lg ml-2"
-                                            title="Delete Room"
-                                          >
-                                            🗑️
-                                          </button>
-                                        </div>
-                                      </td>
-                                      <td className="border border-gray-400 px-2 py-2 text-center"
-                                          style={{ backgroundColor: getRoomColor(room.name) }}>
-                                        <button
-                                          onClick={() => handleAddRoom()}
-                                          className="text-green-300 hover:text-green-100 text-sm font-bold"
-                                          title="Add Room"
-                                        >
-                                          +
-                                        </button>
-                                      </td>
-                                    </tr>
-                                    
-                                    {/* ROOM CATEGORIES */}
-                                    <tr>
-                                      <td colSpan="15" style={{ padding: 0, border: 'none' }}>
-                                        <Droppable droppableId={`categories-${room.id}`} type="category">
-                                          {(provided) => (
-                                            <table 
-                                              ref={provided.innerRef} 
-                                              {...provided.droppableProps}
-                                              style={{ width: '100%', borderCollapse: 'collapse' }}
-                                            >
-                                              <tbody>
-                                                {room.categories?.map((category, catIndex) => {
-                                                  console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
-                                                  return (
-                                                    <Draggable key={category.id} draggableId={category.id} index={catIndex}>
-                                                      {(provided, snapshot) => (
-                                                        <React.Fragment>
-                                                          {/* CATEGORY HEADER ROW */}
-                                                          <tr
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
+                                  <td colSpan="14" 
+                                      className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
+                                      style={{ backgroundColor: getRoomColor(room.name) }}>
+                                    <div className="flex justify-between items-center">
+                                      <span>{room.name.toUpperCase()}</span>
+                                      <button
+                                        onClick={() => handleDeleteRoom(room.id)}
+                                        className="text-red-300 hover:text-red-100 text-lg ml-2"
+                                        title="Delete Room"
+                                      >
+                                        🗑️
+                                      </button>
+                                    </div>
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-2 text-center"
+                                      style={{ backgroundColor: getRoomColor(room.name) }}>
+                                    <button
+                                      onClick={() => handleAddRoom()}
+                                      className="text-green-300 hover:text-green-100 text-sm font-bold"
+                                      title="Add Room"
+                                    >
+                                      +
+                                    </button>
+                                  </td>
+                                </tr>
+                                
+                                {/* ROOM CATEGORIES - Droppable */}
+                                <Droppable droppableId={`categories-${room.id}`} type="category">
+                                  {(provided) => (
+                                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                                      {room.categories?.map((category, catIndex) => {
+                                        console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
+                                        return (
+                                          <Draggable key={category.id} draggableId={category.id} index={catIndex}>
+                                            {(provided, snapshot) => (
+                                              <React.Fragment>
+                                                {/* CATEGORY HEADER ROW */}
+                                                <tr
+                                                  ref={provided.innerRef}
+                                                  {...provided.draggableProps}
+                                                  {...provided.dragHandleProps}
+                                                  style={{
+                                                    ...provided.draggableProps.style,
+                                                    ...(snapshot.isDragging ? { boxShadow: '0 3px 10px rgba(0,0,0,0.2)' } : {})
+                                                  }}
+                                                >
+                                                  <td colSpan="15" 
+                                                      className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
+                                                      style={{ backgroundColor: getCategoryColor() }}>
+                                                    {category.name.toUpperCase()}
+                                                  </td>
+                                                </tr>
+
+                                                {/* SUBCATEGORIES AND ITEMS */}
+                                                {category.subcategories?.map((subcategory) => (
+                                                  <React.Fragment key={subcategory.id}>
+                                                    
+                                                    {/* SUBCATEGORY HEADER ROW WITH PROPER SECTION HEADERS */}
+                                                    <tr>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getMainHeaderColor() }}>
+                                                        {subcategory.name.toUpperCase()}
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getMainHeaderColor() }}>
+                                                        VENDOR/SKU
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getMainHeaderColor() }}>
+                                                        QTY
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getMainHeaderColor() }}>
+                                                        SIZE
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getMainHeaderColor() }}>
+                                                        REMARKS
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getMainHeaderColor() }}>
+                                                        STATUS
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getMainHeaderColor() }}>
+                                                        COST
+                                                      </td>
+                                                      
+                                                      {/* BROWN "ADDITIONAL INFO." SECTION */}
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getAdditionalInfoColor() }}>
+                                                        ADDITIONAL INFO.
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getAdditionalInfoColor() }}>
+                                                        FINISH/Color
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getAdditionalInfoColor() }}>
+                                                        Cost/Price
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getAdditionalInfoColor() }}>
+                                                        Image
+                                                      </td>
+                                                      
+                                                      {/* PURPLE "SHIPPING INFO." SECTION */}
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getShippingInfoColor() }}>
+                                                        SHIPPING INFO.
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getShippingInfoColor() }}>
+                                                        Order Date
+                                                      </td>
+                                                      
+                                                      {/* RED "NOTES" AND "ACTIONS" SECTION */}
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getNotesActionsColor() }}>
+                                                        NOTES
+                                                      </td>
+                                                      <td className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" style={{ backgroundColor: getNotesActionsColor() }}>
+                                                        ACTIONS
+                                                      </td>
+                                                    </tr>
+
+                                                    {/* ITEMS */}
+                                                    {subcategory.items?.map((item) => (
+                                                      <tr key={item.id} className="bg-gray-800 hover:bg-gray-700 text-white">
+                                                        {/* ITEM NAME */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          {item.name || 'Item Name'}
+                                                        </td>
+                                                        
+                                                        {/* VENDOR/SKU */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          {item.vendor || 'Vendor Name'}
+                                                        </td>
+                                                        
+                                                        {/* QTY */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm text-center">
+                                                          {item.quantity || '1'}
+                                                        </td>
+                                                        
+                                                        {/* SIZE */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          {item.size || 'Size'}
+                                                        </td>
+                                                        
+                                                        {/* REMARKS */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          {item.remarks || 'Remarks'}
+                                                        </td>
+                                                        
+                                                        {/* STATUS - Color-coded dropdown */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <select 
+                                                            value={item.status || 'TO BE SELECTED'}
+                                                            onChange={(e) => {
+                                                              console.log(`Status changed to: ${e.target.value}`);
+                                                            }}
+                                                            className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
                                                             style={{
-                                                              ...provided.draggableProps.style,
-                                                              ...(snapshot.isDragging ? { boxShadow: '0 3px 10px rgba(0,0,0,0.2)' } : {})
+                                                              backgroundColor: getStatusColor(item.status || 'TO BE SELECTED'),
+                                                              color: '#000'
                                                             }}
                                                           >
-                                                            <td colSpan="15" 
-                                                                className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
-                                                                style={{ backgroundColor: getCategoryColor() }}>
-                                                              {category.name.toUpperCase()}
-                                                            </td>
-                                                          </tr>
+                                                            <option value="">Select Status...</option>
+                                                            <option value="TO BE SELECTED">🔵 TO BE SELECTED</option>
+                                                            <option value="RESEARCHING">🔵 RESEARCHING</option>
+                                                            <option value="PENDING APPROVAL">🟡 PENDING APPROVAL</option>
+                                                            <option value="APPROVED">🟢 APPROVED</option>
+                                                            <option value="ORDERED">🟢 ORDERED</option>
+                                                            <option value="PICKED">🟡 PICKED</option>
+                                                            <option value="CONFIRMED">🟢 CONFIRMED</option>
+                                                            <option value="IN PRODUCTION">🟠 IN PRODUCTION</option>
+                                                            <option value="SHIPPED">🔵 SHIPPED</option>
+                                                            <option value="IN TRANSIT">🔵 IN TRANSIT</option>
+                                                            <option value="OUT FOR DELIVERY">🔵 OUT FOR DELIVERY</option>
+                                                            <option value="DELIVERED TO RECEIVER">🟣 DELIVERED TO RECEIVER</option>
+                                                            <option value="DELIVERED TO JOB SITE">🟣 DELIVERED TO JOB SITE</option>
+                                                            <option value="RECEIVED">🟣 RECEIVED</option>
+                                                            <option value="READY FOR INSTALL">🟢 READY FOR INSTALL</option>
+                                                            <option value="INSTALLING">🟢 INSTALLING</option>
+                                                            <option value="INSTALLED">🟢 INSTALLED</option>
+                                                            <option value="ON HOLD">🔴 ON HOLD</option>
+                                                            <option value="BACKORDERED">🔴 BACKORDERED</option>
+                                                            <option value="DAMAGED">🔴 DAMAGED</option>
+                                                            <option value="RETURNED">🔴 RETURNED</option>
+                                                            <option value="CANCELLED">🔴 CANCELLED</option>
+                                                          </select>
+                                                        </td>
+                                                        
+                                                        {/* COST */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm text-right">
+                                                          ${item.cost || '0.00'}
+                                                        </td>
+                                                        
+                                                        {/* ADDITIONAL INFO - FINISH/COLOR */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          {item.finish_color || 'Finish/Color'}
+                                                        </td>
+                                                        
+                                                        {/* ADDITIONAL INFO - COST/PRICE */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          ${item.cost || '0.00'}
+                                                        </td>
+                                                        
+                                                        {/* ADDITIONAL INFO - IMAGE */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm text-center">
+                                                          {item.image_url ? (
+                                                            <a href={item.image_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+                                                              🖼️ Image
+                                                            </a>
+                                                          ) : (
+                                                            <button className="text-blue-400 hover:text-blue-300">
+                                                              ➕ Image
+                                                            </button>
+                                                          )}
+                                                        </td>
+                                                        
+                                                        {/* SHIPPING INFO */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          {item.tracking_number ? (
+                                                            <button
+                                                              onClick={() => handleTrackItem(item)}
+                                                              className="text-blue-400 hover:text-blue-300 underline"
+                                                              title="Track Package"
+                                                            >
+                                                              Track: {item.tracking_number.substring(0, 8)}...
+                                                            </button>
+                                                          ) : (
+                                                            'No tracking yet'
+                                                          )}
+                                                        </td>
+                                                        
+                                                        {/* ORDER DATE */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          <input 
+                                                            type="date" 
+                                                            value={item.order_date || ''} 
+                                                            className="bg-gray-700 text-white border-none outline-none w-full" 
+                                                            placeholder="mm/dd/yyyy"
+                                                          />
+                                                        </td>
+                                                        
+                                                        {/* NOTES */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-sm">
+                                                          {item.notes || 'Notes'}
+                                                        </td>
+                                                        
+                                                        {/* ACTIONS - Blue + and Red Trash */}
+                                                        <td className="border border-gray-400 px-2 py-2 text-center">
+                                                          <div className="flex space-x-1">
+                                                            <button 
+                                                              onClick={() => {
+                                                                setSelectedSubCategoryId(subcategory.id);
+                                                                setShowAddItem(true);
+                                                              }}
+                                                              className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                                                              title="Add Item"
+                                                            >
+                                                              +
+                                                            </button>
+                                                            <button 
+                                                              onClick={() => handleDeleteItem(item.id)}
+                                                              className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
+                                                              title="Delete Item"
+                                                            >
+                                                              🗑️
+                                                            </button>
+                                                          </div>
+                                                        </td>
+                                                      </tr>
+                                                    ))}
+                                                    
+                                                    {/* ADD ITEM ROW */}
+                                                    <tr>
+                                                      <td colSpan="16" className="border border-gray-400 px-6 py-2 text-center bg-gray-700">
+                                                        <div className="flex justify-center items-center space-x-4">
+                                                          <button
+                                                            onClick={() => {
+                                                              setSelectedSubCategoryId(subcategory.id);
+                                                              setShowAddItem(true);
+                                                            }}
+                                                            className="text-gray-300 hover:text-white text-sm font-medium bg-gray-600 px-3 py-1 rounded"
+                                                          >
+                                                            ➕ Add Item
+                                                          </button>
                                                           
-                                                          {/* SUBCATEGORIES */}
-                                                          {category.subcategories?.map((subcategory) => (
-                                                            <React.Fragment key={subcategory.id}>
-                                                              
-                                                              {/* FIXED HEADER STRUCTURE - Only section headers on top */}
-                                                              <tr>
-                                                                {/* Empty cells for main data columns */}
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
-                                                                
-                                                                {/* ADDITIONAL INFO section header */}
-                                                                <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                                    style={{ backgroundColor: getAdditionalInfoColor() }} colSpan="3">
-                                                                  ADDITIONAL INFO.
-                                                                </th>
-                                                                
-                                                                {/* SHIPPING INFO section header */}
-                                                                <th className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                                    style={{ backgroundColor: getShippingInfoColor() }} colSpan="5">
-                                                                  SHIPPING INFO.
-                                                                </th>
-                                                                
-                                                                {/* Empty cells for notes/actions */}
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getNotesActionsColor() }}></td>
-                                                                <td className="border border-gray-400" style={{ backgroundColor: getNotesActionsColor() }}></td>
-                                                              </tr>
-                                                              
-                                                              {/* COLUMN HEADERS - All moved down here */}
-                                                              <tr>
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[150px]" 
-                                                                    style={{ backgroundColor: getMainHeaderColor() }}>
-                                                                  {subcategory.name.toUpperCase()}
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[120px]" 
-                                                                    style={{ backgroundColor: getMainHeaderColor() }}>
-                                                                  VENDOR/SKU
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white min-w-[50px]" 
-                                                                    style={{ backgroundColor: getMainHeaderColor() }}>
-                                                                  QTY
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[80px]" 
-                                                                    style={{ backgroundColor: getMainHeaderColor() }}>
-                                                                  SIZE
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white min-w-[100px]" 
-                                                                    style={{ backgroundColor: getMainHeaderColor() }}>
-                                                                  ORDERS STATUS
-                                                                </th>
-                                                                
-                                                                {/* ADDITIONAL INFO columns */}
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
-                                                                    style={{ backgroundColor: getAdditionalInfoColor() }}>
-                                                                  FINISH/Color
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-right text-xs font-bold text-white" 
-                                                                    style={{ backgroundColor: getAdditionalInfoColor() }}>
-                                                                  Cost/Price
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white" 
-                                                                    style={{ backgroundColor: getAdditionalInfoColor() }}>
-                                                                  Image
-                                                                </th>
-                                                                
-                                                                {/* SHIPPING INFO columns */}
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
-                                                                    style={{ backgroundColor: getShippingInfoColor() }}>
-                                                                  SHIP TO
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
-                                                                    style={{ backgroundColor: getShippingInfoColor() }}>
-                                                                  CARRIER
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
-                                                                    style={{ backgroundColor: getShippingInfoColor() }}>
-                                                                  TRACKING #
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
-                                                                    style={{ backgroundColor: getShippingInfoColor() }}>
-                                                                  ORDER DATE
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
-                                                                    style={{ backgroundColor: getShippingInfoColor() }}>
-                                                                  DELIVERY DATE
-                                                                </th>
-                                                                
-                                                                {/* NOTES & ACTIONS columns */}
-                                                                <th className="border border-gray-400 px-2 py-2 text-left text-xs font-bold text-white" 
-                                                                    style={{ backgroundColor: getNotesActionsColor() }}>
-                                                                  NOTES
-                                                                </th>
-                                                                <th className="border border-gray-400 px-2 py-2 text-center text-xs font-bold text-white" 
-                                                                    style={{ backgroundColor: getNotesActionsColor() }}>
-                                                                  ACTIONS
-                                                                </th>
-                                                              </tr>
-
-                                                              {/* ITEMS */}
-                                                              {subcategory.items?.map((item) => (
-                                                                <tr key={item.id}>
-                                                                  {/* ITEM NAME */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                                    {item.name || 'Chandelier'}
-                                                                  </td>
-                                                                  
-                                                                  {/* VENDOR/SKU */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                                    {item.vendor || 'Visual Comfort'}
-                                                                  </td>
-                                                                  
-                                                                  {/* QTY */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black text-center">
-                                                                    {item.quantity || '1'}
-                                                                  </td>
-                                                                  
-                                                                  {/* SIZE */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                                    {item.size || '24"W x 30"H'}
-                                                                  </td>
-                                                                  
-                                                                  {/* STATUS - Color-coded dropdown */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                                    <select 
-                                                                      value={item.status || 'PICKED'}
-                                                                      onChange={(e) => {
-                                                                        console.log(`Status changed to: ${e.target.value} with color: ${getStatusColor(e.target.value)}`);
-                                                                      }}
-                                                                      className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
-                                                                      style={{
-                                                                        backgroundColor: getStatusColor(item.status || 'PICKED'),
-                                                                        color: '#000'
-                                                                      }}
-                                                                    >
-                                                                      <option value="">Select Status...</option>
-                                                                      <option value="TO BE SELECTED">🔵 TO BE SELECTED</option>
-                                                                      <option value="RESEARCHING">🔵 RESEARCHING</option>
-                                                                      <option value="PENDING APPROVAL">🟡 PENDING APPROVAL</option>
-                                                                      <option value="APPROVED">🟢 APPROVED</option>
-                                                                      <option value="ORDERED">🟢 ORDERED</option>
-                                                                      <option value="PICKED">🟡 PICKED</option>
-                                                                      <option value="CONFIRMED">🟢 CONFIRMED</option>
-                                                                      <option value="IN PRODUCTION">🟠 IN PRODUCTION</option>
-                                                                      <option value="SHIPPED">🔵 SHIPPED</option>
-                                                                      <option value="IN TRANSIT">🔵 IN TRANSIT</option>
-                                                                      <option value="OUT FOR DELIVERY">🔵 OUT FOR DELIVERY</option>
-                                                                      <option value="DELIVERED TO RECEIVER">🟣 DELIVERED TO RECEIVER</option>
-                                                                      <option value="DELIVERED TO JOB SITE">🟣 DELIVERED TO JOB SITE</option>
-                                                                      <option value="RECEIVED">🟣 RECEIVED</option>
-                                                                      <option value="READY FOR INSTALL">🟢 READY FOR INSTALL</option>
-                                                                      <option value="INSTALLING">🟢 INSTALLING</option>
-                                                                      <option value="INSTALLED">🟢 INSTALLED</option>
-                                                                      <option value="ON HOLD">🔴 ON HOLD</option>
-                                                                      <option value="BACKORDERED">🔴 BACKORDERED</option>
-                                                                      <option value="DAMAGED">🔴 DAMAGED</option>
-                                                                      <option value="RETURNED">🔴 RETURNED</option>
-                                                                      <option value="CANCELLED">🔴 CANCELLED</option>
-                                                                    </select>
-                                                                  </td>
-                                                                  
-                                                                  {/* FINISH/COLOR */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                                    {item.finish_color || 'Aged Brass'}
-                                                                  </td>
-                                                                  
-                                                                  {/* COST */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black text-right">
-                                                                    ${item.cost || '450.00'}
-                                                                  </td>
-                                                                  
-                                                                  {/* IMAGE */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-center">
-                                                                    {item.image_url ? (
-                                                                      <img 
-                                                                        src={item.image_url} 
-                                                                        alt={item.name}
-                                                                        className="w-12 h-12 object-cover rounded cursor-pointer"
-                                                                        onClick={() => window.open(item.image_url, '_blank')}
-                                                                      />
-                                                                    ) : (
-                                                                      <button className="text-blue-600 hover:text-blue-800 text-xs">+ Image</button>
-                                                                    )}
-                                                                  </td>
-                                                                  
-                                                                  {/* SHIP TO - Color-coded dropdown */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                                    <select 
-                                                                      value={item.ship_to || ''}
-                                                                      onChange={(e) => {
-                                                                        console.log(`Ship To changed to: ${e.target.value} with color: ${getShipToColor(e.target.value)}`);
-                                                                      }}
-                                                                      className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
-                                                                      style={{
-                                                                        backgroundColor: item.ship_to ? getShipToColor(item.ship_to) : '#374151',
-                                                                        color: '#000'
-                                                                      }}
-                                                                    >
-                                                                      <option value="">Select Location...</option>
-                                                                      <option value="CLIENT HOME">🏠 CLIENT HOME</option>
-                                                                      <option value="JOB SITE">🏗️ JOB SITE</option>
-                                                                      <option value="DESIGN CENTER">🏢 DESIGN CENTER</option>
-                                                                      <option value="WAREHOUSE">📦 WAREHOUSE</option>
-                                                                      <option value="VENDOR LOCATION">🏭 VENDOR LOCATION</option>
-                                                                    </select>
-                                                                  </td>
-                                                                  
-                                                                  {/* CARRIER - Color-coded dropdown */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                                    <select 
-                                                                      value={item.carrier || ''}
-                                                                      onChange={(e) => {
-                                                                        console.log(`Carrier changed to: ${e.target.value} with color: ${getCarrierColor(e.target.value)}`);
-                                                                      }}
-                                                                      className="w-full border-none outline-none rounded px-1 py-1 text-xs font-medium"
-                                                                      style={{
-                                                                        backgroundColor: item.carrier ? getCarrierColor(item.carrier) : '#374151',
-                                                                        color: '#000'
-                                                                      }}
-                                                                    >
-                                                                      <option value="">Select Carrier...</option>
-                                                                      <option value="FedEx">📦 FedEx</option>
-                                                                      <option value="UPS">📦 UPS</option>
-                                                                      <option value="Brooks">🚚 Brooks</option>
-                                                                      <option value="Zenith">🚚 Zenith</option>
-                                                                      <option value="Sunbelt">🚚 Sunbelt</option>
-                                                                      <option value="R+L Carriers">🚚 R+L Carriers</option>
-                                                                      <option value="Yellow Freight">🚚 Yellow Freight</option>
-                                                                      <option value="XPO Logistics">🚚 XPO Logistics</option>
-                                                                      <option value="Old Dominion">🚚 Old Dominion</option>
-                                                                      <option value="ABF Freight">🚚 ABF Freight</option>
-                                                                      <option value="OTHER">🚚 OTHER</option>
-                                                                    </select>
-                                                                  </td>
-                                                                  
-                                                                  {/* TRACKING # */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                                    {item.tracking_number ? (
-                                                                      <button
-                                                                        onClick={() => handleTrackItem(item)}
-                                                                        className="text-blue-600 hover:text-blue-800 underline"
-                                                                        title="Track Package"
-                                                                      >
-                                                                        Track: {item.tracking_number.substring(0, 8)}...
-                                                                      </button>
-                                                                    ) : (
-                                                                      'No tracking yet'
-                                                                    )}
-                                                                  </td>
-                                                                  
-                                                                  {/* ORDER DATE */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                                    {item.order_date || 'Not set'}
-                                                                  </td>
-                                                                  
-                                                                  {/* DELIVERY DATE */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                                    {item.expected_delivery || 'Not set'}
-                                                                  </td>
-                                                                  
-                                                                  {/* NOTES */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                                    {item.notes || item.remarks || 'For dining room entryway'}
-                                                                  </td>
-                                                                  
-                                                                  {/* ACTIONS */}
-                                                                  <td className="border border-gray-400 px-2 py-2 text-center">
-                                                                    <button 
-                                                                      onClick={() => {
-                                                                        // Handle delete item
-                                                                        console.log('Delete item:', item.id);
-                                                                      }}
-                                                                      className="text-red-600 hover:text-red-800 text-lg"
-                                                                    >
-                                                                      🗑️
-                                                                    </button>
-                                                                  </td>
-                                                                </tr>
-                                                              ))}
-                                                              
-                                                              {/* ADD ITEM ROW */}
-                                                              <tr>
-                                                                <td colSpan="15" className="border border-gray-400 px-6 py-2 text-center">
-                                                                  <button
-                                                                    onClick={() => {
-                                                                      setSelectedSubCategoryId(subcategory.id);
-                                                                      setShowAddItem(true);
-                                                                    }}
-                                                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                                                                  >
-                                                                    + Add Item
-                                                                  </button>
-                                                                </td>
-                                                              </tr>
-                                                              
-                                                            </React.Fragment>
-                                                          ))}
-                                                        </React.Fragment>
-                                                      )}
-                                                    </Draggable>
-                                                  );
-                                                })}
-                                                {provided.placeholder}
-                                              </tbody>
-                                            </table>
-                                          )}
-                                        </Droppable>
-                                      </td>
-                                    </tr>
-
-                                    {/* ADD CATEGORY ROW - Enhanced with dropdown */}
-                                    <tr>
-                                      <td colSpan="15" className="border border-gray-400 px-6 py-2 text-center bg-gray-100">
-                                        <div className="flex justify-center items-center space-x-4">
-                                          {/* Add Category Dropdown */}
-                                          <div className="flex items-center space-x-2">
-                                            <select
-                                              value=""
-                                              onChange={(e) => {
-                                                if (e.target.value === 'CREATE_NEW') {
-                                                  const categoryName = prompt('Enter new category name:');
-                                                  if (categoryName && categoryName.trim()) {
-                                                    handleAddCategory(room.id, categoryName.trim());
-                                                  }
-                                                } else if (e.target.value) {
-                                                  handleAddCategory(room.id, e.target.value);
-                                                }
-                                              }}
-                                              className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            >
-                                              <option value="">+ Add Category ▼</option>
-                                              {availableCategories.map((category) => (
-                                                <option key={category} value={category}>
-                                                  {category}
-                                                </option>
-                                              ))}
-                                              <option value="CREATE_NEW">➕ Create New Category</option>
-                                            </select>
-                                          </div>
-                                          
-                                          {/* Delete Section Button */}
-                                          <button
-                                            onClick={() => handleDeleteRoom(room.id)}
-                                            className="text-red-600 hover:text-red-800 text-sm font-medium"
-                                            title="Delete Section"
-                                          >
-                                            🗑️ Delete Section
-                                          </button>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              )}
-                            </Draggable>
-                          );
-                        })}
-                        {provided.placeholder}
-                      </td>
-                    </tr>
+                                                          <select
+                                                            value=""
+                                                            onChange={(e) => {
+                                                              if (e.target.value === 'CREATE_NEW') {
+                                                                const categoryName = prompt('Enter new category name:');
+                                                                if (categoryName && categoryName.trim()) {
+                                                                  handleAddCategory(room.id, categoryName.trim());
+                                                                }
+                                                              } else if (e.target.value) {
+                                                                handleAddCategory(room.id, e.target.value);
+                                                              }
+                                                            }}
+                                                            className="bg-gray-600 text-white border border-gray-500 rounded px-3 py-1 text-sm"
+                                                          >
+                                                            <option value="">➕ Add Category ▼</option>
+                                                            {availableCategories.map((category) => (
+                                                              <option key={category} value={category}>
+                                                                {category}
+                                                              </option>
+                                                            ))}
+                                                            <option value="CREATE_NEW">➕ Create New Category</option>
+                                                          </select>
+                                                          
+                                                          <button
+                                                            onClick={() => handleDeleteRoom(room.id)}
+                                                            className="text-red-400 hover:text-red-300 text-sm font-medium bg-red-900 px-3 py-1 rounded"
+                                                            title="Delete Section"
+                                                          >
+                                                            🗑️ Delete Section
+                                                          </button>
+                                                        </div>
+                                                      </td>
+                                                    </tr>
+                                                    
+                                                  </React.Fragment>
+                                                ))}
+                                              </React.Fragment>
+                                            )}
+                                          </Draggable>
+                                        );
+                                      })}
+                                      {provided.placeholder}
+                                    </div>
+                                  )}
+                                </Droppable>
+                              </React.Fragment>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                      {provided.placeholder}
+                    </div>
                   )}
                 </Droppable>
               </tbody>
@@ -899,7 +820,7 @@ const ExactFFESpreadsheet = ({
         </div>
       </div>
 
-      {/* ADD ITEM MODAL */}
+      {/* ADD ITEM MODAL WITH ENHANCED SCRAPING */}
       {showAddItem && (
         <AddItemModal
           onClose={() => setShowAddItem(false)}
