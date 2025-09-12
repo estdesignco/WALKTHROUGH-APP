@@ -682,120 +682,45 @@ const ExactFFESpreadsheet = ({
                                                           {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
                                                           
                                                           {/* Order Date (ALONE) */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <input 
-                                                              type="date" 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Order date changed:', e.target.value)}
-                                                            />
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            Order Date
                                                           </td>
                                                           
                                                           {/* Order Status/Order Number (STACKED) */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <div className="space-y-1">
-                                                              <select 
-                                                                className="w-full bg-transparent border-none text-white text-xs"
-                                                                onChange={(e) => console.log('Order status changed:', e.target.value)}
-                                                              >
-                                                                <option value="">Status...</option>
-                                                                <option value="TO BE SELECTED">TO BE SELECTED</option>
-                                                                <option value="RESEARCHING">RESEARCHING</option>
-                                                                <option value="PENDING APPROVAL">PENDING APPROVAL</option>
-                                                                <option value="APPROVED">APPROVED</option>
-                                                                <option value="ORDERED">ORDERED</option>
-                                                                <option value="PICKED">PICKED</option>
-                                                                <option value="CONFIRMED">CONFIRMED</option>
-                                                                <option value="IN PRODUCTION">IN PRODUCTION</option>
-                                                                <option value="SHIPPED">SHIPPED</option>
-                                                                <option value="IN TRANSIT">IN TRANSIT</option>
-                                                                <option value="OUT FOR DELIVERY">OUT FOR DELIVERY</option>
-                                                                <option value="DELIVERED TO RECEIVER">DELIVERED TO RECEIVER</option>
-                                                                <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
-                                                                <option value="RECEIVED">RECEIVED</option>
-                                                                <option value="READY FOR INSTALL">READY FOR INSTALL</option>
-                                                                <option value="INSTALLING">INSTALLING</option>
-                                                                <option value="INSTALLED">INSTALLED</option>
-                                                                <option value="ON HOLD">ON HOLD</option>
-                                                                <option value="BACKORDERED">BACKORDERED</option>
-                                                                <option value="DAMAGED">DAMAGED</option>
-                                                                <option value="RETURNED">RETURNED</option>
-                                                                <option value="CANCELLED">CANCELLED</option>
-                                                              </select>
-                                                              <input 
-                                                                type="text" 
-                                                                placeholder="Order #"
-                                                                className="w-full bg-transparent border-none text-white text-xs"
-                                                                onChange={(e) => console.log('Order number changed:', e.target.value)}
-                                                              />
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            <div className="space-y-1 text-xs">
+                                                              <div>Order Status</div>
+                                                              <div>Order Number</div>
                                                             </div>
                                                           </td>
                                                           
                                                           {/* Estimated Ship Date/Estimated Delivery Date (STACKED) */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <div className="space-y-1">
-                                                              <input 
-                                                                type="date" 
-                                                                className="w-full bg-transparent border-none text-white text-xs"
-                                                                onChange={(e) => console.log('Estimated ship date changed:', e.target.value)}
-                                                              />
-                                                              <input 
-                                                                type="date" 
-                                                                className="w-full bg-transparent border-none text-white text-xs"
-                                                                onChange={(e) => console.log('Estimated delivery date changed:', e.target.value)}
-                                                              />
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            <div className="space-y-1 text-xs">
+                                                              <div>Ship Date</div>
+                                                              <div>Delivery Date</div>
                                                             </div>
                                                           </td>
                                                           
                                                           {/* Install Date/Ship To (STACKED) */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <div className="space-y-1">
-                                                              <input 
-                                                                type="date" 
-                                                                className="w-full bg-transparent border-none text-white text-xs"
-                                                                onChange={(e) => console.log('Install date changed:', e.target.value)}
-                                                              />
-                                                              <select 
-                                                                className="w-full bg-transparent border-none text-white text-xs"
-                                                                onChange={(e) => console.log('Ship to changed:', e.target.value)}
-                                                              >
-                                                                <option value="">Ship To...</option>
-                                                                <option value="CLIENT_HOME">CLIENT HOME</option>
-                                                                <option value="JOB_SITE">JOB SITE</option>
-                                                                <option value="WAREHOUSE">WAREHOUSE</option>
-                                                              </select>
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            <div className="space-y-1 text-xs">
+                                                              <div>Install Date</div>
+                                                              <div>Ship To</div>
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* Tracking/Carrier (STACKED) - LIVE TRACKING */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <div className="space-y-1">
-                                                              <input 
-                                                                type="text" 
-                                                                placeholder="Live Tracking #"
-                                                                className="w-full bg-transparent border-none text-white text-xs"
-                                                                onChange={(e) => console.log('Live tracking changed:', e.target.value)}
-                                                              />
-                                                              <select 
-                                                                className="w-full bg-transparent border-none text-white text-xs"
-                                                                onChange={(e) => console.log('Carrier changed:', e.target.value)}
-                                                              >
-                                                                <option value="">Carrier...</option>
-                                                                <option value="FedEx">FedEx</option>
-                                                                <option value="UPS">UPS</option>
-                                                                <option value="USPS">USPS</option>
-                                                                <option value="OTHER">OTHER</option>
-                                                              </select>
+                                                          {/* Tracking/Carrier (STACKED) */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            <div className="space-y-1 text-xs">
+                                                              <div>Tracking</div>
+                                                              <div>Carrier</div>
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* NOTES - EDITABLE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm">
-                                                            <input 
-                                                              type="text" 
-                                                              placeholder="Notes"
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Notes changed:', e.target.value)}
-                                                            />
+                                                          {/* NOTES */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            Notes
                                                           </td>
                                                         </tr>
                                                       ))}
