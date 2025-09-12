@@ -766,6 +766,7 @@ const ExactFFESpreadsheet = ({
                                                             <input 
                                                               type="date" 
                                                               value={item.estimated_delivery_date || ''} 
+                                                              onChange={(e) => console.log('Estimated delivery date changed:', e.target.value)}
                                                               className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                               placeholder="mm/dd/yyyy"
                                                             />
@@ -776,6 +777,7 @@ const ExactFFESpreadsheet = ({
                                                             <input 
                                                               type="date" 
                                                               value={item.install_date || ''} 
+                                                              onChange={(e) => console.log('Install date changed:', e.target.value)}
                                                               className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                               placeholder="mm/dd/yyyy"
                                                             />
@@ -785,6 +787,7 @@ const ExactFFESpreadsheet = ({
                                                           <td className="border border-gray-400 px-2 py-2 text-sm">
                                                             <select 
                                                               value={item.ship_to || ''}
+                                                              onChange={(e) => console.log('Ship to changed:', e.target.value)}
                                                               className="w-full bg-gray-600 text-white text-xs border-none rounded px-1"
                                                             >
                                                               <option value="">Ship To...</option>
