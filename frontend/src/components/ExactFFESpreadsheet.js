@@ -763,6 +763,49 @@ const ExactFFESpreadsheet = ({
                       ))}
                     </React.Fragment>
                   );})}
+                  
+                  {/* ADD CATEGORY ROW - Enhanced with dropdown */}
+                  <tr>
+                    <td colSpan="15" className="border border-gray-400 px-6 py-2 text-center bg-gray-100">
+                      <div className="flex justify-center items-center space-x-4">
+                        {/* Add Category Dropdown */}
+                        <div className="flex items-center space-x-2">
+                          <select
+                            value=""
+                            onChange={(e) => {
+                              if (e.target.value === 'CREATE_NEW') {
+                                const categoryName = prompt('Enter new category name:');
+                                if (categoryName && categoryName.trim()) {
+                                  handleAddCategory(room.id, categoryName.trim());
+                                }
+                              } else if (e.target.value) {
+                                handleAddCategory(room.id, e.target.value);
+                              }
+                            }}
+                            className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="">+ Add Category ▼</option>
+                            {availableCategories.map((category) => (
+                              <option key={category} value={category}>
+                                {category}
+                              </option>
+                            ))}
+                            <option value="CREATE_NEW">➕ Create New Category</option>
+                          </select>
+                        </div>
+                        
+                        {/* Delete Section Button */}
+                        <button
+                          onClick={() => handleDeleteRoom(room.id)}
+                          className="text-red-600 hover:text-red-800 text-sm font-medium"
+                          title="Delete Section"
+                        >
+                          🗑️ Delete Section
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  
                 </React.Fragment>
               );})}
             </tbody>
