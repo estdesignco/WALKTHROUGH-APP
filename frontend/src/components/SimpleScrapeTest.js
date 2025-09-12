@@ -24,7 +24,7 @@ const SimpleScrapeTest = () => {
     setScrapeError('');
 
     try {
-      const backendUrl = 'https://intsync-platform.preview.emergentagent.com';
+      const backendUrl = 'https://interior-ffe.preview.emergentagent.com';
       
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);
