@@ -621,7 +621,7 @@ const ExactFFESpreadsheet = ({
                   </thead>
 
                   {/* TABLE BODY - Keep original hierarchical structure */}
-                  <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                  <tbody>
                 {/* HIERARCHICAL STRUCTURE AS ROW HEADERS - KEEP ORIGINAL */}
                 {project.rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
