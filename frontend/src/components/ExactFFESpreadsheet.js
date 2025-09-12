@@ -640,7 +640,6 @@ const ExactFFESpreadsheet = ({
                                                       </tr>
                                                       
                                                       {/* ITEMS GO DIRECTLY UNDER RED HEADER */}
-                                                      {['Ceiling Fixture', 'Recessed Lighting', 'Wall Sconces'].map((itemName, itemIndex) => (
                                                       {/* ACTUAL ITEMS - DARK/BLACK BACKGROUND LIKE YOUR SCREENSHOTS */}
                                                       {['Ceiling Fixture', 'Recessed Lighting', 'Wall Sconces'].map((itemName, itemIndex) => (
                                                         <tr key={itemIndex} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
