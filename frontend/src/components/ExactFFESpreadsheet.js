@@ -642,43 +642,41 @@ const ExactFFESpreadsheet = ({
                                                       </tr>
 
                                                       {/* ITEMS - Each subcategory contains multiple items */}
-                                                      {/* EXACT ITEMS FROM YOUR SCREENSHOTS */}
+                                                      {/* ACTUAL ITEMS - RED BACKGROUND LIKE YOUR SCREENSHOTS */}
                                                       {['Ceiling Fixture', 'Recessed Lighting', 'Wall Sconces'].map((itemName, itemIndex) => (
-                                                        <tr key={itemIndex} className={itemIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                                          {/* LEFT SIDE - MATCHES YOUR FIRST SCREENSHOT EXACTLY */}
-                                                          
-                                                          {/* VENDOR/SKU */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
+                                                        <tr key={itemIndex} className="bg-red-900 text-white">
+                                                          {/* VENDOR/SKU - ACTUAL ITEM NAME */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             {itemName}
                                                           </td>
                                                           
                                                           {/* QTY */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-center text-black">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
                                                             1
                                                           </td>
                                                           
                                                           {/* SIZE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                            <input type="text" className="w-full border-none bg-transparent text-black text-sm" placeholder="Size" />
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            Size
                                                           </td>
                                                           
                                                           {/* FINISH/Color */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                            <input type="text" className="w-full border-none bg-transparent text-black text-sm" placeholder="Finish/Color" />
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            Finish/Color
                                                           </td>
                                                           
                                                           {/* Cost/Price */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black">
-                                                            <input type="text" className="w-full border-none bg-transparent text-black text-sm" placeholder="$0.00" />
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            $0.00
                                                           </td>
                                                           
                                                           {/* Image */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center text-black">
+                                                          <td className="border border-gray-400 px-2 py-2 text-center text-white">
                                                             📷 Image
                                                           </td>
                                                           
                                                           {/* Spacer */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-black"></td>
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white"></td>
                                                           
                                                           {/* RIGHT SIDE - MATCHES YOUR SECOND SCREENSHOT EXACTLY */}
                                                           
