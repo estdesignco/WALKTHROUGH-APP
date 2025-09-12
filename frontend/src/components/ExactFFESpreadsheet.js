@@ -23,6 +23,31 @@ const ExactFFESpreadsheet = ({
   const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
 
+  // Load available categories on component mount
+  useEffect(() => {
+    const loadAvailableCategories = async () => {
+      try {
+        const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+        const response = await fetch(`${backendUrl}/api/categories/available`);
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableCategories(data.categories || []);
+        }
+      } catch (error) {
+        console.error('❌ Error loading available categories:', error);
+        // Set fallback categories
+        setAvailableCategories([
+          "Lighting", "Furniture & Storage", "Decor & Accessories", 
+          "Paint, Wallpaper & Finishes", "Architectural Elements, Built-ins & Trim",
+          "Flooring", "Window Treatments", "HVAC & Mechanical Systems",
+          "Security & Smart Home", "Appliances", "Plumbing & Fixtures"
+        ]);
+      }
+    };
+    
+    loadAvailableCategories();
+  }, []);
+
   // Handle adding new items with proper scraping
   const handleAddItem = async (itemData) => {
     if (!selectedSubCategoryId) {
