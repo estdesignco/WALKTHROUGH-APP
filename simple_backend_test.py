@@ -34,6 +34,8 @@ def test_endpoint(method, endpoint, data=None):
             response = requests.get(url)
         elif method.upper() == 'POST':
             response = requests.post(url, json=data)
+        elif method.upper() == 'DELETE':
+            response = requests.delete(url)
         else:
             return False, f"Unsupported method: {method}", 0
             
