@@ -466,53 +466,99 @@ const ExactFFESpreadsheet = ({
             <input
               type="text"
               placeholder="Search Items, Vendors, SKUs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
           
           {/* Filter Dropdowns */}
           <div className="flex gap-3 flex-wrap">
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none">
-              <option>All Rooms</option>
+            <select 
+              value={selectedRoom}
+              onChange={(e) => setSelectedRoom(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">All Rooms</option>
               {project.rooms.map(room => (
                 <option key={room.id} value={room.id}>{room.name}</option>
               ))}
             </select>
             
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none">
-              <option>All Categories</option>
+            <select 
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">All Categories</option>
               {availableCategories.map(category => (
                 <option key={category} value={category}>{category}</option>
               ))}
             </select>
             
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none">
-              <option>All Vendors</option>
-              <option>Visual Comfort</option>
-              <option>Four Hands</option>
-              <option>West Elm</option>
+            <select 
+              value={selectedVendor}
+              onChange={(e) => setSelectedVendor(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">All Vendors</option>
+              <option value="Visual Comfort">Visual Comfort</option>
+              <option value="Four Hands">Four Hands</option>
+              <option value="West Elm">West Elm</option>
+              <option value="Pottery Barn">Pottery Barn</option>
+              <option value="Williams Sonoma">Williams Sonoma</option>
+              <option value="Crate & Barrel">Crate & Barrel</option>
+              <option value="CB2">CB2</option>
+              <option value="Restoration Hardware">Restoration Hardware</option>
             </select>
             
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none">
-              <option>All Carriers</option>
-              <option>FedEx</option>
-              <option>UPS</option>
-              <option>Brooks</option>
-            </select>
-            
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none">
-              <option>All Statuses</option>
-              <option>TO BE SELECTED</option>
-              <option>ORDERED</option>
-              <option>SHIPPED</option>
-              <option>DELIVERED</option>
+            <select 
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">All Status</option>
+              <option value="TO BE SELECTED">TO BE SELECTED</option>
+              <option value="RESEARCHING">RESEARCHING</option>
+              <option value="PENDING APPROVAL">PENDING APPROVAL</option>
+              <option value="APPROVED">APPROVED</option>
+              <option value="ORDERED">ORDERED</option>
+              <option value="PICKED">PICKED</option>
+              <option value="CONFIRMED">CONFIRMED</option>
+              <option value="IN PRODUCTION">IN PRODUCTION</option>
+              <option value="SHIPPED">SHIPPED</option>
+              <option value="IN TRANSIT">IN TRANSIT</option>
+              <option value="OUT FOR DELIVERY">OUT FOR DELIVERY</option>
+              <option value="DELIVERED TO RECEIVER">DELIVERED TO RECEIVER</option>
+              <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
+              <option value="RECEIVED">RECEIVED</option>
+              <option value="READY FOR INSTALL">READY FOR INSTALL</option>
+              <option value="INSTALLING">INSTALLING</option>
+              <option value="INSTALLED">INSTALLED</option>
+              <option value="ON HOLD">ON HOLD</option>
+              <option value="BACKORDERED">BACKORDERED</option>
+              <option value="DAMAGED">DAMAGED</option>
+              <option value="RETURNED">RETURNED</option>
+              <option value="CANCELLED">CANCELLED</option>
             </select>
             
             {/* Filter and Clear Buttons */}
-            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">
+            <button 
+              onClick={() => console.log('Filter applied:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus })}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
+            >
               🔍 FILTER
             </button>
-            <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium">
+            <button 
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedRoom('');
+                setSelectedCategory('');
+                setSelectedVendor('');
+                setSelectedStatus('');
+              }}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium"
+            >
               CLEAR
             </button>
           </div>
