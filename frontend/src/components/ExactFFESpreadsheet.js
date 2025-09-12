@@ -633,10 +633,10 @@ const ExactFFESpreadsheet = ({
                                                   {isCategoryExpanded && category.subcategories?.map((subcategory) => (
                                                     <React.Fragment key={subcategory.id}>
                                                       
-                                                      {/* SUBCATEGORY HEADER ROW - MATCH YOUR SCREENSHOTS */}
+                                                      {/* SUBCATEGORY HEADER ROW - RED COLOR LIKE YOUR SCREENSHOTS */}
                                                       <tr>
                                                         <td colSpan="17" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#A0522D' }}>
+                                                            style={{ backgroundColor: '#DC2626' }}>
                                                           {subcategory.name.toUpperCase()}
                                                         </td>
                                                       </tr>
