@@ -100,7 +100,6 @@ const App = () => {
               path="/project/:projectId/ffe" 
               element={
                 <FFEDashboard 
-                  project={currentProject}
                   isOffline={isOffline}
                 />
               }
