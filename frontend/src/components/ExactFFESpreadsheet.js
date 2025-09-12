@@ -602,10 +602,47 @@ const ExactFFESpreadsheet = ({
                                                   </tr>
 
                                                   {/* SUBCATEGORIES - Only show when category expanded */}
-                                                  {isCategoryExpanded && category.subcategories?.map((subcategory) => (
-                                                    <React.Fragment key={subcategory.id}>
+                                                  {isCategoryExpanded && (
+                                                    <React.Fragment>
+                                                      {/* RED HEADER GOES AFTER CATEGORY - LAST IN HIERARCHY */}
+                                                      <tr>
+                                                        <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                            style={{ backgroundColor: '#7F1D1D', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+                                                          ADDITIONAL INFO.
+                                                        </td>
+                                                        <td colSpan="3" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                            style={{ backgroundColor: '#8B4513' }}>
+                                                          ADDITIONAL INFO.
+                                                        </td>
+                                                        <td colSpan="5" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                            style={{ backgroundColor: '#6B46C1' }}>
+                                                          SHIPPING INFO.
+                                                        </td>
+                                                        <td colSpan="1" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                            style={{ backgroundColor: '#7F1D1D', borderRight: '1px solid #9CA3AF', borderLeft: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+                                                        </td>
+                                                      </tr>
                                                       
-                                                      {/* ITEMS GO DIRECTLY UNDER LIGHTING - NO SEPARATE INSTALLED HEADER */}
+                                                      {/* MAIN RED HEADER ROW */}
+                                                      <tr>
+                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>INSTALLED</td>
+                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>VENDOR/SKU</td>
+                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>QTY</td>
+                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>SIZE</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>FINISH/Color</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>Cost/Price</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>Image</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Order Date</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Order Status<br/>Order Number</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Estimated Ship Date<br/>Estimated Delivery Date</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Install Date<br/>Ship To</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Tracking<br/>Carrier</td>
+                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>NOTES</td>
+                                                      </tr>
+                                                      
+                                                      {/* ITEMS GO DIRECTLY UNDER RED HEADER */}
+                                                      {category.subcategories?.map((subcategory) => (
+                                                        <React.Fragment key={subcategory.id}>
                                                       {/* ACTUAL ITEMS - DARK/BLACK BACKGROUND LIKE YOUR SCREENSHOTS */}
                                                       {['Ceiling Fixture', 'Recessed Lighting', 'Wall Sconces'].map((itemName, itemIndex) => (
                                                         <tr key={itemIndex} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
