@@ -929,37 +929,36 @@ const ExactFFESpreadsheet = ({
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <select 
-                                                                  className="w-full h-full border-none text-white text-xs p-0"
+                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
                                                                   value={item.status || ''}
-                                                                  style={{ backgroundColor: getStatusColor(item.status || '') }}
                                                                   onChange={(e) => {
                                                                     const newStatus = e.target.value;
                                                                     handleStatusChange(item.id, newStatus);
                                                                   }}
                                                                 >
-                                                                  <option value="" style={{ backgroundColor: '#6B7280' }}>—</option>
-                                                                  <option value="TO BE SELECTED" style={{ backgroundColor: '#6B7280' }}>🔵 TO BE SELECTED</option>
-                                                                  <option value="RESEARCHING" style={{ backgroundColor: '#3B82F6' }}>🔵 RESEARCHING</option>
-                                                                  <option value="PENDING APPROVAL" style={{ backgroundColor: '#F59E0B' }}>🟡 PENDING APPROVAL</option>
-                                                                  <option value="APPROVED" style={{ backgroundColor: '#10B981' }}>🟢 APPROVED</option>
-                                                                  <option value="ORDERED" style={{ backgroundColor: '#10B981' }}>🟢 ORDERED</option>
-                                                                  <option value="PICKED" style={{ backgroundColor: '#FFD700' }}>🟡 PICKED</option>
-                                                                  <option value="CONFIRMED" style={{ backgroundColor: '#10B981' }}>🟢 CONFIRMED</option>
-                                                                  <option value="IN PRODUCTION" style={{ backgroundColor: '#F97316' }}>🟠 IN PRODUCTION</option>
-                                                                  <option value="SHIPPED" style={{ backgroundColor: '#3B82F6' }}>🔵 SHIPPED</option>
-                                                                  <option value="IN TRANSIT" style={{ backgroundColor: '#3B82F6' }}>🔵 IN TRANSIT</option>
-                                                                  <option value="OUT FOR DELIVERY" style={{ backgroundColor: '#3B82F6' }}>🔵 OUT FOR DELIVERY</option>
-                                                                  <option value="DELIVERED TO RECEIVER" style={{ backgroundColor: '#8B5CF6' }}>🟣 DELIVERED TO RECEIVER</option>
-                                                                  <option value="DELIVERED TO JOB SITE" style={{ backgroundColor: '#8B5CF6' }}>🟣 DELIVERED TO JOB SITE</option>
-                                                                  <option value="RECEIVED" style={{ backgroundColor: '#8B5CF6' }}>🟣 RECEIVED</option>
-                                                                  <option value="READY FOR INSTALL" style={{ backgroundColor: '#10B981' }}>🟢 READY FOR INSTALL</option>
-                                                                  <option value="INSTALLING" style={{ backgroundColor: '#10B981' }}>🟢 INSTALLING</option>
-                                                                  <option value="INSTALLED" style={{ backgroundColor: '#10B981' }}>🟢 INSTALLED</option>
-                                                                  <option value="ON HOLD" style={{ backgroundColor: '#EF4444' }}>🔴 ON HOLD</option>
-                                                                  <option value="BACKORDERED" style={{ backgroundColor: '#EF4444' }}>🔴 BACKORDERED</option>
-                                                                  <option value="DAMAGED" style={{ backgroundColor: '#EF4444' }}>🔴 DAMAGED</option>
-                                                                  <option value="RETURNED" style={{ backgroundColor: '#EF4444' }}>🔴 RETURNED</option>
-                                                                  <option value="CANCELLED" style={{ backgroundColor: '#EF4444' }}>🔴 CANCELLED</option>
+                                                                  <option value="" className="bg-gray-600 text-white">—</option>
+                                                                  <option value="TO BE SELECTED" className="bg-gray-600 text-white">🔵 TO BE SELECTED</option>
+                                                                  <option value="RESEARCHING" className="bg-blue-500 text-white">🔵 RESEARCHING</option>
+                                                                  <option value="PENDING APPROVAL" className="bg-yellow-500 text-white">🟡 PENDING APPROVAL</option>
+                                                                  <option value="APPROVED" className="bg-green-500 text-white">🟢 APPROVED</option>
+                                                                  <option value="ORDERED" className="bg-green-500 text-white">🟢 ORDERED</option>
+                                                                  <option value="PICKED" className="bg-yellow-400 text-black">🟡 PICKED</option>
+                                                                  <option value="CONFIRMED" className="bg-green-500 text-white">🟢 CONFIRMED</option>
+                                                                  <option value="IN PRODUCTION" className="bg-orange-500 text-white">🟠 IN PRODUCTION</option>
+                                                                  <option value="SHIPPED" className="bg-blue-500 text-white">🔵 SHIPPED</option>
+                                                                  <option value="IN TRANSIT" className="bg-blue-500 text-white">🔵 IN TRANSIT</option>
+                                                                  <option value="OUT FOR DELIVERY" className="bg-blue-500 text-white">🔵 OUT FOR DELIVERY</option>
+                                                                  <option value="DELIVERED TO RECEIVER" className="bg-purple-500 text-white">🟣 DELIVERED TO RECEIVER</option>
+                                                                  <option value="DELIVERED TO JOB SITE" className="bg-purple-500 text-white">🟣 DELIVERED TO JOB SITE</option>
+                                                                  <option value="RECEIVED" className="bg-purple-500 text-white">🟣 RECEIVED</option>
+                                                                  <option value="READY FOR INSTALL" className="bg-green-500 text-white">🟢 READY FOR INSTALL</option>
+                                                                  <option value="INSTALLING" className="bg-green-500 text-white">🟢 INSTALLING</option>
+                                                                  <option value="INSTALLED" className="bg-green-500 text-white">🟢 INSTALLED</option>
+                                                                  <option value="ON HOLD" className="bg-red-500 text-white">🔴 ON HOLD</option>
+                                                                  <option value="BACKORDERED" className="bg-red-500 text-white">🔴 BACKORDERED</option>
+                                                                  <option value="DAMAGED" className="bg-red-500 text-white">🔴 DAMAGED</option>
+                                                                  <option value="RETURNED" className="bg-red-500 text-white">🔴 RETURNED</option>
+                                                                  <option value="CANCELLED" className="bg-red-500 text-white">🔴 CANCELLED</option>
                                                                 </select>
                                                               </div>
                                                               <div className="h-6">
