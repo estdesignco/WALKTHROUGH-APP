@@ -926,28 +926,30 @@ const ExactFFESpreadsheet = ({
                                                               <div className="h-6">
                                                                 <select 
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
+                                                                  value={item.carrier || ''}
+                                                                  style={{ backgroundColor: getCarrierColor(item.carrier || '') }}
                                                                   onChange={(e) => console.log('Carrier changed:', e.target.value)}
                                                                 >
-                                                                  <option value="">Carrier...</option>
-                                                                  <option value="FedEx">📦 FedEx</option>
-                                                                  <option value="FedEx Ground">📦 FedEx Ground</option>
-                                                                  <option value="UPS">📦 UPS</option>
-                                                                  <option value="UPS Ground">📦 UPS Ground</option>
-                                                                  <option value="USPS">📮 USPS</option>
-                                                                  <option value="DHL">📦 DHL</option>
-                                                                  <option value="Brooks">🚚 Brooks</option>
-                                                                  <option value="Zenith">🚚 Zenith</option>
-                                                                  <option value="Sunbelt">🚚 Sunbelt</option>
-                                                                  <option value="R+L Carriers">🚚 R+L Carriers</option>
-                                                                  <option value="Yellow Freight">🚚 Yellow Freight</option>
-                                                                  <option value="XPO Logistics">🚚 XPO Logistics</option>
-                                                                  <option value="Old Dominion">🚚 Old Dominion</option>
-                                                                  <option value="ABF Freight">🚚 ABF Freight</option>
-                                                                  <option value="Con-Way">🚚 Con-Way</option>
-                                                                  <option value="Estes Express">🚚 Estes Express</option>
-                                                                  <option value="YRC Freight">🚚 YRC Freight</option>
-                                                                  <option value="Saia">🚚 Saia</option>
-                                                                  <option value="OTHER">🚚 OTHER</option>
+                                                                  <option value="" style={{ backgroundColor: getCarrierColor('') }}>Carrier...</option>
+                                                                  <option value="FedEx" style={{ backgroundColor: getCarrierColor('FedEx') }}>📦 FedEx</option>
+                                                                  <option value="FedEx Ground" style={{ backgroundColor: getCarrierColor('FedEx Ground') }}>📦 FedEx Ground</option>
+                                                                  <option value="UPS" style={{ backgroundColor: getCarrierColor('UPS') }}>📦 UPS</option>
+                                                                  <option value="UPS Ground" style={{ backgroundColor: getCarrierColor('UPS Ground') }}>📦 UPS Ground</option>
+                                                                  <option value="USPS" style={{ backgroundColor: getCarrierColor('USPS') }}>📮 USPS</option>
+                                                                  <option value="DHL" style={{ backgroundColor: getCarrierColor('DHL') }}>📦 DHL</option>
+                                                                  <option value="Brooks" style={{ backgroundColor: getCarrierColor('Brooks') }}>🚚 Brooks</option>
+                                                                  <option value="Zenith" style={{ backgroundColor: getCarrierColor('Zenith') }}>🚚 Zenith</option>
+                                                                  <option value="Sunbelt" style={{ backgroundColor: getCarrierColor('Sunbelt') }}>🚚 Sunbelt</option>
+                                                                  <option value="R+L Carriers" style={{ backgroundColor: getCarrierColor('R+L Carriers') }}>🚚 R+L Carriers</option>
+                                                                  <option value="Yellow Freight" style={{ backgroundColor: getCarrierColor('Yellow Freight') }}>🚚 Yellow Freight</option>
+                                                                  <option value="XPO Logistics" style={{ backgroundColor: getCarrierColor('XPO Logistics') }}>🚚 XPO Logistics</option>
+                                                                  <option value="Old Dominion" style={{ backgroundColor: getCarrierColor('Old Dominion') }}>🚚 Old Dominion</option>
+                                                                  <option value="ABF Freight" style={{ backgroundColor: getCarrierColor('ABF Freight') }}>🚚 ABF Freight</option>
+                                                                  <option value="Con-Way" style={{ backgroundColor: getCarrierColor('Con-Way') }}>🚚 Con-Way</option>
+                                                                  <option value="Estes Express" style={{ backgroundColor: getCarrierColor('Estes Express') }}>🚚 Estes Express</option>
+                                                                  <option value="YRC Freight" style={{ backgroundColor: getCarrierColor('YRC Freight') }}>🚚 YRC Freight</option>
+                                                                  <option value="Saia" style={{ backgroundColor: getCarrierColor('Saia') }}>🚚 Saia</option>
+                                                                  <option value="OTHER" style={{ backgroundColor: getCarrierColor('OTHER') }}>🚚 OTHER</option>
                                                                   <option value="ADD_NEW">+ Add New Carrier</option>
                                                                 </select>
                                                               </div>
