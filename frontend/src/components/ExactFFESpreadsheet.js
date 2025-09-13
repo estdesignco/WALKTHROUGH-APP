@@ -960,7 +960,7 @@ const ExactFFESpreadsheet = ({
                                                                   className="w-full h-full border-none text-white text-xs p-0"
                                                                   value={item.carrier || ''}
                                                                   style={{ backgroundColor: getCarrierColor(item.carrier || '') }}
-                                                                  onChange={(e) => console.log('Carrier changed:', e.target.value)}
+                                                                  onChange={(e) => handleCarrierChange(item.id, e.target.value)}
                                                                 >
                                                                   <option value="">Carrier...</option>
                                                                   <option value="FedEx">📦 FedEx</option>
