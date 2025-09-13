@@ -823,31 +823,33 @@ const ExactFFESpreadsheet = ({
                                                               <div className="h-6 mb-1">
                                                                 <select 
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
+                                                                  value={item.status || ''}
+                                                                  style={{ backgroundColor: getStatusColor(item.status || '') }}
                                                                   onChange={(e) => console.log('Order status changed:', e.target.value)}
                                                                 >
-                                                                  <option value="">Status...</option>
-                                                                  <option value="TO BE SELECTED">🔵 TO BE SELECTED</option>
-                                                                  <option value="RESEARCHING">🔵 RESEARCHING</option>
-                                                                  <option value="PENDING APPROVAL">🟡 PENDING APPROVAL</option>
-                                                                  <option value="APPROVED">🟢 APPROVED</option>
-                                                                  <option value="ORDERED">🟢 ORDERED</option>
-                                                                  <option value="PICKED">🟡 PICKED</option>
-                                                                  <option value="CONFIRMED">🟢 CONFIRMED</option>
-                                                                  <option value="IN PRODUCTION">🟠 IN PRODUCTION</option>
-                                                                  <option value="SHIPPED">🔵 SHIPPED</option>
-                                                                  <option value="IN TRANSIT">🔵 IN TRANSIT</option>
-                                                                  <option value="OUT FOR DELIVERY">🔵 OUT FOR DELIVERY</option>
-                                                                  <option value="DELIVERED TO RECEIVER">🟣 DELIVERED TO RECEIVER</option>
-                                                                  <option value="DELIVERED TO JOB SITE">🟣 DELIVERED TO JOB SITE</option>
-                                                                  <option value="RECEIVED">🟣 RECEIVED</option>
-                                                                  <option value="READY FOR INSTALL">🟢 READY FOR INSTALL</option>
-                                                                  <option value="INSTALLING">🟢 INSTALLING</option>
-                                                                  <option value="INSTALLED">🟢 INSTALLED</option>
-                                                                  <option value="ON HOLD">🔴 ON HOLD</option>
-                                                                  <option value="BACKORDERED">🔴 BACKORDERED</option>
-                                                                  <option value="DAMAGED">🔴 DAMAGED</option>
-                                                                  <option value="RETURNED">🔴 RETURNED</option>
-                                                                  <option value="CANCELLED">🔴 CANCELLED</option>
+                                                                  <option value="" style={{ backgroundColor: getStatusColor('') }}>Status...</option>
+                                                                  <option value="TO BE SELECTED" style={{ backgroundColor: getStatusColor('TO BE SELECTED') }}>🔵 TO BE SELECTED</option>
+                                                                  <option value="RESEARCHING" style={{ backgroundColor: getStatusColor('RESEARCHING') }}>🔵 RESEARCHING</option>
+                                                                  <option value="PENDING APPROVAL" style={{ backgroundColor: getStatusColor('PENDING APPROVAL') }}>🟡 PENDING APPROVAL</option>
+                                                                  <option value="APPROVED" style={{ backgroundColor: getStatusColor('APPROVED') }}>🟢 APPROVED</option>
+                                                                  <option value="ORDERED" style={{ backgroundColor: getStatusColor('ORDERED') }}>🟢 ORDERED</option>
+                                                                  <option value="PICKED" style={{ backgroundColor: getStatusColor('PICKED') }}>🟡 PICKED</option>
+                                                                  <option value="CONFIRMED" style={{ backgroundColor: getStatusColor('CONFIRMED') }}>🟢 CONFIRMED</option>
+                                                                  <option value="IN PRODUCTION" style={{ backgroundColor: getStatusColor('IN PRODUCTION') }}>🟠 IN PRODUCTION</option>
+                                                                  <option value="SHIPPED" style={{ backgroundColor: getStatusColor('SHIPPED') }}>🔵 SHIPPED</option>
+                                                                  <option value="IN TRANSIT" style={{ backgroundColor: getStatusColor('IN TRANSIT') }}>🔵 IN TRANSIT</option>
+                                                                  <option value="OUT FOR DELIVERY" style={{ backgroundColor: getStatusColor('OUT FOR DELIVERY') }}>🔵 OUT FOR DELIVERY</option>
+                                                                  <option value="DELIVERED TO RECEIVER" style={{ backgroundColor: getStatusColor('DELIVERED TO RECEIVER') }}>🟣 DELIVERED TO RECEIVER</option>
+                                                                  <option value="DELIVERED TO JOB SITE" style={{ backgroundColor: getStatusColor('DELIVERED TO JOB SITE') }}>🟣 DELIVERED TO JOB SITE</option>
+                                                                  <option value="RECEIVED" style={{ backgroundColor: getStatusColor('RECEIVED') }}>🟣 RECEIVED</option>
+                                                                  <option value="READY FOR INSTALL" style={{ backgroundColor: getStatusColor('READY FOR INSTALL') }}>🟢 READY FOR INSTALL</option>
+                                                                  <option value="INSTALLING" style={{ backgroundColor: getStatusColor('INSTALLING') }}>🟢 INSTALLING</option>
+                                                                  <option value="INSTALLED" style={{ backgroundColor: getStatusColor('INSTALLED') }}>🟢 INSTALLED</option>
+                                                                  <option value="ON HOLD" style={{ backgroundColor: getStatusColor('ON HOLD') }}>🔴 ON HOLD</option>
+                                                                  <option value="BACKORDERED" style={{ backgroundColor: getStatusColor('BACKORDERED') }}>🔴 BACKORDERED</option>
+                                                                  <option value="DAMAGED" style={{ backgroundColor: getStatusColor('DAMAGED') }}>🔴 DAMAGED</option>
+                                                                  <option value="RETURNED" style={{ backgroundColor: getStatusColor('RETURNED') }}>🔴 RETURNED</option>
+                                                                  <option value="CANCELLED" style={{ backgroundColor: getStatusColor('CANCELLED') }}>🔴 CANCELLED</option>
                                                                 </select>
                                                               </div>
                                                               <div className="h-6">
