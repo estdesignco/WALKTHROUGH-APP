@@ -34,7 +34,45 @@ const ExactFFESpreadsheet = ({
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  // APPLY FILTERS - ACTUALLY MAKE FILTERING WORK
+  // ACTUAL API CALLS - FIX CONSOLE.LOG PLACEHOLDERS
+  const handleStatusChange = async (itemId, newStatus) => {
+    try {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (response.ok) {
+        // Refresh data to show updated status
+        const projectResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/projects/${project.id}`);
+        if (projectResponse.ok) {
+          const updatedProject = await projectResponse.json();
+          onProjectUpdate(updatedProject);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
+  const handleCarrierChange = async (itemId, newCarrier) => {
+    try {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ carrier: newCarrier })
+      });
+      if (response.ok) {
+        const projectResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/projects/${project.id}`);
+        if (projectResponse.ok) {
+          const updatedProject = await projectResponse.json();
+          onProjectUpdate(updatedProject);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating carrier:', error);
+    }
+  };
   useEffect(() => {
     if (!project) {
       setFilteredProject(null);
