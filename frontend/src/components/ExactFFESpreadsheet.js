@@ -305,8 +305,8 @@ const ExactFFESpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Item deleted successfully');
-        // Update filtered project state without reload
-        setFilteredProject(prevProject => {
+        // Update both project states without reload
+        const updateProjectState = (prevProject) => {
           if (!prevProject) return prevProject;
           const updatedProject = { ...prevProject };
           updatedProject.rooms = updatedProject.rooms.map(room => ({
@@ -320,7 +320,10 @@ const ExactFFESpreadsheet = ({
             }))
           }));
           return updatedProject;
-        });
+        };
+        
+        setProject(updateProjectState);
+        setFilteredProject(updateProjectState);
       } else {
         throw new Error(`HTTP ${response.status}`);
       }
