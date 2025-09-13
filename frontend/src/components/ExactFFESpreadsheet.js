@@ -1022,26 +1022,26 @@ const ExactFFESpreadsheet = ({
                                                                   style={{ backgroundColor: getCarrierColor(item.carrier || '') }}
                                                                   onChange={(e) => handleCarrierChange(item.id, e.target.value)}
                                                                 >
-                                                                  <option value="">Carrier...</option>
-                                                                  <option value="FedEx">📦 FedEx</option>
-                                                                  <option value="FedEx Ground">📦 FedEx Ground</option>
-                                                                  <option value="UPS">📦 UPS</option>
-                                                                  <option value="UPS Ground">📦 UPS Ground</option>
-                                                                  <option value="USPS">📮 USPS</option>
-                                                                  <option value="DHL">📦 DHL</option>
-                                                                  <option value="Brooks">🚚 Brooks</option>
-                                                                  <option value="Zenith">🚚 Zenith</option>
-                                                                  <option value="Sunbelt">🚚 Sunbelt</option>
-                                                                  <option value="R+L Carriers">🚚 R+L Carriers</option>
-                                                                  <option value="Yellow Freight">🚚 Yellow Freight</option>
-                                                                  <option value="XPO Logistics">🚚 XPO Logistics</option>
-                                                                  <option value="Old Dominion">🚚 Old Dominion</option>
-                                                                  <option value="ABF Freight">🚚 ABF Freight</option>
-                                                                  <option value="Con-Way">🚚 Con-Way</option>
-                                                                  <option value="Estes Express">🚚 Estes Express</option>
-                                                                  <option value="YRC Freight">🚚 YRC Freight</option>
-                                                                  <option value="Saia">🚚 Saia</option>
-                                                                  <option value="OTHER">🚚 OTHER</option>
+                                                                  <option value="" style={{ backgroundColor: '#6B7280' }}>—</option>
+                                                                  <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>📦 FedEx</option>
+                                                                  <option value="FedEx Ground" style={{ backgroundColor: '#FF6600', color: 'white' }}>📦 FedEx Ground</option>
+                                                                  <option value="UPS" style={{ backgroundColor: '#8B4513', color: 'white' }}>📦 UPS</option>
+                                                                  <option value="UPS Ground" style={{ backgroundColor: '#8B4513', color: 'white' }}>📦 UPS Ground</option>
+                                                                  <option value="USPS" style={{ backgroundColor: '#004B87', color: 'white' }}>📮 USPS</option>
+                                                                  <option value="DHL" style={{ backgroundColor: '#FFD700', color: 'black' }}>📦 DHL</option>
+                                                                  <option value="Brooks" style={{ backgroundColor: '#4682B4', color: 'white' }}>🚚 Brooks</option>
+                                                                  <option value="Zenith" style={{ backgroundColor: '#20B2AA', color: 'white' }}>🚚 Zenith</option>
+                                                                  <option value="Sunbelt" style={{ backgroundColor: '#FF4500', color: 'white' }}>🚚 Sunbelt</option>
+                                                                  <option value="R+L Carriers" style={{ backgroundColor: '#32CD32', color: 'white' }}>🚚 R+L Carriers</option>
+                                                                  <option value="Yellow Freight" style={{ backgroundColor: '#FFD700', color: 'black' }}>🚚 Yellow Freight</option>
+                                                                  <option value="XPO Logistics" style={{ backgroundColor: '#6A5ACD', color: 'white' }}>🚚 XPO Logistics</option>
+                                                                  <option value="Old Dominion" style={{ backgroundColor: '#DC143C', color: 'white' }}>🚚 Old Dominion</option>
+                                                                  <option value="ABF Freight" style={{ backgroundColor: '#FF6347', color: 'white' }}>🚚 ABF Freight</option>
+                                                                  <option value="Con-Way" style={{ backgroundColor: '#48D1CC', color: 'white' }}>🚚 Con-Way</option>
+                                                                  <option value="Estes Express" style={{ backgroundColor: '#9370DB', color: 'white' }}>🚚 Estes Express</option>
+                                                                  <option value="YRC Freight" style={{ backgroundColor: '#FF1493', color: 'white' }}>🚚 YRC Freight</option>
+                                                                  <option value="Saia" style={{ backgroundColor: '#00CED1', color: 'white' }}>🚚 Saia</option>
+                                                                  <option value="OTHER" style={{ backgroundColor: '#808080', color: 'white' }}>🚚 OTHER</option>
                                                                   <option value="ADD_NEW">+ Add New Carrier</option>
                                                                 </select>
                                                               </div>
