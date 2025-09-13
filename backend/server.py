@@ -1489,11 +1489,6 @@ async def update_category(category_id: str, category_update: CategoryUpdate):
 async def create_room(room_data: RoomCreate):
     """Create a new room with FULL COMPREHENSIVE structure from enhanced_rooms.py"""
     try:
-        # Import comprehensive room structure
-        import sys
-        sys.path.append('/app/backend')
-        from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE
-        
         room_name_lower = room_data.name.lower().strip()
         print(f"🏠 CREATING ROOM: {room_name_lower}")
         
@@ -1508,7 +1503,7 @@ async def create_room(room_data: RoomCreate):
                 room_structure = COMPREHENSIVE_ROOM_STRUCTURE['living room']
                 print(f"✅ Using living room structure as template")
             else:
-                # Fallback basic structure
+                # Fallback basic structure - should never happen with comprehensive structure
                 room_structure = {
                     'Lighting': {
                         'INSTALLED': ['Chandelier', 'Recessed Lighting', 'Wall Sconces', 'Track Lighting', 'Ceiling Fan w/ Light'],
