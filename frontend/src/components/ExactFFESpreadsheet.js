@@ -34,35 +34,53 @@ const ExactFFESpreadsheet = ({
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  // ACTUAL API CALLS - FIX CONSOLE.LOG PLACEHOLDERS
+  // ACTUAL API CALLS - WITH PROPER ERROR HANDLING
   const handleStatusChange = async (itemId, newStatus) => {
+    console.log('🔄 Status change request:', { itemId, newStatus });
+    
     try {
       const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
+      
+      console.log('📡 Status change response:', response.status, response.statusText);
+      
       if (response.ok) {
-        // Force page refresh to show updated data
+        console.log('✅ Status updated successfully, reloading...');
         window.location.reload();
+      } else {
+        const errorData = await response.text();
+        console.error('❌ Status update failed:', response.status, errorData);
+        alert(`Failed to update status: ${response.status} ${response.statusText}\n${errorData}`);
       }
     } catch (error) {
-      console.error('Error updating status:', error);
+      console.error('❌ Status update error:', error);
+      alert(`Error updating status: ${error.message}`);
     }
   };
 
   const handleCarrierChange = async (itemId, newCarrier) => {
+    console.log('🔄 Carrier change request:', { itemId, newCarrier });
+    
     try {
       const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
       });
+      
       if (response.ok) {
         window.location.reload();
+      } else {
+        const errorData = await response.text();
+        console.error('❌ Carrier update failed:', response.status, errorData);
+        alert(`Failed to update carrier: ${response.status} ${response.statusText}`);
       }
     } catch (error) {
-      console.error('Error updating carrier:', error);
+      console.error('❌ Carrier update error:', error);
+      alert(`Error updating carrier: ${error.message}`);
     }
   };
 
