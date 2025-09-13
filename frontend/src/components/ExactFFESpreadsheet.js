@@ -23,6 +23,9 @@ const ExactFFESpreadsheet = ({
   const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
+
+  // FILTER STATE - MAKE IT ACTUALLY WORK
+  const [filteredProject, setFilteredProject] = useState(null);
   
   // ✅ Search and Filter State
   const [searchTerm, setSearchTerm] = useState('');
