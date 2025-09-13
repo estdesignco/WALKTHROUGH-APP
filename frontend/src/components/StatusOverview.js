@@ -307,7 +307,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           </div>
         </div>
 
-        {/* 3. SHIPPING STATUS GRID - LIKE THE IMAGE! */}
+        {/* 3. SHIPPING STATUS GRID - REAL CALCULATIONS */}
         <div>
           <div className="grid grid-cols-2 gap-3">
             {/* Total Items */}
@@ -318,19 +318,19 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
             
             {/* Delivered */}
             <div className="bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-green-400">0</div>
+              <div className="text-2xl font-bold text-green-400">{getCompletedItems()}</div>
               <div className="text-sm text-gray-400">Delivered</div>
             </div>
             
             {/* In Transit */}
             <div className="bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-orange-400">0</div>
+              <div className="text-2xl font-bold text-orange-400">{getInTransitItems()}</div>
               <div className="text-sm text-gray-400">In Transit</div>
             </div>
             
             {/* On Hold */}
             <div className="bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-red-400">0</div>
+              <div className="text-2xl font-bold text-red-400">{statusBreakdown['ON HOLD'] || 0}</div>
               <div className="text-sm text-gray-400">On Hold</div>
             </div>
           </div>
