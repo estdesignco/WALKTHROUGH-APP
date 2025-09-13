@@ -1,437 +1,718 @@
-# USER'S COMPLETE FF&E ROOM STRUCTURE - EXACT FROM THEIR LIST
-# Updated with their comprehensive interior design requirements
+# USER'S COMPLETE FF&E ROOM STRUCTURE - FROM THEIR EXCEL LIST
+# This is their EXACT comprehensive interior design structure
 
 COMPREHENSIVE_ROOM_STRUCTURE = {
+    # LIVING ROOM - User's exact structure
     'living room': {
         'Lighting': {
             'INSTALLED': ['Chandelier', 'Recessed Lighting', 'Sconces', 'Track Lighting', 'Ceiling Fan w/ Light', 'Art Lights', 'Pendant Lights', 'Under Cabinet Lighting', 'Cove Lighting', 'Picture Lights'],
             'PORTABLE': ['Table Lamp', 'Floor Lamp', 'Accent Lamp', 'Desk Lamp', 'Buffet Lamp', 'Reading Lamp']
         },
-        'Furniture & Storage': {
-            'SEATING': ['Sofa', 'Sectional Sofa', 'L-Shaped Sectional', 'U-Shaped Sectional', 'Modular Sectional', 'Loveseat', 'Armchair', 'Accent Chair', 'Wing Chair', 'Club Chair', 'Swivel Chair', 'Recliner', 'Power Recliner', 'Rocker Recliner', 'Ottoman', 'Storage Ottoman', 'Cocktail Ottoman', 'Chaise Lounge', 'Daybed', 'Storage Bench', 'Window Seat', 'Bean Bag Chairs', 'Floor Cushions', 'Poufs'],
-            'TABLES': ['Coffee Table', 'Cocktail Table', 'Storage Coffee Table', 'Lift-Top Coffee Table', 'Nesting Tables', 'Side Table', 'End Table', 'Accent Table', 'Console Table', 'Sofa Table', 'C-Table', 'Tray Table', 'Plant Stand', 'Drink Table'],
-            'STORAGE': ['Media Console', 'TV Stand', 'Entertainment Center', 'Bookcase', 'Built-in Shelving', 'Floating Shelves', 'Ladder Bookshelf', 'Credenza', 'Sideboard', 'Display Cabinet', 'China Cabinet', 'Curio Cabinet', 'Bar Cart', 'Wine Cart', 'Storage Baskets', 'Storage Boxes', 'Decorative Trunks', 'Toy Storage', 'Magazine Rack', 'File Cabinet']
+        'Furniture': {
+            'PIECE': ['Sofa', 'Sectional', 'Loveseat', 'Armchair', 'Accent Chair', 'Ottoman', 'Coffee Table', 'Side Table', 'Console Table', 'Media Console', 'Bookcase', 'Credenza', 'Display Cabinet', 'Bar Cart', 'Sofa Table', 'Storage Bench', 'Chaise Lounge', 'Daybed', 'Recliner', 'Storage Ottoman']
         },
         'Decor & Accessories': {
-            'TEXTILES': ['Area Rug', 'Persian Rug', 'Modern Rug', 'Vintage Rug', 'Shag Rug', 'Throw Pillows', 'Decorative Pillows', 'Lumbar Pillows', 'Floor Pillows', 'Throw Blanket', 'Afghan', 'Quilts', 'Curtains', 'Drapery', 'Sheer Curtains', 'Blackout Curtains', 'Valances', 'Window Treatments', 'Custom Shades', 'Roman Shades', 'Roller Shades', 'Blinds', 'Shutters'],
-            'WALL DECOR': ['Wall Art', 'Paintings', 'Prints', 'Photography', 'Canvas Art', 'Framed Art', 'Gallery Wall', 'Wall Sculptures', 'Metal Wall Art', 'Wood Wall Art', 'Mirror', 'Decorative Mirror', 'Sunburst Mirror', 'Vintage Mirror', 'Wall Shelves', 'Floating Shelves', 'Wall Hooks', 'Wall Decals', 'Wallpaper', 'Wall Panels', 'Wainscoting'],
-            'DECORATIVE OBJECTS': ['Vases', 'Ceramic Vases', 'Glass Vases', 'Sculptures', 'Figurines', 'Decorative Bowls', 'Trays', 'Decorative Boxes', 'Photo Frames', 'Picture Frames', 'Clocks', 'Table Clocks', 'Wall Clocks', 'Bookends', 'Decorative Books', 'Candle Holders', 'Pillar Candle Holders', 'Votive Holders', 'Lanterns', 'Diffusers', 'Essential Oil Diffusers'],
-            'PLANTS & GREENERY': ['Indoor Plants', 'Potted Plants', 'Hanging Plants', 'Succulents', 'Air Plants', 'Artificial Plants', 'Faux Greenery', 'Plant Stands', 'Planters', 'Hanging Planters', 'Terrariums', 'Moss Art', 'Living Walls', 'Plant Care Accessories']
+            'Misc.': ['Area Rug', 'Throw Pillows', 'Throw Blanket', 'Wall Art', 'Mirror', 'Decorative Vases', 'Sculptures', 'Candle Holders', 'Greenery/Plants', 'Curtains/Drapery', 'Sheer Curtains', 'Custom Shades', 'Fireplace Tools', 'Decorative Boxes', 'Trays', 'Photo Frames', 'Coasters']
         },
-        'Paint, Wallpaper & Finishes': {
-            'WALL TREATMENTS': ['Paint Color', 'Accent Wall Paint', 'Textured Paint', 'Metallic Paint', 'Chalk Paint', 'Wallpaper', 'Peel and Stick Wallpaper', 'Grasscloth Wallpaper', 'Vinyl Wallpaper', 'Fabric Wallpaper', 'Mural Wallpaper', 'Wall Panels', 'Wood Paneling', 'Shiplap', 'Board and Batten', 'Wainscoting'],
-            'CEILING TREATMENTS': ['Ceiling Paint', 'Coffered Ceiling', 'Tray Ceiling', 'Exposed Beams', 'Faux Beams', 'Ceiling Medallions', 'Tin Ceiling', 'Wood Plank Ceiling', 'Acoustic Tiles', 'Ceiling Fans']
-        },
-        'Architectural Elements, Built-ins & Trim': {
-            'TRIM WORK': ['Crown Molding', 'Chair Rail', 'Baseboards', 'Shoe Molding', 'Quarter Round', 'Window Trim', 'Door Trim', 'Panel Molding', 'Picture Rail', 'Plate Rail', 'Dentil Molding', 'Rope Molding'],
-            'ARCHITECTURAL FEATURES': ['Columns', 'Pilasters', 'Archways', 'Doorway Arches', 'Niches', 'Built-in Niches', 'Alcoves', 'Coffered Ceilings', 'Tray Ceilings', 'Beam Work', 'Corbels', 'Brackets', 'Rosettes', 'Corner Blocks'],
-            'BUILT-INS': ['Built-in Shelving', 'Built-in Bookcases', 'Built-in Entertainment Center', 'Built-in Seating', 'Window Seats', 'Storage Benches', 'Built-in Desks', 'Built-in Bars', 'Custom Cabinetry', 'Built-in Storage', 'Mudroom Built-ins']
-        },
-        'Flooring': {
-            'HARDWOOD': ['Oak Flooring', 'Maple Flooring', 'Cherry Flooring', 'Walnut Flooring', 'Hickory Flooring', 'Bamboo Flooring', 'Engineered Hardwood', 'Solid Hardwood', 'Distressed Wood', 'Reclaimed Wood', 'Wide Plank Flooring', 'Herringbone Pattern', 'Chevron Pattern'],
-            'TILE': ['Ceramic Tile', 'Porcelain Tile', 'Natural Stone Tile', 'Marble Tile', 'Travertine Tile', 'Slate Tile', 'Granite Tile', 'Mosaic Tile', 'Glass Tile', 'Subway Tile', 'Luxury Vinyl Tile', 'Wood-Look Tile', 'Large Format Tile'],
-            'CARPET & RUGS': ['Wall-to-Wall Carpet', 'Berber Carpet', 'Plush Carpet', 'Frieze Carpet', 'Loop Carpet', 'Area Rugs', 'Persian Rugs', 'Oriental Rugs', 'Modern Rugs', 'Vintage Rugs', 'Natural Fiber Rugs', 'Runners', 'Custom Rugs'],
-            'OTHER FLOORING': ['Laminate Flooring', 'Vinyl Plank', 'Cork Flooring', 'Concrete Flooring', 'Polished Concrete', 'Epoxy Flooring', 'Rubber Flooring', 'Linoleum', 'Terrazzo']
-        },
-        'Window Treatments': {
-            'CURTAINS & DRAPERY': ['Drapery Panels', 'Sheer Curtains', 'Blackout Curtains', 'Thermal Curtains', 'Grommet Curtains', 'Rod Pocket Curtains', 'Tab Top Curtains', 'Pinch Pleat Curtains', 'Valances', 'Swags', 'Jabots', 'Tiebacks', 'Holdbacks'],
-            'BLINDS': ['Venetian Blinds', 'Mini Blinds', 'Vertical Blinds', 'Wood Blinds', 'Faux Wood Blinds', 'Aluminum Blinds', 'Macro Blinds'],
-            'SHADES': ['Roman Shades', 'Roller Shades', 'Cellular Shades', 'Honeycomb Shades', 'Pleated Shades', 'Solar Shades', 'Motorized Shades', 'Cordless Shades', 'Top-Down Bottom-Up Shades'],
-            'SHUTTERS': ['Plantation Shutters', 'Interior Shutters', 'Café Shutters', 'Full Height Shutters', 'Tier-on-Tier Shutters']
-        },
-        'HVAC & Mechanical Systems': {
-            'HEATING & COOLING': ['Central Air Conditioning', 'Ductless Mini-Split', 'Window AC Units', 'Portable AC Units', 'Ceiling Fans', 'Tower Fans', 'Table Fans', 'Wall-Mounted Fans', 'Whole House Fans', 'Air Purifiers', 'HEPA Air Purifiers', 'UV Air Purifiers', 'Humidifiers', 'Dehumidifiers', 'Smart Thermostats', 'Programmable Thermostats', 'Zone Control Systems'],
-            'VENTILATION': ['Exhaust Fans', 'Bathroom Fans', 'Kitchen Exhaust Fans', 'Whole House Ventilation', 'Heat Recovery Ventilators', 'Energy Recovery Ventilators', 'Air Vents', 'Return Air Vents', 'Supply Vents', 'Floor Vents', 'Wall Vents', 'Ceiling Vents']
-        },
-        'Security & Smart Home': {
-            'SECURITY SYSTEMS': ['Security Cameras', 'Indoor Cameras', 'Outdoor Cameras', 'Doorbell Cameras', 'Motion Sensors', 'Door Sensors', 'Window Sensors', 'Glass Break Sensors', 'Smart Locks', 'Keypad Locks', 'Biometric Locks', 'Smart Doorbells', 'Alarm Panels', 'Security Keypads', 'Smoke Detectors', 'Carbon Monoxide Detectors', 'Water Leak Detectors'],
-            'SMART HOME TECHNOLOGY': ['Smart Switches', 'Smart Dimmers', 'Smart Outlets', 'Smart Plugs', 'Voice Assistants', 'Smart Speakers', 'Smart Displays', 'Smart Hubs', 'Home Automation Systems', 'Smart Lighting Controls', 'Automated Blinds', 'Smart Window Treatments', 'WiFi Extenders', 'Mesh Networks', 'Smart Sensors', 'Smart Home Panels']
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
         }
     },
-    
+
+    # DINING ROOM - User's exact structure  
     'dining room': {
         'Lighting': {
-            'INSTALLED': ['Chandelier', 'Crystal Chandelier', 'Modern Chandelier', 'Traditional Chandelier', 'Linear Chandelier', 'Pendant Lights', 'Multi-Light Pendants', 'Drum Pendants', 'Lantern Pendants', 'Sconces', 'Wall Sconces', 'Buffet Sconces', 'Recessed Lighting', 'Track Lighting', 'Art Lights', 'Picture Lights', 'Ceiling Medallion', 'Statement Light Fixtures', 'Candle Chandeliers'],
-            'PORTABLE': ['Buffet Lamp', 'Table Lamp', 'Accent Lamps', 'Candles', 'Candelabras', 'Hurricane Lamps', 'Battery Operated Lights']
-        },
-        'Furniture & Storage': {
-            'DINING FURNITURE': ['Dining Table', 'Extension Dining Table', 'Round Dining Table', 'Rectangular Dining Table', 'Square Dining Table', 'Oval Dining Table', 'Pedestal Table', 'Trestle Table', 'Farm Table', 'Glass Top Table', 'Marble Top Table', 'Live Edge Table'],
-            'SEATING': ['Dining Chairs', 'Upholstered Dining Chairs', 'Leather Dining Chairs', 'Wood Dining Chairs', 'Metal Dining Chairs', 'Host Chairs', 'Captain Chairs', 'Dining Bench', 'Upholstered Bench', 'Storage Bench', 'Bar Stools', 'Counter Stools'],
-            'STORAGE FURNITURE': ['Buffet', 'Sideboard', 'Credenza', 'China Cabinet', 'Hutch', 'Display Cabinet', 'Curio Cabinet', 'Wine Cabinet', 'Wine Rack', 'Bar Cart', 'Wine Cart', 'Console Table', 'Server', 'Storage Cabinets']
-        },
-        'Decor & Accessories': {
-            'TABLE SETTINGS': ['Dinnerware', 'Fine China', 'Everyday Dishes', 'Glassware', 'Wine Glasses', 'Water Glasses', 'Stemware', 'Flatware', 'Silverware', 'Serving Pieces', 'Serving Platters', 'Serving Bowls', 'Charger Plates', 'Placemats', 'Table Runners', 'Tablecloths', 'Napkins', 'Napkin Rings'],
-            'CENTERPIECES': ['Floral Arrangements', 'Seasonal Centerpieces', 'Candle Arrangements', 'Decorative Bowls', 'Fruit Bowls', 'Vases', 'Decorative Trays', 'Table Sculptures'],
-            'WALL DECOR': ['Wall Art', 'Dining Room Art', 'Food Art', 'Wine Art', 'Mirrors', 'Decorative Mirrors', 'Buffet Mirrors', 'Sconces', 'Wall Shelves', 'Plate Displays', 'Wine Displays'],
-            'TEXTILES': ['Area Rug', 'Dining Room Rug', 'Curtains', 'Drapery', 'Window Treatments', 'Chair Cushions', 'Chair Pads', 'Table Linens']
-        },
-        'Paint, Wallpaper & Finishes': {
-            'WALL TREATMENTS': ['Paint Color', 'Accent Wall', 'Wallpaper', 'Grasscloth Wallpaper', 'Textured Wallpaper', 'Wainscoting', 'Chair Rail', 'Panel Molding'],
-            'CEILING TREATMENTS': ['Ceiling Paint', 'Coffered Ceiling', 'Tray Ceiling', 'Ceiling Medallions']
-        },
-        'Architectural Elements, Built-ins & Trim': {
-            'TRIM WORK': ['Crown Molding', 'Chair Rail', 'Baseboards', 'Window Trim', 'Door Trim', 'Panel Molding', 'Picture Rail'],
-            'ARCHITECTURAL FEATURES': ['Columns', 'Pilasters', 'Arches', 'Niches', 'Built-in Niches', 'Coffered Ceilings'],
-            'BUILT-INS': ['Built-in China Cabinet', 'Built-in Buffet', 'Built-in Wine Storage', 'Built-in Display Shelves']
-        },
-        'Flooring': {
-            'HARDWOOD': ['Oak', 'Maple', 'Cherry', 'Walnut', 'Engineered Hardwood', 'Wide Plank', 'Distressed Wood'],
-            'TILE': ['Ceramic', 'Porcelain', 'Natural Stone', 'Marble', 'Travertine'],
-            'OTHER': ['Luxury Vinyl', 'Laminate', 'Area Rugs', 'Runners']
-        }
-    },
-
-    'kitchen': {
-        'Lighting': {
-            'INSTALLED': ['Pendant Lights', 'Island Pendants', 'Bar Pendants', 'Linear Pendants', 'Multi-Light Pendants', 'Mini Pendants', 'Recessed Lighting', 'LED Recessed Lights', 'Under Cabinet Lighting', 'LED Strip Lights', 'Puck Lights', 'Tape Lights', 'Over Cabinet Lighting', 'Toe-Kick Lighting', 'Chandelier', 'Kitchen Chandelier', 'Breakfast Nook Chandelier', 'Sconces', 'Wall Sconces', 'Track Lighting', 'Monorail Lighting', 'Ceiling Fixtures', 'Flush Mount Lights', 'Semi-Flush Lights'],
-            'TASK LIGHTING': ['Under Cabinet LED', 'Cabinet Interior Lighting', 'Drawer Lighting', 'Pantry Lighting', 'Display Lighting', 'Wine Cabinet Lighting']
-        },
-        'Appliances': {
-            'MAJOR APPLIANCES': ['Refrigerator', 'French Door Refrigerator', 'Side-by-Side Refrigerator', 'Bottom Freezer Refrigerator', 'Counter-Depth Refrigerator', 'Built-in Refrigerator', 'Wine Refrigerator', 'Beverage Refrigerator', 'Ice Maker', 'Range', 'Gas Range', 'Electric Range', 'Dual Fuel Range', 'Induction Range', 'Cooktop', 'Gas Cooktop', 'Electric Cooktop', 'Induction Cooktop', 'Wall Oven', 'Single Wall Oven', 'Double Wall Oven', 'Convection Oven', 'Steam Oven', 'Microwave', 'Over-the-Range Microwave', 'Built-in Microwave', 'Countertop Microwave', 'Microwave Drawer', 'Dishwasher', 'Built-in Dishwasher', 'Drawer Dishwasher', 'Portable Dishwasher'],
-            'VENTILATION': ['Range Hood', 'Under Cabinet Range Hood', 'Wall Mount Range Hood', 'Island Range Hood', 'Downdraft Ventilation', 'Ceiling Mounted Hood', 'Custom Hood'],
-            'SPECIALTY APPLIANCES': ['Coffee Machine', 'Built-in Coffee System', 'Espresso Machine', 'Wine Cooler', 'Beverage Center', 'Warming Drawer', 'Trash Compactor', 'Garbage Disposal', 'Water Filtration System', 'Reverse Osmosis System', 'Hot Water Dispenser', 'Bread Maker', 'Stand Mixer', 'Food Processor', 'Blender', 'Juicer']
-        },
-        'Cabinetry & Storage': {
-            'CABINETS': ['Upper Cabinets', 'Base Cabinets', 'Tall Cabinets', 'Pantry Cabinets', 'Wall Cabinets', 'Corner Cabinets', 'Lazy Susan Cabinets', 'Pull-Out Drawers', 'Soft-Close Drawers', 'Dovetail Drawers', 'Custom Cabinets', 'Semi-Custom Cabinets', 'Stock Cabinets', 'Frameless Cabinets', 'Face Frame Cabinets'],
-            'CABINET HARDWARE': ['Cabinet Knobs', 'Cabinet Pulls', 'Cabinet Handles', 'Hinges', 'Soft-Close Hinges', 'Drawer Slides', 'Soft-Close Slides', 'Cabinet Latches', 'Cabinet Locks'],
-            'STORAGE SOLUTIONS': ['Pull-Out Shelves', 'Lazy Susans', 'Spice Racks', 'Spice Drawers', 'Drawer Organizers', 'Cutlery Trays', 'Pull-Out Trash Bins', 'Recycling Centers', 'Pantry Organizers', 'Wire Baskets', 'Drawer Dividers', 'Shelf Risers']
-        },
-        'Countertops & Surfaces': {
-            'COUNTERTOP MATERIALS': ['Granite Countertops', 'Quartz Countertops', 'Marble Countertops', 'Quartzite Countertops', 'Concrete Countertops', 'Butcher Block Countertops', 'Stainless Steel Countertops', 'Solid Surface Countertops', 'Laminate Countertops', 'Tile Countertops', 'Recycled Glass Countertops'],
-            'BACKSPLASH': ['Subway Tile Backsplash', 'Mosaic Backsplash', 'Natural Stone Backsplash', 'Glass Backsplash', 'Metal Backsplash', 'Brick Backsplash', 'Marble Backsplash', 'Ceramic Backsplash', 'Porcelain Backsplash', 'Full Height Backsplash']
-        },
-        'Plumbing & Fixtures': {
-            'SINKS': ['Kitchen Sink', 'Farmhouse Sink', 'Apron Front Sink', 'Undermount Sink', 'Drop-In Sink', 'Single Bowl Sink', 'Double Bowl Sink', 'Triple Bowl Sink', 'Prep Sink', 'Bar Sink', 'Utility Sink', 'Stainless Steel Sink', 'Fireclay Sink', 'Cast Iron Sink', 'Copper Sink', 'Granite Composite Sink'],
-            'FAUCETS': ['Kitchen Faucet', 'Pull-Down Faucet', 'Pull-Out Faucet', 'Bridge Faucet', 'Commercial Style Faucet', 'Prep Faucet', 'Bar Faucet', 'Pot Filler', 'Wall Mount Pot Filler', 'Deck Mount Pot Filler', 'Water Filter Faucet', 'Soap Dispenser', 'Built-in Soap Dispenser', 'Lotion Dispenser']
-        },
-        'Kitchen Island & Breakfast Area': {
-            'ISLAND FEATURES': ['Kitchen Island', 'Large Kitchen Island', 'Butcher Block Island', 'Granite Island', 'Waterfall Island', 'Multi-Level Island', 'Island with Seating', 'Island Storage', 'Island Appliances', 'Island Sink', 'Island Cooktop'],
-            'BREAKFAST AREA': ['Breakfast Nook', 'Breakfast Table', 'Round Breakfast Table', 'Banquette Seating', 'Built-in Banquette', 'Breakfast Bar', 'Counter Height Table', 'Bar Stools', 'Counter Stools', 'Swivel Stools', 'Backless Stools', 'Upholstered Stools']
-        },
-        'Decor & Accessories': {
-            'KITCHEN DECOR': ['Kitchen Art', 'Food Art', 'Coffee Art', 'Wine Art', 'Herbs Garden', 'Kitchen Plants', 'Decorative Bowls', 'Fruit Bowls', 'Decorative Plates', 'Kitchen Scales', 'Vintage Scales', 'Kitchen Clocks', 'Chalkboard Signs', 'Menu Boards'],
-            'FUNCTIONAL ACCESSORIES': ['Cutting Boards', 'Serving Boards', 'Trivets', 'Pot Holders', 'Oven Mitts', 'Kitchen Towels', 'Dish Towels', 'Aprons', 'Kitchen Rugs', 'Anti-Fatigue Mats', 'Window Treatments', 'Café Curtains', 'Roman Shades', 'Valances'],
-            'STORAGE & ORGANIZATION': ['Canisters', 'Storage Jars', 'Spice Containers', 'Bread Boxes', 'Cookie Jars', 'Utensil Crocks', 'Knife Blocks', 'Magnetic Knife Strips', 'Paper Towel Holders', 'Napkin Holders', 'Salt and Pepper Shakers']
-        }
-    },
-
-    'primary bedroom': {
-        'Lighting': {
-            'INSTALLED': ['Chandelier', 'Bedroom Chandelier', 'Crystal Chandelier', 'Modern Chandelier', 'Ceiling Fan with Light', 'Statement Ceiling Light', 'Recessed Lighting', 'Dimmable Recessed Lights', 'Cove Lighting', 'Accent Lighting', 'Bedside Sconces', 'Wall Sconces', 'Swing Arm Sconces', 'Reading Lights', 'Wall Mounted Reading Lights', 'Picture Lights', 'Closet Lighting', 'Walk-in Closet Lighting', 'Under Cabinet Lighting'],
-            'PORTABLE': ['Nightstand Lamps', 'Table Lamps', 'Bedside Lamps', 'Floor Lamps', 'Arc Floor Lamps', 'Tripod Floor Lamps', 'Reading Floor Lamps', 'Dresser Lamps', 'Accent Lamps', 'Task Lighting', 'Desk Lamps', 'Vanity Lighting', 'String Lights', 'Fairy Lights', 'Candles', 'LED Candles']
-        },
-        'Bedroom Furniture': {
-            'BED & BEDDING': ['Bed Frame', 'Platform Bed', 'Sleigh Bed', 'Canopy Bed', 'Four Poster Bed', 'Panel Bed', 'Storage Bed', 'Upholstered Bed', 'Metal Bed Frame', 'Wood Bed Frame', 'King Bed', 'Queen Bed', 'California King Bed', 'Headboard', 'Upholstered Headboard', 'Wood Headboard', 'Metal Headboard', 'Footboard', 'Mattress', 'Memory Foam Mattress', 'Innerspring Mattress', 'Hybrid Mattress', 'Latex Mattress', 'Box Spring', 'Foundation', 'Adjustable Base'],
-            'NIGHTSTANDS & BEDSIDE': ['Nightstands', 'Bedside Tables', '2-Drawer Nightstand', '3-Drawer Nightstand', 'Floating Nightstand', 'Wall Mounted Nightstand', 'Bedside Charging Station', 'Bedside Caddy'],
-            'STORAGE FURNITURE': ['Dresser', 'Double Dresser', 'Triple Dresser', 'Tall Dresser', 'Chest of Drawers', '5-Drawer Chest', '6-Drawer Chest', 'Armoire', 'Wardrobe', 'Gentleman\'s Chest', 'Media Chest', 'TV Armoire', 'Blanket Chest', 'Storage Trunk', 'Cedar Chest', 'Hope Chest']
-        },
-        'Seating & Work Areas': {
-            'SEATING': ['Bedroom Chair', 'Accent Chair', 'Reading Chair', 'Armchair', 'Chaise Lounge', 'Bedroom Bench', 'Foot of Bed Bench', 'Storage Bench', 'Vanity Stool', 'Vanity Chair', 'Ottoman', 'Loveseat', 'Settee'],
-            'WORK AREAS': ['Desk', 'Writing Desk', 'Secretary Desk', 'Vanity Table', 'Makeup Vanity', 'Dressing Table', 'Desk Chair', 'Office Chair', 'Vanity Mirror', 'Lighted Vanity Mirror', 'Tri-Fold Mirror']
-        },
-        'Window Treatments': {
-            'CURTAINS & DRAPERY': ['Bedroom Curtains', 'Blackout Curtains', 'Room Darkening Curtains', 'Thermal Curtains', 'Sheer Curtains', 'Layered Curtains', 'Drapery Panels', 'Valances', 'Cornices', 'Curtain Rods', 'Drapery Hardware'],
-            'BLINDS & SHADES': ['Venetian Blinds', 'Wood Blinds', 'Faux Wood Blinds', 'Roman Shades', 'Cellular Shades', 'Roller Shades', 'Solar Shades', 'Motorized Shades', 'Cordless Shades', 'Top-Down Bottom-Up Shades', 'Plantation Shutters']
-        },
-        'Bedroom Decor': {
-            'BEDDING & TEXTILES': ['Comforter Set', 'Duvet Cover', 'Duvet Insert', 'Sheet Set', 'Fitted Sheets', 'Flat Sheets', 'Pillowcases', 'Pillow Shams', 'Euro Shams', 'Decorative Pillows', 'Throw Pillows', 'Lumbar Pillows', 'Bed Pillows', 'Down Pillows', 'Memory Foam Pillows', 'Throw Blankets', 'Quilts', 'Coverlets', 'Bedspreads', 'Bed Skirts', 'Dust Ruffles'],
-            'RUGS': ['Area Rug', 'Bedroom Rug', 'Bedside Rugs', 'Runner Rugs', 'Persian Rugs', 'Modern Rugs', 'Shag Rugs', 'Vintage Rugs'],
-            'WALL DECOR': ['Bedroom Art', 'Above Bed Art', 'Gallery Wall', 'Canvas Prints', 'Framed Prints', 'Photography', 'Mirrors', 'Full Length Mirror', 'Decorative Mirrors', 'Wall Shelves', 'Floating Shelves', 'Wall Sconces', 'Wall Decals', 'Wallpaper', 'Accent Wall'],
-            'DECORATIVE ACCESSORIES': ['Decorative Vases', 'Table Decor', 'Dresser Decor', 'Jewelry Boxes', 'Decorative Trays', 'Perfume Bottles', 'Photo Frames', 'Picture Frames', 'Clocks', 'Alarm Clocks', 'Digital Clocks', 'Plants', 'Bedroom Plants', 'Air Plants', 'Succulents', 'Diffusers', 'Essential Oil Diffusers', 'Candles', 'Candle Holders']
-        },
-        'Closet & Storage': {
-            'WALK-IN CLOSET': ['Closet System', 'Custom Closet', 'Closet Organizer', 'Closet Shelving', 'Hanging Rods', 'Double Hang Rods', 'Closet Drawers', 'Shoe Shelves', 'Shoe Racks', 'Belt Racks', 'Tie Racks', 'Jewelry Drawers', 'Closet Island', 'Closet Seating', 'Closet Lighting', 'Closet Mirrors', 'Full Length Mirrors'],
-            'REACH-IN CLOSET': ['Closet Organizer', 'Wire Shelving', 'Wood Shelving', 'Closet Rods', 'Shelf Dividers', 'Hanging Organizers', 'Shoe Organizers', 'Over-the-Door Organizers']
-        }
-    },
-
-    'primary bathroom': {
-        'Lighting': {
-            'INSTALLED': ['Vanity Lighting', 'Bath Bar Lights', 'Vanity Sconces', 'Hollywood Style Lights', 'LED Vanity Lights', 'Recessed Lighting', 'Shower Recessed Lights', 'Waterproof Recessed Lights', 'Chandelier', 'Bathroom Chandelier', 'Mini Chandelier', 'Pendant Lights', 'Ceiling Fixtures', 'Exhaust Fan with Light', 'Night Lights', 'Toe-Kick Lighting', 'Under Cabinet Lighting', 'Medicine Cabinet Lighting'],
-            'SPECIALTY LIGHTING': ['Lighted Mirrors', 'LED Mirrors', 'Backlit Mirrors', 'Medicine Cabinet Lights', 'Shower Lights', 'Steam Shower Lights', 'Accent Lighting', 'Color Changing Lights']
-        },
-        'Plumbing Fixtures': {
-            'SINKS & VANITIES': ['Bathroom Vanity', 'Double Vanity', 'Single Vanity', 'Floating Vanity', 'Freestanding Vanity', 'Custom Vanity', 'Vessel Sink', 'Undermount Sink', 'Drop-In Sink', 'Pedestal Sink', 'Wall Mount Sink', 'Console Sink', 'Farmhouse Sink', 'Rectangular Sink', 'Round Sink', 'Oval Sink', 'Square Sink'],
-            'FAUCETS': ['Bathroom Faucet', 'Single Handle Faucet', 'Widespread Faucet', 'Center Set Faucet', 'Wall Mount Faucet', 'Vessel Faucet', 'Waterfall Faucet', 'Touchless Faucet', 'Gold Faucet', 'Brushed Nickel Faucet', 'Chrome Faucet', 'Matte Black Faucet'],
-            'BATHTUBS': ['Freestanding Tub', 'Clawfoot Tub', 'Soaking Tub', 'Japanese Soaking Tub', 'Built-in Tub', 'Alcove Tub', 'Corner Tub', 'Whirlpool Tub', 'Jetted Tub', 'Air Bath Tub', 'Cast Iron Tub', 'Acrylic Tub', 'Stone Tub', 'Copper Tub'],
-            'SHOWERS': ['Walk-in Shower', 'Curbless Shower', 'Roll-in Shower', 'Steam Shower', 'Multi-Head Shower', 'Rain Shower Head', 'Waterfall Shower Head', 'Body Spray Jets', 'Hand Shower', 'Shower Panel', 'Thermostatic Shower Valve', 'Pressure Balance Valve', 'Digital Shower Controls']
-        },
-        'Shower & Tub Surrounds': {
-            'SHOWER ENCLOSURES': ['Frameless Glass Shower', 'Semi-Frameless Shower', 'Framed Shower', 'Sliding Shower Doors', 'Hinged Shower Doors', 'Pivot Shower Doors', 'Shower Curtains', 'Curved Shower Rods', 'Straight Shower Rods'],
-            'TILE & SURFACES': ['Subway Tile', 'Large Format Tile', 'Mosaic Tile', 'Natural Stone Tile', 'Marble Tile', 'Travertine Tile', 'Porcelain Tile', 'Ceramic Tile', 'Glass Tile', 'Metal Tile', 'Pebble Tile', 'Hexagon Tile', 'Penny Tile', 'Herringbone Tile', 'Basketweave Tile']
-        },
-        'Bathroom Storage': {
-            'VANITY STORAGE': ['Vanity Drawers', 'Vanity Cabinets', 'Under Sink Storage', 'Pull-Out Drawers', 'Lazy Susan', 'Drawer Organizers', 'Vanity Trays'],
-            'WALL STORAGE': ['Medicine Cabinet', 'Recessed Medicine Cabinet', 'Surface Mount Medicine Cabinet', 'Mirrored Medicine Cabinet', 'Wall Shelves', 'Floating Shelves', 'Corner Shelves', 'Recessed Shelves', 'Niche Shelves', 'Built-in Shelves'],
-            'FREESTANDING STORAGE': ['Linen Cabinet', 'Tall Cabinet', 'Storage Tower', 'Bathroom Cart', 'Rolling Cart', 'Ladder Shelf', 'Over-Toilet Storage', 'Floor Cabinet']
-        },
-        'Bathroom Accessories': {
-            'TOWEL STORAGE': ['Towel Bars', 'Towel Rings', 'Towel Hooks', 'Heated Towel Racks', 'Towel Warmers', 'Towel Ladders', 'Towel Shelves', 'Towel Baskets'],
-            'BATHROOM HARDWARE': ['Toilet Paper Holder', 'Toilet Brush Holder', 'Soap Dispenser', 'Lotion Dispenser', 'Soap Dish', 'Toothbrush Holder', 'Cup Holder', 'Robe Hooks', 'Grab Bars', 'Safety Rails', 'Shower Caddies', 'Corner Caddies', 'Tension Pole Caddies'],
-            'MIRRORS': ['Bathroom Mirror', 'Vanity Mirror', 'Lighted Mirror', 'LED Mirror', 'Magnifying Mirror', 'Medicine Cabinet Mirror', 'Decorative Mirror', 'Round Mirror', 'Rectangular Mirror', 'Oval Mirror', 'Frameless Mirror', 'Framed Mirror']
-        },
-        'Bathroom Textiles': {
-            'TOWELS': ['Bath Towels', 'Hand Towels', 'Washcloths', 'Bath Sheets', 'Quick-Dry Towels', 'Bamboo Towels', 'Egyptian Cotton Towels', 'Turkish Cotton Towels'],
-            'BATH MATS': ['Bath Mat', 'Bath Rug', 'Memory Foam Bath Mat', 'Bamboo Bath Mat', 'Teak Bath Mat', 'Anti-Slip Bath Mat', 'Machine Washable Bath Mat'],
-            'SHOWER CURTAINS': ['Fabric Shower Curtain', 'Vinyl Shower Curtain', 'Polyester Shower Curtain', 'Linen Shower Curtain', 'Hookless Shower Curtain', 'Weighted Shower Curtain']
-        }
-    },
-
-    'powder room': {
-        'Lighting': {
-            'INSTALLED': ['Vanity Sconces', 'Wall Sconces', 'Pendant Light', 'Mini Chandelier', 'Recessed Lighting', 'Ceiling Fixture', 'Flush Mount Light', 'Semi-Flush Light'],
-            'SPECIALTY': ['Lighted Mirror', 'LED Mirror', 'Medicine Cabinet Light', 'Night Light']
-        },
-        'Plumbing Fixtures': {
-            'SINKS': ['Pedestal Sink', 'Wall Mount Sink', 'Vessel Sink', 'Undermount Sink', 'Console Sink', 'Corner Sink', 'Small Vanity', 'Floating Vanity'],
-            'FAUCETS': ['Single Handle Faucet', 'Wall Mount Faucet', 'Vessel Faucet', 'Widespread Faucet', 'Waterfall Faucet'],
-            'TOILET': ['Standard Toilet', 'Compact Toilet', 'Corner Toilet', 'Wall Hung Toilet', 'Smart Toilet', 'Bidet', 'Toilet Bidet Combo']
-        },
-        'Storage & Accessories': {
-            'STORAGE': ['Medicine Cabinet', 'Wall Shelves', 'Corner Shelves', 'Over-Toilet Storage', 'Pedestal Sink Storage', 'Small Cabinet'],
-            'ACCESSORIES': ['Towel Ring', 'Hand Towel Hook', 'Toilet Paper Holder', 'Soap Dispenser', 'Mirror', 'Decorative Mirror', 'Small Trash Can', 'Toilet Brush']
-        },
-        'Decor': {
-            'WALL DECOR': ['Small Art Pieces', 'Framed Prints', 'Decorative Mirror', 'Wall Sconces', 'Floating Shelves with Decor'],
-            'ACCESSORIES': ['Small Plants', 'Candles', 'Decorative Soap', 'Hand Towels', 'Small Vase', 'Decorative Tray']
-        }
-    },
-    
-    'guest bedroom': {
-        'Lighting': {
-            'INSTALLED': ['Ceiling Light', 'Ceiling Fan with Light', 'Recessed Lighting', 'Bedside Sconces', 'Reading Lights'],
-            'PORTABLE': ['Nightstand Lamps', 'Table Lamps', 'Floor Lamp', 'Reading Lamp', 'Desk Lamp']
+            'INSTALLED': ['Chandelier', 'Pendant Lights', 'Sconces', 'Recessed Lighting', 'Art Lights', 'Ceiling Medallion'],
+            'PORTABLE': ['Buffet Lamp', 'Table Lamp']
         },
         'Furniture': {
-            'BED': ['Queen Bed', 'Full Bed', 'Twin Bed', 'Daybed', 'Trundle Bed', 'Murphy Bed', 'Sofa Bed', 'Futon'],
-            'STORAGE': ['Dresser', 'Chest of Drawers', 'Nightstand', 'Armoire', 'Wardrobe', 'Storage Bench', 'Under-Bed Storage'],
-            'SEATING': ['Chair', 'Reading Chair', 'Accent Chair', 'Bench', 'Ottoman']
+            'PIECE': ['Dining Table', 'Dining Chairs', 'Host Chairs', 'Dining Bench', 'Buffet', 'Credenza', 'China Cabinet', 'Bar Cart', 'Console Table', 'Sideboard', 'Wine Cabinet']
         },
-        'Guest Amenities': {
-            'BEDDING': ['Complete Bedding Set', 'Extra Pillows', 'Extra Blankets', 'Mattress Protector', 'Pillow Protectors'],
-            'CONVENIENCES': ['Luggage Rack', 'Full Length Mirror', 'Clock', 'Charging Station', 'Basket for Toiletries', 'Water Glasses', 'Tissues', 'Reading Materials']
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Wall Art', 'Mirror', 'Table Runner', 'Place Settings', 'Centerpiece', 'Curtains/Drapery', 'Sheer Curtains', 'Custom Shades', 'Decorative Bowls', 'Candle Holders', 'Serveware']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
         }
     },
 
-    'home office': {
+    # KITCHEN - User's exact structure with new additions
+    'kitchen': {
         'Lighting': {
-            'INSTALLED': ['Recessed Lighting', 'Track Lighting', 'Pendant Lights', 'Ceiling Fixture', 'Under Cabinet Lighting'],
-            'TASK LIGHTING': ['Desk Lamp', 'Banker\'s Lamp', 'Adjustable Desk Lamp', 'LED Desk Lamp', 'Floor Lamp', 'Reading Light', 'Monitor Light Bar']
+            'INSTALLED': ['Pendant Lights (Island/Bar)', 'Recessed Lighting', 'Under Cabinet Lighting', 'Chandelier (Nook)', 'Sconces', 'Toe-Kick Lighting', 'Over-Cabinet Lighting', 'Pot Rack Light']
         },
-        'Office Furniture': {
-            'DESKS': ['Executive Desk', 'Writing Desk', 'Computer Desk', 'Standing Desk', 'L-Shaped Desk', 'U-Shaped Desk', 'Corner Desk', 'Secretary Desk', 'Roll-Top Desk', 'Credenza', 'Return Desk'],
-            'SEATING': ['Desk Chair', 'Executive Chair', 'Ergonomic Chair', 'Task Chair', 'Guest Chair', 'Conference Chair', 'Stool'],
-            'STORAGE': ['Filing Cabinet', 'Lateral File', 'Vertical File', 'Mobile File', 'Bookcase', 'Bookshelf', 'Storage Cabinet', 'Credenza', 'Hutch', 'Storage Ottoman']
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
         },
-        'Technology & Equipment': {
-            'ELECTRONICS': ['Computer', 'Monitor', 'Dual Monitors', 'Printer', 'Scanner', 'Shredder', 'Phone System', 'Router', 'Modem', 'UPS Battery Backup'],
-            'CABLES & MANAGEMENT': ['Cable Management', 'Power Strips', 'Surge Protectors', 'Cable Trays', 'Cord Organizers', 'Desk Grommets']
+        'Counter Tops': {
+            'TOPS': ['Granite', 'Quartz', 'Marble', 'Butcher Block', 'Concrete', 'Laminate', 'Solid Surface']
         },
-        'Organization & Accessories': {
-            'DESK ACCESSORIES': ['Desk Organizer', 'Pen Holder', 'Paper Tray', 'Letter Tray', 'Document Holder', 'Business Card Holder', 'Stapler', 'Tape Dispenser', 'Paper Clips', 'Sticky Notes'],
-            'WALL ORGANIZATION': ['Bulletin Board', 'Cork Board', 'White Board', 'Magnetic Board', 'Calendar', 'Wall Organizer', 'Mail Sorter', 'Key Holder']
-        }
-    },
-
-    'family room': {
-        'Lighting': {
-            'INSTALLED': ['Recessed Lighting', 'Track Lighting', 'Ceiling Fan with Light', 'Chandelier', 'Pendant Lights', 'Sconces', 'Cove Lighting'],
-            'PORTABLE': ['Table Lamps', 'Floor Lamps', 'Reading Lamps', 'Accent Lamps']
-        },
-        'Entertainment': {
-            'MEDIA': ['TV', 'Sound System', 'Speakers', 'Gaming Console', 'Media Player', 'Cable Box', 'Streaming Device'],
-            'FURNITURE': ['Media Console', 'TV Stand', 'Entertainment Center', 'Media Cabinet', 'Speaker Stands', 'Gaming Chair']
-        },
-        'Seating': {
-            'SEATING': ['Sectional Sofa', 'Sofa', 'Loveseat', 'Recliners', 'Chairs', 'Ottoman', 'Bean Bags', 'Floor Cushions']
-        },
-        'Storage & Organization': {
-            'STORAGE': ['Toy Storage', 'Game Storage', 'Book Storage', 'Media Storage', 'Baskets', 'Storage Ottomans', 'Shelving Units']
-        }
-    },
-
-    'laundry room': {
         'Appliances': {
-            'WASHER & DRYER': ['Front Load Washer', 'Top Load Washer', 'Electric Dryer', 'Gas Dryer', 'Washer Dryer Combo', 'Stackable Units', 'Compact Units'],
-            'SPECIALTY': ['Utility Sink', 'Wash Tub', 'Steam Cabinet', 'Drying Rack', 'Ironing Board', 'Built-in Ironing Board']
-        },
-        'Storage & Organization': {
-            'CABINETS': ['Upper Cabinets', 'Base Cabinets', 'Tall Cabinets', 'Linen Cabinet', 'Broom Closet'],
-            'ORGANIZATION': ['Shelving', 'Wire Shelving', 'Hanging Rod', 'Laundry Baskets', 'Sorting Baskets', 'Detergent Storage', 'Lint Bin']
-        },
-        'Lighting': {
-            'INSTALLED': ['Recessed Lighting', 'Ceiling Fixture', 'Under Cabinet Lighting', 'Task Lighting']
+            'UNIT': [
+                'Refrigerator (Built-in/Freestanding)', 'Dishwasher', 'Range/Oven', 'Microwave (Built-in/Countertop)', 
+                'Cooktop', 'Wall Oven (Single/Double)', 'Wine Fridge', 'Beverage Cooler', 'Ice Maker', 
+                'Coffee Machine (Built-in)', 'Trash Compactor', 'Garbage Disposal', 'Vent Hood/Range Hood', 
+                'Warming Drawer',
+                # NEW ADDITIONS from user request
+                'Drink Fridge', 'Ice Machine', 'Built in Coffee Maker', 'Convection Microwave', 'Fridge and Freezer Drawer'
+            ]
         },
         'Plumbing': {
-            'FIXTURES': ['Utility Sink', 'Laundry Sink', 'Utility Faucet', 'Hose Bib', 'Floor Drain', 'Water Connections', 'Gas Connections']
+            'SINKS': ['Kitchen Sink (Farmhouse/Undermount)', 'Prep Sink'],
+            'FIXTURES': ['Main Faucet', 'Prep Faucet', 'Pot Filler', 'Soap Dispenser (Built-in)', 'Water Filtration System']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Bar Stools', 'Counter Stools', 'Kitchen Island', 'Pantry Cabinet', 'Breakfast Nook Table', 'Breakfast Nook Chairs/Bench', 'Shelving', 'Floating Shelves', 'Wine Rack (Built-in/Freestanding)', 'Cutting Board Storage', 'Pull-out Pantry', 'Spice Drawer']
+        },
+        'Cabinets, Storage & Organization': {
+            'CABINETS': ['Upper Cabinets', 'Base Cabinets', 'Pantry Cabinets', 'Island Cabinets', 'Corner Cabinets'],
+            'STORAGE & ORGANIZATION': ['Pull-out Shelves', 'Lazy Susans', 'Drawer Organizers', 'Spice Racks', 'Pantry Organizers'],
+            'HARDWARE': ['Cabinet Knobs', 'Cabinet Pulls', 'Hinges', 'Drawer Slides', 'Soft-close Hardware']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug/Runner', 'Wall Art', 'Decorative Bowls/Plates', 'Vases', 'Cookware Displays', 'Herb Garden', 'Curtains/Blinds/Shades', 'Dish Towels', 'Utensil Crocks', 'Fruit Bowls', 'Coffee Bar Accessories']
         }
     },
 
-    'mudroom': {
-        'Storage Solutions': {
-            'BUILT-INS': ['Mudroom Lockers', 'Cubbies', 'Coat Closet', 'Storage Bench', 'Shoe Storage', 'Boot Storage', 'Umbrella Stand', 'Hook Rail', 'Coat Hooks'],
-            'ORGANIZATION': ['Baskets', 'Bins', 'Labels', 'Mail Organizer', 'Key Hooks', 'Charging Station', 'Pet Supplies Storage']
-        },
-        'Flooring': {
-            'DURABLE FLOORING': ['Tile Flooring', 'Luxury Vinyl', 'Sealed Concrete', 'Rubber Flooring', 'Entry Mats', 'Boot Trays']
-        },
+    # PRIMARY BEDROOM
+    'primary bedroom': {
         'Lighting': {
-            'INSTALLED': ['Recessed Lighting', 'Ceiling Fixture', 'Motion Sensor Lights']
+            'INSTALLED': ['Chandelier/Ceiling Fixture', 'Recessed Lighting (Dimmable)', 'Sconces (Bedside)', 'Ceiling Fan w/ Light', 'Cove Lighting', 'Accent Lighting (Architectural)', 'Reading Lights (Wall Mounted)'],
+            'PORTABLE': ['Nightstand Lamps', 'Floor Lamp', 'Dresser Lamp', 'Desk Lamp', 'Buffet Lamp', 'Reading Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Bed Frame (King/Queen/Cal King)', 'Mattress', 'Box Spring/Foundation', 'Nightstands (Pair)', 'Dresser (Long/Tall)', 'Armoire', 'Vanity', 'Vanity Stool', 'Bench (Foot of Bed)', 'Seating Area Sofa/Chairs (Pair)', 'Coffee Table (Seating Area)', 'Bookcase', 'Media Console/TV Stand', 'Desk', 'Desk Chair', 'Chaise Lounge', 'Daybed', 'Recliner']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Throw Pillows (Decorative)', 'Throw Blanket', 'Bedding Set (Duvet, Sheets, Shams)', 'Wall Art (Large Piece/Gallery)', 'Mirror (Full Length/Decorative)', 'Decorative Vases', 'Candles/Diffusers', 'Curtains/Drapery', 'Blackout Curtains', 'Sheer Curtains', 'Custom Shades (Roman/Roller)', 'Bedside Clock/Alarm', 'Trays (Nightstand/Dresser)', 'Jewelry Box', 'Plants/Faux Greenery']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
         }
     },
 
-    'basement': {
+    # PRIMARY BATHROOM  
+    'primary bathroom': {
         'Lighting': {
-            'INSTALLED': ['Recessed Lighting', 'Track Lighting', 'Fluorescent Lights', 'LED Lights', 'Ceiling Fixtures', 'Stair Lighting', 'Emergency Lighting']
+            'INSTALLED': ['Vanity Lights (Over Mirror)', 'Sconces (Side of Mirror)', 'Recessed Lighting (Dimmable)', 'Shower Light', 'Toilet Area Light', 'Chandelier/Pendant (Freestanding Tub)', 'Exhaust Fan w/ Light', 'Under Vanity Lighting']
         },
-        'Flooring': {
-            'BASEMENT FLOORING': ['Concrete Sealer', 'Epoxy Flooring', 'Vinyl Plank', 'Ceramic Tile', 'Rubber Flooring', 'Carpet Tiles', 'Subfloor System']
+        'Plumbing & Fixtures': {
+            'SINKS': ['Vanity Sinks (Undermount/Vessel)'],
+            'FIXTURES': ['Vanity Faucets', 'Shower Head (Rainfall/Standard)', 'Handheld Shower', 'Body Jets', 'Shower Valve Trim', 'Freestanding Tub', 'Drop-in Tub', 'Tub Faucet (Deck Mount/Wall Mount)', 'Toilet', 'Bidet/Bidet Seat', 'Towel Warmer']
         },
-        'Moisture Control': {
-            'WATERPROOFING': ['Dehumidifier', 'Sump Pump', 'Drainage System', 'Vapor Barrier', 'Insulation', 'Ventilation Fan']
+        'Furniture & Storage': {
+            'PIECE': ['Vanity Cabinet (Single/Double)', 'Linen Tower', 'Storage Cabinet', 'Accent Stool/Bench', 'Shower Bench (Built-in/Portable)', 'Hamper (Built-in/Freestanding)', 'Makeup Vanity/Desk']
         },
-        'Multi-Use Areas': {
-            'RECREATION': ['Game Table', 'Pool Table', 'Entertainment Center', 'Bar Area', 'Exercise Equipment', 'Home Theater'],
-            'STORAGE': ['Storage Shelving', 'Storage Cabinets', 'Workshop Storage', 'Seasonal Storage', 'Wine Storage']
+        'Decor & Accessories': {
+            'MISC.': ['Vanity Mirrors (Framed/Frameless)', 'Full Length Mirror', 'Area Rug/Bath Mats', 'Towels (Bath/Hand/Washcloth)', 'Soap Dispensers', 'Toothbrush Holder', 'Tray Organizers', 'Wall Art', 'Shower Curtains/Glass Door', 'Toilet Paper Holder', 'Towel Bar/Ring/Hooks', 'Robe Hooks', 'Plants/Greenery', 'Waste Basket']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish'],
+            'Counter Tops': ['Marble', 'Quartz', 'Granite', 'Solid Surface']
         }
     },
 
-    'garage': {
-        'Storage Systems': {
-            'WALL STORAGE': ['Wall Mounted Shelving', 'Pegboard', 'Slatwall', 'Tool Storage', 'Overhead Storage', 'Bike Racks', 'Sports Equipment Storage'],
-            'CABINETS': ['Garage Cabinets', 'Base Cabinets', 'Upper Cabinets', 'Tall Cabinets', 'Workbench', 'Tool Chest']
-        },
-        'Flooring': {
-            'GARAGE FLOORING': ['Epoxy Floor Coating', 'Interlocking Tiles', 'Rubber Mats', 'Anti-Slip Coating', 'Concrete Sealer']
-        },
+    # POWDER BATH
+    'powder room': {
         'Lighting': {
-            'INSTALLED': ['Fluorescent Lights', 'LED Shop Lights', 'Motion Sensor Lights', 'Security Lighting', 'Task Lighting']
+            'INSTALLED': ['Vanity Light', 'Sconces', 'Recessed Lighting', 'Pendant Light', 'Exhaust Fan w/ Light']
         },
-        'HVAC & Utilities': {
-            'CLIMATE CONTROL': ['Garage Heater', 'Ventilation Fan', 'Insulation', 'Weather Stripping'],
-            'UTILITIES': ['Electrical Outlets', '240V Outlets', 'EV Charging Station', 'Air Compressor', 'Water Spigot']
+        'Plumbing & Fixtures': {
+            'FIXTURE': ['Pedestal Sink', 'Console Sink', 'Wall-mount Sink', 'Faucet', 'Toilet']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Small Vanity Cabinet', 'Small Storage Cabinet', 'Accent Stool']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Mirror (Decorative)', 'Wall Art', 'Small Area Rug/Bath Mat', 'Hand Towels', 'Soap Dispenser', 'Toilet Paper Holder', 'Towel Ring/Hooks', 'Waste Basket']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish'],
+            'Counter Tops': ['Marble', 'Quartz', 'Granite', 'Solid Surface']
         }
     },
 
-    # ADDITIONAL SPECIALTY ROOMS
-    'wine cellar': {
-        'Wine Storage': {
-            'RACKING': ['Wine Racks', 'Custom Wine Racks', 'Wall Wine Racks', 'Island Wine Storage', 'Wine Cubbies', 'Display Racks', 'Bulk Storage'],
-            'REFRIGERATION': ['Wine Refrigerator', 'Wine Cooler', 'Dual Zone Wine Fridge', 'Built-in Wine Storage', 'Climate Control System']
-        },
-        'Climate Control': {
-            'HVAC': ['Temperature Control', 'Humidity Control', 'Ventilation System', 'Insulation', 'Vapor Barrier']
-        },
+    # LAUNDRY ROOM
+    'laundry room': {
         'Lighting': {
-            'INSTALLED': ['LED Strip Lights', 'Accent Lighting', 'Display Lighting', 'Dimmable Lights', 'UV-Free Lighting']
+            'INSTALLED': ['Flush Mount Light', 'Recessed Lighting', 'Task Lighting (over counter)', 'Utility Light', 'Under Cabinet Lighting']
         },
-        'Finishes': {
-            'FLOORING': ['Stone Flooring', 'Tile Flooring', 'Concrete Flooring', 'Cork Flooring'],
-            'WALLS': ['Stone Veneer', 'Brick Walls', 'Wood Paneling', 'Climate Resistant Finishes']
+        'Appliances': {
+            'UNIT': ['Washer (Front Load/Top Load)', 'Dryer (Electric/Gas)', 'Utility Sink', 'Steamer', 'Iron']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Base Cabinets', 'Wall Cabinets', 'Countertop (Folding Area)', 'Laundry Folding Table', 'Hanging Rod', 'Shelving Units', 'Laundry Sorter/Hampers', 'Ironing Board (Built-in/Foldable)', 'Drying Rack (Wall-mounted/Freestanding)']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Wall Art/Signage', 'Floor Mat', 'Storage Bins (Laundry Supplies)', 'Pegboard Organizer', 'Lint Bin', 'Cleaning Supplies Caddy']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish'],
+            'Counter Tops': ['Laminate', 'Quartz', 'Butcher Block']
         }
     },
 
-    'conservatory': {
-        'Structural Elements': {
-            'GLAZING': ['Glass Panels', 'Insulated Glass', 'Low-E Glass', 'Tempered Glass', 'Polycarbonate Panels'],
-            'FRAMING': ['Aluminum Frame', 'Steel Frame', 'Wood Frame', 'Vinyl Frame', 'Composite Frame']
+    # BAR AREA
+    'bar': {
+        'Lighting': {
+            'INSTALLED': ['Pendant Lights', 'Under Cabinet Lighting', 'Accent Lighting', 'Recessed Lighting']
         },
-        'Climate Control': {
-            'HVAC': ['Heating System', 'Cooling System', 'Ventilation', 'Humidity Control', 'Ceiling Fans']
+        'Appliances': {
+            'UNIT': [
+                'Wine Refrigerator', 'Ice Maker', 'Beverage Cooler', 'Mini Fridge', 'Kegerator',
+                # NEW ADDITIONS from user request  
+                'Drink Fridge', 'Ice Machine', 'Built in Coffee Maker'
+            ]
         },
-        'Flooring': {
-            'FLOORING': ['Tile Flooring', 'Natural Stone', 'Heated Floors', 'Drain Systems']
+        'Furniture & Storage': {
+            'PIECE': ['Bar Counter', 'Bar Stools', 'Wine Storage', 'Liquor Cabinet', 'Bar Cart', 'Glass Storage']
         },
-        'Furnishings': {
-            'FURNITURE': ['Weather Resistant Furniture', 'Wicker Furniture', 'Teak Furniture', 'Plants', 'Planters', 'Garden Furniture']
+        'Decor & Accessories': {
+            'MISC.': ['Bar Tools', 'Glassware', 'Cocktail Shakers', 'Bottle Openers', 'Coasters', 'Bar Art']
         }
     },
 
-    'home theater': {
-        'Audio Visual': {
-            'DISPLAY': ['Projector', '4K Projector', 'Projection Screen', 'Motorized Screen', 'Large TV', 'OLED TV', 'QLED TV'],
-            'AUDIO': ['Surround Sound System', '7.1 Surround Sound', 'Speakers', 'In-Wall Speakers', 'In-Ceiling Speakers', 'Subwoofer', 'Soundbar', 'Audio Receiver', 'Amplifier'],
-            'MEDIA': ['Media Server', 'Blu-ray Player', 'Streaming Devices', 'Gaming Console', 'Cable/Satellite Box']
+    # FOYER/ENTRYWAY  
+    'foyer': {
+        'Lighting': {
+            'INSTALLED': ['Chandelier', 'Pendant Light', 'Recessed Lighting', 'Sconces'],
+            'PORTABLE': ['Console Lamp', 'Table Lamp']
         },
-        'Seating': {
-            'THEATER SEATING': ['Theater Recliners', 'Theater Chairs', 'Home Theater Sectional', 'Riser Seating', 'Bean Bags', 'Love Seats'],
-            'ACCESSORIES': ['Cup Holders', 'Snack Trays', 'Blanket Storage', 'Remote Storage']
+        'Furniture': {
+            'PIECE': ['Console Table', 'Entryway Bench', 'Accent Chair', 'Shoe Storage Bench', 'Coat Rack/Tree', 'Storage Cabinet', 'Demilune Table', 'Umbrella Stand']
         },
-        'Room Design': {
-            'ACOUSTICS': ['Acoustic Panels', 'Sound Dampening', 'Carpet', 'Heavy Curtains', 'Acoustic Tiles'],
-            'LIGHTING': ['Dimmable Lighting', 'LED Strip Lights', 'Starlight Ceiling', 'Sconces', 'Floor Lighting', 'Rope Lighting'],
-            'DECOR': ['Movie Posters', 'Theater Signs', 'Curtains', 'Concession Stand', 'Popcorn Machine', 'Mini Fridge']
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug/Runner', 'Mirror (Large Decorative)', 'Wall Art', 'Decorative Bowl/Tray (for keys)', 'Key Holder', 'Plants']
         }
     },
 
-    'game room': {
-        'Gaming': {
-            'TABLES': ['Pool Table', 'Billiards Table', 'Ping Pong Table', 'Foosball Table', 'Air Hockey Table', 'Card Table', 'Poker Table', 'Game Table'],
-            'ARCADE': ['Arcade Games', 'Pinball Machine', 'Video Games', 'Gaming Console', 'Racing Simulator', 'VR Setup']
+    # HOME OFFICE
+    'home office': {
+        'Lighting': {
+            'INSTALLED': ['Flush Mount/Pendant', 'Recessed Lighting', 'Track Lighting', 'Sconces', 'Ceiling Fan w/ Light'],
+            'PORTABLE': ['Desk Lamp (Task Light)', 'Floor Lamp', 'Table Lamp']
         },
-        'Seating & Storage': {
-            'SEATING': ['Bar Stools', 'Gaming Chairs', 'Comfortable Seating', 'Bean Bags', 'Sectional'],
-            'STORAGE': ['Game Storage', 'Trophy Display', 'Equipment Storage', 'Cue Racks', 'Ball Storage']
+        'Furniture': {
+            'PIECE': ['Desk (Executive/L-shaped/Standing)', 'Office Chair (Ergonomic/Guest)', 'Bookcase', 'Filing Cabinet (Lateral/Vertical)', 'Credenza', 'Storage Cabinet', 'Guest Chairs (Pair)', 'Sofa/Loveseat (if space allows)', 'Coffee Table/Side Table', 'Media Console/TV Stand', 'Chaise Lounge', 'Recliner']
         },
-        'Bar Area': {
-            'BAR': ['Home Bar', 'Bar Counter', 'Bar Stools', 'Mini Fridge', 'Ice Maker', 'Wine Cooler', 'Kegerator', 'Glassware Storage']
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Wall Art', 'Desk Organizers', 'Whiteboard/Corkboard', 'Plants', 'Curtains/Blinds/Shades', 'Photo Frames', 'Motivational Decor', 'Cable Management']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish'],
+            'Counter Tops': ['Wood', 'Laminate', 'Solid Surface']
         }
     },
 
-    'outdoor living': {
-        'Patio & Deck': {
-            'FLOORING': ['Composite Decking', 'Wood Decking', 'Stone Patio', 'Concrete Patio', 'Brick Patio', 'Tile Patio', 'Pavers'],
-            'RAILINGS': ['Deck Railings', 'Glass Railings', 'Metal Railings', 'Wood Railings', 'Cable Railings']
+    # BREAKFAST NOOK
+    'breakfast nook': {
+        'Furniture': {
+            'PIECE': ['Breakfast Nook Table', 'Chairs', 'Dining Bench', 'Built-in Banquette Seating', 'Storage Cabinet/Hutch']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Wall Art', 'Tablecloth/Runner', 'Centerpiece', 'Curtains/Blinds/Shades', 'Pillows (for bench)']
+        }
+    },
+
+    # CHILDREN'S BEDROOM/KIDS ROOM
+    'kids bedroom': {
+        'Lighting': {
+            'INSTALLED': ['Ceiling Light (Themed/Fun)', 'Recessed Lighting', 'Night Light (Plug-in/Wall)'],
+            'PORTABLE': ['Desk Lamp', 'Table Lamp', 'Floor Lamp (for reading nook)']
+        },
+        'Furniture': {
+            'PIECE': ['Bed (Twin/Full/Bunk/Loft)', 'Crib', 'Toddler Bed', 'Nightstand', 'Dresser', 'Wardrobe/Armoire', 'Bookcase', 'Desk', 'Desk Chair', 'Play Table & Chairs', 'Toy Storage Bins/Shelves', 'Reading Nook Chair/Bean Bag', 'Changing Table', 'Glider/Rocker']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug (Play Mat)', 'Wall Decor (Posters/Art/Decals)', 'Blackout Curtains', 'Themed Bedding', 'Cushions/Pillows', 'Stuffed Animals/Toys', 'Growth Chart', 'Photo Frames']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
+        }
+    },
+
+    # FAMILY ROOM/GREAT ROOM
+    'family room': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting (Dimmable)', 'Ceiling Fan w/ Light', 'Sconces', 'Track Lighting', 'Accent Lighting'],
+            'PORTABLE': ['Floor Lamp', 'Table Lamp', 'Console Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Sectional Sofa', 'Recliner (Single/Dual)', 'Sofa', 'Loveseat', 'Armchair', 'Ottoman (Large/Storage)', 'Coffee Table', 'End Table (Pair)', 'Media Console/TV Stand', 'Built-in Entertainment Center', 'Bookcase', 'Game Table', 'Game Chairs', 'Bar Cart', 'Display Cabinet']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Large Area Rug', 'Throw Pillows', 'Throw Blankets', 'Wall Art/Gallery Wall', 'Decorative Objects', 'Gaming Accessories Storage', 'Curtains/Blinds', 'DVD/Blu-ray Storage', 'Board Games']
+        }
+    },
+
+    # GUEST BATHROOM  
+    'guest bathroom': {
+        'Lighting': {
+            'INSTALLED': ['Vanity Light', 'Recessed Light', 'Exhaust Fan w/ Light']
+        },
+        'Plumbing & Fixtures': {
+            'FIXTURE': ['Sink', 'Faucet', 'Toilet', 'Shower Head', 'Tub Faucet', 'Shower/Tub Combo']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Vanity Cabinet', 'Linen Closet/Cabinet', 'Small Storage Shelf']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Mirror', 'Bath Mat', 'Towels (Guest Set)', 'Soap Dispenser', 'Shower Curtain/Liner', 'Toilet Paper Holder', 'Towel Bar/Hooks', 'Waste Basket', 'Small Plant']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish'],
+            'Counter Tops': ['Quartz', 'Marble', 'Solid Surface']
+        }
+    },
+
+    # GUEST BEDROOM
+    'guest bedroom': {
+        'Lighting': {
+            'INSTALLED': ['Ceiling Light', 'Recessed Lighting', 'Ceiling Fan w/ Light'],
+            'PORTABLE': ['Nightstand Lamps', 'Floor Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Bed (Queen/Full/Twin)', 'Nightstands (Pair)', 'Dresser', 'Mirror (Dresser/Wall)', 'Accent Chair', 'Small Desk/Table', 'Luggage Rack', 'Bench (Small)']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Bedding Set (Duvet, Sheets, Shams)', 'Throw Pillows', 'Wall Art', 'Curtains/Blinds/Shades', 'Alarm Clock', 'Water Carafe', 'Guest Wi-Fi Info Frame']
+        }
+    },
+
+    # HALF BATHROOM  
+    'half bathroom': {
+        'Lighting': {
+            'INSTALLED': ['Vanity Light', 'Sconces', 'Recessed Lighting', 'Pendant Light']
+        },
+        'Plumbing & Fixtures': {
+            'FIXTURE': ['Sink (Pedestal/Console/Wall-mount)', 'Faucet', 'Toilet']
+        },
+        'Furniture & Storage': {
+            'piece': ['Small Vanity Cabinet', 'Accent Stool']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Mirror (Decorative)', 'Wall Art', 'Hand Towels', 'Soap Dispenser', 'Toilet Paper Holder', 'Waste Basket', 'Small Plant']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish'],
+            'Counter Tops': ['Quartz', 'Marble', 'Solid Surface']
+        }
+    },
+
+    # HOME GYM  
+    'home gym': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Track Lighting', 'LED Strip Lights']
+        },
+        'Equipment & Furniture': {
+            'PORTABLE': ['Floor Fan', 'Portable Speaker'],
+            'PIECE': ['Treadmill', 'Elliptical', 'Stationary Bike', 'Weight Rack', 'Dumbbells/Kettlebells', 'Exercise Bench', 'Yoga Mat', 'Resistance Bands', 'Stability Ball', 'Smart TV/Monitor', 'Sound System', 'Storage Shelves (for weights/gear)', 'Mini Fridge', 'Towel Rack', 'Water Cooler', 'Punching Bag', 'Rowing Machine']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Rubber Flooring/Mats', 'Large Wall Mirror', 'Motivational Art/Quotes', 'Clock/Timer', 'Water Bottle Holder', 'Workout Towels']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish']
+        }
+    },
+
+    # JACK AND JILL BATHROOM
+    'jack and jill bathroom': {
+        'Lighting': {
+            'INSTALLED': ['Vanity Lights (Double)', 'Recessed Lighting', 'Shower Light', 'Exhaust Fan w/ Light']
+        },
+        'Plumbing & Fixtures': {
+            'FIXTURE': ['Double Sinks', 'Faucets (Pair)', 'Toilet', 'Shower Head', 'Tub Faucet', 'Shower/Tub Combo']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Double Vanity Cabinet', 'Linen Closet', 'Shared Storage Tower']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Mirrors (Pair/Large)', 'Bath Mats', 'Towels', 'Shower Curtain/Glass Door', 'Toilet Paper Holder', 'Towel Bars/Hooks', 'Waste Basket']
+        },
+        'Paint, Wallpaper, and Finishes': {
+            'Misc.': ['Paint color', 'Wallpaper', 'Finish'],
+            'Counter Tops': ['Quartz', 'Marble', 'Solid Surface']
+        }
+    },
+
+    # NURSERY  
+    'nursery': {
+        'Lighting': {
+            'INSTALLED': ['Ceiling Light/Pendant (Dimmable)', 'Recessed Lighting (Dimmable)', 'Night Light (Plug-in/Wall)'],
+            'PORTABLE': ['Table Lamp', 'Floor Lamp (for reading nook)']
+        },
+        'Furniture': {
+            'PIECE': ['Crib', 'Changing Table/Dresser Combo', 'Glider/Rocker', 'Ottoman (for glider)', 'Bookcase (Low)', 'Toy Storage Unit', 'Wardrobe/Armoire', 'Humidifier/Air Purifier', 'Toddler Bed', 'Daybed (Twin)']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug (Soft)', 'Blackout Curtains', 'Wall Art/Mural', 'Decorative Mobiles', 'Baby Monitor', 'Diaper Pail', 'Storage Baskets', 'Soft Toys/Plushies', 'Picture Frames', 'Crib Sheets/Bedding']
+        }
+    },
+
+    # SUNROOM  
+    'sunroom': {
+        'Lighting': {
+            'INSTALLED': ['Ceiling Fan w/ Light', 'Recessed Lighting', 'Wall Sconces', 'Pendant Lights', 'Track Lighting'],
+            'PORTABLE': ['Floor Lamp', 'Table Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Sofa', 'Loveseat', 'Armchair', 'Wicker/Rattan Seating', 'Coffee Table', 'Side Tables', 'Console Table', 'Bookcase', 'Daybed', 'Bench', 'Dining Table (Small)', 'Dining Chairs']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug (Indoor/Outdoor)', 'Throw Pillows (Indoor/Outdoor)', 'Throw Blankets', 'Plants/Greenery (Abundant)', 'Wall Art', 'Blinds/Shades (Light Filtering)', 'Bird Feeder (outside)', 'Wind Chimes']
+        }
+    },
+
+    # PATIO  
+    'patio': {
+        'Outdoor Lighting': {
+            'INSTALLED': ['Patio String Lights', 'Outdoor Sconces', 'Post Lights', 'Deck Lights', 'Landscape Spotlights', 'In-ground Lights'],
+            'PORTABLE': ['Solar Lanterns', 'Outdoor Floor Lamps', 'Citronella Torches', 'Battery-operated Lanterns']
         },
         'Outdoor Furniture': {
-            'SEATING': ['Outdoor Sofa', 'Outdoor Sectional', 'Patio Chairs', 'Dining Set', 'Chaise Lounges', 'Outdoor Swing', 'Hammock', 'Outdoor Cushions'],
-            'TABLES': ['Outdoor Dining Table', 'Coffee Table', 'Side Tables', 'Bar Height Table', 'Fire Pit Table']
+            'PIECE': ['Outdoor Sofa', 'Patio Chairs', 'Outdoor Coffee Table', 'Outdoor Dining Table', 'Dining Chairs (Outdoor)', 'Chaise Lounge', 'Daybed (Outdoor)', 'Bar Cart (Outdoor)', 'Umbrella (Cantilever/Market)', 'Fire Pit (Gas/Wood-burning)', 'BBQ Grill (Built-in/Freestanding)', 'Outdoor Bar', 'Adirondack Chairs', 'Glider/Swing', 'Egg Chair']
         },
-        'Outdoor Kitchen': {
-            'APPLIANCES': ['Outdoor Grill', 'Built-in Grill', 'Outdoor Refrigerator', 'Outdoor Sink', 'Pizza Oven', 'Smoker', 'Side Burner', 'Ice Maker'],
-            'COUNTERTOPS': ['Granite Countertops', 'Concrete Countertops', 'Stainless Steel Countertops'],
-            'STORAGE': ['Outdoor Cabinets', 'Storage Drawers', 'Pantry Storage']
-        },
-        'Shade & Weather Protection': {
-            'SHADE': ['Pergola', 'Gazebo', 'Awning', 'Retractable Awning', 'Umbrellas', 'Sail Shades', 'Outdoor Curtains'],
-            'HEATING': ['Fire Pit', 'Fire Table', 'Outdoor Heaters', 'Patio Heaters']
-        },
+        'Outdoor Decor': {
+            'MISC.': ['Outdoor Rug', 'Outdoor Pillows', 'Planters (Various Sizes)', 'Garden Statues', 'Outdoor Speakers', 'Decorative Lanterns', 'Water Feature (Small)', 'Privacy Screen', 'Outdoor Cushions']
+        }
+    },
+
+    # BASEMENT  
+    'basement': {
         'Lighting': {
-            'OUTDOOR LIGHTING': ['String Lights', 'Landscape Lighting', 'Path Lights', 'Deck Lights', 'Post Lights', 'Wall Sconces', 'Pendant Lights', 'Solar Lights']
+            'INSTALLED': ['Recessed Lighting (Dimmable)', 'Track Lighting', 'Flush Mount Lights', 'Pendant Lights', 'Sconces', 'LED Strip Lighting'],
+            'PORTABLE': ['Floor Lamps', 'Table Lamps']
+        },
+        'Furniture': {
+            'PIECE': ['Sectional Sofa', 'Recliner', 'Gaming Chairs', 'Coffee Table', 'End Tables', 'Media Console', 'Bar/Pub Table', 'Bar Stools', 'Game Table (Pool/Foosball)', 'Bookcase', 'Storage Cabinets', 'Sofa Table', 'Accent Chairs', 'Bean Bags']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Throw Pillows', 'Wall Art', 'Gaming Decor', 'Sound System', 'Movie Posters', 'Mini Fridge (Bar Area)', 'Popcorn Machine']
+        }
+    },
+
+    # HOME THEATER  
+    'home theater': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting (Dimmable)', 'Wall Sconces', 'LED Strip Lighting (Cove/Backlight)', 'Star Ceiling Lights', 'Step Lights']
+        },
+        'Seating': {
+            'PIECE': ['Theater Seating (Recliners, Rowed)', 'Sectional Sofa', 'Love Sac/Giant Bean Bag', 'Bar Stools (at back bar)', 'Chairs (Accent)']
+        },
+        'Equipment & Furniture': {
+            'UNIT': ['Projector', 'Projector Screen (Fixed/Motorized)', 'Large TV', 'Sound System (Receiver/Speakers/Subwoofer)', 'Blu-ray/4K Player', 'Game Console', 'Media Cabinet/Rack', 'Popcorn Machine', 'Mini Fridge', 'Wet Bar', 'Popcorn Machine Cart']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Soundproofing Panels/Acoustic Panels', 'Theater Curtains (Blackout)', 'Movie Posters (Framed)', 'Throw Blankets', 'Pillows', 'Themed Decor (Hollywood/Sci-Fi)', 'Ticket Booth (Decorative)', 'Candy Counter (Decorative)']
+        }
+    },
+
+    # MEDIA ROOM  
+    'media room': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Ceiling Fan w/ Light', 'Sconces', 'LED Strip Lighting'],
+            'PORTABLE': ['Floor Lamp', 'Table Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Sectional Sofa', 'Sofa', 'Recliners', 'Coffee Table', 'End Tables', 'Media Console', 'Gaming Chairs', 'Bean Bags', 'Gaming Desk', 'Storage Ottoman']
+        },
+        'Equipment & Decor': {
+            'MISC.': ['Large TV (OLED/LED)', 'Soundbar/Sound System', 'Game Consoles (Xbox/PlayStation)', 'Area Rug', 'Throw Pillows', 'Wall Art (Themed)', 'Storage for Games/Movies', 'Headphone Stand', 'Gaming Controllers']
+        }
+    },
+
+    # PLAY ROOM  
+    'play room': {
+        'Lighting': {
+            'INSTALLED': ['Flush Mount Light (Bright)', 'Recessed Lighting', 'Fun Pendant Lights'],
+            'PORTABLE': ['Table Lamp (Kids)', 'Floor Lamp (Kids)']
+        },
+        'Furniture': {
+            'PIECE': ['Kids Table & Chairs Set', 'Bean Bags (Large)', 'Small Sofa/Loveseat', 'Toy Storage Bins/Cubbies', 'Bookcase (Low/Child-friendly)', 'Art Easel', 'Climbing Structure (indoor)', 'Play Kitchen', 'Dollhouse', 'Costume Chest']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Play Mat/Area Rug (Soft)', 'Wall Decals/Mural', 'Chalkboard/Whiteboard', 'Display Shelves for Toys', 'Art Supplies (Crayons, Paper)', 'Building Blocks', 'Puzzles', 'Stuffed Animals']
+        }
+    },
+
+    # CRAFT ROOM  
+    'craft room': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Task Lighting (over workspace)', 'Track Lighting'],
+            'PORTABLE': ['Desk Lamp (Adjustable)', 'Floor Lamp', 'Magnifying Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Craft Table (Large/Adjustable)', 'Adjustable Chair/Stool', 'Storage Cabinets', 'Shelving Units (Adjustable)', 'Pegboard', 'Drawer Carts (Rolling)', 'Cutting Mat Station', 'Ironing Station', 'Fabric Storage Unit', 'Printer/Cricut Machine']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Storage Bins/Containers (Labeled)', 'Fabric Rolls/Storage', 'Yarn Dispensers', 'Art Supplies Organizer', 'Inspiration Board (Cork/Magnetic)', 'Scrapbook Paper Storage', 'Ribbon Holders']
+        }
+    },
+
+    # MUSIC ROOM  
+    'music room': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Accent Lighting (for instruments)', 'Dimmable Fixtures', 'Track Lighting'],
+            'PORTABLE': ['Music Stand Light', 'Floor Lamp']
+        },
+        'Furniture & Equipment': {
+            'PIECE': ['Piano/Keyboard', 'Guitar Stands', 'Drum Kit', 'Music Stands', 'Sound System (Receiver/Speakers)', 'Headphones', 'Seating (Comfortable Chair/Sofa)', 'Acoustic Panels', 'Storage for Records/CDs/Sheet Music', 'Microphone', 'Amplifier', 'Recording Equipment']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug (for acoustics)', 'Wall Art (Music Themed)', 'Metronome', 'Instrument Cleaning Kits']
+        }
+    },
+
+    # ART STUDIO  
+    'art studio': {
+        'Lighting': {
+            'INSTALLED': ['Track Lighting (Adjustable)', 'Recessed Lighting (true color temp)', 'Natural Light Solutions', 'Light Box (Built-in)'],
+            'PORTABLE': ['Easel Light', 'Adjustable Floor Lamp', 'Daylight Lamp']
+        },
+        'Furniture': {
+            'MISC.': ['Easel (Studio/Tabletop)', 'Art Desk/Drafting Table', 'Adjustable Stool/Chair', 'Storage Cabinets for Supplies', 'Flat Files for Paper/Artworks', 'Drying Rack', 'Utility Sink (Deep)', 'Pottery Wheel', 'Kiln', 'Work Bench']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Paint Organizers', 'Brushes/Tools Storage', 'Canvases/Paper Storage', 'Inspiration Boards', 'Drop Cloths', 'Cleaning Supplies', 'Aprons']
+        }
+    },
+
+    # LIBRARY  
+    'library': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Picture Lights (for shelves)', 'Sconces', 'Chandelier/Pendant'],
+            'PORTABLE': ['Desk Lamp', 'Floor Lamp (for reading)', 'Table Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Built-in Bookshelves', 'Freestanding Bookcases', 'Reading Chair (Comfortable)', 'Ottoman', 'Desk (Writing/Executive)', 'Desk Chair', 'Library Ladder (Rolling)', 'Sofa/Loveseat', 'Coffee Table', 'Display Cabinet (Curio)']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug (Traditional/Persian)', 'Decorative Bookends', 'Globes/Telescopes', 'Wall Art (Classic/Literary)', 'Curtains/Drapery (Heavy)', 'Faux Plants', 'Figurines', 'Personalized Stamps']
+        }
+    },
+
+    # WINE CELLAR  
+    'wine cellar': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting (LED, low heat)', 'Accent Lighting for bottles', 'Track Lighting', 'Display Case Lighting']
+        },
+        'Storage & Furniture': {
+            'PIECE': ['Wine Racks (built-in/modular, various bottle sizes)', 'Wine Cabinets (Temperature Controlled)', 'Wine Fridge (Large)', 'Wine Dispenser', 'Tasting Table', 'Wine Cellar Chairs/Stools', 'Decanting Station', 'Humidor (for cigars)']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Wine Art/Posters', 'Corkscrews/Openers (Decorative)', 'Wine Aerators', 'Wine Preservation Systems', 'Grape Vines (Artificial/Real if climate controlled)', 'Barrel Decor', 'Sommelier Tools']
+        }
+    },
+
+    # HOBBY ROOM  
+    'hobby room': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Task Lighting', 'Track Lighting'],
+            'PORTABLE': ['Desk Lamp (Adjustable)', 'Magnifying Lamp']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Work Table/Bench', 'Storage Cabinets', 'Shelving Units', 'Drawer Organizers', 'Display Cases (for collections)', 'Hobby-specific Tools Storage', 'Comfortable Chair/Stool', 'Reading Nook']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Pegboard', 'Wall Organizers', 'Themed Decor (e.g., model airplanes, trains)', 'Tool Kits', 'Project Display Area']
+        }
+    },
+
+    # WORKSHOP  
+    'workshop': {
+        'Lighting': {
+            'INSTALLED': ['Fluorescent/LED Shop Lights', 'Task Lighting (over benches)', 'Recessed Lighting (bright)'],
+            'PORTABLE': ['Work Light (Portable)']
+        },
+        'Equipment & Storage': {
+            'PIECE': ['Work Bench (Heavy Duty)', 'Tool Chest/Cabinet', 'Pegboard', 'Shelving Units (Industrial)', 'Power Tools (Saw, Drill Press, etc.)', 'Hand Tools', 'Air Compressor', 'Dust Collection System', 'Safety Equipment Storage', 'Small Desk/Computer Station', 'Utility Sink']
+        },
+        'Safety & Misc.': {
+            'MISC.': ['Safety Glasses/Ear Protection', 'First Aid Kit', 'Fire Extinguisher', 'Shop Vac', 'Broom/Dustpan', 'Work Gloves', 'Extension Cords', 'Storage Bins (Parts/Hardware)']
+        }
+    },
+
+    # PANTRY  
+    'pantry': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'LED Strip Lights (Shelving)', 'Flush Mount Light']
+        },
+        'Storage': {
+            'PIECE': ['Adjustable Shelving', 'Pull-out Drawers', 'Spice Racks (Door/Wall)', 'Canned Goods Organizers', 'Wine Bottle Storage', 'Basket Storage (Wire/Wicker)', 'Broom/Mop Holder', 'Vacuum Storage', 'Small Appliance Shelf']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Labeled Containers', 'Clipboards (Shopping List)', 'Chalkboard (Inventory)']
+        }
+    },
+
+    # BAR AREA  
+    'bar area': {
+        'Lighting': {
+            'INSTALLED': ['Pendant Lights (over bar)', 'Recessed Lighting (Dimmable)', 'Under Cabinet Lighting', 'Bottle Display Lighting', 'LED Strip Lights']
+        },
+        'Furniture & Equipment': {
+            'PIECE': ['Bar Counter/Island', 'Bar Stools', 'Beverage Cooler/Wine Fridge', 'Ice Maker (Built-in)', 'Sink & Faucet (Bar Sink)', 'Glass Racks (Stemware)', 'Bottle Display Shelving', 'Liquor Cabinet', 'Cocktail Station']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Bar Tools Set', 'Cocktail Shakers', 'Specialty Glassware', 'Coasters', 'Bar Mats', 'Neon Sign/Bar Sign', 'Wall Art (Bar themed)', 'Bottle Openers (Decorative)']
+        }
+    },
+
+    # BACKYARD  
+    'backyard': {
+        'Outdoor Lighting': {
+            'INSTALLED': ['String Lights', 'Landscape Lighting (Pathway/Spotlights)', 'Deck Lights', 'Post Lights', 'In-ground Lights', 'Security Lights'],
+            'PORTABLE': ['Solar Lanterns', 'Outdoor Floor Lamps', 'Bug Zapper Lanterns']
+        },
+        'Outdoor Furniture & Features': {
+            'PIECE': ['Outdoor Seating Set (Sofa, Chairs, Coffee Table)', 'Dining Table (Outdoor)', 'Dining Chairs (Outdoor)', 'Patio Umbrella', 'Fire Pit (Gas/Wood)', 'BBQ Grill/Outdoor Kitchen', 'Pergola/Gazebo', 'Hot Tub/Spa', 'Swimming Pool', 'Garden Beds (Raised)', 'Swing Set/Play Structure', 'Shed/Storage Unit', 'Hammock', 'Lounge Chairs', 'Water Feature (Large Fountain/Pond)', 'Outdoor Bar', 'Outdoor Speakers', 'Built-in Bench Seating']
+        },
+        'Landscaping & Decor': {
+            'MISC.': ['Outdoor Rug', 'Outdoor Pillows/Cushions', 'Planters (Large/Small)', 'Garden Decor (Statues, Gnomes)', 'Bird Bath/Feeder', 'Wind Chimes', 'Garden Tools', 'Compost Bin', 'Hose Reel', 'Lawn Games', 'Privacy Screens', 'Trellises']
+        }
+    },
+
+    # MUDROOM  
+    'mudroom': {
+        'Lighting': {
+            'INSTALLED': ['Flush Mount Light', 'Recessed Lighting', 'Task Lighting']
+        },
+        'Storage': {
+            'PIECE': ['Built-in Bench w/ Storage', 'Cubbies/Lockers', 'Coat Hooks/Rack', 'Shoe Rack/Cubby', 'Storage Cabinets', 'Shelving Units', 'Utility Sink', 'Dog Washing Station', 'Key Holder', 'Mail Organizer', 'Umbrella Stand']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Floor Mat (Durable)', 'Wall Art/Signage', 'Waste Basket', 'Boot Tray', 'Mirror (Small)']
+        }
+    },
+
+    # UTILITY ROOM  
+    'utility room': {
+        'Lighting': {
+            'INSTALLED': ['Utility Lights (LED/Fluorescent)', 'Recessed Lighting']
+        },
+        'Storage & Equipment': {
+            'PIECE': ['Utility Sink', 'Water Heater', 'HVAC Unit', 'Water Softener', 'Sump Pump', 'Shelving Units (Heavy Duty)', 'Storage Bins', 'Tool Storage', 'Work Bench (Small)', 'Cleaning Supplies Storage', 'Extension Cords']
+        },
+        'Safety & Misc.': {
+            'MISC.': ['First Aid Kit', 'Fire Extinguisher', 'Wet/Dry Vac', 'Floor Drain', 'Leak Detector']
+        }
+    },
+
+    # LINEN CLOSET  
+    'linen closet': {
+        'Lighting': {
+            'INSTALLED': ['Small Flush Mount Light', 'LED Strip Lighting']
+        },
+        'Storage': {
+            'PIECE': ['Adjustable Shelving', 'Drawer Organizers', 'Linen Baskets', 'Towel Organizers', 'Medicine Cabinet (if applicable)', 'Hamper']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Labels for shelves/baskets', 'Scented Sachets']
+        }
+    },
+
+    # WALK-IN CLOSET - NEW MAJOR CATEGORY  
+    'walk-in closet': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'LED Strip Lighting (Shelves/Rods)', 'Chandelier (if large)', 'Vanity Lighting (if dressing area)']
+        },
+        'Furniture & Storage': {
+            'PIECE': ['Built-in Shelving', 'Hanging Rods (Double/Single)', 'Drawers (Built-in/Freestanding)', 'Shoe Racks/Shelves', 'Jewelry Drawer/Organizer', 'Island (with drawers)', 'Vanity Table/Mirror', 'Seating (Ottoman/Bench)', 'Display Shelves (for bags/hats)', 'Valet Rod']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Full-Length Mirror', 'Area Rug (Small)', 'Storage Baskets (for accessories)', 'Tie/Belt Racks', 'Hangers (Matching)', 'Scented Sachets']
+        }
+    },
+
+    # CABINETS - NEW MAJOR CATEGORY as requested  
+    'cabinets': {
+        'Kitchen Cabinets': {
+            'CABINETS': ['Upper Cabinets', 'Base Cabinets', 'Pantry Cabinets', 'Island Cabinets', 'Corner Cabinets', 'Lazy Susan Cabinets'],
+            'STORAGE & ORGANIZATION': ['Pull-out Shelves', 'Drawer Organizers', 'Spice Racks', 'Trash Pull-outs', 'Lazy Susans'],
+            'HARDWARE': ['Cabinet Knobs', 'Cabinet Pulls', 'Hinges', 'Drawer Slides', 'Soft-close Hardware']
+        },
+        'Bathroom Cabinets': {
+            'CABINETS': ['Vanity Cabinets', 'Medicine Cabinets', 'Linen Cabinets', 'Storage Towers', 'Wall Cabinets'],
+            'STORAGE & ORGANIZATION': ['Drawer Organizers', 'Under-sink Storage', 'Towel Storage', 'Toiletry Storage'],
+            'HARDWARE': ['Cabinet Knobs', 'Cabinet Pulls', 'Hinges', 'Drawer Slides', 'Soft-close Hardware']
+        },
+        'Built-in Cabinets': {
+            'CABINETS': ['Entertainment Centers', 'Bookcases', 'Window Seats', 'Mudroom Lockers', 'Office Built-ins', 'Bar Cabinets'],
+            'STORAGE & ORGANIZATION': ['Adjustable Shelving', 'File Storage', 'Media Storage', 'Display Shelves'],
+            'HARDWARE': ['Cabinet Knobs', 'Cabinet Pulls', 'Hinges', 'Drawer Slides', 'Touch Latches']
+        }
+    },
+
+    # ARCHITECTURAL ELEMENTS - NEW MAJOR CATEGORY as requested  
+    'architectural elements': {
+        'Trim Work': {
+            'TRIM': ['Crown Molding', 'Chair Rail', 'Baseboards', 'Shoe Molding', 'Quarter Round', 'Window Trim', 'Door Trim', 'Panel Molding', 'Picture Rail', 'Plate Rail', 'Dentil Molding', 'Rope Molding']
+        },
+        'Architectural Features': {
+            'FEATURES': ['Columns', 'Pilasters', 'Archways', 'Doorway Arches', 'Niches', 'Built-in Niches', 'Alcoves', 'Coffered Ceilings', 'Tray Ceilings', 'Beam Work', 'Corbels', 'Brackets', 'Rosettes', 'Corner Blocks']
+        },
+        'Built-ins': {
+            'BUILT-INS': ['Built-in Shelving', 'Built-in Bookcases', 'Built-in Entertainment Center', 'Built-in Seating', 'Window Seats', 'Storage Benches', 'Built-in Desks', 'Built-in Bars', 'Custom Cabinetry', 'Built-in Storage', 'Mudroom Built-ins']
+        }
+    },
+
+    # TRIM - NEW MAJOR CATEGORY as requested  
+    'trim': {
+        'Interior Trim': {
+            'TRIM': ['Crown Molding', 'Chair Rail', 'Baseboards', 'Shoe Molding', 'Quarter Round', 'Window Trim', 'Door Trim', 'Panel Molding', 'Picture Rail', 'Plate Rail']
+        },
+        'Decorative Trim': {
+            'TRIM': ['Dentil Molding', 'Rope Molding', 'Fluted Trim', 'Beaded Trim', 'Carved Trim', 'Corner Blocks', 'Rosettes', 'Plinth Blocks']
+        },
+        'Exterior Trim': {
+            'TRIM': ['Fascia Boards', 'Soffit', 'Frieze Boards', 'Corner Boards', 'Window Trim', 'Door Trim', 'Shutters', 'Brackets']
+        }
+    },
+
+    # OTHER - Catch-all category  
+    'other': {
+        'Lighting': {
+            'INSTALLED': ['Recessed Lighting', 'Flush Mount', 'Pendant Light', 'Sconces'],
+            'PORTABLE': ['Floor Lamp', 'Table Lamp']
+        },
+        'Furniture': {
+            'PIECE': ['Table', 'Chairs', 'Storage Cabinet', 'Work Surface']
+        },
+        'Decor & Accessories': {
+            'MISC.': ['Area Rug', 'Wall Art', 'Plants', 'Curtains/Blinds', 'Storage Bins']
         }
     }
 }
 
-# INTEGRATION POSSIBILITIES
-INTEGRATION_CAPABILITIES = {
-    'canva': {
-        'description': 'Design collaboration platform integration',
-        'features': ['Mood board creation', 'Design presentation templates', 'Client presentation tools', 'Brand asset management'],
-        'api_available': True,
-        'implementation_complexity': 'Medium'
-    },
-    'leica_disto_plan': {
-        'description': 'Laser measurement and floor plan integration',
-        'features': ['Accurate room measurements', 'Floor plan import', 'Space planning', 'As-built documentation'],
-        'api_available': 'Limited',
-        'implementation_complexity': 'High'
-    },
-    'houzz_pro': {
-        'description': 'Professional design platform integration',
-        'features': ['Product sourcing', 'Client management', 'Project management', 'Invoice integration'],
-        'api_available': 'Partner Program',
-        'implementation_complexity': 'High'
-    },
-    'autocad': {
-        'description': 'CAD drawing integration',
-        'features': ['Technical drawings', 'Construction documents', 'Dimension accuracy', 'Scale drawings'],
-        'api_available': True,
-        'implementation_complexity': 'High'
-    },
-    'sketchup': {
-        'description': '3D modeling integration',
-        'features': ['3D visualization', 'Space planning', 'Design rendering', 'Client presentations'],
-        'api_available': True,
-        'implementation_complexity': 'Medium'
-    }
-}
+# Function to get comprehensive room structure for API
+def get_room_structure(room_name):
+    """Get the complete structure for a room type"""
+    room_key = room_name.lower().strip()
+    return COMPREHENSIVE_ROOM_STRUCTURE.get(room_key, COMPREHENSIVE_ROOM_STRUCTURE.get('other', {}))
+
+# Function to get all available room types
+def get_available_room_types():
+    """Get list of all available room types"""
+    return list(COMPREHENSIVE_ROOM_STRUCTURE.keys())
+
+# Function to get all categories for a room
+def get_room_categories(room_name):
+    """Get all categories for a specific room"""
+    structure = get_room_structure(room_name)
+    return list(structure.keys())
+
+# Function to get all subcategories for a room category
+def get_category_subcategories(room_name, category_name):
+    """Get all subcategories for a specific room category"""
+    structure = get_room_structure(room_name)
+    category = structure.get(category_name, {})
+    return list(category.keys())
+
+# Function to get all items for a subcategory
+def get_subcategory_items(room_name, category_name, subcategory_name):
+    """Get all items for a specific subcategory"""
+    structure = get_room_structure(room_name)
+    category = structure.get(category_name, {})
+    subcategory = category.get(subcategory_name, [])
+    return subcategory
