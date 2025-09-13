@@ -1036,29 +1036,30 @@ const ExactFFESpreadsheet = ({
                                                                 <select 
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
                                                                   value={item.carrier || ''}
+                                                                  style={{ backgroundColor: getCarrierColor(item.carrier || '') }}
                                                                   onChange={(e) => handleCarrierChange(item.id, e.target.value)}
                                                                 >
-                                                                  <option value="" className="bg-gray-800 text-white">—</option>
-                                                                  <option value="FedEx" className="bg-orange-600 text-white">📦 FedEx</option>
-                                                                  <option value="FedEx Ground" className="bg-orange-600 text-white">📦 FedEx Ground</option>
-                                                                  <option value="UPS" className="bg-amber-800 text-white">📦 UPS</option>
-                                                                  <option value="UPS Ground" className="bg-amber-800 text-white">📦 UPS Ground</option>
-                                                                  <option value="USPS" className="bg-blue-800 text-white">📮 USPS</option>
-                                                                  <option value="DHL" className="bg-yellow-400 text-black">📦 DHL</option>
-                                                                  <option value="Brooks" className="bg-blue-600 text-white">🚚 Brooks</option>
-                                                                  <option value="Zenith" className="bg-teal-500 text-white">🚚 Zenith</option>
-                                                                  <option value="Sunbelt" className="bg-red-600 text-white">🚚 Sunbelt</option>
-                                                                  <option value="R+L Carriers" className="bg-green-500 text-white">🚚 R+L Carriers</option>
-                                                                  <option value="Yellow Freight" className="bg-yellow-400 text-black">🚚 Yellow Freight</option>
-                                                                  <option value="XPO Logistics" className="bg-purple-600 text-white">🚚 XPO Logistics</option>
-                                                                  <option value="Old Dominion" className="bg-red-700 text-white">🚚 Old Dominion</option>
-                                                                  <option value="ABF Freight" className="bg-orange-500 text-white">🚚 ABF Freight</option>
-                                                                  <option value="Con-Way" className="bg-cyan-500 text-white">🚚 Con-Way</option>
-                                                                  <option value="Estes Express" className="bg-purple-500 text-white">🚚 Estes Express</option>
-                                                                  <option value="YRC Freight" className="bg-pink-600 text-white">🚚 YRC Freight</option>
-                                                                  <option value="Saia" className="bg-cyan-400 text-white">🚚 Saia</option>
-                                                                  <option value="OTHER" className="bg-gray-600 text-white">🚚 OTHER</option>
-                                                                  <option value="ADD_NEW" className="bg-gray-700 text-white">+ Add New Carrier</option>
+                                                                  <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>—</option>
+                                                                  <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>📦 FedEx</option>
+                                                                  <option value="FedEx Ground" style={{ backgroundColor: '#FF6600', color: 'white' }}>📦 FedEx Ground</option>
+                                                                  <option value="UPS" style={{ backgroundColor: '#8B4513', color: 'white' }}>📦 UPS</option>
+                                                                  <option value="UPS Ground" style={{ backgroundColor: '#8B4513', color: 'white' }}>📦 UPS Ground</option>
+                                                                  <option value="USPS" style={{ backgroundColor: '#004B87', color: 'white' }}>📮 USPS</option>
+                                                                  <option value="DHL" style={{ backgroundColor: '#FFD700', color: 'black' }}>📦 DHL</option>
+                                                                  <option value="Brooks" style={{ backgroundColor: '#4682B4', color: 'white' }}>🚚 Brooks</option>
+                                                                  <option value="Zenith" style={{ backgroundColor: '#20B2AA', color: 'white' }}>🚚 Zenith</option>
+                                                                  <option value="Sunbelt" style={{ backgroundColor: '#FF4500', color: 'white' }}>🚚 Sunbelt</option>
+                                                                  <option value="R+L Carriers" style={{ backgroundColor: '#32CD32', color: 'white' }}>🚚 R+L Carriers</option>
+                                                                  <option value="Yellow Freight" style={{ backgroundColor: '#FFD700', color: 'black' }}>🚚 Yellow Freight</option>
+                                                                  <option value="XPO Logistics" style={{ backgroundColor: '#6A5ACD', color: 'white' }}>🚚 XPO Logistics</option>
+                                                                  <option value="Old Dominion" style={{ backgroundColor: '#DC143C', color: 'white' }}>🚚 Old Dominion</option>
+                                                                  <option value="ABF Freight" style={{ backgroundColor: '#FF6347', color: 'white' }}>🚚 ABF Freight</option>
+                                                                  <option value="Con-Way" style={{ backgroundColor: '#48D1CC', color: 'white' }}>🚚 Con-Way</option>
+                                                                  <option value="Estes Express" style={{ backgroundColor: '#9370DB', color: 'white' }}>🚚 Estes Express</option>
+                                                                  <option value="YRC Freight" style={{ backgroundColor: '#FF1493', color: 'white' }}>🚚 YRC Freight</option>
+                                                                  <option value="Saia" style={{ backgroundColor: '#00CED1', color: 'white' }}>🚚 Saia</option>
+                                                                  <option value="OTHER" style={{ backgroundColor: '#808080', color: 'white' }}>🚚 OTHER</option>
+                                                                  <option value="ADD_NEW" style={{ backgroundColor: '#6B7280', color: 'white' }}>+ Add New Carrier</option>
                                                                 </select>
                                                               </div>
                                                             </div>
