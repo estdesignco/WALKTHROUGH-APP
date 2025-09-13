@@ -857,7 +857,7 @@ const ExactFFESpreadsheet = ({
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
                                                                   value={item.status || ''}
                                                                   style={{ backgroundColor: getStatusColor(item.status || '') }}
-                                                                  onChange={(e) => console.log('Order status changed:', e.target.value)}
+                                                                  onChange={(e) => handleStatusChange(item.id, e.target.value)}
                                                                 >
                                                                   <option value="">Status...</option>
                                                                   <option value="TO BE SELECTED">🔵 TO BE SELECTED</option>
