@@ -1,11 +1,11 @@
-# COMPLETE ROOM STRUCTURE - MOST POWERFUL DESIGN APP EVER!
-# Every possible room, category, and feature for comprehensive interior design
+# USER'S COMPLETE FF&E ROOM STRUCTURE - EXACT FROM THEIR LIST
+# Updated with their comprehensive interior design requirements
 
 COMPREHENSIVE_ROOM_STRUCTURE = {
     'living room': {
         'Lighting': {
-            'INSTALLED': ['Chandelier', 'Crystal Chandelier', 'Modern Chandelier', 'Traditional Chandelier', 'Recessed Lighting', 'LED Recessed Lights', 'Adjustable Recessed Lights', 'Sconces', 'Wall Sconces', 'Swing Arm Sconces', 'Picture Lights', 'Art Lights', 'Track Lighting', 'Monorail Lighting', 'Ceiling Fan w/ Light', 'Statement Light Fixtures', 'Pendant Lights', 'Linear Pendant Lights', 'Under Cabinet Lighting', 'LED Strip Lighting', 'Cove Lighting', 'Accent Lighting', 'Uplighting', 'Downlighting', 'Smart Lighting Controls', 'Dimmer Switches', 'Motion Sensor Lights', 'Pathway Lighting'],
-            'PORTABLE': ['Table Lamp', 'Floor Lamp', 'Arc Floor Lamp', 'Tripod Floor Lamp', 'Accent Lamp', 'Desk Lamp', 'Buffet Lamp', 'Reading Lamp', 'Task Lighting', 'Decorative Lamps', 'Salt Lamps', 'Edison Bulb Lamps', 'LED Portable Lights', 'Battery Operated Lights', 'Candles', 'Candle Holders', 'Hurricane Lanterns']
+            'INSTALLED': ['Chandelier', 'Recessed Lighting', 'Sconces', 'Track Lighting', 'Ceiling Fan w/ Light', 'Art Lights', 'Pendant Lights', 'Under Cabinet Lighting', 'Cove Lighting', 'Picture Lights'],
+            'PORTABLE': ['Table Lamp', 'Floor Lamp', 'Accent Lamp', 'Desk Lamp', 'Buffet Lamp', 'Reading Lamp']
         },
         'Furniture & Storage': {
             'SEATING': ['Sofa', 'Sectional Sofa', 'L-Shaped Sectional', 'U-Shaped Sectional', 'Modular Sectional', 'Loveseat', 'Armchair', 'Accent Chair', 'Wing Chair', 'Club Chair', 'Swivel Chair', 'Recliner', 'Power Recliner', 'Rocker Recliner', 'Ottoman', 'Storage Ottoman', 'Cocktail Ottoman', 'Chaise Lounge', 'Daybed', 'Storage Bench', 'Window Seat', 'Bean Bag Chairs', 'Floor Cushions', 'Poufs'],
