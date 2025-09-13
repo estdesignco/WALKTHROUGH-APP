@@ -43,12 +43,8 @@ const ExactFFESpreadsheet = ({
         body: JSON.stringify({ status: newStatus })
       });
       if (response.ok) {
-        // Refresh data to show updated status
-        const projectResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/projects/${project.id}`);
-        if (projectResponse.ok) {
-          const updatedProject = await projectResponse.json();
-          onProjectUpdate(updatedProject);
-        }
+        // Force page refresh to show updated data
+        window.location.reload();
       }
     } catch (error) {
       console.error('Error updating status:', error);
@@ -63,16 +59,14 @@ const ExactFFESpreadsheet = ({
         body: JSON.stringify({ carrier: newCarrier })
       });
       if (response.ok) {
-        const projectResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/projects/${project.id}`);
-        if (projectResponse.ok) {
-          const updatedProject = await projectResponse.json();
-          onProjectUpdate(updatedProject);
-        }
+        window.location.reload();
       }
     } catch (error) {
       console.error('Error updating carrier:', error);
     }
   };
+
+  // APPLY FILTERS - ACTUALLY MAKE FILTERING WORK
   useEffect(() => {
     if (!project) {
       setFilteredProject(null);
