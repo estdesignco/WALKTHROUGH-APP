@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-FF&E Backend API Testing Suite
+FF&E Backend API Testing Suite - COMPREHENSIVE STRUCTURE TESTING
 Tests all FF&E functionality including projects, rooms, categories, subcategories, and items.
+FOCUS: Testing enhanced_rooms.py comprehensive structure implementation
 """
 
 import requests
