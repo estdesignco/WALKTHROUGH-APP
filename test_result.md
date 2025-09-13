@@ -138,6 +138,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "🎯 REVIEW REQUEST SCRAPING TESTING COMPLETED: Tested exact Four Hands URL (https://fourhands.com/product/248067-003) as requested. ✅ SCRAPING WORKING PERFECTLY: Successfully extracts name='Fenn Chair', vendor='Four Hands', sku='248067-003', cost='$1,899' with 200 OK status. Playwright browsers installed and fully functional. ✅ VENDOR DETECTION: Correctly identifies 'Four Hands' from URL domain. ✅ JSON STRUCTURE: Perfect {success: true, data: {...}} response format with all expected fields. ✅ BACKEND LOGS: Confirm successful data extraction and processing. ✅ PRODUCTION READY: Core scraping infrastructure operational for wholesale furniture vendor integration. The reported 'scraping not working' issue is definitively RESOLVED - system is fully operational and ready for production use."
+      - working: true
+        agent: "testing"
+        comment: "🚀 FF&E ROUTING FIX SCRAPING VERIFICATION: Comprehensive testing confirms scraping endpoint is FULLY OPERATIONAL after Playwright browser installation. ✅ FOUR HANDS URL WORKING: https://fourhands.com/product/248067-003 successfully extracts name='Fenn Chair', vendor='Four Hands', sku='248067-003', cost='$1,899' with perfect JSON response format. ✅ MULTIPLE VENDOR SUPPORT: Tested Four Hands, Uttermost, and example.com - all return proper response structure with vendor detection working correctly. ✅ ERROR HANDLING: Graceful handling of invalid URLs and network issues. ✅ PLAYWRIGHT BROWSERS: Successfully installed and functional (/pw-browsers/chromium-1091). The scraping functionality is production-ready and supports the wholesale furniture vendor integration as designed."
 
 frontend:
   - task: "Filter Functionality Implementation"
