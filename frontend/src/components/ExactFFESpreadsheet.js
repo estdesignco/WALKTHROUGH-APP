@@ -450,21 +450,32 @@ const ExactFFESpreadsheet = ({
     return statusColors[status] || '#D4A574';
   };
 
+  // Get carrier color to match header colors
   const getCarrierColor = (carrier) => {
-    const carrierColors = {
-      'FedEx': '#FF6600',
-      'UPS': '#8B4513',
-      'Brooks': '#4682B4',
-      'Zenith': '#20B2AA',
-      'Sunbelt': '#DC143C',
-      'R+L Carriers': '#8A2BE2',
-      'Yellow Freight': '#FFD700',
-      'XPO Logistics': '#FF1493',
-      'Old Dominion': '#228B22',
-      'ABF Freight': '#B22222',
-      'OTHER': '#9370DB'
+    const colors = {
+      'FedEx': '#FF6600',           // FedEx Orange
+      'FedEx Ground': '#FF6600',    // FedEx Orange
+      'FedEx Express': '#FF6600',   // FedEx Orange
+      'UPS': '#8B4513',            // UPS Brown
+      'UPS Ground': '#8B4513',     // UPS Brown
+      'UPS Express': '#8B4513',    // UPS Brown
+      'USPS': '#004B87',           // USPS Blue
+      'DHL': '#FFD700',            // DHL Yellow
+      'Brooks': '#4682B4',         // Steel Blue
+      'Zenith': '#20B2AA',         // Light Sea Green
+      'Sunbelt': '#FF4500',        // Orange Red
+      'R+L Carriers': '#32CD32',   // Lime Green
+      'Yellow Freight': '#FFD700', // Yellow
+      'XPO Logistics': '#6A5ACD',  // Slate Blue
+      'Old Dominion': '#DC143C',   // Crimson
+      'ABF Freight': '#FF6347',    // Tomato
+      'Con-Way': '#48D1CC',        // Medium Turquoise
+      'Estes Express': '#9370DB',  // Medium Purple
+      'YRC Freight': '#FF1493',    // Deep Pink
+      'Saia': '#00CED1',           // Dark Turquoise
+      'OTHER': '#808080'           // Gray
     };
-    return carrierColors[carrier] || '#9370DB';
+    return colors[carrier] || '#6B7280';
   };
 
   const getShipToColor = (shipTo) => {
