@@ -772,37 +772,72 @@ const ExactFFESpreadsheet = ({
                                                             {item.name}
                                                           </td>
                                                           
-                                                          {/* VENDOR/SKU */}
+                                                          {/* VENDOR/SKU - CLEAR BY DEFAULT */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.vendor || 'Vendor/SKU'}
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.vendor || ''}
+                                                              placeholder="Vendor/SKU"
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Vendor changed:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
-                                                          {/* QTY */}
+                                                          {/* QTY - CLEAR BY DEFAULT */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
-                                                            {item.quantity || 1}
+                                                            <input 
+                                                              type="number" 
+                                                              value={item.quantity || ''}
+                                                              placeholder="1"
+                                                              className="w-full bg-transparent border-none text-white text-sm text-center"
+                                                              onChange={(e) => console.log('Quantity changed:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
-                                                          {/* SIZE */}
+                                                          {/* SIZE - CLEAR BY DEFAULT */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.size || 'Size'}
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.size || ''}
+                                                              placeholder="Size"
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Size changed:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
-                                                          {/* FINISH/Color */}
+                                                          {/* FINISH/Color - CLEAR BY DEFAULT */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.finish_color || 'Finish/Color'}
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.finish_color || ''}
+                                                              placeholder="Finish/Color"
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Finish/Color changed:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
-                                                          {/* Cost/Price */}
+                                                          {/* Cost/Price - CLEAR BY DEFAULT */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            ${item.cost || '0.00'}
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.cost ? `$${item.cost}` : ''}
+                                                              placeholder="$0.00"
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Cost changed:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
-                                                          {/* Image */}
+                                                          {/* Image - CLEAR BY DEFAULT */}
                                                           <td className="border border-gray-400 px-2 py-2 text-center text-white">
                                                             {item.image_url ? (
                                                               <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
                                                             ) : (
-                                                              '📷 Image'
+                                                              <input 
+                                                                type="file" 
+                                                                accept="image/*"
+                                                                className="w-full bg-transparent border-none text-white text-xs"
+                                                                onChange={(e) => console.log('Image changed:', e.target.value)}
+                                                              />
                                                             )}
                                                           </td>
                                                           
