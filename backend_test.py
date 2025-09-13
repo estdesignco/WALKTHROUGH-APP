@@ -813,17 +813,19 @@ class FFEAPITester:
 
     def run_all_tests(self):
         """Run all FF&E backend tests"""
-        print("🚀 Starting FF&E Backend API Tests")
-        print("=" * 50)
+        print("🚀 Starting FF&E Backend API Tests - COMPREHENSIVE STRUCTURE FOCUS")
+        print("=" * 60)
         
         # Run tests in logical order based on review request
-        self.test_project_data_structure()  # Test #5: Project Data Structure
-        self.test_add_room_functionality()  # Test #1: Add Room Functionality  
-        self.test_dropdown_endpoints()      # Test #2: Dropdown Data Endpoints
-        self.test_link_scraping()          # Test #3: Web Scraping Endpoint
-        self.test_item_operations()        # Test #4: Item CRUD Operations
-        self.test_enum_endpoints()         # Additional: Basic enum endpoints
-        self.test_data_persistence()       # Additional: Data persistence
+        self.test_project_data_structure()      # Test #5: Project Data Structure
+        self.test_add_room_functionality()      # Test #1: Add Room Functionality  
+        self.test_comprehensive_room_structure() # 🎯 NEW: Test comprehensive structure
+        self.test_new_major_categories()        # 🎯 NEW: Test new categories
+        self.test_dropdown_endpoints()          # Test #2: Dropdown Data Endpoints
+        self.test_link_scraping()              # Test #3: Web Scraping Endpoint
+        self.test_item_operations()            # Test #4: Item CRUD Operations
+        self.test_enum_endpoints()             # Additional: Basic enum endpoints
+        self.test_data_persistence()           # Additional: Data persistence
         
         # Clean up
         self.cleanup_test_data()
