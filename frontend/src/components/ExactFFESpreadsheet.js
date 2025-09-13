@@ -291,7 +291,7 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Handle deleting an item
+  // Handle deleting an item - NO RELOAD
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm('Are you sure you want to delete this item?')) {
       return;
@@ -305,7 +305,22 @@ const ExactFFESpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Item deleted successfully');
-        window.location.reload(); 
+        // Update filtered project state without reload
+        setFilteredProject(prevProject => {
+          if (!prevProject) return prevProject;
+          const updatedProject = { ...prevProject };
+          updatedProject.rooms = updatedProject.rooms.map(room => ({
+            ...room,
+            categories: room.categories.map(category => ({
+              ...category,
+              subcategories: category.subcategories.map(subcategory => ({
+                ...subcategory,
+                items: subcategory.items.filter(item => item.id !== itemId)
+              }))
+            }))
+          }));
+          return updatedProject;
+        });
       } else {
         throw new Error(`HTTP ${response.status}`);
       }
