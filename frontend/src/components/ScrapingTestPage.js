@@ -25,7 +25,7 @@ const ScrapingTestPage = () => {
     setScrapeError('');
 
     try {
-      const backendUrl = 'https://ffe-manager.preview.emergentagent.com';
+      const backendUrl = 'https://code-scanner-14.preview.emergentagent.com';
       
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);
