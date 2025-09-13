@@ -34,6 +34,101 @@ const ExactFFESpreadsheet = ({
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
+  // APPLY FILTERS - ACTUALLY MAKE FILTERING WORK
+  useEffect(() => {
+    if (!project) {
+      setFilteredProject(null);
+      return;
+    }
+
+    let filtered = { ...project };
+
+    if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
+      filtered.rooms = project.rooms.filter(room => {
+        // Room filter
+        if (selectedRoom && room.name.toLowerCase() !== selectedRoom.toLowerCase()) {
+          return false;
+        }
+
+        // Search term in room name
+        if (searchTerm && !room.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+          let hasMatchingItem = false;
+          
+          // Check if any item in room matches search term
+          room.categories?.forEach(category => {
+            category.subcategories?.forEach(subcategory => {
+              subcategory.items?.forEach(item => {
+                if (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (item.vendor && item.vendor.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                    (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))) {
+                  hasMatchingItem = true;
+                }
+              });
+            });
+          });
+          
+          if (!hasMatchingItem) return false;
+        }
+
+        // Filter categories and items within room
+        if (selectedCategory || selectedVendor || selectedStatus || searchTerm) {
+          const filteredCategories = room.categories?.filter(category => {
+            // Category filter
+            if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) {
+              return false;
+            }
+
+            // Filter items within category
+            const filteredSubcategories = category.subcategories?.map(subcategory => {
+              const filteredItems = subcategory.items?.filter(item => {
+                // Vendor filter
+                if (selectedVendor && (!item.vendor || item.vendor.toLowerCase() !== selectedVendor.toLowerCase())) {
+                  return false;
+                }
+
+                // Status filter
+                if (selectedStatus && (!item.status || item.status !== selectedStatus)) {
+                  return false;
+                }
+
+                // Search term filter for items
+                if (searchTerm) {
+                  const searchLower = searchTerm.toLowerCase();
+                  if (!item.name.toLowerCase().includes(searchLower) &&
+                      !(item.vendor && item.vendor.toLowerCase().includes(searchLower)) &&
+                      !(item.sku && item.sku.toLowerCase().includes(searchLower))) {
+                    return false;
+                  }
+                }
+
+                return true;
+              }) || [];
+
+              return {
+                ...subcategory,
+                items: filteredItems
+              };
+            }) || [];
+
+            return {
+              ...category,
+              subcategories: filteredSubcategories
+            };
+          }) || [];
+
+          return {
+            ...room,
+            categories: filteredCategories
+          };
+        }
+
+        return room;
+      });
+    }
+
+    setFilteredProject(filtered);
+  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
+
   // Load available categories on component mount
   useEffect(() => {
     const loadAvailableCategories = async () => {
