@@ -11,30 +11,61 @@ import { Pie } from 'react-chartjs-2';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemStatuses }) => {
-  // Status colors for pie chart and breakdown
+  // Status colors for pie chart and breakdown - MATCH ExactFFESpreadsheet colors
   const getStatusColor = (status) => {
-    const statusColors = {
-      'TO BE SELECTED': '#D4A574', 'RESEARCHING': '#B8860B', 'PENDING APPROVAL': '#DAA520',
-      'APPROVED': '#9ACD32', 'ORDERED': '#32CD32', 'PICKED': '#FFD700', 'CONFIRMED': '#228B22',
-      'IN PRODUCTION': '#FF8C00', 'SHIPPED': '#4169E1', 'IN TRANSIT': '#6495ED', 'OUT FOR DELIVERY': '#87CEEB',
-      'DELIVERED TO RECEIVER': '#9370DB', 'DELIVERED TO JOB SITE': '#8A2BE2', 'RECEIVED': '#DDA0DD',
-      'READY FOR INSTALL': '#20B2AA', 'INSTALLING': '#48D1CC', 'INSTALLED': '#00CED1',
-      'ON HOLD': '#DC143C', 'BACKORDERED': '#B22222', 'DAMAGED': '#8B0000', 'RETURNED': '#CD5C5C', 'CANCELLED': '#A52A2A'
+    const colors = {
+      '': '#6B7280',                        // Gray for blank/default
+      'TO BE SELECTED': '#6B7280',          // Gray
+      'RESEARCHING': '#3B82F6',             // Blue
+      'PENDING APPROVAL': '#F59E0B',        // Amber
+      'APPROVED': '#10B981',                // Emerald
+      'ORDERED': '#10B981',                 // Emerald
+      'PICKED': '#FFD700',                  // Gold
+      'CONFIRMED': '#10B981',               // Emerald
+      'IN PRODUCTION': '#F97316',           // Orange
+      'SHIPPED': '#3B82F6',                 // Blue
+      'IN TRANSIT': '#3B82F6',              // Blue  
+      'OUT FOR DELIVERY': '#3B82F6',        // Blue
+      'DELIVERED TO RECEIVER': '#8B5CF6',   // Violet
+      'DELIVERED TO JOB SITE': '#8B5CF6',   // Violet
+      'RECEIVED': '#8B5CF6',                // Violet
+      'READY FOR INSTALL': '#10B981',       // Emerald
+      'INSTALLING': '#10B981',              // Emerald
+      'INSTALLED': '#10B981',               // Emerald
+      'ON HOLD': '#EF4444',                 // Red
+      'BACKORDERED': '#EF4444',             // Red
+      'DAMAGED': '#EF4444',                 // Red
+      'RETURNED': '#EF4444',                // Red
+      'CANCELLED': '#EF4444'                // Red
     };
-    return statusColors[status] || '#6B7280';
+    return colors[status] || '#6B7280';
   };
 
   const getCarrierColor = (carrier) => {
-    const carrierColors = {
-      'FedEx': '#FF6600', 'UPS': '#8B4513', 'Brooks': '#4682B4', 'Zenith': '#20B2AA',
-      'Sunbelt': '#DC143C', 'R+L Carriers': '#8A2BE2', 'Yellow Freight': '#FFD700',
-      'XPO Logistics': '#FF1493', 'Old Dominion': '#228B22', 'ABF Freight': '#B22222',
-      'Estes Express': '#4B0082', 'Saia LTL': '#2E8B57', 'TForce Freight': '#FF4500',
-      'Roadrunner': '#6B8E23', 'Central Transport': '#8B008B', 'Southeastern Freight': '#D2691E',
-      'Averitt Express': '#CD853F', 'Holland': '#F4A460', 'USPS': '#0047AB',
-      'DHL': '#FFCC00', 'OTHER': '#9370DB'
+    const colors = {
+      'FedEx': '#FF6600',           // FedEx Orange
+      'FedEx Ground': '#FF6600',    // FedEx Orange
+      'FedEx Express': '#FF6600',   // FedEx Orange
+      'UPS': '#8B4513',            // UPS Brown
+      'UPS Ground': '#8B4513',     // UPS Brown
+      'UPS Express': '#8B4513',    // UPS Brown
+      'USPS': '#004B87',           // USPS Blue
+      'DHL': '#FFD700',            // DHL Yellow
+      'Brooks': '#4682B4',         // Steel Blue
+      'Zenith': '#20B2AA',         // Light Sea Green
+      'Sunbelt': '#FF4500',        // Orange Red
+      'R+L Carriers': '#32CD32',   // Lime Green
+      'Yellow Freight': '#FFD700', // Yellow
+      'XPO Logistics': '#6A5ACD',  // Slate Blue
+      'Old Dominion': '#DC143C',   // Crimson
+      'ABF Freight': '#FF6347',    // Tomato
+      'Con-Way': '#48D1CC',        // Medium Turquoise
+      'Estes Express': '#9370DB',  // Medium Purple
+      'YRC Freight': '#FF1493',    // Deep Pink
+      'Saia': '#00CED1',           // Dark Turquoise
+      'OTHER': '#808080'           // Gray
     };
-    return carrierColors[carrier] || '#6B7280';
+    return colors[carrier] || '#6B7280';
   };
 
   const getCompletedItems = () => {
