@@ -305,7 +305,7 @@ const ExactFFESpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Item deleted successfully');
-        // Update both project states without reload
+        // Update filtered project state without reload
         const updateProjectState = (prevProject) => {
           if (!prevProject) return prevProject;
           const updatedProject = { ...prevProject };
@@ -322,8 +322,12 @@ const ExactFFESpreadsheet = ({
           return updatedProject;
         };
         
-        setProject(updateProjectState);
         setFilteredProject(updateProjectState);
+        
+        // Also trigger parent component reload if callback is available
+        if (onReload) {
+          onReload();
+        }
       } else {
         throw new Error(`HTTP ${response.status}`);
       }
