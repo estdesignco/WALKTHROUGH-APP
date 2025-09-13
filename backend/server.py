@@ -752,7 +752,7 @@ class ItemBase(BaseModel):
     size: Optional[str] = ""
     remarks: Optional[str] = ""
     vendor: Optional[str] = ""
-    status: ItemStatus = ItemStatus.PICKED
+    status: ItemStatus = ItemStatus.BLANK
     cost: Optional[float] = 0.0
     link: Optional[str] = ""
     tracking_number: Optional[str] = ""
