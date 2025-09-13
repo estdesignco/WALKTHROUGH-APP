@@ -17,6 +17,7 @@ import time
 from datetime import datetime, timezone
 from enum import Enum
 from playwright.async_api import async_playwright
+from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE  # Add comprehensive structure import
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
