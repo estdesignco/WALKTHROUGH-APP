@@ -26,7 +26,7 @@ def get_backend_url():
     return "http://localhost:8001"
 
 BASE_URL = get_backend_url() + "/api"
-PROJECT_ID = "bb060596-85c2-455f-860a-cf9fa23dfacf"
+PROJECT_ID = "7ba600f9-a384-49ad-b86d-d09c84afb5c9"
 
 print(f"Testing FF&E Backend APIs at: {BASE_URL}")
 print(f"Using Project ID: {PROJECT_ID}")
