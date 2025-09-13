@@ -826,32 +826,67 @@ const ExactFFESpreadsheet = ({
                                                             {item.name}
                                                           </td>
                                                           
-                                                          {/* VENDOR/SKU - COMPLETELY CLEAR */}
+                                                          {/* VENDOR/SKU - EDITABLE INLINE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.vendor || ''}
+                                                            <div 
+                                                              contentEditable={true}
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm outline-none"
+                                                              onBlur={(e) => console.log('Vendor updated:', e.target.textContent)}
+                                                            >
+                                                              {item.vendor || ''}
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* QTY - COMPLETELY CLEAR */}
+                                                          {/* QTY - EDITABLE INLINE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
-                                                            {item.quantity || ''}
+                                                            <div 
+                                                              contentEditable={true}
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm text-center outline-none"
+                                                              onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
+                                                            >
+                                                              {item.quantity || ''}
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* SIZE - COMPLETELY CLEAR */}
+                                                          {/* SIZE - EDITABLE INLINE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.size || ''}
+                                                            <div 
+                                                              contentEditable={true}
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm outline-none"
+                                                              onBlur={(e) => console.log('Size updated:', e.target.textContent)}
+                                                            >
+                                                              {item.size || ''}
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* FINISH/Color - COMPLETELY CLEAR */}
+                                                          {/* FINISH/Color - EDITABLE INLINE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.finish_color || ''}
+                                                            <div 
+                                                              contentEditable={true}
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm outline-none"
+                                                              onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
+                                                            >
+                                                              {item.finish_color || ''}
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* Cost/Price - COMPLETELY CLEAR */}
+                                                          {/* Cost/Price - EDITABLE INLINE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.cost ? `$${item.cost}` : ''}
+                                                            <div 
+                                                              contentEditable={true}
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm outline-none"
+                                                              onBlur={(e) => console.log('Cost updated:', e.target.textContent)}
+                                                            >
+                                                              {item.cost ? `$${item.cost}` : ''}
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* Image - SCRAPED AUTOMATICALLY, NOT FILE INPUT */}
+                                                          {/* Image - SCRAPED AUTOMATICALLY */}
                                                           <td className="border border-gray-400 px-2 py-2 text-center text-white">
                                                             {item.image_url ? (
                                                               <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
