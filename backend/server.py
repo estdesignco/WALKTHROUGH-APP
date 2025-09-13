@@ -648,6 +648,9 @@ ROOM_DEFAULT_STRUCTURE = {
 }
 
 class ItemStatus(str, Enum):
+    # Default blank status as requested by user
+    BLANK = ""
+    
     # Planning Phase
     TO_BE_SELECTED = "TO BE SELECTED"
     RESEARCHING = "RESEARCHING"
