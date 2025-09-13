@@ -421,33 +421,34 @@ const ExactFFESpreadsheet = ({
   const getShippingInfoColor = () => '#6B21A8';  // Purple for SHIPPING INFO.
   const getNotesActionsColor = () => '#7F1D1D';  // Red for NOTES and ACTIONS
 
-  // Color functions for dropdowns
+  // Get status color
   const getStatusColor = (status) => {
-    const statusColors = {
-      'TO BE SELECTED': '#D4A574',
-      'RESEARCHING': '#B8860B', 
-      'PENDING APPROVAL': '#DAA520',
-      'APPROVED': '#9ACD32',
-      'ORDERED': '#32CD32',
-      'PICKED': '#FFD700',
-      'CONFIRMED': '#228B22',
-      'IN PRODUCTION': '#FF8C00',
-      'SHIPPED': '#4169E1',
-      'IN TRANSIT': '#6495ED',
-      'OUT FOR DELIVERY': '#87CEEB',
-      'DELIVERED TO RECEIVER': '#9370DB',
-      'DELIVERED TO JOB SITE': '#8A2BE2',
-      'RECEIVED': '#DDA0DD',
-      'READY FOR INSTALL': '#20B2AA',
-      'INSTALLING': '#48D1CC',
-      'INSTALLED': '#00CED1',
-      'ON HOLD': '#DC143C',
-      'BACKORDERED': '#B22222',
-      'DAMAGED': '#8B0000',
-      'RETURNED': '#CD5C5C',
-      'CANCELLED': '#A52A2A'
+    const colors = {
+      '': '#6B7280',                        // Gray for blank/default
+      'TO BE SELECTED': '#6B7280',          // Gray
+      'RESEARCHING': '#3B82F6',             // Blue
+      'PENDING APPROVAL': '#F59E0B',        // Amber
+      'APPROVED': '#10B981',                // Emerald
+      'ORDERED': '#10B981',                 // Emerald
+      'PICKED': '#FFD700',                  // Gold - but user wants this NOT as default
+      'CONFIRMED': '#10B981',               // Emerald
+      'IN PRODUCTION': '#F97316',           // Orange
+      'SHIPPED': '#3B82F6',                 // Blue
+      'IN TRANSIT': '#3B82F6',              // Blue  
+      'OUT FOR DELIVERY': '#3B82F6',        // Blue
+      'DELIVERED TO RECEIVER': '#8B5CF6',   // Violet
+      'DELIVERED TO JOB SITE': '#8B5CF6',   // Violet
+      'RECEIVED': '#8B5CF6',                // Violet
+      'READY FOR INSTALL': '#10B981',       // Emerald
+      'INSTALLING': '#10B981',              // Emerald
+      'INSTALLED': '#10B981',               // Emerald
+      'ON HOLD': '#EF4444',                 // Red
+      'BACKORDERED': '#EF4444',             // Red
+      'DAMAGED': '#EF4444',                 // Red
+      'RETURNED': '#EF4444',                // Red
+      'CANCELLED': '#EF4444'                // Red
     };
-    return statusColors[status] || '#D4A574';
+    return colors[status] || '#6B7280';
   };
 
   // Get carrier color to match header colors
