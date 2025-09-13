@@ -604,6 +604,212 @@ class FFEAPITester:
                 print(f"   Deleted test item: {item_id}")
             else:
                 print(f"   Failed to delete test item: {item_id}")
+                
+        # Delete test rooms
+        for room_id in self.created_rooms:
+            success, _, _ = self.make_request('DELETE', f'/rooms/{room_id}')
+            if success:
+                print(f"   Deleted test room: {room_id}")
+            else:
+                print(f"   Failed to delete test room: {room_id}")
+
+    def test_comprehensive_room_structure(self):
+        """Test room creation with comprehensive structure from enhanced_rooms.py"""
+        print("\n=== 🎯 TESTING COMPREHENSIVE ROOM STRUCTURE ===")
+        
+        # Test 1: Create kitchen room to verify comprehensive structure
+        print("Testing kitchen room creation with comprehensive structure...")
+        
+        kitchen_data = {
+            "name": "kitchen",
+            "project_id": PROJECT_ID
+        }
+        
+        success, room_data, status_code = self.make_request('POST', '/rooms', kitchen_data)
+        
+        if success and 'categories' in room_data:
+            categories = room_data.get('categories', [])
+            total_subcategories = 0
+            total_items = 0
+            
+            print(f"📊 KITCHEN ROOM STRUCTURE ANALYSIS:")
+            print(f"   Total Categories: {len(categories)}")
+            
+            # Check for new categories from enhanced_rooms.py
+            category_names = [cat['name'].lower() for cat in categories]
+            
+            # Expected new categories from enhanced_rooms.py
+            expected_categories = [
+                'lighting', 'paint, wallpaper, and finishes', 'counter tops', 'appliances',
+                'plumbing', 'furniture & storage', 'cabinets, storage & organization', 'decor & accessories'
+            ]
+            
+            found_categories = []
+            missing_categories = []
+            
+            for expected in expected_categories:
+                if expected in category_names:
+                    found_categories.append(expected)
+                else:
+                    missing_categories.append(expected)
+            
+            print(f"   Found Categories: {found_categories}")
+            if missing_categories:
+                print(f"   ❌ Missing Categories: {missing_categories}")
+            
+            # Check for new appliances in kitchen
+            appliance_items = []
+            new_appliances = ['drink fridge', 'ice machine', 'built in coffee maker', 'convection microwave', 'fridge and freezer drawer']
+            found_new_appliances = []
+            
+            for category in categories:
+                if 'appliance' in category['name'].lower():
+                    for subcategory in category.get('subcategories', []):
+                        for item in subcategory.get('items', []):
+                            appliance_items.append(item['name'].lower())
+                            if any(new_app in item['name'].lower() for new_app in new_appliances):
+                                found_new_appliances.append(item['name'])
+                
+                total_subcategories += len(category.get('subcategories', []))
+                for subcategory in category.get('subcategories', []):
+                    total_items += len(subcategory.get('items', []))
+            
+            print(f"   Total Subcategories: {total_subcategories}")
+            print(f"   Total Items: {total_items}")
+            
+            # Check for new appliances
+            print(f"🔍 NEW APPLIANCES CHECK:")
+            print(f"   Found New Appliances: {found_new_appliances}")
+            
+            # Check if we have comprehensive structure (should be hundreds of items, not just 56)
+            if total_items > 100:
+                self.log_test("Kitchen Comprehensive Structure", True, f"{total_items} items (expected hundreds)")
+                print(f"✅ COMPREHENSIVE STRUCTURE CONFIRMED: {total_items} items")
+            else:
+                self.log_test("Kitchen Comprehensive Structure", False, f"Only {total_items} items (expected hundreds)")
+                print(f"❌ BASIC STRUCTURE DETECTED: Only {total_items} items")
+                
+            # Check status defaults
+            print(f"🔍 STATUS DEFAULTS CHECK:")
+            blank_status_count = 0
+            picked_status_count = 0
+            
+            for category in categories:
+                for subcategory in category.get('subcategories', []):
+                    for item in subcategory.get('items', []):
+                        if item.get('status', '') == '':
+                            blank_status_count += 1
+                        elif item.get('status', '') == 'PICKED':
+                            picked_status_count += 1
+            
+            print(f"   Items with blank status: {blank_status_count}")
+            print(f"   Items with PICKED status: {picked_status_count}")
+            
+            if blank_status_count > picked_status_count:
+                self.log_test("Status Defaults Blank", True, f"Most items have blank status ({blank_status_count} blank vs {picked_status_count} picked)")
+            else:
+                self.log_test("Status Defaults Blank", False, f"Too many items have PICKED status ({picked_status_count} picked vs {blank_status_count} blank)")
+            
+            # Store room for cleanup
+            if 'id' in room_data:
+                self.created_rooms.append(room_data['id'])
+                
+        else:
+            self.log_test("Kitchen Comprehensive Structure", False, f"Failed to create kitchen room: {room_data}")
+
+    def test_new_major_categories(self):
+        """Test creation of new major categories: CABINETS and ARCHITECTURAL ELEMENTS"""
+        print("\n=== 🎯 TESTING NEW MAJOR CATEGORIES ===")
+        
+        # Test 1: Create cabinets room
+        print("Testing 'cabinets' room creation...")
+        
+        cabinets_data = {
+            "name": "cabinets",
+            "project_id": PROJECT_ID
+        }
+        
+        success, room_data, status_code = self.make_request('POST', '/rooms', cabinets_data)
+        
+        if success and 'categories' in room_data:
+            categories = room_data.get('categories', [])
+            
+            print(f"📊 CABINETS ROOM STRUCTURE:")
+            print(f"   Total Categories: {len(categories)}")
+            
+            # Check for cabinet-specific categories
+            cabinet_categories = ['kitchen cabinets', 'bathroom cabinets', 'built-in cabinets']
+            found_cabinet_categories = []
+            
+            for category in categories:
+                cat_name = category['name'].lower()
+                if any(cab_cat in cat_name for cab_cat in cabinet_categories):
+                    found_cabinet_categories.append(category['name'])
+                    
+                    # Check for RED 'CABINETS' subcategories
+                    for subcategory in category.get('subcategories', []):
+                        if subcategory['name'].upper() == 'CABINETS':
+                            print(f"   ✅ Found CABINETS subcategory in {category['name']}")
+                            print(f"      Color: {subcategory.get('color', 'N/A')}")
+            
+            print(f"   Found Cabinet Categories: {found_cabinet_categories}")
+            
+            if found_cabinet_categories:
+                self.log_test("CABINETS Category Working", True, f"Found categories: {found_cabinet_categories}")
+            else:
+                self.log_test("CABINETS Category Working", False, "No cabinet categories found")
+                
+            # Store room for cleanup
+            if 'id' in room_data:
+                self.created_rooms.append(room_data['id'])
+                
+        else:
+            self.log_test("CABINETS Category Working", False, f"Failed to create cabinets room: {room_data}")
+
+        # Test 2: Create architectural elements room
+        print("\nTesting 'architectural elements' room creation...")
+        
+        arch_data = {
+            "name": "architectural elements",
+            "project_id": PROJECT_ID
+        }
+        
+        success, room_data, status_code = self.make_request('POST', '/rooms', arch_data)
+        
+        if success and 'categories' in room_data:
+            categories = room_data.get('categories', [])
+            
+            print(f"📊 ARCHITECTURAL ELEMENTS ROOM STRUCTURE:")
+            print(f"   Total Categories: {len(categories)}")
+            
+            # Check for architectural-specific categories
+            arch_categories = ['trim work', 'architectural features', 'built-ins']
+            found_arch_categories = []
+            
+            for category in categories:
+                cat_name = category['name'].lower()
+                if any(arch_cat in cat_name for arch_cat in arch_categories):
+                    found_arch_categories.append(category['name'])
+                    
+                    # Check for RED subcategories
+                    for subcategory in category.get('subcategories', []):
+                        if subcategory['name'].upper() in ['TRIM', 'FEATURES', 'BUILT-INS']:
+                            print(f"   ✅ Found {subcategory['name']} subcategory in {category['name']}")
+                            print(f"      Color: {subcategory.get('color', 'N/A')}")
+            
+            print(f"   Found Architectural Categories: {found_arch_categories}")
+            
+            if found_arch_categories:
+                self.log_test("ARCHITECTURAL ELEMENTS Category Working", True, f"Found categories: {found_arch_categories}")
+            else:
+                self.log_test("ARCHITECTURAL ELEMENTS Category Working", False, "No architectural categories found")
+                
+            # Store room for cleanup
+            if 'id' in room_data:
+                self.created_rooms.append(room_data['id'])
+                
+        else:
+            self.log_test("ARCHITECTURAL ELEMENTS Category Working", False, f"Failed to create architectural elements room: {room_data}")
 
     def run_all_tests(self):
         """Run all FF&E backend tests"""
