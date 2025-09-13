@@ -25,7 +25,7 @@ const ScrapingTestPage = () => {
     setScrapeError('');
 
     try {
-      const backendUrl = 'https://interior-sprints.preview.emergentagent.com';
+      const backendUrl = 'https://ffe-manager.preview.emergentagent.com';
       
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);
