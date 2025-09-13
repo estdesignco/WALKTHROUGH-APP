@@ -1572,7 +1572,7 @@ async def create_room(room_data: RoomCreate):
                         "name": item_name,
                         "quantity": 1,
                         "size": "",
-                        "status": "PICKED",  # Valid default status
+                        "status": "",  # BLANK default as requested by user
                         "vendor": "",
                         "cost": 0,
                         "finish_color": "",
