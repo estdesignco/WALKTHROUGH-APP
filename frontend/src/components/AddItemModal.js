@@ -21,6 +21,25 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
   const [scrapeError, setScrapeError] = useState('');
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
 
+  const handleBarcodeResult = (productData) => {
+    console.log('📷 Barcode scan result:', productData);
+    
+    if (productData.success && productData.data) {
+      const data = productData.data;
+      setFormData(prev => ({
+        ...prev,
+        name: data.name || prev.name,
+        vendor: data.vendor || prev.vendor,
+        sku: data.sku || data.upc || prev.sku,
+        image_url: data.image_url || prev.image_url
+      }));
+      
+      console.log('✅ Form populated from barcode scan');
+    }
+    
+    setShowBarcodeScanner(false);
+  };
+
   const handleLinkScraping = async () => {
     if (!formData.link || !formData.link.startsWith('http')) {
       setScrapeError('Please enter a valid URL starting with http:// or https://');
