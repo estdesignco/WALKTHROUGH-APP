@@ -199,9 +199,9 @@ frontend:
 
   - task: "Add Item Modal and Scraping"
     implemented: true
-    working: true
+    working: false
     file: "AddItemModal.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -211,6 +211,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "🎯 REVIEW REQUEST ENHANCED SCRAPING TESTING COMPLETED: ✅ FOUR HANDS URL WORKING PERFECTLY: https://fourhands.com/product/248067-003 successfully extracts name='Fenn Chair', vendor='Four Hands', sku='248067-003' with 200 OK status and correct JSON response format. ✅ VENDOR DETECTION ULTRA-ROBUST: Correctly identifies 'Four Hands' from URL domain with comprehensive vendor mapping. ✅ PRODUCT DATA EXTRACTION: Successfully extracts core product information (name, vendor, SKU) from JavaScript-rendered wholesale furniture site. ✅ SCRAPING ENDPOINT OPERATIONAL: POST /api/scrape-product fully functional with proper error handling and response structure. Enhanced scraping system is production-ready for wholesale furniture vendor integration as requested in review."
+      - working: false
+        agent: "testing"
+        comment: "❌ SCRAPING DATA NOT POPULATING FORM FIELDS: While Add Item modal opens with URL input field and Fill button, testing Four Hands URL (https://fourhands.com/product/248067-003) only populates the URL field itself but does NOT populate the name, vendor, or SKU fields as expected. The scraping appears to be running (shows 'Scraping product information...' message) but the extracted data is not being mapped to the form fields. This is a critical issue as user specifically requested verification that scraping extracts name, price, image, SKU, etc. from Four Hands URL."
 
 metadata:
   created_by: "main_agent"
