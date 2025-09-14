@@ -793,7 +793,10 @@ const ExactFFESpreadsheet = ({
                   {/* TABLE BODY - Keep original hierarchical structure */}
                   <tbody>
                 {/* USE FILTERED PROJECT DATA */}
-                {(filteredProject || project).rooms.map((room, roomIndex) => {
+                <Droppable droppableId="rooms" type="room">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {(filteredProject || project).rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
                   console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
                   
