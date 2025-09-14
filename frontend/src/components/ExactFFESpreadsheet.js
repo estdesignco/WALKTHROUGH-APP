@@ -473,7 +473,9 @@ const ExactFFESpreadsheet = ({
 
         if (basicResponse.ok) {
           console.log('✅ Basic category added successfully');
-          window.location.reload();
+          if (onReload) {
+            onReload();
+          }
         } else {
           throw new Error(`HTTP ${basicResponse.status}`);
         }
