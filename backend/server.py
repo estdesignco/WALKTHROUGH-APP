@@ -2855,7 +2855,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            # Try to extract the MAIN PRODUCT IMAGE (largest/best quality)
+            # 🖼️ ULTRA-COMPREHENSIVE IMAGE EXTRACTION (FINDS THE PERFECT MAIN IMAGE!)
+            print(f"🖼️ Starting ULTRA-IMAGE extraction...")
             best_image_url = None
             best_image_score = 0
             
@@ -2877,34 +2878,73 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                             base_url = '/'.join(url.split('/')[:3])
                                             src = base_url + src
                                         best_image_url = src
+                                        print(f"✅ IMAGE candidate: {src} (score: {score})")
                             except:
                                 continue
                     else:  # Regular selector handling - prioritize first match
-                        element = await page.query_selector(selector)
-                        if element:
-                            src = await element.get_attribute('src')
-                            if src:
-                                # Convert relative URLs to absolute
+                        elements = await page.query_selector_all(selector)
+                        for element in elements:
+                            try:
+                                src = await element.get_attribute('src')
+                                if src:
+                                    # Convert relative URLs to absolute
+                                    if src.startswith('//'):
+                                        src = 'https:' + src
+                                    elif src.startswith('/'):
+                                        base_url = '/'.join(url.split('/')[:3])
+                                        src = base_url + src
+                                    
+                                    # Score this image
+                                    score = _score_image_quality(src)
+                                    if score > best_image_score:
+                                        best_image_score = score
+                                        best_image_url = src
+                                        print(f"✅ IMAGE found: {src} (score: {score})")
+                                        
+                                    # If this is a high-priority selector and good quality, use it
+                                    if score >= 50:  # Good quality threshold
+                                        break
+                            except:
+                                continue
+                        if best_image_score >= 50:
+                            break
+                except:
+                    continue
+            
+            # If no high-quality image found, try aggressive approach
+            if not best_image_url or best_image_score < 30:
+                try:
+                    print("🔍 Trying AGGRESSIVE image extraction...")
+                    all_images = await page.query_selector_all('img')
+                    for img in all_images[:20]:  # Check first 20 images
+                        try:
+                            src = await img.get_attribute('src')
+                            alt = await img.get_attribute('alt')
+                            width = await img.get_attribute('width')
+                            height = await img.get_attribute('height')
+                            
+                            if src and (
+                                (alt and ('product' in alt.lower() or 'main' in alt.lower())) or
+                                (width and int(width) > 200) or 
+                                (height and int(height) > 200) or
+                                ('product' in src.lower() or 'main' in src.lower() or 'hero' in src.lower())
+                            ):
                                 if src.startswith('//'):
                                     src = 'https:' + src
                                 elif src.startswith('/'):
                                     base_url = '/'.join(url.split('/')[:3])
                                     src = base_url + src
-                                
-                                # Score this image
-                                score = _score_image_quality(src)
-                                if score > best_image_score:
-                                    best_image_score = score
-                                    best_image_url = src
-                                    
-                                # If this is a high-priority selector and good quality, use it
-                                if score >= 50:  # Good quality threshold
-                                    break
+                                best_image_url = src
+                                print(f"✅ AGGRESSIVE IMAGE found: {src}")
+                                break
+                        except:
+                            continue
                 except:
-                    continue
+                    pass
             
             if best_image_url:
                 result['image_url'] = best_image_url
+                print(f"🎯 FINAL IMAGE: {best_image_url}")
             
             # Try to extract description with enhanced filtering
             for selector in description_selectors:
