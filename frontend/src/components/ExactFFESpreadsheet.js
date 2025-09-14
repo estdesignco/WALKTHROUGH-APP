@@ -453,7 +453,9 @@ const ExactFFESpreadsheet = ({
       if (response.ok) {
         console.log('✅ Category with full structure added successfully');
         // Force reload to show the new category with all subcategories and items
-        window.location.reload();
+        if (onReload) {
+          onReload();
+        }
       } else {
         console.error('❌ Comprehensive category endpoint failed, trying basic endpoint');
         // Fallback to basic category creation
