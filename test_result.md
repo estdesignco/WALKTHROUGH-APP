@@ -214,14 +214,15 @@ metadata:
 
 test_plan:
   current_focus:
-    - "✅ FF&E ROUTING FIX VERIFIED: Project creation, data access, and backend APIs all working"
-    - "✅ SCRAPING ENDPOINT FIXED: Four Hands URL working with Playwright browsers installed"
-    - "✅ COMPREHENSIVE STRUCTURE CONFIRMED: Kitchen rooms create 82 items with new appliances"
-    - "✅ NEW CATEGORIES WORKING: CABINETS and ARCHITECTURAL ELEMENTS properly implemented"
-    - "✅ STATUS DEFAULTS FIXED: All items default to blank status as requested"
+    - "✅ REVIEW REQUEST BACKEND TESTING COMPLETED: All 5 critical fixes verified"
+    - "✅ FILTERING SYSTEM BACKEND: Room/carrier/status/vendor filter data working"
+    - "✅ DROPDOWN PERSISTENCE BACKEND: 22 statuses + 19 carriers with colors"
+    - "✅ LINK COLUMN BACKEND: Link field support and blank status defaults verified"
+    - "✅ ENHANCED SCRAPING ULTRA-ROBUST: Four Hands URL working perfectly"
+    - "✅ ADD CATEGORY COMPREHENSIVE: Endpoint operational with auto-populate support"
   stuck_tasks: []
   test_all: false
-  test_priority: "ff_e_routing_fix_verified"
+  test_priority: "review_request_backend_verified"
 
 agent_communication:
   - agent: "main"
