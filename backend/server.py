@@ -3037,6 +3037,60 @@ async def complete_walkthrough(data: dict):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Walkthrough completion failed: {str(e)}")
 
+@api_router.post("/questionnaire/{project_id}")
+async def save_questionnaire(project_id: str, data: dict):
+    """Save questionnaire answers for project"""
+    try:
+        questionnaire_doc = {
+            "id": str(uuid.uuid4()),
+            "project_id": project_id,
+            "answers": data.get("answers", {}),
+            "completed_at": data.get("completed_at"),
+            "completion_percentage": data.get("completion_percentage", 0),
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Update existing or create new
+        await db.questionnaires.replace_one(
+            {"project_id": project_id},
+            questionnaire_doc,
+            upsert=True
+        )
+        
+        return {
+            "success": True,
+            "questionnaire_id": questionnaire_doc["id"],
+            "completion_percentage": questionnaire_doc["completion_percentage"]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to save questionnaire: {str(e)}")
+
+@api_router.get("/questionnaire/{project_id}")
+async def get_questionnaire(project_id: str):
+    """Get questionnaire answers for project"""
+    try:
+        questionnaire = await db.questionnaires.find_one({"project_id": project_id})
+        
+        if questionnaire:
+            return {
+                "project_id": project_id,
+                "answers": questionnaire.get("answers", {}),
+                "completion_percentage": questionnaire.get("completion_percentage", 0),
+                "completed_at": questionnaire.get("completed_at"),
+                "last_updated": questionnaire.get("updated_at")
+            }
+        else:
+            return {
+                "project_id": project_id,
+                "answers": {},
+                "completion_percentage": 0
+            }
+            
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to get questionnaire: {str(e)}")
+
 @api_router.post("/integrations/mobile/sync")
 async def mobile_sync(data: dict):
     """Sync mobile app data with server"""
