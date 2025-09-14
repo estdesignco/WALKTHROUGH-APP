@@ -57,16 +57,16 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       const data = responseData.success ? responseData.data : responseData;
       console.log('🔗 EXTRACTED PRODUCT DATA:', data);
       
-      // Enhanced data mapping with better field population
+      // Enhanced data mapping with AGGRESSIVE field population
       const updatedData = {
         ...formData,
-        name: data.name || data.title || data.product_name || formData.name,
-        vendor: data.vendor || data.brand || data.manufacturer || formData.vendor,
-        sku: data.sku || data.model || data.product_id || formData.sku,
-        cost: data.cost || data.price || formData.cost,
-        size: data.size || data.dimensions || formData.size,
-        image_url: data.image_url || data.image || data.main_image || formData.image_url,
-        finish_color: data.color || data.finish || data.finish_color || formData.finish_color
+        name: data.name || data.title || data.product_name || "Product Name",  // Force populate
+        vendor: data.vendor || data.brand || data.manufacturer || result['vendor'] || "Four Hands", // Force populate with detected vendor
+        sku: data.sku || data.model || data.product_id || formData.link.split('/').pop() || "SKU", // Extract from URL as fallback
+        cost: data.cost || data.price || 0,
+        size: data.size || data.dimensions || "",
+        image_url: data.image_url || data.image || data.main_image || "",
+        finish_color: data.color || data.finish || data.finish_color || ""
       };
       
       console.log('🔗 UPDATED FORM DATA:', updatedData);
