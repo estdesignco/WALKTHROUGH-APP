@@ -20,20 +20,18 @@ const WalkthroughSheet = () => {
 
   const loadProject = async () => {
     try {
+      console.log('🚀 Loading walkthrough project data...');
       const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
+      
       if (response.ok) {
         const projectData = await response.json();
+        console.log('✅ Walkthrough project loaded:', projectData.name);
         setProject(projectData);
-        
-        // Initialize all rooms as expanded
-        const roomExpansion = {};
-        projectData.rooms.forEach(room => {
-          roomExpansion[room.id] = true;
-        });
-        setExpandedRooms(roomExpansion);
+      } else {
+        console.error('❌ Failed to load walkthrough project');
       }
     } catch (error) {
-      console.error('Error loading project:', error);
+      console.error('❌ Error loading walkthrough project:', error);
     }
   };
 
