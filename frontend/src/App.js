@@ -142,8 +142,8 @@ const App = () => {
               }
             />
             <Route 
-              path="/project/:projectId/ffe" 
-              element={<FFEDashboardWrapper />}
+              path="/project/:projectId/questionnaire" 
+              element={<QuestionnaireSheet />}
             />
             <Route 
               path="/project/:projectId/walkthrough" 
@@ -152,6 +152,10 @@ const App = () => {
             <Route 
               path="/project/:projectId/checklist" 
               element={<ChecklistSheet />}
+            />
+            <Route 
+              path="/project/:projectId/ffe" 
+              element={<FFEDashboardWrapper />}
             />
             <Route 
               path="/scraping-test" 
