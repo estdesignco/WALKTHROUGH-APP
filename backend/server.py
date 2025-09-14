@@ -2755,17 +2755,39 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'p:not([class*="nav"]):not([class*="menu"])'
             ]
             
-            # Try to extract product name
+            # 🔍 ULTRA-COMPREHENSIVE NAME EXTRACTION (FINDS EVERYTHING!)
+            print(f"🔍 Starting ULTRA-NAME extraction...")
             for selector in name_selectors:
                 try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        text = await element.inner_text()
-                        if text and len(text.strip()) > 0:
-                            result['name'] = text.strip()
-                            break
+                    if 'title' in selector and 'meta' in selector:  # Special handling for meta tags
+                        element = await page.query_selector(selector)
+                        if element:
+                            content = await element.get_attribute('content')
+                            if content and len(content.strip()) > 0:
+                                result['name'] = content.strip()
+                                print(f"✅ NAME from meta tag: {result['name']}")
+                                break
+                    else:
+                        element = await page.query_selector(selector)
+                        if element:
+                            text = await element.inner_text()
+                            if text and len(text.strip()) > 0 and len(text.strip()) < 200:
+                                result['name'] = text.strip()
+                                print(f"✅ NAME extracted: {result['name']}")
+                                break
                 except:
                     continue
+            
+            # If no name found, try even more aggressive approach
+            if not result['name']:
+                try:
+                    # Try page title as last resort
+                    page_title = await page.title()
+                    if page_title and len(page_title.strip()) > 0:
+                        result['name'] = page_title.strip()
+                        print(f"✅ NAME from page title: {result['name']}")
+                except:
+                    pass
             
             # Try to extract price with enhanced JavaScript handling
             for selector in price_selectors:
