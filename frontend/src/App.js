@@ -8,6 +8,7 @@ import Navigation from "./components/Navigation";
 import ScrapingTestPage from "./components/ScrapingTestPage";
 import QuestionnaireSheet from "./components/QuestionnaireSheet";
 import WalkthroughDashboard from "./components/WalkthroughDashboard";
+import ChecklistDashboard from "./components/ChecklistDashboard";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
