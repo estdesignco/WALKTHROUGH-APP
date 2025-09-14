@@ -213,20 +213,20 @@ const FFEDashboard = ({ isOffline }) => {
           <p className="text-gray-300">Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
         </div>
 
-        {/* SHEET NAVIGATION TABS */}
+        {/* Navigation Tabs */}
         <div className="flex justify-center space-x-8 mb-6">
-          <div className="flex items-center space-x-2 text-gray-400">
+          <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
             <span>📋</span>
             <span>Questionnaire</span>
-          </div>
-          <div className="flex items-center space-x-2 text-gray-400">
+          </a>
+          <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
             <span>🚶</span>
             <span>Walkthrough</span>
-          </div>
-          <div className="flex items-center space-x-2 text-gray-400">
+          </a>
+          <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
             <span>✅</span>
             <span>Checklist</span>
-          </div>
+          </a>
           <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
             <span>📊</span>
             <span className="font-semibold">FF&E</span>
