@@ -323,29 +323,8 @@ const ExactFFESpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Item deleted successfully');
-        // Update filtered project state without reload
-        const updateProjectState = (prevProject) => {
-          if (!prevProject) return prevProject;
-          const updatedProject = { ...prevProject };
-          updatedProject.rooms = updatedProject.rooms.map(room => ({
-            ...room,
-            categories: room.categories.map(category => ({
-              ...category,
-              subcategories: category.subcategories.map(subcategory => ({
-                ...subcategory,
-                items: subcategory.items.filter(item => item.id !== itemId)
-              }))
-            }))
-          }));
-          return updatedProject;
-        };
-        
-        setFilteredProject(updateProjectState);
-        
-        // Also trigger parent component reload if callback is available
-        if (onReload) {
-          onReload();
-        }
+        // Force reload to show updated data
+        window.location.reload();
       } else {
         throw new Error(`HTTP ${response.status}`);
       }
