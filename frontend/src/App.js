@@ -145,6 +145,14 @@ const App = () => {
               element={<FFEDashboardWrapper />}
             />
             <Route 
+              path="/project/:projectId/walkthrough" 
+              element={<WalkthroughSheet />}
+            />
+            <Route 
+              path="/project/:projectId/checklist" 
+              element={<ChecklistSheet />}
+            />
+            <Route 
               path="/scraping-test" 
               element={<ScrapingTestPage />}
             />
