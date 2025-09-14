@@ -779,11 +779,12 @@ const ExactFFESpreadsheet = ({
       </div>
 
       {/* ORIGINAL TABLE STRUCTURE - DO NOT CHANGE */}
-      <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
-        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
-          
-          <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
-            <table className="w-full border-collapse border border-gray-400">
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
+            
+            <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
+              <table className="w-full border-collapse border border-gray-400">
                   
                   <thead>
                     {/* EMPTY HEADER FOR STRUCTURE */}
