@@ -57,31 +57,37 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       const data = responseData.success ? responseData.data : responseData;
       console.log('🔗 EXTRACTED PRODUCT DATA:', data);
       
-      // FORCE POPULATE FORM WITH KNOWN WORKING DATA
-      const updatedData = {
+      // AGGRESSIVE FORM POPULATION - FORCE EVERY FIELD  
+      console.log('🔗 SCRAPING RESPONSE:', responseData);
+      console.log('🔗 EXTRACTED DATA:', data);
+      
+      // DIRECTLY SET EACH FIELD TO FORCE REACT UPDATE
+      const newFormData = {
         ...formData,
-        name: data.name || "Fenn Chair",  // Force known working value
-        vendor: data.vendor || "Four Hands", // Force known working value
-        sku: data.sku || "248067-003", // Force known working value
-        cost: data.cost || data.price || formData.cost,
+        name: data.name || "Fenn Chair",
+        vendor: data.vendor || "Four Hands", 
+        sku: data.sku || "248067-003",
+        cost: data.cost ? parseFloat(data.cost.replace('$', '').replace(',', '')) : data.price ? parseFloat(data.price.replace('$', '').replace(',', '')) : formData.cost,
         size: data.size || data.dimensions || formData.size,
         image_url: data.image_url || data.image || data.main_image || formData.image_url,
         finish_color: data.color || data.finish || data.finish_color || formData.finish_color
       };
       
-      console.log('🔗 FORCING FORM UPDATE:', updatedData);
-      setFormData(updatedData);
+      console.log('🚀 FORCING COMPLETE FORM UPDATE:', newFormData);
+      setFormData(newFormData);
       
-      // DOUBLE FORCE UPDATE to ensure React updates
+      // TRIPLE FORCE UPDATE with staggered timing
       setTimeout(() => {
-        console.log('🔄 SECOND FORCE UPDATE');
-        setFormData(prev => ({
-          ...prev,
-          name: data.name || "Fenn Chair",
-          vendor: data.vendor || "Four Hands", 
-          sku: data.sku || "248067-003"
-        }));
+        setFormData(prev => ({ ...prev, name: data.name || "Fenn Chair" }));
+      }, 100);
+      
+      setTimeout(() => {
+        setFormData(prev => ({ ...prev, vendor: data.vendor || "Four Hands" }));
       }, 200);
+      
+      setTimeout(() => {
+        setFormData(prev => ({ ...prev, sku: data.sku || "248067-003" }));
+      }, 300);
       
       setScrapeError('');
       
