@@ -409,6 +409,78 @@ const ExactFFESpreadsheet = ({
 
   // Drag and drop functionality removed
 
+  // Handle drag and drop for rooms and categories
+  const handleDragEnd = async (result) => {
+    if (!result.destination) return;
+
+    const { source, destination, type } = result;
+
+    if (type === 'room') {
+      // Reorder rooms
+      const newRooms = Array.from(project.rooms);
+      const [reorderedRoom] = newRooms.splice(source.index, 1);
+      newRooms.splice(destination.index, 0, reorderedRoom);
+      
+      // Update order indices
+      const updatedRooms = newRooms.map((room, index) => ({
+        ...room,
+        order_index: index
+      }));
+      
+      // Update local state immediately
+      const updatedProject = { ...project, rooms: updatedRooms };
+      setProject(updatedProject);
+      setFilteredProject(updatedProject);
+      
+      // Update backend
+      try {
+        for (const room of updatedRooms) {
+          await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms/${room.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_index: room.order_index })
+          });
+        }
+        console.log('✅ Room order updated successfully');
+      } catch (err) {
+        console.error('❌ Error updating room order:', err);
+        // Revert on error
+        window.location.reload();
+      }
+    }
+    
+    if (type === 'category') {
+      // Handle category reordering
+      const roomId = source.droppableId.replace('categories-', '');
+      const room = project.rooms.find(r => r.id === roomId);
+      
+      if (room) {
+        const newCategories = Array.from(room.categories);
+        const [reorderedCategory] = newCategories.splice(source.index, 1);
+        newCategories.splice(destination.index, 0, reorderedCategory);
+        
+        // Update order indices
+        const updatedCategories = newCategories.map((category, index) => ({
+          ...category,
+          order_index: index
+        }));
+        
+        // Update local state
+        const updatedProject = {
+          ...project,
+          rooms: project.rooms.map(r => 
+            r.id === roomId ? { ...r, categories: updatedCategories } : r
+          )
+        };
+        
+        setProject(updatedProject);
+        setFilteredProject(updatedProject);
+        
+        console.log('✅ Category order updated locally');
+      }
+    }
+  };
+
   // Toggle room expansion
   const toggleRoomExpansion = (roomId) => {
     setExpandedRooms(prev => ({
