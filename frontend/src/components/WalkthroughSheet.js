@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import WalkthroughSpreadsheet from './WalkthroughSpreadsheet';
+import AddRoomModal from './AddRoomModal';
 
 const WalkthroughSheet = () => {
   const { projectId } = useParams();
