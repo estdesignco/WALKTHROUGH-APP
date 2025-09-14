@@ -87,8 +87,10 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // APPLY FILTERS - ACTUALLY MAKE FILTERING WORK
+  // APPLY FILTERS - SIMPLE WORKING VERSION
   useEffect(() => {
+    console.log('🔍 Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier });
+    
     if (!project) {
       setFilteredProject(null);
       return;
@@ -96,97 +98,66 @@ const ExactFFESpreadsheet = ({
 
     let filtered = { ...project };
 
+    // Apply filters if any are selected
     if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus || selectedCarrier) {
-      filtered.rooms = project.rooms.filter(room => {
-        // Room filter - Fixed to use room.id instead of room.name
+      console.log('🔍 Applying filters...');
+      
+      filtered.rooms = project.rooms.map(room => {
+        // Room filter
         if (selectedRoom && room.id !== selectedRoom) {
-          return false;
+          return { ...room, categories: [] }; // Hide room content but keep room header
         }
-
-        // Search term in room name
-        if (searchTerm && !room.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-          let hasMatchingItem = false;
+        
+        // Filter categories and items
+        const filteredCategories = room.categories.map(category => {
+          // Category filter
+          if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) {
+            return { ...category, subcategories: [] };
+          }
           
-          // Check if any item in room matches search term
-          room.categories?.forEach(category => {
-            category.subcategories?.forEach(subcategory => {
-              subcategory.items?.forEach(item => {
-                if (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    (item.vendor && item.vendor.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                    (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))) {
-                  hasMatchingItem = true;
-                }
-              });
+          // Filter subcategories and items
+          const filteredSubcategories = category.subcategories.map(subcategory => {
+            const filteredItems = subcategory.items.filter(item => {
+              // Search term filter
+              if (searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
+                const itemMatch = 
+                  item.name.toLowerCase().includes(searchLower) ||
+                  (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
+                  (item.sku && item.sku.toLowerCase().includes(searchLower));
+                if (!itemMatch) return false;
+              }
+              
+              // Vendor filter
+              if (selectedVendor && item.vendor !== selectedVendor) {
+                return false;
+              }
+              
+              // Status filter
+              if (selectedStatus && item.status !== selectedStatus) {
+                return false;
+              }
+              
+              // Carrier filter
+              if (selectedCarrier && item.carrier !== selectedCarrier) {
+                return false;
+              }
+              
+              return true;
             });
+            
+            return { ...subcategory, items: filteredItems };
           });
           
-          if (!hasMatchingItem) return false;
-        }
-
-        // Filter categories and items within room
-        if (selectedCategory || selectedVendor || selectedStatus || selectedCarrier || searchTerm) {
-          const filteredCategories = room.categories?.filter(category => {
-            // Category filter
-            if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) {
-              return false;
-            }
-
-            // Filter items within category
-            const filteredSubcategories = category.subcategories?.map(subcategory => {
-              const filteredItems = subcategory.items?.filter(item => {
-                // Vendor filter
-                if (selectedVendor && (!item.vendor || item.vendor.toLowerCase() !== selectedVendor.toLowerCase())) {
-                  return false;
-                }
-
-                // Status filter
-                if (selectedStatus && (!item.status || item.status !== selectedStatus)) {
-                  return false;
-                }
-
-                // Carrier filter
-                if (selectedCarrier && (!item.carrier || item.carrier !== selectedCarrier)) {
-                  return false;
-                }
-
-                // Search term filter for items
-                if (searchTerm) {
-                  const searchLower = searchTerm.toLowerCase();
-                  if (!item.name.toLowerCase().includes(searchLower) &&
-                      !(item.vendor && item.vendor.toLowerCase().includes(searchLower)) &&
-                      !(item.sku && item.sku.toLowerCase().includes(searchLower))) {
-                    return false;
-                  }
-                }
-
-                return true;
-              }) || [];
-
-              return {
-                ...subcategory,
-                items: filteredItems
-              };
-            }) || [];
-
-            return {
-              ...category,
-              subcategories: filteredSubcategories.filter(sub => 
-                sub.items && sub.items.length > 0
-              )
-            };
-          }) || [];
-
-          return {
-            ...room,
-            categories: filteredCategories
-          };
-        }
-
-        return room;
+          return { ...category, subcategories: filteredSubcategories };
+        });
+        
+        return { ...room, categories: filteredCategories };
       });
     }
 
     setFilteredProject(filtered);
+    console.log('🔍 Filter applied, rooms:', filtered.rooms.length);
   }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier]);
 
   // Load available categories on component mount
