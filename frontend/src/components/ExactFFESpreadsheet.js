@@ -388,9 +388,10 @@ const ExactFFESpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Item deleted successfully');
-        // Update filtered project state without reload
+        // Update local state instead of reloading page  
         const updateProjectState = (prevProject) => {
           if (!prevProject) return prevProject;
+          
           const updatedProject = { ...prevProject };
           updatedProject.rooms = updatedProject.rooms.map(room => ({
             ...room,
@@ -406,7 +407,7 @@ const ExactFFESpreadsheet = ({
         };
         
         setFilteredProject(updateProjectState);
-        
+
         // Also trigger parent component reload if callback is available
         if (onReload) {
           onReload();
