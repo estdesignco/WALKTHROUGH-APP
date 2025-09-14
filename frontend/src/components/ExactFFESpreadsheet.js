@@ -227,7 +227,9 @@ const ExactFFESpreadsheet = ({
 
           return {
             ...room,
-            categories: filteredCategories
+            categories: filteredCategories.filter(cat => 
+              cat.subcategories.some(sub => sub.items.length > 0)  // Only show categories with items
+            )
           };
         }
 
