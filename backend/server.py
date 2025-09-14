@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uuid
 import time
+import json
 from datetime import datetime, timezone
 from enum import Enum
 from playwright.async_api import async_playwright
