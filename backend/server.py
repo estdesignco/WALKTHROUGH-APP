@@ -2659,70 +2659,100 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 '.breadcrumb a:last-child, .breadcrumbs a:last-child'
             ]
             
-            # ✅ ENHANCED FOUR HANDS SPECIFIC SELECTORS FOR IMAGE, COST, SIZE
-            # Enhanced price selectors for JavaScript-rendered content
+            # 💰 ULTRA-COMPREHENSIVE PRICE SELECTORS (FINDS EVERY PENNY!)
             price_selectors = [
-                # Four Hands specific selectors (JavaScript-rendered)
+                # HIGH PRIORITY - Specific Price Selectors
                 '.price .money, .product-price .money, [data-price], .price-current',
                 '.product-form__price, .product__price, .price__sale, .price__regular',
                 '.price-item--regular, .price__regular, .price--highlight',
-                'span[class*="price"], div[class*="price"]',
-                # Four Hands specific price patterns
+                '[class*="price"]:not([class*="original"]):not([class*="old"])',
+                'span[class*="price"], div[class*="price"], p[class*="price"]',
+                
+                # MEDIUM PRIORITY - E-commerce Platform Specific
+                # Shopify selectors
+                '.product__price .money, .product-form__price .money',
+                '.price-list .price-item, .product-price-wrap .price',
+                '.shopify-price, .money, .price-item',
+                
+                # WooCommerce selectors
+                '.woocommerce-price-amount, .amount, .price .woocommerce-Price-amount',
+                '.price-current .amount, .price-now .amount',
+                
+                # Magento selectors
+                '.price-final_price, .price-wrapper, .price-box .price',
+                
+                # Four Hands and wholesale specific
                 '.product-meta .price, .product-info .price, .pricing .price',
                 '.variant-picker .price, .product-form .price',
                 '[data-product-price], [data-variant-price]',
-                # Shopify common selectors
-                '.product__price .money, .product-form__price .money',
-                '.price-list .price-item, .product-price-wrap .price',
-                # Generic selectors
-                '[class*="price"]:not([class*="original"]):not([class*="old"])',
+                
+                # MEDIUM-LOW PRIORITY - Generic Attribute Selectors
                 '[data-testid*="price"], [data-test*="price"]',
+                '[data-price-value], [data-cost], [data-amount]',
                 '.cost, .pricing, .product-price, .price-current',
-                # Text-based approach for dynamic content
+                '.retail-price, .msrp, .sale-price, .regular-price',
+                
+                # LOW PRIORITY - Text-based search (will be filtered)
+                'span:contains("$"), div:contains("$"), p:contains("$")',
+                '*[text()*="$"]',  # XPath-like concept
                 'span, div, p'  # Will filter for $ content in code
             ]
             
-            # Enhanced image selectors for the MAIN PRODUCT IMAGE (not thumbnails)
+            # 🖼️ ULTRA-COMPREHENSIVE IMAGE SELECTORS (FINDS THE PERFECT IMAGE!)
             image_selectors = [
-                # Target the MAIN/HERO product images first
+                # HIGHEST PRIORITY - Main Product Images
                 '.product__media img[src*="cdn"]:not([src*="thumb"]):not([src*="small"])',
                 '.product-media img[src*="images"]:not([src*="thumbnail"])',
                 '.hero-image img, .main-image img, .primary-image img',
                 '.product-gallery img:first-child, .gallery-main img',
                 '.product-photos img:first-child',
+                '.featured-image img, .product-featured-image img',
                 
-                # Four Hands and Shopify specific MAIN image selectors
+                # HIGH PRIORITY - Shopify/E-commerce specific
                 '.product__media .media img[src*="1024"], .product__media .media img[src*="master"]',
                 '.product-single__photo img[src*="large"], .product-single__photo img[src*="master"]',
+                '.product-image-main img, .main-product-image img',
                 
-                # Generic selectors for LARGE product images (avoid thumbnails/small images)
+                # MEDIUM PRIORITY - Generic selectors for LARGE images
                 'img[class*="product"]:not([class*="thumb"]):not([class*="small"])',
                 'img[class*="hero"]:not([class*="thumb"])',
                 'img[class*="main"]:not([class*="thumb"])',
                 'img[class*="featured"]:not([class*="small"])',
                 'img[class*="primary"]:not([class*="thumbnail"])',
+                'img[alt*="product"], img[alt*="main"], img[alt*="hero"]',
                 
-                # Data attribute selectors for main images
+                # MEDIUM-LOW PRIORITY - Data attribute selectors
                 'img[data-main-image], img[data-product-image], img[data-featured-image]',
                 '[data-testid*="main-image"] img, [data-test*="product-image"] img',
+                'img[data-src*="product"], img[data-original*="product"]',
                 
-                # Last resort - but filter for larger images in code
-                'img[src*="product"], img[src*="item"], img[src*="cdn"]'
+                # LOW PRIORITY - Fallback selectors (will be filtered for quality)
+                'img[src*="product"], img[src*="item"], img[src*="cdn"]',
+                '.gallery img:first-child, .images img:first-child',
+                'figure img, .figure img, .image img'
             ]
             
-            # Enhanced description selectors for JavaScript-rendered content
+            # 📝 ULTRA-COMPREHENSIVE DESCRIPTION SELECTORS 
             description_selectors = [
-                # Shopify and modern e-commerce selectors
+                # HIGH PRIORITY - Specific Description Selectors
                 '.product__description, .product-description, .product-content',
                 '.product-single__description, .product-form__description',
+                '.description, .product-details, .item-description',
                 '[class*="description"]:not([class*="nav"]):not([class*="menu"])',
                 '[class*="detail"]:not([class*="nav"]):not([class*="menu"])',
-                '[class*="content"]:not([class*="nav"]):not([class*="menu"])',
+                
+                # MEDIUM PRIORITY - Rich Text Selectors
+                '.rte, .rich-text, .formatted-text, .wysiwyg',
+                '.product-info .content, .product-content .text',
                 '[data-testid*="description"], [data-test*="description"]',
-                '.rte, .rich-text, .formatted-text',
-                # Generic selectors
+                
+                # MEDIUM-LOW PRIORITY - Generic Content Selectors  
+                '[class*="content"]:not([class*="nav"]):not([class*="menu"])',
                 '.product-description, .item-details, .product-details',
-                'p:not([class*="nav"]):not([class*="menu"])'  # Will filter for description-like content
+                '.specifications, .specs, .features',
+                
+                # LOW PRIORITY - Fallback text elements
+                'p:not([class*="nav"]):not([class*="menu"])'
             ]
             
             # Try to extract product name
