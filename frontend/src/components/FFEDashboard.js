@@ -61,42 +61,31 @@ const FFEDashboard = ({ isOffline }) => {
 
   const loadSimpleProject = async () => {
     try {
-      console.log('🚀 Loading project data...');
-      console.log('🌍 Environment URL:', process.env.REACT_APP_BACKEND_URL);
-      console.log('🌍 Import meta URL:', import.meta.env?.REACT_APP_BACKEND_URL);
+      console.log('🚀 Loading project data for:', projectId);
       
-      // Try environment variable first, then fallback to hardcoded
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env?.REACT_APP_BACKEND_URL || 'https://code-scanner-14.preview.emergentagent.com';
-      console.log('🌍 Using backend URL:', backendUrl);
-      
-      const response = await fetch(`${backendUrl}/api/projects/${projectId}`);
-      
-      console.log('📡 Response status:', response.status);
+      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();
-        console.log('🚀 Project loaded:', projectData.name);
-        console.log('🚀 Project rooms count:', projectData.rooms?.length || 0);
+        console.log('✅ Project loaded successfully:', projectData.name);
         setProject(projectData);
         setError(null);
       } else {
-        console.error('🚀 Failed to load project:', response.status);
+        console.error('❌ Failed to load project:', response.status);
         setError('Failed to load project');
       }
     } catch (err) {
-      console.error('🚀 Error loading project:', err);
+      console.error('❌ Error loading project:', err);
       setError('Error loading project: ' + err.message);
-    } finally {
-      console.log('🚀 FORCE SETTING LOADING = FALSE');
-      setLoading(false);
-      
-      // Set default utility data
-      setRoomColors({});
-      setCategoryColors({});
-      setItemStatuses(['ORDERED', 'DELIVERED TO JOB SITE', 'INSTALLED']);
-      setVendorTypes(['Four Hands', 'Uttermost']);
-      setCarrierTypes(['FedEx', 'UPS']);
     }
+    
+    // ALWAYS set loading to false
+    setLoading(false);
+    
+    // Set utility data
+    setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']);
+    setVendorTypes(['Four Hands', 'Uttermost', 'Visual Comfort']);
+    setCarrierTypes(['FedEx', 'UPS', 'USPS', 'DHL']);
   };
 
   const loadUtilityDataAsync = async () => {
