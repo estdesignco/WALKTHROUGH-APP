@@ -169,7 +169,7 @@ const ExactFFESpreadsheet = ({
 
             return {
               ...category,
-              subcategories: filteredSubcategories
+              subcategories: filteredSubcategories.filter(sub => sub.items.length > 0)  // Only show subcategories with items
             };
           }) || [];
 
