@@ -4,18 +4,13 @@ import { useParams } from 'react-router-dom';
 const ChecklistSheet = () => {
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
-  const [checklistData, setChecklistData] = useState({
-    preDesign: [],
-    design: [],
-    procurement: [],
-    installation: [],
-    completion: []
-  });
+  const [checklistItems, setChecklistItems] = useState([]);
+  const [completedCount, setCompletedCount] = useState(0);
 
   useEffect(() => {
     if (projectId) {
       loadProject();
-      generateChecklist();
+      loadChecklist();
     }
   }, [projectId]);
 
@@ -27,73 +22,96 @@ const ChecklistSheet = () => {
         setProject(projectData);
       }
     } catch (error) {
-      console.error('Error loading project for checklist:', error);
+      console.error('Error loading project:', error);
     }
   };
 
-  const generateChecklist = () => {
-    // Generate comprehensive checklist based on project scope
-    const preDesignTasks = [
-      { id: 1, task: 'Initial client consultation', completed: false, phase: 'Discovery' },
-      { id: 2, task: 'Site measurements and walkthrough', completed: false, phase: 'Discovery' },
-      { id: 3, task: 'Design brief and requirements', completed: false, phase: 'Discovery' },
-      { id: 4, task: 'Budget discussion and approval', completed: false, phase: 'Discovery' },
-      { id: 5, task: 'Timeline establishment', completed: false, phase: 'Discovery' }
-    ];
+  const loadChecklist = async () => {
+    try {
+      // Generate checklist from walkthrough data or FF&E items
+      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
+      if (response.ok) {
+        const projectData = await response.json();
+        
+        // Generate checklist items from project data
+        const items = [];
+        let itemId = 1;
+        
+        projectData.rooms.forEach(room => {
+          room.categories.forEach(category => {
+            category.subcategories.forEach(subcategory => {
+              subcategory.items.forEach(item => {
+                items.push({
+                  id: itemId++,
+                  room: room.name,
+                  category: category.name,
+                  item: item.name,
+                  vendor: item.vendor || '',
+                  status: item.status || 'TO BE SELECTED',
+                  priority: 'Medium',
+                  completed: item.status === 'PICKED' || item.status === 'ORDERED' || item.status === 'DELIVERED TO JOB SITE' || item.status === 'INSTALLED',
+                  link: item.link || '',
+                  canva_board: null // For Canva integration
+                });
+              });
+            });
+          });
+        });
+        
+        setChecklistItems(items);
+        setCompletedCount(items.filter(item => item.completed).length);
+      }
+    } catch (error) {
+      console.error('Error loading checklist:', error);
+    }
+  };
 
-    const designTasks = [
-      { id: 6, task: 'Concept development', completed: false, phase: 'Design' },
-      { id: 7, task: 'Space planning and layout', completed: false, phase: 'Design' },
-      { id: 8, task: 'Material and finish selection', completed: false, phase: 'Design' },
-      { id: 9, task: 'Furniture and fixture selection', completed: false, phase: 'Design' },
-      { id: 10, task: 'Client presentation and approval', completed: false, phase: 'Design' }
-    ];
-
-    const procurementTasks = [
-      { id: 11, task: 'Final FF&E selections', completed: false, phase: 'Procurement' },
-      { id: 12, task: 'Vendor sourcing and quotes', completed: false, phase: 'Procurement' },
-      { id: 13, task: 'Purchase orders and contracts', completed: false, phase: 'Procurement' },
-      { id: 14, task: 'Delivery coordination', completed: false, phase: 'Procurement' },
-      { id: 15, task: 'Quality control inspections', completed: false, phase: 'Procurement' }
-    ];
-
-    const installationTasks = [
-      { id: 16, task: 'Pre-installation site prep', completed: false, phase: 'Installation' },
-      { id: 17, task: 'Fixture installation', completed: false, phase: 'Installation' },
-      { id: 18, task: 'Furniture placement', completed: false, phase: 'Installation' },
-      { id: 19, task: 'Styling and accessories', completed: false, phase: 'Installation' },
-      { id: 20, task: 'Final walkthrough with client', completed: false, phase: 'Installation' }
-    ];
-
-    const completionTasks = [
-      { id: 21, task: 'Final photography', completed: false, phase: 'Completion' },
-      { id: 22, task: 'Documentation handover', completed: false, phase: 'Completion' },
-      { id: 23, task: 'Warranty information', completed: false, phase: 'Completion' },
-      { id: 24, task: 'Maintenance guidelines', completed: false, phase: 'Completion' },
-      { id: 25, task: 'Project closeout', completed: false, phase: 'Completion' }
-    ];
-
-    setChecklistData({
-      preDesign: preDesignTasks,
-      design: designTasks,
-      procurement: procurementTasks,
-      installation: installationTasks,
-      completion: completionTasks
+  const toggleItemCompletion = (itemId) => {
+    setChecklistItems(prev => {
+      const updated = prev.map(item => 
+        item.id === itemId ? { ...item, completed: !item.completed } : item
+      );
+      setCompletedCount(updated.filter(item => item.completed).length);
+      return updated;
     });
   };
 
-  const toggleTask = (phase, taskId) => {
-    setChecklistData(prev => ({
-      ...prev,
-      [phase]: prev[phase].map(task => 
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    }));
+  const getCompletionPercentage = () => {
+    if (checklistItems.length === 0) return 0;
+    return Math.round((completedCount / checklistItems.length) * 100);
   };
 
-  const getPhaseProgress = (phaseTasks) => {
-    const completed = phaseTasks.filter(task => task.completed).length;
-    return Math.round((completed / phaseTasks.length) * 100);
+  const scrapeCanvaBoard = async (itemId, canvaLink) => {
+    try {
+      console.log('🎨 Scraping Canva board:', canvaLink);
+      
+      // Use our enhanced scraping for Canva boards
+      const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/scrape-product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: canvaLink })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Canva board scraped:', data);
+        
+        // Update checklist item with Canva data
+        setChecklistItems(prev => 
+          prev.map(item => 
+            item.id === itemId 
+              ? { 
+                  ...item, 
+                  canva_board: data.data,
+                  canva_images: data.data?.image_url ? [data.data.image_url] : []
+                }
+              : item
+          )
+        );
+      }
+    } catch (error) {
+      console.error('❌ Canva scraping failed:', error);
+    }
   };
 
   if (!project) {
@@ -108,97 +126,239 @@ const ChecklistSheet = () => {
   }
 
   return (
-    <div className="max-w-full mx-auto bg-gray-950 min-h-screen p-6">
+    <div className="max-w-full mx-auto bg-gray-950 min-h-screen">
       {/* Header */}
       <div className="mb-6">
         <div className="text-center mb-4">
           <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
-          <p className="text-gray-300">Project Checklist & Timeline</p>
+          <p className="text-gray-300">Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
         </div>
 
         {/* Navigation Tabs */}
         <div className="flex justify-center space-x-8 mb-6">
-          <div className="flex items-center space-x-2 text-gray-400">
+          <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
             <span>📋</span>
             <span>Questionnaire</span>
-          </div>
-          <div className="flex items-center space-x-2 text-gray-400">
+          </a>
+          <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
             <span>🚶</span>
             <span>Walkthrough</span>
-          </div>
+          </a>
           <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
             <span>✅</span>
             <span className="font-semibold">Checklist</span>
           </div>
-          <div className="flex items-center space-x-2 text-gray-400">
+          <a href={`/project/${projectId}/ffe`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
             <span>📊</span>
             <span>FF&E</span>
+          </a>
+        </div>
+
+        {/* Logo Banner */}
+        <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}>
+          <img 
+            src="/established-logo.png" 
+            alt="Established Design Co. Logo" 
+            style={{ height: '200px', width: 'auto', objectFit: 'contain', display: 'block' }}
+          />
+        </div>
+
+        {/* Checklist Title and Actions */}
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>CHECKLIST - GREENE</h3>
+          <div className="flex space-x-4">
+            <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+              📄 Print Checklist
+            </button>
+            <button 
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+              onClick={() => window.location.href = `/project/${projectId}/ffe`}
+            >
+              ➡️ Move to FF&E
+            </button>
+          </div>
+        </div>
+
+        {/* Status Overview and Breakdown */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Status Overview */}
+          <div className="bg-gray-800 rounded-lg p-6">
+            <h4 className="text-lg font-semibold text-white mb-4" style={{ color: '#8b7355' }}>Status Overview</h4>
+            <div className="flex items-center justify-center">
+              <div className="relative w-32 h-32">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#374151"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#10B981"
+                    strokeWidth="3"
+                    strokeDasharray={`${getCompletionPercentage()}, 100`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">{getCompletionPercentage()}%</span>
+                </div>
+              </div>
+            </div>
+            <div className="text-center mt-4">
+              <p className="text-green-400 text-sm">PICKED ({completedCount})</p>
+              <p className="text-gray-400 text-sm">TOTAL ({checklistItems.length})</p>
+            </div>
+          </div>
+
+          {/* Status Breakdown */}
+          <div className="bg-gray-800 rounded-lg p-6">
+            <h4 className="text-lg font-semibold text-white mb-4" style={{ color: '#8b7355' }}>Status Breakdown</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-green-500 rounded"></div>
+                  <span className="text-gray-300">PICKED</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="bg-gray-700 rounded-full h-2 flex-1 w-32">
+                    <div 
+                      className="bg-green-500 h-2 rounded-full"
+                      style={{ width: `${getCompletionPercentage()}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-white font-bold text-right w-8">{completedCount}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Checklist Phases */}
-      <div className="space-y-8">
-        {Object.entries(checklistData).map(([phase, tasks]) => (
-          <div key={phase} className="bg-gray-800 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-white capitalize">
-                {phase.replace(/([A-Z])/g, ' $1').trim()} Phase
-              </h3>
-              <div className="text-right">
-                <div className={`text-sm ${getPhaseProgress(tasks) === 100 ? 'text-green-400' : 'text-gray-400'}`}>
-                  {getPhaseProgress(tasks)}% Complete
-                </div>
-                <div className="w-32 bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ 
-                      width: `${getPhaseProgress(tasks)}%`,
-                      backgroundColor: getPhaseProgress(tasks) === 100 ? '#10B981' : '#3B82F6'
-                    }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {tasks.map(task => (
-                <div 
-                  key={task.id} 
-                  className={`flex items-center space-x-3 p-3 rounded ${
-                    task.completed ? 'bg-green-900/30' : 'bg-gray-700'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={() => toggleTask(phase, task.id)}
-                    className="w-5 h-5 text-blue-600 bg-gray-700 border-gray-600 rounded"
+      {/* Checklist Table - Simplified columns */}
+      <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A' }}>
+        <table className="w-full border-collapse border border-gray-400">
+          <thead>
+            <tr>
+              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8b7355' }}>✓</th>
+              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ROOM</th>
+              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>CATEGORY</th>
+              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ITEM</th>
+              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>VENDOR</th>
+              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS</th>
+              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>CANVA LINK</th>
+              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {checklistItems.map((item) => (
+              <tr key={item.id}>
+                <td className="border border-gray-400 px-2 py-2 text-center">
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4"
+                    checked={item.completed}
+                    onChange={() => toggleItemCompletion(item.id)}
                   />
-                  <span className={`flex-1 ${task.completed ? 'text-green-400 line-through' : 'text-gray-300'}`}>
-                    {task.task}
+                </td>
+                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                  {item.room}
+                </td>
+                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                  {item.category}
+                </td>
+                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                  {item.item}
+                </td>
+                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                  {item.vendor}
+                </td>
+                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                  <span 
+                    className={`px-2 py-1 rounded text-xs ${
+                      item.completed ? 'bg-green-600' : 'bg-gray-600'
+                    }`}
+                  >
+                    {item.completed ? 'PICKED' : item.status}
                   </span>
-                  <span className="text-xs text-gray-500">
-                    {task.phase}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+                </td>
+                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                  <input 
+                    type="url" 
+                    className="w-full bg-transparent border border-gray-600 text-white text-xs px-1 py-1 rounded"
+                    placeholder="Canva board URL"
+                    defaultValue={item.link}
+                    onBlur={(e) => {
+                      if (e.target.value.includes('canva.com')) {
+                        scrapeCanvaBoard(item.id, e.target.value);
+                      }
+                    }}
+                  />
+                </td>
+                <td className="border border-gray-400 px-2 py-2 text-center">
+                  <button 
+                    onClick={() => {
+                      // Move item to FF&E sheet
+                      window.location.href = `/project/${projectId}/ffe`;
+                    }}
+                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-2 py-1 rounded mr-1"
+                    title="Move to FF&E"
+                  >
+                    ➡️
+                  </button>
+                  <button 
+                    onClick={() => window.open(`https://canva.com/design/new?template=mood-board&item=${encodeURIComponent(item.item)}`, '_blank')}
+                    className="bg-purple-600 hover:bg-purple-500 text-white text-xs px-2 py-1 rounded"
+                    title="Create in Canva"
+                  >
+                    🎨
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-between mt-8">
-        <button className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded">
-          Export Checklist
-        </button>
-        <button 
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
-          style={{ backgroundColor: '#8b7355' }}
-        >
-          Generate FF&E Items from Checklist
-        </button>
+      {/* Canva Integration Panel */}
+      <div className="mt-6 bg-gray-800 rounded-lg p-6">
+        <h4 className="text-lg font-semibold text-white mb-4" style={{ color: '#8b7355' }}>
+          🎨 Canva Integration
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <button 
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+            onClick={() => window.open('https://canva.com/design/new?template=mood-board', '_blank')}
+          >
+            Create Mood Board
+          </button>
+          <button 
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+            onClick={() => window.open('https://canva.com/design/new?template=presentation', '_blank')}
+          >
+            Create Presentation
+          </button>
+          <button 
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+            onClick={() => {
+              const selectedLinks = checklistItems
+                .filter(item => item.link && item.link.includes('canva.com'))
+                .map(item => item.link);
+              
+              if (selectedLinks.length > 0) {
+                console.log('🎨 Batch scraping Canva boards:', selectedLinks);
+                selectedLinks.forEach((link, index) => {
+                  setTimeout(() => scrapeCanvaBoard(`canva_${index}`, link), index * 1000);
+                });
+              } else {
+                alert('No Canva links found to scrape');
+              }
+            }}
+          >
+            🔄 Scrape All Canva Boards
+          </button>
+        </div>
       </div>
     </div>
   );
