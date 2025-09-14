@@ -155,7 +155,7 @@ const App = () => {
             />
             <Route 
               path="/project/:projectId/ffe" 
-              element={<FFEDashboardWrapper />}
+              element={<FFEDashboard isOffline={isOffline} />}
             />
             <Route 
               path="/scraping-test" 
