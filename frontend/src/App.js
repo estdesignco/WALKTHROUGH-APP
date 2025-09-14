@@ -150,6 +150,10 @@ const App = () => {
               element={<WalkthroughDashboard isOffline={isOffline} />}
             />
             <Route 
+              path="/project/:projectId/checklist" 
+              element={<ChecklistDashboard isOffline={isOffline} />}
+            />
+            <Route 
               path="/project/:projectId/ffe" 
               element={<FFEDashboardWrapper />}
             />
