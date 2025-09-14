@@ -22,8 +22,27 @@ const FFEDashboard = ({ isOffline }) => {
   useEffect(() => {
     if (projectId) {
       console.log('🚀 Loading project:', projectId);
-      setLoading(true);
-      loadSimpleProject();
+      
+      // IMMEDIATE TEST - Force load project data
+      fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`)
+        .then(response => {
+          console.log('📡 Response received:', response.status);
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error(`HTTP ${response.status}`);
+          }
+        })
+        .then(projectData => {
+          console.log('✅ SUCCESS - Project data:', projectData.name);
+          setProject(projectData);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error('❌ ERROR loading project:', err);
+          setError('Failed to load project: ' + err.message);
+          setLoading(false);
+        });
     }
   }, [projectId]);
 
