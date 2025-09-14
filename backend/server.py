@@ -2860,33 +2860,51 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             best_image_url = None
             best_image_score = 0
             
-            for selector in image_selectors:
-                try:
-                    if selector == 'img[src*="product"], img[src*="item"], img[src*="cdn"]':  # Last resort - filter for best image
-                        elements = await page.query_selector_all(selector)
+            # First try to find the MAIN product image with enhanced methods
+            try:
+                # Wait for images to load
+                await page.wait_for_timeout(2000)
+                
+                # Try to find largest visible image first
+                await page.evaluate('''() => {
+                    const images = Array.from(document.querySelectorAll('img'));
+                    images.forEach(img => {
+                        if (img.complete && img.naturalWidth > 0) {
+                            console.log(`Image: ${img.src}, Size: ${img.naturalWidth}x${img.naturalHeight}`);
+                        }
+                    });
+                }''')
+                
+                # Enhanced image search with multiple strategies
+                image_search_strategies = [
+                    # Strategy 1: Look for product images by src content
+                    'img[src*="product"]:not([src*="thumb"]):not([src*="small"])',
+                    'img[src*="1024"]:not([src*="thumb"])',
+                    'img[src*="master"]:not([src*="thumb"])',
+                    'img[src*="large"]:not([src*="thumb"])',
+                    
+                    # Strategy 2: Look by class/data attributes
+                    'img[class*="product-image"], img[class*="main-image"]',
+                    'img[data-product-image], img[data-main-image]',
+                    '.product-gallery img:first-child',
+                    '.product-photos img:first-child',
+                    
+                    # Strategy 3: Look for hero/featured images
+                    '.hero img, .main img, .featured img',
+                    'img[alt*="product"], img[alt*="main"]',
+                    
+                    # Strategy 4: Shopify specific
+                    '.product__media img, .product-single__photo img',
+                    '.media img, .gallery img',
+                ]
+                
+                for strategy in image_search_strategies:
+                    try:
+                        elements = await page.query_selector_all(strategy)
                         for element in elements:
                             try:
                                 src = await element.get_attribute('src')
-                                if src and _is_main_product_image(src):
-                                    # Score images based on size indicators in URL
-                                    score = _score_image_quality(src)
-                                    if score > best_image_score:
-                                        best_image_score = score
-                                        if src.startswith('//'):
-                                            src = 'https:' + src
-                                        elif src.startswith('/'):
-                                            base_url = '/'.join(url.split('/')[:3])
-                                            src = base_url + src
-                                        best_image_url = src
-                                        print(f"✅ IMAGE candidate: {src} (score: {score})")
-                            except:
-                                continue
-                    else:  # Regular selector handling - prioritize first match
-                        elements = await page.query_selector_all(selector)
-                        for element in elements:
-                            try:
-                                src = await element.get_attribute('src')
-                                if src:
+                                if src and not any(exclude in src.lower() for exclude in ['thumb', 'icon', 'logo', 'nav', 'btn', 'bullet']):
                                     # Convert relative URLs to absolute
                                     if src.startswith('//'):
                                         src = 'https:' + src
@@ -2894,57 +2912,58 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                         base_url = '/'.join(url.split('/')[:3])
                                         src = base_url + src
                                     
-                                    # Score this image
-                                    score = _score_image_quality(src)
-                                    if score > best_image_score:
+                                    # Prioritize images with product-related keywords and larger sizes
+                                    score = 0
+                                    if 'product' in src.lower(): score += 30
+                                    if 'main' in src.lower(): score += 25  
+                                    if 'hero' in src.lower(): score += 25
+                                    if 'large' in src.lower(): score += 20
+                                    if '1024' in src: score += 15
+                                    if 'master' in src.lower(): score += 15
+                                    if 'cdn' in src.lower(): score += 10
+                                    
+                                    # Check actual image dimensions if possible
+                                    try:
+                                        dimensions = await element.evaluate('''(element) => {
+                                            return {
+                                                naturalWidth: element.naturalWidth,
+                                                naturalHeight: element.naturalHeight,
+                                                width: element.width,
+                                                height: element.height
+                                            };
+                                        }''')
+                                        
+                                        if dimensions['naturalWidth'] > 400:
+                                            score += 25
+                                        if dimensions['naturalHeight'] > 400:
+                                            score += 25
+                                    except:
+                                        pass
+                                    
+                                    if score > best_image_score and score > 30:  # Minimum quality threshold
                                         best_image_score = score
                                         best_image_url = src
-                                        print(f"✅ IMAGE found: {src} (score: {score})")
-                                        
-                                    # If this is a high-priority selector and good quality, use it
-                                    if score >= 50:  # Good quality threshold
+                                        print(f"✅ BETTER IMAGE found: {src} (score: {score})")
+                                    
+                                    # If we found a really good image, stop searching
+                                    if score >= 80:
                                         break
                             except:
                                 continue
-                        if best_image_score >= 50:
+                        
+                        if best_image_score >= 80:
                             break
-                except:
-                    continue
-            
-            # If no high-quality image found, try aggressive approach
-            if not best_image_url or best_image_score < 30:
-                try:
-                    print("🔍 Trying AGGRESSIVE image extraction...")
-                    all_images = await page.query_selector_all('img')
-                    for img in all_images[:20]:  # Check first 20 images
-                        try:
-                            src = await img.get_attribute('src')
-                            alt = await img.get_attribute('alt')
-                            width = await img.get_attribute('width')
-                            height = await img.get_attribute('height')
-                            
-                            if src and (
-                                (alt and ('product' in alt.lower() or 'main' in alt.lower())) or
-                                (width and int(width) > 200) or 
-                                (height and int(height) > 200) or
-                                ('product' in src.lower() or 'main' in src.lower() or 'hero' in src.lower())
-                            ):
-                                if src.startswith('//'):
-                                    src = 'https:' + src
-                                elif src.startswith('/'):
-                                    base_url = '/'.join(url.split('/')[:3])
-                                    src = base_url + src
-                                best_image_url = src
-                                print(f"✅ AGGRESSIVE IMAGE found: {src}")
-                                break
-                        except:
-                            continue
-                except:
-                    pass
+                    except:
+                        continue
+                
+            except Exception as e:
+                print(f"❌ Error in image extraction: {e}")
             
             if best_image_url:
                 result['image_url'] = best_image_url
-                print(f"🎯 FINAL IMAGE: {best_image_url}")
+                print(f"🎯 FINAL IMAGE: {best_image_url} (score: {best_image_score})")
+            else:
+                print("⚠️ No suitable product image found")
             
             # Try to extract description with enhanced filtering
             for selector in description_selectors:
