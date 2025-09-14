@@ -364,8 +364,16 @@ const ExactFFESpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Room deleted successfully');
-        // Force reload to show updated data
-        window.location.reload();
+        // Update local state instead of reloading page
+        const updateProject = (prevProject) => {
+          if (!prevProject) return prevProject;
+          
+          const updatedProject = { ...prevProject };
+          updatedProject.rooms = updatedProject.rooms.filter(room => room.id !== roomId);
+          return updatedProject;
+        };
+        
+        setFilteredProject(updateProject);
       } else {
         throw new Error(`HTTP ${response.status}`);
       }
