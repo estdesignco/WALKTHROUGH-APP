@@ -80,48 +80,6 @@ const App = () => {
     };
   }, []);
 
-  // Component wrapper to handle project loading for direct FF&E navigation
-  const FFEDashboardWrapper = () => {
-    const location = useLocation();
-    const [projectLoaded, setProjectLoaded] = useState(false);
-
-    useEffect(() => {
-      // Extract projectId from current path
-      const pathMatch = location.pathname.match(/\/project\/([^\/]+)\/ffe/);
-      const projectId = pathMatch ? pathMatch[1] : null;
-
-      if (projectId && !currentProject) {
-        // Load project data for navigation context
-        const loadProject = async () => {
-          try {
-            const response = await projectAPI.getById(projectId);
-            if (response.data) {
-              setCurrentProject(response.data);
-              setProjectLoaded(true);
-            }
-          } catch (error) {
-            console.error('Failed to load project for navigation:', error);
-            setProjectLoaded(true); // Still proceed even if project load fails
-          }
-        };
-        loadProject();
-      } else {
-        setProjectLoaded(true);
-      }
-    }, [location.pathname]);
-
-    // Show loading state while project is being loaded
-    if (!projectLoaded) {
-      return (
-        <div className="text-center text-gray-400 py-8">
-          <p className="text-lg">Loading project...</p>
-        </div>
-      );
-    }
-
-    return <FFEDashboard isOffline={isOffline} />;
-  };
-
   return (
     <div className="App min-h-screen bg-gray-900">
       <BrowserRouter>
