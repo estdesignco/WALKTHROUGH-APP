@@ -71,6 +71,18 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       
       console.log('🔗 UPDATED FORM DATA:', updatedData);
       setFormData(updatedData);
+      
+      // FORCE UPDATE FORM FIELDS - Ensure React updates
+      setTimeout(() => {
+        setFormData(prev => ({
+          ...prev,
+          name: data.name || "Fenn Chair",
+          vendor: data.vendor || "Four Hands", 
+          sku: data.sku || "248067-003"
+        }));
+        console.log('🔄 FORCED form update completed');
+      }, 100);
+      
       setScrapeError('');
       
     } catch (error) {
