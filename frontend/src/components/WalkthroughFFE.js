@@ -1245,4 +1245,4 @@ const WalkthroughFFE = ({
   );
 };
 
-export default ExactFFESpreadsheet;
+export default WalkthroughFFE;
