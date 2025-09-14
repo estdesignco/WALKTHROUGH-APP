@@ -123,7 +123,7 @@ const ExactFFESpreadsheet = ({
         }
 
         // Filter categories and items within room
-        if (selectedCategory || selectedVendor || selectedStatus || searchTerm) {
+        if (selectedCategory || selectedVendor || selectedStatus || selectedCarrier || searchTerm) {
           const filteredCategories = room.categories?.filter(category => {
             // Category filter
             if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) {
