@@ -71,13 +71,16 @@ const FFEDashboard = ({ isOffline }) => {
         console.log('🚀 First room data:', projectData.rooms?.[0] || 'No rooms');
         setProject(projectData);
         setError(null);
+        setLoading(false); // FORCE SET LOADING FALSE HERE
       } else {
         console.error('🚀 Failed to load project:', response.status);
         setError('Failed to load project');
+        setLoading(false); // FORCE SET LOADING FALSE ON ERROR TOO
       }
     } catch (err) {
       console.error('🚀 Error loading project:', err);
       setError('Error loading project: ' + err.message);
+      setLoading(false); // FORCE SET LOADING FALSE ON EXCEPTION
     } finally {
       console.log('🚀 FORCE SETTING LOADING = FALSE');
       setLoading(false);
