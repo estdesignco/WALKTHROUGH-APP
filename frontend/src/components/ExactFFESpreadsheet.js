@@ -49,8 +49,34 @@ const ExactFFESpreadsheet = ({
       console.log('📡 Status change response:', response.status, response.statusText);
       
       if (response.ok) {
-        console.log('✅ Status updated successfully, reloading...');
-        window.location.reload();
+        console.log('✅ Status updated successfully, updating local state...');
+        
+        // Update local state instead of reloading page
+        const updateProject = (prevProject) => {
+          if (!prevProject) return prevProject;
+          
+          const updatedProject = { ...prevProject };
+          updatedProject.rooms = updatedProject.rooms.map(room => ({
+            ...room,
+            categories: room.categories.map(category => ({
+              ...category,
+              subcategories: category.subcategories.map(subcategory => ({
+                ...subcategory,
+                items: subcategory.items.map(item => 
+                  item.id === itemId ? { ...item, status: newStatus } : item
+                )
+              }))
+            }))
+          }));
+          return updatedProject;
+        };
+        
+        setFilteredProject(updateProject);
+        
+        // Also trigger parent reload if callback available
+        if (onReload) {
+          onReload();
+        }
       } else {
         const errorData = await response.text();
         console.error('❌ Status update failed:', response.status, errorData);
