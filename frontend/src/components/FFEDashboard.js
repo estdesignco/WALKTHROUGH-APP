@@ -62,9 +62,14 @@ const FFEDashboard = ({ isOffline }) => {
   const loadSimpleProject = async () => {
     try {
       console.log('🚀 Loading project data...');
+      console.log('🌍 Environment URL:', process.env.REACT_APP_BACKEND_URL);
+      console.log('🌍 Import meta URL:', import.meta.env?.REACT_APP_BACKEND_URL);
       
-      // DIRECT API CALL USING ENVIRONMENT VARIABLE
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects/${projectId}`);
+      // Try environment variable first, then fallback to hardcoded
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env?.REACT_APP_BACKEND_URL || 'https://code-scanner-14.preview.emergentagent.com';
+      console.log('🌍 Using backend URL:', backendUrl);
+      
+      const response = await fetch(`${backendUrl}/api/projects/${projectId}`);
       
       console.log('📡 Response status:', response.status);
       
@@ -72,7 +77,6 @@ const FFEDashboard = ({ isOffline }) => {
         const projectData = await response.json();
         console.log('🚀 Project loaded:', projectData.name);
         console.log('🚀 Project rooms count:', projectData.rooms?.length || 0);
-        console.log('🚀 First room data:', projectData.rooms?.[0] || 'No rooms');
         setProject(projectData);
         setError(null);
       } else {
