@@ -2735,7 +2735,10 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         src = await img.get_attribute('src')
                         alt = await img.get_attribute('alt') or ""
                         
-                        if src and not any(exclude in src.lower() for exclude in ['logo', 'icon', 'thumb', 'nav', 'btn']):
+                        if src and not any(exclude in src.lower() for exclude in ['logo', 'icon', 'thumb', 'nav', 'btn', 'bing.com', 'gtm', 'analytics']):
+                            # Skip tracking pixels and analytics images
+                            if 'bat.bing.com' in src or 'google-analytics' in src or 'gtm' in src:
+                                continue
                             # Convert relative URLs to absolute
                             if src.startswith('//'):
                                 src = 'https:' + src
