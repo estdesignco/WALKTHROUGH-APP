@@ -7,32 +7,6 @@ import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 
-// Default categories for each room type (from Google Sheets)
-const ROOM_DEFAULT_CATEGORIES = {
-  'living room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
-  'kitchen': ['Lighting', 'Plumbing & Fixtures', 'Equipment & Furniture', 'Decor & Accessories'],
-  'master bedroom': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
-  'bedroom 2': ['Lighting', 'Furniture & Storage', 'Decor & Accessories'],
-  'bedroom 3': ['Lighting', 'Furniture & Storage', 'Decor & Accessories'],
-  'bathroom': ['Lighting', 'Plumbing & Fixtures', 'Decor & Accessories'],
-  'master bathroom': ['Lighting', 'Plumbing & Fixtures', 'Decor & Accessories'],
-  'powder room': ['Lighting', 'Plumbing & Fixtures', 'Decor & Accessories'],
-  'dining room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
-  'office': ['Lighting', 'Furniture & Storage', 'Equipment & Furniture', 'Decor & Accessories'],
-  'family room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
-  'basement': ['Lighting', 'Furniture & Storage', 'Equipment & Furniture', 'Misc.'],
-  'laundry room': ['Lighting', 'Equipment & Furniture', 'Plumbing & Fixtures'],
-  'mudroom': ['Lighting', 'Furniture & Storage', 'Decor & Accessories'],
-  'pantry': ['Lighting', 'Furniture & Storage'],
-  'closet': ['Lighting', 'Furniture & Storage'],
-  'guest room': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
-  'playroom': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
-  'library': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating'],
-  'wine cellar': ['Lighting', 'Equipment & Furniture', 'Furniture & Storage'],
-  'garage': ['Lighting', 'Equipment & Furniture'],
-  'patio': ['Lighting', 'Furniture & Storage', 'Decor & Accessories', 'Seating']
-};
-
 const FFEDashboard = ({ isOffline }) => {
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
@@ -44,16 +18,10 @@ const FFEDashboard = ({ isOffline }) => {
   const [itemStatuses, setItemStatuses] = useState([]);
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
-  const loadingRef = useRef(false);
   
-  // SCRAPING TEST STATE
-  const [showScrapingTest, setShowScrapingTest] = useState(false);
-
   useEffect(() => {
     if (projectId) {
-      // FORCE SIMPLE LOADING - NO COMPLEX LOGIC
-      console.log('🚀 FORCE LOADING PROJECT:', projectId);
-      
+      console.log('🚀 Loading project:', projectId);
       setLoading(true);
       loadSimpleProject();
     }
@@ -61,59 +29,31 @@ const FFEDashboard = ({ isOffline }) => {
 
   const loadSimpleProject = async () => {
     try {
-      console.log('🚀 Loading project data...');
-      const response = await fetch(`${import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://ffe-manager.preview.emergentagent.com'}/api/projects/${projectId}`);
+      console.log('🚀 Loading project data for:', projectId);
+      
+      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();
-        console.log('🚀 Project loaded:', projectData.name);
-        console.log('🚀 Project rooms count:', projectData.rooms?.length || 0);
-        console.log('🚀 First room data:', projectData.rooms?.[0] || 'No rooms');
+        console.log('✅ Project loaded successfully:', projectData.name);
         setProject(projectData);
         setError(null);
       } else {
-        console.error('🚀 Failed to load project:', response.status);
+        console.error('❌ Failed to load project:', response.status);
         setError('Failed to load project');
       }
     } catch (err) {
-      console.error('🚀 Error loading project:', err);
+      console.error('❌ Error loading project:', err);
       setError('Error loading project: ' + err.message);
-    } finally {
-      console.log('🚀 FORCE SETTING LOADING = FALSE');
-      setLoading(false);
-      
-      // Set default utility data
-      setRoomColors({});
-      setCategoryColors({});
-      setItemStatuses(['ORDERED', 'DELIVERED TO JOB SITE', 'INSTALLED']);
-      setVendorTypes(['Four Hands', 'Uttermost']);
-      setCarrierTypes(['FedEx', 'UPS']);
     }
-  };
-
-  const loadUtilityDataAsync = async () => {
-    try {
-      // SIMPLE FIX: Just use default values instead of trying to fetch from API
-      console.log('🔧 Loading default utility data...');
-      
-      setRoomColors({});
-      setCategoryColors({});
-      setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED', 'PARTIALLY DELIVERED', 'ON HOLD', 'CANCELLED', 'BACKORDERED', 'IN TRANSIT', 'OUT FOR DELIVERY', 'RETURNED', 'DAMAGED', 'MISSING', 'PENDING APPROVAL', 'QUOTE REQUESTED', 'APPROVED', 'REJECTED']);
-      setVendorTypes(['Four Hands', 'Uttermost', 'Rowe Furniture', 'Regina Andrew', 'Bernhardt', 'Loloi Rugs', 'Vandh', 'Visual Comfort', 'HVL Group', 'Flow Decor', 'Classic Home', 'Crestview Collection', 'Bassett Mirror', 'Eichholtz', 'York Wallcoverings', 'Phillips Collection', 'Phillip Jeffries', 'Hinkley Lighting', 'Zeev Lighting', 'Hubbardton Forge', 'Currey and Company', 'Surya', 'Myoh America', 'Gabby']);
-      setCarrierTypes(['FedEx', 'FedEx Ground', 'FedEx Express', 'UPS', 'UPS Ground', 'UPS Express', 'USPS', 'DHL', 'White Glove Delivery', 'Freight', 'Local Delivery', 'Customer Pickup', 'Brooks', 'Zenith', 'Sunbelt', 'Specialized Carrier', 'Installation Crew', 'Other']);
-      
-      console.log('✅ Default utility data loaded successfully');
-      return true;
-    } catch (err) {
-      console.error('Error loading utility data:', err);
-      // Fallback values
-      setRoomColors({});
-      setCategoryColors({});
-      setItemStatuses(['ORDERED', 'DELIVERED TO JOB SITE', 'INSTALLED']);
-      setVendorTypes(['Four Hands', 'Uttermost', 'Rowe Furniture']);
-      setCarrierTypes(['FedEx', 'UPS', 'USPS']);
-      return true;
-    }
+    
+    // ALWAYS set loading to false
+    setLoading(false);
+    
+    // Set utility data
+    setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']);
+    setVendorTypes(['Four Hands', 'Uttermost', 'Visual Comfort']);
+    setCarrierTypes(['FedEx', 'UPS', 'USPS', 'DHL']);
   };
 
   const handleAddRoom = async (roomData) => {
@@ -124,22 +64,12 @@ const FFEDashboard = ({ isOffline }) => {
         order_index: project.rooms.length
       };
       
-      // Create the room - backend will auto-populate categories and subcategories
       console.log('🏠 Creating room with data:', newRoom);
       const roomResponse = await roomAPI.create(newRoom);
       console.log('🏠 Room created successfully:', roomResponse);
       
-      // FORCE RELOAD PROJECT TO SHOW NEW ROOM STRUCTURE
-      console.log('🔄 Reloading project to show new room...');
+      // RELOAD PROJECT TO SHOW NEW ROOM
       await loadSimpleProject();
-      console.log('🔄 Project reloaded successfully');
-      
-      // Force a small delay to ensure data is loaded
-      setTimeout(() => {
-        console.log('🔄 Delayed project reload complete');
-        setLoading(false);
-      }, 1000);
-      
       setShowAddRoom(false);
     } catch (err) {
       setError('Failed to create room');
@@ -161,46 +91,6 @@ const FFEDashboard = ({ isOffline }) => {
     }
   };
 
-  const handleDragEnd = async (result) => {
-    if (!result.destination) return;
-
-    const { source, destination, type } = result;
-
-    if (type === 'room') {
-      // Reorder rooms
-      const newRooms = Array.from(project.rooms);
-      const [reorderedRoom] = newRooms.splice(source.index, 1);
-      newRooms.splice(destination.index, 0, reorderedRoom);
-      
-      // Update order indices
-      const updatedRooms = newRooms.map((room, index) => ({
-        ...room,
-        order_index: index
-      }));
-      
-      setProject({ ...project, rooms: updatedRooms });
-      
-      // Update order in backend
-      try {
-        for (const room of updatedRooms) {
-          await roomAPI.update(room.id, { order_index: room.order_index });
-        }
-      } catch (err) {
-        console.error('Error updating room order:', err);
-        // Revert on error
-        await loadSimpleProject();
-      }
-    }
-  };
-
-  // PREVENT LOADING LOOP WITH useEffect
-  useEffect(() => {
-    if (loading && project) {
-      console.log('🔧 FORCE STOPPING LOADING LOOP');
-      setLoading(false);
-    }
-  }, [loading, project]);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">
@@ -208,6 +98,26 @@ const FFEDashboard = ({ isOffline }) => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto"></div>
           <p className="text-gray-400 mt-4">Loading FF&E data...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-6xl mb-4">❌</div>
+        <h2 className="text-2xl font-bold text-gray-200 mb-2">Error Loading Project</h2>
+        <p className="text-gray-400">{error}</p>
+        <button 
+          onClick={() => {
+            setError(null);
+            setLoading(true);
+            loadSimpleProject();
+          }}
+          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -235,22 +145,6 @@ const FFEDashboard = ({ isOffline }) => {
   const getStatusBreakdown = () => {
     const breakdown = {};
     
-    // Include ALL possible status values with colors
-    const allStatuses = [
-      'TO BE SELECTED', 'RESEARCHING', 'PENDING APPROVAL', 
-      'APPROVED', 'ORDERED', 'PICKED', 'CONFIRMED',
-      'IN PRODUCTION', 'SHIPPED', 'IN TRANSIT', 'OUT FOR DELIVERY',
-      'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'RECEIVED',
-      'READY FOR INSTALL', 'INSTALLING', 'INSTALLED',
-      'ON HOLD', 'BACKORDERED', 'DAMAGED', 'RETURNED', 'CANCELLED'
-    ];
-    
-    // Initialize all statuses with 0
-    allStatuses.forEach(status => {
-      breakdown[status] = 0;
-    });
-    
-    // Count actual items
     project.rooms.forEach(room => {
       room.categories.forEach(category => {
         (category.subcategories || []).forEach(subcategory => {
@@ -268,21 +162,6 @@ const FFEDashboard = ({ isOffline }) => {
   const getCarrierBreakdown = () => {
     const carriers = {};
     
-    // Include ALL possible carriers with colors
-    const allCarriers = [
-      'FedEx', 'UPS', 'USPS', 'DHL', 'Brooks', 'Zenith', 'Sunbelt',
-      'R+L Carriers', 'Yellow Freight', 'XPO Logistics', 'Old Dominion',
-      'ABF Freight', 'Estes Express', 'Saia LTL', 'TForce Freight',
-      'Roadrunner', 'Central Transport', 'Southeastern Freight',
-      'Averitt Express', 'Holland', 'OTHER'
-    ];
-    
-    // Initialize all carriers with 0
-    allCarriers.forEach(carrier => {
-      carriers[carrier] = 0;
-    });
-    
-    // Count actual items
     project.rooms.forEach(room => {
       room.categories.forEach(category => {
         (category.subcategories || []).forEach(subcategory => {
@@ -298,29 +177,9 @@ const FFEDashboard = ({ isOffline }) => {
     return carriers;
   };
 
-  const extractCarrier = (vendor, trackingNumber) => {
-    if (!trackingNumber) return null;
-    
-    // Simple carrier detection based on tracking number patterns
-    if (trackingNumber.match(/^1Z/)) return 'UPS';
-    if (trackingNumber.match(/^\d{12,14}$/)) return 'FedEx';
-    if (trackingNumber.match(/^(94|92|93|95)/)) return 'USPS';
-    if (vendor && vendor.toLowerCase().includes('fedex')) return 'FedEx';
-    if (vendor && vendor.toLowerCase().includes('ups')) return 'UPS';
-    if (vendor && vendor.toLowerCase().includes('usps')) return 'USPS';
-    
-    return 'Other';
-  };
-
   return (
     <div className="max-w-full mx-auto bg-gray-950 min-h-screen">
-      {error && (
-        <div className="bg-red-900 border border-red-700 text-red-100 p-4 rounded-lg mb-6">
-          {error}
-        </div>
-      )}
-
-      {/* TOP HEADER - LARGE GREENE + ADDRESS - FIRST! */}
+      {/* TOP HEADER */}
       <div className="mb-6">
         <div className="text-center mb-4">
           <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
@@ -347,7 +206,7 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* LOGO BANNER - BARELY ANY TOP/BOTTOM PADDING */}
+        {/* LOGO BANNER */}
         <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}>
           <img 
             src="/established-logo.png" 
@@ -377,7 +236,7 @@ const FFEDashboard = ({ isOffline }) => {
           </div>
         </div>
 
-        {/* PIE CHART AND STATUS BREAKDOWN - UNDER FF&E TITLE */}
+        {/* PIE CHART AND STATUS BREAKDOWN */}
         <StatusOverview
           totalItems={getTotalItems()}
           statusBreakdown={getStatusBreakdown()}
@@ -385,7 +244,7 @@ const FFEDashboard = ({ isOffline }) => {
           itemStatuses={itemStatuses}
         />
 
-        {/* SEARCH BAR AND ADD ROOM BUTTON - LAST */}
+        {/* SEARCH BAR AND ADD ROOM BUTTON */}
         <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
           <div className="flex items-center space-x-4 flex-1">
             <input
@@ -407,13 +266,11 @@ const FFEDashboard = ({ isOffline }) => {
           >
             ➕ Add Room
           </button>
-          {/* TEST SCRAPING BUTTON REMOVED AS REQUESTED */}
         </div>
       </div>
 
-      {/* FF&E Spreadsheet - FORCE ABOVE THE FOLD */}
+      {/* FF&E Spreadsheet */}
       <div className="px-6 mt-4">
-        {/* ✅ SUCCESS BANNER REMOVED COMPLETELY */}
         <ExactFFESpreadsheet
           project={project}
           roomColors={roomColors}
@@ -433,21 +290,6 @@ const FFEDashboard = ({ isOffline }) => {
           onClose={() => setShowAddRoom(false)}
           onSubmit={handleAddRoom}
           roomColors={roomColors}
-        />
-      )}
-      
-      {/* SCRAPING TEST MODAL */}
-      {showScrapingTest && (
-        <AddItemModal
-          onClose={() => setShowScrapingTest(false)}
-          onSubmit={(itemData) => {
-            // For testing, just show the data
-            // ✅ SUCCESS BANNER REMOVED AS REQUESTED
-            setShowScrapingTest(false);
-          }}
-          itemStatuses={itemStatuses}
-          vendorTypes={vendorTypes}
-          loading={false}
         />
       )}
     </div>
