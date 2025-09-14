@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
-import ExactWalkthroughSpreadsheet from './ExactWalkthroughSpreadsheet';
+import ExactChecklistSpreadsheet from './ExactChecklistSpreadsheet';
 import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
