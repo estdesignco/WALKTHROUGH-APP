@@ -95,8 +95,8 @@ const ExactFFESpreadsheet = ({
 
     if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
       filtered.rooms = project.rooms.filter(room => {
-        // Room filter
-        if (selectedRoom && room.name.toLowerCase() !== selectedRoom.toLowerCase()) {
+        // Room filter - Fixed to use room.id instead of room.name
+        if (selectedRoom && room.id !== selectedRoom) {
           return false;
         }
 
