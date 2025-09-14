@@ -242,7 +242,7 @@ const WalkthroughSheet = () => {
           carrierTypes={['FedEx', 'UPS', 'USPS']}
           onDeleteRoom={deleteRoom}
           onAddRoom={() => setShowAddRoom(true)}
-          onReload={loadSimpleProject}
+          onReload={loadProject}
         />
       </div>
 
