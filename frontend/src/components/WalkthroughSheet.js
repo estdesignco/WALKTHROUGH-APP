@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import WalkthroughSpreadsheet from './WalkthroughSpreadsheet';
+import ExactWalkthroughSpreadsheet from './ExactWalkthroughSpreadsheet';
 import AddRoomModal from './AddRoomModal';
 
 const WalkthroughSheet = () => {
