@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
 
-const ExactFFESpreadsheet = ({ 
+const ExactChecklistSpreadsheet = ({ 
   project, 
   roomColors, 
   categoryColors, 
