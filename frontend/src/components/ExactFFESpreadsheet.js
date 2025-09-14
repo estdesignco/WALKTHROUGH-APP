@@ -178,7 +178,7 @@ const ExactFFESpreadsheet = ({
     }
 
     setFilteredProject(filtered);
-  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
+  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier]);
 
   // Load available categories on component mount
   useEffect(() => {
