@@ -304,6 +304,15 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
                   >
                     {isScraping ? '🔍...' : '🔍 Fill'}
                   </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => setShowBarcodeScanner(true)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors font-medium"
+                    title="Scan product barcode"
+                  >
+                    📷 Scan
+                  </button>
                 </div>
                 {scrapeError && (
                   <p className="text-red-400 text-sm mt-2">{scrapeError}</p>
