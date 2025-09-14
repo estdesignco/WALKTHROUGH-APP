@@ -19,6 +19,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
 
   const [isScraping, setIsScraping] = useState(false);
   const [scrapeError, setScrapeError] = useState('');
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
 
   const handleLinkScraping = async () => {
     if (!formData.link || !formData.link.startsWith('http')) {
