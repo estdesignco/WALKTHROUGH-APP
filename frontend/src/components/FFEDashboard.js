@@ -45,16 +45,24 @@ const FFEDashboard = ({ isOffline }) => {
     } catch (err) {
       console.error('❌ Error loading project:', err);
       setError('Error loading project: ' + err.message);
+    } finally {
+      console.log('🚀 FORCE SETTING LOADING = FALSE');
+      setLoading(false);
+      
+      // Set utility data
+      setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']);
+      setVendorTypes(['Four Hands', 'Uttermost', 'Visual Comfort']);
+      setCarrierTypes(['FedEx', 'UPS', 'USPS', 'DHL']);
     }
-    
-    // ALWAYS set loading to false
-    setLoading(false);
-    
-    // Set utility data
-    setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']);
-    setVendorTypes(['Four Hands', 'Uttermost', 'Visual Comfort']);
-    setCarrierTypes(['FedEx', 'UPS', 'USPS', 'DHL']);
   };
+
+  // PREVENT LOADING LOOP WITH useEffect  
+  useEffect(() => {
+    if (loading && project) {
+      console.log('🔧 FORCE STOPPING LOADING LOOP');
+      setLoading(false);
+    }
+  }, [loading, project]);
 
   const handleAddRoom = async (roomData) => {
     try {
