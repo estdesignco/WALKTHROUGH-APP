@@ -238,90 +238,59 @@ const ChecklistSheet = () => {
         </div>
       </div>
 
-      {/* Checklist Table - Simplified columns */}
-      <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A' }}>
-        <table className="w-full border-collapse border border-gray-400">
-          <thead>
-            <tr>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8b7355' }}>✓</th>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ROOM</th>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>CATEGORY</th>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ITEM</th>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>VENDOR</th>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS</th>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>CANVA LINK</th>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {checklistItems.map((item) => (
-              <tr key={item.id}>
-                <td className="border border-gray-400 px-2 py-2 text-center">
-                  <input 
-                    type="checkbox" 
-                    className="w-4 h-4"
-                    checked={item.completed}
-                    onChange={() => toggleItemCompletion(item.id)}
-                  />
-                </td>
-                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                  {item.room}
-                </td>
-                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                  {item.category}
-                </td>
-                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                  {item.item}
-                </td>
-                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                  {item.vendor}
-                </td>
-                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                  <span 
-                    className={`px-2 py-1 rounded text-xs ${
-                      item.completed ? 'bg-green-600' : 'bg-gray-600'
-                    }`}
-                  >
-                    {item.completed ? 'PICKED' : item.status}
-                  </span>
-                </td>
-                <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                  <input 
-                    type="url" 
-                    className="w-full bg-transparent border border-gray-600 text-white text-xs px-1 py-1 rounded"
-                    placeholder="Canva board URL"
-                    defaultValue={item.link}
-                    onBlur={(e) => {
-                      if (e.target.value.includes('canva.com')) {
-                        scrapeCanvaBoard(item.id, e.target.value);
-                      }
-                    }}
-                  />
-                </td>
-                <td className="border border-gray-400 px-2 py-2 text-center">
-                  <button 
-                    onClick={() => {
-                      // Move item to FF&E sheet
-                      window.location.href = `/project/${projectId}/ffe`;
-                    }}
-                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-2 py-1 rounded mr-1"
-                    title="Move to FF&E"
-                  >
-                    ➡️
-                  </button>
-                  <button 
-                    onClick={() => window.open(`https://canva.com/design/new?template=mood-board&item=${encodeURIComponent(item.item)}`, '_blank')}
-                    className="bg-purple-600 hover:bg-purple-500 text-white text-xs px-2 py-1 rounded"
-                    title="Create in Canva"
-                  >
-                    🎨
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Checklist Table - EXACT COPY OF FF&E WITH DIFFERENT COLUMNS */}
+      <div className="px-6 mt-4">
+        <ChecklistSpreadsheet
+          project={project}
+          roomColors={{}}
+          categoryColors={{}}
+          itemStatuses={['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO JOB SITE', 'INSTALLED']}
+          vendorTypes={['Four Hands', 'Uttermost', 'Visual Comfort']}
+          carrierTypes={['FedEx', 'UPS', 'USPS']}
+          onDeleteRoom={(roomId) => {
+            if (window.confirm('Delete this room?')) {
+              fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms/${roomId}`, {
+                method: 'DELETE'
+              }).then(() => {
+                loadProject();
+              });
+            }
+          }}
+          onAddRoom={() => setShowAddRoom(true)}
+          onReload={loadProject}
+        />
       </div>
+
+      {/* Add Room Modal */}
+      {showAddRoom && (
+        <AddRoomModal
+          onClose={() => setShowAddRoom(false)}
+          onSubmit={async (roomData) => {
+            try {
+              const newRoom = {
+                ...roomData,
+                project_id: projectId,
+                order_index: project.rooms.length
+              };
+              
+              const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/rooms', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newRoom)
+              });
+              
+              if (response.ok) {
+                console.log('✅ Room added successfully');
+                setShowAddRoom(false);
+                await loadProject();
+              }
+            } catch (err) {
+              console.error('Error creating room:', err);
+            }
+          }}
+          roomColors={{}}
+        />
+      )}
 
       {/* Canva Integration Panel */}
       <div className="mt-6 bg-gray-800 rounded-lg p-6">
@@ -343,20 +312,6 @@ const ChecklistSheet = () => {
           </button>
           <button 
             className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
-            onClick={() => {
-              const selectedLinks = checklistItems
-                .filter(item => item.link && item.link.includes('canva.com'))
-                .map(item => item.link);
-              
-              if (selectedLinks.length > 0) {
-                console.log('🎨 Batch scraping Canva boards:', selectedLinks);
-                selectedLinks.forEach((link, index) => {
-                  setTimeout(() => scrapeCanvaBoard(`canva_${index}`, link), index * 1000);
-                });
-              } else {
-                alert('No Canva links found to scrape');
-              }
-            }}
           >
             🔄 Scrape All Canva Boards
           </button>
