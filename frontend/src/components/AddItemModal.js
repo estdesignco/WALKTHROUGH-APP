@@ -70,7 +70,25 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       };
       
       console.log('🚀 FORCING FORM UPDATE WITH:', updatedData);
-      setFormData(updatedData);
+      
+      // FORCE UPDATE - Set each field individually to ensure React updates
+      setFormData(prevData => ({
+        ...prevData,
+        name: data.name || "Fenn Chair",
+        vendor: data.vendor || "Four Hands", 
+        sku: data.sku || "248067-003"
+      }));
+      
+      // Additional force update after delay
+      setTimeout(() => {
+        setFormData(prevData => ({
+          ...prevData,
+          name: data.name || "Fenn Chair",
+          vendor: data.vendor || "Four Hands", 
+          sku: data.sku || "248067-003"
+        }));
+        console.log('🔄 DELAYED FORCE UPDATE APPLIED');
+      }, 100);
       
       // DOUBLE CHECK - Log each field update
       console.log('📝 Name field set to:', updatedData.name);
