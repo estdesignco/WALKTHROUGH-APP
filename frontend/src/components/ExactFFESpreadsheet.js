@@ -416,67 +416,52 @@ const ExactFFESpreadsheet = ({
     const { source, destination, type } = result;
 
     if (type === 'room') {
-      // Reorder rooms
-      const newRooms = Array.from(project.rooms);
-      const [reorderedRoom] = newRooms.splice(source.index, 1);
-      newRooms.splice(destination.index, 0, reorderedRoom);
+      console.log('🔄 Reordering rooms...');
       
-      // Update order indices
-      const updatedRooms = newRooms.map((room, index) => ({
-        ...room,
-        order_index: index
-      }));
-      
-      // Update local state immediately
-      const updatedProject = { ...project, rooms: updatedRooms };
-      setProject(updatedProject);
-      setFilteredProject(updatedProject);
-      
-      // Update backend
+      // Update backend room order
       try {
-        for (const room of updatedRooms) {
-          await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms/${room.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_index: room.order_index })
-          });
+        const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/rooms/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            source_index: source.index,
+            destination_index: destination.index,
+            project_id: project.id
+          })
+        });
+        
+        if (response.ok) {
+          console.log('✅ Room order updated');
+          // Reload to show changes
+          if (onReload) onReload();
         }
-        console.log('✅ Room order updated successfully');
       } catch (err) {
         console.error('❌ Error updating room order:', err);
-        // Revert on error
-        window.location.reload();
       }
     }
     
     if (type === 'category') {
-      // Handle category reordering
-      const roomId = source.droppableId.replace('categories-', '');
-      const room = project.rooms.find(r => r.id === roomId);
+      console.log('🔄 Reordering categories...');
       
-      if (room) {
-        const newCategories = Array.from(room.categories);
-        const [reorderedCategory] = newCategories.splice(source.index, 1);
-        newCategories.splice(destination.index, 0, reorderedCategory);
+      // Update backend category order  
+      try {
+        const roomId = source.droppableId.replace('categories-', '');
+        const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/categories/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            room_id: roomId,
+            source_index: source.index,
+            destination_index: destination.index
+          })
+        });
         
-        // Update order indices
-        const updatedCategories = newCategories.map((category, index) => ({
-          ...category,
-          order_index: index
-        }));
-        
-        // Update local state
-        const updatedProject = {
-          ...project,
-          rooms: project.rooms.map(r => 
-            r.id === roomId ? { ...r, categories: updatedCategories } : r
-          )
-        };
-        
-        setProject(updatedProject);
-        setFilteredProject(updatedProject);
-        
-        console.log('✅ Category order updated locally');
+        if (response.ok) {
+          console.log('✅ Category order updated');
+          if (onReload) onReload();
+        }
+      } catch (err) {
+        console.error('❌ Error updating category order:', err);
       }
     }
   };
