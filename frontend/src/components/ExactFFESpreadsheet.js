@@ -33,6 +33,7 @@ const ExactFFESpreadsheet = ({
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedCarrier, setSelectedCarrier] = useState('');
 
   // ACTUAL API CALLS - WITH PROPER ERROR HANDLING
   const handleStatusChange = async (itemId, newStatus) => {
