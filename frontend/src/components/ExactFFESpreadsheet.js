@@ -368,7 +368,9 @@ const ExactFFESpreadsheet = ({
           name: categoryName,
           room_id: roomId,
           order_index: 0,
-          populate_comprehensive: true
+          populate_comprehensive: true,
+          create_all_items: true,
+          populate_all_subcategories: true
         })
       });
 
