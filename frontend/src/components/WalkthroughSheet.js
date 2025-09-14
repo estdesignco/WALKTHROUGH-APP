@@ -10,6 +10,7 @@ const WalkthroughSheet = () => {
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [selectedItems, setSelectedItems] = useState(new Set());
+  const [roomColors, setRoomColors] = useState({});
 
   useEffect(() => {
     if (projectId) {
