@@ -25,7 +25,7 @@ const ExactFFESpreadsheet = ({
   const [expandedCategories, setExpandedCategories] = useState({});
 
   // FILTER STATE - MAKE IT ACTUALLY WORK
-  const [filteredProject, setFilteredProject] = useState(null);
+  const [filteredProject, setFilteredProject] = useState(project);
   
   // ✅ Search and Filter State
   const [searchTerm, setSearchTerm] = useState('');
