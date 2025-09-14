@@ -7,7 +7,7 @@ import ProjectList from "./components/ProjectList";
 import Navigation from "./components/Navigation";
 import ScrapingTestPage from "./components/ScrapingTestPage";
 
-const BACKEND_URL = "https://code-scanner-14.preview.emergentagent.com";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 // Create axios instance with default config
@@ -91,13 +91,10 @@ const App = () => {
         // Load project data for navigation context
         const loadProject = async () => {
           try {
-            const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
-            if (response.ok) {
-              const data = await response.json();
-              setCurrentProject(data);
+            const response = await projectAPI.getById(projectId);
+            if (response.data) {
+              setCurrentProject(response.data);
               setProjectLoaded(true);
-            } else {
-              setProjectLoaded(true); // Still proceed even if project load fails
             }
           } catch (error) {
             console.error('Failed to load project for navigation:', error);

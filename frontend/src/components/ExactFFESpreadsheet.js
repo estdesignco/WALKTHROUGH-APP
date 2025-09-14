@@ -25,7 +25,7 @@ const ExactFFESpreadsheet = ({
   const [expandedCategories, setExpandedCategories] = useState({});
 
   // FILTER STATE - MAKE IT ACTUALLY WORK
-  const [filteredProject, setFilteredProject] = useState(project);
+  const [filteredProject, setFilteredProject] = useState(null);
   
   // ✅ Search and Filter State
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,14 +33,13 @@ const ExactFFESpreadsheet = ({
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedCarrier, setSelectedCarrier] = useState('');
 
   // ACTUAL API CALLS - WITH PROPER ERROR HANDLING
   const handleStatusChange = async (itemId, newStatus) => {
     console.log('🔄 Status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -49,34 +48,8 @@ const ExactFFESpreadsheet = ({
       console.log('📡 Status change response:', response.status, response.statusText);
       
       if (response.ok) {
-        console.log('✅ Status updated successfully, updating local state...');
-        
-        // Update local state instead of reloading page
-        const updateProject = (prevProject) => {
-          if (!prevProject) return prevProject;
-          
-          const updatedProject = { ...prevProject };
-          updatedProject.rooms = updatedProject.rooms.map(room => ({
-            ...room,
-            categories: room.categories.map(category => ({
-              ...category,
-              subcategories: category.subcategories.map(subcategory => ({
-                ...subcategory,
-                items: subcategory.items.map(item => 
-                  item.id === itemId ? { ...item, status: newStatus } : item
-                )
-              }))
-            }))
-          }));
-          return updatedProject;
-        };
-        
-        setFilteredProject(updateProject);
-        
-        // Also trigger parent reload if callback available
-        if (onReload) {
-          onReload();
-        }
+        console.log('✅ Status updated successfully, reloading...');
+        window.location.reload();
       } else {
         const errorData = await response.text();
         console.error('❌ Status update failed:', response.status, errorData);
@@ -92,41 +65,14 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
       });
       
       if (response.ok) {
-        console.log('✅ Carrier updated successfully, updating local state...');
-        
-        // Update local state instead of reloading page
-        const updateProject = (prevProject) => {
-          if (!prevProject) return prevProject;
-          
-          const updatedProject = { ...prevProject };
-          updatedProject.rooms = updatedProject.rooms.map(room => ({
-            ...room,
-            categories: room.categories.map(category => ({
-              ...category,
-              subcategories: category.subcategories.map(subcategory => ({
-                ...subcategory,
-                items: subcategory.items.map(item => 
-                  item.id === itemId ? { ...item, carrier: newCarrier } : item
-                )
-              }))
-            }))
-          }));
-          return updatedProject;
-        };
-        
-        setFilteredProject(updateProject);
-        
-        // Also trigger parent reload if callback available
-        if (onReload) {
-          onReload();
-        }
+        window.location.reload();
       } else {
         const errorData = await response.text();
         console.error('❌ Carrier update failed:', response.status, errorData);
@@ -147,10 +93,10 @@ const ExactFFESpreadsheet = ({
 
     let filtered = { ...project };
 
-    if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus || selectedCarrier) {
+    if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
       filtered.rooms = project.rooms.filter(room => {
-        // Room filter - Fixed to use room.id instead of room.name
-        if (selectedRoom && room.id !== selectedRoom) {
+        // Room filter
+        if (selectedRoom && room.name.toLowerCase() !== selectedRoom.toLowerCase()) {
           return false;
         }
 
@@ -175,7 +121,7 @@ const ExactFFESpreadsheet = ({
         }
 
         // Filter categories and items within room
-        if (selectedCategory || selectedVendor || selectedStatus || selectedCarrier || searchTerm) {
+        if (selectedCategory || selectedVendor || selectedStatus || searchTerm) {
           const filteredCategories = room.categories?.filter(category => {
             // Category filter
             if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) {
@@ -192,11 +138,6 @@ const ExactFFESpreadsheet = ({
 
                 // Status filter
                 if (selectedStatus && (!item.status || item.status !== selectedStatus)) {
-                  return false;
-                }
-
-                // Carrier filter
-                if (selectedCarrier && (!item.carrier || item.carrier !== selectedCarrier)) {
                   return false;
                 }
 
@@ -227,9 +168,7 @@ const ExactFFESpreadsheet = ({
 
           return {
             ...room,
-            categories: filteredCategories.filter(cat => 
-              cat.subcategories.some(sub => sub.items.length > 0)  // Only show categories with items
-            )
+            categories: filteredCategories
           };
         }
 
@@ -238,13 +177,13 @@ const ExactFFESpreadsheet = ({
     }
 
     setFilteredProject(filtered);
-  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier]);
+  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
   // Load available categories on component mount
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+        const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -307,7 +246,7 @@ const ExactFFESpreadsheet = ({
         return;
       }
 
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
       
       const newItem = {
         ...itemData,
@@ -328,8 +267,7 @@ const ExactFFESpreadsheet = ({
       if (response.ok) {
         console.log('✅ Item added successfully');
         setShowAddItem(false);
-        
-        // FORCE RELOAD TO SHOW NEW ITEM
+        // Force reload to show the new item
         window.location.reload();
       } else {
         const errorData = await response.text();
@@ -354,23 +292,15 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
 
       if (response.ok) {
         console.log('✅ Room deleted successfully');
-        // Update local state instead of reloading page
-        const updateProject = (prevProject) => {
-          if (!prevProject) return prevProject;
-          
-          const updatedProject = { ...prevProject };
-          updatedProject.rooms = updatedProject.rooms.filter(room => room.id !== roomId);
-          return updatedProject;
-        };
-        
-        setFilteredProject(updateProject);
+        // Force reload to show updated data
+        window.location.reload();
       } else {
         throw new Error(`HTTP ${response.status}`);
       }
@@ -386,15 +316,36 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'DELETE'
       });
 
       if (response.ok) {
         console.log('✅ Item deleted successfully');
-        // FORCE RELOAD TO SHOW UPDATED DATA
-        window.location.reload();
+        // Update filtered project state without reload
+        const updateProjectState = (prevProject) => {
+          if (!prevProject) return prevProject;
+          const updatedProject = { ...prevProject };
+          updatedProject.rooms = updatedProject.rooms.map(room => ({
+            ...room,
+            categories: room.categories.map(category => ({
+              ...category,
+              subcategories: category.subcategories.map(subcategory => ({
+                ...subcategory,
+                items: subcategory.items.filter(item => item.id !== itemId)
+              }))
+            }))
+          }));
+          return updatedProject;
+        };
+        
+        setFilteredProject(updateProjectState);
+        
+        // Also trigger parent component reload if callback is available
+        if (onReload) {
+          onReload();
+        }
       } else {
         throw new Error(`HTTP ${response.status}`);
       }
@@ -419,7 +370,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
       const response = await fetch(`${backendUrl}/api/categories/comprehensive`, {
         method: 'POST',
         headers: {
@@ -429,15 +380,13 @@ const ExactFFESpreadsheet = ({
           name: categoryName,
           room_id: roomId,
           order_index: 0,
-          populate_comprehensive: true,
-          create_all_items: true
+          populate_comprehensive: true
         })
       });
 
       if (response.ok) {
         console.log('✅ Category with full structure added successfully');
-        
-        // FORCE RELOAD TO SHOW NEW CATEGORY WITH ALL ITEMS
+        // Force reload to show the new category with all subcategories and items
         window.location.reload();
       } else {
         console.error('❌ Comprehensive category endpoint failed, trying basic endpoint');
@@ -456,9 +405,7 @@ const ExactFFESpreadsheet = ({
 
         if (basicResponse.ok) {
           console.log('✅ Basic category added successfully');
-          if (onReload) {
-            onReload();
-          }
+          window.location.reload();
         } else {
           throw new Error(`HTTP ${basicResponse.status}`);
         }
@@ -495,7 +442,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {
@@ -702,33 +649,6 @@ const ExactFFESpreadsheet = ({
             </select>
             
             <select 
-              value={selectedCarrier}
-              onChange={(e) => setSelectedCarrier(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
-            >
-              <option value="">All Carriers</option>
-              <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
-              <option value="FedEx Ground" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx Ground</option>
-              <option value="UPS" style={{ backgroundColor: '#8B4513', color: 'white' }}>UPS</option>
-              <option value="UPS Ground" style={{ backgroundColor: '#8B4513', color: 'white' }}>UPS Ground</option>
-              <option value="USPS" style={{ backgroundColor: '#004B87', color: 'white' }}>USPS</option>
-              <option value="DHL" style={{ backgroundColor: '#FFD700', color: 'black' }}>DHL</option>
-              <option value="Brooks" style={{ backgroundColor: '#4682B4', color: 'white' }}>Brooks</option>
-              <option value="Zenith" style={{ backgroundColor: '#20B2AA', color: 'white' }}>Zenith</option>
-              <option value="Sunbelt" style={{ backgroundColor: '#FF4500', color: 'white' }}>Sunbelt</option>
-              <option value="R+L Carriers" style={{ backgroundColor: '#32CD32', color: 'white' }}>R+L Carriers</option>
-              <option value="Yellow Freight" style={{ backgroundColor: '#FFD700', color: 'black' }}>Yellow Freight</option>
-              <option value="XPO Logistics" style={{ backgroundColor: '#6A5ACD', color: 'white' }}>XPO Logistics</option>
-              <option value="Old Dominion" style={{ backgroundColor: '#DC143C', color: 'white' }}>Old Dominion</option>
-              <option value="ABF Freight" style={{ backgroundColor: '#FF6347', color: 'white' }}>ABF Freight</option>
-              <option value="Con-Way" style={{ backgroundColor: '#48D1CC', color: 'white' }}>Con-Way</option>
-              <option value="Estes Express" style={{ backgroundColor: '#9370DB', color: 'white' }}>Estes Express</option>
-              <option value="YRC Freight" style={{ backgroundColor: '#FF1493', color: 'white' }}>YRC Freight</option>
-              <option value="Saia" style={{ backgroundColor: '#00CED1', color: 'white' }}>Saia</option>
-              <option value="OTHER" style={{ backgroundColor: '#808080', color: 'white' }}>OTHER</option>
-            </select>
-            
-            <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
@@ -761,7 +681,7 @@ const ExactFFESpreadsheet = ({
             {/* Filter and Clear Buttons */}
             <button 
               onClick={() => {
-                console.log('🔍 FILTER APPLIED - Search:', searchTerm, 'Room:', selectedRoom, 'Category:', selectedCategory, 'Vendor:', selectedVendor, 'Status:', selectedStatus, 'Carrier:', selectedCarrier);
+                console.log('🔍 FILTER APPLIED - Search:', searchTerm, 'Room:', selectedRoom, 'Category:', selectedCategory, 'Vendor:', selectedVendor, 'Status:', selectedStatus);
                 // Filters are applied automatically via useEffect
               }}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
@@ -775,7 +695,6 @@ const ExactFFESpreadsheet = ({
                 setSelectedCategory('');
                 setSelectedVendor('');
                 setSelectedStatus('');
-                setSelectedCarrier('');
                 console.log('🧹 FILTER CLEARED');
               }}
               className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium"
@@ -912,7 +831,6 @@ const ExactFFESpreadsheet = ({
                                                         <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Install Date<br/>Ship To</td>
                                                         <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Tracking<br/>Carrier</td>
                                                         <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>NOTES</td>
-                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>LINK</td>
                                                         <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ACTIONS</td>
                                                       </tr>
                                                       
@@ -1091,13 +1009,13 @@ const ExactFFESpreadsheet = ({
                                                                   onChange={(e) => console.log('Ship to changed:', e.target.value)}
                                                                 >
                                                                   <option value="">Ship To...</option>
-                                                                  <option value="CLIENT HOME">CLIENT HOME</option>
-                                                                  <option value="JOB SITE">JOB SITE</option>
-                                                                  <option value="DESIGN CENTER">DESIGN CENTER</option>
-                                                                  <option value="WAREHOUSE">WAREHOUSE</option>
-                                                                  <option value="VENDOR LOCATION">VENDOR LOCATION</option>
-                                                                  <option value="CLASSIC DESIGN SERVICES">CLASSIC DESIGN SERVICES</option>
-                                                                  <option value="RECEIVER">RECEIVER</option>
+                                                                  <option value="CLIENT HOME">🏠 CLIENT HOME</option>
+                                                                  <option value="JOB SITE">🏗️ JOB SITE</option>
+                                                                  <option value="DESIGN CENTER">🏢 DESIGN CENTER</option>
+                                                                  <option value="WAREHOUSE">📦 WAREHOUSE</option>
+                                                                  <option value="VENDOR LOCATION">🏭 VENDOR LOCATION</option>
+                                                                  <option value="CLASSIC DESIGN SERVICES">🏢 CLASSIC DESIGN SERVICES</option>
+                                                                  <option value="RECEIVER">📋 RECEIVER</option>
                                                                   <option value="ADD_NEW">+ Add New Location</option>
                                                                 </select>
                                                               </div>
@@ -1123,25 +1041,25 @@ const ExactFFESpreadsheet = ({
                                                                   onChange={(e) => handleCarrierChange(item.id, e.target.value)}
                                                                 >
                                                                   <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>—</option>
-                                                                  <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
-                                                                  <option value="FedEx Ground" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx Ground</option>
-                                                                  <option value="UPS" style={{ backgroundColor: '#8B4513', color: 'white' }}>UPS</option>
-                                                                  <option value="UPS Ground" style={{ backgroundColor: '#8B4513', color: 'white' }}>UPS Ground</option>
-                                                                  <option value="USPS" style={{ backgroundColor: '#004B87', color: 'white' }}>USPS</option>
-                                                                  <option value="DHL" style={{ backgroundColor: '#FFD700', color: 'black' }}>DHL</option>
-                                                                  <option value="Brooks" style={{ backgroundColor: '#4682B4', color: 'white' }}>Brooks</option>
-                                                                  <option value="Zenith" style={{ backgroundColor: '#20B2AA', color: 'white' }}>Zenith</option>
-                                                                  <option value="Sunbelt" style={{ backgroundColor: '#FF4500', color: 'white' }}>Sunbelt</option>
-                                                                  <option value="R+L Carriers" style={{ backgroundColor: '#32CD32', color: 'white' }}>R+L Carriers</option>
-                                                                  <option value="Yellow Freight" style={{ backgroundColor: '#FFD700', color: 'black' }}>Yellow Freight</option>
-                                                                  <option value="XPO Logistics" style={{ backgroundColor: '#6A5ACD', color: 'white' }}>XPO Logistics</option>
-                                                                  <option value="Old Dominion" style={{ backgroundColor: '#DC143C', color: 'white' }}>Old Dominion</option>
-                                                                  <option value="ABF Freight" style={{ backgroundColor: '#FF6347', color: 'white' }}>ABF Freight</option>
-                                                                  <option value="Con-Way" style={{ backgroundColor: '#48D1CC', color: 'white' }}>Con-Way</option>
-                                                                  <option value="Estes Express" style={{ backgroundColor: '#9370DB', color: 'white' }}>Estes Express</option>
-                                                                  <option value="YRC Freight" style={{ backgroundColor: '#FF1493', color: 'white' }}>YRC Freight</option>
-                                                                  <option value="Saia" style={{ backgroundColor: '#00CED1', color: 'white' }}>Saia</option>
-                                                                  <option value="OTHER" style={{ backgroundColor: '#808080', color: 'white' }}>OTHER</option>
+                                                                  <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>📦 FedEx</option>
+                                                                  <option value="FedEx Ground" style={{ backgroundColor: '#FF6600', color: 'white' }}>📦 FedEx Ground</option>
+                                                                  <option value="UPS" style={{ backgroundColor: '#8B4513', color: 'white' }}>📦 UPS</option>
+                                                                  <option value="UPS Ground" style={{ backgroundColor: '#8B4513', color: 'white' }}>📦 UPS Ground</option>
+                                                                  <option value="USPS" style={{ backgroundColor: '#004B87', color: 'white' }}>📮 USPS</option>
+                                                                  <option value="DHL" style={{ backgroundColor: '#FFD700', color: 'black' }}>📦 DHL</option>
+                                                                  <option value="Brooks" style={{ backgroundColor: '#4682B4', color: 'white' }}>🚚 Brooks</option>
+                                                                  <option value="Zenith" style={{ backgroundColor: '#20B2AA', color: 'white' }}>🚚 Zenith</option>
+                                                                  <option value="Sunbelt" style={{ backgroundColor: '#FF4500', color: 'white' }}>🚚 Sunbelt</option>
+                                                                  <option value="R+L Carriers" style={{ backgroundColor: '#32CD32', color: 'white' }}>🚚 R+L Carriers</option>
+                                                                  <option value="Yellow Freight" style={{ backgroundColor: '#FFD700', color: 'black' }}>🚚 Yellow Freight</option>
+                                                                  <option value="XPO Logistics" style={{ backgroundColor: '#6A5ACD', color: 'white' }}>🚚 XPO Logistics</option>
+                                                                  <option value="Old Dominion" style={{ backgroundColor: '#DC143C', color: 'white' }}>🚚 Old Dominion</option>
+                                                                  <option value="ABF Freight" style={{ backgroundColor: '#FF6347', color: 'white' }}>🚚 ABF Freight</option>
+                                                                  <option value="Con-Way" style={{ backgroundColor: '#48D1CC', color: 'white' }}>🚚 Con-Way</option>
+                                                                  <option value="Estes Express" style={{ backgroundColor: '#9370DB', color: 'white' }}>🚚 Estes Express</option>
+                                                                  <option value="YRC Freight" style={{ backgroundColor: '#FF1493', color: 'white' }}>🚚 YRC Freight</option>
+                                                                  <option value="Saia" style={{ backgroundColor: '#00CED1', color: 'white' }}>🚚 Saia</option>
+                                                                  <option value="OTHER" style={{ backgroundColor: '#808080', color: 'white' }}>🚚 OTHER</option>
                                                                   <option value="ADD_NEW" style={{ backgroundColor: '#6B7280', color: 'white' }}>+ Add New Carrier</option>
                                                                 </select>
                                                               </div>
@@ -1156,23 +1074,6 @@ const ExactFFESpreadsheet = ({
                                                               className="w-full bg-transparent border-none text-white text-sm"
                                                               onChange={(e) => console.log('Notes changed:', e.target.value)}
                                                             />
-                                                          </td>
-                                                          
-                                                          {/* LINK */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.link ? (
-                                                              <a 
-                                                                href={item.link} 
-                                                                target="_blank" 
-                                                                rel="noopener noreferrer"
-                                                                className="text-blue-400 hover:text-blue-300 text-xs underline"
-                                                                title="View Product Link"
-                                                              >
-                                                                🔗 LINK
-                                                              </a>
-                                                            ) : (
-                                                              <span className="text-gray-500 text-xs">No Link</span>
-                                                            )}
                                                           </td>
                                                           
                                                           {/* ACTIONS - DELETE ITEM */}
@@ -1191,7 +1092,7 @@ const ExactFFESpreadsheet = ({
                                                       
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
                                                       <tr>
-                                                        <td colSpan="15" className="border border-gray-400 px-6 py-2 bg-slate-900">
+                                                        <td colSpan="14" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                                           <div className="flex justify-start items-center space-x-4">
                                                             {/* Add Item Button - GOLD/AMBER COLOR */}
                                                             <button
