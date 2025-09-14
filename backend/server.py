@@ -2557,11 +2557,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'specifications': None
             }
             
-            # Extract vendor from URL with enhanced debugging
+            # 🎯 ULTRA-COMPREHENSIVE VENDOR MAPPING (EVERY POSSIBLE DOMAIN)
             domain = url.split('/')[2].lower()
             print(f"🔍 EXTRACTING VENDOR - Domain: {domain}")
             
             vendor_mapping = {
+                # Wholesale Furniture Vendors
                 'fourhands.com': 'Four Hands',
                 'uttermost.com': 'Uttermost', 
                 'rowefurniture.com': 'Rowe Furniture',
@@ -2576,7 +2577,6 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'crestviewcollection.com': 'Crestview Collection',
                 'bassettmirror.com': 'Bassett Mirror',
                 'eichholtz.com': 'Eichholtz',
-                # ✅ ADDED MORE WHOLESALE VENDORS
                 'arteriorshome.com': 'Arteriors',
                 'phillipscollection.com': 'Phillips Collection',
                 'palecek.com': 'Palecek',
@@ -2587,13 +2587,36 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'caracole.com': 'Caracole',
                 'centuryfurniture.com': 'Century Furniture',
                 'hickorychair.com': 'Hickory Chair',
-                # ✅ ADDED REVIEW REQUEST DOMAINS
+                
+                # Consumer Retailers  
                 'westelm.com': 'West Elm',
                 'cb2.com': 'CB2',
                 'restorationhardware.com': 'Restoration Hardware',
-                'rh.com': 'Restoration Hardware'
+                'rh.com': 'Restoration Hardware',
+                'potterybarn.com': 'Pottery Barn',
+                'williams-sonoma.com': 'Williams Sonoma',
+                'crateandbarrel.com': 'Crate & Barrel',
+                
+                # Major Retailers
+                'wayfair.com': 'Wayfair',
+                'homedepot.com': 'Home Depot',
+                'lowes.com': 'Lowes',
+                'target.com': 'Target',
+                'amazon.com': 'Amazon',
+                'overstock.com': 'Overstock',
+                
+                # Additional Wholesale Vendors
+                'gabby.com': 'Gabby',
+                'surya.com': 'Surya',
+                'myohamerica.com': 'Myoh America',
+                'hubbardtonforge.com': 'Hubbardton Forge',
+                'hinkley.com': 'Hinkley Lighting',
+                'zeevlighting.com': 'Zeev Lighting',
+                'phillipjeffries.com': 'Phillip Jeffries',
+                'yorkwall.com': 'York Wallcoverings'
             }
             
+            result['vendor'] = None
             for domain_key, vendor_name in vendor_mapping.items():
                 if domain_key in domain:
                     result['vendor'] = vendor_name
@@ -2601,13 +2624,39 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     break
             else:
                 print(f"⚠️ VENDOR NOT FOUND for domain: {domain}")
+                # Try to extract vendor from page content
+                try:
+                    vendor_elements = await page.query_selector_all('*')
+                    for elem in vendor_elements[:20]:
+                        text = await elem.inner_text()
+                        if text and any(vendor in text for vendor in vendor_mapping.values()):
+                            for vendor in vendor_mapping.values():
+                                if vendor.lower() in text.lower():
+                                    result['vendor'] = vendor
+                                    print(f"✅ VENDOR EXTRACTED FROM CONTENT: {vendor}")
+                                    break
+                            if result['vendor']:
+                                break
+                except:
+                    pass
             
-            # Universal selectors for common product information
+            # 🔍 ULTRA-COMPREHENSIVE NAME SELECTORS (COVERS EVERY POSSIBLE PATTERN)
             name_selectors = [
+                # High Priority - Product Title Selectors
                 'h1[class*="product"], h1[class*="title"], h1.title, h1.product-title',
                 '[data-testid="product-title"], [data-test="product-title"]',
                 '.product-name, .product-title, .item-title, .page-title',
-                'h1, h2:first-of-type'
+                '.product-form__title, .product__title, .product-single__title',
+                '[class*="product-name"], [class*="item-name"], [class*="title"]',
+                
+                # Medium Priority - Generic Headers
+                'h1, h2:first-of-type, h3:first-of-type',
+                '.main-title, .page-header h1, .content-title',
+                '[data-product-title], [data-item-title]',
+                
+                # Low Priority - Fallback Selectors
+                'title', 'meta[property="og:title"]', 'meta[name="title"]',
+                '.breadcrumb a:last-child, .breadcrumbs a:last-child'
             ]
             
             # ✅ ENHANCED FOUR HANDS SPECIFIC SELECTORS FOR IMAGE, COST, SIZE
