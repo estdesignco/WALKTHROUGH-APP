@@ -1015,13 +1015,13 @@ const ExactFFESpreadsheet = ({
                                                                   onChange={(e) => console.log('Ship to changed:', e.target.value)}
                                                                 >
                                                                   <option value="">Ship To...</option>
-                                                                  <option value="CLIENT HOME">🏠 CLIENT HOME</option>
-                                                                  <option value="JOB SITE">🏗️ JOB SITE</option>
-                                                                  <option value="DESIGN CENTER">🏢 DESIGN CENTER</option>
-                                                                  <option value="WAREHOUSE">📦 WAREHOUSE</option>
-                                                                  <option value="VENDOR LOCATION">🏭 VENDOR LOCATION</option>
-                                                                  <option value="CLASSIC DESIGN SERVICES">🏢 CLASSIC DESIGN SERVICES</option>
-                                                                  <option value="RECEIVER">📋 RECEIVER</option>
+                                                                  <option value="CLIENT HOME">CLIENT HOME</option>
+                                                                  <option value="JOB SITE">JOB SITE</option>
+                                                                  <option value="DESIGN CENTER">DESIGN CENTER</option>
+                                                                  <option value="WAREHOUSE">WAREHOUSE</option>
+                                                                  <option value="VENDOR LOCATION">VENDOR LOCATION</option>
+                                                                  <option value="CLASSIC DESIGN SERVICES">CLASSIC DESIGN SERVICES</option>
+                                                                  <option value="RECEIVER">RECEIVER</option>
                                                                   <option value="ADD_NEW">+ Add New Location</option>
                                                                 </select>
                                                               </div>
