@@ -326,8 +326,14 @@ const ExactFFESpreadsheet = ({
       if (response.ok) {
         console.log('✅ Item added successfully');
         setShowAddItem(false);
-        // Force reload to show the new item
-        window.location.reload();
+        
+        // Update local state instead of reloading page  
+        const newItemResponse = await response.json();
+        
+        // Also trigger parent reload to refresh data
+        if (onReload) {
+          onReload();
+        }
       } else {
         const errorData = await response.text();
         console.error('❌ Backend error:', errorData);
