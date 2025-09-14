@@ -7,6 +7,7 @@ const WalkthroughSheet = () => {
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
   const [questionnaire, setQuestionnaire] = useState(null);
+  const [showAddRoom, setShowAddRoom] = useState(false);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [selectedItems, setSelectedItems] = useState(new Set());
 
