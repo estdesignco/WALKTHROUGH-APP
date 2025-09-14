@@ -72,6 +72,7 @@ const ExactFFESpreadsheet = ({
       });
       
       if (response.ok) {
+        console.log('✅ Carrier updated successfully, reloading...');
         window.location.reload();
       } else {
         const errorData = await response.text();
