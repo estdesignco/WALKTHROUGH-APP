@@ -1246,10 +1246,8 @@ const ExactFFESpreadsheet = ({
                   </tbody>
                 </table>
             </div>
-
+          </div>
         </div>
-      </div>
-      </DragDropContext>
 
       {/* ADD ITEM MODAL */}
       {showAddItem && (
