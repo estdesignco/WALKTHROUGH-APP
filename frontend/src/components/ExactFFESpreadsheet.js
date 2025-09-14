@@ -683,7 +683,7 @@ const ExactFFESpreadsheet = ({
             {/* Filter and Clear Buttons */}
             <button 
               onClick={() => {
-                console.log('🔍 FILTER APPLIED - Search:', searchTerm, 'Room:', selectedRoom, 'Category:', selectedCategory, 'Vendor:', selectedVendor, 'Status:', selectedStatus);
+                console.log('🔍 FILTER APPLIED - Search:', searchTerm, 'Room:', selectedRoom, 'Category:', selectedCategory, 'Vendor:', selectedVendor, 'Status:', selectedStatus, 'Carrier:', selectedCarrier);
                 // Filters are applied automatically via useEffect
               }}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
