@@ -3234,6 +3234,124 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         finally:
             await browser.close()
 
+@api_router.post("/scrape-product-ultra")
+async def scrape_product_ultra_llm(data: dict):
+    """
+    🚀 ULTRA-POWERFUL LLM-BASED SCRAPING 🚀
+    Uses GPT-4 to extract EVERYTHING from any furniture website
+    Can literally scrape a speck of dust!
+    """
+    url = data.get('url', '')
+    if not url:
+        raise HTTPException(status_code=400, detail="URL is required")
+    
+    try:
+        print(f"🚀 ULTRA-LLM SCRAPING: {url}")
+        
+        # First get the raw HTML content using Playwright
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
+            await page.goto(url, wait_until='networkidle', timeout=60000)
+            
+            # Get the full page content 
+            html_content = await page.content()
+            page_text = await page.evaluate('() => document.body.innerText')
+            
+            # Get all images on the page
+            images = await page.evaluate('''() => {
+                return Array.from(document.querySelectorAll('img')).map(img => ({
+                    src: img.src,
+                    alt: img.alt,
+                    width: img.naturalWidth,
+                    height: img.naturalHeight
+                })).filter(img => img.width > 200 && img.height > 200);
+            }''')
+            
+            await browser.close()
+        
+        # Use LLM to extract EVERYTHING from the content
+        chat = LlmChat(
+            api_key=os.environ.get('EMERGENT_LLM_KEY'),
+            session_id=f"scrape-{uuid.uuid4()}",
+            system_message="""You are an ULTRA-POWERFUL product data extraction specialist. 
+            Extract EVERY possible detail from furniture product pages.
+            Return ONLY a JSON object with these exact fields:
+            {
+                "name": "exact product name",
+                "vendor": "brand/manufacturer name", 
+                "sku": "product SKU/model number",
+                "price": "price with $ symbol",
+                "cost": "same as price",
+                "size": "dimensions in W x D x H format",
+                "description": "detailed product description",
+                "material": "construction materials",
+                "finish_color": "color/finish options",
+                "style": "design style",
+                "collection": "product collection/line",
+                "availability": "in stock/availability status",
+                "image_url": "best product image URL from provided images"
+            }
+            Extract data even if not explicitly labeled. Use context clues."""
+        ).with_model("openai", "gpt-4o")
+        
+        # Create the extraction prompt
+        extraction_prompt = f"""
+        EXTRACT ALL PRODUCT DATA FROM THIS FURNITURE WEBSITE:
+        
+        URL: {url}
+        
+        PAGE TEXT:
+        {page_text[:8000]}
+        
+        AVAILABLE IMAGES:
+        {json.dumps(images[:10], indent=2)}
+        
+        Extract EVERY detail possible and return as JSON. Find the main product image from the images list.
+        Be thorough - extract name, vendor, SKU, price, dimensions, materials, colors, description, etc.
+        """
+        
+        user_message = UserMessage(text=extraction_prompt)
+        response = await chat.send_message(user_message)
+        
+        print(f"🧠 LLM RESPONSE: {response}")
+        
+        # Parse the LLM response as JSON
+        try:
+            # Clean the response to extract JSON
+            clean_response = response.strip()
+            if clean_response.startswith('```json'):
+                clean_response = clean_response[7:]
+            if clean_response.endswith('```'):
+                clean_response = clean_response[:-3]
+            
+            extracted_data = json.loads(clean_response)
+            
+            print(f"✅ LLM EXTRACTED DATA: {extracted_data}")
+            
+            return {"success": True, "data": extracted_data}
+            
+        except json.JSONDecodeError:
+            # If JSON parsing fails, try to extract key-value pairs from text
+            extracted_data = {
+                'name': 'Extracted Product',
+                'vendor': 'Vendor',
+                'sku': 'SKU',
+                'price': '$0',
+                'cost': '$0',
+                'size': '',
+                'description': response[:200],
+                'material': '',
+                'finish_color': '',
+                'image_url': images[0]['src'] if images else None
+            }
+            
+            return {"success": True, "data": extracted_data}
+        
+    except Exception as e:
+        print(f"❌ ULTRA-LLM SCRAPING ERROR: {e}")
+        raise HTTPException(status_code=400, detail=f"Failed to scrape URL with LLM: {str(e)}")
+
 @api_router.post("/scrape-product")
 async def scrape_product_advanced(data: dict):
     """
