@@ -58,38 +58,36 @@ const FFEDashboard = ({ isOffline }) => {
   }, [projectId]);
 
   const loadSimpleProject = async () => {
+    console.log('🚀 Loading project data...');
+    setLoading(true);
+    
     try {
-      console.log('🚀 Loading project data...');
       const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();
         console.log('🚀 Project loaded:', projectData.name);
         console.log('🚀 Project rooms count:', projectData.rooms?.length || 0);
-        console.log('🚀 First room data:', projectData.rooms?.[0] || 'No rooms');
         setProject(projectData);
         setError(null);
-        setLoading(false); // FORCE SET LOADING FALSE HERE
       } else {
         console.error('🚀 Failed to load project:', response.status);
         setError('Failed to load project');
-        setLoading(false); // FORCE SET LOADING FALSE ON ERROR TOO
       }
     } catch (err) {
       console.error('🚀 Error loading project:', err);
       setError('Error loading project: ' + err.message);
-      setLoading(false); // FORCE SET LOADING FALSE ON EXCEPTION
-    } finally {
-      console.log('🚀 FORCE SETTING LOADING = FALSE');
-      setLoading(false);
-      
-      // Set default utility data
-      setRoomColors({});
-      setCategoryColors({});
-      setItemStatuses(['ORDERED', 'DELIVERED TO JOB SITE', 'INSTALLED']);
-      setVendorTypes(['Four Hands', 'Uttermost']);
-      setCarrierTypes(['FedEx', 'UPS']);
     }
+    
+    // ALWAYS set loading to false
+    setLoading(false);
+    
+    // Set default utility data
+    setRoomColors({});
+    setCategoryColors({});
+    setItemStatuses(['ORDERED', 'DELIVERED TO JOB SITE', 'INSTALLED']);
+    setVendorTypes(['Four Hands', 'Uttermost']);
+    setCarrierTypes(['FedEx', 'UPS']);
   };
 
   const loadUtilityDataAsync = async () => {
