@@ -649,6 +649,33 @@ const ExactFFESpreadsheet = ({
             </select>
             
             <select 
+              value={selectedCarrier}
+              onChange={(e) => setSelectedCarrier(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">All Carriers</option>
+              <option value="FedEx">FedEx</option>
+              <option value="FedEx Ground">FedEx Ground</option>
+              <option value="UPS">UPS</option>
+              <option value="UPS Ground">UPS Ground</option>
+              <option value="USPS">USPS</option>
+              <option value="DHL">DHL</option>
+              <option value="Brooks">Brooks</option>
+              <option value="Zenith">Zenith</option>
+              <option value="Sunbelt">Sunbelt</option>
+              <option value="R+L Carriers">R+L Carriers</option>
+              <option value="Yellow Freight">Yellow Freight</option>
+              <option value="XPO Logistics">XPO Logistics</option>
+              <option value="Old Dominion">Old Dominion</option>
+              <option value="ABF Freight">ABF Freight</option>
+              <option value="Con-Way">Con-Way</option>
+              <option value="Estes Express">Estes Express</option>
+              <option value="YRC Freight">YRC Freight</option>
+              <option value="Saia">Saia</option>
+              <option value="OTHER">OTHER</option>
+            </select>
+            
+            <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
