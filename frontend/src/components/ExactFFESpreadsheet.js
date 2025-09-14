@@ -334,51 +334,65 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
-      const response = await fetch(`${backendUrl}/api/categories/comprehensive`, {
+      console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
+      
+      // DIRECT APPROACH: Create a new room with the category structure, then merge
+      const tempRoomResponse = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: categoryName,
-          room_id: roomId,
-          order_index: 0,
-          populate_comprehensive: true,
-          create_all_items: true,
-          populate_all_subcategories: true
+          name: `temp_${categoryName}_${Date.now()}`,
+          description: `Temporary room to extract ${categoryName} structure`,
+          project_id: "temp",
+          order_index: 999
         })
       });
 
-      if (response.ok) {
-        console.log('✅ Category with full structure added successfully');
-        // Force reload to show the new category with all subcategories and items
-        window.location.reload();
-      } else {
-        console.error('❌ Comprehensive category endpoint failed, trying basic endpoint');
-        // Fallback to basic category creation
-        const basicResponse = await fetch(`${backendUrl}/api/categories`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: categoryName,
+      if (tempRoomResponse.ok) {
+        const tempRoom = await tempRoomResponse.json();
+        
+        // Find the matching category from the temp room
+        const matchingCategory = tempRoom.categories.find(cat => 
+          cat.name.toLowerCase() === categoryName.toLowerCase()
+        );
+        
+        if (matchingCategory) {
+          // Add the comprehensive category to the actual room
+          const categoryData = {
+            ...matchingCategory,
             room_id: roomId,
-            order_index: 0
-          })
-        });
-
-        if (basicResponse.ok) {
-          console.log('✅ Basic category added successfully');
-          window.location.reload();
-        } else {
-          throw new Error(`HTTP ${basicResponse.status}`);
+            id: undefined // Let backend generate new ID
+          };
+          
+          const addResponse = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/categories`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(categoryData)
+          });
+          
+          if (addResponse.ok) {
+            console.log('✅ Comprehensive category added successfully');
+            
+            // Delete the temp room
+            await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+              method: 'DELETE'
+            });
+            
+            // Reload to show new category with all items
+            window.location.reload();
+          }
         }
+        
+        // Clean up temp room regardless
+        await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+          method: 'DELETE'
+        });
+      } else {
+        throw new Error('Failed to create comprehensive category structure');
       }
     } catch (error) {
-      console.error('❌ Error adding category:', error);
-      alert('Failed to add category. Please try again.');
+      console.error('❌ Error adding comprehensive category:', error);
+      alert('Failed to add category with items. Please try again.');
     }
   };
 
