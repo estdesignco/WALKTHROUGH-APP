@@ -2456,47 +2456,79 @@ def _extract_dimensions_from_text(text: str) -> Optional[str]:
 # Advanced Product Scraping with Playwright for JavaScript-rendered content
 async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     """
+    🚀 ULTRA-ROBUST PRODUCT SCRAPING 🚀
     Advanced product scraping using Playwright for JavaScript-rendered wholesale sites
-    Handles Four Hands, Uttermost, and other wholesale vendors with dynamic content
+    Can scrape a SPECK OF DUST! Extracts EVERY possible piece of data
+    Handles Four Hands, Uttermost, and ALL wholesale vendors with dynamic content
     """
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,
-            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+            args=[
+                '--no-sandbox', 
+                '--disable-setuid-sandbox', 
+                '--disable-dev-shm-usage',
+                '--disable-blink-features=AutomationControlled',
+                '--disable-features=VizDisplayCompositor',
+                '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            ]
         )
         context = await browser.new_context(
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            viewport={'width': 1920, 'height': 1080}
+            viewport={'width': 1920, 'height': 1080},
+            # Bypass bot detection
+            extra_http_headers={
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate',
+                'Referer': 'https://www.google.com/',
+                'DNT': '1',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1',
+                'Sec-Fetch-Dest': 'document',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-Site': 'none'
+            }
         )
         page = await context.new_page()
         
-        # Set reasonable timeouts
-        page.set_default_timeout(30000)
+        # Set ULTRA-ROBUST timeouts
+        page.set_default_timeout(45000)
         
         try:
-            # Navigate to the URL with better wait strategy for wholesale sites
-            await page.goto(url, wait_until='domcontentloaded', timeout=45000)
+            print(f"🚀 ULTRA-SCRAPING INITIATED for: {url}")
             
-            # Try to wait for network idle, but don't fail if it times out
+            # Navigate with multiple fallback strategies
+            await page.goto(url, wait_until='domcontentloaded', timeout=60000)
+            
+            # Wait for network and dynamic content with multiple strategies
             try:
-                await page.wait_for_load_state('networkidle', timeout=20000)
+                await page.wait_for_load_state('networkidle', timeout=25000)
             except:
-                pass  # Continue even if network doesn't become idle
+                try:
+                    await page.wait_for_load_state('domcontentloaded', timeout=15000)
+                except:
+                    pass
             
             # Wait for potential dynamic content to load
-            await page.wait_for_timeout(3000)
+            await page.wait_for_timeout(4000)
             
-            # Try to wait for common product elements to appear
-            try:
-                await page.wait_for_selector('h1, [class*="title"], [class*="product"], .product-form, .product-info', timeout=10000)
-            except:
-                # If specific selectors don't appear, try a more general approach
+            # Try to wait for common product elements with fallbacks
+            product_element_selectors = [
+                'h1, [class*="title"], [class*="product"]',
+                '.product-form, .product-info, .product-details',
+                '[data-product], [data-testid*="product"]',
+                'main, .main, #main, .content, .container'
+            ]
+            
+            for selector in product_element_selectors:
                 try:
-                    await page.wait_for_selector('body', timeout=5000)
+                    await page.wait_for_selector(selector, timeout=8000)
+                    break
                 except:
-                    pass  # Continue even if page doesn't fully load
+                    continue
             
-            # Initialize result structure
+            # Initialize COMPREHENSIVE result structure
             result = {
                 'name': None,
                 'vendor': None,
@@ -2507,7 +2539,22 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'size': None,
                 'description': None,
                 'sku': None,
-                'availability': None
+                'availability': None,
+                'dimensions': None,
+                'material': None,
+                'style': None,
+                'collection': None,
+                'brand': None,
+                'category': None,
+                'weight': None,
+                'color': None,
+                'finish': None,
+                'warranty': None,
+                'manufacturer': None,
+                'model_number': None,
+                'item_number': None,
+                'upc': None,
+                'specifications': None
             }
             
             # Extract vendor from URL with enhanced debugging
