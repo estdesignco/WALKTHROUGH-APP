@@ -219,7 +219,7 @@ const WalkthroughSheet = () => {
           carrierTypes={['FedEx', 'UPS', 'USPS']}
           onDeleteRoom={deleteRoom}
           onAddRoom={() => setShowAddRoom(true)}
-          onReload={loadProject}
+          onReload={loadSimpleProject}
         />
       </div>
 
@@ -227,48 +227,10 @@ const WalkthroughSheet = () => {
       {showAddRoom && (
         <AddRoomModal
           onClose={() => setShowAddRoom(false)}
-          onSubmit={async (roomData) => {
-            try {
-              const newRoom = {
-                ...roomData,
-                project_id: projectId,
-                order_index: project.rooms.length
-              };
-              
-              const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/rooms', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newRoom)
-              });
-              
-              if (response.ok) {
-                console.log('✅ Room added successfully');
-                setShowAddRoom(false);
-                await loadProject();
-              }
-            } catch (err) {
-              console.error('Error creating room:', err);
-            }
-          }}
-          roomColors={{}}
+          onSubmit={handleAddRoom}
+          roomColors={roomColors}
         />
       )}
-
-      {/* Integration Buttons */}
-      <div className="flex justify-center space-x-4 mt-6">
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded">
-          📐 Sync with My Measures
-        </button>
-        <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded">
-          🏠 Export to Houzz Pro
-        </button>
-        <button 
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded"
-          onClick={() => window.location.href = `/project/${projectId}/checklist`}
-        >
-          ✅ Generate Checklist
-        </button>
-      </div>
     </div>
   );
 };
