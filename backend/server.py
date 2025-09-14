@@ -2979,6 +2979,101 @@ async def scrape_product_advanced(data: dict):
 # Include the router in the main app
 app.include_router(api_router)
 
+# Advanced Integration Endpoints
+@api_router.post("/integrations/walkthrough/complete")
+async def complete_walkthrough(data: dict):
+    """Complete walkthrough and generate checklist items"""
+    try:
+        project_id = data.get('project_id')
+        walkthrough_data = data.get('walkthrough_data', {})
+        
+        # Generate checklist items based on walkthrough findings
+        checklist_items = []
+        
+        for room_data in walkthrough_data.get('rooms', []):
+            room_name = room_data.get('name')
+            measurements = room_data.get('measurements', {})
+            
+            # Generate room-specific checklist items
+            if measurements.get('length') and measurements.get('width'):
+                area = float(measurements['length']) * float(measurements['width'])
+                
+                if 'kitchen' in room_name.lower():
+                    checklist_items.extend([
+                        f"Order {area * 1.5:.0f} sq ft of flooring for {room_name}",
+                        f"Coordinate appliance delivery for {room_name}",
+                        f"Schedule cabinet installation for {room_name}"
+                    ])
+                elif 'bathroom' in room_name.lower():
+                    checklist_items.extend([
+                        f"Order plumbing fixtures for {room_name}",
+                        f"Schedule tile installation for {room_name}"
+                    ])
+                else:
+                    checklist_items.extend([
+                        f"Order furniture for {room_name}",
+                        f"Schedule painting for {room_name}"
+                    ])
+        
+        # Save checklist to database
+        checklist_doc = {
+            "id": str(uuid.uuid4()),
+            "project_id": project_id,
+            "items": checklist_items,
+            "generated_from": "walkthrough",
+            "created_at": datetime.utcnow(),
+            "completed_items": []
+        }
+        
+        result = await db.checklists.insert_one(checklist_doc)
+        
+        return {
+            "success": True,
+            "checklist_id": checklist_doc["id"],
+            "items_generated": len(checklist_items),
+            "checklist_items": checklist_items
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Walkthrough completion failed: {str(e)}")
+
+@api_router.post("/integrations/mobile/sync")
+async def mobile_sync(data: dict):
+    """Sync mobile app data with server"""
+    try:
+        device_id = data.get('device_id')
+        offline_actions = data.get('offline_actions', [])
+        
+        # Process offline actions
+        synced_actions = []
+        
+        for action in offline_actions:
+            try:
+                action_type = action.get('type')
+                action_data = action.get('data')
+                
+                if action_type == 'CREATE_ITEM':
+                    result = await db.items.insert_one(action_data)
+                    synced_actions.append(action['id'])
+                elif action_type == 'UPDATE_STATUS':
+                    await db.items.update_one(
+                        {"id": action_data['item_id']},
+                        {"$set": {"status": action_data['status'], "updated_at": datetime.utcnow()}}
+                    )
+                    synced_actions.append(action['id'])
+                    
+            except Exception as e:
+                print(f"Failed to sync action: {e}")
+        
+        return {
+            "success": True,
+            "synced_actions": len(synced_actions),
+            "sync_timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Mobile sync failed: {str(e)}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
