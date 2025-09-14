@@ -91,10 +91,13 @@ const App = () => {
         // Load project data for navigation context
         const loadProject = async () => {
           try {
-            const response = await projectAPI.getById(projectId);
-            if (response.data) {
-              setCurrentProject(response.data);
+            const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
+            if (response.ok) {
+              const data = await response.json();
+              setCurrentProject(data);
               setProjectLoaded(true);
+            } else {
+              setProjectLoaded(true); // Still proceed even if project load fails
             }
           } catch (error) {
             console.error('Failed to load project for navigation:', error);
