@@ -56,6 +56,12 @@ const FFEDashboard = ({ isOffline }) => {
       
       setLoading(true);
       loadSimpleProject();
+      
+      // EMERGENCY TIMEOUT - FORCE STOP LOADING AFTER 10 SECONDS
+      setTimeout(() => {
+        console.log('🚨 EMERGENCY TIMEOUT - FORCING LOADING TO FALSE');
+        setLoading(false);
+      }, 10000);
     }
   }, [projectId]);
 
