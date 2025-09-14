@@ -464,32 +464,13 @@ const ExactFFESpreadsheet = ({
         
         // Get the new category data from response
         const newCategory = await response.json();
-        console.log('📊 New category created:', newCategory);
+        console.log('📊 New category created with items:', newCategory);
         
-        // Update local state to show new category immediately
-        const updateProject = (prevProject) => {
-          if (!prevProject) return prevProject;
-          
-          const updatedProject = { ...prevProject };
-          updatedProject.rooms = updatedProject.rooms.map(room => {
-            if (room.id === roomId) {
-              return {
-                ...room,
-                categories: [...(room.categories || []), newCategory]
-              };
-            }
-            return room;
-          });
-          return updatedProject;
-        };
-        
-        setFilteredProject(updateProject);
-        
-        // Force expand the new category
-        setExpandedCategories(prev => ({
-          ...prev,
-          [newCategory.id]: true
-        }));
+        // FORCE RELOAD PROJECT TO SHOW NEW CATEGORY  
+        if (onReload) {
+          console.log('🔄 Forcing project reload to show new category...');
+          await onReload();
+        }
       } else {
         console.error('❌ Comprehensive category endpoint failed, trying basic endpoint');
         // Fallback to basic category creation
