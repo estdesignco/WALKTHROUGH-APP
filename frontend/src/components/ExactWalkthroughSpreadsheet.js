@@ -865,270 +865,44 @@ const ExactWalkthroughSpreadsheet = ({
                                                       {/* ACTUAL ITEMS FROM BACKEND DATA */}
                                                       {category.subcategories?.map((subcategory) => (
                                                         subcategory.items?.map((item, itemIndex) => (
-                                                        <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                                          {/* INSTALLED - ITEM NAME GOES HERE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                        <tr key={item.id}>
+                                                          {/* Checkbox */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-center">
+                                                            <input 
+                                                              type="checkbox" 
+                                                              className="w-4 h-4"
+                                                              defaultChecked={item.status === 'PICKED'}
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* Item Name */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                                             {item.name}
                                                           </td>
                                                           
-                                                          {/* VENDOR/SKU - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Vendor updated:', e.target.textContent)}
-                                                            >
-                                                              {item.vendor || ''}
-                                                            </div>
+                                                          {/* Quantity */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
+                                                            {item.quantity || 1}
                                                           </td>
                                                           
-                                                          {/* QTY - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm text-center outline-none"
-                                                              onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
-                                                            >
-                                                              {item.quantity || ''}
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* SIZE - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Size updated:', e.target.textContent)}
-                                                            >
-                                                              {item.size || ''}
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* FINISH/Color - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
-                                                            >
-                                                              {item.finish_color || ''}
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* Cost/Price - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Cost updated:', e.target.textContent)}
-                                                            >
-                                                              {item.cost ? `$${item.cost}` : ''}
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* Image - SCRAPED AUTOMATICALLY */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center text-white">
-                                                            {item.image_url ? (
-                                                              <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
-                                                            ) : (
-                                                              ''
-                                                            )}
-                                                          </td>
-                                                          
-                                                          {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
-                                                          
-                                                          {/* Order Date (ALONE) */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <input 
-                                                              type="date" 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Order date changed:', e.target.value)}
-                                                            />
-                                                          </td>
-                                                          
-                                                          {/* Order Status/Order Number (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
-                                                            <div className="flex flex-col h-full">
-                                                              <div className="h-6 mb-1">
-                                                                <select 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  value={item.status || ''}
-                                                                  style={{ backgroundColor: getStatusColor(item.status || '') }}
-                                                                  onChange={(e) => {
-                                                                    const newStatus = e.target.value;
-                                                                    handleStatusChange(item.id, newStatus);
-                                                                  }}
-                                                                >
-                                                                  <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>—</option>
-                                                                  <option value="TO BE SELECTED" style={{ backgroundColor: '#6B7280', color: 'white' }}>🔵 TO BE SELECTED</option>
-                                                                  <option value="RESEARCHING" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 RESEARCHING</option>
-                                                                  <option value="PENDING APPROVAL" style={{ backgroundColor: '#F59E0B', color: 'white' }}>🟡 PENDING APPROVAL</option>
-                                                                  <option value="APPROVED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 APPROVED</option>
-                                                                  <option value="ORDERED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 ORDERED</option>
-                                                                  <option value="PICKED" style={{ backgroundColor: '#FFD700', color: 'black' }}>🟡 PICKED</option>
-                                                                  <option value="CONFIRMED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 CONFIRMED</option>
-                                                                  <option value="IN PRODUCTION" style={{ backgroundColor: '#F97316', color: 'white' }}>🟠 IN PRODUCTION</option>
-                                                                  <option value="SHIPPED" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 SHIPPED</option>
-                                                                  <option value="IN TRANSIT" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 IN TRANSIT</option>
-                                                                  <option value="OUT FOR DELIVERY" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 OUT FOR DELIVERY</option>
-                                                                  <option value="DELIVERED TO RECEIVER" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 DELIVERED TO RECEIVER</option>
-                                                                  <option value="DELIVERED TO JOB SITE" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 DELIVERED TO JOB SITE</option>
-                                                                  <option value="RECEIVED" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 RECEIVED</option>
-                                                                  <option value="READY FOR INSTALL" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 READY FOR INSTALL</option>
-                                                                  <option value="INSTALLING" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 INSTALLING</option>
-                                                                  <option value="INSTALLED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 INSTALLED</option>
-                                                                  <option value="ON HOLD" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 ON HOLD</option>
-                                                                  <option value="BACKORDERED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 BACKORDERED</option>
-                                                                  <option value="DAMAGED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 DAMAGED</option>
-                                                                  <option value="RETURNED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 RETURNED</option>
-                                                                  <option value="CANCELLED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 CANCELLED</option>
-                                                                </select>
-                                                              </div>
-                                                              <div className="h-6">
-                                                                <input 
-                                                                  type="text" 
-                                                                  placeholder="Order #"
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Order number changed:', e.target.value)}
-                                                                />
-                                                              </div>
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* Estimated Ship Date/Estimated Delivery Date (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
-                                                            <div className="flex flex-col h-full">
-                                                              <div className="h-6 mb-1">
-                                                                <input 
-                                                                  type="date" 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Estimated ship date changed:', e.target.value)}
-                                                                />
-                                                              </div>
-                                                              <div className="h-6">
-                                                                <input 
-                                                                  type="date" 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Estimated delivery date changed:', e.target.value)}
-                                                                />
-                                                              </div>
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* Install Date/Ship To (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
-                                                            <div className="flex flex-col h-full">
-                                                              <div className="h-6 mb-1">
-                                                                <input 
-                                                                  type="date" 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Install date changed:', e.target.value)}
-                                                                />
-                                                              </div>
-                                                              <div className="h-6">
-                                                                <select 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Ship to changed:', e.target.value)}
-                                                                >
-                                                                  <option value="">Ship To...</option>
-                                                                  <option value="CLIENT HOME">CLIENT HOME</option>
-                                                                  <option value="JOB SITE">JOB SITE</option>
-                                                                  <option value="DESIGN CENTER">DESIGN CENTER</option>
-                                                                  <option value="WAREHOUSE">WAREHOUSE</option>
-                                                                  <option value="VENDOR LOCATION">VENDOR LOCATION</option>
-                                                                  <option value="CLASSIC DESIGN SERVICES">CLASSIC DESIGN SERVICES</option>
-                                                                  <option value="RECEIVER">RECEIVER</option>
-                                                                  <option value="ADD_NEW">+ Add New Location</option>
-                                                                </select>
-                                                              </div>
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* Tracking/Carrier (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
-                                                            <div className="flex flex-col h-full">
-                                                              <div className="h-6 mb-1">
-                                                                <input 
-                                                                  type="text" 
-                                                                  placeholder="Live Tracking #"
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Live tracking changed:', e.target.value)}
-                                                                />
-                                                              </div>
-                                                              <div className="h-6">
-                                                                <select 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  value={item.carrier || ''}
-                                                                  style={{ backgroundColor: getCarrierColor(item.carrier || '') }}
-                                                                  onChange={(e) => handleCarrierChange(item.id, e.target.value)}
-                                                                >
-                                                                  <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>—</option>
-                                                                  <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
-                                                                  <option value="FedEx Ground" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx Ground</option>
-                                                                  <option value="UPS" style={{ backgroundColor: '#8B4513', color: 'white' }}>UPS</option>
-                                                                  <option value="UPS Ground" style={{ backgroundColor: '#8B4513', color: 'white' }}>UPS Ground</option>
-                                                                  <option value="USPS" style={{ backgroundColor: '#004B87', color: 'white' }}>USPS</option>
-                                                                  <option value="DHL" style={{ backgroundColor: '#FFD700', color: 'black' }}>DHL</option>
-                                                                  <option value="Brooks" style={{ backgroundColor: '#4682B4', color: 'white' }}>Brooks</option>
-                                                                  <option value="Zenith" style={{ backgroundColor: '#20B2AA', color: 'white' }}>Zenith</option>
-                                                                  <option value="Sunbelt" style={{ backgroundColor: '#FF4500', color: 'white' }}>Sunbelt</option>
-                                                                  <option value="R+L Carriers" style={{ backgroundColor: '#32CD32', color: 'white' }}>R+L Carriers</option>
-                                                                  <option value="Yellow Freight" style={{ backgroundColor: '#FFD700', color: 'black' }}>Yellow Freight</option>
-                                                                  <option value="XPO Logistics" style={{ backgroundColor: '#6A5ACD', color: 'white' }}>XPO Logistics</option>
-                                                                  <option value="Old Dominion" style={{ backgroundColor: '#DC143C', color: 'white' }}>Old Dominion</option>
-                                                                  <option value="ABF Freight" style={{ backgroundColor: '#FF6347', color: 'white' }}>ABF Freight</option>
-                                                                  <option value="Con-Way" style={{ backgroundColor: '#48D1CC', color: 'white' }}>Con-Way</option>
-                                                                  <option value="Estes Express" style={{ backgroundColor: '#9370DB', color: 'white' }}>Estes Express</option>
-                                                                  <option value="YRC Freight" style={{ backgroundColor: '#FF1493', color: 'white' }}>YRC Freight</option>
-                                                                  <option value="Saia" style={{ backgroundColor: '#00CED1', color: 'white' }}>Saia</option>
-                                                                  <option value="OTHER" style={{ backgroundColor: '#808080', color: 'white' }}>OTHER</option>
-                                                                  <option value="ADD_NEW" style={{ backgroundColor: '#6B7280', color: 'white' }}>+ Add New Carrier</option>
-                                                                </select>
-                                                              </div>
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* NOTES */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                          {/* Size */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                                             <input 
                                                               type="text" 
-                                                              placeholder="Notes"
                                                               className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Notes changed:', e.target.value)}
+                                                              placeholder="Size"
+                                                              defaultValue={item.size || ''}
                                                             />
                                                           </td>
                                                           
-                                                          {/* LINK */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.link ? (
-                                                              <a 
-                                                                href={item.link} 
-                                                                target="_blank" 
-                                                                rel="noopener noreferrer"
-                                                                className="text-blue-400 hover:text-blue-300 text-xs underline"
-                                                                title="View Product Link"
-                                                              >
-                                                                🔗 LINK
-                                                              </a>
-                                                            ) : (
-                                                              <span className="text-gray-500 text-xs">No Link</span>
-                                                            )}
-                                                          </td>
-                                                          
-                                                          {/* ACTIONS - DELETE ITEM */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center">
-                                                            <button 
-                                                              onClick={() => handleDeleteItem(item.id)}
-                                                              className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
-                                                              title="Delete Item"
-                                                            >
-                                                              🗑️
-                                                            </button>
+                                                          {/* Remarks */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                                                            <input 
+                                                              type="text" 
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              placeholder="Remarks"
+                                                              defaultValue={item.remarks || ''}
+                                                            />
                                                           </td>
                                                         </tr>
                                                         ))
