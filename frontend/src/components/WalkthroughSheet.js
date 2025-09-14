@@ -209,135 +209,51 @@ const WalkthroughSheet = () => {
         </div>
       </div>
 
-      {/* Walkthrough Table - Simplified Version of FF&E */}
-      <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
-        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '800px' }}>
-          <table className="w-full border-collapse border border-gray-400">
-            <thead>
-              <tr>
-                <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8b7355' }}>✓</th>
-                <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ROOM/CATEGORY</th>
-                <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>QTY</th>
-                <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>SIZE</th>
-                <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>REMARKS</th>
-                <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {project.rooms.map((room, roomIndex) => {
-                const isRoomExpanded = expandedRooms[room.id];
-                
-                return (
-                  <React.Fragment key={room.id}>
-                    {/* Room Header */}
-                    <tr>
-                      <td className="border border-gray-400 px-2 py-2 text-center">
-                        <input 
-                          type="checkbox" 
-                          className="w-4 h-4"
-                          onChange={() => {
-                            // Toggle all items in room
-                            room.categories.forEach(category => {
-                              category.subcategories.forEach(subcategory => {
-                                subcategory.items.forEach(item => {
-                                  toggleItemSelection(item.id);
-                                });
-                              });
-                            });
-                          }}
-                        />
-                      </td>
-                      <td 
-                        colSpan="4" 
-                        className="border border-gray-400 px-3 py-2 text-white text-sm font-bold cursor-pointer"
-                        style={{ backgroundColor: '#065F46' }}
-                        onClick={() => toggleRoomExpansion(room.id)}
-                      >
-                        <div className="flex justify-between items-center">
-                          <span>🏠 {room.name.toUpperCase()} ({room.categories?.reduce((total, cat) => total + cat.subcategories?.reduce((subTotal, sub) => subTotal + (sub.items?.length || 0), 0), 0)} Items)</span>
-                          <span>{isRoomExpanded ? '🔽' : '▶️'}</span>
-                        </div>
-                      </td>
-                      <td className="border border-gray-400 px-2 py-2 text-center">
-                        <button 
-                          onClick={() => deleteRoom(room.id)}
-                          className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
-                        >
-                          🗑️
-                        </button>
-                      </td>
-                    </tr>
-
-                    {/* Room Categories and Items */}
-                    {isRoomExpanded && room.categories.map((category, catIndex) => (
-                      <React.Fragment key={category.id}>
-                        {/* Category Header */}
-                        <tr>
-                          <td className="border border-gray-400 px-2 py-2"></td>
-                          <td 
-                            colSpan="4"
-                            className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
-                            style={{ backgroundColor: '#065F46' }}
-                          >
-                            📂 {category.name.toUpperCase()}
-                          </td>
-                          <td className="border border-gray-400 px-2 py-2"></td>
-                        </tr>
-
-                        {/* Subcategory Items */}
-                        {category.subcategories.map((subcategory) => 
-                          subcategory.items.map((item, itemIndex) => (
-                            <tr key={item.id}>
-                              <td className="border border-gray-400 px-2 py-2 text-center">
-                                <input 
-                                  type="checkbox" 
-                                  className="w-4 h-4"
-                                  checked={selectedItems.has(item.id)}
-                                  onChange={() => toggleItemSelection(item.id)}
-                                />
-                              </td>
-                              <td className="border border-gray-400 px-4 py-2 text-white text-sm">
-                                {subcategory.name}: {item.name}
-                              </td>
-                              <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
-                                {item.quantity || 1}
-                              </td>
-                              <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                <input 
-                                  type="text" 
-                                  className="w-full bg-transparent border-none text-white text-sm"
-                                  placeholder="Size"
-                                  defaultValue={item.size || ''}
-                                />
-                              </td>
-                              <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                <input 
-                                  type="text" 
-                                  className="w-full bg-transparent border-none text-white text-sm"
-                                  placeholder="Remarks"
-                                  defaultValue={item.remarks || ''}
-                                />
-                              </td>
-                              <td className="border border-gray-400 px-2 py-2 text-center">
-                                <button 
-                                  onClick={() => deleteItem(item.id)}
-                                  className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
-                                >
-                                  🗑️
-                                </button>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+      {/* Walkthrough Table - EXACT COPY OF FF&E WITH DIFFERENT COLUMNS */}
+      <div className="px-6 mt-4">
+        <WalkthroughSpreadsheet
+          project={project}
+          roomColors={{}}
+          categoryColors={{}}
+          itemStatuses={['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO JOB SITE', 'INSTALLED']}
+          vendorTypes={['Four Hands', 'Uttermost', 'Visual Comfort']}
+          carrierTypes={['FedEx', 'UPS', 'USPS']}
+          onDeleteRoom={deleteRoom}
+          onAddRoom={() => setShowAddRoom(true)}
+          onReload={loadProject}
+        />
       </div>
+
+      {/* Add Room Modal */}
+      {showAddRoom && (
+        <AddRoomModal
+          onClose={() => setShowAddRoom(false)}
+          onSubmit={async (roomData) => {
+            try {
+              const newRoom = {
+                ...roomData,
+                project_id: projectId,
+                order_index: project.rooms.length
+              };
+              
+              const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/rooms', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newRoom)
+              });
+              
+              if (response.ok) {
+                console.log('✅ Room added successfully');
+                setShowAddRoom(false);
+                await loadProject();
+              }
+            } catch (err) {
+              console.error('Error creating room:', err);
+            }
+          }}
+          roomColors={{}}
+        />
+      )}
 
       {/* Integration Buttons */}
       <div className="flex justify-center space-x-4 mt-6">
