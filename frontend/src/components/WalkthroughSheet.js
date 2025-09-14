@@ -234,7 +234,7 @@ const WalkthroughSheet = () => {
 
       {/* Walkthrough Table - EXACT COPY OF FF&E WITH DIFFERENT COLUMNS */}
       <div className="px-6 mt-4">
-        <WalkthroughSpreadsheet
+        <ExactWalkthroughSpreadsheet
           project={project}
           roomColors={roomColors}
           categoryColors={{}}
