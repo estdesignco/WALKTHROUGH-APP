@@ -868,11 +868,7 @@ const ExactWalkthroughSpreadsheet = ({
                                                         <tr key={item.id}>
                                                           {/* Checkbox */}
                                                           <td className="border border-gray-400 px-2 py-2 text-center">
-                                                            <input 
-                                                              type="checkbox" 
-                                                              className="w-4 h-4"
-                                                              defaultChecked={item.status === 'PICKED'}
-                                                            />
+                                                            <input type="checkbox" className="w-4 h-4" />
                                                           </td>
                                                           
                                                           {/* Item Name */}
@@ -887,22 +883,12 @@ const ExactWalkthroughSpreadsheet = ({
                                                           
                                                           {/* Size */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                                            <input 
-                                                              type="text" 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              placeholder="Size"
-                                                              defaultValue={item.size || ''}
-                                                            />
+                                                            <input type="text" className="w-full bg-transparent border-none text-white text-sm" placeholder="Size" />
                                                           </td>
                                                           
                                                           {/* Remarks */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                                            <input 
-                                                              type="text" 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              placeholder="Remarks"
-                                                              defaultValue={item.remarks || ''}
-                                                            />
+                                                            <input type="text" className="w-full bg-transparent border-none text-white text-sm" placeholder="Remarks" />
                                                           </td>
                                                         </tr>
                                                         ))
