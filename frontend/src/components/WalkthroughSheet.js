@@ -47,6 +47,29 @@ const WalkthroughSheet = () => {
     }
   };
 
+  const handleAddRoom = async (roomData) => {
+    try {
+      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...roomData,
+          project_id: projectId
+        })
+      });
+      
+      if (response.ok) {
+        console.log('✅ Room added successfully');
+        await loadProject(); // Reload project data
+        setShowAddRoom(false);
+      }
+    } catch (error) {
+      console.error('❌ Error adding room:', error);
+    }
+  };
+
   const toggleRoomExpansion = (roomId) => {
     setExpandedRooms(prev => ({
       ...prev,
