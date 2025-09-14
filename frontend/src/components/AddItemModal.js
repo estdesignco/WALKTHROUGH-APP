@@ -61,7 +61,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       const updatedData = {
         ...formData,
         name: data.name || data.title || data.product_name || "Product Name",  // Force populate
-        vendor: data.vendor || data.brand || data.manufacturer || result['vendor'] || "Four Hands", // Force populate with detected vendor
+        vendor: data.vendor || data.brand || data.manufacturer || "Four Hands", // Force populate with detected vendor
         sku: data.sku || data.model || data.product_id || formData.link.split('/').pop() || "SKU", // Extract from URL as fallback
         cost: data.cost || data.price || 0,
         size: data.size || data.dimensions || "",
