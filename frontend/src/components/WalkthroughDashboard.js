@@ -323,4 +323,4 @@ const WalkthroughDashboard = ({ isOffline }) => {
   );
 };
 
-export default FFEDashboard;
+export default WalkthroughDashboard;
