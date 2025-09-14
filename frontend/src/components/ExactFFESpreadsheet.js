@@ -1082,6 +1082,23 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
+                                                          {/* LINK */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            {item.link ? (
+                                                              <a 
+                                                                href={item.link} 
+                                                                target="_blank" 
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-400 hover:text-blue-300 text-xs underline"
+                                                                title="View Product Link"
+                                                              >
+                                                                🔗 LINK
+                                                              </a>
+                                                            ) : (
+                                                              <span className="text-gray-500 text-xs">No Link</span>
+                                                            )}
+                                                          </td>
+                                                          
                                                           {/* ACTIONS - DELETE ITEM */}
                                                           <td className="border border-gray-400 px-2 py-2 text-center">
                                                             <button 
