@@ -7,7 +7,7 @@ import ProjectList from "./components/ProjectList";
 import Navigation from "./components/Navigation";
 import ScrapingTestPage from "./components/ScrapingTestPage";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = "https://code-scanner-14.preview.emergentagent.com";
 const API = `${BACKEND_URL}/api`;
 
 // Create axios instance with default config
