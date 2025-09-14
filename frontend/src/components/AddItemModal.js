@@ -57,43 +57,20 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       const data = responseData.success ? responseData.data : responseData;
       console.log('🔗 EXTRACTED PRODUCT DATA:', data);
       
-      // FORCE POPULATE FORM WITH SCRAPED DATA - NO FALLBACKS TO EXISTING VALUES
+      // Enhanced data mapping with better field population
       const updatedData = {
         ...formData,
-        name: data.name || "Fenn Chair",  // FORCE with known good value
-        vendor: data.vendor || "Four Hands", // FORCE with known good value  
-        sku: data.sku || "248067-003", // FORCE with known good value
+        name: data.name || data.title || data.product_name || formData.name,
+        vendor: data.vendor || data.brand || data.manufacturer || formData.vendor,
+        sku: data.sku || data.model || data.product_id || formData.sku,
         cost: data.cost || data.price || formData.cost,
         size: data.size || data.dimensions || formData.size,
         image_url: data.image_url || data.image || data.main_image || formData.image_url,
         finish_color: data.color || data.finish || data.finish_color || formData.finish_color
       };
       
-      console.log('🚀 FORCING FORM UPDATE WITH:', updatedData);
-      
-      // FORCE UPDATE - Set each field individually to ensure React updates
-      setFormData(prevData => ({
-        ...prevData,
-        name: data.name || "Fenn Chair",
-        vendor: data.vendor || "Four Hands", 
-        sku: data.sku || "248067-003"
-      }));
-      
-      // Additional force update after delay
-      setTimeout(() => {
-        setFormData(prevData => ({
-          ...prevData,
-          name: data.name || "Fenn Chair",
-          vendor: data.vendor || "Four Hands", 
-          sku: data.sku || "248067-003"
-        }));
-        console.log('🔄 DELAYED FORCE UPDATE APPLIED');
-      }, 100);
-      
-      // DOUBLE CHECK - Log each field update
-      console.log('📝 Name field set to:', updatedData.name);
-      console.log('📝 Vendor field set to:', updatedData.vendor);  
-      console.log('📝 SKU field set to:', updatedData.sku);
+      console.log('🔗 UPDATED FORM DATA:', updatedData);
+      setFormData(updatedData);
       setScrapeError('');
       
     } catch (error) {
