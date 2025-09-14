@@ -141,6 +141,14 @@ const App = () => {
               }
             />
             <Route 
+              path="/project/:projectId/questionnaire" 
+              element={<QuestionnaireSheet />}
+            />
+            <Route 
+              path="/project/:projectId/walkthrough" 
+              element={<WalkthroughDashboard isOffline={isOffline} />}
+            />
+            <Route 
               path="/project/:projectId/ffe" 
               element={<FFEDashboardWrapper />}
             />
