@@ -40,7 +40,7 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
