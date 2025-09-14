@@ -30,7 +30,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
 
     try {
       // Get backend URL from environment
-      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
       
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);
