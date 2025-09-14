@@ -429,7 +429,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;
       const response = await fetch(`${backendUrl}/api/categories/comprehensive`, {
         method: 'POST',
         headers: {
