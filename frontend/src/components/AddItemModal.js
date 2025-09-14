@@ -374,6 +374,13 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
           </div>
         </form>
       </div>
+      
+      {/* Barcode Scanner Modal */}
+      <BarcodeScannerModal
+        isOpen={showBarcodeScanner}
+        onClose={() => setShowBarcodeScanner(false)}
+        onScanResult={handleBarcodeResult}
+      />
     </div>
   );
 };
