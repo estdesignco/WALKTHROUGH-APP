@@ -1,7 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from emergentintegrations.llm.chat import LlmChat, UserMessage
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -15,7 +14,6 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uuid
 import time
-import json
 from datetime import datetime, timezone
 from enum import Enum
 from playwright.async_api import async_playwright
@@ -2458,79 +2456,47 @@ def _extract_dimensions_from_text(text: str) -> Optional[str]:
 # Advanced Product Scraping with Playwright for JavaScript-rendered content
 async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     """
-    🚀 ULTRA-ROBUST PRODUCT SCRAPING 🚀
     Advanced product scraping using Playwright for JavaScript-rendered wholesale sites
-    Can scrape a SPECK OF DUST! Extracts EVERY possible piece of data
-    Handles Four Hands, Uttermost, and ALL wholesale vendors with dynamic content
+    Handles Four Hands, Uttermost, and other wholesale vendors with dynamic content
     """
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,
-            args=[
-                '--no-sandbox', 
-                '--disable-setuid-sandbox', 
-                '--disable-dev-shm-usage',
-                '--disable-blink-features=AutomationControlled',
-                '--disable-features=VizDisplayCompositor',
-                '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            ]
+            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
         )
         context = await browser.new_context(
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            viewport={'width': 1920, 'height': 1080},
-            # Bypass bot detection
-            extra_http_headers={
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Accept-Encoding': 'gzip, deflate',
-                'Referer': 'https://www.google.com/',
-                'DNT': '1',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'none'
-            }
+            viewport={'width': 1920, 'height': 1080}
         )
         page = await context.new_page()
         
-        # Set ULTRA-ROBUST timeouts
-        page.set_default_timeout(45000)
+        # Set reasonable timeouts
+        page.set_default_timeout(30000)
         
         try:
-            print(f"🚀 ULTRA-SCRAPING INITIATED for: {url}")
+            # Navigate to the URL with better wait strategy for wholesale sites
+            await page.goto(url, wait_until='domcontentloaded', timeout=45000)
             
-            # Navigate with multiple fallback strategies
-            await page.goto(url, wait_until='domcontentloaded', timeout=60000)
-            
-            # Wait for network and dynamic content with multiple strategies
+            # Try to wait for network idle, but don't fail if it times out
             try:
-                await page.wait_for_load_state('networkidle', timeout=25000)
+                await page.wait_for_load_state('networkidle', timeout=20000)
             except:
-                try:
-                    await page.wait_for_load_state('domcontentloaded', timeout=15000)
-                except:
-                    pass
+                pass  # Continue even if network doesn't become idle
             
             # Wait for potential dynamic content to load
-            await page.wait_for_timeout(4000)
+            await page.wait_for_timeout(3000)
             
-            # Try to wait for common product elements with fallbacks
-            product_element_selectors = [
-                'h1, [class*="title"], [class*="product"]',
-                '.product-form, .product-info, .product-details',
-                '[data-product], [data-testid*="product"]',
-                'main, .main, #main, .content, .container'
-            ]
-            
-            for selector in product_element_selectors:
+            # Try to wait for common product elements to appear
+            try:
+                await page.wait_for_selector('h1, [class*="title"], [class*="product"], .product-form, .product-info', timeout=10000)
+            except:
+                # If specific selectors don't appear, try a more general approach
                 try:
-                    await page.wait_for_selector(selector, timeout=8000)
-                    break
+                    await page.wait_for_selector('body', timeout=5000)
                 except:
-                    continue
+                    pass  # Continue even if page doesn't fully load
             
-            # Initialize COMPREHENSIVE result structure
+            # Initialize result structure
             result = {
                 'name': None,
                 'vendor': None,
@@ -2541,30 +2507,14 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'size': None,
                 'description': None,
                 'sku': None,
-                'availability': None,
-                'dimensions': None,
-                'material': None,
-                'style': None,
-                'collection': None,
-                'brand': None,
-                'category': None,
-                'weight': None,
-                'color': None,
-                'finish': None,
-                'warranty': None,
-                'manufacturer': None,
-                'model_number': None,
-                'item_number': None,
-                'upc': None,
-                'specifications': None
+                'availability': None
             }
             
-            # 🎯 ULTRA-COMPREHENSIVE VENDOR MAPPING (EVERY POSSIBLE DOMAIN)
+            # Extract vendor from URL with enhanced debugging
             domain = url.split('/')[2].lower()
             print(f"🔍 EXTRACTING VENDOR - Domain: {domain}")
             
             vendor_mapping = {
-                # Wholesale Furniture Vendors
                 'fourhands.com': 'Four Hands',
                 'uttermost.com': 'Uttermost', 
                 'rowefurniture.com': 'Rowe Furniture',
@@ -2579,6 +2529,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'crestviewcollection.com': 'Crestview Collection',
                 'bassettmirror.com': 'Bassett Mirror',
                 'eichholtz.com': 'Eichholtz',
+                # ✅ ADDED MORE WHOLESALE VENDORS
                 'arteriorshome.com': 'Arteriors',
                 'phillipscollection.com': 'Phillips Collection',
                 'palecek.com': 'Palecek',
@@ -2589,36 +2540,13 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'caracole.com': 'Caracole',
                 'centuryfurniture.com': 'Century Furniture',
                 'hickorychair.com': 'Hickory Chair',
-                
-                # Consumer Retailers  
+                # ✅ ADDED REVIEW REQUEST DOMAINS
                 'westelm.com': 'West Elm',
                 'cb2.com': 'CB2',
                 'restorationhardware.com': 'Restoration Hardware',
-                'rh.com': 'Restoration Hardware',
-                'potterybarn.com': 'Pottery Barn',
-                'williams-sonoma.com': 'Williams Sonoma',
-                'crateandbarrel.com': 'Crate & Barrel',
-                
-                # Major Retailers
-                'wayfair.com': 'Wayfair',
-                'homedepot.com': 'Home Depot',
-                'lowes.com': 'Lowes',
-                'target.com': 'Target',
-                'amazon.com': 'Amazon',
-                'overstock.com': 'Overstock',
-                
-                # Additional Wholesale Vendors
-                'gabby.com': 'Gabby',
-                'surya.com': 'Surya',
-                'myohamerica.com': 'Myoh America',
-                'hubbardtonforge.com': 'Hubbardton Forge',
-                'hinkley.com': 'Hinkley Lighting',
-                'zeevlighting.com': 'Zeev Lighting',
-                'phillipjeffries.com': 'Phillip Jeffries',
-                'yorkwall.com': 'York Wallcoverings'
+                'rh.com': 'Restoration Hardware'
             }
             
-            result['vendor'] = None
             for domain_key, vendor_name in vendor_mapping.items():
                 if domain_key in domain:
                     result['vendor'] = vendor_name
@@ -2626,340 +2554,173 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     break
             else:
                 print(f"⚠️ VENDOR NOT FOUND for domain: {domain}")
-                # Try to extract vendor from page content
-                try:
-                    vendor_elements = await page.query_selector_all('*')
-                    for elem in vendor_elements[:20]:
-                        text = await elem.inner_text()
-                        if text and any(vendor in text for vendor in vendor_mapping.values()):
-                            for vendor in vendor_mapping.values():
-                                if vendor.lower() in text.lower():
-                                    result['vendor'] = vendor
-                                    print(f"✅ VENDOR EXTRACTED FROM CONTENT: {vendor}")
-                                    break
-                            if result['vendor']:
-                                break
-                except:
-                    pass
             
-            # 🔍 ULTRA-COMPREHENSIVE NAME SELECTORS (COVERS EVERY POSSIBLE PATTERN)
+            # Universal selectors for common product information
             name_selectors = [
-                # High Priority - Product Title Selectors
                 'h1[class*="product"], h1[class*="title"], h1.title, h1.product-title',
                 '[data-testid="product-title"], [data-test="product-title"]',
                 '.product-name, .product-title, .item-title, .page-title',
-                '.product-form__title, .product__title, .product-single__title',
-                '[class*="product-name"], [class*="item-name"], [class*="title"]',
-                
-                # Medium Priority - Generic Headers
-                'h1, h2:first-of-type, h3:first-of-type',
-                '.main-title, .page-header h1, .content-title',
-                '[data-product-title], [data-item-title]',
-                
-                # Low Priority - Fallback Selectors
-                'title', 'meta[property="og:title"]', 'meta[name="title"]',
-                '.breadcrumb a:last-child, .breadcrumbs a:last-child'
+                'h1, h2:first-of-type'
             ]
             
-            # 💰 ULTRA-COMPREHENSIVE PRICE SELECTORS (FINDS EVERY PENNY!)
+            # ✅ ENHANCED FOUR HANDS SPECIFIC SELECTORS FOR IMAGE, COST, SIZE
+            # Enhanced price selectors for JavaScript-rendered content
             price_selectors = [
-                # HIGH PRIORITY - Specific Price Selectors
+                # Four Hands specific selectors (JavaScript-rendered)
                 '.price .money, .product-price .money, [data-price], .price-current',
                 '.product-form__price, .product__price, .price__sale, .price__regular',
                 '.price-item--regular, .price__regular, .price--highlight',
-                '[class*="price"]:not([class*="original"]):not([class*="old"])',
-                'span[class*="price"], div[class*="price"], p[class*="price"]',
-                
-                # MEDIUM PRIORITY - E-commerce Platform Specific
-                # Shopify selectors
-                '.product__price .money, .product-form__price .money',
-                '.price-list .price-item, .product-price-wrap .price',
-                '.shopify-price, .money, .price-item',
-                
-                # WooCommerce selectors
-                '.woocommerce-price-amount, .amount, .price .woocommerce-Price-amount',
-                '.price-current .amount, .price-now .amount',
-                
-                # Magento selectors
-                '.price-final_price, .price-wrapper, .price-box .price',
-                
-                # Four Hands and wholesale specific
+                'span[class*="price"], div[class*="price"]',
+                # Four Hands specific price patterns
                 '.product-meta .price, .product-info .price, .pricing .price',
                 '.variant-picker .price, .product-form .price',
                 '[data-product-price], [data-variant-price]',
-                
-                # MEDIUM-LOW PRIORITY - Generic Attribute Selectors
+                # Shopify common selectors
+                '.product__price .money, .product-form__price .money',
+                '.price-list .price-item, .product-price-wrap .price',
+                # Generic selectors
+                '[class*="price"]:not([class*="original"]):not([class*="old"])',
                 '[data-testid*="price"], [data-test*="price"]',
-                '[data-price-value], [data-cost], [data-amount]',
                 '.cost, .pricing, .product-price, .price-current',
-                '.retail-price, .msrp, .sale-price, .regular-price',
-                
-                # LOW PRIORITY - Text-based search (will be filtered)
-                'span:contains("$"), div:contains("$"), p:contains("$")',
-                '*[text()*="$"]',  # XPath-like concept
+                # Text-based approach for dynamic content
                 'span, div, p'  # Will filter for $ content in code
             ]
             
-            # 🖼️ ULTRA-COMPREHENSIVE IMAGE SELECTORS (FINDS THE PERFECT IMAGE!)
+            # Enhanced image selectors for the MAIN PRODUCT IMAGE (not thumbnails)
             image_selectors = [
-                # HIGHEST PRIORITY - Main Product Images
+                # Target the MAIN/HERO product images first
                 '.product__media img[src*="cdn"]:not([src*="thumb"]):not([src*="small"])',
                 '.product-media img[src*="images"]:not([src*="thumbnail"])',
                 '.hero-image img, .main-image img, .primary-image img',
                 '.product-gallery img:first-child, .gallery-main img',
                 '.product-photos img:first-child',
-                '.featured-image img, .product-featured-image img',
                 
-                # HIGH PRIORITY - Shopify/E-commerce specific
+                # Four Hands and Shopify specific MAIN image selectors
                 '.product__media .media img[src*="1024"], .product__media .media img[src*="master"]',
                 '.product-single__photo img[src*="large"], .product-single__photo img[src*="master"]',
-                '.product-image-main img, .main-product-image img',
                 
-                # MEDIUM PRIORITY - Generic selectors for LARGE images
+                # Generic selectors for LARGE product images (avoid thumbnails/small images)
                 'img[class*="product"]:not([class*="thumb"]):not([class*="small"])',
                 'img[class*="hero"]:not([class*="thumb"])',
                 'img[class*="main"]:not([class*="thumb"])',
                 'img[class*="featured"]:not([class*="small"])',
                 'img[class*="primary"]:not([class*="thumbnail"])',
-                'img[alt*="product"], img[alt*="main"], img[alt*="hero"]',
                 
-                # MEDIUM-LOW PRIORITY - Data attribute selectors
+                # Data attribute selectors for main images
                 'img[data-main-image], img[data-product-image], img[data-featured-image]',
                 '[data-testid*="main-image"] img, [data-test*="product-image"] img',
-                'img[data-src*="product"], img[data-original*="product"]',
                 
-                # LOW PRIORITY - Fallback selectors (will be filtered for quality)
-                'img[src*="product"], img[src*="item"], img[src*="cdn"]',
-                '.gallery img:first-child, .images img:first-child',
-                'figure img, .figure img, .image img'
+                # Last resort - but filter for larger images in code
+                'img[src*="product"], img[src*="item"], img[src*="cdn"]'
             ]
             
-            # 📝 ULTRA-COMPREHENSIVE DESCRIPTION SELECTORS 
+            # Enhanced description selectors for JavaScript-rendered content
             description_selectors = [
-                # HIGH PRIORITY - Specific Description Selectors
+                # Shopify and modern e-commerce selectors
                 '.product__description, .product-description, .product-content',
                 '.product-single__description, .product-form__description',
-                '.description, .product-details, .item-description',
                 '[class*="description"]:not([class*="nav"]):not([class*="menu"])',
                 '[class*="detail"]:not([class*="nav"]):not([class*="menu"])',
-                
-                # MEDIUM PRIORITY - Rich Text Selectors
-                '.rte, .rich-text, .formatted-text, .wysiwyg',
-                '.product-info .content, .product-content .text',
-                '[data-testid*="description"], [data-test*="description"]',
-                
-                # MEDIUM-LOW PRIORITY - Generic Content Selectors  
                 '[class*="content"]:not([class*="nav"]):not([class*="menu"])',
+                '[data-testid*="description"], [data-test*="description"]',
+                '.rte, .rich-text, .formatted-text',
+                # Generic selectors
                 '.product-description, .item-details, .product-details',
-                '.specifications, .specs, .features',
-                
-                # LOW PRIORITY - Fallback text elements
-                'p:not([class*="nav"]):not([class*="menu"])'
+                'p:not([class*="nav"]):not([class*="menu"])'  # Will filter for description-like content
             ]
             
-            # 🔍 ULTRA-COMPREHENSIVE NAME EXTRACTION (FINDS EVERYTHING!)
-            print(f"🔍 Starting ULTRA-NAME extraction...")
+            # Try to extract product name
             for selector in name_selectors:
                 try:
-                    if 'title' in selector and 'meta' in selector:  # Special handling for meta tags
-                        element = await page.query_selector(selector)
-                        if element:
-                            content = await element.get_attribute('content')
-                            if content and len(content.strip()) > 0:
-                                result['name'] = content.strip()
-                                print(f"✅ NAME from meta tag: {result['name']}")
-                                break
-                    else:
+                    element = await page.query_selector(selector)
+                    if element:
+                        text = await element.inner_text()
+                        if text and len(text.strip()) > 0:
+                            result['name'] = text.strip()
+                            break
+                except:
+                    continue
+            
+            # Try to extract price with enhanced JavaScript handling
+            for selector in price_selectors:
+                try:
+                    if selector == 'span, div, p':  # Special handling for text-based search
+                        elements = await page.query_selector_all(selector)
+                        for element in elements[:50]:  # Limit to first 50 elements for performance
+                            try:
+                                text = await element.inner_text()
+                                if '$' in text:
+                                    price_match = re.search(r'\$[\d,]+\.?\d*', text)
+                                    if price_match:
+                                        result['cost'] = price_match.group()
+                                        result['price'] = price_match.group()
+                                        break
+                            except:
+                                continue
+                        if result['price']:  # If found, break outer loop
+                            break
+                    else:  # Regular selector handling
                         element = await page.query_selector(selector)
                         if element:
                             text = await element.inner_text()
-                            if text and len(text.strip()) > 0 and len(text.strip()) < 200:
-                                result['name'] = text.strip()
-                                print(f"✅ NAME extracted: {result['name']}")
+                            price_match = re.search(r'\$[\d,]+\.?\d*', text)
+                            if price_match:
+                                result['cost'] = price_match.group()
+                                result['price'] = price_match.group()
                                 break
                 except:
                     continue
             
-            # If no name found, try even more aggressive approach
-            if not result['name']:
-                try:
-                    # Try page title as last resort
-                    page_title = await page.title()
-                    if page_title and len(page_title.strip()) > 0:
-                        result['name'] = page_title.strip()
-                        print(f"✅ NAME from page title: {result['name']}")
-                except:
-                    pass
-            
-            # 💰 ULTRA-PRICE EXTRACTION - GET EVERY PRICE ON THE PAGE
-            print(f"💰 Starting AGGRESSIVE price extraction...")
-            price_found = False
-            
-            # Strategy 1: Look for Four Hands specific price elements
-            try:
-                # Try to find price in JSON-LD structured data
-                json_scripts = await page.query_selector_all('script[type="application/ld+json"]')
-                for script in json_scripts:
-                    try:
-                        content = await script.inner_text()
-                        import json
-                        json_data = json.loads(content)
-                        if isinstance(json_data, dict) and 'offers' in json_data:
-                            price = json_data['offers'].get('price')
-                            if price:
-                                result['price'] = f"${price}"
-                                result['cost'] = f"${price}"
-                                print(f"✅ PRICE from JSON-LD: ${price}")
-                                price_found = True
-                                break
-                    except:
-                        continue
-            except:
-                pass
-                
-            # Strategy 2: Search for price in page content aggressively  
-            if not price_found:
-                try:
-                    page_content = await page.content()
-                    # Look for Four Hands price patterns in the HTML
-                    price_patterns = [
-                        r'"price":\s*"?(\d+\.?\d*)"?',
-                        r'"cost":\s*"?(\d+\.?\d*)"?', 
-                        r'PRICE.*?(\$[\d,]+\.?\d*)',
-                        r'Price.*?(\$[\d,]+\.?\d*)',
-                        r'MSRP.*?(\$[\d,]+\.?\d*)',
-                        r'\$(\d{3,5}\.?\d*)',  # Look for substantial prices
-                        r'(\d{3,5}\.?\d*)\s*USD',
-                    ]
-                    
-                    for pattern in price_patterns:
-                        matches = re.findall(pattern, page_content, re.IGNORECASE)
-                        for match in matches:
-                            if isinstance(match, tuple):
-                                match = match[0] if match[0] else match[1] if len(match) > 1 else ""
-                            
-                            # Clean and validate price
-                            clean_price = re.sub(r'[^\d.]', '', str(match))
-                            if clean_price and float(clean_price) > 100:  # Reasonable furniture price
-                                result['price'] = f"${clean_price}"
-                                result['cost'] = f"${clean_price}"
-                                print(f"✅ PRICE from content: ${clean_price}")
-                                price_found = True
-                                break
-                        if price_found:
-                            break
-                except:
-                    pass
-            
-            # 🖼️ ULTRA-COMPREHENSIVE IMAGE EXTRACTION (FINDS THE PERFECT MAIN IMAGE!)
-            print(f"🖼️ Starting ULTRA-IMAGE extraction...")
+            # Try to extract the MAIN PRODUCT IMAGE (largest/best quality)
             best_image_url = None
             best_image_score = 0
             
-            # First try to find the MAIN product image with enhanced methods
-            try:
-                # Wait for images to load
-                await page.wait_for_timeout(2000)
-                
-                # Try to find largest visible image first
-                await page.evaluate('''() => {
-                    const images = Array.from(document.querySelectorAll('img'));
-                    images.forEach(img => {
-                        if (img.complete && img.naturalWidth > 0) {
-                            console.log(`Image: ${img.src}, Size: ${img.naturalWidth}x${img.naturalHeight}`);
-                        }
-                    });
-                }''')
-                
-                # Enhanced image search with multiple strategies
-                image_search_strategies = [
-                    # Strategy 1: Look for product images by src content
-                    'img[src*="product"]:not([src*="thumb"]):not([src*="small"])',
-                    'img[src*="1024"]:not([src*="thumb"])',
-                    'img[src*="master"]:not([src*="thumb"])',
-                    'img[src*="large"]:not([src*="thumb"])',
-                    
-                    # Strategy 2: Look by class/data attributes
-                    'img[class*="product-image"], img[class*="main-image"]',
-                    'img[data-product-image], img[data-main-image]',
-                    '.product-gallery img:first-child',
-                    '.product-photos img:first-child',
-                    
-                    # Strategy 3: Look for hero/featured images
-                    '.hero img, .main img, .featured img',
-                    'img[alt*="product"], img[alt*="main"]',
-                    
-                    # Strategy 4: Shopify specific
-                    '.product__media img, .product-single__photo img',
-                    '.media img, .gallery img',
-                ]
-                
-                for strategy in image_search_strategies:
-                    try:
-                        elements = await page.query_selector_all(strategy)
+            for selector in image_selectors:
+                try:
+                    if selector == 'img[src*="product"], img[src*="item"], img[src*="cdn"]':  # Last resort - filter for best image
+                        elements = await page.query_selector_all(selector)
                         for element in elements:
                             try:
                                 src = await element.get_attribute('src')
-                                if src and not any(exclude in src.lower() for exclude in ['thumb', 'icon', 'logo', 'nav', 'btn', 'bullet']):
-                                    # Convert relative URLs to absolute
-                                    if src.startswith('//'):
-                                        src = 'https:' + src
-                                    elif src.startswith('/'):
-                                        base_url = '/'.join(url.split('/')[:3])
-                                        src = base_url + src
-                                    
-                                    # Prioritize images with product-related keywords and larger sizes
-                                    score = 0
-                                    if 'product' in src.lower(): score += 30
-                                    if 'main' in src.lower(): score += 25  
-                                    if 'hero' in src.lower(): score += 25
-                                    if 'large' in src.lower(): score += 20
-                                    if '1024' in src: score += 15
-                                    if 'master' in src.lower(): score += 15
-                                    if 'cdn' in src.lower(): score += 10
-                                    
-                                    # Check actual image dimensions if possible
-                                    try:
-                                        dimensions = await element.evaluate('''(element) => {
-                                            return {
-                                                naturalWidth: element.naturalWidth,
-                                                naturalHeight: element.naturalHeight,
-                                                width: element.width,
-                                                height: element.height
-                                            };
-                                        }''')
-                                        
-                                        if dimensions['naturalWidth'] > 400:
-                                            score += 25
-                                        if dimensions['naturalHeight'] > 400:
-                                            score += 25
-                                    except:
-                                        pass
-                                    
-                                    if score > best_image_score and score > 30:  # Minimum quality threshold
+                                if src and _is_main_product_image(src):
+                                    # Score images based on size indicators in URL
+                                    score = _score_image_quality(src)
+                                    if score > best_image_score:
                                         best_image_score = score
+                                        if src.startswith('//'):
+                                            src = 'https:' + src
+                                        elif src.startswith('/'):
+                                            base_url = '/'.join(url.split('/')[:3])
+                                            src = base_url + src
                                         best_image_url = src
-                                        print(f"✅ BETTER IMAGE found: {src} (score: {score})")
-                                    
-                                    # If we found a really good image, stop searching
-                                    if score >= 80:
-                                        break
                             except:
                                 continue
-                        
-                        if best_image_score >= 80:
-                            break
-                    except:
-                        continue
-                
-            except Exception as e:
-                print(f"❌ Error in image extraction: {e}")
+                    else:  # Regular selector handling - prioritize first match
+                        element = await page.query_selector(selector)
+                        if element:
+                            src = await element.get_attribute('src')
+                            if src:
+                                # Convert relative URLs to absolute
+                                if src.startswith('//'):
+                                    src = 'https:' + src
+                                elif src.startswith('/'):
+                                    base_url = '/'.join(url.split('/')[:3])
+                                    src = base_url + src
+                                
+                                # Score this image
+                                score = _score_image_quality(src)
+                                if score > best_image_score:
+                                    best_image_score = score
+                                    best_image_url = src
+                                    
+                                # If this is a high-priority selector and good quality, use it
+                                if score >= 50:  # Good quality threshold
+                                    break
+                except:
+                    continue
             
             if best_image_url:
                 result['image_url'] = best_image_url
-                print(f"🎯 FINAL IMAGE: {best_image_url} (score: {best_image_score})")
-            else:
-                print("⚠️ No suitable product image found")
             
             # Try to extract description with enhanced filtering
             for selector in description_selectors:
@@ -3110,97 +2871,6 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            # 📝 ULTRA-COMPREHENSIVE DATA EXTRACTION - GET EVERYTHING!
-            print(f"📝 Starting MEGA data extraction for ALL fields...")
-            
-            # Extract EVERY possible piece of data from the page
-            try:
-                # Get ALL text content and search for patterns
-                all_text = await page.evaluate('() => document.body.innerText')
-                
-                # Extract description from page content
-                if not result['description']:
-                    description_patterns = [
-                        r'Description[:\s]([^.]{20,200})',
-                        r'Details[:\s]([^.]{20,200})', 
-                        r'About[:\s]([^.]{20,200})',
-                        r'Features[:\s]([^.]{20,200})'
-                    ]
-                    
-                    for pattern in description_patterns:
-                        match = re.search(pattern, all_text, re.IGNORECASE | re.DOTALL)
-                        if match:
-                            result['description'] = match.group(1).strip()
-                            print(f"✅ DESCRIPTION found: {result['description'][:50]}...")
-                            break
-                
-                # Extract material information
-                material_patterns = [
-                    r'Material[:\s]([^.\n]{5,50})',
-                    r'Made of[:\s]([^.\n]{5,50})',
-                    r'Construction[:\s]([^.\n]{5,50})'
-                ]
-                
-                for pattern in material_patterns:
-                    match = re.search(pattern, all_text, re.IGNORECASE)
-                    if match:
-                        result['material'] = match.group(1).strip()
-                        print(f"✅ MATERIAL found: {result['material']}")
-                        break
-                
-                # Extract dimensions more aggressively
-                if not result['size']:
-                    dimension_patterns = [
-                        r'(\d+\.?\d*)["\s]*[Ww]\s*[xX×]\s*(\d+\.?\d*)["\s]*[Dd]\s*[xX×]\s*(\d+\.?\d*)["\s]*[Hh]',
-                        r'(\d+\.?\d*)["\s]*[Ww]\s*[xX×]\s*(\d+\.?\d*)["\s]*[Hh]',
-                        r'Dimensions[:\s]*(\d+[^.\n]{5,30})',
-                        r'Size[:\s]*(\d+[^.\n]{5,30})',
-                        r'(\d+)\s*x\s*(\d+)\s*x\s*(\d+)',
-                        r'(\d+\.?\d*)["\s]*W\s*[xX×]\s*(\d+\.?\d*)["\s]*D'
-                    ]
-                    
-                    for pattern in dimension_patterns:
-                        match = re.search(pattern, all_text, re.IGNORECASE)
-                        if match:
-                            if len(match.groups()) >= 3:
-                                result['size'] = f'{match.group(1)}"W x {match.group(2)}"D x {match.group(3)}"H'
-                            elif len(match.groups()) >= 2:
-                                result['size'] = f'{match.group(1)}"W x {match.group(2)}"H'
-                            else:
-                                result['size'] = match.group(1).strip()
-                            print(f"✅ DIMENSIONS found: {result['size']}")
-                            break
-                
-                # Extract color/finish more aggressively
-                if not result['finish_color']:
-                    color_patterns = [
-                        r'Color[:\s]([^.\n]{3,30})',
-                        r'Finish[:\s]([^.\n]{3,30})',
-                        r'Available in[:\s]([^.\n]{3,30})',
-                        r'Options[:\s]([^.\n]{3,30})'
-                    ]
-                    
-                    for pattern in color_patterns:
-                        match = re.search(pattern, all_text, re.IGNORECASE)
-                        if match:
-                            result['finish_color'] = match.group(1).strip()
-                            print(f"✅ COLOR/FINISH found: {result['finish_color']}")
-                            break
-                
-                # Force extract price if still not found
-                if not result['price']:
-                    # Look for any price-like number in the $1000-$5000 range (typical furniture)
-                    price_matches = re.findall(r'\$(\d{3,4}\.?\d*)', all_text)
-                    for price in price_matches:
-                        if 100 <= float(price) <= 10000:  # Reasonable furniture price range
-                            result['price'] = f"${price}"
-                            result['cost'] = f"${price}"
-                            print(f"✅ AGGRESSIVE PRICE found: ${price}")
-                            break
-                
-            except Exception as e:
-                print(f"❌ Error in aggressive data extraction: {e}")
-            
             # Add final debug logging before return
             print(f"🎉 SCRAPING COMPLETED for {url}")
             print(f"📊 FINAL RESULT:")
@@ -3210,10 +2880,6 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             print(f"   Price: {result.get('price', 'None')}")
             print(f"   Cost: {result.get('cost', 'None')}")
             print(f"   Image: {result.get('image_url', 'None')}")
-            print(f"   Size: {result.get('size', 'None')}")
-            print(f"   Description: {result.get('description', 'None')[:50] if result.get('description') else 'None'}...")
-            print(f"   Material: {result.get('material', 'None')}")
-            print(f"   Color: {result.get('finish_color', 'None')}")
             
             return result
             
@@ -3233,124 +2899,6 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             }
         finally:
             await browser.close()
-
-@api_router.post("/scrape-product-ultra")
-async def scrape_product_ultra_llm(data: dict):
-    """
-    🚀 ULTRA-POWERFUL LLM-BASED SCRAPING 🚀
-    Uses GPT-4 to extract EVERYTHING from any furniture website
-    Can literally scrape a speck of dust!
-    """
-    url = data.get('url', '')
-    if not url:
-        raise HTTPException(status_code=400, detail="URL is required")
-    
-    try:
-        print(f"🚀 ULTRA-LLM SCRAPING: {url}")
-        
-        # First get the raw HTML content using Playwright
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
-            await page.goto(url, wait_until='networkidle', timeout=60000)
-            
-            # Get the full page content 
-            html_content = await page.content()
-            page_text = await page.evaluate('() => document.body.innerText')
-            
-            # Get all images on the page
-            images = await page.evaluate('''() => {
-                return Array.from(document.querySelectorAll('img')).map(img => ({
-                    src: img.src,
-                    alt: img.alt,
-                    width: img.naturalWidth,
-                    height: img.naturalHeight
-                })).filter(img => img.width > 200 && img.height > 200);
-            }''')
-            
-            await browser.close()
-        
-        # Use LLM to extract EVERYTHING from the content
-        chat = LlmChat(
-            api_key=os.environ.get('EMERGENT_LLM_KEY'),
-            session_id=f"scrape-{uuid.uuid4()}",
-            system_message="""You are an ULTRA-POWERFUL product data extraction specialist. 
-            Extract EVERY possible detail from furniture product pages.
-            Return ONLY a JSON object with these exact fields:
-            {
-                "name": "exact product name",
-                "vendor": "brand/manufacturer name", 
-                "sku": "product SKU/model number",
-                "price": "price with $ symbol",
-                "cost": "same as price",
-                "size": "dimensions in W x D x H format",
-                "description": "detailed product description",
-                "material": "construction materials",
-                "finish_color": "color/finish options",
-                "style": "design style",
-                "collection": "product collection/line",
-                "availability": "in stock/availability status",
-                "image_url": "best product image URL from provided images"
-            }
-            Extract data even if not explicitly labeled. Use context clues."""
-        ).with_model("openai", "gpt-4o")
-        
-        # Create the extraction prompt
-        extraction_prompt = f"""
-        EXTRACT ALL PRODUCT DATA FROM THIS FURNITURE WEBSITE:
-        
-        URL: {url}
-        
-        PAGE TEXT:
-        {page_text[:8000]}
-        
-        AVAILABLE IMAGES:
-        {json.dumps(images[:10], indent=2)}
-        
-        Extract EVERY detail possible and return as JSON. Find the main product image from the images list.
-        Be thorough - extract name, vendor, SKU, price, dimensions, materials, colors, description, etc.
-        """
-        
-        user_message = UserMessage(text=extraction_prompt)
-        response = await chat.send_message(user_message)
-        
-        print(f"🧠 LLM RESPONSE: {response}")
-        
-        # Parse the LLM response as JSON
-        try:
-            # Clean the response to extract JSON
-            clean_response = response.strip()
-            if clean_response.startswith('```json'):
-                clean_response = clean_response[7:]
-            if clean_response.endswith('```'):
-                clean_response = clean_response[:-3]
-            
-            extracted_data = json.loads(clean_response)
-            
-            print(f"✅ LLM EXTRACTED DATA: {extracted_data}")
-            
-            return {"success": True, "data": extracted_data}
-            
-        except json.JSONDecodeError:
-            # If JSON parsing fails, try to extract key-value pairs from text
-            extracted_data = {
-                'name': 'Extracted Product',
-                'vendor': 'Vendor',
-                'sku': 'SKU',
-                'price': '$0',
-                'cost': '$0',
-                'size': '',
-                'description': response[:200],
-                'material': '',
-                'finish_color': '',
-                'image_url': images[0]['src'] if images else None
-            }
-            
-            return {"success": True, "data": extracted_data}
-        
-    except Exception as e:
-        print(f"❌ ULTRA-LLM SCRAPING ERROR: {e}")
-        raise HTTPException(status_code=400, detail=f"Failed to scrape URL with LLM: {str(e)}")
 
 @api_router.post("/scrape-product")
 async def scrape_product_advanced(data: dict):
