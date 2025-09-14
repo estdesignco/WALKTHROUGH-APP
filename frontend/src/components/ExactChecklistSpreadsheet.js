@@ -1245,4 +1245,4 @@ const ExactChecklistSpreadsheet = ({
   );
 };
 
-export default ExactFFESpreadsheet;
+export default ExactChecklistSpreadsheet;
