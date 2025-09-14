@@ -659,6 +659,22 @@ const ExactFFESpreadsheet = ({
               <option value="CANCELLED">CANCELLED</option>
             </select>
             
+            <select 
+              value={selectedCarrier}
+              onChange={(e) => setSelectedCarrier(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">All Carriers</option>
+              <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
+              <option value="UPS" style={{ backgroundColor: '#8B4513', color: 'white' }}>UPS</option>
+              <option value="USPS" style={{ backgroundColor: '#004B87', color: 'white' }}>USPS</option>
+              <option value="DHL" style={{ backgroundColor: '#FFD700', color: 'black' }}>DHL</option>
+              <option value="Brooks" style={{ backgroundColor: '#4682B4', color: 'white' }}>Brooks</option>
+              <option value="Zenith" style={{ backgroundColor: '#20B2AA', color: 'white' }}>Zenith</option>
+              <option value="Sunbelt" style={{ backgroundColor: '#FF4500', color: 'white' }}>Sunbelt</option>
+              <option value="R+L Carriers" style={{ backgroundColor: '#32CD32', color: 'white' }}>R+L Carriers</option>
+            </select>
+            
             {/* Filter and Clear Buttons */}
             <button 
               onClick={() => {
