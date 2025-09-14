@@ -19,13 +19,18 @@ const ChecklistSheet = () => {
 
   const loadProject = async () => {
     try {
+      console.log('🚀 Loading checklist project data...');
       const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
+      
       if (response.ok) {
         const projectData = await response.json();
+        console.log('✅ Checklist project loaded:', projectData.name);
         setProject(projectData);
+      } else {
+        console.error('❌ Failed to load checklist project');
       }
     } catch (error) {
-      console.error('Error loading project:', error);
+      console.error('❌ Error loading checklist project:', error);
     }
   };
 
