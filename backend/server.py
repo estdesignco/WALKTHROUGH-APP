@@ -2719,8 +2719,65 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            if best_image_url:
-                result['image_url'] = best_image_url
+            # 🖼️ ULTRA-AGGRESSIVE IMAGE EXTRACTION - FIND ANY PRODUCT IMAGE
+            print(f"🖼️ Starting ULTRA-AGGRESSIVE image extraction...")
+            
+            try:
+                # Get ALL images on the page
+                all_images = await page.query_selector_all('img')
+                print(f"🔍 Found {len(all_images)} total images on page")
+                
+                best_image = None
+                best_score = 0
+                
+                for img in all_images:
+                    try:
+                        src = await img.get_attribute('src')
+                        alt = await img.get_attribute('alt') or ""
+                        
+                        if src and not any(exclude in src.lower() for exclude in ['logo', 'icon', 'thumb', 'nav', 'btn']):
+                            # Convert relative URLs to absolute
+                            if src.startswith('//'):
+                                src = 'https:' + src
+                            elif src.startswith('/'):
+                                base_url = '/'.join(url.split('/')[:3])
+                                src = base_url + src
+                            
+                            # Score image based on multiple factors
+                            score = 0
+                            if 'product' in src.lower(): score += 40
+                            if 'fenn' in src.lower(): score += 50  # Four Hands specific
+                            if 'chair' in src.lower(): score += 30
+                            if 'main' in src.lower(): score += 25
+                            if 'hero' in src.lower(): score += 25
+                            if '1024' in src or 'large' in src.lower(): score += 20
+                            if 'product' in alt.lower(): score += 15
+                            if 'chair' in alt.lower(): score += 15
+                            
+                            # Get image dimensions if possible
+                            try:
+                                width = await img.get_attribute('width')
+                                height = await img.get_attribute('height')
+                                if width and int(width) > 300: score += 15
+                                if height and int(height) > 300: score += 15
+                            except:
+                                pass
+                            
+                            if score > best_score:
+                                best_score = score
+                                best_image = src
+                                print(f"✅ BETTER IMAGE: {src} (score: {score})")
+                    except:
+                        continue
+                
+                if best_image:
+                    result['image_url'] = best_image
+                    print(f"🎯 FINAL IMAGE SELECTED: {best_image}")
+                else:
+                    print("⚠️ No suitable product image found")
+                    
+            except Exception as e:
+                print(f"❌ Error in image extraction: {e}")
             
             # Try to extract description with enhanced filtering
             for selector in description_selectors:
