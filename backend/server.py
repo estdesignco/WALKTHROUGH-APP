@@ -3108,6 +3108,97 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
+            # 📝 ULTRA-COMPREHENSIVE DATA EXTRACTION - GET EVERYTHING!
+            print(f"📝 Starting MEGA data extraction for ALL fields...")
+            
+            # Extract EVERY possible piece of data from the page
+            try:
+                # Get ALL text content and search for patterns
+                all_text = await page.evaluate('() => document.body.innerText')
+                
+                # Extract description from page content
+                if not result['description']:
+                    description_patterns = [
+                        r'Description[:\s]([^.]{20,200})',
+                        r'Details[:\s]([^.]{20,200})', 
+                        r'About[:\s]([^.]{20,200})',
+                        r'Features[:\s]([^.]{20,200})'
+                    ]
+                    
+                    for pattern in description_patterns:
+                        match = re.search(pattern, all_text, re.IGNORECASE | re.DOTALL)
+                        if match:
+                            result['description'] = match.group(1).strip()
+                            print(f"✅ DESCRIPTION found: {result['description'][:50]}...")
+                            break
+                
+                # Extract material information
+                material_patterns = [
+                    r'Material[:\s]([^.\n]{5,50})',
+                    r'Made of[:\s]([^.\n]{5,50})',
+                    r'Construction[:\s]([^.\n]{5,50})'
+                ]
+                
+                for pattern in material_patterns:
+                    match = re.search(pattern, all_text, re.IGNORECASE)
+                    if match:
+                        result['material'] = match.group(1).strip()
+                        print(f"✅ MATERIAL found: {result['material']}")
+                        break
+                
+                # Extract dimensions more aggressively
+                if not result['size']:
+                    dimension_patterns = [
+                        r'(\d+\.?\d*)["\s]*[Ww]\s*[xX×]\s*(\d+\.?\d*)["\s]*[Dd]\s*[xX×]\s*(\d+\.?\d*)["\s]*[Hh]',
+                        r'(\d+\.?\d*)["\s]*[Ww]\s*[xX×]\s*(\d+\.?\d*)["\s]*[Hh]',
+                        r'Dimensions[:\s]*(\d+[^.\n]{5,30})',
+                        r'Size[:\s]*(\d+[^.\n]{5,30})',
+                        r'(\d+)\s*x\s*(\d+)\s*x\s*(\d+)',
+                        r'(\d+\.?\d*)["\s]*W\s*[xX×]\s*(\d+\.?\d*)["\s]*D'
+                    ]
+                    
+                    for pattern in dimension_patterns:
+                        match = re.search(pattern, all_text, re.IGNORECASE)
+                        if match:
+                            if len(match.groups()) >= 3:
+                                result['size'] = f'{match.group(1)}"W x {match.group(2)}"D x {match.group(3)}"H'
+                            elif len(match.groups()) >= 2:
+                                result['size'] = f'{match.group(1)}"W x {match.group(2)}"H'
+                            else:
+                                result['size'] = match.group(1).strip()
+                            print(f"✅ DIMENSIONS found: {result['size']}")
+                            break
+                
+                # Extract color/finish more aggressively
+                if not result['finish_color']:
+                    color_patterns = [
+                        r'Color[:\s]([^.\n]{3,30})',
+                        r'Finish[:\s]([^.\n]{3,30})',
+                        r'Available in[:\s]([^.\n]{3,30})',
+                        r'Options[:\s]([^.\n]{3,30})'
+                    ]
+                    
+                    for pattern in color_patterns:
+                        match = re.search(pattern, all_text, re.IGNORECASE)
+                        if match:
+                            result['finish_color'] = match.group(1).strip()
+                            print(f"✅ COLOR/FINISH found: {result['finish_color']}")
+                            break
+                
+                # Force extract price if still not found
+                if not result['price']:
+                    # Look for any price-like number in the $1000-$5000 range (typical furniture)
+                    price_matches = re.findall(r'\$(\d{3,4}\.?\d*)', all_text)
+                    for price in price_matches:
+                        if 100 <= float(price) <= 10000:  # Reasonable furniture price range
+                            result['price'] = f"${price}"
+                            result['cost'] = f"${price}"
+                            print(f"✅ AGGRESSIVE PRICE found: ${price}")
+                            break
+                
+            except Exception as e:
+                print(f"❌ Error in aggressive data extraction: {e}")
+            
             # Add final debug logging before return
             print(f"🎉 SCRAPING COMPLETED for {url}")
             print(f"📊 FINAL RESULT:")
@@ -3117,6 +3208,10 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             print(f"   Price: {result.get('price', 'None')}")
             print(f"   Cost: {result.get('cost', 'None')}")
             print(f"   Image: {result.get('image_url', 'None')}")
+            print(f"   Size: {result.get('size', 'None')}")
+            print(f"   Description: {result.get('description', 'None')[:50] if result.get('description') else 'None'}...")
+            print(f"   Material: {result.get('material', 'None')}")
+            print(f"   Color: {result.get('finish_color', 'None')}")
             
             return result
             
