@@ -62,7 +62,7 @@ const FFEDashboard = ({ isOffline }) => {
   const loadSimpleProject = async () => {
     try {
       console.log('🚀 Loading project data...');
-      const response = await fetch(`${import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://code-scanner-14.preview.emergentagent.com'}/api/projects/${projectId}`);
+      const response = await fetch(`${import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://ffe-manager.preview.emergentagent.com'}/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();
