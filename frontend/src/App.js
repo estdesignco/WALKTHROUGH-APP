@@ -6,11 +6,8 @@ import FFEDashboard from "./components/FFEDashboard";
 import ProjectList from "./components/ProjectList";
 import Navigation from "./components/Navigation";
 import ScrapingTestPage from "./components/ScrapingTestPage";
-import QuestionnaireSheet from "./components/QuestionnaireSheet";
-import WalkthroughSheet from "./components/WalkthroughSheet";
-import ChecklistSheet from "./components/ChecklistSheet";
 
-const BACKEND_URL = "https://code-scanner-14.preview.emergentagent.com";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 // Create axios instance with default config
@@ -80,6 +77,48 @@ const App = () => {
     };
   }, []);
 
+  // Component wrapper to handle project loading for direct FF&E navigation
+  const FFEDashboardWrapper = () => {
+    const location = useLocation();
+    const [projectLoaded, setProjectLoaded] = useState(false);
+
+    useEffect(() => {
+      // Extract projectId from current path
+      const pathMatch = location.pathname.match(/\/project\/([^\/]+)\/ffe/);
+      const projectId = pathMatch ? pathMatch[1] : null;
+
+      if (projectId && !currentProject) {
+        // Load project data for navigation context
+        const loadProject = async () => {
+          try {
+            const response = await projectAPI.getById(projectId);
+            if (response.data) {
+              setCurrentProject(response.data);
+              setProjectLoaded(true);
+            }
+          } catch (error) {
+            console.error('Failed to load project for navigation:', error);
+            setProjectLoaded(true); // Still proceed even if project load fails
+          }
+        };
+        loadProject();
+      } else {
+        setProjectLoaded(true);
+      }
+    }, [location.pathname]);
+
+    // Show loading state while project is being loaded
+    if (!projectLoaded) {
+      return (
+        <div className="text-center text-gray-400 py-8">
+          <p className="text-lg">Loading project...</p>
+        </div>
+      );
+    }
+
+    return <FFEDashboard isOffline={isOffline} />;
+  };
+
   return (
     <div className="App min-h-screen bg-gray-900">
       <BrowserRouter>
@@ -100,20 +139,8 @@ const App = () => {
               }
             />
             <Route 
-              path="/project/:projectId/questionnaire" 
-              element={<QuestionnaireSheet />}
-            />
-            <Route 
-              path="/project/:projectId/walkthrough" 
-              element={<WalkthroughSheet />}
-            />
-            <Route 
-              path="/project/:projectId/checklist" 
-              element={<ChecklistSheet />}
-            />
-            <Route 
               path="/project/:projectId/ffe" 
-              element={<FFEDashboard isOffline={isOffline} />}
+              element={<FFEDashboardWrapper />}
             />
             <Route 
               path="/scraping-test" 
