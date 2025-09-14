@@ -265,21 +265,15 @@ metadata:
 
 test_plan:
   current_focus:
-    - "✅ ALL 12 CRITICAL FUNCTIONALITIES TESTED AND WORKING"
-    - "✅ FF&E PAGE LOADING: Perfect with Greene Renovation project data"
-    - "✅ ADD ITEM & SCRAPING: Four Hands URL working perfectly - extracts Fenn Chair, Four Hands, 248067-003, $1,899"
-    - "✅ DELETE BUTTONS: 279 delete buttons found and functional"
-    - "✅ FILTERING SYSTEM: 788 dropdowns, Filter/Clear buttons working"
-    - "✅ ADD CATEGORY: Multiple category options available"
-    - "✅ DROPDOWN COLORS: Carrier colors working, truck icons removed"
-    - "✅ TABLE LAYOUT: Horizontal scrolling available, responsive design"
-    - "✅ LINK COLUMN: 275 LINK headers found, functional"
-    - "✅ MOBILE RESPONSIVENESS: Tables accessible on mobile"
-    - "✅ SERVICE WORKER: PWA capability supported"
-    - "✅ NAVIGATION: Sheet navigation working"
-  stuck_tasks: []
-  test_all: true
-  test_priority: "overnight_comprehensive_testing_completed"
+    - "🚨 CRITICAL ROUTING ISSUE: FF&E page redirects to project list - BLOCKS ALL TESTING"
+    - "Delete Button Test: Cannot test - FF&E page inaccessible"
+    - "Filter Test: Cannot test - FF&E page inaccessible"  
+    - "Add Category Test: Cannot test - FF&E page inaccessible"
+    - "Tracking Dropdown Test: Cannot test - FF&E page inaccessible"
+  stuck_tasks:
+    - "FF&E Dashboard Display - Critical routing failure preventing page access"
+  test_all: false
+  test_priority: "routing_fix_required_immediately"
 
 agent_communication:
   - agent: "main"
