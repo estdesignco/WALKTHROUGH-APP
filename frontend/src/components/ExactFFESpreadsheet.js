@@ -437,15 +437,8 @@ const ExactFFESpreadsheet = ({
       if (response.ok) {
         console.log('✅ Category with full structure added successfully');
         
-        // Get the new category data from response
-        const newCategory = await response.json();
-        console.log('📊 New category created with items:', newCategory);
-        
-        // FORCE RELOAD PROJECT TO SHOW NEW CATEGORY  
-        if (onReload) {
-          console.log('🔄 Forcing project reload to show new category...');
-          await onReload();
-        }
+        // FORCE RELOAD TO SHOW NEW CATEGORY WITH ALL ITEMS
+        window.location.reload();
       } else {
         console.error('❌ Comprehensive category endpoint failed, trying basic endpoint');
         // Fallback to basic category creation
