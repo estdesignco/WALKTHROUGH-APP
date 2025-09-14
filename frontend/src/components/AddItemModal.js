@@ -35,7 +35,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);
       
-      const response = await fetch(`${backendUrl}/api/scrape-product-ultra`, {
+      const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
