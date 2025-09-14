@@ -2789,33 +2789,69 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     pass
             
-            # Try to extract price with enhanced JavaScript handling
+            # 💰 ULTRA-COMPREHENSIVE PRICE EXTRACTION (FINDS EVERY PENNY!)
+            print(f"💰 Starting ULTRA-PRICE extraction...")
             for selector in price_selectors:
                 try:
                     if selector == 'span, div, p':  # Special handling for text-based search
                         elements = await page.query_selector_all(selector)
-                        for element in elements[:50]:  # Limit to first 50 elements for performance
+                        for element in elements[:100]:  # Increased to 100 elements for ULTRA extraction
                             try:
                                 text = await element.inner_text()
-                                if '$' in text:
-                                    price_match = re.search(r'\$[\d,]+\.?\d*', text)
-                                    if price_match:
-                                        result['cost'] = price_match.group()
-                                        result['price'] = price_match.group()
+                                if '$' in text and text.count('$') <= 3:  # Avoid pages with many prices
+                                    # Enhanced price regex patterns
+                                    price_patterns = [
+                                        r'\$[\d,]+\.?\d*',  # Standard $1,234.56
+                                        r'USD\s*[\d,]+\.?\d*',  # USD 1234.56
+                                        r'[\d,]+\.?\d*\s*dollars?',  # 1234 dollars
+                                        r'Price:\s*\$[\d,]+\.?\d*',  # Price: $1234
+                                        r'Cost:\s*\$[\d,]+\.?\d*',  # Cost: $1234
+                                        r'MSRP:\s*\$[\d,]+\.?\d*',  # MSRP: $1234
+                                    ]
+                                    
+                                    for pattern in price_patterns:
+                                        price_match = re.search(pattern, text, re.IGNORECASE)
+                                        if price_match:
+                                            price_text = price_match.group()
+                                            # Extract just the numeric part
+                                            numeric_price = re.search(r'[\d,]+\.?\d*', price_text)
+                                            if numeric_price:
+                                                result['cost'] = f"${numeric_price.group()}"
+                                                result['price'] = f"${numeric_price.group()}"
+                                                print(f"✅ PRICE extracted: {result['price']}")
+                                                break
+                                    if result['price']:
                                         break
                             except:
                                 continue
                         if result['price']:  # If found, break outer loop
                             break
-                    else:  # Regular selector handling
-                        element = await page.query_selector(selector)
-                        if element:
-                            text = await element.inner_text()
-                            price_match = re.search(r'\$[\d,]+\.?\d*', text)
-                            if price_match:
-                                result['cost'] = price_match.group()
-                                result['price'] = price_match.group()
-                                break
+                    else:  # Regular selector handling with enhanced patterns
+                        elements = await page.query_selector_all(selector)
+                        for element in elements:
+                            try:
+                                text = await element.inner_text()
+                                if text and '$' in text:
+                                    # Multiple price patterns for ULTRA extraction
+                                    price_patterns = [
+                                        r'\$[\d,]+\.?\d*',
+                                        r'USD\s*[\d,]+\.?\d*',
+                                        r'[\d,]+\.?\d*\s*dollars?'
+                                    ]
+                                    
+                                    for pattern in price_patterns:
+                                        price_match = re.search(pattern, text, re.IGNORECASE)
+                                        if price_match:
+                                            result['cost'] = price_match.group()
+                                            result['price'] = price_match.group()
+                                            print(f"✅ PRICE from selector: {result['price']}")
+                                            break
+                                    if result['price']:
+                                        break
+                            except:
+                                continue
+                        if result['price']:
+                            break
                 except:
                     continue
             
