@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// Drag and drop functionality removed
 import AddItemModal from './AddItemModal';
+import AdvancedFFEFeatures from './AdvancedFFEFeatures';
 
 const ExactFFESpreadsheet = ({ 
   project, 
