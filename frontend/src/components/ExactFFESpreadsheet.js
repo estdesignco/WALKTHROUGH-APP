@@ -99,7 +99,34 @@ const ExactFFESpreadsheet = ({
       });
       
       if (response.ok) {
-        window.location.reload();
+        console.log('✅ Carrier updated successfully, updating local state...');
+        
+        // Update local state instead of reloading page
+        const updateProject = (prevProject) => {
+          if (!prevProject) return prevProject;
+          
+          const updatedProject = { ...prevProject };
+          updatedProject.rooms = updatedProject.rooms.map(room => ({
+            ...room,
+            categories: room.categories.map(category => ({
+              ...category,
+              subcategories: category.subcategories.map(subcategory => ({
+                ...subcategory,
+                items: subcategory.items.map(item => 
+                  item.id === itemId ? { ...item, carrier: newCarrier } : item
+                )
+              }))
+            }))
+          }));
+          return updatedProject;
+        };
+        
+        setFilteredProject(updateProject);
+        
+        // Also trigger parent reload if callback available
+        if (onReload) {
+          onReload();
+        }
       } else {
         const errorData = await response.text();
         console.error('❌ Carrier update failed:', response.status, errorData);
