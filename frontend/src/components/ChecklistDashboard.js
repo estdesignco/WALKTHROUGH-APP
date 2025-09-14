@@ -298,7 +298,7 @@ const ChecklistDashboard = ({ isOffline }) => {
 
       {/* FF&E Spreadsheet */}
       <div className="px-6 mt-4">
-        <ExactWalkthroughSpreadsheet
+        <ExactChecklistSpreadsheet
           project={project}
           roomColors={roomColors}
           categoryColors={categoryColors}
