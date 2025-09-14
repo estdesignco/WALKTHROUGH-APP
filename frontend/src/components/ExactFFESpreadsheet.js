@@ -246,7 +246,7 @@ const ExactFFESpreadsheet = ({
         return;
       }
 
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
       
       const newItem = {
         ...itemData,
