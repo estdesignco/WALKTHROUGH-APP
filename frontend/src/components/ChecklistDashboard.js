@@ -323,4 +323,4 @@ const ChecklistDashboard = ({ isOffline }) => {
   );
 };
 
-export default WalkthroughDashboard;
+export default ChecklistDashboard;
