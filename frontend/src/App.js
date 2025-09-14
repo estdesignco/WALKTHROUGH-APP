@@ -6,6 +6,7 @@ import FFEDashboard from "./components/FFEDashboard";
 import ProjectList from "./components/ProjectList";
 import Navigation from "./components/Navigation";
 import ScrapingTestPage from "./components/ScrapingTestPage";
+import QuestionnaireSheet from "./components/QuestionnaireSheet";
 import WalkthroughSheet from "./components/WalkthroughSheet";
 import ChecklistSheet from "./components/ChecklistSheet";
 
