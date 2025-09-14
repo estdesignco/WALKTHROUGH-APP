@@ -181,9 +181,9 @@ frontend:
 
   - task: "Cell Colors and Default Status Implementation"
     implemented: true
-    working: true
+    working: false
     file: "ExactFFESpreadsheet.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -193,6 +193,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "🎯 REVIEW REQUEST LINK COLUMN BACKEND TESTING COMPLETED: ✅ PROJECT STRUCTURE: Project access working with 105 items across 2 rooms, 10 categories, 10 subcategories. ✅ LINK FIELD SUPPORT: All items have link field available for LINK column addition. ✅ STATUS DEFAULTS VERIFIED: All 105 items have blank status (not PICKED) as requested by user. ✅ ITEM CRUD WITH LINKS: Backend supports creating and updating items with link field for new LINK column functionality. Backend fully supports link column addition with proper field structure and blank status defaults."
+      - working: false
+        agent: "testing"
+        comment: "❌ TRUCK ICONS NOT REMOVED: Found 155 instances of truck icons (📦🚚📮) still present in dropdown options, particularly in 'WAREHOUSE' options. User specifically requested removal of ALL truck icons from carrier dropdowns. While dropdown colors are working properly, the truck icon removal requirement is not met. This is a critical user requirement that needs to be addressed."
 
   - task: "Add Item Modal and Scraping"
     implemented: true
