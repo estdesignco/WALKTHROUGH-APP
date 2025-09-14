@@ -333,13 +333,17 @@ const ExactFFESpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Item deleted successfully');
+        alert('Item deleted successfully!');
         // Force reload to show updated data
         window.location.reload();
       } else {
+        console.error('❌ Delete failed with status:', response.status);
+        alert(`Delete failed: ${response.status}`);
         throw new Error(`HTTP ${response.status}`);
       }
     } catch (error) {
       console.error('❌ Error deleting item:', error);
+      alert(`Delete error: ${error.message}`);
       alert('Failed to delete item. Please try again.');
     }
   };
