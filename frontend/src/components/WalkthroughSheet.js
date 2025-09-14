@@ -236,7 +236,7 @@ const WalkthroughSheet = () => {
       <div className="px-6 mt-4">
         <WalkthroughSpreadsheet
           project={project}
-          roomColors={{}}
+          roomColors={roomColors}
           categoryColors={{}}
           itemStatuses={['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO JOB SITE', 'INSTALLED']}
           vendorTypes={['Four Hands', 'Uttermost', 'Visual Comfort']}
