@@ -8,6 +8,7 @@ const ChecklistSheet = () => {
   const [project, setProject] = useState(null);
   const [checklistItems, setChecklistItems] = useState([]);
   const [completedCount, setCompletedCount] = useState(0);
+  const [showAddRoom, setShowAddRoom] = useState(false);
 
   useEffect(() => {
     if (projectId) {
