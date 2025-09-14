@@ -249,18 +249,18 @@ const QuestionnaireSheet = () => {
             <span>📋</span>
             <span className="font-semibold">Questionnaire</span>
           </div>
-          <div className="flex items-center space-x-2 text-gray-400">
+          <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
             <span>🚶</span>
             <span>Walkthrough</span>
-          </div>
-          <div className="flex items-center space-x-2 text-gray-400">
+          </a>
+          <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
             <span>✅</span>
             <span>Checklist</span>
-          </div>
-          <div className="flex items-center space-x-2 text-gray-400">
+          </a>
+          <a href={`/project/${projectId}/ffe`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
             <span>📊</span>
             <span>FF&E</span>
-          </div>
+          </a>
         </div>
 
         {/* Progress Bar */}
