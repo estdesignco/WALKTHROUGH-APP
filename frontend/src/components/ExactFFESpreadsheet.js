@@ -142,6 +142,11 @@ const ExactFFESpreadsheet = ({
                   return false;
                 }
 
+                // Carrier filter
+                if (selectedCarrier && (!item.carrier || item.carrier !== selectedCarrier)) {
+                  return false;
+                }
+
                 // Search term filter for items
                 if (searchTerm) {
                   const searchLower = searchTerm.toLowerCase();
