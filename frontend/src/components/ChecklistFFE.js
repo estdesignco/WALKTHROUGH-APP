@@ -1245,4 +1245,4 @@ const ChecklistFFE = ({
   );
 };
 
-export default ExactFFESpreadsheet;
+export default ChecklistFFE;
