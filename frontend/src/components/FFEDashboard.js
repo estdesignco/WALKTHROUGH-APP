@@ -61,31 +61,34 @@ const FFEDashboard = ({ isOffline }) => {
 
   const loadSimpleProject = async () => {
     try {
-      console.log('🚀 Loading project data for:', projectId);
-      
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
+      console.log('🚀 Loading project data...');
+      const response = await fetch(`${import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'https://ffe-manager.preview.emergentagent.com'}/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();
-        console.log('✅ Project loaded successfully:', projectData.name);
+        console.log('🚀 Project loaded:', projectData.name);
+        console.log('🚀 Project rooms count:', projectData.rooms?.length || 0);
+        console.log('🚀 First room data:', projectData.rooms?.[0] || 'No rooms');
         setProject(projectData);
         setError(null);
       } else {
-        console.error('❌ Failed to load project:', response.status);
+        console.error('🚀 Failed to load project:', response.status);
         setError('Failed to load project');
       }
     } catch (err) {
-      console.error('❌ Error loading project:', err);
+      console.error('🚀 Error loading project:', err);
       setError('Error loading project: ' + err.message);
+    } finally {
+      console.log('🚀 FORCE SETTING LOADING = FALSE');
+      setLoading(false);
+      
+      // Set default utility data
+      setRoomColors({});
+      setCategoryColors({});
+      setItemStatuses(['ORDERED', 'DELIVERED TO JOB SITE', 'INSTALLED']);
+      setVendorTypes(['Four Hands', 'Uttermost']);
+      setCarrierTypes(['FedEx', 'UPS']);
     }
-    
-    // ALWAYS set loading to false
-    setLoading(false);
-    
-    // Set utility data
-    setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']);
-    setVendorTypes(['Four Hands', 'Uttermost', 'Visual Comfort']);
-    setCarrierTypes(['FedEx', 'UPS', 'USPS', 'DHL']);
   };
 
   const loadUtilityDataAsync = async () => {
