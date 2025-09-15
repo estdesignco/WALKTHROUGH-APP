@@ -24,7 +24,7 @@ const FFEDashboard = ({ isOffline }) => {
       console.log('🚀 Loading project:', projectId);
       
       // IMMEDIATE TEST - Force load project data
-      fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`)
+      fetch(`https://app-finalizer-2.preview.emergentagent.com/api/projects/${projectId}`)
         .then(response => {
           console.log('📡 Response received:', response.status);
           if (response.ok) {
@@ -50,7 +50,7 @@ const FFEDashboard = ({ isOffline }) => {
     try {
       console.log('🚀 Loading project data for:', projectId);
       
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();

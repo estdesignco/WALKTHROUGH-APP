@@ -20,7 +20,7 @@ const ChecklistSheet = () => {
   const loadProject = async () => {
     try {
       console.log('🚀 Loading checklist project data...');
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();
@@ -37,7 +37,7 @@ const ChecklistSheet = () => {
   const loadChecklist = async () => {
     try {
       // Generate checklist from walkthrough data or FF&E items
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/projects/${projectId}`);
       if (response.ok) {
         const projectData = await response.json();
         
@@ -94,7 +94,7 @@ const ChecklistSheet = () => {
       console.log('🎨 Scraping Canva board:', canvaLink);
       
       // Use our enhanced scraping for Canva boards
-      const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/scrape-product', {
+      const response = await fetch('https://app-finalizer-2.preview.emergentagent.com/api/scrape-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: canvaLink })
@@ -255,7 +255,7 @@ const ChecklistSheet = () => {
           carrierTypes={['FedEx', 'UPS', 'USPS']}
           onDeleteRoom={(roomId) => {
             if (window.confirm('Delete this room?')) {
-              fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms/${roomId}`, {
+              fetch(`https://app-finalizer-2.preview.emergentagent.com/api/rooms/${roomId}`, {
                 method: 'DELETE'
               }).then(() => {
                 loadProject();
@@ -279,7 +279,7 @@ const ChecklistSheet = () => {
                 order_index: project.rooms.length
               };
               
-              const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/rooms', {
+              const response = await fetch('https://app-finalizer-2.preview.emergentagent.com/api/rooms', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newRoom)

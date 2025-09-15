@@ -38,7 +38,7 @@ const SimpleWalkthroughSpreadsheet = ({
         order_index: 0
       };
 
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/items`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItem)
@@ -58,7 +58,7 @@ const SimpleWalkthroughSpreadsheet = ({
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items/${itemId}`, {
         method: 'DELETE'
       });
 
@@ -73,7 +73,7 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const handleAddCategory = async (roomId, categoryName) => {
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/categories`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

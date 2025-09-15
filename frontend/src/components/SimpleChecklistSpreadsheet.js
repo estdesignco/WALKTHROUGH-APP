@@ -38,7 +38,7 @@ const SimpleChecklistSpreadsheet = ({
         order_index: 0
       };
 
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/items`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItem)
@@ -58,7 +58,7 @@ const SimpleChecklistSpreadsheet = ({
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items/${itemId}`, {
         method: 'DELETE'
       });
 
@@ -73,7 +73,7 @@ const SimpleChecklistSpreadsheet = ({
 
   const handleStatusChange = async (itemId, newStatus) => {
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -90,7 +90,7 @@ const SimpleChecklistSpreadsheet = ({
 
   const handleAddCategory = async (roomId, categoryName) => {
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/categories`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -484,7 +484,7 @@ const SimpleChecklistSpreadsheet = ({
                                               
                                               // Scrape Canva board
                                               try {
-                                                const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/scrape-product', {
+                                                const response = await fetch('https://app-finalizer-2.preview.emergentagent.com/api/scrape-product', {
                                                   method: 'POST',
                                                   headers: { 'Content-Type': 'application/json' },
                                                   body: JSON.stringify({ url: e.target.value })
@@ -550,7 +550,7 @@ const SimpleChecklistSpreadsheet = ({
                                             canvaLinks.forEach(async (link, index) => {
                                               setTimeout(async () => {
                                                 try {
-                                                  const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/scrape-product', {
+                                                  const response = await fetch('https://app-finalizer-2.preview.emergentagent.com/api/scrape-product', {
                                                     method: 'POST',
                                                     headers: { 'Content-Type': 'application/json' },
                                                     body: JSON.stringify({ url: link })

@@ -10,7 +10,7 @@ const SimpleScrapeTest = () => {
     setResult(null);
 
     try {
-      const backendUrl = 'https://code-scanner-14.preview.emergentagent.com';
+      const backendUrl = 'https://app-finalizer-2.preview.emergentagent.com';
       
       const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',

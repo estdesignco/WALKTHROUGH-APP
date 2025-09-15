@@ -22,7 +22,7 @@ const WalkthroughSheet = () => {
   const loadProject = async () => {
     try {
       console.log('🚀 Loading walkthrough project data...');
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/projects/${projectId}`);
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();
@@ -38,7 +38,7 @@ const WalkthroughSheet = () => {
 
   const loadQuestionnaire = async () => {
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/questionnaire/${projectId}`);
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/questionnaire/${projectId}`);
       if (response.ok) {
         const data = await response.json();
         setQuestionnaire(data);
@@ -50,7 +50,7 @@ const WalkthroughSheet = () => {
 
   const handleAddRoom = async (roomData) => {
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/rooms`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ const WalkthroughSheet = () => {
     if (!window.confirm('Are you sure you want to delete this room?')) return;
     
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms/${roomId}`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
       
@@ -109,7 +109,7 @@ const WalkthroughSheet = () => {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
     
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items/${itemId}`, {
         method: 'DELETE'
       });
       

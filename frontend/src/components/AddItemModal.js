@@ -51,7 +51,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
 
     try {
       // Get backend URL - hardcoded to work properly
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+      const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
       
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);

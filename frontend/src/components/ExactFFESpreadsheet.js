@@ -41,7 +41,7 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -67,7 +67,7 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
@@ -164,7 +164,7 @@ const ExactFFESpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+        const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -227,7 +227,7 @@ const ExactFFESpreadsheet = ({
         return;
       }
 
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+      const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
       
       const newItem = {
         ...itemData,
@@ -273,7 +273,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+      const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
@@ -297,7 +297,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+      const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'DELETE'
       });
@@ -337,7 +337,7 @@ const ExactFFESpreadsheet = ({
       console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
       
       // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms`, {
+      const tempRoomResponse = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -364,7 +364,7 @@ const ExactFFESpreadsheet = ({
             id: undefined // Let backend generate new ID
           };
           
-          const addResponse = await fetch(`https://code-scanner-14.preview.emergentagent.com/api/categories`, {
+          const addResponse = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(categoryData)
@@ -374,7 +374,7 @@ const ExactFFESpreadsheet = ({
             console.log('✅ Comprehensive category added successfully');
             
             // Delete the temp room
-            await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+            await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
@@ -384,7 +384,7 @@ const ExactFFESpreadsheet = ({
         }
         
         // Clean up temp room regardless
-        await fetch(`https://code-scanner-14.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+        await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
           method: 'DELETE'
         });
       } else {
@@ -409,7 +409,7 @@ const ExactFFESpreadsheet = ({
       
       // Update backend room order
       try {
-        const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/rooms/reorder', {
+        const response = await fetch('https://app-finalizer-2.preview.emergentagent.com/api/rooms/reorder', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -435,7 +435,7 @@ const ExactFFESpreadsheet = ({
       // Update backend category order  
       try {
         const roomId = source.droppableId.replace('categories-', '');
-        const response = await fetch('https://code-scanner-14.preview.emergentagent.com/api/categories/reorder', {
+        const response = await fetch('https://app-finalizer-2.preview.emergentagent.com/api/categories/reorder', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -479,7 +479,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://code-scanner-14.preview.emergentagent.com";
+      const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {
