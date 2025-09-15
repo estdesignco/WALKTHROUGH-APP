@@ -789,7 +789,7 @@ const WalkthroughFFE = ({
                               <React.Fragment key={room.id}>
                                 {/* ROOM HEADER ROW - Full width like your screenshots */}
                                 <tr>
-                                  <td colSpan="12" 
+                                  <td colSpan="5" 
                                       className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                                       style={{ backgroundColor: getRoomColor(room.name) }}>
                                     <div className="flex justify-between items-center">
