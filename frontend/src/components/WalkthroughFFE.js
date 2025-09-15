@@ -865,11 +865,32 @@ const WalkthroughFFE = ({
                                                       {/* ACTUAL ITEMS FROM BACKEND DATA */}
                                                       {category.subcategories?.map((subcategory) => (
                                                         subcategory.items?.map((item, itemIndex) => (
-                                                        <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                                          {/* INSTALLED - ITEM NAME GOES HERE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                        <tr key={item.id}>
+                                                          {/* Checkbox */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-center">
+                                                            <input type="checkbox" className="w-4 h-4" />
+                                                          </td>
+                                                          
+                                                          {/* Item Name */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                                             {item.name}
                                                           </td>
+                                                          
+                                                          {/* Quantity */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
+                                                            {item.quantity || 1}
+                                                          </td>
+                                                          
+                                                          {/* Size */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                                                            <input type="text" className="w-full bg-transparent border-none text-white text-sm" placeholder="Size" />
+                                                          </td>
+                                                          
+                                                          {/* Remarks */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                                                            <input type="text" className="w-full bg-transparent border-none text-white text-sm" placeholder="Remarks" />
+                                                          </td>
+                                                        </tr>
                                                           
                                                           {/* VENDOR/SKU - EDITABLE INLINE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
