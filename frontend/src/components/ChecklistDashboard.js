@@ -244,7 +244,7 @@ const ChecklistDashboard = ({ isOffline }) => {
 
         {/* FF&E TITLE WITH EXPORT BUTTONS */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>WALKTHROUGH - GREENE</h3>
+          <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>CHECKLIST - GREENE</h3>
           <div className="flex space-x-4">
             <button
               style={{ backgroundColor: '#8b7355' }}
