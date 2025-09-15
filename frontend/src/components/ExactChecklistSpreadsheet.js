@@ -898,27 +898,16 @@ const ExactChecklistSpreadsheet = ({
                                                           
                                                           {/* Size */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                                            <input 
-                                                              type="text" 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              placeholder="Size"
-                                                              defaultValue={item.size || ''}
-                                                            />
+                                                            <input type="text" className="w-full bg-transparent border-none text-white text-sm" placeholder="Size" />
                                                           </td>
                                                           
-                                                          {/* Status Dropdown */}
+                                                          {/* Status */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                                            <select 
-                                                              className="w-full bg-transparent border-none text-white text-xs p-0"
-                                                              value={item.status || ''}
-                                                              style={{ backgroundColor: getStatusColor(item.status || '') }}
-                                                              onChange={(e) => handleStatusChange(item.id, e.target.value)}
-                                                            >
-                                                              <option value="">Select Status...</option>
+                                                            <select className="w-full bg-transparent border-none text-white text-xs" value={item.status || ''}>
+                                                              <option value="">Status...</option>
                                                               <option value="PICKED">PICKED</option>
                                                               <option value="ORDERED">ORDERED</option>
                                                               <option value="SHIPPED">SHIPPED</option>
-                                                              <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
                                                               <option value="INSTALLED">INSTALLED</option>
                                                             </select>
                                                           </td>
@@ -932,15 +921,9 @@ const ExactChecklistSpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Image */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center text-white">
+                                                          <td className="border border-gray-400 px-2 py-2 text-center">
                                                             {item.image_url ? (
-                                                              <img 
-                                                                src={item.image_url} 
-                                                                alt={item.name} 
-                                                                className="w-8 h-8 object-cover rounded cursor-pointer"
-                                                                onClick={() => window.open(item.image_url, '_blank')}
-                                                                title="Click to expand image"
-                                                              />
+                                                              <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded cursor-pointer" onClick={() => window.open(item.image_url, '_blank')} />
                                                             ) : (
                                                               <span className="text-gray-500 text-xs">No Image</span>
                                                             )}
@@ -949,26 +932,9 @@ const ExactChecklistSpreadsheet = ({
                                                           {/* Link */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                                             {item.link ? (
-                                                              <a 
-                                                                href={item.link} 
-                                                                target="_blank" 
-                                                                rel="noopener noreferrer"
-                                                                className="text-blue-400 hover:text-blue-300 text-xs underline"
-                                                                title="View Product Link"
-                                                              >
-                                                                🔗 LINK
-                                                              </a>
+                                                              <a href={item.link} target="_blank" className="text-blue-400 hover:text-blue-300 text-xs underline">🔗 LINK</a>
                                                             ) : (
-                                                              <input 
-                                                                type="url" 
-                                                                className="w-full bg-transparent border border-gray-600 text-white text-xs px-1 py-1 rounded"
-                                                                placeholder="Add Canva link"
-                                                                onBlur={(e) => {
-                                                                  if (e.target.value.includes('canva.com')) {
-                                                                    console.log('🎨 Canva link detected:', e.target.value);
-                                                                  }
-                                                                }}
-                                                              />
+                                                              <input type="url" className="w-full bg-transparent border border-gray-600 text-white text-xs px-1 py-1 rounded" placeholder="Canva link" />
                                                             )}
                                                           </td>
                                                         </tr>
