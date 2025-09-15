@@ -7,7 +7,7 @@ import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 
-const WalkthroughDashboard = ({ isOffline }) => {
+const ChecklistDashboard = ({ isOffline }) => {
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
