@@ -834,7 +834,7 @@ const WalkthroughFFE = ({
                                                 <React.Fragment key={category.id}>
                                                   {/* CATEGORY HEADER ROW */}
                                                   <tr>
-                                                    <td colSpan="14" 
+                                                    <td colSpan="5" 
                                                         className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
                                                         style={{ backgroundColor: getCategoryColor() }}>
                                                       <div className="flex items-center gap-2">
