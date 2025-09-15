@@ -298,7 +298,7 @@ const WalkthroughDashboard = ({ isOffline }) => {
 
       {/* FF&E Spreadsheet */}
       <div className="px-6 mt-4">
-        <WalkthroughFFE
+        <SimpleWalkthroughSpreadsheet
           project={project}
           roomColors={roomColors}
           categoryColors={categoryColors}
