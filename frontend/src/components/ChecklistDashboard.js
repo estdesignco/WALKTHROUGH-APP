@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
-import ChecklistFFE from './ChecklistFFE';
+import WalkthroughFFE from './WalkthroughFFE';
 import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 
-const ChecklistDashboard = ({ isOffline }) => {
+const WalkthroughDashboard = ({ isOffline }) => {
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -244,7 +244,7 @@ const ChecklistDashboard = ({ isOffline }) => {
 
         {/* FF&E TITLE WITH EXPORT BUTTONS */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>CHECKLIST - GREENE</h3>
+          <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>WALKTHROUGH - GREENE</h3>
           <div className="flex space-x-4">
             <button
               style={{ backgroundColor: '#8b7355' }}
@@ -298,7 +298,7 @@ const ChecklistDashboard = ({ isOffline }) => {
 
       {/* FF&E Spreadsheet */}
       <div className="px-6 mt-4">
-        <ChecklistFFE
+        <WalkthroughFFE
           project={project}
           roomColors={roomColors}
           categoryColors={categoryColors}
@@ -323,4 +323,4 @@ const ChecklistDashboard = ({ isOffline }) => {
   );
 };
 
-export default ChecklistDashboard;
+export default WalkthroughDashboard;
