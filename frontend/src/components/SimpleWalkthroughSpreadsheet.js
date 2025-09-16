@@ -73,7 +73,7 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const handleAddCategory = async (roomId, categoryName) => {
     try {
-      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/categories`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
