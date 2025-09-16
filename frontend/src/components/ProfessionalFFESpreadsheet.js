@@ -226,7 +226,7 @@ const ProfessionalFFESpreadsheet = ({
             {/* TABLE HEADERS - EXACTLY like your right-side image */}
             <thead>
               <tr className="bg-neutral-700 sticky top-0 z-10">
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[200px] text-left font-bold">ITEM NAME</th>
+                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[200px] text-left font-bold">INSTALLED NAME</th>
                 <th className="p-3 text-amber-300 border border-neutral-600 min-w-[150px] text-left font-bold">VENDOR</th>
                 <th className="p-3 text-amber-300 border border-neutral-600 min-w-[80px] text-center font-bold">QTY</th>
                 <th className="p-3 text-amber-300 border border-neutral-600 min-w-[120px] text-left font-bold">SIZE</th>
@@ -315,10 +315,10 @@ const ProfessionalFFESpreadsheet = ({
                                 {/* SUBCATEGORY CONTENT - Show when expanded */}
                                 {isSubcategoryExpanded && (
                                   <>
-                                    {/* ITEMS */}
+                                    {/* INSTALLEDS */}
                                     {subcategory.items && subcategory.items.map((item, itemIndex) => (
                                       <tr key={item.id || itemIndex} className="hover:bg-neutral-700 transition-colors">
-                                        {/* ITEM NAME */}
+                                        {/* INSTALLED NAME */}
                                         <td className="p-2 border border-neutral-600">
                                           <input
                                             type="text"
@@ -521,7 +521,7 @@ const ProfessionalFFESpreadsheet = ({
                                       </tr>
                                     ))}
                                     
-                                    {/* ADD ITEM BUTTON - At bottom of each subcategory */}
+                                    {/* ADD INSTALLED BUTTON - At bottom of each subcategory */}
                                     <tr>
                                       <td colSpan="17" className="p-3 text-center border border-neutral-600">
                                         <button
@@ -531,7 +531,7 @@ const ProfessionalFFESpreadsheet = ({
                                           }}
                                           className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold transition-colors"
                                         >
-                                          ➕ ADD ITEM (Test Scraping!)
+                                          ➕ ADD INSTALLED (Test Scraping!)
                                         </button>
                                       </td>
                                     </tr>
@@ -551,7 +551,7 @@ const ProfessionalFFESpreadsheet = ({
         </div>
       </div>
       
-      {/* ADD ITEM MODAL - Your sophisticated working modal with scraping */}
+      {/* ADD INSTALLED MODAL - Your sophisticated working modal with scraping */}
       {showAddItem && (
         <AddItemModal
           onClose={() => setShowAddItem(false)}

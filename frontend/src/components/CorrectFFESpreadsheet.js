@@ -151,7 +151,7 @@ const CorrectFFESpreadsheet = ({
                                 <span className="text-xs">{expandedSubcategories[subcategory.id] ? '−' : '+'}</span>
                               </div>
 
-                              {/* ITEMS LIST - Individual items like Console Lamp, Table Lamp */}
+                              {/* INSTALLEDS LIST - Individual items like Console Lamp, Table Lamp */}
                               {expandedSubcategories[subcategory.id] && subcategory.items && (
                                 <div className="ml-3 mt-1">
                                   {subcategory.items.map((item, itemIndex) => (
@@ -160,7 +160,7 @@ const CorrectFFESpreadsheet = ({
                                     </div>
                                   ))}
                                   
-                                  {/* ADD ITEM BUTTON */}
+                                  {/* ADD INSTALLED BUTTON */}
                                   <button
                                     onClick={() => {
                                       setSelectedSubCategoryId(subcategory.id);
@@ -216,7 +216,7 @@ const CorrectFFESpreadsheet = ({
                 {/* Individual column headers */}
                 <tr className="bg-gray-50">
                   {/* ADDITIONAL INFO columns */}
-                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[200px]">ITEM NAME</th>
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[200px]">INSTALLED NAME</th>
                   <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[150px]">VENDOR/SKU</th>
                   <th className="border border-gray-300 px-2 py-2 text-center text-xs font-medium text-gray-700 min-w-[60px]">QTY</th>
                   <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[100px]">SIZE</th>
@@ -393,7 +393,7 @@ const CorrectFFESpreadsheet = ({
         </div>
       </div>
 
-      {/* ADD ITEM MODAL */}
+      {/* ADD INSTALLED MODAL */}
       {showAddItem && (
         <AddItemModal
           onClose={() => setShowAddItem(false)}

@@ -213,7 +213,7 @@ const ActualFFESpreadsheet = ({
                                 <span className="text-xs">{expandedSubcategories[subcategory.id] ? '▼' : '▶'}</span>
                               </div>
 
-                              {/* ITEMS LIST - Like your Console Lamp, Table Lamp */}
+                              {/* INSTALLEDS LIST - Like your Console Lamp, Table Lamp */}
                               {expandedSubcategories[subcategory.id] && subcategory.items && (
                                 <div className="ml-4 mt-1">
                                   {subcategory.items.map((item, itemIndex) => (
@@ -222,7 +222,7 @@ const ActualFFESpreadsheet = ({
                                     </div>
                                   ))}
                                   
-                                  {/* ADD ITEM BUTTON */}
+                                  {/* ADD INSTALLED BUTTON */}
                                   <button
                                     onClick={() => {
                                       setSelectedSubCategoryId(subcategory.id);
@@ -269,7 +269,7 @@ const ActualFFESpreadsheet = ({
               <table className="w-full border-collapse border border-gray-300">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">ITEM NAME</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">INSTALLED NAME</th>
                     <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">VENDOR/SKU</th>
                     <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">QTY</th>
                     <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">SIZE</th>
@@ -377,7 +377,7 @@ const ActualFFESpreadsheet = ({
               <table className="w-full border-collapse border border-gray-300">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">ITEM NAME</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">INSTALLED NAME</th>
                     <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">CARRIER</th>
                     <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">TRACKING #</th>
                     <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">ORDER DATE</th>
@@ -458,7 +458,7 @@ const ActualFFESpreadsheet = ({
         </div>
       </div>
 
-      {/* ADD ITEM MODAL */}
+      {/* ADD INSTALLED MODAL */}
       {showAddItem && (
         <AddItemModal
           onClose={() => setShowAddItem(false)}
