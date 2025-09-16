@@ -392,7 +392,7 @@ const ChecklistSpreadsheet = ({
                         </td>
                       </tr>
 
-                      {/* CATEGORIES AND ITEMS */}
+                      {/* CATEGORIES AND INSTALLEDS */}
                       {isRoomExpanded && room.categories?.map((category, categoryIndex) => {
                         const isCategoryExpanded = expandedCategories[category.id];
                         
@@ -417,7 +417,7 @@ const ChecklistSpreadsheet = ({
                               </td>
                             </tr>
 
-                            {/* SUBCATEGORY ITEMS */}
+                            {/* SUBCATEGORY INSTALLEDS */}
                             {isCategoryExpanded && category.subcategories?.map((subcategory) => (
                               <React.Fragment key={subcategory.id}>
                                 {/* SUBCATEGORY HEADER */}
@@ -437,7 +437,7 @@ const ChecklistSpreadsheet = ({
                                   </td>
                                 </tr>
 
-                                {/* ITEMS */}
+                                {/* INSTALLEDS */}
                                 {subcategory.items?.map((item) => (
                                   <tr key={item.id}>
                                     <td className="border border-gray-400 px-2 py-2 text-white text-sm">
@@ -515,7 +515,7 @@ const ChecklistSpreadsheet = ({
                                   </tr>
                                 ))}
 
-                                {/* ADD ITEM BUTTON ROW */}
+                                {/* ADD INSTALLED BUTTON ROW */}
                                 <tr>
                                   <td colSpan="7" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                     <div className="flex justify-start items-center space-x-4">
@@ -577,7 +577,7 @@ const ChecklistSpreadsheet = ({
         </div>
       </div>
 
-      {/* ADD ITEM MODAL */}
+      {/* ADD INSTALLED MODAL */}
       {showAddItem && (
         <AddItemModal
           onClose={() => setShowAddItem(false)}

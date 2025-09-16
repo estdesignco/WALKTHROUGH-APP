@@ -181,7 +181,7 @@ const SimpleSpreadsheet = ({
                                 }}
                                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold"
                               >
-                                ➕ ADD ITEM (Test Scraping!)
+                                ➕ ADD INSTALLED (Test Scraping!)
                               </button>
                             </div>
                           </td>
@@ -237,7 +237,7 @@ const SimpleSpreadsheet = ({
         </p>
       </div>
       
-      {/* ADD ITEM MODAL */}
+      {/* ADD INSTALLED MODAL */}
       {showAddItem && (
         <AddItemModal
           onClose={() => {

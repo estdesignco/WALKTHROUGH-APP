@@ -232,7 +232,7 @@ const FFESpreadsheet = ({
                       </td>
                     </tr>
                     
-                    {/* SUBCATEGORIES & ITEMS */}
+                    {/* SUBCATEGORIES & INSTALLEDS */}
                     {category.subcategories && category.subcategories.map((subcategory) => (
                       <React.Fragment key={subcategory.id}>
                         {/* SUBCATEGORY HEADER */}
@@ -264,7 +264,7 @@ const FFESpreadsheet = ({
                           <th className="p-2 text-custom-gold font-semibold border border-neutral-600">Delete</th>
                         </tr>
                         
-                        {/* ITEMS */}
+                        {/* INSTALLEDS */}
                         {subcategory.items && subcategory.items.map((item) => (
                           <tr key={item.id} className="bg-neutral-900 hover:bg-neutral-800">
                             <td className="p-2 text-white border border-neutral-600 fit-text">{item.name}</td>

@@ -326,7 +326,7 @@ const ChecklistFFE = ({
     }
   };
 
-  // Handle adding a new category WITH ALL SUBCATEGORIES AND ITEMS
+  // Handle adding a new category WITH ALL SUBCATEGORIES AND INSTALLEDS
   const handleAddCategory = async (roomId, categoryName) => {
     if (!roomId || !categoryName) {
       console.error('❌ Missing roomId or categoryName');
@@ -881,12 +881,12 @@ const ChecklistFFE = ({
                                                         <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>LINK</td>
                                                       </tr>
                                                       
-                                                      {/* ITEMS GO DIRECTLY UNDER RED HEADER */}
-                                                      {/* ACTUAL ITEMS FROM BACKEND DATA */}
+                                                      {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
+                                                      {/* ACTUAL INSTALLEDS FROM BACKEND DATA */}
                                                       {category.subcategories?.map((subcategory) => (
                                                         subcategory.items?.map((item, itemIndex) => (
                                                         <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                                          {/* INSTALLED - ITEM NAME GOES HERE */}
+                                                          {/* INSTALLED - INSTALLED NAME GOES HERE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             {item.name}
                                                           </td>
@@ -1140,7 +1140,7 @@ const ChecklistFFE = ({
                                                             )}
                                                           </td>
                                                           
-                                                          {/* ACTIONS - DELETE ITEM */}
+                                                          {/* ACTIONS - DELETE INSTALLED */}
                                                           <td className="border border-gray-400 px-2 py-2 text-center">
                                                             <button 
                                                               onClick={() => handleDeleteItem(item.id)}
@@ -1223,7 +1223,7 @@ const ChecklistFFE = ({
           </div>
         </div>
 
-      {/* ADD ITEM MODAL */}
+      {/* ADD INSTALLED MODAL */}
       {showAddItem && (
         <AddItemModal
           onClose={() => setShowAddItem(false)}

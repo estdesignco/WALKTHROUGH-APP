@@ -543,7 +543,7 @@ const ExactFFESpreadsheet = ({
                                                             </td>
                                                           </tr>
 
-                                                          {/* SUBCATEGORIES AND ITEMS */}
+                                                          {/* SUBCATEGORIES AND INSTALLEDS */}
                                                           {category.subcategories?.map((subcategory) => (
                                                             <React.Fragment key={subcategory.id}>
                                                               
@@ -573,10 +573,10 @@ const ExactFFESpreadsheet = ({
                                                                 <td className="border border-gray-400" style={{ backgroundColor: getMainHeaderColor() }}></td>
                                                               </tr>
 
-                                                              {/* ITEMS */}
+                                                              {/* INSTALLEDS */}
                                                               {subcategory.items?.map((item) => (
                                                                 <tr key={item.id}>
-                                                                  {/* ITEM NAME */}
+                                                                  {/* INSTALLED NAME */}
                                                                   <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                                     {item.name || 'Chandelier'}
                                                                   </td>
@@ -591,7 +591,7 @@ const ExactFFESpreadsheet = ({
                                                                     {item.size || '24"W x 30"H'}
                                                                   </td>
                                                                   
-                                                                  {/* REMARKS */}
+                                                                  {/* VENDOR/SKU */}
                                                                   <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                                     {item.remarks || 'Matches living room theme'}
                                                                   </td>
@@ -771,7 +771,7 @@ const ExactFFESpreadsheet = ({
                                                                 </tr>
                                                               ))}
                                                               
-                                                              {/* ADD ITEM ROW */}
+                                                              {/* ADD INSTALLED ROW */}
                                                               <tr>
                                                                 <td colSpan="15" className="border border-gray-400 px-6 py-2 text-center">
                                                                   <button
@@ -860,7 +860,7 @@ const ExactFFESpreadsheet = ({
         </div>
       </div>
 
-      {/* ADD ITEM MODAL */}
+      {/* ADD INSTALLED MODAL */}
       {showAddItem && (
         <AddItemModal
           onClose={() => setShowAddItem(false)}

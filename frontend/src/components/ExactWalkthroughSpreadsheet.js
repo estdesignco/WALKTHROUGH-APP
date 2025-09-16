@@ -327,7 +327,7 @@ const ExactWalkthroughSpreadsheet = ({
     }
   };
 
-  // Handle adding a new category WITH ALL SUBCATEGORIES AND ITEMS
+  // Handle adding a new category WITH ALL SUBCATEGORIES AND INSTALLEDS
   const handleAddCategory = async (roomId, categoryName) => {
     if (!roomId || !categoryName) {
       console.error('❌ Missing roomId or categoryName');
@@ -861,8 +861,8 @@ const ExactWalkthroughSpreadsheet = ({
                                                         <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>SIZE</td>
                                                       </tr>
                                                       
-                                                      {/* ITEMS GO DIRECTLY UNDER RED HEADER */}
-                                                      {/* ACTUAL ITEMS FROM BACKEND DATA */}
+                                                      {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
+                                                      {/* ACTUAL INSTALLEDS FROM BACKEND DATA */}
                                                       {category.subcategories?.map((subcategory) => (
                                                         subcategory.items?.map((item, itemIndex) => (
                                                         <tr key={item.id}>
@@ -958,7 +958,7 @@ const ExactWalkthroughSpreadsheet = ({
           </div>
         </div>
 
-      {/* ADD ITEM MODAL */}
+      {/* ADD INSTALLED MODAL */}
       {showAddItem && (
         <AddItemModal
           onClose={() => setShowAddItem(false)}

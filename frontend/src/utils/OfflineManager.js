@@ -76,21 +76,21 @@ class OfflineManager {
     const { type, data } = action;
 
     switch (type) {
-      case 'CREATE_ITEM':
+      case 'CREATE_INSTALLED':
         return fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
 
-      case 'UPDATE_ITEM':
+      case 'UPDATE_INSTALLED':
         return fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items/${data.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
 
-      case 'DELETE_ITEM':
+      case 'DELETE_INSTALLED':
         return fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items/${data.id}`, {
           method: 'DELETE'
         });
