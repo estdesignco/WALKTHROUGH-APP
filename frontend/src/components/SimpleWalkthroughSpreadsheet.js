@@ -369,32 +369,27 @@ const SimpleWalkthroughSpreadsheet = ({
                               <React.Fragment key={subcategory.id}>
                                 {/* REMOVED SUBCATEGORY HEADER - Items now go directly under category */}
 
-                                {/* ITEMS - 5 COLUMNS ONLY */}
+                                {/* ITEMS - 4 COLUMNS: INSTALLED, VENDOR/SKU, QTY, SIZE */}
                                 {subcategory.items?.map((item) => (
                                   <tr key={item.id}>
-                                    {/* Checkbox */}
-                                    <td className="border border-gray-400 px-2 py-2 text-center">
-                                      <input type="checkbox" className="w-4 h-4" />
-                                    </td>
-                                    
-                                    {/* Item Name */}
-                                    <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                                    {/* INSTALLED - directly editable text */}
+                                    <td className="border border-gray-400 px-3 py-2 text-white text-sm">
                                       {item.name}
                                     </td>
                                     
-                                    {/* Quantity */}
-                                    <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
+                                    {/* VENDOR/SKU - directly editable text */}
+                                    <td className="border border-gray-400 px-3 py-2 text-white text-sm">
+                                      {item.vendor || ''}
+                                    </td>
+                                    
+                                    {/* QTY - directly editable text */}
+                                    <td className="border border-gray-400 px-3 py-2 text-white text-sm">
                                       {item.quantity || 1}
                                     </td>
                                     
-                                    {/* Size */}
-                                    <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                      <input type="text" className="w-full bg-transparent border-none text-white text-sm" placeholder="Size" />
-                                    </td>
-                                    
-                                    {/* Remarks */}
-                                    <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                      <input type="text" className="w-full bg-transparent border-none text-white text-sm" placeholder="Remarks" />
+                                    {/* SIZE - directly editable text */}
+                                    <td className="border border-gray-400 px-3 py-2 text-white text-sm">
+                                      {item.size || ''}
                                     </td>
                                   </tr>
                                 ))}
