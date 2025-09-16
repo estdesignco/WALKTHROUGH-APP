@@ -1,17 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import AddItemModal from './AddItemModal';
+import React from 'react';
 
-const SimpleChecklistSpreadsheet = ({
-  project,
-  roomColors,
-  categoryColors,
-  itemStatuses = [],
-  vendorTypes = [],
-  carrierTypes = [],
-  onDeleteRoom,
-  onAddRoom,
-  onReload
-}) => {
+const SimpleChecklistSpreadsheet = ({ project }) => {
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
