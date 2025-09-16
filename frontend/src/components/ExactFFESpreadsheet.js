@@ -1205,7 +1205,7 @@ const ExactFFESpreadsheet = ({
                                                               value=""
                                                               onChange={(e) => {
                                                                 if (e.target.value === 'CREATE_NEW') {
-                                                                  const categoryName = window.prompt('Enter new category name:');
+                                                                  const categoryName = 'New Category'; // TODO: Replace with proper modal
                                                                   if (categoryName && categoryName.trim()) {
                                                                     handleAddCategory(room.id, categoryName.trim());
                                                                   }
