@@ -619,19 +619,40 @@ const ExactFFESpreadsheet = ({
     return deliveryColors[status] || '#FEF08A';
   };
 
-  // DEBUG: Log the project data
+  // FORCE VISIBLE DEBUG - Show component is rendering
   console.log('🔍 ExactFFESpreadsheet rendering with:', { project, roomsCount: project?.rooms?.length });
 
-  if (!project || !project.rooms || project.rooms.length === 0) {
-    console.log('❌ ExactFFESpreadsheet: No project data', { project, rooms: project?.rooms });
+  // ALWAYS show debug info temporarily
+  if (!project) {
     return (
-      <div className="text-center text-gray-400 py-8">
-        <p className="text-lg">No FF&E data available</p>
-        <p className="text-sm mt-2">Project: {project ? 'Found' : 'Missing'}, Rooms: {project?.rooms?.length || 0}</p>
-        <p className="text-xs mt-1">Debug: {JSON.stringify({ hasProject: !!project, hasRooms: !!project?.rooms, roomCount: project?.rooms?.length })}</p>
+      <div className="text-center text-red-400 py-8 bg-red-900 m-4 p-4 rounded">
+        <p className="text-lg">🚨 ExactFFESpreadsheet: NO PROJECT DATA</p>
+        <p className="text-sm mt-2">Component is rendering but project is null/undefined</p>
       </div>
     );
   }
+
+  if (!project.rooms) {
+    return (
+      <div className="text-center text-orange-400 py-8 bg-orange-900 m-4 p-4 rounded">
+        <p className="text-lg">🚨 ExactFFESpreadsheet: NO ROOMS PROPERTY</p>
+        <p className="text-sm mt-2">Project exists but has no 'rooms' property</p>
+        <p className="text-xs mt-1">Project keys: {Object.keys(project).join(', ')}</p>
+      </div>
+    );
+  }
+
+  if (project.rooms.length === 0) {
+    return (
+      <div className="text-center text-yellow-400 py-8 bg-yellow-900 m-4 p-4 rounded">
+        <p className="text-lg">🚨 ExactFFESpreadsheet: EMPTY ROOMS ARRAY</p>
+        <p className="text-sm mt-2">Project has rooms property but it's empty (length: {project.rooms.length})</p>
+      </div>
+    );
+  }
+
+  // If we get here, we have valid data - show success message
+  console.log('✅ ExactFFESpreadsheet: Valid project data, proceeding to render spreadsheet');
 
   return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
