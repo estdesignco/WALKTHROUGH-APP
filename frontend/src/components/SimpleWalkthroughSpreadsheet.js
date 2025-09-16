@@ -2,6 +2,9 @@ import React from 'react';
 
 const SimpleWalkthroughSpreadsheet = ({ project }) => {
   
+  // FORCE ERROR TO TEST IF THIS COMPONENT IS BEING USED
+  throw new Error("🚨 SimpleWalkthroughSpreadsheet IS BEING CALLED!");
+  
   // SIMPLE COMPONENT - NO COMPLEX LOGIC, JUST SHOW THE TABLE
 
   // SIMPLE RENDER - NO COMPLEX LOGIC
