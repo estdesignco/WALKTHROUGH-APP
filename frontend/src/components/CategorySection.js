@@ -131,7 +131,7 @@ const CategorySection = ({
                 <div className="col-span-1">SIZE</div>
                 <div className="col-span-2">STATUS</div>
                 <div className="col-span-2">VENDOR</div>
-                <div className="col-span-2">REMARKS</div>
+                <div className="col-span-2">VENDOR/SKU</div>
                 <div className="col-span-1">ACTIONS</div>
               </div>
               

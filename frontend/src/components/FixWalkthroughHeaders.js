@@ -13,10 +13,10 @@ const filesToFix = [
 filesToFix.forEach(file => {
   try {
     // Replace ITEM with INSTALLED in headers
-    execSync(`sed -i 's/>ITEM</>INSTALLED</g' /app/frontend/src/components/${file}`);
+    execSync(`sed -i 's/>INSTALLED</>INSTALLED</g' /app/frontend/src/components/${file}`);
     
     // Replace REMARKS with VENDOR/SKU in headers
-    execSync(`sed -i 's/>REMARKS</>VENDOR\/SKU</g' /app/frontend/src/components/${file}`);
+    execSync(`sed -i 's/>VENDOR/SKU</>VENDOR\/SKU</g' /app/frontend/src/components/${file}`);
     
     console.log(`Fixed headers in ${file}`);
   } catch (e) {

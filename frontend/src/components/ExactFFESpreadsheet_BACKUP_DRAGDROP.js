@@ -445,7 +445,7 @@ const ExactFFESpreadsheet = ({
                   <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>INSTALLED</th>
                   <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>QTY</th>
                   <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>SIZE</th>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>REMARKS</th>
+                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>VENDOR/SKU</th>
                   <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>VENDOR</th>
                   <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>STATUS</th>
                   <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>COST</th>
