@@ -314,8 +314,8 @@ const ExactFFESpreadsheet = ({
       }
     } catch (error) {
       console.error('❌ Error deleting item:', error);
-      alert(`Delete error: ${error.message}`);
-      alert('Failed to delete item. Please try again.');
+      console.error(`Delete error: ${error.message}`);
+      console.error('Failed to delete item. Please try again.');
     }
   };
 
