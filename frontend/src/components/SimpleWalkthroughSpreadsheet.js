@@ -196,14 +196,46 @@ const SimpleWalkthroughSpreadsheet = ({
   console.log('Rooms:', project?.rooms?.length || 'NO ROOMS');
 
   return (
-    <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
+    <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       
-      {/* FORCE VISIBLE TEST */}
-      <div className="bg-red-900 text-red-400 p-8 m-4 rounded border-4 border-red-500">
-        <h1 className="text-3xl font-bold">🚨 SIMPLE WALKTHROUGH SPREADSHEET IS RENDERING!</h1>
-        <p className="text-xl mt-4">Project: {project.name}</p>
-        <p className="text-lg">Rooms: {project.rooms?.length}</p>
-        <p className="text-lg">Total Items: {project.rooms?.reduce((sum, r) => sum + (r.categories?.reduce((catSum, c) => catSum + (c.subcategories?.reduce((subSum, s) => subSum + (s.items?.length || 0), 0) || 0), 0) || 0), 0)}</p>
+      {/* SIMPLE SPREADSHEET TABLE WITH CORRECT HEADERS */}
+      <div className="overflow-x-auto">
+        
+        {/* LIVING ROOM HEADER */}
+        <div className="bg-purple-800 text-white px-4 py-2 font-bold text-lg mb-2">
+          LIVING ROOM
+        </div>
+        
+        {/* LIGHTING HEADER */}
+        <div className="bg-green-800 text-white px-4 py-2 font-bold mb-2">
+          LIGHTING
+        </div>
+        
+        {/* TABLE WITH CORRECT 4 HEADERS */}
+        <table className="w-full border-collapse border border-gray-400">
+          <thead>
+            <tr>
+              <th className="border border-gray-400 px-3 py-2 text-white font-bold bg-red-800">INSTALLED</th>
+              <th className="border border-gray-400 px-3 py-2 text-white font-bold bg-orange-800">VENDOR/SKU</th>
+              <th className="border border-gray-400 px-3 py-2 text-white font-bold bg-orange-800">QTY</th>
+              <th className="border border-gray-400 px-3 py-2 text-white font-bold bg-orange-800">SIZE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border border-gray-400 px-3 py-2 text-white">Recessed Lighting</td>
+              <td className="border border-gray-400 px-3 py-2 text-white">Four Hands/ABC123</td>
+              <td className="border border-gray-400 px-3 py-2 text-white">6</td>
+              <td className="border border-gray-400 px-3 py-2 text-white">4 inch</td>
+            </tr>
+            <tr>
+              <td className="border border-gray-400 px-3 py-2 text-white">Chandelier</td>
+              <td className="border border-gray-400 px-3 py-2 text-white">West Elm/XYZ789</td>
+              <td className="border border-gray-400 px-3 py-2 text-white">1</td>
+              <td className="border border-gray-400 px-3 py-2 text-white">36 inch</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       {/* SEARCH AND FILTER SECTION */}
