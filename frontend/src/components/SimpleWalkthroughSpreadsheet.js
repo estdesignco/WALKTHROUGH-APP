@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import AddItemModal from './AddItemModal';
+import React from 'react';
 
 const SimpleWalkthroughSpreadsheet = ({ project }) => {
   
