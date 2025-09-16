@@ -867,12 +867,17 @@ const WalkthroughFFE = ({
                                                       {category.subcategories?.map((subcategory) => (
                                                         subcategory.items?.map((item, itemIndex) => (
                                                         <tr key={item.id}>
-                                                          {/* INSTALLED */}
+                                                          {/* CHECKBOX - KEEP THIS! */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-center">
+                                                            <input type="checkbox" className="w-4 h-4" />
+                                                          </td>
+                                                          
+                                                          {/* INSTALLED (was ITEM) */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                                             {item.name}
                                                           </td>
                                                           
-                                                          {/* VENDOR/SKU */}
+                                                          {/* VENDOR/SKU (was REMARKS) */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                                             {item.vendor || ''}
                                                           </td>
