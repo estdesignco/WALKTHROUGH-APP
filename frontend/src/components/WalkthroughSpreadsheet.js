@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// FORCE ERROR TO IDENTIFY COMPONENT
-throw new Error("🔥 THIS IS WalkthroughSpreadsheet.js COMPONENT!");
 import AddItemModal from './AddItemModal';
 
 const WalkthroughSpreadsheet = ({
