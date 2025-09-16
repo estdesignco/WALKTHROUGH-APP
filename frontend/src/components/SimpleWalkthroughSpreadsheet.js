@@ -476,7 +476,6 @@ const SimpleWalkthroughSpreadsheet = ({
         />
       )}
     </div>
-    </> {/* End fragment wrapper */}
   );
 };
 
