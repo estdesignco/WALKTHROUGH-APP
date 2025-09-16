@@ -298,7 +298,7 @@ const FFEDashboard = ({ isOffline }) => {
 
       {/* FF&E Spreadsheet */}
       <div className="px-6 mt-4">
-        <FFESpreadsheet
+        <ExactFFESpreadsheet
           project={project}
           roomColors={roomColors}
           categoryColors={categoryColors}
