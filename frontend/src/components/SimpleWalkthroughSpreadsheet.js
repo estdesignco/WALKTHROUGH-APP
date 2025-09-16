@@ -9,10 +9,10 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
   return (
     <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       <div className="text-white text-center p-8">
-        <h1 className="text-2xl font-bold mb-4">Simple Walkthrough Spreadsheet</h1>
-        <p className="text-gray-400">Simplified component - no complex logic</p>
+        <h1 className="text-4xl font-bold mb-4 text-red-500">🚨 THIS IS MY SIMPLE WALKTHROUGH COMPONENT!</h1>
+        <p className="text-2xl text-red-400">If you see this, the component is working</p>
         {project && (
-          <p className="text-sm mt-2">Project: {project.name || 'Unnamed Project'}</p>
+          <p className="text-lg mt-2 text-red-300">Project: {project.name || 'Unnamed Project'}</p>
         )}
         
         {/* LIVING ROOM HEADER */}
