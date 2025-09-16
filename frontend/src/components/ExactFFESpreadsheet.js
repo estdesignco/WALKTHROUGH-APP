@@ -55,7 +55,7 @@ const ExactFFESpreadsheet = ({
       } else {
         const errorData = await response.text();
         console.error('❌ Status update failed:', response.status, errorData);
-        alert(`Failed to update status: ${response.status} ${response.statusText}\n${errorData}`);
+        console.error(`Failed to update status: ${response.status} ${response.statusText}`, errorData);
       }
     } catch (error) {
       console.error('❌ Status update error:', error);
