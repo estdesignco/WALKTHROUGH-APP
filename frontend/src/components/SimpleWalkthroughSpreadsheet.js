@@ -220,6 +220,9 @@ const SimpleWalkthroughSpreadsheet = ({
   }
 
   console.log('✅ SimpleWalkthroughSpreadsheet: Valid project data, proceeding to render spreadsheet');
+  console.log('🏠 Rooms data:', project.rooms?.map(r => ({ name: r.name, categoriesCount: r.categories?.length })));
+  console.log('📊 Expanded rooms:', expandedRooms);
+  console.log('📂 Expanded categories:', expandedCategories);
 
   return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
