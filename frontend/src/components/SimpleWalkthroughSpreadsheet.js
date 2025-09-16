@@ -222,6 +222,12 @@ const SimpleWalkthroughSpreadsheet = ({
   console.log('✅ SimpleWalkthroughSpreadsheet: Valid project data, proceeding to render spreadsheet');
 
   return (
+    <div className="bg-green-900 text-green-400 p-4 m-4 rounded">
+      <p className="text-lg font-bold">🎉 WALKTHROUGH SPREADSHEET COMPONENT LOADED!</p>
+      <p className="text-sm">Project: {project.name}, Rooms: {project.rooms.length}</p>
+    </div>
+
+    /* ORIGINAL RETURN STARTS HERE */
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
       
       {/* SEARCH AND FILTER SECTION */}
