@@ -304,7 +304,7 @@ const ExactFFESpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Item deleted successfully');
-        alert('Item deleted successfully!');
+        console.log('Item deleted successfully!');
         // Force reload to show updated data
         window.location.reload();
       } else {
