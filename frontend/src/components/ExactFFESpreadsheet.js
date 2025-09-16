@@ -83,7 +83,7 @@ const ExactFFESpreadsheet = ({
       }
     } catch (error) {
       console.error('❌ Carrier update error:', error);
-      alert(`Error updating carrier: ${error.message}`);
+      console.error(`Error updating carrier: ${error.message}`);
     }
   };
 
