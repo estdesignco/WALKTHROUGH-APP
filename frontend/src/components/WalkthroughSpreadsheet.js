@@ -1,5 +1,4 @@
 // RED BANNER TEST
-const RED_BANNER = () => <div style={{backgroundColor: "red", color: "white", padding: "20px", fontSize: "24px", fontWeight: "bold", textAlign: "center", margin: "10px"}}>🚨 THIS IS COMPONENT: WalkthroughSpreadsheet.js</div>;
 import React, { useState, useEffect } from 'react';
 
 import AddItemModal from './AddItemModal';
@@ -237,14 +236,12 @@ const WalkthroughSpreadsheet = ({
   const getCategoryColor = () => '#065F46';
 
   if (!project || !project.rooms || project.rooms.length === 0) {
-    return (<><RED_BANNER />
       <div className="text-center text-gray-400 py-8">
         <p className="text-lg">Loading Walkthrough data...</p>
       </div>
     );
   }
 
-  return (<><RED_BANNER />
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
       
       {/* SEARCH AND FILTER SECTION */}
@@ -334,7 +331,6 @@ const WalkthroughSpreadsheet = ({
                 {(filteredProject || project).rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
                   
-                  return (<><RED_BANNER />
                     <React.Fragment key={room.id}>
                       {/* ROOM HEADER ROW */}
                       <tr>
@@ -366,7 +362,6 @@ const WalkthroughSpreadsheet = ({
                       {isRoomExpanded && room.categories?.map((category, categoryIndex) => {
                         const isCategoryExpanded = expandedCategories[category.id];
                         
-                        return (<><RED_BANNER />
                           <React.Fragment key={category.id}>
                             {/* CATEGORY HEADER */}
                             <tr>

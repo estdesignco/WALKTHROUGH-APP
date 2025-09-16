@@ -1,5 +1,4 @@
 // RED BANNER TEST
-const RED_BANNER = () => <div style={{backgroundColor: "red", color: "white", padding: "20px", fontSize: "24px", fontWeight: "bold", textAlign: "center", margin: "10px"}}>🚨 THIS IS COMPONENT: WalkthroughFFE.js</div>;
 import React, { useState, useEffect } from 'react';
 
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -623,7 +622,6 @@ const WalkthroughFFE = ({
   };
 
   if (!project || !project.rooms || project.rooms.length === 0) {
-    return (<><RED_BANNER />
       <div className="text-center text-gray-400 py-8">
         <p className="text-lg">Loading FF&E data...</p>
         <p className="text-sm mt-2">Please wait while we load your project information.</p>
@@ -631,7 +629,6 @@ const WalkthroughFFE = ({
     );
   }
 
-  return (<><RED_BANNER />
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
       
       {/* SEARCH AND FILTER SECTION - EXACTLY LIKE YOUR SCREENSHOT */}
@@ -788,7 +785,6 @@ const WalkthroughFFE = ({
                   const isRoomExpanded = expandedRooms[room.id];
                   console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
                   
-                  return (<><RED_BANNER />
                               <React.Fragment key={room.id}>
                                 {/* ROOM HEADER ROW - Full width like your screenshots */}
                                 <tr>
@@ -833,7 +829,6 @@ const WalkthroughFFE = ({
                                           const isCategoryExpanded = expandedCategories[category.id];
                                           console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
                                           
-                                          return (<><RED_BANNER />
                                                 <React.Fragment key={category.id}>
                                                   {/* CATEGORY HEADER ROW */}
                                                   <tr>
