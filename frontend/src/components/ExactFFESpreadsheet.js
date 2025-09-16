@@ -59,7 +59,7 @@ const ExactFFESpreadsheet = ({
       }
     } catch (error) {
       console.error('❌ Status update error:', error);
-      alert(`Error updating status: ${error.message}`);
+      console.error(`Error updating status: ${error.message}`);
     }
   };
 
