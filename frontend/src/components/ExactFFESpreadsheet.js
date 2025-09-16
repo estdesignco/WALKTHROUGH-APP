@@ -619,11 +619,16 @@ const ExactFFESpreadsheet = ({
     return deliveryColors[status] || '#FEF08A';
   };
 
+  // DEBUG: Log the project data
+  console.log('🔍 ExactFFESpreadsheet rendering with:', { project, roomsCount: project?.rooms?.length });
+
   if (!project || !project.rooms || project.rooms.length === 0) {
+    console.log('❌ ExactFFESpreadsheet: No project data', { project, rooms: project?.rooms });
     return (
       <div className="text-center text-gray-400 py-8">
-        <p className="text-lg">Loading FF&E data...</p>
-        <p className="text-sm mt-2">Please wait while we load your project information.</p>
+        <p className="text-lg">No FF&E data available</p>
+        <p className="text-sm mt-2">Project: {project ? 'Found' : 'Missing'}, Rooms: {project?.rooms?.length || 0}</p>
+        <p className="text-xs mt-1">Debug: {JSON.stringify({ hasProject: !!project, hasRooms: !!project?.rooms, roomCount: project?.rooms?.length })}</p>
       </div>
     );
   }
