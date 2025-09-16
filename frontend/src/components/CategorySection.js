@@ -1,3 +1,5 @@
+// RED BANNER TEST
+const RED_BANNER = () => <div style={{backgroundColor: "red", color: "white", padding: "20px", fontSize: "24px", fontWeight: "bold", textAlign: "center", margin: "10px"}}>🚨 THIS IS COMPONENT: CategorySection.js</div>;
 import React, { useState } from 'react';
 import { itemAPI } from '../App';
 import ItemRow from './ItemRow';
@@ -63,7 +65,7 @@ const CategorySection = ({
     }
   };
 
-  return (
+  return (<><RED_BANNER />
     <div className="bg-gray-700 rounded-lg overflow-hidden">
       {/* Category Header */}
       <div 

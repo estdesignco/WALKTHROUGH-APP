@@ -1,3 +1,5 @@
+// RED BANNER TEST
+const RED_BANNER = () => <div style={{backgroundColor: "red", color: "white", padding: "20px", fontSize: "24px", fontWeight: "bold", textAlign: "center", margin: "10px"}}>🚨 THIS IS COMPONENT: ExactFFESpreadsheet_BACKUP_DRAGDROP.js</div>;
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AddItemModal from './AddItemModal';
@@ -424,7 +426,7 @@ const ExactFFESpreadsheet = ({
   };
 
   if (!project || !project.rooms || project.rooms.length === 0) {
-    return (
+    return (<><RED_BANNER />
       <div className="text-center text-gray-400 py-8">
         <p className="text-lg">Loading FF&E data...</p>
         <p className="text-sm mt-2">Please wait while we load your project information.</p>
@@ -432,7 +434,7 @@ const ExactFFESpreadsheet = ({
     );
   }
 
-  return (
+  return (<><RED_BANNER />
     <div className="space-y-6">
       {/* EXACT SPREADSHEET TABLE */}
       <div className="bg-gray-900 border border-gray-600 rounded-lg shadow-lg overflow-hidden">
@@ -470,7 +472,7 @@ const ExactFFESpreadsheet = ({
                         {/* ROOMS - Draggable */}
                         {project.rooms.map((room, roomIndex) => {
                           console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
-                          return (
+                          return (<><RED_BANNER />
                             <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
                               {(provided, snapshot) => (
                                 <table 
@@ -525,7 +527,7 @@ const ExactFFESpreadsheet = ({
                                               <tbody>
                                                 {room.categories?.map((category, catIndex) => {
                                                   console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
-                                                  return (
+                                                  return (<><RED_BANNER />
                                                     <Draggable key={category.id} draggableId={category.id} index={catIndex}>
                                                       {(provided, snapshot) => (
                                                         <React.Fragment>
