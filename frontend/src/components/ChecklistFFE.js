@@ -525,10 +525,10 @@ const ChecklistFFE = ({
   };
 
   const getCategoryColor = () => '#065F46';  // Dark green
-  const getMainHeaderColor = () => '#7F1D1D';  // Dark red for main headers
-  const getAdditionalInfoColor = () => '#92400E';  // Brown for ADDITIONAL INFO.
+  const getMainHeaderColor = () => '#8B4444';  // Dark red for main headers
+  const getAdditionalInfoColor = () => '#8B4444';  // Brown for ADDITIONAL INFO.
   const getShippingInfoColor = () => '#6B21A8';  // Purple for SHIPPING INFO.
-  const getNotesActionsColor = () => '#7F1D1D';  // Red for NOTES and ACTIONS
+  const getNotesActionsColor = () => '#8B4444';  // Red for NOTES and ACTIONS
 
   // Get status color
   const getStatusColor = (status) => {
@@ -614,7 +614,7 @@ const ChecklistFFE = ({
       'EXCEPTION': '#DC2626',
       'DAMAGED': '#B91C1C',
       'LOST': '#991B1B',
-      'RETURNED TO SENDER': '#7F1D1D'
+      'RETURNED TO SENDER': '#8B4444'
     };
     return deliveryColors[status] || '#FEF08A';
   };
@@ -855,7 +855,7 @@ const ChecklistFFE = ({
                                                       {/* RED HEADER GOES AFTER CATEGORY - LAST IN HIERARCHY */}
                                                       <tr>
                                                         <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#7F1D1D', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+                                                            style={{ backgroundColor: '#8B4444', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
                                                         </td>
                                                         <td colSpan="3" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#8B4513' }}>
@@ -866,19 +866,19 @@ const ChecklistFFE = ({
                                                           SHIPPING INFO.
                                                         </td>
                                                         <td colSpan="2" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#7F1D1D', borderRight: '1px solid #9CA3AF', borderLeft: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+                                                            style={{ backgroundColor: '#8B4444', borderRight: '1px solid #9CA3AF', borderLeft: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
                                                         </td>
                                                       </tr>
                                                       
                                                       {/* MAIN RED HEADER ROW */}
                                                       <tr>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>INSTALLED</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>QTY</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>SIZE</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
                                                         <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>VENDOR/SKU</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>IMAGE</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>LINK</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>IMAGE</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK</td>
                                                       </tr>
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}

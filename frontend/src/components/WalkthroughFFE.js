@@ -527,10 +527,10 @@ const WalkthroughFFE = ({
   };
 
   const getCategoryColor = () => '#065F46';  // Dark green
-  const getMainHeaderColor = () => '#7F1D1D';  // Dark red for main headers
-  const getAdditionalInfoColor = () => '#92400E';  // Brown for ADDITIONAL INFO.
+  const getMainHeaderColor = () => '#8B4444';  // Dark red for main headers
+  const getAdditionalInfoColor = () => '#8B4444';  // Brown for ADDITIONAL INFO.
   const getShippingInfoColor = () => '#6B21A8';  // Purple for SHIPPING INFO.
-  const getNotesActionsColor = () => '#7F1D1D';  // Red for NOTES and ACTIONS
+  const getNotesActionsColor = () => '#8B4444';  // Red for NOTES and ACTIONS
 
   // Get status color
   const getStatusColor = (status) => {
@@ -616,7 +616,7 @@ const WalkthroughFFE = ({
       'EXCEPTION': '#DC2626',
       'DAMAGED': '#B91C1C',
       'LOST': '#991B1B',
-      'RETURNED TO SENDER': '#7F1D1D'
+      'RETURNED TO SENDER': '#8B4444'
     };
     return deliveryColors[status] || '#FEF08A';
   };
@@ -853,10 +853,10 @@ const WalkthroughFFE = ({
                                                       {/* WALKTHROUGH HEADER ROW - 5 COLUMNS ONLY */}
                                                       <tr>
                                                         <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8b7355' }}>✓</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>INSTALLED</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>VENDOR/SKU</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>QTY</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#92400E' }}>SIZE</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
                                                       </tr>
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
