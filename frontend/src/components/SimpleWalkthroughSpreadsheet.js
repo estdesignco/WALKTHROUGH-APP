@@ -295,7 +295,13 @@ const SimpleWalkthroughSpreadsheet = ({
         </div>
       </div>
 
-      {/* WALKTHROUGH TABLE - 5 COLUMNS ONLY */}
+      {/* TEST MESSAGE */}
+      <div className="bg-blue-900 text-blue-400 p-4 m-4 rounded">
+        <p className="text-lg font-bold">🎯 WALKTHROUGH TABLE COMPONENT REACHED!</p>
+        <p className="text-sm">Rooms: {project.rooms?.length}, Items: {project.rooms?.reduce((sum, r) => sum + (r.categories?.reduce((catSum, c) => catSum + (c.subcategories?.reduce((subSum, s) => subSum + (s.items?.length || 0), 0) || 0), 0) || 0), 0)}</p>
+      </div>
+
+      {/* WALKTHROUGH TABLE - 4 COLUMNS ONLY */}
       <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
         <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '800px' }}>
           <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
