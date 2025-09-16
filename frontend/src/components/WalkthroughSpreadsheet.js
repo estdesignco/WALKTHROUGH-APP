@@ -389,37 +389,20 @@ const WalkthroughSpreadsheet = ({
                               <React.Fragment key={subcategory.id}>
                                 {/* REMOVED SUBCATEGORY HEADER - Items go directly under category */}
 
-                                {/* ITEMS */}
+                                {/* ITEMS - 4 COLUMNS: INSTALLED | VENDOR/SKU | QTY | SIZE */}
                                 {subcategory.items?.map((item) => (
                                   <tr key={item.id}>
-                                    <td className="border border-gray-400 px-2 py-2 text-center">
-                                      <input 
-                                        type="checkbox" 
-                                        className="w-4 h-4"
-                                        defaultChecked={item.status === 'PICKED'}
-                                      />
-                                    </td>
                                     <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                       {item.name}
+                                    </td>
+                                    <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                                      {item.vendor || ''}
                                     </td>
                                     <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
                                       {item.quantity || 1}
                                     </td>
                                     <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                      <input 
-                                        type="text" 
-                                        className="w-full bg-transparent border-none text-white text-sm"
-                                        placeholder="Size"
-                                        defaultValue={item.size || ''}
-                                      />
-                                    </td>
-                                    <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                      <input 
-                                        type="text" 
-                                        className="w-full bg-transparent border-none text-white text-sm"
-                                        placeholder="Remarks"
-                                        defaultValue={item.remarks || ''}
-                                      />
+                                      {item.size || ''}
                                     </td>
                                   </tr>
                                 ))}
