@@ -92,19 +92,20 @@ const SimpleWalkthroughSpreadsheet = ({
     }
   };
 
-  // Initialize expanded states
+  // Initialize expanded states - EXPAND ALL BY DEFAULT
   useEffect(() => {
     if (project?.rooms) {
       const roomExpansion = {};
       const categoryExpansion = {};
       project.rooms.forEach(room => {
-        roomExpansion[room.id] = true;
+        roomExpansion[room.id] = true; // EXPANDED by default
         room.categories?.forEach(category => {
-          categoryExpansion[category.id] = true;
+          categoryExpansion[category.id] = true; // EXPANDED by default
         });
       });
       setExpandedRooms(roomExpansion);
       setExpandedCategories(categoryExpansion);
+      console.log('✅ All rooms and categories expanded by default');
     }
   }, [project]);
 
