@@ -38,7 +38,7 @@ const SimpleWalkthroughSpreadsheet = ({
         order_index: 0
       };
 
-      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItem)
