@@ -5,6 +5,11 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
   return (
     <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       
+      {/* BRIGHT RED TEST MESSAGE */}
+      <div style={{ backgroundColor: 'red', color: 'white', padding: '50px', fontSize: '30px', fontWeight: 'bold', textAlign: 'center', border: '10px solid yellow' }}>
+        🚨🚨🚨 IF YOU SEE THIS, THE COMPONENT IS WORKING! 🚨🚨🚨
+      </div>
+      
       {/* FIXED SPREADSHEET - EXACTLY WHAT USER WANTS */}
       <div className="overflow-x-auto">
         
