@@ -24,7 +24,7 @@ const WalkthroughDashboard = ({ isOffline }) => {
       console.log('🚀 Loading project:', projectId);
       
       // IMMEDIATE TEST - Force load project data
-      fetch(`https://app-finalizer-2.preview.emergentagent.com/api/projects/${projectId}`)
+      fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}`)
         .then(response => {
           console.log('📡 Response received:', response.status);
           if (response.ok) {
