@@ -675,7 +675,7 @@ const ExactFFESpreadsheet = ({
               className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Rooms</option>
-              {project.rooms.map(room => (
+              {displayProject.rooms.map(room => (
                 <option key={room.id} value={room.id}>{room.name}</option>
               ))}
             </select>
