@@ -392,7 +392,7 @@ const ExactFFESpreadsheet = ({
       }
     } catch (error) {
       console.error('❌ Error adding comprehensive category:', error);
-      alert('Failed to add category with items. Please try again.');
+      console.error('Failed to add category with items. Please try again.');
     }
   };
 
