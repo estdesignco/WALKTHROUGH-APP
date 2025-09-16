@@ -347,7 +347,7 @@ const SimpleWalkthroughSpreadsheet = ({
                           <React.Fragment key={category.id}>
                             {/* CATEGORY HEADER */}
                             <tr>
-                              <td colSpan="5"
+                              <td colSpan="4"
                                   className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
                                   style={{ backgroundColor: getCategoryColor() }}>
                                 <div className="flex justify-between items-center">
