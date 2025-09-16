@@ -367,26 +367,7 @@ const SimpleWalkthroughSpreadsheet = ({
                             {/* SUBCATEGORY ITEMS */}
                             {isCategoryExpanded && category.subcategories?.map((subcategory) => (
                               <React.Fragment key={subcategory.id}>
-                                {/* SUBCATEGORY HEADER */}
-                                <tr>
-                                  <td className="border border-gray-400 px-2 py-1 text-center">
-                                    <input type="checkbox" className="w-3 h-3" />
-                                  </td>
-                                  <td colSpan="3"
-                                      className="border border-gray-400 px-6 py-2 text-white text-sm font-bold"
-                                      style={{ backgroundColor: '#8A5A5A' }}>
-                                    {subcategory.name.toUpperCase()} ({subcategory.items?.length || 0})
-                                  </td>
-                                  <td className="border border-gray-400 px-2 py-2 text-center">
-                                    <button 
-                                      onClick={() => handleDeleteItem(subcategory.id)}
-                                      className="bg-red-600 hover:bg-red-500 text-white text-xs px-1 py-1 rounded"
-                                      title="Delete Subcategory"
-                                    >
-                                      🗑️
-                                    </button>
-                                  </td>
-                                </tr>
+                                {/* REMOVED SUBCATEGORY HEADER - Items now go directly under category */}
 
                                 {/* ITEMS - 5 COLUMNS ONLY */}
                                 {subcategory.items?.map((item) => (
