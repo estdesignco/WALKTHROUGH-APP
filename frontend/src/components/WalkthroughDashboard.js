@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+
+// FORCE ERROR TO IDENTIFY COMPONENT
+throw new Error("🔥 THIS IS WalkthroughDashboard.js COMPONENT!");
 import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';

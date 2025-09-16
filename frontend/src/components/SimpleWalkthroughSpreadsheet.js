@@ -1,5 +1,11 @@
 import React from 'react';
 
+// FORCE ERROR TO IDENTIFY COMPONENT
+throw new Error("🔥 THIS IS SimpleWalkthroughSpreadsheet.js COMPONENT!");
+
+// FORCE ERROR TO IDENTIFY COMPONENT
+throw new Error("🔥 THIS IS SimpleWalkthroughSpreadsheet.js COMPONENT!");
+
 const SimpleWalkthroughSpreadsheet = ({ project }) => {
   
   // This component is NOT being used

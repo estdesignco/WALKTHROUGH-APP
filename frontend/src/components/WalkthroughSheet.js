@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+
+// FORCE ERROR TO IDENTIFY COMPONENT
+throw new Error("🔥 THIS IS WalkthroughSheet.js COMPONENT!");
 import { useParams } from 'react-router-dom';
 import ExactWalkthroughSpreadsheet from './ExactWalkthroughSpreadsheet';
 import AddRoomModal from './AddRoomModal';

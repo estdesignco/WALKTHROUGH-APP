@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+
+// FORCE ERROR TO IDENTIFY COMPONENT
+throw new Error("🔥 THIS IS WalkthroughFFE.js COMPONENT!");
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
