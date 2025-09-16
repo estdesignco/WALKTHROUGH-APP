@@ -442,7 +442,7 @@ const ExactFFESpreadsheet = ({
               {/* TABLE HEADERS */}
               <thead>
                 <tr>
-                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>ITEM</th>
+                  <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>INSTALLED</th>
                   <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>QTY</th>
                   <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>SIZE</th>
                   <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>REMARKS</th>
