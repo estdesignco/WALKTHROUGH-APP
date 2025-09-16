@@ -79,7 +79,7 @@ const ExactFFESpreadsheet = ({
       } else {
         const errorData = await response.text();
         console.error('❌ Carrier update failed:', response.status, errorData);
-        alert(`Failed to update carrier: ${response.status} ${response.statusText}`);
+        console.error(`Failed to update carrier: ${response.status} ${response.statusText}`);
       }
     } catch (error) {
       console.error('❌ Carrier update error:', error);
