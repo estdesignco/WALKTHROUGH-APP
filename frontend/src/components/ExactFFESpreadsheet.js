@@ -309,7 +309,7 @@ const ExactFFESpreadsheet = ({
         window.location.reload();
       } else {
         console.error('❌ Delete failed with status:', response.status);
-        alert(`Delete failed: ${response.status}`);
+        console.error(`Delete failed: ${response.status}`);
         throw new Error(`HTTP ${response.status}`);
       }
     } catch (error) {
