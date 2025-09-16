@@ -387,18 +387,7 @@ const WalkthroughSpreadsheet = ({
                             {/* SUBCATEGORY ITEMS */}
                             {isCategoryExpanded && category.subcategories?.map((subcategory) => (
                               <React.Fragment key={subcategory.id}>
-                                {/* SUBCATEGORY HEADER */}
-                                <tr>
-                                  <td className="border border-gray-400 px-2 py-1 text-center">
-                                    <input type="checkbox" className="w-4 h-4" />
-                                  </td>
-                                  <td colSpan="3"
-                                      className="border border-gray-400 px-6 py-2 text-white text-sm font-bold"
-                                      style={{ backgroundColor: '#8A5A5A' }}>
-                                    {subcategory.name.toUpperCase()} ({subcategory.items?.length || 0})
-                                  </td>
-                                  <td className="border border-gray-400 px-2 py-2"></td>
-                                </tr>
+                                {/* REMOVED SUBCATEGORY HEADER - Items go directly under category */}
 
                                 {/* ITEMS */}
                                 {subcategory.items?.map((item) => (
