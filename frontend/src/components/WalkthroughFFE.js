@@ -866,29 +866,24 @@ const WalkthroughFFE = ({
                                                       {category.subcategories?.map((subcategory) => (
                                                         subcategory.items?.map((item, itemIndex) => (
                                                         <tr key={item.id}>
-                                                          {/* Checkbox */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center">
-                                                            <input type="checkbox" className="w-4 h-4" />
-                                                          </td>
-                                                          
-                                                          {/* Item Name */}
+                                                          {/* INSTALLED */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                                             {item.name}
                                                           </td>
                                                           
-                                                          {/* Quantity */}
+                                                          {/* VENDOR/SKU */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                                                            {item.vendor || ''}
+                                                          </td>
+                                                          
+                                                          {/* QTY */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
                                                             {item.quantity || 1}
                                                           </td>
                                                           
-                                                          {/* Size */}
+                                                          {/* SIZE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                                            <input type="text" className="w-full bg-transparent border-none text-white text-sm" placeholder="Size" />
-                                                          </td>
-                                                          
-                                                          {/* Remarks */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                                            <input type="text" className="w-full bg-transparent border-none text-white text-sm" placeholder="Remarks" />
+                                                            {item.size || ''}
                                                           </td>
                                                         </tr>
                                                           
