@@ -5,9 +5,51 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
   return (
     <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       
-      {/* BRIGHT RED TEST MESSAGE */}
-      <div style={{ backgroundColor: 'red', color: 'white', padding: '50px', fontSize: '30px', fontWeight: 'bold', textAlign: 'center', border: '10px solid yellow' }}>
-        🚨🚨🚨 IF YOU SEE THIS, THE COMPONENT IS WORKING! 🚨🚨🚨
+      {/* FILTER AND SEARCH SECTION */}
+      <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
+        <div className="flex flex-col gap-4">
+          {/* Search Bar */}
+          <div className="w-full">
+            <input
+              type="text"
+              placeholder="Search Items, Vendors, SKUs..."
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+          
+          {/* Filter Dropdowns */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+              <option value="">All Rooms</option>
+            </select>
+            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+              <option value="">All Categories</option>
+            </select>
+            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+              <option value="">All Vendors</option>
+            </select>
+            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+              <option value="">All Status</option>
+            </select>
+          </div>
+          
+          {/* Filter Buttons */}
+          <div className="flex gap-4">
+            <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded font-bold">
+              🔍 FILTER
+            </button>
+            <button className="bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded font-bold">
+              CLEAR
+            </button>
+          </div>
+          
+          {/* Add Room Button */}
+          <div className="flex justify-end">
+            <button className="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded font-bold">
+              + ADD ROOM
+            </button>
+          </div>
+        </div>
       </div>
       
       {/* FIXED SPREADSHEET - EXACTLY WHAT USER WANTS */}
