@@ -9,6 +9,9 @@ import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 
 const WalkthroughDashboard = ({ isOffline }) => {
+  // FORCE CRASH TO TEST IF THIS DASHBOARD IS LOADING
+  throw new Error("🚨 WALKTHROUGH DASHBOARD IS CRASHING!");
+  
   console.error("🚨 WALKTHROUGH DASHBOARD IS LOADING!");
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
