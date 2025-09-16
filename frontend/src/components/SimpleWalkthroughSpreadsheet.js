@@ -190,40 +190,10 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const getCategoryColor = () => '#065F46';
 
-  // DEBUG: Log the project data
-  console.log('🔍 SimpleWalkthroughSpreadsheet rendering with:', { project, roomsCount: project?.rooms?.length });
-
-  if (!project) {
-    console.log('❌ SimpleWalkthroughSpreadsheet: No project data');
-    return (
-      <div className="text-center text-red-400 py-8 bg-red-900 m-4 p-4 rounded">
-        <p className="text-lg font-bold">🚨 WALKTHROUGH COMPONENT LOADED - NO PROJECT DATA</p>
-      </div>
-    );
-  }
-
-  if (!project.rooms) {
-    return (
-      <div className="text-center text-orange-400 py-8 bg-orange-900 m-4 p-4 rounded">
-        <p className="text-lg font-bold">🚨 WALKTHROUGH: NO ROOMS PROPERTY</p>
-        <p className="text-sm mt-2">Project keys: {Object.keys(project).join(', ')}</p>
-      </div>
-    );
-  }
-
-  if (project.rooms.length === 0) {
-    return (
-      <div className="text-center text-yellow-400 py-8 bg-yellow-900 m-4 p-4 rounded">
-        <p className="text-lg font-bold">🚨 WALKTHROUGH: EMPTY ROOMS ARRAY</p>
-        <p className="text-sm mt-2">Rooms length: {project.rooms.length}</p>
-      </div>
-    );
-  }
-
-  console.log('✅ SimpleWalkthroughSpreadsheet: Valid project data, proceeding to render spreadsheet');
-  console.log('🏠 Rooms data:', project.rooms?.map(r => ({ name: r.name, categoriesCount: r.categories?.length })));
-  console.log('📊 Expanded rooms:', expandedRooms);
-  console.log('📂 Expanded categories:', expandedCategories);
+  // FORCE RENDER - BYPASS ALL EARLY RETURNS
+  console.log('🚨 FORCE RENDERING SimpleWalkthroughSpreadsheet');
+  console.log('Project data:', project ? 'EXISTS' : 'NULL');
+  console.log('Rooms:', project?.rooms?.length || 'NO ROOMS');
 
   return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
