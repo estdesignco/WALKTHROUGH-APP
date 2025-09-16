@@ -420,22 +420,7 @@ const ChecklistSpreadsheet = ({
                             {/* SUBCATEGORY INSTALLEDS */}
                             {isCategoryExpanded && category.subcategories?.map((subcategory) => (
                               <React.Fragment key={subcategory.id}>
-                                {/* SUBCATEGORY HEADER */}
-                                <tr>
-                                  <td colSpan="6"
-                                      className="border border-gray-400 px-6 py-2 text-white text-sm font-bold"
-                                      style={{ backgroundColor: '#8A5A5A' }}>
-                                    {subcategory.name.toUpperCase()} ({subcategory.items?.length || 0})
-                                  </td>
-                                  <td className="border border-gray-400 px-2 py-2 text-center">
-                                    <button 
-                                      onClick={() => handleDeleteItem(subcategory.id)}
-                                      className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
-                                    >
-                                      🗑️
-                                    </button>
-                                  </td>
-                                </tr>
+                                {/* REMOVED SUBCATEGORY HEADER - Items go directly under category */}
 
                                 {/* INSTALLEDS */}
                                 {subcategory.items?.map((item) => (
