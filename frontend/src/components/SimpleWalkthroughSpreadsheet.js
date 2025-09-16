@@ -1,28 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import AddItemModal from './AddItemModal';
 
-const SimpleWalkthroughSpreadsheet = ({
-  project,
-  roomColors,
-  categoryColors,
-  itemStatuses = [],
-  vendorTypes = [],
-  carrierTypes = [],
-  onDeleteRoom,
-  onAddRoom,
-  onReload
-}) => {
-  const [showAddItem, setShowAddItem] = useState(false);
-  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
-  const [availableCategories, setAvailableCategories] = useState([]);
-  const [expandedRooms, setExpandedRooms] = useState({});
-  const [expandedCategories, setExpandedCategories] = useState({});
-  const [filteredProject, setFilteredProject] = useState(project);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRoom, setSelectedRoom] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedVendor, setSelectedVendor] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
+const SimpleWalkthroughSpreadsheet = ({ project }) => {
+  
+  // SIMPLE COMPONENT - NO COMPLEX LOGIC, JUST SHOW THE TABLE
 
   // API CALLS
   const handleAddItem = async (itemData) => {
