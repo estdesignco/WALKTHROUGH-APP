@@ -409,7 +409,7 @@ const WalkthroughSpreadsheet = ({
 
                                 {/* ADD ITEM BUTTON ROW */}
                                 <tr>
-                                  <td colSpan="5" className="border border-gray-400 px-6 py-2 bg-slate-900">
+                                  <td colSpan="4" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                     <div className="flex justify-start items-center space-x-4">
                                       <button
                                         onClick={() => {
