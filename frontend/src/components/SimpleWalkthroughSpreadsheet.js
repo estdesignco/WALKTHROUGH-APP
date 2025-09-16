@@ -28,7 +28,7 @@ const SimpleWalkthroughSpreadsheet = ({
   const handleAddItem = async (itemData) => {
     try {
       if (!selectedSubCategoryId) {
-        alert('Please expand a category first to add items to it.');
+        console.log('Please expand a category first to add items to it.');
         return;
       }
 
