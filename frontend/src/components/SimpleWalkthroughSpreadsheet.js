@@ -228,6 +228,14 @@ const SimpleWalkthroughSpreadsheet = ({
   return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
       
+      {/* FORCE VISIBLE TEST */}
+      <div className="bg-red-900 text-red-400 p-8 m-4 rounded border-4 border-red-500">
+        <h1 className="text-3xl font-bold">🚨 SIMPLE WALKTHROUGH SPREADSHEET IS RENDERING!</h1>
+        <p className="text-xl mt-4">Project: {project.name}</p>
+        <p className="text-lg">Rooms: {project.rooms?.length}</p>
+        <p className="text-lg">Total Items: {project.rooms?.reduce((sum, r) => sum + (r.categories?.reduce((catSum, c) => catSum + (c.subcategories?.reduce((subSum, s) => subSum + (s.items?.length || 0), 0) || 0), 0) || 0), 0)}</p>
+      </div>
+
       {/* SEARCH AND FILTER SECTION */}
       <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
         <div className="flex flex-col lg:flex-row gap-4 items-center">
