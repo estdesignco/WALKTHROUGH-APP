@@ -803,7 +803,7 @@ const ExactFFESpreadsheet = ({
                   {/* TABLE BODY - Keep original hierarchical structure */}
                   <tbody>
                 {/* USE FILTERED PROJECT DATA */}
-                {(filteredProject || displayProject)?.rooms?.map((room, roomIndex) => (
+                {(filteredProject || displayProject)?.rooms?.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
                   console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
                   
