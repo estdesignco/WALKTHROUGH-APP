@@ -317,7 +317,10 @@ const SimpleWalkthroughSpreadsheet = ({
               </thead>
 
               <tbody>
-                {(filteredProject || project).rooms.map((room, roomIndex) => {
+                {/* DEBUG: Force display room data */}
+                {console.log('🔍 Attempting to render rooms:', (filteredProject || project).rooms?.length)}
+                {(filteredProject || project).rooms?.map((room, roomIndex) => {
+                  console.log('🏠 Rendering room:', room.name, 'Categories:', room.categories?.length);
                   const isRoomExpanded = expandedRooms[room.id];
                   
                   return (
