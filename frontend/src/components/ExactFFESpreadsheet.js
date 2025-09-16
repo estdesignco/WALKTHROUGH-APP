@@ -223,7 +223,7 @@ const ExactFFESpreadsheet = ({
       }
 
       if (!subcategoryId) {
-        alert('Please expand a category first to add items to it.');
+        console.error('Please expand a category first to add items to it.');
         return;
       }
 
