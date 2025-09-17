@@ -2999,8 +2999,201 @@ async def scrape_product_advanced(data: dict):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to scrape URL: {str(e)}")
 
-@api_router.post("/scrape-canva")
-async def scrape_canva_board(data: dict):
+@api_router.post("/scrape-canva-pdf")
+async def scrape_canva_pdf(data: dict):
+    """
+    Enhanced Canva PDF scraping - Extract all links from a Canva PDF and auto-categorize them
+    Handles PDF files with multiple design links and automatically assigns them to correct categories
+    """
+    canva_url = data.get('canva_url', '')
+    room_name = data.get('room_name', '')
+    project_id = data.get('project_id', '')
+    
+    if not canva_url:
+        raise HTTPException(status_code=400, detail="Canva URL is required")
+    
+    if not room_name or not project_id:
+        raise HTTPException(status_code=400, detail="Room name and project ID are required")
+    
+    try:
+        print(f"🎨 Starting enhanced Canva PDF scraping for room: {room_name}")
+        
+        # Step 1: Extract the PDF if it's a Canva PDF link
+        pdf_content = None
+        extracted_links = []
+        
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
+            
+            # Set headers
+            await page.set_extra_http_headers({
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            })
+            
+            try:
+                # Navigate to Canva URL
+                await page.goto(canva_url, wait_until='networkidle', timeout=30000)
+                await page.wait_for_timeout(3000)
+                
+                # Extract all links from the page
+                links = await page.evaluate('''
+                    () => {
+                        const allLinks = [];
+                        const linkElements = document.querySelectorAll('a[href]');
+                        linkElements.forEach(link => {
+                            const href = link.href;
+                            const text = link.textContent.trim();
+                            if (href && (href.includes('http') || href.includes('www'))) {
+                                allLinks.push({
+                                    url: href,
+                                    text: text,
+                                    context: link.closest('div')?.textContent?.trim() || ''
+                                });
+                            }
+                        });
+                        return allLinks;
+                    }
+                ''')
+                
+                # Also look for text content that might contain URLs
+                text_content = await page.evaluate('document.body.innerText')
+                
+                # Extract URLs from text using regex
+                import re
+                url_pattern = r'https?://[^\s<>"{}|\\^`\[\]]+|www\.[^\s<>"{}|\\^`\[\]]+'
+                text_urls = re.findall(url_pattern, text_content)
+                
+                # Combine all found links
+                for url in text_urls:
+                    if url not in [link['url'] for link in links]:
+                        links.append({
+                            'url': url if url.startswith('http') else f'https://{url}',
+                            'text': url,
+                            'context': 'Found in page text'
+                        })
+                
+                extracted_links = links[:20]  # Limit to first 20 links
+                print(f"✅ Extracted {len(extracted_links)} links from Canva page")
+                
+            except Exception as scrape_error:
+                print(f"⚠️ Scraping error: {scrape_error}")
+                # Fallback: try to extract from PDF if it's a direct PDF link
+                if canva_url.lower().endswith('.pdf'):
+                    print("📄 Attempting to process as direct PDF link")
+                    extracted_links = [{'url': canva_url, 'text': 'PDF Document', 'context': 'Direct PDF'}]
+            
+            await browser.close()
+        
+        # Step 2: Categorize links and create items
+        if not extracted_links:
+            return {
+                "success": False,
+                "message": "No links found in the provided Canva content",
+                "items_created": 0
+            }
+        
+        # Find the room in the project
+        project_doc = await db.projects.find_one({"id": project_id})
+        if not project_doc:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        target_room = None
+        for room in project_doc.get('rooms', []):
+            if room['name'].lower() == room_name.lower():
+                target_room = room
+                break
+        
+        if not target_room:
+            raise HTTPException(status_code=404, detail=f"Room '{room_name}' not found in project")
+        
+        # Step 3: Smart categorization based on link content and context
+        category_keywords = {
+            'lighting': ['light', 'lamp', 'fixture', 'chandelier', 'sconce', 'pendant', 'track', 'recessed'],
+            'furniture': ['chair', 'table', 'sofa', 'desk', 'bed', 'cabinet', 'shelf', 'storage'],
+            'decor': ['art', 'mirror', 'vase', 'pillow', 'rug', 'plant', 'accessory', 'decoration'],
+            'paint': ['paint', 'color', 'wall', 'finish', 'texture', 'wallpaper'],
+            'architectural': ['molding', 'trim', 'door', 'window', 'built-in', 'crown', 'baseboard']
+        }
+        
+        created_items = []
+        
+        for link_data in extracted_links:
+            url = link_data['url']
+            text = link_data.get('text', '').lower()
+            context = link_data.get('context', '').lower()
+            
+            # Determine best category
+            best_category = None
+            best_score = 0
+            
+            for category_name, keywords in category_keywords.items():
+                score = 0
+                for keyword in keywords:
+                    if keyword in text or keyword in context:
+                        score += 1
+                
+                if score > best_score:
+                    best_score = score
+                    best_category = category_name
+            
+            # Default to first available category if no match
+            if not best_category and target_room.get('categories'):
+                best_category = target_room['categories'][0]['name'].lower()
+            
+            # Find matching category in room
+            target_category = None
+            for category in target_room.get('categories', []):
+                if best_category and best_category in category['name'].lower():
+                    target_category = category
+                    break
+            
+            # Use first category as fallback
+            if not target_category and target_room.get('categories'):
+                target_category = target_room['categories'][0]
+            
+            if target_category and target_category.get('subcategories'):
+                subcategory = target_category['subcategories'][0]
+                
+                # Create new item
+                new_item = {
+                    "id": str(uuid.uuid4()),
+                    "name": text[:50] or f"Item from Canva PDF",
+                    "description": f"Auto-imported from Canva PDF: {context[:100]}",
+                    "subcategory_id": subcategory['id'],
+                    "status": "",  # Start blank as requested
+                    "link_url": url,
+                    "quantity": 1,
+                    "vendor": "From Canva PDF",
+                    "price": 0,
+                    "order_index": len(subcategory.get('items', [])),
+                    "created_at": datetime.now(timezone.utc),
+                    "updated_at": datetime.now(timezone.utc)
+                }
+                
+                # Insert item into database
+                result = await db.items.insert_one(new_item)
+                if result.inserted_id:
+                    created_items.append(new_item)
+                    print(f"✅ Created item: {new_item['name']} in {target_category['name']}")
+        
+        return {
+            "success": True,
+            "message": f"Successfully processed Canva PDF and created {len(created_items)} items",
+            "items_created": len(created_items),
+            "links_processed": len(extracted_links),
+            "room": room_name,
+            "categories_used": list(set([item.get('category', 'Unknown') for item in created_items]))
+        }
+        
+    except Exception as e:
+        print(f"❌ Canva PDF scraping failed: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "message": f"Failed to process Canva PDF: {str(e)}",
+            "items_created": 0
+        }
     """
     Scrape Canva board for design information and images
     Extracts images, colors, and design elements from Canva boards
