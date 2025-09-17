@@ -691,6 +691,16 @@ class ItemStatus(str, Enum):
     QUOTE_REQUESTED = "QUOTE REQUESTED"
     REJECTED = "REJECTED"
     
+    # Checklist-specific statuses (9 statuses for checklist functionality)
+    ORDER_SAMPLES = "ORDER SAMPLES"
+    SAMPLES_ARRIVED = "SAMPLES ARRIVED"
+    ASK_NEIL = "ASK NEIL"
+    ASK_CHARLENE = "ASK CHARLENE"
+    ASK_JALA = "ASK JALA"
+    GET_QUOTE = "GET QUOTE"
+    WAITING_ON_QT = "WAITING ON QT"
+    READY_FOR_PRESENTATION = "READY FOR PRESENTATION"
+    
 # Vendor dropdown options - ONLY YOUR WHOLESALE SITES
 class VendorType(str, Enum):
     FOUR_HANDS = "Four Hands"
