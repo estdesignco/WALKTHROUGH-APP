@@ -41,7 +41,7 @@ const AdvancedFFEFeatures = ({ project, onUpdate }) => {
       console.log(`🔄 Bulk updating ${selectedIds.length} items to status: ${newStatus}`);
 
       const updatePromises = selectedIds.map(itemId =>
-        fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items/${itemId}`, {
+        fetch(`https://designflow-24.preview.emergentagent.com/api/items/${itemId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: newStatus })
@@ -65,7 +65,7 @@ const AdvancedFFEFeatures = ({ project, onUpdate }) => {
       console.log(`🚚 Bulk updating ${selectedIds.length} items to carrier: ${newCarrier}`);
 
       const updatePromises = selectedIds.map(itemId =>
-        fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items/${itemId}`, {
+        fetch(`https://designflow-24.preview.emergentagent.com/api/items/${itemId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ carrier: newCarrier })
@@ -92,7 +92,7 @@ const AdvancedFFEFeatures = ({ project, onUpdate }) => {
       console.log(`🗑️ Bulk deleting ${selectedIds.length} items`);
 
       const deletePromises = selectedIds.map(itemId =>
-        fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items/${itemId}`, {
+        fetch(`https://designflow-24.preview.emergentagent.com/api/items/${itemId}`, {
           method: 'DELETE'
         })
       );
@@ -158,7 +158,7 @@ const AdvancedFFEFeatures = ({ project, onUpdate }) => {
         timestamp: new Date().toISOString()
       };
 
-      const response = await fetch('https://spreadsheet-revamp.preview.emergentagent.com/api/export/pdf', {
+      const response = await fetch('https://designflow-24.preview.emergentagent.com/api/export/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(exportData)

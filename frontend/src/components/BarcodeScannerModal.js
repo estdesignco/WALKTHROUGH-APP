@@ -108,7 +108,7 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScanResult }) => {
       setIsScanning(false);
 
       // Call our enhanced scraping API with barcode lookup
-      const response = await fetch('https://spreadsheet-revamp.preview.emergentagent.com/api/barcode-lookup', {
+      const response = await fetch('https://designflow-24.preview.emergentagent.com/api/barcode-lookup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ barcode: barcode })

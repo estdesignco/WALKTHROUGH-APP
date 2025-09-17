@@ -42,7 +42,7 @@ const WalkthroughSpreadsheet = ({
         order_index: 0
       };
 
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items`, {
+      const response = await fetch(`https://designflow-24.preview.emergentagent.com/api/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItem)
@@ -66,7 +66,7 @@ const WalkthroughSpreadsheet = ({
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`https://designflow-24.preview.emergentagent.com/api/items/${itemId}`, {
         method: 'DELETE'
       });
 
@@ -85,7 +85,7 @@ const WalkthroughSpreadsheet = ({
     if (!window.confirm('Are you sure you want to delete this room?')) return;
     
     try {
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/rooms/${roomId}`, {
+      const response = await fetch(`https://designflow-24.preview.emergentagent.com/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
 
@@ -102,7 +102,7 @@ const WalkthroughSpreadsheet = ({
 
   const handleAddCategory = async (roomId, categoryName) => {
     try {
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/categories`, {
+      const response = await fetch(`https://designflow-24.preview.emergentagent.com/api/categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -177,7 +177,7 @@ const WalkthroughSpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/categories/available`);
+        const response = await fetch(`https://designflow-24.preview.emergentagent.com/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
           setAvailableCategories(data.categories || []);

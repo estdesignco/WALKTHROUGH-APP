@@ -10,7 +10,7 @@ const SimpleScrapeTest = () => {
     setResult(null);
 
     try {
-      const backendUrl = 'https://spreadsheet-revamp.preview.emergentagent.com';
+      const backendUrl = 'https://designflow-24.preview.emergentagent.com';
       
       const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',

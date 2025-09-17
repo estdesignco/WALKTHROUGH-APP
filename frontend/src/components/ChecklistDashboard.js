@@ -24,7 +24,7 @@ const ChecklistDashboard = ({ isOffline }) => {
       console.log('🚀 Loading project:', projectId);
       
       // IMMEDIATE TEST - Force load project data
-      fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/projects/${projectId}`)
+      fetch(`https://designflow-24.preview.emergentagent.com/api/projects/${projectId}`)
         .then(response => {
           console.log('📡 Response received:', response.status);
           if (response.ok) {
@@ -50,7 +50,7 @@ const ChecklistDashboard = ({ isOffline }) => {
     try {
       console.log('🚀 Loading project data for:', projectId);
       
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/projects/${projectId}`);
+      const response = await fetch(`https://designflow-24.preview.emergentagent.com/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();
@@ -70,7 +70,7 @@ const ChecklistDashboard = ({ isOffline }) => {
       
       // Load dynamic checklist statuses from API instead of hardcoded values
       try {
-        const statusResponse = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/item-statuses`);
+        const statusResponse = await fetch(`https://designflow-24.preview.emergentagent.com/api/item-statuses`);
         if (statusResponse.ok) {
           const statusData = await statusResponse.json();
           const statusList = statusData.map(status => status.status || status);
