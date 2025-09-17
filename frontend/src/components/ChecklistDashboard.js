@@ -68,8 +68,25 @@ const ChecklistDashboard = ({ isOffline }) => {
       console.log('🚀 FORCE SETTING LOADING = FALSE');
       setLoading(false);
       
-      // Set utility data
-      setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']);
+      // Load dynamic checklist statuses from API instead of hardcoded values
+      try {
+        const statusResponse = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/item-statuses`);
+        if (statusResponse.ok) {
+          const statusData = await statusResponse.json();
+          const statusList = statusData.map(status => status.status || status);
+          console.log('✅ Loaded dynamic checklist statuses:', statusList.length);
+          setItemStatuses(statusList);
+        } else {
+          console.warn('⚠️ Failed to load dynamic statuses, using checklist defaults');
+          // Use checklist-specific statuses as fallback
+          setItemStatuses(['PICKED', 'ORDER SAMPLES', 'SAMPLES ARRIVED', 'ASK NEIL', 'ASK CHARLENE', 'ASK JALA', 'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION']);
+        }
+      } catch (statusErr) {
+        console.warn('⚠️ Error loading statuses, using checklist defaults:', statusErr);
+        // Use checklist-specific statuses as fallback
+        setItemStatuses(['PICKED', 'ORDER SAMPLES', 'SAMPLES ARRIVED', 'ASK NEIL', 'ASK CHARLENE', 'ASK JALA', 'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION']);
+      }
+      
       setVendorTypes(['Four Hands', 'Uttermost', 'Visual Comfort']);
       setCarrierTypes(['FedEx', 'UPS', 'USPS', 'DHL']);
     }
