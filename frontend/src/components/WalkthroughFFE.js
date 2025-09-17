@@ -551,23 +551,8 @@ const WalkthroughFFE = ({
     }
     return mutedColors[Math.abs(hash) % mutedColors.length];
   };
-    const roomColors = {
-      'living room': '#7C3AED',      // Purple
-      'dining room': '#DC2626',      // Red
-      'kitchen': '#EA580C',          // Orange  
-      'primary bedroom': '#059669',  // Green
-      'primary bathroom': '#2563EB', // Blue
-      'powder room': '#7C2D12',      // Brown
-      'guest room': '#BE185D',       // Pink
-      'office': '#6366F1',           // Indigo
-      'laundry room': '#16A34A',     // Green
-      'mudroom': '#0891B2',          // Cyan
-      'family room': '#CA8A04',      // Yellow
-      'basement': '#6B7280',         // Gray
-      'attic storage': '#78716C',    // Stone
-      'garage': '#374151',           // Gray-800
-      'balcony': '#7C3AED'           // Purple
-    };
+
+  const getCategoryColor = () => '#065F46';  // Dark green
     return roomColors[roomName.toLowerCase()] || '#7C3AED';
   };
 
