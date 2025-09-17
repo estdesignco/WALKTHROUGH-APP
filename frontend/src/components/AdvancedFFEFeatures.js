@@ -158,7 +158,7 @@ const AdvancedFFEFeatures = ({ project, onUpdate }) => {
         timestamp: new Date().toISOString()
       };
 
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/export/pdf', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/export/pdf`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(exportData)
