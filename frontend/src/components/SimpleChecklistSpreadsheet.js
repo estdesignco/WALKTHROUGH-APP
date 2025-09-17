@@ -14,10 +14,67 @@ const SimpleChecklistSpreadsheet = ({
 }) => {
   console.log('🎯 SimpleChecklistSpreadsheet rendering with project:', project);
 
-  const [showAddItem, setShowAddItem] = useState(false);
-  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
-  const [expandedRooms, setExpandedRooms] = useState({});
-  const [expandedCategories, setExpandedCategories] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedVendor, setSelectedVendor] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [filteredProject, setFilteredProject] = useState(project);
+
+  // APPLY FILTERS - WORKING FILTER LOGIC
+  useEffect(() => {
+    console.log('🔍 Checklist Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus });
+    
+    if (!project) {
+      setFilteredProject(null);
+      return;
+    }
+
+    let filtered = { ...project };
+
+    if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
+      console.log('🔍 Applying checklist filters...');
+      
+      filtered.rooms = project.rooms.map(room => {
+        if (selectedRoom && room.id !== selectedRoom) {
+          return { ...room, categories: [] };
+        }
+        
+        const filteredCategories = room.categories.map(category => {
+          if (selectedCategory && !category.name.toLowerCase().includes(selectedCategory.toLowerCase())) {
+            return { ...category, subcategories: [] };
+          }
+          
+          const filteredSubcategories = category.subcategories.map(subcategory => {
+            const filteredItems = subcategory.items.filter(item => {
+              if (searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
+                const itemMatch = 
+                  item.name.toLowerCase().includes(searchLower) ||
+                  (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
+                  (item.sku && item.sku.toLowerCase().includes(searchLower)) ||
+                  (item.remarks && item.remarks.toLowerCase().includes(searchLower));
+                if (!itemMatch) return false;
+              }
+              
+              if (selectedVendor && item.vendor !== selectedVendor) return false;
+              if (selectedStatus && item.status !== selectedStatus) return false;
+              
+              return true;
+            });
+            
+            return { ...subcategory, items: filteredItems };
+          });
+          
+          return { ...category, subcategories: filteredSubcategories };
+        });
+        
+        return { ...room, categories: filteredCategories };
+      });
+    }
+
+    setFilteredProject(filtered);
+  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
   // Initialize all rooms and categories as expanded
   useEffect(() => {
