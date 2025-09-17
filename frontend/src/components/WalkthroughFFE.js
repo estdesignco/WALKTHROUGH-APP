@@ -646,6 +646,7 @@ const WalkthroughFFE = ({
   };
 
   if (!project || !project.rooms || project.rooms.length === 0) {
+    return (
       <div className="text-center text-gray-400 py-8">
         <p className="text-lg">Loading FF&E data...</p>
         <p className="text-sm mt-2">Please wait while we load your project information.</p>
@@ -653,6 +654,7 @@ const WalkthroughFFE = ({
     );
   }
 
+  return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
       
       {/* SEARCH AND FILTER SECTION - EXACTLY LIKE YOUR SCREENSHOT */}
