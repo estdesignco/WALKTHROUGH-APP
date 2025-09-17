@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
 import SimpleChecklistSpreadsheet from './SimpleChecklistSpreadsheet';
-import StatusOverview from './StatusOverview';
+import ChecklistStatusOverview from './ChecklistStatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 
