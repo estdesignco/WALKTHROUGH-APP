@@ -924,9 +924,7 @@ const WalkthroughFFE = ({
                                                           <div className="flex justify-start items-center space-x-4">
                                                             {/* Add Item Button - GOLD/AMBER COLOR */}
                                                             <button
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
+                                                              onClick={() => setShowAddItem(true)}
                                                               className="w-full bg-transparent text-white text-sm text-center outline-none"
                                                               onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
                                                             >
