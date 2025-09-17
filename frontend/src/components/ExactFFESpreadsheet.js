@@ -1193,13 +1193,15 @@ const ExactFFESpreadsheet = ({
                                                       <tr>
                                                         <td colSpan="15" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                                           <div className="flex justify-start items-center space-x-4">
-                                                            {/* Add Item Button - FIXED */}
+                                                            {/* Add Item Button - ROBUST WITH SUBCATEGORY */}
                                                             <button
                                                               onClick={() => {
+                                                                // Find the subcategory from the current context (this button is inside a category loop)
                                                                 if (category.subcategories?.length > 0) {
-                                                                  setSelectedSubCategoryId(category.subcategories[0].id);
+                                                                  const subcategory = category.subcategories[0];
+                                                                  console.log('🎯 Setting subcategory for Add Item:', subcategory.name, subcategory.id);
+                                                                  setSelectedSubCategoryId(subcategory.id);
                                                                   setShowAddItem(true);
-                                                                  console.log('🎯 Selected subcategory for FFE item:', category.subcategories[0].id);
                                                                 } else {
                                                                   alert('This category has no subcategories. Please contact support.');
                                                                 }
