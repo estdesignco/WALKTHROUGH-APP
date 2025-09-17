@@ -923,7 +923,7 @@ const WalkthroughFFE = ({
                                                         <td colSpan="5" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                                           <div className="flex justify-start items-center space-x-4">
                                                             {/* Add Item Button - GOLD/AMBER COLOR */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
+                                                            <button
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
