@@ -3043,19 +3043,27 @@ async def process_canva_pdf_file(file_path: str, room_name: str, project_id: str
     try:
         print(f"🎨 Processing Canva PDF file: {file_path}")
         
-        # Find the room in the project
+        # Find the room in the project - FIXED ROOM LOOKUP
         project_doc = await db.projects.find_one({"id": project_id})
         if not project_doc:
             raise HTTPException(status_code=404, detail="Project not found")
         
+        # Get rooms from the project data structure
+        rooms = project_doc.get('rooms', [])
+        if not rooms:
+            # Try to get rooms from separate rooms collection
+            rooms_cursor = db.rooms.find({"project_id": project_id})
+            rooms = await rooms_cursor.to_list(length=None)
+        
         target_room = None
-        for room in project_doc.get('rooms', []):
+        for room in rooms:
             if room['name'].lower() == room_name.lower():
                 target_room = room
                 break
         
         if not target_room:
-            raise HTTPException(status_code=404, detail=f"Room '{room_name}' not found in project")
+            print(f"⚠️ Available rooms: {[r['name'] for r in rooms]}")
+            raise HTTPException(status_code=404, detail=f"Room '{room_name}' not found in project. Available rooms: {[r['name'] for r in rooms]}")
         
         # Extract text from PDF using basic approach - ACTUALLY SCRAPE
         extracted_items = []
