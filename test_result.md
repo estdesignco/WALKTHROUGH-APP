@@ -106,6 +106,18 @@ user_problem_statement: |
   "User reported extensive list of broken functionality - SCRAPING NOT WORKING IN 'ADD ITEM' AGAIN! Filter is NOT WORKING, PIE CHARTS NOT WORKING! Cells need to match carrier colors, need to clear all columns except 'ITEMS' as default, STATUS should be BLANK not PICKED, categories need comprehensive loading, need to add subcategories for kitchen/laundry/bar/primary bath, need RED sub like 'INSTALLED' for various categories, need BIG CATEGORIES: CABINETS, ARCHITECTURAL ELEMENTS, AND TRIM"
 
 backend:
+  - task: "Canva PDF Scraping Functionality"
+    implemented: true
+    working: false
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL BACKEND BUG CONFIRMED: Canva PDF upload endpoint exists but has database query inconsistency bug. ❌ ROOT CAUSE: Regular project endpoint (GET /api/projects/{id}) builds room structure by fetching from separate collections (rooms, categories, subcategories, items) and assembling them. However, Canva PDF processing (lines 3047-3058 in server.py) tries to find rooms directly in project document from projects collection, which doesn't contain embedded rooms. ❌ ERROR: 'Room 'Living Room' not found in project' even though room exists. ✅ ENDPOINT ACCESSIBLE: POST /api/upload-canva-pdf accepts file, room_name, project_id parameters correctly. ✅ PDF PROCESSING LOGIC: Has text extraction, keyword detection, item creation logic. URGENT FIX NEEDED: Update process_canva_pdf_file() function to use same room lookup logic as get_project() endpoint - fetch rooms from separate collections instead of expecting them in project document."
+
   - task: "Enhanced_rooms.py Comprehensive Structure Update"
     implemented: true
     working: true
