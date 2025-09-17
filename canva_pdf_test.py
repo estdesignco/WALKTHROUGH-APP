@@ -223,7 +223,7 @@ class CanvaPDFTester:
                 "project_id": PROJECT_ID
             }
             
-            success, response_data, status_code = self.make_request('POST', '/scrape-canva', scrape_data)
+            success, response_data, status_code = self.make_request('POST', '/scrape-canva-pdf', scrape_data)
             
             print(f"   URL: {test_case['canva_url']}")
             print(f"   Room: {test_case['room_name']}")
