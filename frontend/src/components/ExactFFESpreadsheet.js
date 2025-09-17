@@ -502,26 +502,27 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // EXACT COLORS FROM YOUR SCREENSHOTS
-  const getRoomColor = (roomName) => {
-    const roomColors = {
-      'living room': '#7C3AED',      // Purple
-      'dining room': '#DC2626',      // Red
-      'kitchen': '#EA580C',          // Orange  
-      'primary bedroom': '#059669',  // Green
-      'primary bathroom': '#2563EB', // Blue
-      'powder room': '#7C2D12',      // Brown
-      'guest room': '#BE185D',       // Pink
-      'office': '#6366F1',           // Indigo
-      'laundry room': '#16A34A',     // Green
-      'mudroom': '#0891B2',          // Cyan
-      'family room': '#CA8A04',      // Yellow
-      'basement': '#6B7280',         // Gray
-      'attic storage': '#78716C',    // Stone
-      'garage': '#374151',           // Gray-800
-      'balcony': '#7C3AED'           // Purple
-    };
-    return roomColors[roomName.toLowerCase()] || '#7C3AED';
+  // MUTED ROOM COLORS FOR FFE - CONSISTENT WITH OTHER SHEETS
+  const getRoomColor = (roomName, index = 0) => {
+    const mutedColors = [
+      '#8B5A6B',  // Muted rose
+      '#6B7C93',  // Muted blue  
+      '#7A8B5A',  // Muted olive
+      '#9B6B8B',  // Muted purple
+      '#8B7A5A',  // Muted brown
+      '#5A8B7A',  // Muted teal
+      '#8B5A7A',  // Muted mauve
+      '#7A5A8B',  // Muted violet
+      '#5A7A8B',  // Muted slate
+      '#8B6B5A'   // Muted tan
+    ];
+    
+    // Use room name hash for consistent color per room
+    let hash = 0;
+    for (let i = 0; i < roomName.length; i++) {
+      hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return mutedColors[Math.abs(hash) % mutedColors.length];
   };
 
   const getCategoryColor = () => '#065F46';  // Dark green
