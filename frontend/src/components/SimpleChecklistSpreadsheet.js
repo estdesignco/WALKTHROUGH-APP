@@ -781,16 +781,57 @@ const SimpleChecklistSpreadsheet = ({
                                         className="w-12 h-12 object-cover cursor-pointer hover:scale-150 transition-transform duration-200 z-10"
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          // Create full-size overlay
+                                          // Create full-size overlay with better styling
                                           const overlay = document.createElement('div');
-                                          overlay.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
-                                          overlay.innerHTML = `
-                                            <div class="max-w-4xl max-h-full p-4">
-                                              <img src="${item.image_url}" alt="${item.name}" class="max-w-full max-h-full object-contain" />
-                                              <p class="text-white text-center mt-4">${item.name}</p>
-                                            </div>
+                                          overlay.style.cssText = `
+                                            position: fixed;
+                                            top: 0;
+                                            left: 0;
+                                            width: 100%;
+                                            height: 100%;
+                                            background: rgba(0, 0, 0, 0.8);
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            z-index: 9999;
+                                            cursor: pointer;
                                           `;
-                                          overlay.onclick = () => document.body.removeChild(overlay);
+                                          
+                                          const container = document.createElement('div');
+                                          container.style.cssText = `
+                                            max-width: 80vw;
+                                            max-height: 80vh;
+                                            padding: 20px;
+                                            text-align: center;
+                                          `;
+                                          
+                                          const img = document.createElement('img');
+                                          img.src = item.image_url;
+                                          img.alt = item.name;
+                                          img.style.cssText = `
+                                            max-width: 100%;
+                                            max-height: 100%;
+                                            object-fit: contain;
+                                            border-radius: 8px;
+                                          `;
+                                          
+                                          const title = document.createElement('p');
+                                          title.textContent = item.name;
+                                          title.style.cssText = `
+                                            color: white;
+                                            margin-top: 15px;
+                                            font-size: 18px;
+                                            font-weight: bold;
+                                          `;
+                                          
+                                          container.appendChild(img);
+                                          container.appendChild(title);
+                                          overlay.appendChild(container);
+                                          
+                                          overlay.addEventListener('click', () => {
+                                            document.body.removeChild(overlay);
+                                          });
+                                          
                                           document.body.appendChild(overlay);
                                         }}
                                       />
