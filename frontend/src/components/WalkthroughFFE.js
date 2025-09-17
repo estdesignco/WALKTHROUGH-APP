@@ -921,11 +921,10 @@ const WalkthroughFFE = ({
                                                             {/* Add Item Button - GOLD/AMBER COLOR */}
                                                             <button
                                                               onClick={() => setShowAddItem(true)}
-                                                              className="w-full bg-transparent text-white text-sm text-center outline-none"
-                                                              onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
+                                                              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
                                                             >
-                                                              {item.quantity || ''}
-                                                            </div>
+                                                              ✚ ADD ITEM
+                                                            </button>
                                                           </td>
                                                           
                                                           {/* SIZE - EDITABLE INLINE */}
