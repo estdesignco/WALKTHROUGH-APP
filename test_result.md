@@ -304,15 +304,18 @@ frontend:
 
   - task: "ChecklistDashboard and ChecklistStatusOverview Integration"
     implemented: true
-    working: true
-    file: "ChecklistDashboard.js, ChecklistStatusOverview.js"
-    stuck_count: 0
+    working: false
+    file: "ChecklistDashboard.js, ChecklistStatusOverview.js, SimpleChecklistSpreadsheet.js"
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
       - working: true
         agent: "testing"
         comment: "🎯 CHECKLIST DASHBOARD INTEGRATION FULLY OPERATIONAL: Comprehensive testing confirms ChecklistDashboard successfully uses ChecklistStatusOverview instead of StatusOverview as requested. ✅ COMPONENT INTEGRATION: ChecklistDashboard.js correctly imports and uses ChecklistStatusOverview component (lines 267-272). ✅ DATA FLOW: Dashboard properly calculates and passes totalItems, statusBreakdown, and carrierBreakdown to ChecklistStatusOverview. ✅ 9 STATUS MAPPING: ChecklistStatusOverview.js correctly maps all 9 checklist statuses (PICKED, ORDER SAMPLES, SAMPLES ARRIVED, ASK NEIL, ASK CHARLENE, ASK JALA, GET QUOTE, WAITING ON QT, READY FOR PRESENTATION) with proper colors. ✅ PIE CHART FUNCTIONALITY: Status breakdown pie chart displays correctly with checklist-specific status colors and proper data visualization. ✅ PROJECT LOADING: Checklist project (5cccfb11-0ac0-45ed-91ab-a56088d65b5a) loads successfully with 56 items for status breakdown. The ChecklistDashboard integration is production-ready and resolves the user's pie chart and status breakdown issues."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL FRONTEND INTEGRATION ISSUE: While subcategory headers and table structure are working correctly, Add Category dropdown only shows 5 hardcoded categories instead of using backend API with 14 categories. Backend GET /api/categories/available returns all 14 categories correctly, but SimpleChecklistSpreadsheet.js lines 686-692 use hardcoded options instead of fetching from API. Missing 10 categories: Appliances, Art & Accessories, Cabinets Built-ins and Trim, Fireplace & Built-ins, Paint Wallpaper and Finishes, Plumbing, Plumbing & Fixtures, Textiles & Soft Goods, Tile and Tops, Window Treatments. URGENT: Update Add Category dropdown to use dynamic API data instead of hardcoded values."
 
 metadata:
   created_by: "main_agent"
