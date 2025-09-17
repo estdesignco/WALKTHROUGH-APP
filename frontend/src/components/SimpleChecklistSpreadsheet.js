@@ -515,9 +515,43 @@ const SimpleChecklistSpreadsheet = ({
                             {category.subcategories?.map((subcategory) => 
                               subcategory.items?.map((item, itemIndex) => (
                                 <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.name}</td>
-                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center">{item.quantity || ''}</td>
-                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.size || ''}</td>
+                                  {/* ITEM - EDITABLE */}
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-white text-sm outline-none"
+                                      onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
+                                    >
+                                      {item.name}
+                                    </div>
+                                  </td>
+                                  
+                                  {/* QTY - EDITABLE */}
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-white text-sm text-center outline-none"
+                                      onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
+                                    >
+                                      {item.quantity || ''}
+                                    </div>
+                                  </td>
+                                  
+                                  {/* SIZE - EDITABLE */}
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-white text-sm outline-none"
+                                      onBlur={(e) => console.log('Size updated:', e.target.textContent)}
+                                    >
+                                      {item.size || ''}
+                                    </div>
+                                  </td>
+                                  
+                                  {/* STATUS - DROPDOWN (KEEP AS IS) */}
                                   <td className="border border-gray-400 px-2 py-1 text-white text-sm">
                                     <select 
                                       className="bg-gray-800 text-white text-xs border-none w-full"
@@ -537,19 +571,39 @@ const SimpleChecklistSpreadsheet = ({
                                       <option value="READY FOR PRESENTATION" style={{ backgroundColor: '#84CC16', color: 'white' }}>READY FOR PRESENTATION</option>
                                     </select>
                                   </td>
+                                  
+                                  {/* IMAGE */}
                                   <td className="border border-gray-400 px-2 py-1 text-white text-sm w-20">
                                     {item.image_url ? (
                                       <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
                                     ) : ''}
                                   </td>
+                                  
+                                  {/* LINK - EDITABLE */}
                                   <td className="border border-gray-400 px-2 py-1 text-white text-sm w-20">
-                                    {item.link_url ? (
-                                      <a href={item.link_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
-                                        🔗 Link
-                                      </a>
-                                    ) : ''}
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-blue-400 text-xs outline-none"
+                                      onBlur={(e) => console.log('Link updated:', e.target.textContent)}
+                                    >
+                                      {item.link_url || ''}
+                                    </div>
                                   </td>
-                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.remarks || ''}</td>
+                                  
+                                  {/* REMARKS - EDITABLE */}
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-white text-sm outline-none"
+                                      onBlur={(e) => console.log('Remarks updated:', e.target.textContent)}
+                                    >
+                                      {item.remarks || ''}
+                                    </div>
+                                  </td>
+                                  
+                                  {/* DELETE BUTTON */}
                                   <td className="border border-gray-400 px-2 py-1 text-center w-12">
                                     <button
                                       onClick={() => handleDeleteItem(item.id)}
