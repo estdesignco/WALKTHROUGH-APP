@@ -920,9 +920,7 @@ const WalkthroughFFE = ({
                                                       
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
                                                       <tr>
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
+                                                        <td colSpan="5" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                                               className="w-full bg-transparent text-white text-sm outline-none"
                                                               onBlur={(e) => console.log('Vendor updated:', e.target.textContent)}
                                                             >
