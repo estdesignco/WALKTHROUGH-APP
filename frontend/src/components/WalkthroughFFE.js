@@ -921,12 +921,7 @@ const WalkthroughFFE = ({
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
                                                       <tr>
                                                         <td colSpan="5" className="border border-gray-400 px-6 py-2 bg-slate-900">
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Vendor updated:', e.target.textContent)}
-                                                            >
-                                                              {item.vendor || ''}
-                                                            </div>
-                                                          </td>
+                                                          <div className="flex justify-start items-center space-x-4">
                                                           
                                                           {/* QTY - EDITABLE INLINE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
