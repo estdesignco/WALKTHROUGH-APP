@@ -321,7 +321,7 @@ class CanvaPDFTester:
             "project_id": PROJECT_ID
         }
         
-        success, response_data, status_code = self.make_request('POST', '/scrape-canva', scrape_data)
+        success, response_data, status_code = self.make_request('POST', '/scrape-canva-pdf', scrape_data)
         
         if not success and "Room" in str(response_data) and "not found" in str(response_data):
             # This should still happen for truly non-existent rooms
