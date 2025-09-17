@@ -229,6 +229,41 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
+  // Handle Canva PDF Upload - ENHANCED FEATURE  
+  const handleCanvaPdfUpload = async (file, roomName) => {
+    if (!file) {
+      console.log('⚠️ No file provided');
+      return;
+    }
+
+    try {
+      console.log('🎨 Uploading Canva PDF for room:', roomName, 'File:', file.name);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('room_name', roomName);
+      formData.append('project_id', project.id);
+      
+      const response = await fetch('https://spreadsheet-revamp.preview.emergentagent.com/api/upload-canva-pdf', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Canva PDF uploaded successfully:', result);
+        alert(`Success! Processed ${result.items_created || 0} items from Canva PDF`);
+        window.location.reload();
+      } else {
+        console.error('❌ Canva PDF upload failed:', response.status);
+        alert('Failed to upload Canva PDF. Please try again.');
+      }
+    } catch (error) {
+      console.error('❌ Canva PDF upload error:', error);
+      alert('Error uploading Canva PDF: ' + error.message);
+    }
+  };
+
   // Handle Canva PDF scraping - ENHANCED FEATURE
   const handleCanvaPdfScrape = async (canvaUrl, roomName) => {
     if (!canvaUrl) {
