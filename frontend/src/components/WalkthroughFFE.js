@@ -967,9 +967,9 @@ const WalkthroughFFE = ({
                                                         </button>
                                                       </td>
                                                     </tr>
-                                                          
-                                                          {/* SIZE - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                    </React.Fragment>
+                                                  )}
+                                                </React.Fragment>
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
