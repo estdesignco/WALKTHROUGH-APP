@@ -1560,49 +1560,52 @@ async def create_room(room_data: RoomCreate):
         room_dict["created_at"] = datetime.utcnow()
         room_dict["updated_at"] = datetime.utcnow()
         
-        # Add ALL categories and subcategories with ALL ITEMS (blank defaults)
-        for category_name, subcategories_dict in room_structure.items():
+        # Add ALL categories and subcategories with ALL ITEMS (blank defaults) - FIXED FOR NEW STRUCTURE
+        categories_list = room_structure.get("categories", [])
+        for category_obj in categories_list:
             category_id = str(uuid.uuid4())
             category = {
                 "id": category_id,
                 "room_id": room_dict["id"],
-                "name": category_name,
-                "color": get_category_color(category_name),
+                "name": category_obj["name"],
+                "color": category_obj.get("color", get_category_color(category_obj["name"])),
                 "subcategories": [],
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
             
             # Add subcategories with ALL ITEMS from comprehensive structure
-            for subcategory_name, items_list in subcategories_dict.items():
+            subcategories_list = category_obj.get("subcategories", [])
+            for subcategory_obj in subcategories_list:
                 subcategory_id = str(uuid.uuid4())
                 subcategory = {
                     "id": subcategory_id,
                     "category_id": category_id,
-                    "name": subcategory_name,
-                    "color": get_subcategory_color(subcategory_name),
+                    "name": subcategory_obj["name"],
+                    "color": subcategory_obj.get("color", "#8A5A5A"),
                     "items": [],
                     "created_at": datetime.utcnow(),
                     "updated_at": datetime.utcnow()
                 }
                 
-                # Add ALL ITEMS from the comprehensive list with VALID defaults
-                for item_name in items_list:  # ALL items, not just first 5
+                # Add ALL items with BLANK defaults for checklist
+                items_list = subcategory_obj.get("items", [])
+                for item_obj in items_list:
                     item_id = str(uuid.uuid4())
                     item = {
                         "id": item_id,
                         "subcategory_id": subcategory_id,
-                        "name": item_name,
+                        "name": item_obj["name"],
                         "quantity": 1,
                         "size": "",
-                        "status": "",  # BLANK default as requested by user
+                        "finish_color": item_obj.get("finish_color", ""),
+                        "status": "",  # BLANK status for all sheets
                         "vendor": "",
+                        "sku": "",
                         "cost": 0,
-                        "finish_color": "",
-                        "carrier": "",  # BLANK default
-                        "ship_to": "",  # BLANK default
-                        "delivery_status": "",  # BLANK default
-                        "notes": "",
+                        "image_url": "",
+                        "link": "",
+                        "remarks": "",
                         "created_at": datetime.utcnow(),
                         "updated_at": datetime.utcnow()
                     }
