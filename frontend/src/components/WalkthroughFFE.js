@@ -43,7 +43,7 @@ const WalkthroughFFE = ({
     console.log('🔄 Status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -69,7 +69,7 @@ const WalkthroughFFE = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
@@ -166,7 +166,7 @@ const WalkthroughFFE = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
+        const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -229,7 +229,7 @@ const WalkthroughFFE = ({
         return;
       }
 
-      const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
+      const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
       
       const newItem = {
         ...itemData,
@@ -275,7 +275,7 @@ const WalkthroughFFE = ({
     }
 
     try {
-      const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
+      const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
@@ -299,7 +299,7 @@ const WalkthroughFFE = ({
     }
 
     try {
-      const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
+      const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'DELETE'
       });
@@ -339,7 +339,7 @@ const WalkthroughFFE = ({
       console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
       
       // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/rooms`, {
+      const tempRoomResponse = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -366,7 +366,7 @@ const WalkthroughFFE = ({
             id: undefined // Let backend generate new ID
           };
           
-          const addResponse = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/categories`, {
+          const addResponse = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(categoryData)
@@ -376,7 +376,7 @@ const WalkthroughFFE = ({
             console.log('✅ Comprehensive category added successfully');
             
             // Delete the temp room
-            await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+            await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
@@ -386,7 +386,7 @@ const WalkthroughFFE = ({
         }
         
         // Clean up temp room regardless
-        await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+        await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
           method: 'DELETE'
         });
       } else {
@@ -411,7 +411,7 @@ const WalkthroughFFE = ({
       
       // Update backend room order
       try {
-        const response = await fetch('https://app-finalizer-2.preview.emergentagent.com/api/rooms/reorder', {
+        const response = await fetch('https://spreadsheet-revamp.preview.emergentagent.com/api/rooms/reorder', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -437,7 +437,7 @@ const WalkthroughFFE = ({
       // Update backend category order  
       try {
         const roomId = source.droppableId.replace('categories-', '');
-        const response = await fetch('https://app-finalizer-2.preview.emergentagent.com/api/categories/reorder', {
+        const response = await fetch('https://spreadsheet-revamp.preview.emergentagent.com/api/categories/reorder', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -481,7 +481,7 @@ const WalkthroughFFE = ({
     }
 
     try {
-      const backendUrl = "https://app-finalizer-2.preview.emergentagent.com";
+      const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {

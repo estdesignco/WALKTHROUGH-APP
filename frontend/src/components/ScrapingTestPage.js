@@ -17,7 +17,7 @@ const ScrapingTestPage = () => {
     setResult(null);
 
     try {
-      const backendUrl = 'https://app-finalizer-2.preview.emergentagent.com';
+      const backendUrl = 'https://spreadsheet-revamp.preview.emergentagent.com';
       
       console.log('🔗 Scraping URL:', url);
       console.log('🔗 Backend URL:', backendUrl);

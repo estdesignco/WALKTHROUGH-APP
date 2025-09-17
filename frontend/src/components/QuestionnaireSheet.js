@@ -117,7 +117,7 @@ const QuestionnaireSheet = () => {
 
   const loadProject = async () => {
     try {
-      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/projects/${projectId}`);
+      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/projects/${projectId}`);
       if (response.ok) {
         const projectData = await response.json();
         setProject(projectData);
@@ -130,7 +130,7 @@ const QuestionnaireSheet = () => {
   const loadExistingAnswers = async () => {
     try {
       // Load any existing questionnaire answers
-      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/questionnaire/${projectId}`);
+      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/questionnaire/${projectId}`);
       if (response.ok) {
         const existingAnswers = await response.json();
         setAnswers(existingAnswers.answers || {});
@@ -166,7 +166,7 @@ const QuestionnaireSheet = () => {
 
   const saveAnswers = async () => {
     try {
-      const response = await fetch(`https://app-finalizer-2.preview.emergentagent.com/api/questionnaire/${projectId}`, {
+      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/questionnaire/${projectId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
