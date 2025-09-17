@@ -714,11 +714,11 @@ const SimpleChecklistSpreadsheet = ({
                             className="bg-green-600 text-white text-xs px-2 py-1 rounded border-none"
                           >
                             <option value="">+ Add Category</option>
-                            <option value="Lighting">Lighting</option>
-                            <option value="Furniture & Storage">Furniture & Storage</option>
-                            <option value="Decor & Accessories">Decor & Accessories</option>
-                            <option value="Paint, Wallpaper & Finishes">Paint, Wallpaper & Finishes</option>
-                            <option value="Architectural Elements, Built-ins & Trim">Architectural Elements</option>
+                            {availableCategories.map(categoryName => (
+                              <option key={categoryName} value={categoryName}>
+                                {categoryName}
+                              </option>
+                            ))}
                           </select>
                           <button
                             onClick={() => handleDeleteCategory(category.id)}
