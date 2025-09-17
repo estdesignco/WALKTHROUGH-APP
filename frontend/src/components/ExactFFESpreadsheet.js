@@ -22,6 +22,7 @@ const ExactFFESpreadsheet = ({
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
+  const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
 
