@@ -14,6 +14,10 @@ const SimpleChecklistSpreadsheet = ({
 }) => {
   console.log('🎯 SimpleChecklistSpreadsheet rendering with project:', project);
 
+  const [showAddItem, setShowAddItem] = useState(false);
+  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
+  const [expandedRooms, setExpandedRooms] = useState({});
+  const [expandedCategories, setExpandedCategories] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
