@@ -209,7 +209,7 @@ class CanvaPDFTester:
             },
             {
                 "canva_url": "https://fourhands.com/product/248067-003",  # Direct product URL as fallback
-                "room_name": "Primary Bedroom", 
+                "room_name": "Living Room",  # Use actual room name
                 "description": "Direct product URL (fallback test)"
             }
         ]
