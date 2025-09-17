@@ -207,11 +207,13 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
-            'PICKED', 'ORDER SAMPLES', 'SAMPLES ARRIVED', 'ASK NEIL', 'ASK CHARLENE', 
-            'ASK JALA', 'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION'
+            'TO BE SELECTED', 'RESEARCHING', 'PENDING APPROVAL', 'APPROVED', 'ORDERED', 'PICKED', 'CONFIRMED',
+            'IN PRODUCTION', 'SHIPPED', 'IN TRANSIT', 'OUT FOR DELIVERY', 
+            'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'RECEIVED',
+            'READY FOR INSTALL', 'INSTALLING', 'INSTALLED',
+            'ON HOLD', 'BACKORDERED', 'DAMAGED', 'RETURNED', 'CANCELLED'
           ].map(status => {
-            const statusData = statusBreakdown[status] || { count: 0, color: '#6B7280' };
-            const count = statusData.count;
+            const count = statusBreakdown[status] || 0;
             const percentage = totalItems > 0 ? (count / totalItems) * 100 : 0;
             
             return (
@@ -219,7 +221,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                 <div className="flex items-center space-x-2">
                   <div 
                     className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: statusData.color }}
+                    style={{ backgroundColor: getStatusColor(status) }}
                   ></div>
                   <span className="text-sm text-gray-300">{status}</span>
                 </div>
@@ -228,7 +230,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                     <div
                       className="h-2 rounded-full transition-all duration-300"
                       style={{
-                        backgroundColor: statusData.color,
+                        backgroundColor: getStatusColor(status),
                         width: `${percentage}%`
                       }}
                     />
