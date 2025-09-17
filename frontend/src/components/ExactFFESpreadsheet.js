@@ -1173,6 +1173,10 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                         </tr>
                                                         ))}
+                                                                </tbody>
+                                                              </table>
+                                                            </td>
+                                                          </tr>
                                                         </React.Fragment>
                                                       ))}
                                                       
