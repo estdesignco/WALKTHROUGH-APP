@@ -798,6 +798,7 @@ const WalkthroughFFE = ({
                   const isRoomExpanded = expandedRooms[room.id];
                   console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
                   
+                  return (
                               <React.Fragment key={room.id}>
                                 {/* ROOM HEADER ROW - Full width like your screenshots */}
                                 <tr>
