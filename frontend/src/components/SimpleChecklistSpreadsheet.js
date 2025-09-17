@@ -405,7 +405,7 @@ const SimpleChecklistSpreadsheet = ({
     try {
       console.log('🎨 Scraping Canva PDF for room:', roomName, 'URL:', canvaUrl);
       
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/scrape-canva-pdf', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/scrape-canva-pdf`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
