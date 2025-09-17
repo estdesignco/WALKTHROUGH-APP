@@ -861,14 +861,23 @@ const WalkthroughFFE = ({
                                                     <td colSpan="5" 
                                                         className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
                                                         style={{ backgroundColor: getCategoryColor() }}>
-                                                      <div className="flex items-center gap-2">
+                                                      <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                          <button
+                                                            onClick={() => toggleCategoryExpansion(category.id)}
+                                                            className="text-white hover:text-gray-200"
+                                                          >
+                                                            {isCategoryExpanded ? '▼' : '▶'}
+                                                          </button>
+                                                          <span>{category.name.toUpperCase()}</span>
+                                                        </div>
                                                         <button
-                                                          onClick={() => toggleCategoryExpansion(category.id)}
-                                                          className="text-white hover:text-gray-200"
+                                                          onClick={() => handleDeleteCategory(category.id)}
+                                                          className="text-red-300 hover:text-red-100 text-lg"
+                                                          title="Delete Category"
                                                         >
-                                                          {isCategoryExpanded ? '▼' : '▶'}
+                                                          🗑️
                                                         </button>
-                                                        <span>{category.name.toUpperCase()}</span>
                                                       </div>
                                                     </td>
                                                   </tr>
