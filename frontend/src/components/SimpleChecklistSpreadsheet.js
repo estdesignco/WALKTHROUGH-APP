@@ -752,6 +752,18 @@ const SimpleChecklistSpreadsheet = ({
                                     </div>
                                   </td>
                                   
+                                  {/* FINISH/COLOR - EDITABLE */}
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-white text-sm outline-none"
+                                      onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
+                                    >
+                                      {item.finish_color || ''}
+                                    </div>
+                                  </td>
+                                  
                                   {/* STATUS - DROPDOWN (KEEP AS IS) */}
                                   <td className="border border-gray-400 px-2 py-1 text-white text-sm">
                                     <select 
