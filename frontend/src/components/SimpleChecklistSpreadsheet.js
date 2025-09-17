@@ -181,7 +181,7 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
-  // Handle deleting an item - RESTORED DELETE FUNCTIONALITY
+  // Handle deleting an item - NO PAGE RELOAD
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm('Are you sure you want to delete this item?')) {
       return;
@@ -194,7 +194,10 @@ const SimpleChecklistSpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Checklist item deleted successfully');
-        window.location.reload();
+        // Call onReload to refresh data without full page reload
+        if (onReload) {
+          onReload();
+        }
       } else {
         console.error('❌ Delete failed with status:', response.status);
         throw new Error(`HTTP ${response.status}`);
@@ -205,7 +208,7 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
-  // Handle deleting a category - RESTORED DELETE FUNCTIONALITY
+  // Handle deleting a category - NO PAGE RELOAD
   const handleDeleteCategory = async (categoryId) => {
     if (!window.confirm('Are you sure you want to delete this entire category and all its items?')) {
       return;
@@ -218,7 +221,10 @@ const SimpleChecklistSpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Checklist category deleted successfully');
-        window.location.reload();
+        // Call onReload to refresh data without full page reload
+        if (onReload) {
+          onReload();
+        }
       } else {
         console.error('❌ Category delete failed with status:', response.status);
         throw new Error(`HTTP ${response.status}`);
