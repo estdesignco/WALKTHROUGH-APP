@@ -704,27 +704,26 @@ const SimpleChecklistSpreadsheet = ({
                     {/* CHECKLIST TABLE - Only show when category expanded */}
                     {isCategoryExpanded && (
                       <>
-                          <tbody>
-                            {category.subcategories?.map((subcategory) => (
-                              <React.Fragment key={subcategory.id || subcategory.name}>
-                                {/* TABLE WITH SUBCATEGORY NAME IN HEADER */}
-                                <table className="w-full border-collapse border border-gray-400 mb-4">
-                                  <thead>
-                                    <tr>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>LINK</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>REMARKS</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {/* ITEMS UNDER THIS SUBCATEGORY */}
-                                    {subcategory.items?.map((item, itemIndex) => (
+                        {category.subcategories?.map((subcategory) => (
+                          <React.Fragment key={subcategory.id || subcategory.name}>
+                            {/* TABLE WITH SUBCATEGORY NAME IN HEADER */}
+                            <table className="w-full border-collapse border border-gray-400 mb-4">
+                              <thead>
+                                <tr>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>LINK</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>REMARKS</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {/* ITEMS UNDER THIS SUBCATEGORY */}
+                                {subcategory.items?.map((item, itemIndex) => (
                                       <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
                                         {/* ITEM - EDITABLE */}
                                         <td className="border border-gray-400 px-2 py-1 text-white text-sm">
