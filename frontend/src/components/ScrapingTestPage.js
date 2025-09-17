@@ -17,7 +17,7 @@ const ScrapingTestPage = () => {
     setResult(null);
 
     try {
-      const backendUrl = 'https://designflow-24.preview.emergentagent.com';
+      const backendUrl = '${process.env.REACT_APP_BACKEND_URL || window.location.origin}';
       
       console.log('🔗 Scraping URL:', url);
       console.log('🔗 Backend URL:', backendUrl);

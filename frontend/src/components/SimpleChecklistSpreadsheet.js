@@ -162,7 +162,7 @@ const SimpleChecklistSpreadsheet = ({
     console.log('🔄 Checklist status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`https://designflow-24.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -251,7 +251,7 @@ const SimpleChecklistSpreadsheet = ({
     }
 
     try {
-      const response = await fetch(`https://designflow-24.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'DELETE'
       });
 
@@ -278,7 +278,7 @@ const SimpleChecklistSpreadsheet = ({
     }
 
     try {
-      const response = await fetch(`https://designflow-24.preview.emergentagent.com/api/categories/${categoryId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${categoryId}`, {
         method: 'DELETE'
       });
 
@@ -308,7 +308,7 @@ const SimpleChecklistSpreadsheet = ({
     try {
       console.log('🔄 Creating comprehensive checklist category:', categoryName, 'for room:', roomId);
       
-      const tempRoomResponse = await fetch(`https://designflow-24.preview.emergentagent.com/api/rooms`, {
+      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -333,7 +333,7 @@ const SimpleChecklistSpreadsheet = ({
             id: undefined
           };
           
-          const addResponse = await fetch(`https://designflow-24.preview.emergentagent.com/api/categories`, {
+          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(categoryData)
@@ -342,7 +342,7 @@ const SimpleChecklistSpreadsheet = ({
           if (addResponse.ok) {
             console.log('✅ Comprehensive checklist category added successfully');
             
-            await fetch(`https://designflow-24.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
@@ -353,7 +353,7 @@ const SimpleChecklistSpreadsheet = ({
           }
         }
         
-        await fetch(`https://designflow-24.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
           method: 'DELETE'
         });
       }
@@ -375,7 +375,7 @@ const SimpleChecklistSpreadsheet = ({
       formData.append('room_name', roomName);
       formData.append('project_id', project.id);
       
-      const response = await fetch('https://designflow-24.preview.emergentagent.com/api/upload-canva-pdf', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/upload-canva-pdf', {
         method: 'POST',
         body: formData
       });
@@ -405,7 +405,7 @@ const SimpleChecklistSpreadsheet = ({
     try {
       console.log('🎨 Scraping Canva PDF for room:', roomName, 'URL:', canvaUrl);
       
-      const response = await fetch('https://designflow-24.preview.emergentagent.com/api/scrape-canva-pdf', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/scrape-canva-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
