@@ -172,36 +172,18 @@ const ChecklistDashboard = ({ isOffline }) => {
   const getStatusBreakdown = () => {
     const breakdown = {};
     
-    // Initialize with checklist statuses and their colors
-    const checklistStatuses = {
-      'PICKED': { count: 0, color: '#3B82F6' },
-      'ORDER SAMPLES': { count: 0, color: '#10B981' },
-      'SAMPLES ARRIVED': { count: 0, color: '#8B5CF6' },
-      'ASK NEIL': { count: 0, color: '#F59E0B' },
-      'ASK CHARLENE': { count: 0, color: '#EF4444' },
-      'ASK JALA': { count: 0, color: '#EC4899' },
-      'GET QUOTE': { count: 0, color: '#06B6D4' },
-      'WAITING ON QT': { count: 0, color: '#F97316' },
-      'READY FOR PRESENTATION': { count: 0, color: '#84CC16' }
-    };
-    
     project.rooms.forEach(room => {
       room.categories.forEach(category => {
         (category.subcategories || []).forEach(subcategory => {
           (subcategory.items || []).forEach(item => {
-            const status = item.status || 'PICKED'; // Default to PICKED instead of TO BE SELECTED
-            if (checklistStatuses[status]) {
-              checklistStatuses[status].count += 1;
-            } else {
-              // If status doesn't exist, default to PICKED
-              checklistStatuses['PICKED'].count += 1;
-            }
+            const status = item.status || 'TO BE SELECTED';
+            breakdown[status] = (breakdown[status] || 0) + 1;
           });
         });
       });
     });
     
-    return checklistStatuses;
+    return breakdown;
   };
 
   const getCarrierBreakdown = () => {
