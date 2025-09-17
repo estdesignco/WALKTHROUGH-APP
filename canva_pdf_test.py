@@ -28,7 +28,7 @@ def get_backend_url():
 
 BASE_URL = get_backend_url() + "/api"
 PROJECT_ID = "5cccfb11-0ac0-45ed-91ab-a56088d65b5a"  # From review request
-AVAILABLE_ROOMS = ["Primary Bedroom", "Bedroom 3", "Living Room", "Kitchen", "Powder Room"]
+AVAILABLE_ROOMS = ["Living Room", "Kitchen", "Powder Room", "Bedroom 3", "Family Room"]  # Actual rooms in project
 
 print(f"🎨 Testing Canva PDF Scraping at: {BASE_URL}")
 print(f"📋 Using Project ID: {PROJECT_ID}")
