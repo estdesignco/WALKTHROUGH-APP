@@ -338,7 +338,10 @@ const WalkthroughFFE = ({
 
       if (response.ok) {
         console.log('✅ Walkthrough category deleted successfully');
-        window.location.reload();
+        // Call onReload to refresh data without full page reload
+        if (onReload) {
+          onReload();
+        }
       } else {
         console.error('❌ Category delete failed with status:', response.status);
         throw new Error(`HTTP ${response.status}`);
