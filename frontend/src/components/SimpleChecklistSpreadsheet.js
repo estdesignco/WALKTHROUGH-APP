@@ -16,6 +16,67 @@ const SimpleChecklistSpreadsheet = ({
 
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
+  const [expandedRooms, setExpandedRooms] = useState({});
+  const [expandedCategories, setExpandedCategories] = useState({});
+
+  // Initialize all rooms and categories as expanded
+  useEffect(() => {
+    if (project?.rooms) {
+      const roomExpansion = {};
+      const categoryExpansion = {};
+      
+      project.rooms.forEach(room => {
+        roomExpansion[room.id] = true;
+        room.categories?.forEach(category => {
+          categoryExpansion[category.id] = true;
+        });
+      });
+      
+      setExpandedRooms(roomExpansion);
+      setExpandedCategories(categoryExpansion);
+    }
+  }, [project]);
+
+  // Toggle room expansion
+  const toggleRoomExpansion = (roomId) => {
+    setExpandedRooms(prev => ({
+      ...prev,
+      [roomId]: !prev[roomId]
+    }));
+  };
+
+  // Toggle category expansion  
+  const toggleCategoryExpansion = (categoryId) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }));
+  };
+
+  // Different muted room colors for checklist
+  const getRoomColor = (roomName, index = 0) => {
+    const mutedColors = [
+      '#8B5A6B',  // Muted rose
+      '#6B7C93',  // Muted blue
+      '#7A8B5A',  // Muted olive
+      '#9B6B8B',  // Muted purple
+      '#8B7A5A',  // Muted brown
+      '#5A8B7A',  // Muted teal
+      '#8B5A7A',  // Muted mauve
+      '#7A5A8B',  // Muted violet
+      '#5A7A8B',  // Muted slate
+      '#8B6B5A'   // Muted tan
+    ];
+    
+    // Use room name hash for consistent color per room
+    let hash = 0;
+    for (let i = 0; i < roomName.length; i++) {
+      hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return mutedColors[Math.abs(hash) % mutedColors.length];
+  };
+
+  const getCategoryColor = () => '#065F46';  // Dark green for categories
 
   // Status colors mapping for checklist
   const getStatusColor = (status) => {
