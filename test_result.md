@@ -331,6 +331,21 @@ test_plan:
   test_all: false
   test_priority: "canva_pdf_fix_required"
 
+  - task: "Add Room and Add Category Backend Data Structure Fix"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL BACKEND BUG IDENTIFIED: Add Room functionality failing with 500 error 'list' object has no attribute 'values'. Root cause: server.py line 1552 tries to call .values() on room_structure which now uses new enhanced_rooms.py format with 'categories': [...] (list) instead of dictionary. The code expects old dictionary format but enhanced_rooms.py uses new list-based structure."
+      - working: true
+        agent: "testing"
+        comment: "🎉 CRITICAL BACKEND BUG FIXED AND VERIFIED! Fixed the data structure mismatch in server.py line 1552. ✅ KITCHEN ROOM CREATION: Successfully creates 6 categories (Lighting, Paint/Wallpaper/Finishes, Appliances, Plumbing, Furniture & Storage, Decor & Accessories), 6 subcategories (INSTALLED, Misc., UNIT, FIXTURE, PIECE, MISC.), 56 items with comprehensive structure from enhanced_rooms.py. ✅ PRIMARY BEDROOM CREATION: Successfully creates 4 categories, 50 items with comprehensive bedroom structure. ✅ FINISH COLOR FIELD: All items include finish_color field as requested. ✅ COMPREHENSIVE STRUCTURE VERIFIED: Kitchen includes all expected categories like Appliances with items (Refrigerator, Dishwasher, Range/Oven, etc.), Lighting with INSTALLED subcategory (Pendant Lights, Recessed Lighting, Under Cabinet Lighting), and Plumbing with FIXTURE subcategory (Kitchen Sink, Prep Sink, Main Faucet, etc.). ✅ PROJECT ROOM COUNT: Increased from 7 to 9 rooms confirming successful room additions. The backend data structure mismatch has been completely resolved - Add Room now creates comprehensive room structures as designed."
+
 agent_communication:
   - agent: "main"
     message: "🎉 CRITICAL USER FIXES COMPLETED AND VERIFIED! ✅ FILTERING SYSTEM: Fixed room filter bug (name vs ID), added carrier filter dropdown, enhanced filtering logic for all combinations. ✅ DROPDOWN PERSISTENCE: Removed page reloads, added local state updates for immediate changes. ✅ LINK COLUMN: Added LINK column at end of table with proper display and functionality. ✅ ENHANCED SCRAPING: Ultra-robust scraping with 50+ vendor mapping, anti-bot detection, comprehensive selectors - can literally scrape a speck of dust! ✅ ADD CATEGORY: Already uses comprehensive endpoint for full auto-population. All backend APIs tested at 100% success rate. Ready for user verification."
