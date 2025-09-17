@@ -82,8 +82,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-3 h-3" />
               </td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm">Recessed Lighting</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
             </tr>
             <tr>
@@ -91,8 +91,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Chandelier</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -100,8 +100,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Sconces</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -109,8 +109,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Track Lighting</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -118,8 +118,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Ceiling Fan w/ Light</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -127,8 +127,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Art Lights</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -136,8 +136,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Pendant Lights</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -145,8 +145,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Under Cabinet Lighting</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -154,8 +154,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Cove Lighting</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -163,8 +163,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Picture Lights</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
           </tbody>
