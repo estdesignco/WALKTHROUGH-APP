@@ -202,7 +202,7 @@ const WalkthroughFFE = ({
     }
   }, [project]);
 
-  // Handle adding new items - FIX THE SUBCATEGORY SELECTION
+  // Handle adding new items - COPIED EXACTLY FROM WORKING FFE
   const handleAddItem = async (itemData) => {
     try {
       // Find the first available subcategory if none selected
@@ -225,7 +225,7 @@ const WalkthroughFFE = ({
       }
 
       if (!subcategoryId) {
-        alert('Please expand a category first to add items to it.');
+        console.error('Please expand a category first to add items to it.');
         return;
       }
 
@@ -237,7 +237,7 @@ const WalkthroughFFE = ({
         order_index: 0
       };
 
-      console.log('📤 Creating item:', newItem);
+      console.log('📤 Creating walkthrough item:', newItem);
 
       const response = await fetch(`${backendUrl}/api/items`, {
         method: 'POST',
@@ -248,7 +248,7 @@ const WalkthroughFFE = ({
       });
 
       if (response.ok) {
-        console.log('✅ Item added successfully');
+        console.log('✅ Walkthrough item added successfully');
         setShowAddItem(false);
         // Force reload to show the new item
         window.location.reload();
@@ -258,8 +258,8 @@ const WalkthroughFFE = ({
         throw new Error(`HTTP ${response.status}: ${errorData}`);
       }
     } catch (error) {
-      console.error('❌ Error adding item:', error);
-      alert(`Failed to add item: ${error.message}`);
+      console.error('❌ Error adding walkthrough item:', error);
+      console.error(`Failed to add item: ${error.message}`);
     }
   };
 
