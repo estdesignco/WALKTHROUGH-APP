@@ -945,13 +945,24 @@ const WalkthroughFFE = ({
                                                               {item.remarks || ''}
                                                             </div>
                                                           </td>
+                                                          
+                                                          {/* DELETE BUTTON - COLUMN 6 */}
+                                                          <td className="border border-gray-400 px-2 py-1 text-center w-12">
+                                                            <button
+                                                              onClick={() => handleDeleteItem(item.id)}
+                                                              className="text-red-400 hover:text-red-300 text-sm"
+                                                              title="Delete Item"
+                                                            >
+                                                              🗑️
+                                                            </button>
+                                                          </td>
                                                         </tr>
                                                       ))
                                                     ))}
                                                     
                                                     {/* ADD ITEM ROW */}
                                                     <tr>
-                                                      <td colSpan="5" className="border border-gray-400 px-2 py-2">
+                                                      <td colSpan="6" className="border border-gray-400 px-2 py-2">
                                                         <button
                                                           onClick={() => {
                                                             if (category.subcategories?.length > 0) {
