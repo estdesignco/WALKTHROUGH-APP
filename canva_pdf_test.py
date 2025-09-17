@@ -339,7 +339,7 @@ class CanvaPDFTester:
             # Missing room_name and project_id
         }
         
-        success, response_data, status_code = self.make_request('POST', '/scrape-canva', scrape_data)
+        success, response_data, status_code = self.make_request('POST', '/scrape-canva-pdf', scrape_data)
         
         if not success and status_code == 400:
             self.log_test("Missing Fields Handling", True, f"Correctly returned 400 for missing fields")
