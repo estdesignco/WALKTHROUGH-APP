@@ -72,7 +72,7 @@ ITEM_STATUSES = [
     # Procurement Phase  
     {'status': 'APPROVED', 'color': '#9ACD32', 'phase': 'procurement'},
     {'status': 'ORDERED', 'color': '#32CD32', 'phase': 'procurement'},
-    {'status': 'PICKED', 'color': '#FFD700', 'phase': 'procurement'},  # YELLOW like your image
+    {'status': 'PICKED', 'color': '#3B82F6', 'phase': 'procurement'},  # Updated to match checklist color
     {'status': 'CONFIRMED', 'color': '#228B22', 'phase': 'procurement'},
     
     # Fulfillment Phase
@@ -96,7 +96,17 @@ ITEM_STATUSES = [
     {'status': 'BACKORDERED', 'color': '#B22222', 'phase': 'exception'},
     {'status': 'DAMAGED', 'color': '#8B0000', 'phase': 'exception'},
     {'status': 'RETURNED', 'color': '#CD5C5C', 'phase': 'exception'},
-    {'status': 'CANCELLED', 'color': '#A52A2A', 'phase': 'exception'}
+    {'status': 'CANCELLED', 'color': '#A52A2A', 'phase': 'exception'},
+    
+    # Checklist-specific statuses (9 statuses with colors matching ChecklistStatusOverview.js)
+    {'status': 'ORDER SAMPLES', 'color': '#10B981', 'phase': 'checklist'},
+    {'status': 'SAMPLES ARRIVED', 'color': '#8B5CF6', 'phase': 'checklist'},
+    {'status': 'ASK NEIL', 'color': '#F59E0B', 'phase': 'checklist'},
+    {'status': 'ASK CHARLENE', 'color': '#EF4444', 'phase': 'checklist'},
+    {'status': 'ASK JALA', 'color': '#EC4899', 'phase': 'checklist'},
+    {'status': 'GET QUOTE', 'color': '#06B6D4', 'phase': 'checklist'},
+    {'status': 'WAITING ON QT', 'color': '#F97316', 'phase': 'checklist'},
+    {'status': 'READY FOR PRESENTATION', 'color': '#84CC16', 'phase': 'checklist'}
 ]
 
 # Enhanced Carrier Options with Colors like your screenshots
