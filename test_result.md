@@ -292,13 +292,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "🚨 CRITICAL ROUTING ISSUE: FF&E page redirects to project list - BLOCKS ALL TESTING"
-    - "Delete Button Test: Cannot test - FF&E page inaccessible"
-    - "Filter Test: Cannot test - FF&E page inaccessible"  
-    - "Add Category Test: Cannot test - FF&E page inaccessible"
-    - "Tracking Dropdown Test: Cannot test - FF&E page inaccessible"
+    - "🚨 CRITICAL CHECKLIST ROUTING ISSUE: Checklist page redirects to project list - BLOCKS ALL TESTING"
+    - "Add Item Button Functionality: Cannot test - checklist page inaccessible"
+    - "Modal Form Testing: Cannot test - checklist page inaccessible"  
+    - "Status Testing: Cannot test - checklist page inaccessible"
+    - "Delete Button Testing: Cannot test - checklist page inaccessible"
   stuck_tasks:
-    - "FF&E Dashboard Display - Critical routing failure preventing page access"
+    - "ChecklistDashboard Display - Critical routing failure preventing page access"
   test_all: false
   test_priority: "routing_fix_required_immediately"
 
