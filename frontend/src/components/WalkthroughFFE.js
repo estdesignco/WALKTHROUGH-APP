@@ -250,8 +250,10 @@ const WalkthroughFFE = ({
       if (response.ok) {
         console.log('✅ Walkthrough item added successfully');
         setShowAddItem(false);
-        // Force reload to show the new item
-        window.location.reload();
+        // Call onReload to refresh data without full page reload
+        if (onReload) {
+          onReload();
+        }
       } else {
         const errorData = await response.text();
         console.error('❌ Backend error:', errorData);
