@@ -14,6 +14,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
   // Convert regular status breakdown to checklist format
   const getChecklistStatusBreakdown = () => {
     const checklistStatuses = {
+      'BLANK': { count: 0, color: '#6B7280' },        // Add BLANK as first status (gray)
       'PICKED': { count: 0, color: '#3B82F6' },
       'ORDER SAMPLES': { count: 0, color: '#10B981' },
       'SAMPLES ARRIVED': { count: 0, color: '#8B5CF6' },
@@ -25,13 +26,16 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       'READY FOR PRESENTATION': { count: 0, color: '#84CC16' }
     };
     
-    // Map existing statuses to checklist statuses or default to PICKED
+    // Map existing statuses to checklist statuses
     Object.keys(statusBreakdown).forEach(status => {
       if (checklistStatuses[status]) {
         checklistStatuses[status].count = statusBreakdown[status];
+      } else if (status === '' || status === 'TO BE SELECTED') {
+        // Map blank and "TO BE SELECTED" to BLANK
+        checklistStatuses['BLANK'].count += statusBreakdown[status];
       } else {
-        // Default all other statuses to PICKED
-        checklistStatuses['PICKED'].count += statusBreakdown[status];
+        // For any other unknown statuses, add them to BLANK as well
+        checklistStatuses['BLANK'].count += statusBreakdown[status];
       }
     });
     
