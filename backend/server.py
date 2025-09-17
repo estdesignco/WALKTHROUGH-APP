@@ -1549,7 +1549,10 @@ async def create_room(room_data: RoomCreate):
         print(f"📊 Room structure categories: {list(room_structure.keys())}")
         
         # Count total items that will be created
-        total_items = sum(len(items) for subcategories in room_structure.values() for items in subcategories.values())
+        categories_list = room_structure.get("categories", [])
+        total_items = sum(len(item_obj) for category_obj in categories_list 
+                         for subcategory_obj in category_obj.get("subcategories", [])
+                         for item_obj in subcategory_obj.get("items", []))
         print(f"🔢 Will create {total_items} items for this room")
         
         # Create room object
