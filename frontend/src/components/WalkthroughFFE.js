@@ -906,13 +906,13 @@ const WalkthroughFFE = ({
                                                   {/* SUBCATEGORIES - Only show when category expanded */}
                                                   {isCategoryExpanded && (
                                                     <React.Fragment>
-                                                      {/* WALKTHROUGH HEADER ROW - 5 COLUMNS ONLY */}
+                                                      {/* WALKTHROUGH HEADER ROW - CORRECT ORDER: CHECKBOX, ITEM, QTY, SIZE, REMARKS */}
                                                       <tr>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8b7355' }}>✓</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</td>
+                                                        <td className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-8 text-center" style={{ backgroundColor: '#8B4444' }}>✓</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>ITEM</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</td>
                                                         <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>REMARKS</td>
                                                       </tr>
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
