@@ -305,163 +305,186 @@ const SimpleChecklistSpreadsheet = ({
         </div>
       </div>
 
-      {/* ENHANCED CHECKLIST TABLE WITH DELETE BUTTONS */}
+      {/* ENHANCED CHECKLIST TABLE WITH MINIMIZE/EXPAND */}
       <div className="w-full">
-        {project.rooms.map((room) => (
-          <div key={room.id} className="mb-8">
-            {/* ROOM HEADER WITH DELETE BUTTON */}
-            <div 
-              className="px-4 py-2 text-white font-bold mb-4"
-              style={{ backgroundColor: '#7C3AED' }}
-            >
-              <div className="flex justify-between items-center">
-                <span>{room.name.toUpperCase()}</span>
-                <div className="flex items-center gap-2">
-                  {/* CANVA PDF SCRAPING INPUT */}
-                  <input
-                    type="url"
-                    placeholder="Canva PDF URL..."
-                    className="bg-gray-800 text-white text-sm px-2 py-1 rounded border border-gray-600"
-                    onBlur={(e) => {
-                      if (e.target.value) {
-                        handleCanvaPdfScrape(e.target.value, room.name);
-                        e.target.value = '';
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={() => {
-                      const input = event.target.previousElementSibling;
-                      if (input && input.value) {
-                        handleCanvaPdfScrape(input.value, room.name);
-                        input.value = '';
-                      }
-                    }}
-                    className="bg-purple-600 text-white text-xs px-2 py-1 rounded hover:bg-purple-700"
-                    title="Scrape Canva PDF"
-                  >
-                    🎨 Scrape PDF
-                  </button>
-                  <button
-                    onClick={() => onDeleteRoom && onDeleteRoom(room.id)}
-                    className="text-red-300 hover:text-red-100 text-lg"
-                    title="Delete Room"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* CATEGORIES */}
-            {room.categories?.map((category) => (
-              <div key={category.id} className="mb-6">
-                {/* CATEGORY HEADER WITH DELETE BUTTON */}
-                <div 
-                  className="px-4 py-2 text-white font-bold mb-2"
-                  style={{ backgroundColor: '#065F46' }}
-                >
-                  <div className="flex justify-between items-center">
-                    <span>{category.name.toUpperCase()}</span>
+        {project.rooms.map((room, roomIndex) => {
+          const isRoomExpanded = expandedRooms[room.id];
+          
+          return (
+            <div key={room.id} className="mb-8">
+              {/* ROOM HEADER WITH DIFFERENT MUTED COLORS AND EXPAND/COLLAPSE */}
+              <div 
+                className="px-4 py-2 text-white font-bold mb-4"
+                style={{ backgroundColor: getRoomColor(room.name, roomIndex) }}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
                     <button
-                      onClick={() => handleDeleteCategory(category.id)}
+                      onClick={() => toggleRoomExpansion(room.id)}
+                      className="text-white hover:text-gray-200"
+                    >
+                      {isRoomExpanded ? '▼' : '▶'}
+                    </button>
+                    <span>{room.name.toUpperCase()}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/* FILE UPLOAD FOR CANVA PDF */}
+                    <input
+                      type="file"
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      className="hidden"
+                      id={`canva-upload-${room.id}`}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          handleCanvaPdfUpload(file, room.name);
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor={`canva-upload-${room.id}`}
+                      className="bg-purple-600 text-white text-xs px-2 py-1 rounded hover:bg-purple-700 cursor-pointer"
+                      title="Upload Canva PDF/Image"
+                    >
+                      🎨 Upload Canva
+                    </label>
+                    <button
+                      onClick={() => onDeleteRoom && onDeleteRoom(room.id)}
                       className="text-red-300 hover:text-red-100 text-lg"
-                      title="Delete Category"
+                      title="Delete Room"
                     >
                       🗑️
                     </button>
                   </div>
                 </div>
-
-                {/* CHECKLIST TABLE - 7 COLUMNS */}
-                <table className="w-full border-collapse border border-gray-400 mb-4">
-                  <thead>
-                    <tr>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>ITEM</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>LINK</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>REMARKS</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {category.subcategories?.map((subcategory) => 
-                      subcategory.items?.map((item, itemIndex) => (
-                        <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.name}</td>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center">{item.quantity || ''}</td>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.size || ''}</td>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm">
-                            <select 
-                              className="bg-gray-800 text-white text-xs border-none w-full"
-                              value={item.status || ''}
-                              style={{ backgroundColor: getStatusColor(item.status || ''), color: 'white' }}
-                              onChange={(e) => handleStatusChange(item.id, e.target.value)}
-                            >
-                              <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>Select Status</option>
-                              <option value="PICKED" style={{ backgroundColor: '#3B82F6', color: 'white' }}>PICKED</option>
-                              <option value="ORDER SAMPLES" style={{ backgroundColor: '#10B981', color: 'white' }}>ORDER SAMPLES</option>
-                              <option value="SAMPLES ARRIVED" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>SAMPLES ARRIVED</option>
-                              <option value="ASK NEIL" style={{ backgroundColor: '#F59E0B', color: 'white' }}>ASK NEIL</option>
-                              <option value="ASK CHARLENE" style={{ backgroundColor: '#EF4444', color: 'white' }}>ASK CHARLENE</option>
-                              <option value="ASK JALA" style={{ backgroundColor: '#EC4899', color: 'white' }}>ASK JALA</option>
-                              <option value="GET QUOTE" style={{ backgroundColor: '#06B6D4', color: 'white' }}>GET QUOTE</option>
-                              <option value="WAITING ON QT" style={{ backgroundColor: '#F97316', color: 'white' }}>WAITING ON QT</option>
-                              <option value="READY FOR PRESENTATION" style={{ backgroundColor: '#84CC16', color: 'white' }}>READY FOR PRESENTATION</option>
-                            </select>
-                          </td>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm w-20">
-                            {item.image_url ? (
-                              <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
-                            ) : ''}
-                          </td>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm w-20">
-                            {item.link_url ? (
-                              <a href={item.link_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
-                                🔗 Link
-                              </a>
-                            ) : ''}
-                          </td>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.remarks || ''}</td>
-                          <td className="border border-gray-400 px-2 py-1 text-center w-12">
-                            <button
-                              onClick={() => handleDeleteItem(item.id)}
-                              className="text-red-400 hover:text-red-300 text-sm"
-                              title="Delete Item"
-                            >
-                              🗑️
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-
-                {/* ADD ITEM BUTTON - FIXED */}
-                <div className="mb-4">
-                  <button 
-                    onClick={() => {
-                      if (category.subcategories?.length > 0) {
-                        setSelectedSubCategoryId(category.subcategories[0].id);
-                        setShowAddItem(true);
-                        console.log('🎯 Selected subcategory for new item:', category.subcategories[0].id);
-                      } else {
-                        alert('This category has no subcategories. Please contact support.');
-                      }
-                    }}
-                    className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
-                  >
-                    + Add Item
-                  </button>
-                </div>
               </div>
-            ))}
-          </div>
-        ))}
+
+              {/* CATEGORIES - Only show when room expanded */}
+              {isRoomExpanded && room.categories?.map((category) => {
+                const isCategoryExpanded = expandedCategories[category.id];
+                
+                return (
+                  <div key={category.id} className="mb-6">
+                    {/* CATEGORY HEADER WITH EXPAND/COLLAPSE */}
+                    <div 
+                      className="px-4 py-2 text-white font-bold mb-2"
+                      style={{ backgroundColor: getCategoryColor() }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => toggleCategoryExpansion(category.id)}
+                            className="text-white hover:text-gray-200"
+                          >
+                            {isCategoryExpanded ? '▼' : '▶'}
+                          </button>
+                          <span>{category.name.toUpperCase()}</span>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteCategory(category.id)}
+                          className="text-red-300 hover:text-red-100 text-lg"
+                          title="Delete Category"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* CHECKLIST TABLE - Only show when category expanded */}
+                    {isCategoryExpanded && (
+                      <>
+                        <table className="w-full border-collapse border border-gray-400 mb-4">
+                          <thead>
+                            <tr>
+                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>ITEM</th>
+                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
+                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
+                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>LINK</th>
+                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>REMARKS</th>
+                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {category.subcategories?.map((subcategory) => 
+                              subcategory.items?.map((item, itemIndex) => (
+                                <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.name}</td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center">{item.quantity || ''}</td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.size || ''}</td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                    <select 
+                                      className="bg-gray-800 text-white text-xs border-none w-full"
+                                      value={item.status || ''}
+                                      style={{ backgroundColor: getStatusColor(item.status || ''), color: 'white' }}
+                                      onChange={(e) => handleStatusChange(item.id, e.target.value)}
+                                    >
+                                      <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>Select Status</option>
+                                      <option value="PICKED" style={{ backgroundColor: '#3B82F6', color: 'white' }}>PICKED</option>
+                                      <option value="ORDER SAMPLES" style={{ backgroundColor: '#10B981', color: 'white' }}>ORDER SAMPLES</option>
+                                      <option value="SAMPLES ARRIVED" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>SAMPLES ARRIVED</option>
+                                      <option value="ASK NEIL" style={{ backgroundColor: '#F59E0B', color: 'white' }}>ASK NEIL</option>
+                                      <option value="ASK CHARLENE" style={{ backgroundColor: '#EF4444', color: 'white' }}>ASK CHARLENE</option>
+                                      <option value="ASK JALA" style={{ backgroundColor: '#EC4899', color: 'white' }}>ASK JALA</option>
+                                      <option value="GET QUOTE" style={{ backgroundColor: '#06B6D4', color: 'white' }}>GET QUOTE</option>
+                                      <option value="WAITING ON QT" style={{ backgroundColor: '#F97316', color: 'white' }}>WAITING ON QT</option>
+                                      <option value="READY FOR PRESENTATION" style={{ backgroundColor: '#84CC16', color: 'white' }}>READY FOR PRESENTATION</option>
+                                    </select>
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm w-20">
+                                    {item.image_url ? (
+                                      <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
+                                    ) : ''}
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm w-20">
+                                    {item.link_url ? (
+                                      <a href={item.link_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+                                        🔗 Link
+                                      </a>
+                                    ) : ''}
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.remarks || ''}</td>
+                                  <td className="border border-gray-400 px-2 py-1 text-center w-12">
+                                    <button
+                                      onClick={() => handleDeleteItem(item.id)}
+                                      className="text-red-400 hover:text-red-300 text-sm"
+                                      title="Delete Item"
+                                    >
+                                      🗑️
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+
+                        {/* ADD ITEM BUTTON - FIXED */}
+                        <div className="mb-4">
+                          <button 
+                            onClick={() => {
+                              if (category.subcategories?.length > 0) {
+                                setSelectedSubCategoryId(category.subcategories[0].id);
+                                setShowAddItem(true);
+                                console.log('🎯 Selected subcategory for new item:', category.subcategories[0].id);
+                              } else {
+                                alert('This category has no subcategories. Please contact support.');
+                              }
+                            }}
+                            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
+                          >
+                            + Add Item
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
 
       {/* Add Item Modal - FIXED */}
