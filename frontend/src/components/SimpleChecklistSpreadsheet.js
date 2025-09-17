@@ -897,11 +897,11 @@ const SimpleChecklistSpreadsheet = ({
                                     </button>
                                   </td>
                                 </tr>
-                                  ))}
-                                  </tbody>
-                                </table>
-                              </React.Fragment>
-                            ))}
+                                ))}
+                              </tbody>
+                            </table>
+                          </React.Fragment>
+                        ))}
 
                         {/* ADD ITEM BUTTON - FIXED */}
                         <div className="mb-4">
