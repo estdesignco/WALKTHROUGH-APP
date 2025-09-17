@@ -553,43 +553,24 @@ const WalkthroughFFE = ({
   };
 
   const getCategoryColor = () => '#065F46';  // Dark green
-    return roomColors[roomName.toLowerCase()] || '#7C3AED';
-  };
 
-  const getCategoryColor = () => '#065F46';  // Dark green
-  const getMainHeaderColor = () => '#8B4444';  // Dark red for main headers
-  const getAdditionalInfoColor = () => '#8B4444';  // Brown for ADDITIONAL INFO.
-  const getShippingInfoColor = () => '#6B21A8';  // Purple for SHIPPING INFO.
-  const getNotesActionsColor = () => '#8B4444';  // Red for NOTES and ACTIONS
-
-  // Get status color
+  // Status colors for walkthrough items (simplified for walkthrough)
   const getStatusColor = (status) => {
-    const colors = {
-      '': '#6B7280',                        // Gray for blank/default
-      'TO BE SELECTED': '#6B7280',          // Gray
-      'RESEARCHING': '#3B82F6',             // Blue
-      'PENDING APPROVAL': '#F59E0B',        // Amber
-      'APPROVED': '#10B981',                // Emerald
-      'ORDERED': '#10B981',                 // Emerald
-      'PICKED': '#FFD700',                  // Gold - but user wants this NOT as default
-      'CONFIRMED': '#10B981',               // Emerald
-      'IN PRODUCTION': '#F97316',           // Orange
-      'SHIPPED': '#3B82F6',                 // Blue
-      'IN TRANSIT': '#3B82F6',              // Blue  
-      'OUT FOR DELIVERY': '#3B82F6',        // Blue
-      'DELIVERED TO RECEIVER': '#8B5CF6',   // Violet
-      'DELIVERED TO JOB SITE': '#8B5CF6',   // Violet
-      'RECEIVED': '#8B5CF6',                // Violet
-      'READY FOR INSTALL': '#10B981',       // Emerald
-      'INSTALLING': '#10B981',              // Emerald
-      'INSTALLED': '#10B981',               // Emerald
-      'ON HOLD': '#EF4444',                 // Red
-      'BACKORDERED': '#EF4444',             // Red
-      'DAMAGED': '#EF4444',                 // Red
-      'RETURNED': '#EF4444',                // Red
-      'CANCELLED': '#EF4444'                // Red
+    const statusColors = {
+      '': '#6B7280',                    // Gray for blank
+      'PICKED': '#FFD700',              // Gold
+      'TO BE SELECTED': '#D4A574',      // Muted gold
+      'RESEARCHING': '#3B82F6',         // Blue
+      'PENDING APPROVAL': '#F59E0B',    // Amber
+      'APPROVED': '#10B981',            // Emerald
+      'ORDERED': '#10B981',             // Emerald
+      'CONFIRMED': '#10B981',           // Emerald
+      'IN PRODUCTION': '#F97316',       // Orange
+      'SHIPPED': '#3B82F6',             // Blue
+      'DELIVERED': '#8B5CF6',           // Violet
+      'INSTALLED': '#10B981'            // Emerald
     };
-    return colors[status] || '#6B7280';
+    return statusColors[status] || '#6B7280';
   };
 
   // Get carrier color to match header colors
