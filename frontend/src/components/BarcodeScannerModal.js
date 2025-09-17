@@ -125,7 +125,7 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScanResult }) => {
         onClose();
       } else {
         // Fallback: manual product search
-        setError(`Product not found for barcode: ${barcode}. Please enter details manually.`);
+        setError("Product not found for barcode: " + barcode + ". Please enter details manually.");
         setTimeout(() => {
           onClose();
         }, 3000);
