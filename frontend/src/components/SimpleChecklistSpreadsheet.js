@@ -260,9 +260,12 @@ const SimpleChecklistSpreadsheet = ({
 
       if (response.ok) {
         console.log('✅ Checklist item deleted successfully');
-        // Call onReload to refresh data without full page reload
+        // Call onReload to refresh data WITHOUT RESETTING MINIMIZE STATE
+        const currentExpandedState = expandedRooms;
         if (onReload) {
-          onReload();
+          await onReload();
+          // Restore expanded state after reload
+          setExpandedRooms(currentExpandedState);
         }
       } else {
         console.error('❌ Delete failed with status:', response.status);
