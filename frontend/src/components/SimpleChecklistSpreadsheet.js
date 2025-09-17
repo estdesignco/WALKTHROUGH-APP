@@ -327,6 +327,7 @@ const SimpleChecklistSpreadsheet = ({
         );
         
         if (matchingCategory) {
+          // First add the category
           const categoryData = {
             ...matchingCategory,
             room_id: roomId,
@@ -340,13 +341,50 @@ const SimpleChecklistSpreadsheet = ({
           });
           
           if (addResponse.ok) {
-            console.log('✅ Comprehensive checklist category added successfully');
+            const newCategory = await addResponse.json();
+            console.log('✅ Category added:', newCategory.name);
+            
+            // Now add ALL subcategories with their items
+            for (const subcategory of matchingCategory.subcategories) {
+              const subcategoryData = {
+                ...subcategory,
+                category_id: newCategory.id,
+                id: undefined
+              };
+              
+              const subResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/subcategories`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(subcategoryData)
+              });
+              
+              if (subResponse.ok) {
+                const newSubcategory = await subResponse.json();
+                console.log('✅ Subcategory added:', newSubcategory.name);
+                
+                // Add ALL items for this subcategory
+                for (const item of subcategory.items) {
+                  const itemData = {
+                    ...item,
+                    subcategory_id: newSubcategory.id,
+                    id: undefined,
+                    status: '' // BLANK status for checklist items
+                  };
+                  
+                  await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(itemData)
+                  });
+                }
+              }
+            }
             
             await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
-            // Call onReload to refresh data without full page reload
+            // Reload to show all new items
             if (onReload) {
               onReload();
             }
