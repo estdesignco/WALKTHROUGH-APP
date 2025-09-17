@@ -2996,6 +2996,142 @@ async def scrape_product_advanced(data: dict):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to scrape URL: {str(e)}")
 
+@api_router.post("/scrape-canva")
+async def scrape_canva_board(data: dict):
+    """
+    Scrape Canva board for design information and images
+    Extracts images, colors, and design elements from Canva boards
+    """
+    canva_url = data.get('canva_url', '')
+    item_id = data.get('item_id', '')
+    
+    if not canva_url:
+        raise HTTPException(status_code=400, detail="Canva URL is required")
+    
+    if not canva_url.lower().find('canva.com') != -1:
+        raise HTTPException(status_code=400, detail="URL must be a Canva board URL")
+    
+    try:
+        print(f"🎨 Starting Canva board scraping for: {canva_url}")
+        
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
+            
+            # Set user agent to appear as regular browser
+            await page.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')
+            
+            try:
+                # Navigate to Canva URL
+                await page.goto(canva_url, wait_until='networkidle', timeout=30000)
+                
+                # Wait for content to load
+                await page.wait_for_timeout(3000)
+                
+                # Extract basic information
+                title = await page.title()
+                
+                # Try to get design images (Canva shows design previews)
+                images = []
+                try:
+                    # Look for image elements in Canva
+                    image_elements = await page.query_selector_all('img[src*="canva"]')
+                    for img in image_elements[:5]:  # Limit to first 5 images
+                        src = await img.get_attribute('src')
+                        if src and 'canva' in src:
+                            images.append(src)
+                except Exception as img_error:
+                    print(f"⚠️ Could not extract images: {img_error}")
+                
+                # Try to extract color palette if visible
+                colors = []
+                try:
+                    # Look for color elements (this is approximate as Canva structure may vary)
+                    color_elements = await page.query_selector_all('[style*="background-color"], [style*="color:"]')
+                    for elem in color_elements[:10]:  # Limit color extraction
+                        style = await elem.get_attribute('style')
+                        if style:
+                            # Extract hex colors from style
+                            color_matches = re.findall(r'#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}', style)
+                            colors.extend(color_matches)
+                except Exception as color_error:
+                    print(f"⚠️ Could not extract colors: {color_error}")
+                
+                # Extract text content for inspiration/notes
+                description = ""
+                try:
+                    # Get page text content
+                    text_content = await page.evaluate('document.body.innerText')
+                    # Clean and limit text
+                    description = text_content[:500] if text_content else "Canva design board"
+                except Exception as text_error:
+                    print(f"⚠️ Could not extract text: {text_error}")
+                    description = f"Canva design board: {title}"
+                
+                await browser.close()
+                
+                # Prepare scraped data
+                canva_data = {
+                    "title": title or "Canva Design",
+                    "url": canva_url,
+                    "images": list(set(images))[:3],  # Remove duplicates, limit to 3
+                    "colors": list(set(colors))[:5],  # Remove duplicates, limit to 5
+                    "description": description[:200],  # Limit description
+                    "scraped_at": datetime.now(timezone.utc).isoformat(),
+                    "type": "canva_board"
+                }
+                
+                print(f"✅ Successfully scraped Canva board: {len(images)} images, {len(colors)} colors")
+                
+                # If item_id provided, update the item with scraped data
+                if item_id:
+                    try:
+                        # Update item with Canva data
+                        update_data = {
+                            "canva_data": canva_data,
+                            "image_url": images[0] if images else None,  # Use first image as main image
+                            "description": canva_data["description"],
+                            "updated_at": datetime.now(timezone.utc)
+                        }
+                        
+                        result = await db.items.update_one(
+                            {"id": item_id},
+                            {"$set": update_data}
+                        )
+                        
+                        if result.modified_count > 0:
+                            print(f"✅ Updated item {item_id} with Canva data")
+                        else:
+                            print(f"⚠️ No item found with ID {item_id}")
+                            
+                    except Exception as update_error:
+                        print(f"⚠️ Failed to update item: {update_error}")
+                
+                return {
+                    "success": True, 
+                    "data": canva_data,
+                    "message": f"Successfully scraped Canva board with {len(images)} images and {len(colors)} colors"
+                }
+                
+            except Exception as scrape_error:
+                await browser.close()
+                raise scrape_error
+                
+    except Exception as e:
+        print(f"❌ Canva scraping failed: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "data": {
+                "title": "Failed to scrape",
+                "url": canva_url,
+                "images": [],
+                "colors": [],
+                "description": f"Failed to scrape Canva board: {str(e)}",
+                "type": "canva_board_error"
+            }
+        }
+
 # Include the router in the main app
 app.include_router(api_router)
 
