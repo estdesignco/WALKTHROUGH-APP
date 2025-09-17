@@ -322,14 +322,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "🚨 CANVA PDF SCRAPING: Critical backend bug in room lookup logic needs fix"
+    - "Categories Available Endpoint: CONFIRMED WORKING - returns all 14 categories from enhanced_rooms.py"
     - "Add Item Functionality: CONFIRMED WORKING - no issues found"
     - "Add Category Functionality: CONFIRMED WORKING - no issues found"  
     - "Four Hands Scraping: CONFIRMED WORKING - Playwright installed successfully"
   stuck_tasks:
     - "Canva PDF Scraping - Database query inconsistency bug in server.py"
   test_all: false
-  test_priority: "canva_pdf_fix_required"
+  test_priority: "categories_endpoint_verified"
 
   - task: "Add Room and Add Category Backend Data Structure Fix"
     implemented: true
