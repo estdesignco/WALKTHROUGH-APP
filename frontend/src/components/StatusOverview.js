@@ -91,15 +91,15 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
 
   // Prepare data for Status Overview pie chart
   const statusPieData = {
-    labels: Object.keys(statusBreakdown).filter(status => statusBreakdown[status].count > 0),
+    labels: Object.keys(statusBreakdown).filter(status => statusBreakdown[status] > 0),
     datasets: [
       {
         data: Object.keys(statusBreakdown)
-          .filter(status => statusBreakdown[status].count > 0)
-          .map(status => statusBreakdown[status].count),
+          .filter(status => statusBreakdown[status] > 0)
+          .map(status => statusBreakdown[status]),
         backgroundColor: Object.keys(statusBreakdown)
-          .filter(status => statusBreakdown[status].count > 0)
-          .map(status => statusBreakdown[status].color),
+          .filter(status => statusBreakdown[status] > 0)
+          .map(status => getStatusColor(status)),
         borderWidth: 0,
         hoverBorderWidth: 2,
         hoverBorderColor: '#ffffff'
