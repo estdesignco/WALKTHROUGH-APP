@@ -321,6 +321,30 @@ const WalkthroughFFE = ({
     }
   };
 
+  // Handle deleting a category - ADDED FOR WALKTHROUGH
+  const handleDeleteCategory = async (categoryId) => {
+    if (!window.confirm('Are you sure you want to delete this entire category and all its items?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/categories/${categoryId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        console.log('✅ Walkthrough category deleted successfully');
+        window.location.reload();
+      } else {
+        console.error('❌ Category delete failed with status:', response.status);
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('❌ Error deleting walkthrough category:', error);
+      alert('Failed to delete category: ' + error.message);
+    }
+  };
+
   // Handle adding a new room - SIMPLE VERSION LIKE BEFORE
   const handleAddRoom = () => {
     if (onAddRoom) {
