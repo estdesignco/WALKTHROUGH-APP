@@ -220,7 +220,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loadi
                 className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
               >
                 <option value="">Select Status...</option>
-                {itemStatuses.map(status => (
+                {(itemStatuses || []).map(status => (
                   <option key={status} value={status}>
                     {status.replace('_', ' ')}
                   </option>
