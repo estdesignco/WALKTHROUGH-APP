@@ -1783,11 +1783,14 @@ async def get_available_categories():
     try:
         from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE
         
-        # Collect all unique category names from the comprehensive structure
+        # Collect all unique category names from the comprehensive structure - NEW FORMAT
         all_categories = set()
         for room_name, room_structure in COMPREHENSIVE_ROOM_STRUCTURE.items():
-            for category_name in room_structure.keys():
-                all_categories.add(category_name)
+            categories_list = room_structure.get("categories", [])
+            for category_obj in categories_list:
+                category_name = category_obj.get("name", "")
+                if category_name:
+                    all_categories.add(category_name)
         
         # Sort alphabetically and return
         return {"categories": sorted(list(all_categories))}
@@ -1795,10 +1798,9 @@ async def get_available_categories():
     except Exception as e:
         logger.error(f"Error getting available categories: {str(e)}")
         return {"categories": [
-            "Lighting", "Furniture & Storage", "Decor & Accessories", 
-            "Paint, Wallpaper & Finishes", "Architectural Elements, Built-ins & Trim",
-            "Flooring", "Window Treatments", "HVAC & Mechanical Systems",
-            "Security & Smart Home", "Appliances", "Plumbing & Fixtures"
+            "Lighting", "Furniture", "Decor & Accessories", 
+            "Paint, Wallpaper, and Finishes", "Cabinets, Built-ins, and Trim",
+            "Appliances", "Plumbing", "Plumbing & Fixtures"
         ]}
 
 # SUBCATEGORY ENDPOINTS
