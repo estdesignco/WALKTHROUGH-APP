@@ -64,6 +64,9 @@ ROOM_COLORS = {
 
 # Enhanced Item Status Options with Colors for Sophisticated Tracking
 ITEM_STATUSES = [
+    # Default blank status (should be first for ChecklistStatusOverview)
+    {'status': '', 'color': '#9CA3AF', 'phase': 'default'},
+    
     # Planning Phase
     {'status': 'TO BE SELECTED', 'color': '#D4A574', 'phase': 'planning'},
     {'status': 'RESEARCHING', 'color': '#B8860B', 'phase': 'planning'}, 
