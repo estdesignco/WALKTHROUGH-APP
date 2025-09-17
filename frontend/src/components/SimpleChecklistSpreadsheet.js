@@ -474,12 +474,12 @@ const SimpleChecklistSpreadsheet = ({
                           <span>{category.name.toUpperCase()}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          {/* ADD CATEGORY DROPDOWN */}
+                          {/* ADD CATEGORY DROPDOWN - FIXED */}
                           <select 
                             onChange={(e) => {
                               if (e.target.value) {
-                                console.log('Adding category:', e.target.value, 'to room:', room.id);
-                                // handleAddCategory(room.id, e.target.value);
+                                console.log('🎯 Adding category:', e.target.value, 'to room:', room.id);
+                                handleAddCategory(room.id, e.target.value);
                                 e.target.value = '';
                               }
                             }}
