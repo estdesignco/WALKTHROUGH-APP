@@ -460,20 +460,30 @@ const SimpleChecklistSpreadsheet = ({
             <input
               type="text"
               placeholder="Search Items, Vendors, SKUs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
           
           {/* Filter Dropdowns */}
           <div className="flex gap-3 flex-wrap">
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedRoom}
+              onChange={(e) => setSelectedRoom(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Rooms</option>
               {project.rooms.map(room => (
                 <option key={room.id} value={room.id}>{room.name}</option>
               ))}
             </select>
             
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Categories</option>
               <option value="Lighting">Lighting</option>
               <option value="Furniture">Furniture & Storage</option>
@@ -482,14 +492,22 @@ const SimpleChecklistSpreadsheet = ({
               <option value="Architectural">Architectural Elements</option>
             </select>
             
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedVendor}
+              onChange={(e) => setSelectedVendor(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Vendors</option>
               {vendorTypes.map(vendor => (
                 <option key={vendor} value={vendor}>{vendor}</option>
               ))}
             </select>
             
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Status</option>
               <option value="PICKED">PICKED</option>
               <option value="ORDER SAMPLES">ORDER SAMPLES</option>
@@ -503,10 +521,23 @@ const SimpleChecklistSpreadsheet = ({
             </select>
             
             {/* Filter and Clear Buttons */}
-            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">
+            <button 
+              onClick={() => console.log('🔍 CHECKLIST FILTER APPLIED')}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
+            >
               🔍 FILTER
             </button>
-            <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium">
+            <button 
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedRoom('');
+                setSelectedCategory('');
+                setSelectedVendor('');
+                setSelectedStatus('');
+                console.log('🧹 CHECKLIST FILTER CLEARED');
+              }}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium"
+            >
               CLEAR
             </button>
           </div>
