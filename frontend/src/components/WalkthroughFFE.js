@@ -988,7 +988,7 @@ const WalkthroughFFE = ({
                                       </React.Fragment>
                                 )}
                               </React.Fragment>
-                        );
+                  );
                       })}
                   </tbody>
                 </table>
