@@ -977,7 +977,8 @@ const WalkthroughFFE = ({
                                                             </button>
                                                           </td>
                                                         </tr>
-                                                      ))
+                                                      ))}
+                                                      </React.Fragment>
                                                     ))}
                                                     
                                                     {/* ADD ITEM ROW */}
