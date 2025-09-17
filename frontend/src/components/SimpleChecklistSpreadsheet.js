@@ -719,20 +719,32 @@ const SimpleChecklistSpreadsheet = ({
                             </tr>
                           </thead>
                           <tbody>
-                            {category.subcategories?.map((subcategory) => 
-                              subcategory.items?.map((item, itemIndex) => (
-                                <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                  {/* ITEM - EDITABLE */}
-                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">
-                                    <div 
-                                      contentEditable={true}
-                                      suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-white text-sm outline-none"
-                                      onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
-                                    >
-                                      {item.name}
-                                    </div>
+                            {category.subcategories?.map((subcategory) => (
+                              <React.Fragment key={subcategory.id || subcategory.name}>
+                                {/* SUBCATEGORY HEADER - RED */}
+                                <tr>
+                                  <td 
+                                    colSpan="8" 
+                                    className="bg-red-700 text-white font-bold text-sm px-4 py-2 border border-gray-400"
+                                    style={{ backgroundColor: '#8B4444' }}
+                                  >
+                                    {subcategory.name.toUpperCase()}
                                   </td>
+                                </tr>
+                                {/* ITEMS UNDER THIS SUBCATEGORY */}
+                                {subcategory.items?.map((item, itemIndex) => (
+                                  <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
+                                    {/* ITEM - EDITABLE */}
+                                    <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                      <div 
+                                        contentEditable={true}
+                                        suppressContentEditableWarning={true}
+                                        className="w-full bg-transparent text-white text-sm outline-none"
+                                        onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
+                                      >
+                                        {item.name}
+                                      </div>
+                                    </td>
                                   
                                   {/* QTY - EDITABLE */}
                                   <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center">
