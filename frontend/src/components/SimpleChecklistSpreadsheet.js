@@ -375,7 +375,7 @@ const SimpleChecklistSpreadsheet = ({
       formData.append('room_name', roomName);
       formData.append('project_id', project.id);
       
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/upload-canva-pdf', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/upload-canva-pdf`, {
         method: 'POST',
         body: formData
       });
