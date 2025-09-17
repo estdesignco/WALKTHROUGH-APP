@@ -237,7 +237,69 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
-  // Handle Canva PDF Upload - ENHANCED FEATURE  
+  // Handle adding a new category - COPIED FROM WORKING FFE
+  const handleAddCategory = async (roomId, categoryName) => {
+    if (!roomId || !categoryName) {
+      console.error('❌ Missing roomId or categoryName');
+      return;
+    }
+
+    try {
+      console.log('🔄 Creating comprehensive checklist category:', categoryName, 'for room:', roomId);
+      
+      const tempRoomResponse = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/rooms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `temp_${categoryName}_${Date.now()}`,
+          description: `Temporary room to extract ${categoryName} structure`,
+          project_id: "temp",
+          order_index: 999
+        })
+      });
+
+      if (tempRoomResponse.ok) {
+        const tempRoom = await tempRoomResponse.json();
+        
+        const matchingCategory = tempRoom.categories.find(cat => 
+          cat.name.toLowerCase() === categoryName.toLowerCase()
+        );
+        
+        if (matchingCategory) {
+          const categoryData = {
+            ...matchingCategory,
+            room_id: roomId,
+            id: undefined
+          };
+          
+          const addResponse = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/categories`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(categoryData)
+          });
+          
+          if (addResponse.ok) {
+            console.log('✅ Comprehensive checklist category added successfully');
+            
+            await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+              method: 'DELETE'
+            });
+            
+            // Call onReload to refresh data without full page reload
+            if (onReload) {
+              onReload();
+            }
+          }
+        }
+        
+        await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+          method: 'DELETE'
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error adding comprehensive checklist category:', error);
+    }
+  };  
   const handleCanvaPdfUpload = async (file, roomName) => {
     if (!file) {
       console.log('⚠️ No file provided');
