@@ -892,21 +892,27 @@ const WalkthroughFFE = ({
                                                       </tr>
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
-                                                    {/* SUBCATEGORIES WITH PROPER HEADERS */}
-                                                    {category.subcategories?.map((subcategory) => (
-                                                      <React.Fragment key={subcategory.id || subcategory.name}>
-                                                        {/* SUBCATEGORY HEADER - RED */}
-                                                        <tr>
-                                                          <td 
-                                                            colSpan="5" 
-                                                            className="bg-red-700 text-white font-bold text-sm px-4 py-2 border border-gray-400"
-                                                            style={{ backgroundColor: '#8B4444' }}
-                                                          >
-                                                            {subcategory.name.toUpperCase()}
-                                                          </td>
-                                                        </tr>
-                                                        {/* ITEMS UNDER THIS SUBCATEGORY */}
-                                                        {subcategory.items?.map((item, itemIndex) => (
+                                                    {/* SUBCATEGORIES - Only show when category expanded */}
+                                                    {isCategoryExpanded && (
+                                                      <>
+                                                        {category.subcategories?.map((subcategory) => (
+                                                          <React.Fragment key={subcategory.id || subcategory.name}>
+                                                            {/* TABLE WITH SUBCATEGORY NAME IN HEADER */}
+                                                            <tr>
+                                                              <td colSpan="5">
+                                                                <table className="w-full border-collapse border border-gray-400 mb-4">
+                                                                  <thead>
+                                                                    <tr>
+                                                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-8" style={{ backgroundColor: '#8B4444' }}>✓</th>
+                                                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
+                                                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                                                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                                                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>REMARKS</th>
+                                                                    </tr>
+                                                                  </thead>
+                                                                  <tbody>
+                                                                    {/* ITEMS UNDER THIS SUBCATEGORY */}
+                                                                    {subcategory.items?.map((item, itemIndex) => (
                                                         <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
                                                           {/* CHECKBOX - COLUMN 1 (NARROW) */}
                                                           <td className="border border-gray-400 px-1 py-2 text-center w-8">
