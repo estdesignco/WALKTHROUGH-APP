@@ -3044,17 +3044,13 @@ async def process_canva_pdf_file(file_path: str, room_name: str, project_id: str
     try:
         print(f"🎨 Processing Canva PDF file: {file_path}")
         
-        # Find the room in the project - FIXED ROOM LOOKUP
+        # Find the room in the project - USE SAME LOGIC AS get_project ENDPOINT
         project_doc = await db.projects.find_one({"id": project_id})
         if not project_doc:
             raise HTTPException(status_code=404, detail="Project not found")
         
-        # Get rooms from the project data structure
-        rooms = project_doc.get('rooms', [])
-        if not rooms:
-            # Try to get rooms from separate rooms collection
-            rooms_cursor = db.rooms.find({"project_id": project_id})
-            rooms = await rooms_cursor.to_list(length=None)
+        # Fetch rooms from separate rooms collection (same as get_project endpoint)
+        rooms = await db.rooms.find({"project_id": project_id}).to_list(length=None)
         
         target_room = None
         for room in rooms:
