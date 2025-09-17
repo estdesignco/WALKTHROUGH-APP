@@ -1193,9 +1193,17 @@ const ExactFFESpreadsheet = ({
                                                       <tr>
                                                         <td colSpan="15" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                                           <div className="flex justify-start items-center space-x-4">
-                                                            {/* Add Item Button - GOLD/AMBER COLOR */}
+                                                            {/* Add Item Button - FIXED */}
                                                             <button
-                                                              onClick={() => setShowAddItem(true)}
+                                                              onClick={() => {
+                                                                if (category.subcategories?.length > 0) {
+                                                                  setSelectedSubCategoryId(category.subcategories[0].id);
+                                                                  setShowAddItem(true);
+                                                                  console.log('🎯 Selected subcategory for FFE item:', category.subcategories[0].id);
+                                                                } else {
+                                                                  alert('This category has no subcategories. Please contact support.');
+                                                                }
+                                                              }}
                                                               className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium"
                                                             >
                                                               ✚ Add Item
