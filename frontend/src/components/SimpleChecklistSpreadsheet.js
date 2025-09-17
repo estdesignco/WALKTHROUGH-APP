@@ -465,13 +465,33 @@ const SimpleChecklistSpreadsheet = ({
                           </button>
                           <span>{category.name.toUpperCase()}</span>
                         </div>
-                        <button
-                          onClick={() => handleDeleteCategory(category.id)}
-                          className="text-red-300 hover:text-red-100 text-lg"
-                          title="Delete Category"
-                        >
-                          🗑️
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {/* ADD CATEGORY DROPDOWN */}
+                          <select 
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                console.log('Adding category:', e.target.value, 'to room:', room.id);
+                                // handleAddCategory(room.id, e.target.value);
+                                e.target.value = '';
+                              }
+                            }}
+                            className="bg-green-600 text-white text-xs px-2 py-1 rounded border-none"
+                          >
+                            <option value="">+ Add Category</option>
+                            <option value="Lighting">Lighting</option>
+                            <option value="Furniture & Storage">Furniture & Storage</option>
+                            <option value="Decor & Accessories">Decor & Accessories</option>
+                            <option value="Paint, Wallpaper & Finishes">Paint, Wallpaper & Finishes</option>
+                            <option value="Architectural Elements, Built-ins & Trim">Architectural Elements</option>
+                          </select>
+                          <button
+                            onClick={() => handleDeleteCategory(category.id)}
+                            className="text-red-300 hover:text-red-100 text-lg"
+                            title="Delete Category"
+                          >
+                            🗑️
+                          </button>
+                        </div>
                       </div>
                     </div>
 
