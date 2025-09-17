@@ -1197,7 +1197,8 @@ const ExactFFESpreadsheet = ({
                                                             </button>
                                                           </td>
                                                         </tr>
-                                                        ))
+                                                        ))}
+                                                        </React.Fragment>
                                                       ))}
                                                       
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
