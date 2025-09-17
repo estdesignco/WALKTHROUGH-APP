@@ -58,27 +58,48 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
-  // Handle adding new items
+  // Handle adding new items - COPIED FROM WORKING FFE
   const handleAddItem = async (itemData) => {
     try {
-      if (!selectedSubCategoryId) {
-        console.error('❌ No subcategory selected for adding item');
-        alert('Please select a category first by clicking "Add Item" in a specific category section.');
+      // Find the first available subcategory if none selected
+      let subcategoryId = selectedSubCategoryId;
+      
+      if (!subcategoryId) {
+        // Find the first subcategory from any room/category
+        for (const room of project.rooms) {
+          for (const category of room.categories || []) {
+            if (category.subcategories?.length > 0) {
+              subcategoryId = category.subcategories[0].id;
+              console.log(`🔍 Auto-selected subcategory: ${category.subcategories[0].name}`);
+              break;
+            }
+          }
+          if (subcategoryId) break;
+        }
+      }
+
+      if (!subcategoryId) {
+        console.error('No subcategories available. Please add a category first.');
+        alert('No subcategories available. Please add a category first.');
         return;
       }
 
+      const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
+      
       const newItem = {
         ...itemData,
-        subcategory_id: selectedSubCategoryId,
+        subcategory_id: subcategoryId,
         status: '', // Start with blank status as requested
         order_index: 0
       };
 
       console.log('📤 Creating checklist item:', newItem);
 
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items`, {
+      const response = await fetch(`${backendUrl}/api/items`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(newItem)
       });
 
@@ -86,6 +107,7 @@ const SimpleChecklistSpreadsheet = ({
         console.log('✅ Checklist item added successfully');
         setShowAddItem(false);
         setSelectedSubCategoryId(null);
+        // Force reload to show new item
         window.location.reload();
       } else {
         const errorData = await response.text();
