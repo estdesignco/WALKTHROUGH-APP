@@ -307,7 +307,7 @@ class CanvaPDFTester:
             "project_id": "invalid-project-id"
         }
         
-        success, response_data, status_code = self.make_request('POST', '/scrape-canva', scrape_data)
+        success, response_data, status_code = self.make_request('POST', '/scrape-canva-pdf', scrape_data)
         
         if not success and status_code == 404:
             self.log_test("Invalid Project ID Handling", True, f"Correctly returned 404 for invalid project ID")
