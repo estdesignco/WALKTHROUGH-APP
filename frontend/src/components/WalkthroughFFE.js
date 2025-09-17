@@ -883,50 +883,90 @@ const WalkthroughFFE = ({
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
                                                       {/* ACTUAL INSTALLEDS FROM BACKEND DATA */}
-                                                      {category.subcategories?.map((subcategory) => (
-                                                        subcategory.items?.map((item, itemIndex) => (
-                                                        <tr key={item.id}>
-                                                          {/* CHECKBOX - KEEP THIS! */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center">
-                                                            <input type="checkbox" className="w-4 h-4" />
+                                                    {/* WALKTHROUGH DATA ROWS - CORRECT 5 COLUMNS: CHECKBOX, ITEM, QTY, SIZE, REMARKS */}
+                                                    {category.subcategories?.map((subcategory) => (
+                                                      subcategory.items?.map((item, itemIndex) => (
+                                                        <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
+                                                          {/* CHECKBOX - COLUMN 1 (NARROW) */}
+                                                          <td className="border border-gray-400 px-1 py-2 text-center w-8">
+                                                            <input 
+                                                              type="checkbox" 
+                                                              checked={item.status === 'INSTALLED' || false}
+                                                              onChange={(e) => console.log('Checkbox toggled:', e.target.checked)}
+                                                              className="w-4 h-4"
+                                                            />
                                                           </td>
                                                           
-                                                          {/* INSTALLED (was INSTALLED) */}
+                                                          {/* ITEM - COLUMN 2 (EDITABLE) */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                                            {item.name}
+                                                            <div 
+                                                              contentEditable={true}
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm outline-none"
+                                                              onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
+                                                            >
+                                                              {item.name}
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* VENDOR/SKU (was VENDOR/SKU) */}
+                                                          {/* QTY - COLUMN 3 (EDITABLE) */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center w-16">
+                                                            <div 
+                                                              contentEditable={true}
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm text-center outline-none"
+                                                              onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
+                                                            >
+                                                              {item.quantity || ''}
+                                                            </div>
+                                                          </td>
+                                                          
+                                                          {/* SIZE - COLUMN 4 (EDITABLE) */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                                            {item.vendor || ''}
+                                                            <div 
+                                                              contentEditable={true}
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm outline-none"
+                                                              onBlur={(e) => console.log('Size updated:', e.target.textContent)}
+                                                            >
+                                                              {item.size || ''}
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* QTY */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
-                                                            {item.quantity || 1}
-                                                          </td>
-                                                          
-                                                          {/* SIZE */}
+                                                          {/* REMARKS - COLUMN 5 (EDITABLE) */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                                                            {item.size || ''}
+                                                            <div 
+                                                              contentEditable={true}
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm outline-none"
+                                                              onBlur={(e) => console.log('Remarks updated:', e.target.textContent)}
+                                                            >
+                                                              {item.remarks || ''}
+                                                            </div>
                                                           </td>
                                                         </tr>
-                                                        ))
-                                                      ))}
-                                                      
-                                                      {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
-                                                      <tr>
-                                                        <td colSpan="5" className="border border-gray-400 px-6 py-2 bg-slate-900">
-                                                          <div className="flex justify-start items-center space-x-4">
-                                                            {/* Add Item Button - GOLD/AMBER COLOR */}
-                                                            <button
-                                                              onClick={() => setShowAddItem(true)}
-                                                              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
-                                                            >
-                                                              ✚ ADD ITEM
-                                                            </button>
-                                                          </div>
-                                                        </td>
+                                                      ))
+                                                    ))}
+                                                    
+                                                    {/* ADD ITEM ROW */}
+                                                    <tr>
+                                                      <td colSpan="5" className="border border-gray-400 px-2 py-2">
+                                                        <button
+                                                          onClick={() => {
+                                                            if (category.subcategories?.length > 0) {
+                                                              setSelectedSubCategoryId(category.subcategories[0].id);
+                                                              setShowAddItem(true);
+                                                              console.log('🎯 Selected subcategory for walkthrough item:', category.subcategories[0].id);
+                                                            } else {
+                                                              alert('This category has no subcategories. Please contact support.');
+                                                            }
+                                                          }}
+                                                          className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
+                                                        >
+                                                          + Add Item
+                                                        </button>
+                                                      </td>
+                                                    </tr>
                                                           
                                                           {/* SIZE - EDITABLE INLINE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
