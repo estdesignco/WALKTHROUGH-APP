@@ -180,8 +180,8 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
               />
             </div>
 
-            {/* Quantity and Size */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Quantity, Size, and Finish/Color */}
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Quantity *
@@ -204,7 +204,19 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
                   value={formData.size}
                   onChange={(e) => setFormData({ ...formData, size: e.target.value })}
                   className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                  placeholder="e.g., 24x36, Large, Medium..."
+                  placeholder="e.g., 24x36, Large..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Finish/Color (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.finish_color}
+                  onChange={(e) => setFormData({ ...formData, finish_color: e.target.value })}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  placeholder="e.g., White, Oak, Chrome..."
                 />
               </div>
             </div>
