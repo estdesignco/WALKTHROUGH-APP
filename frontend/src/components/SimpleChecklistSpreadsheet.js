@@ -906,8 +906,9 @@ const SimpleChecklistSpreadsheet = ({
                                     </button>
                                   </td>
                                 </tr>
-                              ))
-                            )}
+                              ))}
+                              </React.Fragment>
+                            ))}
                           </tbody>
                         </table>
 
