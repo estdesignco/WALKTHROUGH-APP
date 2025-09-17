@@ -37,7 +37,7 @@ const ProjectList = ({ onSelectProject, isOffline }) => {
     onSelectProject(project);
     // Cache project for offline use
     localStorage.setItem('current_project', JSON.stringify(project));
-    navigate(`/project/${project.id}/ffe`);
+    // Don't auto-navigate - let user choose sheet type
   };
 
   const createSampleProject = async () => {
