@@ -552,9 +552,9 @@ const SimpleChecklistSpreadsheet = ({
         </div>
       </div>
 
-      {/* ENHANCED CHECKLIST TABLE WITH MINIMIZE/EXPAND */}
+      {/* ENHANCED CHECKLIST TABLE WITH MINIMIZE/EXPAND AND FILTERING */}
       <div className="w-full">
-        {project.rooms.map((room, roomIndex) => {
+        {(filteredProject || project).rooms.map((room, roomIndex) => {
           const isRoomExpanded = expandedRooms[room.id];
           
           return (
