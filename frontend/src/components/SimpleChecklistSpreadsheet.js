@@ -229,9 +229,12 @@ const SimpleChecklistSpreadsheet = ({
       if (response.ok) {
         console.log('✅ Checklist item added successfully');
         setShowAddItem(false);
-        // Call onReload to refresh data without full page reload
+        // Call onReload to refresh data WITHOUT RESETTING MINIMIZE STATE
+        const currentExpandedState = expandedRooms;
         if (onReload) {
-          onReload();
+          await onReload();
+          // Restore expanded state after reload
+          setExpandedRooms(currentExpandedState);
         }
       } else {
         const errorData = await response.text();
