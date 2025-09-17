@@ -321,19 +321,69 @@ const SimpleChecklistSpreadsheet = ({
   return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
       
-      {/* BASIC FILTER SECTION */}
+      {/* ENHANCED FILTER SECTION - MATCHING FFE FUNCTIONALITY */}
       <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
-        <div className="flex gap-4 items-center">
-          <input
-            type="text"
-            placeholder="Search Items..."
-            className="flex-1 px-4 py-2 rounded bg-gray-700 text-white border border-gray-600"
-          />
-          <button className="px-4 py-2 bg-blue-600 text-white rounded">🔍 FILTER</button>
-          <button className="px-4 py-2 bg-red-600 text-white rounded">CLEAR</button>
+        <div className="flex flex-col lg:flex-row gap-4 items-center">
+          {/* Search Input */}
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search Items, Vendors, SKUs..."
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+          
+          {/* Filter Dropdowns */}
+          <div className="flex gap-3 flex-wrap">
+            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+              <option value="">All Rooms</option>
+              {project.rooms.map(room => (
+                <option key={room.id} value={room.id}>{room.name}</option>
+              ))}
+            </select>
+            
+            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+              <option value="">All Categories</option>
+              <option value="Lighting">Lighting</option>
+              <option value="Furniture">Furniture & Storage</option>
+              <option value="Decor">Decor & Accessories</option>
+              <option value="Paint">Paint, Wallpaper & Finishes</option>
+              <option value="Architectural">Architectural Elements</option>
+            </select>
+            
+            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+              <option value="">All Vendors</option>
+              {vendorTypes.map(vendor => (
+                <option key={vendor} value={vendor}>{vendor}</option>
+              ))}
+            </select>
+            
+            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+              <option value="">All Status</option>
+              <option value="PICKED">PICKED</option>
+              <option value="ORDER SAMPLES">ORDER SAMPLES</option>
+              <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
+              <option value="ASK NEIL">ASK NEIL</option>
+              <option value="ASK CHARLENE">ASK CHARLENE</option>
+              <option value="ASK JALA">ASK JALA</option>
+              <option value="GET QUOTE">GET QUOTE</option>
+              <option value="WAITING ON QT">WAITING ON QT</option>
+              <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
+            </select>
+            
+            {/* Filter and Clear Buttons */}
+            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">
+              🔍 FILTER
+            </button>
+            <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium">
+              CLEAR
+            </button>
+          </div>
+          
+          {/* Add Room Button */}
           <button 
             onClick={onAddRoom}
-            className="px-4 py-2 bg-amber-600 text-white rounded"
+            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
           >
             ✚ ADD ROOM
           </button>
