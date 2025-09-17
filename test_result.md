@@ -307,15 +307,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "🚨 CRITICAL CHECKLIST ROUTING ISSUE: Checklist page redirects to project list - BLOCKS ALL TESTING"
-    - "Add Item Button Functionality: Cannot test - checklist page inaccessible"
-    - "Modal Form Testing: Cannot test - checklist page inaccessible"  
-    - "Status Testing: Cannot test - checklist page inaccessible"
-    - "Delete Button Testing: Cannot test - checklist page inaccessible"
+    - "🚨 CANVA PDF SCRAPING: Critical backend bug in room lookup logic needs fix"
+    - "Add Item Functionality: CONFIRMED WORKING - no issues found"
+    - "Add Category Functionality: CONFIRMED WORKING - no issues found"  
+    - "Four Hands Scraping: CONFIRMED WORKING - Playwright installed successfully"
   stuck_tasks:
-    - "ChecklistDashboard Display - Critical routing failure preventing page access"
+    - "Canva PDF Scraping - Database query inconsistency bug in server.py"
   test_all: false
-  test_priority: "routing_fix_required_immediately"
+  test_priority: "canva_pdf_fix_required"
 
 agent_communication:
   - agent: "main"
