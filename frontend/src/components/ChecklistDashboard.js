@@ -264,7 +264,7 @@ const ChecklistDashboard = ({ isOffline }) => {
         </div>
 
         {/* PIE CHART AND STATUS BREAKDOWN */}
-        <StatusOverview
+        <ChecklistStatusOverview
           totalItems={getTotalItems()}
           statusBreakdown={getStatusBreakdown()}
           carrierBreakdown={getCarrierBreakdown()}
