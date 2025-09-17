@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BarcodeScannerModal from './BarcodeScannerModal';
 
-const AddItemModal = ({ onClose, onSubmit, itemStatuses, vendorTypes = [], loading }) => {
+const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], loading }) => {
   const [formData, setFormData] = useState({
     name: '',
     quantity: 1,
