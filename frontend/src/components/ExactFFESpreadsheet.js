@@ -916,10 +916,21 @@ const ExactFFESpreadsheet = ({
                                                         <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ACTIONS</td>
                                                       </tr>
                                                       
-                                                      {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
-                                                      {/* ACTUAL INSTALLEDS FROM BACKEND DATA */}
+                                                      {/* SUBCATEGORIES WITH PROPER HEADERS */}
                                                       {category.subcategories?.map((subcategory) => (
-                                                        subcategory.items?.map((item, itemIndex) => (
+                                                        <React.Fragment key={subcategory.id || subcategory.name}>
+                                                          {/* SUBCATEGORY HEADER - RED */}
+                                                          <tr>
+                                                            <td 
+                                                              colSpan="15" 
+                                                              className="bg-red-700 text-white font-bold text-sm px-4 py-2 border border-gray-400"
+                                                              style={{ backgroundColor: '#8B4444' }}
+                                                            >
+                                                              {subcategory.name.toUpperCase()}
+                                                            </td>
+                                                          </tr>
+                                                          {/* ITEMS UNDER THIS SUBCATEGORY */}
+                                                          {subcategory.items?.map((item, itemIndex) => (
                                                         <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
                                                           {/* INSTALLED - INSTALLED NAME GOES HERE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
