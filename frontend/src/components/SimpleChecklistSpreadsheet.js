@@ -119,29 +119,30 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
-  // Handle adding new items - COPIED FROM WORKING FFE
+  // Handle adding new items - COPIED EXACTLY FROM WORKING FFE
   const handleAddItem = async (itemData) => {
     try {
       // Find the first available subcategory if none selected
       let subcategoryId = selectedSubCategoryId;
       
       if (!subcategoryId) {
-        // Find the first subcategory from any room/category
+        // Find the first subcategory from any expanded room/category
         for (const room of project.rooms) {
-          for (const category of room.categories || []) {
-            if (category.subcategories?.length > 0) {
-              subcategoryId = category.subcategories[0].id;
-              console.log(`🔍 Auto-selected subcategory: ${category.subcategories[0].name}`);
-              break;
+          if (expandedRooms[room.id]) {
+            for (const category of room.categories || []) {
+              if (expandedCategories[category.id] && category.subcategories?.length > 0) {
+                subcategoryId = category.subcategories[0].id;
+                console.log(`🔍 Auto-selected subcategory: ${category.subcategories[0].name}`);
+                break;
+              }
             }
+            if (subcategoryId) break;
           }
-          if (subcategoryId) break;
         }
       }
 
       if (!subcategoryId) {
-        console.error('No subcategories available. Please add a category first.');
-        alert('No subcategories available. Please add a category first.');
+        console.error('Please expand a category first to add items to it.');
         return;
       }
 
@@ -167,8 +168,7 @@ const SimpleChecklistSpreadsheet = ({
       if (response.ok) {
         console.log('✅ Checklist item added successfully');
         setShowAddItem(false);
-        setSelectedSubCategoryId(null);
-        // Force reload to show new item
+        // Force reload to show the new item
         window.location.reload();
       } else {
         const errorData = await response.text();
@@ -177,7 +177,7 @@ const SimpleChecklistSpreadsheet = ({
       }
     } catch (error) {
       console.error('❌ Error adding checklist item:', error);
-      alert('Failed to add item: ' + error.message);
+      console.error(`Failed to add item: ${error.message}`);
     }
   };
 
