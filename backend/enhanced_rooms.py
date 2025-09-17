@@ -1,5 +1,6 @@
-# Enhanced Room Structure with Comprehensive Categories, Subcategories, and Items
-# This will be applied to ALL sheets and ensures proper loading when rooms/categories are added
+# COMPREHENSIVE ROOM STRUCTURE - Based on user's exact specifications
+# This structure will be applied to ALL sheets (FF&E, Walkthrough, Checklist)
+# When rooms/categories are added, these subcategories and items load automatically
 
 COMPREHENSIVE_ROOM_STRUCTURE = {
     "living room": {
@@ -9,43 +10,31 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
                 "color": "#5A7A5A",
                 "subcategories": [
                     {
-                        "name": "Chandeliers",
+                        "name": "INSTALLED",
                         "color": "#8A5A5A",
                         "items": [
-                            {"name": "Crystal Chandelier", "finish_color": "Crystal/Chrome"},
-                            {"name": "Modern Linear Chandelier", "finish_color": "Black/Brass"},
-                            {"name": "Traditional Brass Chandelier", "finish_color": "Antique Brass"},
-                            {"name": "Contemporary Glass Chandelier", "finish_color": "Clear Glass/Chrome"}
+                            {"name": "Chandelier", "finish_color": ""},
+                            {"name": "Recessed Lighting", "finish_color": ""},
+                            {"name": "Sconces", "finish_color": ""},
+                            {"name": "Track Lighting", "finish_color": ""},
+                            {"name": "Ceiling Fan w/ Light", "finish_color": ""},
+                            {"name": "Art Lights", "finish_color": ""},
+                            {"name": "Pendant Lights", "finish_color": ""},
+                            {"name": "Under Cabinet Lighting", "finish_color": ""},
+                            {"name": "Cove Lighting", "finish_color": ""},
+                            {"name": "Picture Lights", "finish_color": ""}
                         ]
                     },
                     {
-                        "name": "Table Lamps",
+                        "name": "PORTABLE",
                         "color": "#8A5A5A",
                         "items": [
-                            {"name": "Ceramic Table Lamp", "finish_color": "White/Cream"},
-                            {"name": "Brass Accent Lamp", "finish_color": "Brushed Brass"},
-                            {"name": "Crystal Base Lamp", "finish_color": "Crystal/Chrome"},
-                            {"name": "Wood Base Lamp", "finish_color": "Walnut/Oak"}
-                        ]
-                    },
-                    {
-                        "name": "Floor Lamps",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Arc Floor Lamp", "finish_color": "Chrome/Brass"},
-                            {"name": "Tripod Floor Lamp", "finish_color": "Wood/Black"},
-                            {"name": "Torchiere Floor Lamp", "finish_color": "Brushed Nickel"},
-                            {"name": "Reading Floor Lamp", "finish_color": "Bronze/Black"}
-                        ]
-                    },
-                    {
-                        "name": "Sconces",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Wall Sconce", "finish_color": "Brushed Nickel"},
-                            {"name": "Swing Arm Sconce", "finish_color": "Bronze/Black"},
-                            {"name": "Candle Sconce", "finish_color": "Wrought Iron"},
-                            {"name": "Modern LED Sconce", "finish_color": "White/Chrome"}
+                            {"name": "Table Lamp", "finish_color": ""},
+                            {"name": "Floor Lamp", "finish_color": ""},
+                            {"name": "Accent Lamp", "finish_color": ""},
+                            {"name": "Desk Lamp", "finish_color": ""},
+                            {"name": "Buffet Lamp", "finish_color": ""},
+                            {"name": "Reading Lamp", "finish_color": ""}
                         ]
                     }
                 ]
@@ -55,37 +44,29 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
                 "color": "#5A7A5A",
                 "subcategories": [
                     {
-                        "name": "Seating",
+                        "name": "PIECE",
                         "color": "#8A5A5A",
                         "items": [
-                            {"name": "Sectional Sofa", "finish_color": "Charcoal/Navy/Beige"},
-                            {"name": "Accent Chair", "finish_color": "Various Fabrics"},
-                            {"name": "Ottoman", "finish_color": "Matching/Contrasting"},
-                            {"name": "Loveseat", "finish_color": "Various Fabrics"},
-                            {"name": "Recliner", "finish_color": "Leather/Fabric"},
-                            {"name": "Chaise Lounge", "finish_color": "Various Fabrics"}
-                        ]
-                    },
-                    {
-                        "name": "Tables",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Coffee Table", "finish_color": "Wood/Glass/Metal"},
-                            {"name": "End Table", "finish_color": "Wood/Metal"},
-                            {"name": "Console Table", "finish_color": "Wood/Metal/Glass"},
-                            {"name": "Side Table", "finish_color": "Various Finishes"},
-                            {"name": "Nesting Tables", "finish_color": "Wood/Metal"}
-                        ]
-                    },
-                    {
-                        "name": "Storage",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Entertainment Center", "finish_color": "Wood Finishes"},
-                            {"name": "Bookshelf", "finish_color": "Wood/Metal"},
-                            {"name": "Storage Ottoman", "finish_color": "Various Fabrics"},
-                            {"name": "Media Console", "finish_color": "Wood/Metal"},
-                            {"name": "Display Cabinet", "finish_color": "Wood/Glass"}
+                            {"name": "Sofa", "finish_color": ""},
+                            {"name": "Sectional", "finish_color": ""},
+                            {"name": "Loveseat", "finish_color": ""},
+                            {"name": "Armchair", "finish_color": ""},
+                            {"name": "Accent Chair", "finish_color": ""},
+                            {"name": "Ottoman", "finish_color": ""},
+                            {"name": "Coffee Table", "finish_color": ""},
+                            {"name": "Side Table", "finish_color": ""},
+                            {"name": "Console Table", "finish_color": ""},
+                            {"name": "Media Console", "finish_color": ""},
+                            {"name": "Bookcase", "finish_color": ""},
+                            {"name": "Credenza", "finish_color": ""},
+                            {"name": "Display Cabinet", "finish_color": ""},
+                            {"name": "Bar Cart", "finish_color": ""},
+                            {"name": "Sofa Table", "finish_color": ""},
+                            {"name": "Storage Bench", "finish_color": ""},
+                            {"name": "Chaise Lounge", "finish_color": ""},
+                            {"name": "Daybed", "finish_color": ""},
+                            {"name": "Recliner", "finish_color": ""},
+                            {"name": "Storage Ottoman", "finish_color": ""}
                         ]
                     }
                 ]
@@ -95,484 +76,41 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
                 "color": "#5A7A5A",
                 "subcategories": [
                     {
-                        "name": "Art & Mirrors",
+                        "name": "Misc.",
                         "color": "#8A5A5A",
                         "items": [
-                            {"name": "Wall Art", "finish_color": "Various Frames"},
-                            {"name": "Mirror", "finish_color": "Various Frames"},
-                            {"name": "Gallery Wall Set", "finish_color": "Mixed Frames"},
-                            {"name": "Statement Art Piece", "finish_color": "Custom Frame"}
-                        ]
-                    },
-                    {
-                        "name": "Textiles",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Area Rug", "finish_color": "Various Patterns/Colors"},
-                            {"name": "Throw Pillows", "finish_color": "Various Fabrics/Colors"},
-                            {"name": "Throw Blanket", "finish_color": "Various Textures/Colors"},
-                            {"name": "Curtains/Drapes", "finish_color": "Various Fabrics/Colors"},
-                            {"name": "Window Treatments", "finish_color": "Various Styles/Colors"}
-                        ]
-                    },
-                    {
-                        "name": "Decorative Objects",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Vases", "finish_color": "Ceramic/Glass/Metal"},
-                            {"name": "Sculptures", "finish_color": "Various Materials"},
-                            {"name": "Candles & Holders", "finish_color": "Various Finishes"},
-                            {"name": "Books & Objects", "finish_color": "Various Colors"},
-                            {"name": "Plants & Planters", "finish_color": "Various Finishes"}
+                            {"name": "Area Rug", "finish_color": ""},
+                            {"name": "Throw Pillows", "finish_color": ""},
+                            {"name": "Throw Blanket", "finish_color": ""},
+                            {"name": "Wall Art", "finish_color": ""},
+                            {"name": "Mirror", "finish_color": ""},
+                            {"name": "Decorative Vases", "finish_color": ""},
+                            {"name": "Sculptures", "finish_color": ""},
+                            {"name": "Candle Holders", "finish_color": ""},
+                            {"name": "Greenery/Plants", "finish_color": ""},
+                            {"name": "Curtains/Drapery", "finish_color": ""},
+                            {"name": "Sheer Curtains", "finish_color": ""},
+                            {"name": "Custom Shades", "finish_color": ""},
+                            {"name": "Fireplace Tools", "finish_color": ""},
+                            {"name": "Decorative Boxes", "finish_color": ""},
+                            {"name": "Trays", "finish_color": ""},
+                            {"name": "Photo Frames", "finish_color": ""},
+                            {"name": "Coasters", "finish_color": ""}
                         ]
                     }
                 ]
             },
             {
-                "name": "Window Treatments",
+                "name": "Paint, Wallpaper, and Finishes",
                 "color": "#5A7A5A",
                 "subcategories": [
                     {
-                        "name": "Curtains & Drapes",
+                        "name": "Misc.",
                         "color": "#8A5A5A",
                         "items": [
-                            {"name": "Sheer Curtains", "finish_color": "White/Cream/Gray"},
-                            {"name": "Blackout Drapes", "finish_color": "Various Colors"},
-                            {"name": "Patterned Curtains", "finish_color": "Various Patterns"},
-                            {"name": "Linen Drapes", "finish_color": "Natural/White/Gray"}
-                        ]
-                    },
-                    {
-                        "name": "Blinds & Shades",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Roller Shades", "finish_color": "Various Colors"},
-                            {"name": "Roman Shades", "finish_color": "Various Fabrics"},
-                            {"name": "Venetian Blinds", "finish_color": "Wood/Aluminum"},
-                            {"name": "Cellular Shades", "finish_color": "Various Colors"}
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    
-    "kitchen": {
-        "categories": [
-            {
-                "name": "Lighting",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Pendant Lights",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Island Pendants", "finish_color": "Bronze/Brass/Chrome"},
-                            {"name": "Mini Pendants", "finish_color": "Glass/Metal"},
-                            {"name": "Linear Pendants", "finish_color": "Black/White/Brass"},
-                            {"name": "Drum Pendants", "finish_color": "Various Finishes"}
-                        ]
-                    },
-                    {
-                        "name": "Under Cabinet Lighting",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "LED Strip Lights", "finish_color": "White/Warm White"},
-                            {"name": "Puck Lights", "finish_color": "Chrome/White"},
-                            {"name": "Linear LED Lights", "finish_color": "Aluminum/White"},
-                            {"name": "Tape Lights", "finish_color": "Various Colors"}
-                        ]
-                    },
-                    {
-                        "name": "Recessed Lighting",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Can Lights", "finish_color": "White/Nickel"},
-                            {"name": "LED Recessed", "finish_color": "Various Trim Colors"},
-                            {"name": "Adjustable Recessed", "finish_color": "White/Black"},
-                            {"name": "Decorative Recessed", "finish_color": "Various Finishes"}
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Appliances",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Major Appliances",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Refrigerator", "finish_color": "Stainless/Black/White"},
-                            {"name": "Range/Cooktop", "finish_color": "Stainless/Black"},
-                            {"name": "Dishwasher", "finish_color": "Stainless/Panel Ready"},
-                            {"name": "Range Hood", "finish_color": "Stainless/Custom"},
-                            {"name": "Wall Oven", "finish_color": "Stainless/Black"}
-                        ]
-                    },
-                    {
-                        "name": "Small Appliances",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Microwave", "finish_color": "Stainless/Black/White"},
-                            {"name": "Coffee Maker", "finish_color": "Stainless/Black"},
-                            {"name": "Toaster", "finish_color": "Stainless/Chrome"},
-                            {"name": "Blender", "finish_color": "Various Colors"},
-                            {"name": "Food Processor", "finish_color": "Various Colors"}
-                        ]
-                    },
-                    {
-                        "name": "Built-in Appliances",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Built-in Coffee Maker", "finish_color": "Stainless/Black"},
-                            {"name": "Wine Cooler", "finish_color": "Stainless/Black"},
-                            {"name": "Ice Maker", "finish_color": "Stainless"},
-                            {"name": "Warming Drawer", "finish_color": "Stainless/Panel Ready"},
-                            {"name": "Steam Oven", "finish_color": "Stainless/Black"}
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Cabinetry",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Upper Cabinets",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Wall Cabinets", "finish_color": "Wood/Painted"},
-                            {"name": "Glass Front Cabinets", "finish_color": "Wood/Painted"},
-                            {"name": "Open Shelving", "finish_color": "Wood/Metal"},
-                            {"name": "Crown Molding", "finish_color": "Matching Cabinet"}
-                        ]
-                    },
-                    {
-                        "name": "Base Cabinets",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Base Cabinets", "finish_color": "Wood/Painted"},
-                            {"name": "Sink Base", "finish_color": "Wood/Painted"},
-                            {"name": "Corner Cabinets", "finish_color": "Wood/Painted"},
-                            {"name": "Pantry Cabinets", "finish_color": "Wood/Painted"}
-                        ]
-                    },
-                    {
-                        "name": "Islands & Peninsulas",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Kitchen Island", "finish_color": "Wood/Painted"},
-                            {"name": "Peninsula", "finish_color": "Wood/Painted"},
-                            {"name": "Breakfast Bar", "finish_color": "Wood/Stone"},
-                            {"name": "Island Seating", "finish_color": "Various Materials"}
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Countertops & Backsplash",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Countertops",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Quartz Countertops", "finish_color": "Various Colors/Patterns"},
-                            {"name": "Granite Countertops", "finish_color": "Natural Stone Colors"},
-                            {"name": "Marble Countertops", "finish_color": "White/Gray/Veined"},
-                            {"name": "Butcher Block", "finish_color": "Wood Species"},
-                            {"name": "Concrete Countertops", "finish_color": "Custom Colors"}
-                        ]
-                    },
-                    {
-                        "name": "Backsplash",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Subway Tile", "finish_color": "White/Colored"},
-                            {"name": "Natural Stone", "finish_color": "Various Stones"},
-                            {"name": "Glass Tile", "finish_color": "Various Colors"},
-                            {"name": "Metal Backsplash", "finish_color": "Stainless/Copper"},
-                            {"name": "Mosaic Tile", "finish_color": "Various Patterns"}
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Hardware & Fixtures",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Cabinet Hardware",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Cabinet Pulls", "finish_color": "Brass/Chrome/Black/Nickel"},
-                            {"name": "Cabinet Knobs", "finish_color": "Brass/Chrome/Black/Nickel"},
-                            {"name": "Hinges", "finish_color": "Matching Hardware"},
-                            {"name": "Drawer Slides", "finish_color": "Various Finishes"}
-                        ]
-                    },
-                    {
-                        "name": "Plumbing Fixtures",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Kitchen Sink", "finish_color": "Stainless/White/Black"},
-                            {"name": "Kitchen Faucet", "finish_color": "Chrome/Brass/Black/Nickel"},
-                            {"name": "Soap Dispenser", "finish_color": "Matching Faucet"},
-                            {"name": "Water Filter", "finish_color": "Various Finishes"}
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    
-    "primary bedroom": {
-        "categories": [
-            {
-                "name": "Lighting",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Overhead Lighting",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Ceiling Fan with Light", "finish_color": "Various Finishes"},
-                            {"name": "Chandelier", "finish_color": "Crystal/Metal"},
-                            {"name": "Flush Mount Light", "finish_color": "Various Finishes"},
-                            {"name": "Recessed Lighting", "finish_color": "White/Nickel"}
-                        ]
-                    },
-                    {
-                        "name": "Bedside Lighting",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Table Lamps (Pair)", "finish_color": "Various Finishes"},
-                            {"name": "Wall Sconces", "finish_color": "Brass/Chrome/Black"},
-                            {"name": "Pendant Lights", "finish_color": "Various Finishes"},
-                            {"name": "Reading Lights", "finish_color": "Adjustable/Various"}
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Furniture",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Bed & Bedding",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Bed Frame", "finish_color": "Wood/Upholstered/Metal"},
-                            {"name": "Headboard", "finish_color": "Upholstered/Wood/Metal"},
-                            {"name": "Mattress", "finish_color": "White/Various"},
-                            {"name": "Box Spring", "finish_color": "Various"},
-                            {"name": "Bed Linens", "finish_color": "Various Colors/Patterns"}
-                        ]
-                    },
-                    {
-                        "name": "Storage Furniture",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Dresser", "finish_color": "Wood Finishes"},
-                            {"name": "Nightstands (Pair)", "finish_color": "Wood/Painted"},
-                            {"name": "Chest of Drawers", "finish_color": "Wood Finishes"},
-                            {"name": "Armoire/Wardrobe", "finish_color": "Wood Finishes"},
-                            {"name": "Bench", "finish_color": "Upholstered/Wood"}
-                        ]
-                    },
-                    {
-                        "name": "Seating",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Accent Chair", "finish_color": "Various Fabrics"},
-                            {"name": "Reading Chair", "finish_color": "Various Fabrics"},
-                            {"name": "Ottoman", "finish_color": "Various Fabrics"},
-                            {"name": "Vanity Stool", "finish_color": "Various Fabrics"}
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Window Treatments",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Curtains & Drapes",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Blackout Curtains", "finish_color": "Various Colors"},
-                            {"name": "Sheer Curtains", "finish_color": "White/Cream"},
-                            {"name": "Layered Window Treatments", "finish_color": "Coordinated"},
-                            {"name": "Curtain Hardware", "finish_color": "Various Finishes"}
-                        ]
-                    },
-                    {
-                        "name": "Blinds & Shades",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Blackout Shades", "finish_color": "Various Colors"},
-                            {"name": "Roman Shades", "finish_color": "Various Fabrics"},
-                            {"name": "Motorized Blinds", "finish_color": "Various Colors"},
-                            {"name": "Cellular Shades", "finish_color": "Various Colors"}
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Decor & Accessories",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Wall Decor",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Wall Art", "finish_color": "Various Frames"},
-                            {"name": "Mirrors", "finish_color": "Various Frames"},
-                            {"name": "Wall Shelves", "finish_color": "Wood/Metal"},
-                            {"name": "Decorative Objects", "finish_color": "Various"}
-                        ]
-                    },
-                    {
-                        "name": "Textiles & Rugs",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Area Rug", "finish_color": "Various Patterns/Colors"},
-                            {"name": "Throw Pillows", "finish_color": "Various Fabrics"},
-                            {"name": "Throw Blankets", "finish_color": "Various Textures"},
-                            {"name": "Bedding Set", "finish_color": "Various Colors/Patterns"}
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    
-    "bathroom": {
-        "categories": [
-            {
-                "name": "Lighting",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Vanity Lighting",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Vanity Light Bar", "finish_color": "Chrome/Brushed Nickel/Black"},
-                            {"name": "Sconces (Pair)", "finish_color": "Various Finishes"},
-                            {"name": "Pendant Lights", "finish_color": "Various Finishes"},
-                            {"name": "Backlit Mirror", "finish_color": "Various Frames"}
-                        ]
-                    },
-                    {
-                        "name": "Ambient Lighting",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Recessed Lighting", "finish_color": "White/Nickel"},
-                            {"name": "Chandelier", "finish_color": "Crystal/Metal"},
-                            {"name": "Exhaust Fan with Light", "finish_color": "White/Nickel"},
-                            {"name": "Night Light", "finish_color": "Various"}
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Plumbing Fixtures",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Vanity & Sinks",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Bathroom Vanity", "finish_color": "Wood/Painted"},
-                            {"name": "Undermount Sink", "finish_color": "White/Colored"},
-                            {"name": "Vessel Sink", "finish_color": "Various Materials/Colors"},
-                            {"name": "Faucet", "finish_color": "Chrome/Brushed Nickel/Black/Brass"},
-                            {"name": "Mirror", "finish_color": "Various Frames"}
-                        ]
-                    },
-                    {
-                        "name": "Bathtub & Shower",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Freestanding Tub", "finish_color": "White/Various"},
-                            {"name": "Shower System", "finish_color": "Chrome/Brushed Nickel/Black"},
-                            {"name": "Showerhead", "finish_color": "Various Finishes"},
-                            {"name": "Shower Door", "finish_color": "Clear/Frosted Glass"},
-                            {"name": "Tub Filler", "finish_color": "Various Finishes"}
-                        ]
-                    },
-                    {
-                        "name": "Toilet & Bidet",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Toilet", "finish_color": "White/Colored"},
-                            {"name": "Bidet", "finish_color": "White/Colored"},
-                            {"name": "Toilet Seat", "finish_color": "White/Wood"},
-                            {"name": "Toilet Paper Holder", "finish_color": "Various Finishes"}
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Tile & Surfaces",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Floor Tile",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Porcelain Floor Tile", "finish_color": "Various Colors/Patterns"},
-                            {"name": "Natural Stone Floor", "finish_color": "Marble/Travertine/Slate"},
-                            {"name": "Mosaic Floor Tile", "finish_color": "Various Patterns"},
-                            {"name": "Heated Floor System", "finish_color": "Various"}
-                        ]
-                    },
-                    {
-                        "name": "Wall Tile",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Subway Tile", "finish_color": "White/Colored"},
-                            {"name": "Large Format Tiles", "finish_color": "Various Colors"},
-                            {"name": "Natural Stone Wall", "finish_color": "Marble/Travertine"},
-                            {"name": "Decorative Accent Tile", "finish_color": "Various Patterns"}
-                        ]
-                    },
-                    {
-                        "name": "Countertops",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Quartz Countertop", "finish_color": "Various Colors"},
-                            {"name": "Marble Countertop", "finish_color": "White/Gray/Veined"},
-                            {"name": "Granite Countertop", "finish_color": "Natural Stone Colors"},
-                            {"name": "Solid Surface", "finish_color": "Various Colors"}
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Storage & Accessories",
-                "color": "#5A7A5A",
-                "subcategories": [
-                    {
-                        "name": "Storage Solutions",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Medicine Cabinet", "finish_color": "Various Finishes"},
-                            {"name": "Linen Cabinet", "finish_color": "Wood/Painted"},
-                            {"name": "Towel Storage", "finish_color": "Various Finishes"},
-                            {"name": "Built-in Shelving", "finish_color": "Tile/Wood"}
-                        ]
-                    },
-                    {
-                        "name": "Accessories",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Towel Bars", "finish_color": "Chrome/Brushed Nickel/Black"},
-                            {"name": "Towel Hooks", "finish_color": "Various Finishes"},
-                            {"name": "Grab Bars", "finish_color": "Various Finishes"},
-                            {"name": "Shower Caddy", "finish_color": "Various Finishes"},
-                            {"name": "Bath Mat", "finish_color": "Various Colors"}
+                            {"name": "Paint color", "finish_color": ""},
+                            {"name": "Wallpaper", "finish_color": ""},
+                            {"name": "Finish", "finish_color": ""}
                         ]
                     }
                 ]
@@ -587,23 +125,23 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
                 "color": "#5A7A5A",
                 "subcategories": [
                     {
-                        "name": "Chandelier",
+                        "name": "INSTALLED",
                         "color": "#8A5A5A",
                         "items": [
-                            {"name": "Crystal Chandelier", "finish_color": "Crystal/Chrome/Brass"},
-                            {"name": "Modern Linear Chandelier", "finish_color": "Black/Brass/Chrome"},
-                            {"name": "Traditional Chandelier", "finish_color": "Bronze/Brass"},
-                            {"name": "Contemporary Chandelier", "finish_color": "Various Finishes"}
+                            {"name": "Chandelier", "finish_color": ""},
+                            {"name": "Pendant Lights", "finish_color": ""},
+                            {"name": "Sconces", "finish_color": ""},
+                            {"name": "Recessed Lighting", "finish_color": ""},
+                            {"name": "Art Lights", "finish_color": ""},
+                            {"name": "Ceiling Medallion", "finish_color": ""}
                         ]
                     },
                     {
-                        "name": "Accent Lighting",
+                        "name": "PORTABLE",
                         "color": "#8A5A5A",
                         "items": [
-                            {"name": "Buffet Lamps", "finish_color": "Various Finishes"},
-                            {"name": "Wall Sconces", "finish_color": "Various Finishes"},
-                            {"name": "Candles & Candelabras", "finish_color": "Various Materials"},
-                            {"name": "Dimmer Controls", "finish_color": "Various Finishes"}
+                            {"name": "Buffet Lamp", "finish_color": ""},
+                            {"name": "Table Lamp", "finish_color": ""}
                         ]
                     }
                 ]
@@ -613,25 +151,20 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
                 "color": "#5A7A5A",
                 "subcategories": [
                     {
-                        "name": "Dining Table & Seating",
+                        "name": "PIECE",
                         "color": "#8A5A5A",
                         "items": [
-                            {"name": "Dining Table", "finish_color": "Wood/Glass/Stone"},
-                            {"name": "Dining Chairs", "finish_color": "Wood/Upholstered"},
-                            {"name": "Captain's Chairs", "finish_color": "Wood/Upholstered"},
-                            {"name": "Bench Seating", "finish_color": "Wood/Upholstered"},
-                            {"name": "Bar Cart", "finish_color": "Metal/Wood/Glass"}
-                        ]
-                    },
-                    {
-                        "name": "Storage & Display",
-                        "color": "#8A5A5A",
-                        "items": [
-                            {"name": "Buffet/Sideboard", "finish_color": "Wood Finishes"},
-                            {"name": "China Cabinet", "finish_color": "Wood/Glass"},
-                            {"name": "Display Cabinet", "finish_color": "Wood/Glass"},
-                            {"name": "Server", "finish_color": "Wood Finishes"},
-                            {"name": "Wine Rack", "finish_color": "Wood/Metal"}
+                            {"name": "Dining Table", "finish_color": ""},
+                            {"name": "Dining Chairs", "finish_color": ""},
+                            {"name": "Host Chairs", "finish_color": ""},
+                            {"name": "Dining Bench", "finish_color": ""},
+                            {"name": "Buffet", "finish_color": ""},
+                            {"name": "Credenza", "finish_color": ""},
+                            {"name": "China Cabinet", "finish_color": ""},
+                            {"name": "Bar Cart", "finish_color": ""},
+                            {"name": "Console Table", "finish_color": ""},
+                            {"name": "Sideboard", "finish_color": ""},
+                            {"name": "Wine Cabinet", "finish_color": ""}
                         ]
                     }
                 ]
@@ -641,23 +174,557 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
                 "color": "#5A7A5A",
                 "subcategories": [
                     {
-                        "name": "Table Settings",
+                        "name": "MISC.",
                         "color": "#8A5A5A",
                         "items": [
-                            {"name": "Table Runner", "finish_color": "Various Fabrics/Colors"},
-                            {"name": "Placemats", "finish_color": "Various Materials/Colors"},
-                            {"name": "Centerpiece", "finish_color": "Various Materials"},
-                            {"name": "Dinnerware", "finish_color": "Various Patterns/Colors"}
+                            {"name": "Area Rug", "finish_color": ""},
+                            {"name": "Wall Art", "finish_color": ""},
+                            {"name": "Mirror", "finish_color": ""},
+                            {"name": "Table Runner", "finish_color": ""},
+                            {"name": "Place Settings", "finish_color": ""},
+                            {"name": "Centerpiece", "finish_color": ""},
+                            {"name": "Curtains/Drapery", "finish_color": ""},
+                            {"name": "Sheer Curtains", "finish_color": ""},
+                            {"name": "Custom Shades", "finish_color": ""},
+                            {"name": "Decorative Bowls", "finish_color": ""},
+                            {"name": "Candle Holders", "finish_color": ""},
+                            {"name": "Serveware", "finish_color": ""}
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    
+    "kitchen": {
+        "categories": [
+            {
+                "name": "Lighting",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "INSTALLED",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Pendant Lights (Island/Bar)", "finish_color": ""},
+                            {"name": "Recessed Lighting", "finish_color": ""},
+                            {"name": "Under Cabinet Lighting", "finish_color": ""},
+                            {"name": "Chandelier (Nook)", "finish_color": ""},
+                            {"name": "Sconces", "finish_color": ""},
+                            {"name": "Toe-Kick Lighting", "finish_color": ""},
+                            {"name": "Over-Cabinet Lighting", "finish_color": ""},
+                            {"name": "Pot Rack Light", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Paint, Wallpaper, and Finishes",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "Misc.",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Paint color", "finish_color": ""},
+                            {"name": "Wallpaper", "finish_color": ""},
+                            {"name": "Finish", "finish_color": ""},
+                            {"name": "Counter Tops", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Appliances",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "UNIT",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Refrigerator (Built-in/Freestanding)", "finish_color": ""},
+                            {"name": "Dishwasher", "finish_color": ""},
+                            {"name": "Range/Oven", "finish_color": ""},
+                            {"name": "Microwave (Built-in/Countertop)", "finish_color": ""},
+                            {"name": "Cooktop", "finish_color": ""},
+                            {"name": "Wall Oven (Single/Double)", "finish_color": ""},
+                            {"name": "Wine Fridge", "finish_color": ""},
+                            {"name": "Beverage Cooler", "finish_color": ""},
+                            {"name": "Ice Maker", "finish_color": ""},
+                            {"name": "Coffee Machine (Built-in)", "finish_color": ""},
+                            {"name": "Trash Compactor", "finish_color": ""},
+                            {"name": "Garbage Disposal", "finish_color": ""},
+                            {"name": "Vent Hood/Range Hood", "finish_color": ""},
+                            {"name": "Warming Drawer", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Plumbing",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "FIXTURE",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Kitchen Sink (Farmhouse/Undermount)", "finish_color": ""},
+                            {"name": "Prep Sink", "finish_color": ""},
+                            {"name": "Main Faucet", "finish_color": ""},
+                            {"name": "Prep Faucet", "finish_color": ""},
+                            {"name": "Pot Filler", "finish_color": ""},
+                            {"name": "Soap Dispenser (Built-in)", "finish_color": ""},
+                            {"name": "Water Filtration System", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Furniture & Storage",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "PIECE",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Bar Stools", "finish_color": ""},
+                            {"name": "Counter Stools", "finish_color": ""},
+                            {"name": "Kitchen Island", "finish_color": ""},
+                            {"name": "Pantry Cabinet", "finish_color": ""},
+                            {"name": "Breakfast Nook Table", "finish_color": ""},
+                            {"name": "Breakfast Nook Chairs/Bench", "finish_color": ""},
+                            {"name": "Shelving", "finish_color": ""},
+                            {"name": "Floating Shelves", "finish_color": ""},
+                            {"name": "Wine Rack (Built-in/Freestanding)", "finish_color": ""},
+                            {"name": "Cutting Board Storage", "finish_color": ""},
+                            {"name": "Pull-out Pantry", "finish_color": ""},
+                            {"name": "Spice Drawer", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Decor & Accessories",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "MISC.",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Area Rug/Runner", "finish_color": ""},
+                            {"name": "Wall Art", "finish_color": ""},
+                            {"name": "Decorative Bowls/Plates", "finish_color": ""},
+                            {"name": "Vases", "finish_color": ""},
+                            {"name": "Cookware Displays", "finish_color": ""},
+                            {"name": "Herb Garden", "finish_color": ""},
+                            {"name": "Curtains/Blinds/Shades", "finish_color": ""},
+                            {"name": "Dish Towels", "finish_color": ""},
+                            {"name": "Utensil Crocks", "finish_color": ""},
+                            {"name": "Fruit Bowls", "finish_color": ""},
+                            {"name": "Coffee Bar Accessories", "finish_color": ""}
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    
+    "primary bedroom": {
+        "categories": [
+            {
+                "name": "Lighting",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "INSTALLED",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Chandelier/Ceiling Fixture", "finish_color": ""},
+                            {"name": "Recessed Lighting (Dimmable)", "finish_color": ""},
+                            {"name": "Sconces (Bedside)", "finish_color": ""},
+                            {"name": "Ceiling Fan w/ Light", "finish_color": ""},
+                            {"name": "Cove Lighting", "finish_color": ""},
+                            {"name": "Accent Lighting (Architectural)", "finish_color": ""},
+                            {"name": "Reading Lights (Wall Mounted)", "finish_color": ""}
                         ]
                     },
                     {
-                        "name": "Wall Decor",
+                        "name": "PORTABLE",
                         "color": "#8A5A5A",
                         "items": [
-                            {"name": "Wall Art", "finish_color": "Various Frames"},
-                            {"name": "Mirror", "finish_color": "Various Frames"},
-                            {"name": "Wall Shelves", "finish_color": "Wood/Metal"},
-                            {"name": "Decorative Objects", "finish_color": "Various"}
+                            {"name": "Nightstand Lamps", "finish_color": ""},
+                            {"name": "Floor Lamp", "finish_color": ""},
+                            {"name": "Dresser Lamp", "finish_color": ""},
+                            {"name": "Desk Lamp", "finish_color": ""},
+                            {"name": "Buffet Lamp", "finish_color": ""},
+                            {"name": "Reading Lamp", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Paint, Wallpaper, and Finishes",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "Misc.",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Paint color", "finish_color": ""},
+                            {"name": "Wallpaper", "finish_color": ""},
+                            {"name": "Finish", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Furniture",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "PIECE",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Bed Frame (King/Queen/Cal King)", "finish_color": ""},
+                            {"name": "Mattress", "finish_color": ""},
+                            {"name": "Box Spring/Foundation", "finish_color": ""},
+                            {"name": "Nightstands (Pair)", "finish_color": ""},
+                            {"name": "Dresser (Long/Tall)", "finish_color": ""},
+                            {"name": "Armoire", "finish_color": ""},
+                            {"name": "Vanity", "finish_color": ""},
+                            {"name": "Vanity Stool", "finish_color": ""},
+                            {"name": "Bench (Foot of Bed)", "finish_color": ""},
+                            {"name": "Seating Area Sofa/Chairs (Pair)", "finish_color": ""},
+                            {"name": "Coffee Table (Seating Area)", "finish_color": ""},
+                            {"name": "Bookcase", "finish_color": ""},
+                            {"name": "Media Console/TV Stand", "finish_color": ""},
+                            {"name": "Desk", "finish_color": ""},
+                            {"name": "Desk Chair", "finish_color": ""},
+                            {"name": "Chaise Lounge", "finish_color": ""},
+                            {"name": "Daybed", "finish_color": ""},
+                            {"name": "Recliner", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Decor & Accessories",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "MISC.",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Area Rug", "finish_color": ""},
+                            {"name": "Throw Pillows (Decorative)", "finish_color": ""},
+                            {"name": "Throw Blanket", "finish_color": ""},
+                            {"name": "Bedding Set (Duvet, Sheets, Shams)", "finish_color": ""},
+                            {"name": "Wall Art (Large Piece/Gallery)", "finish_color": ""},
+                            {"name": "Mirror (Full Length/Decorative)", "finish_color": ""},
+                            {"name": "Decorative Vases", "finish_color": ""},
+                            {"name": "Candles/Diffusers", "finish_color": ""},
+                            {"name": "Curtains/Drapery", "finish_color": ""},
+                            {"name": "Blackout Curtains", "finish_color": ""},
+                            {"name": "Sheer Curtains", "finish_color": ""},
+                            {"name": "Custom Shades (Roman/Roller)", "finish_color": ""},
+                            {"name": "Bedside Clock/Alarm", "finish_color": ""},
+                            {"name": "Trays (Nightstand/Dresser)", "finish_color": ""},
+                            {"name": "Jewelry Box", "finish_color": ""},
+                            {"name": "Plants/Faux Greenery", "finish_color": ""}
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    
+    "primary bathroom": {
+        "categories": [
+            {
+                "name": "Lighting",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "INSTALLED",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Vanity Lights (Over Mirror)", "finish_color": ""},
+                            {"name": "Sconces (Side of Mirror)", "finish_color": ""},
+                            {"name": "Recessed Lighting (Dimmable)", "finish_color": ""},
+                            {"name": "Shower Light", "finish_color": ""},
+                            {"name": "Toilet Area Light", "finish_color": ""},
+                            {"name": "Chandelier/Pendant (Freestanding Tub)", "finish_color": ""},
+                            {"name": "Exhaust Fan w/ Light", "finish_color": ""},
+                            {"name": "Under Vanity Lighting", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Plumbing & Fixtures",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "FIXTURE",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Vanity Sinks (Undermount/Vessel)", "finish_color": ""},
+                            {"name": "Vanity Faucets", "finish_color": ""},
+                            {"name": "Shower Head (Rainfall/Standard)", "finish_color": ""},
+                            {"name": "Handheld Shower", "finish_color": ""},
+                            {"name": "Body Jets", "finish_color": ""},
+                            {"name": "Shower Valve Trim", "finish_color": ""},
+                            {"name": "Freestanding Tub", "finish_color": ""},
+                            {"name": "Drop-in Tub", "finish_color": ""},
+                            {"name": "Tub Faucet (Deck Mount/Wall Mount)", "finish_color": ""},
+                            {"name": "Toilet", "finish_color": ""},
+                            {"name": "Bidet/Bidet Seat", "finish_color": ""},
+                            {"name": "Towel Warmer", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Furniture & Storage",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "PIECE",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Vanity Cabinet (Single/Double)", "finish_color": ""},
+                            {"name": "Linen Tower", "finish_color": ""},
+                            {"name": "Storage Cabinet", "finish_color": ""},
+                            {"name": "Accent Stool/Bench", "finish_color": ""},
+                            {"name": "Shower Bench (Built-in/Portable)", "finish_color": ""},
+                            {"name": "Hamper (Built-in/Freestanding)", "finish_color": ""},
+                            {"name": "Makeup Vanity/Desk", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Decor & Accessories",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "MISC.",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Vanity Mirrors (Framed/Frameless)", "finish_color": ""},
+                            {"name": "Full Length Mirror", "finish_color": ""},
+                            {"name": "Area Rug/Bath Mats", "finish_color": ""},
+                            {"name": "Towels (Bath/Hand/Washcloth)", "finish_color": ""},
+                            {"name": "Soap Dispensers", "finish_color": ""},
+                            {"name": "Toothbrush Holder", "finish_color": ""},
+                            {"name": "Tray Organizers", "finish_color": ""},
+                            {"name": "Wall Art", "finish_color": ""},
+                            {"name": "Shower Curtains/Glass Door", "finish_color": ""},
+                            {"name": "Toilet Paper Holder", "finish_color": ""},
+                            {"name": "Towel Bar/Ring/Hooks", "finish_color": ""},
+                            {"name": "Robe Hooks", "finish_color": ""},
+                            {"name": "Plants/Greenery", "finish_color": ""},
+                            {"name": "Waste Basket", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Paint, Wallpaper, and Finishes",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "Misc.",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Paint color", "finish_color": ""},
+                            {"name": "Wallpaper", "finish_color": ""},
+                            {"name": "Finish", "finish_color": ""},
+                            {"name": "Counter Tops", "finish_color": ""}
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    
+    "powder bath": {
+        "categories": [
+            {
+                "name": "Lighting",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "INSTALLED",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Vanity Light", "finish_color": ""},
+                            {"name": "Sconces", "finish_color": ""},
+                            {"name": "Recessed Lighting", "finish_color": ""},
+                            {"name": "Pendant Light", "finish_color": ""},
+                            {"name": "Exhaust Fan w/ Light", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Paint, Wallpaper, and Finishes",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "Misc.",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Paint color", "finish_color": ""},
+                            {"name": "Wallpaper", "finish_color": ""},
+                            {"name": "Finish", "finish_color": ""},
+                            {"name": "Counter Tops", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Plumbing & Fixtures",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "FIXTURE",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Pedestal Sink", "finish_color": ""},
+                            {"name": "Console Sink", "finish_color": ""},
+                            {"name": "Wall-mount Sink", "finish_color": ""},
+                            {"name": "Faucet", "finish_color": ""},
+                            {"name": "Toilet", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Furniture & Storage",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "PIECE",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Small Vanity Cabinet", "finish_color": ""},
+                            {"name": "Small Storage Cabinet", "finish_color": ""},
+                            {"name": "Accent Stool", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Decor & Accessories",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "MISC.",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Mirror (Decorative)", "finish_color": ""},
+                            {"name": "Wall Art", "finish_color": ""},
+                            {"name": "Small Area Rug/Bath Mat", "finish_color": ""},
+                            {"name": "Hand Towels", "finish_color": ""},
+                            {"name": "Soap Dispenser", "finish_color": ""},
+                            {"name": "Toilet Paper Holder", "finish_color": ""},
+                            {"name": "Towel Ring/Hooks", "finish_color": ""},
+                            {"name": "Waste Basket", "finish_color": ""}
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    
+    "laundry room": {
+        "categories": [
+            {
+                "name": "Lighting",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "INSTALLED",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Flush Mount Light", "finish_color": ""},
+                            {"name": "Recessed Lighting", "finish_color": ""},
+                            {"name": "Task Lighting (over counter)", "finish_color": ""},
+                            {"name": "Utility Light", "finish_color": ""},
+                            {"name": "Under Cabinet Lighting", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Appliances",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "UNIT",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Washer (Front Load/Top Load)", "finish_color": ""},
+                            {"name": "Dryer (Electric/Gas)", "finish_color": ""},
+                            {"name": "Utility Sink", "finish_color": ""},
+                            {"name": "Steamer", "finish_color": ""},
+                            {"name": "Iron", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Furniture & Storage",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "PIECE",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Base Cabinets", "finish_color": ""},
+                            {"name": "Wall Cabinets", "finish_color": ""},
+                            {"name": "Countertop (Folding Area)", "finish_color": ""},
+                            {"name": "Laundry Folding Table", "finish_color": ""},
+                            {"name": "Hanging Rod", "finish_color": ""},
+                            {"name": "Shelving Units", "finish_color": ""},
+                            {"name": "Laundry Sorter/Hampers", "finish_color": ""},
+                            {"name": "Ironing Board (Built-in/Foldable)", "finish_color": ""},
+                            {"name": "Drying Rack (Wall-mounted/Freestanding)", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Decor & Accessories",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "MISC.",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Wall Art/Signage", "finish_color": ""},
+                            {"name": "Floor Mat", "finish_color": ""},
+                            {"name": "Storage Bins (Laundry Supplies)", "finish_color": ""},
+                            {"name": "Pegboard Organizer", "finish_color": ""},
+                            {"name": "Lint Bin", "finish_color": ""},
+                            {"name": "Cleaning Supplies Caddy", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Paint, Wallpaper, and Finishes",
+                "color": "#5A7A5A",
+                "subcategories": [
+                    {
+                        "name": "Misc.",
+                        "color": "#8A5A5A",
+                        "items": [
+                            {"name": "Paint color", "finish_color": ""},
+                            {"name": "Wallpaper", "finish_color": ""},
+                            {"name": "Finish", "finish_color": ""},
+                            {"name": "Counter Tops", "finish_color": ""}
                         ]
                     }
                 ]
@@ -666,7 +733,7 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
     }
 }
 
-# Default structure for rooms not specifically defined
+# Default structure for rooms not specifically defined above
 DEFAULT_ROOM_STRUCTURE = {
     "categories": [
         {
@@ -674,21 +741,22 @@ DEFAULT_ROOM_STRUCTURE = {
             "color": "#5A7A5A",
             "subcategories": [
                 {
-                    "name": "Overhead Lighting",
+                    "name": "INSTALLED",  
                     "color": "#8A5A5A",
                     "items": [
-                        {"name": "Ceiling Light", "finish_color": "Various Finishes"},
-                        {"name": "Pendant Light", "finish_color": "Various Finishes"},
-                        {"name": "Chandelier", "finish_color": "Various Finishes"}
+                        {"name": "Ceiling Light", "finish_color": ""},
+                        {"name": "Recessed Lighting", "finish_color": ""},
+                        {"name": "Pendant Light", "finish_color": ""},
+                        {"name": "Sconces", "finish_color": ""}
                     ]
                 },
                 {
-                    "name": "Task Lighting",
+                    "name": "PORTABLE",
                     "color": "#8A5A5A",
                     "items": [
-                        {"name": "Table Lamp", "finish_color": "Various Finishes"},
-                        {"name": "Floor Lamp", "finish_color": "Various Finishes"},
-                        {"name": "Desk Lamp", "finish_color": "Various Finishes"}
+                        {"name": "Table Lamp", "finish_color": ""},
+                        {"name": "Floor Lamp", "finish_color": ""},
+                        {"name": "Desk Lamp", "finish_color": ""}
                     ]
                 }
             ]
@@ -698,21 +766,13 @@ DEFAULT_ROOM_STRUCTURE = {
             "color": "#5A7A5A",
             "subcategories": [
                 {
-                    "name": "Seating",
+                    "name": "PIECE",
                     "color": "#8A5A5A",
                     "items": [
-                        {"name": "Chair", "finish_color": "Various Fabrics/Wood"},
-                        {"name": "Sofa", "finish_color": "Various Fabrics"},
-                        {"name": "Ottoman", "finish_color": "Various Fabrics"}
-                    ]
-                },
-                {
-                    "name": "Tables",
-                    "color": "#8A5A5A",
-                    "items": [
-                        {"name": "Coffee Table", "finish_color": "Wood/Glass/Metal"},
-                        {"name": "Side Table", "finish_color": "Various Finishes"},
-                        {"name": "Console Table", "finish_color": "Various Finishes"}
+                        {"name": "Table", "finish_color": ""},
+                        {"name": "Chairs", "finish_color": ""},
+                        {"name": "Storage Cabinet", "finish_color": ""},
+                        {"name": "Work Surface", "finish_color": ""}
                     ]
                 }
             ]
@@ -722,21 +782,29 @@ DEFAULT_ROOM_STRUCTURE = {
             "color": "#5A7A5A",
             "subcategories": [
                 {
-                    "name": "Wall Decor",
+                    "name": "MISC.",
                     "color": "#8A5A5A",
                     "items": [
-                        {"name": "Wall Art", "finish_color": "Various Frames"},
-                        {"name": "Mirror", "finish_color": "Various Frames"},
-                        {"name": "Wall Shelves", "finish_color": "Various Finishes"}
+                        {"name": "Area Rug", "finish_color": ""},
+                        {"name": "Wall Art", "finish_color": ""},
+                        {"name": "Plants", "finish_color": ""},
+                        {"name": "Curtains/Blinds", "finish_color": ""},
+                        {"name": "Storage Bins", "finish_color": ""}
                     ]
-                },
+                }
+            ]
+        },
+        {
+            "name": "Paint, Wallpaper, and Finishes",
+            "color": "#5A7A5A",
+            "subcategories": [
                 {
-                    "name": "Accessories",
+                    "name": "Misc.",
                     "color": "#8A5A5A",
                     "items": [
-                        {"name": "Decorative Objects", "finish_color": "Various"},
-                        {"name": "Plants", "finish_color": "Various Planters"},
-                        {"name": "Textiles", "finish_color": "Various Colors/Patterns"}
+                        {"name": "Paint color", "finish_color": ""},
+                        {"name": "Wallpaper", "finish_color": ""},
+                        {"name": "Finish", "finish_color": ""}
                     ]
                 }
             ]
