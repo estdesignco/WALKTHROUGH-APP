@@ -843,6 +843,7 @@ const WalkthroughFFE = ({
                                           const isCategoryExpanded = expandedCategories[category.id];
                                           console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
                                           
+                                          return (
                                                 <React.Fragment key={category.id}>
                                                   {/* CATEGORY HEADER ROW */}
                                                   <tr>
