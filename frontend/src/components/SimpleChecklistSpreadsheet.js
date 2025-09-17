@@ -99,6 +99,35 @@ const SimpleChecklistSpreadsheet = ({
     }
   }, [project]);
 
+  // Fetch available categories from backend API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+        const response = await fetch(`${backendUrl}/api/categories/available`);
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableCategories(data.categories || []);
+          console.log('✅ Loaded categories from API:', data.categories);
+        } else {
+          console.warn('⚠️ Failed to fetch categories, using fallback');
+          setAvailableCategories([
+            "Lighting", "Furniture", "Appliances", "Plumbing", 
+            "Decor & Accessories", "Paint, Wallpaper, and Finishes"
+          ]);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching categories:', error);
+        setAvailableCategories([
+          "Lighting", "Furniture", "Appliances", "Plumbing", 
+          "Decor & Accessories", "Paint, Wallpaper, and Finishes"
+        ]);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
+
   // Toggle room expansion
   const toggleRoomExpansion = (roomId) => {
     setExpandedRooms(prev => ({
