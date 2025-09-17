@@ -903,8 +903,6 @@ const SimpleChecklistSpreadsheet = ({
                                 </table>
                               </React.Fragment>
                             ))}
-                          </tbody>
-                        </table>
 
                         {/* ADD ITEM BUTTON - FIXED */}
                         <div className="mb-4">
