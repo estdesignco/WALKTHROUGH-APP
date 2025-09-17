@@ -915,8 +915,10 @@ const WalkthroughFFE = ({
                                                             {item.size || ''}
                                                           </td>
                                                         </tr>
-                                                          
-                                                          {/* VENDOR/SKU - EDITABLE INLINE */}
+                                                        ))
+                                                      ))}
+                                                      
+                                                      {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             <div 
                                                               contentEditable={true}
