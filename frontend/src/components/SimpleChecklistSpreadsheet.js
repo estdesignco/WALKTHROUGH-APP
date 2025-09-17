@@ -498,7 +498,7 @@ const SimpleChecklistSpreadsheet = ({
               className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
             >
               <option value="">All Vendors</option>
-              {vendorTypes.map(vendor => (
+              {(vendorTypes || []).map(vendor => (
                 <option key={vendor} value={vendor}>{vendor}</option>
               ))}
             </select>
