@@ -775,8 +775,28 @@ const SimpleChecklistSpreadsheet = ({
                                   {/* IMAGE */}
                                   <td className="border border-gray-400 px-2 py-1 text-white text-sm w-20">
                                     {item.image_url ? (
-                                      <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
-                                    ) : ''}
+                                      <img 
+                                        src={item.image_url} 
+                                        alt={item.name}
+                                        className="w-12 h-12 object-cover cursor-pointer hover:scale-150 transition-transform duration-200 z-10"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          // Create full-size overlay
+                                          const overlay = document.createElement('div');
+                                          overlay.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+                                          overlay.innerHTML = `
+                                            <div class="max-w-4xl max-h-full p-4">
+                                              <img src="${item.image_url}" alt="${item.name}" class="max-w-full max-h-full object-contain" />
+                                              <p class="text-white text-center mt-4">${item.name}</p>
+                                            </div>
+                                          `;
+                                          overlay.onclick = () => document.body.removeChild(overlay);
+                                          document.body.appendChild(overlay);
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="w-12 h-12 bg-gray-600 flex items-center justify-center text-xs">No Image</div>
+                                    )}
                                   </td>
                                   
                                   {/* LINK - EDITABLE */}
