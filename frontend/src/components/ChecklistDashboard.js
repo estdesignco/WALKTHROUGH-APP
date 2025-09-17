@@ -70,7 +70,7 @@ const ChecklistDashboard = ({ isOffline }) => {
       
       // Load dynamic checklist statuses from API instead of hardcoded values
       try {
-        const statusResponse = await fetch(`https://designflow-24.preview.emergentagent.com/api/item-statuses`);
+        const statusResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/item-statuses`);
         if (statusResponse.ok) {
           const statusData = await statusResponse.json();
           const statusList = statusData.map(status => status.status || status);
