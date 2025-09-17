@@ -2579,12 +2579,73 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             else:
                 print(f"⚠️ VENDOR NOT FOUND for domain: {domain}")
             
-            # Universal selectors for common product information
+            # ✅ ULTRA-ENHANCED SELECTORS - SCRAPE A SPECK OF DUST!
             name_selectors = [
-                'h1[class*="product"], h1[class*="title"], h1.title, h1.product-title',
-                '[data-testid="product-title"], [data-test="product-title"]',
-                '.product-name, .product-title, .item-title, .page-title',
-                'h1, h2:first-of-type'
+                # Product titles - comprehensive search
+                'h1[class*="product"], h1[class*="title"], h1.title, h1.product-title, h1.item-title',
+                '[data-testid="product-title"], [data-test="product-title"], [data-cy="product-title"]',
+                '.product-name, .product-title, .item-title, .page-title, .main-title',
+                'h1, h2:first-of-type, h3:first-of-type',
+                # More specific selectors
+                '.pdp-product-name, .product-details h1, .item-info h1',
+                '[class*="title"]:first-of-type, [id*="title"], [id*="name"]',
+                '.product-information h1, .product-summary h1',
+                # Backup selectors
+                'title, .product-header h1, .content h1'
+            ]
+            
+            # ULTRA-ENHANCED price selectors
+            price_selectors = [
+                # Standard price patterns
+                '.price .money, .product-price .money, [data-price], .price-current',
+                '.product-form__price, .product__price, .price__sale, .price__regular',
+                '.price-item--regular, .price__regular, .price--highlight',
+                'span[class*="price"], div[class*="price"], p[class*="price"]',
+                # Wholesale specific
+                '.product-meta .price, .product-info .price, .pricing .price',
+                '.variant-picker .price, .product-form .price',
+                # Currency symbols
+                '[class*="dollar"], [class*="currency"], [class*="cost"]',
+                # Generic patterns
+                'span:contains("$"), div:contains("$"), p:contains("$")',
+                # SKU and model numbers
+                '[class*="sku"], [class*="model"], [data-sku]',
+                # More specific
+                '.price-box .price, .price-container .price, .product-price-value'
+            ]
+            
+            # ULTRA-ENHANCED image selectors
+            image_selectors = [
+                # Standard product images
+                '.product-image img, .product-photo img, [class*="product-image"] img',
+                '.main-image img, .featured-image img, .hero-image img',
+                '[data-testid="product-image"] img, [data-test="product-image"] img',
+                # Gallery images  
+                '.product-gallery img:first-of-type, .image-gallery img:first-of-type',
+                '.product-media img:first-of-type, .media-gallery img:first-of-type',
+                # Generic selectors
+                'img[alt*="product"], img[alt*="item"], img[src*="product"]',
+                # Backup - any large image
+                'img[width], img[height]'
+            ]
+            
+            # ULTRA-ENHANCED size/dimension selectors
+            size_selectors = [
+                '[class*="dimension"], [class*="size"], [class*="measurement"]',
+                '.product-specs .size, .specifications .dimensions',
+                '.product-details .size, .item-details .dimensions',
+                '[data-size], [data-dimensions], [data-specs]',
+                'td:contains("Dimensions"), td:contains("Size"), td:contains("W x D x H")',
+                '.specs-table td, .specification-table td'
+            ]
+            
+            # ULTRA-ENHANCED description selectors
+            description_selectors = [
+                '.product-description, .item-description, .product-details',
+                '.product-summary, .product-info, .product-content',
+                '[class*="description"], [class*="summary"], [class*="details"]',
+                '.product-text, .item-text, .content-text',
+                'p:contains("description"), div:contains("details")'
             ]
             
             # ✅ ENHANCED FOUR HANDS SPECIFIC SELECTORS FOR IMAGE, COST, SIZE
