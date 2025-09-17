@@ -919,7 +919,7 @@ const WalkthroughFFE = ({
                                                       ))}
                                                       
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                      <tr>
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
