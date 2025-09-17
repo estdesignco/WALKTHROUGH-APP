@@ -878,7 +878,7 @@ const ExactFFESpreadsheet = ({
 
                                                   {/* SUBCATEGORIES - Only show when category expanded */}
                                                   {isCategoryExpanded && (
-                                                    <>
+                                                    <React.Fragment>
                                                       {category.subcategories?.map((subcategory) => (
                                                         <React.Fragment key={subcategory.id || subcategory.name}>
                                                           {/* TABLE WITH SUBCATEGORY NAME IN HEADER */}
