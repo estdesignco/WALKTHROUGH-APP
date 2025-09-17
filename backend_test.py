@@ -993,10 +993,13 @@ class FFEAPITester:
 
     def run_all_tests(self):
         """Run all FF&E backend tests"""
-        print("🚀 Starting FF&E Backend API Tests - COMPREHENSIVE STRUCTURE FOCUS")
+        print("🚀 Starting FF&E Backend API Tests - REVIEW REQUEST FOCUS")
         print("=" * 60)
         
-        # Run tests in logical order based on review request
+        # Run review request tests first
+        self.test_review_request_add_room_functionality()  # 🎯 REVIEW REQUEST: Add Room functionality
+        
+        # Run other tests in logical order
         self.test_project_data_structure()      # Test #5: Project Data Structure
         self.test_add_room_functionality()      # Test #1: Add Room Functionality  
         self.test_comprehensive_room_structure() # 🎯 NEW: Test comprehensive structure
