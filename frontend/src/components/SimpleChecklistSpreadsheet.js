@@ -45,7 +45,7 @@ const SimpleChecklistSpreadsheet = ({
         }
         
         const filteredCategories = room.categories.map(category => {
-          if (selectedCategory && !category.name.toLowerCase().includes(selectedCategory.toLowerCase())) {
+          if (selectedCategory && category.name !== selectedCategory) {
             return { ...category, subcategories: [] };
           }
           
