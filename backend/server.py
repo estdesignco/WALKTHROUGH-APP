@@ -3066,69 +3066,134 @@ async def process_canva_pdf_file(file_path: str, room_name: str, project_id: str
             print(f"⚠️ Available rooms: {[r['name'] for r in rooms]}")
             raise HTTPException(status_code=404, detail=f"Room '{room_name}' not found in project. Available rooms: {[r['name'] for r in rooms]}")
         
-        # Extract text from PDF using basic approach - ACTUALLY SCRAPE
+        # Extract text from PDF using basic approach - ACTUALLY SCRAPE REAL LINKS
         extracted_items = []
         
         try:
-            # Try to extract links and text from the uploaded PDF
-            import subprocess
-            import re
+            # REAL PDF TEXT EXTRACTION USING PYTHON LIBRARIES
+            pdf_text = ""
+            urls = []
             
-            # Use pdftotext if available, otherwise fall back to basic extraction
+            # Method 1: Try using PyPDF2 if available
             try:
-                # Extract text from PDF
-                result = subprocess.run(['pdftotext', file_path, '-'], 
-                                      capture_output=True, text=True, timeout=30)
-                pdf_text = result.stdout if result.returncode == 0 else ""
-                
-                # Extract URLs from the text
-                url_pattern = r'https?://[^\s<>"{}|\\^`\[\]]+'
+                import PyPDF2
+                with open(file_path, 'rb') as file:
+                    pdf_reader = PyPDF2.PdfReader(file)
+                    for page in pdf_reader.pages:
+                        page_text = page.extract_text()
+                        pdf_text += page_text + "\n"
+                print(f"✅ PyPDF2 extracted {len(pdf_text)} characters of text")
+            except ImportError:
+                print("⚠️ PyPDF2 not available, trying alternative method")
+            except Exception as e:
+                print(f"⚠️ PyPDF2 extraction failed: {e}")
+            
+            # Method 2: Try using pdfplumber
+            if not pdf_text:
+                try:
+                    import pdfplumber
+                    with pdfplumber.open(file_path) as pdf:
+                        for page in pdf.pages:
+                            page_text = page.extract_text()
+                            if page_text:
+                                pdf_text += page_text + "\n"
+                    print(f"✅ pdfplumber extracted {len(pdf_text)} characters of text")
+                except ImportError:
+                    print("⚠️ pdfplumber not available, trying command line")
+                except Exception as e:
+                    print(f"⚠️ pdfplumber extraction failed: {e}")
+            
+            # Method 3: Command line pdftotext
+            if not pdf_text:
+                try:
+                    result = subprocess.run(['pdftotext', file_path, '-'], 
+                                          capture_output=True, text=True, timeout=30)
+                    if result.returncode == 0:
+                        pdf_text = result.stdout
+                        print(f"✅ pdftotext extracted {len(pdf_text)} characters of text")
+                except Exception as e:
+                    print(f"⚠️ pdftotext failed: {e}")
+            
+            if pdf_text:
+                # Extract ALL URLs from the PDF text
+                url_pattern = r'https?://[^\s<>"{}|\\^`\[\]]+|www\.[^\s<>"{}|\\^`\[\]]+'
                 urls = re.findall(url_pattern, pdf_text)
                 
-                # Extract common furniture/design words
+                # Clean up URLs
+                clean_urls = []
+                for url in urls:
+                    if not url.startswith('http'):
+                        url = 'https://' + url
+                    # Remove trailing punctuation
+                    url = re.sub(r'[.,;:!?]+$', '', url)
+                    if len(url) > 10:  # Filter out very short URLs
+                        clean_urls.append(url)
+                
+                urls = list(set(clean_urls))[:20]  # Remove duplicates, limit to 20
+                print(f"✅ Found {len(urls)} unique URLs in PDF")
+                
+                # Extract product/design keywords from text
                 design_keywords = [
-                    'sofa', 'chair', 'table', 'lamp', 'rug', 'mirror', 'art', 'vase', 
-                    'pillow', 'curtain', 'light', 'fixture', 'cabinet', 'shelf', 'desk',
-                    'bed', 'nightstand', 'dresser', 'ottoman', 'bench', 'console'
+                    'sofa', 'chair', 'table', 'lamp', 'light', 'fixture', 'rug', 'mirror', 
+                    'art', 'vase', 'pillow', 'curtain', 'cabinet', 'shelf', 'desk',
+                    'bed', 'nightstand', 'dresser', 'ottoman', 'bench', 'console',
+                    'chandelier', 'sconce', 'pendant', 'floor lamp', 'table lamp'
                 ]
                 
                 found_items = []
                 pdf_text_lower = pdf_text.lower()
                 
+                # Create items from found keywords
                 for keyword in design_keywords:
                     if keyword in pdf_text_lower:
-                        category = 'furniture' if keyword in ['sofa', 'chair', 'table', 'desk', 'bed'] else \
-                                  'lighting' if keyword in ['lamp', 'light', 'fixture'] else 'decor'
-                        found_items.append({
-                            'name': keyword.capitalize(),
+                        # Try to find URLs related to this keyword
+                        related_urls = [url for url in urls if keyword.replace(' ', '') in url.lower()]
+                        
+                        category = 'furniture' if keyword in ['sofa', 'chair', 'table', 'desk', 'bed', 'nightstand', 'dresser', 'ottoman', 'bench', 'console'] else \
+                                  'lighting' if keyword in ['lamp', 'light', 'fixture', 'chandelier', 'sconce', 'pendant'] else 'decor'
+                        
+                        item = {
+                            'name': keyword.title(),
                             'category': category,
-                            'source': f'Extracted from PDF text: {keyword}',
-                            'urls': [url for url in urls if keyword in url.lower()][:1]  # Max 1 URL per item
+                            'source': f'Extracted from PDF: "{keyword}" found in text',
+                            'urls': related_urls[:1] if related_urls else [],
+                            'full_urls': urls if not related_urls else []
+                        }
+                        found_items.append(item)
+                
+                # If no keywords found, create items from URLs directly
+                if not found_items and urls:
+                    for i, url in enumerate(urls[:10]):  # Limit to 10 URLs
+                        # Try to guess category from URL
+                        url_lower = url.lower()
+                        if any(word in url_lower for word in ['chair', 'sofa', 'table', 'furniture']):
+                            category = 'furniture'
+                        elif any(word in url_lower for word in ['light', 'lamp', 'fixture']):
+                            category = 'lighting'
+                        else:
+                            category = 'decor'
+                        
+                        found_items.append({
+                            'name': f'Item from Link {i+1}',
+                            'category': category,
+                            'source': f'URL found in PDF: {url}',
+                            'urls': [url],
+                            'full_urls': []
                         })
                 
-                extracted_items = found_items[:10]  # Limit to 10 items
-                print(f"✅ Extracted {len(extracted_items)} items from PDF text analysis")
+                extracted_items = found_items[:15]  # Limit to 15 items
+                print(f"✅ Created {len(extracted_items)} items from PDF analysis")
                 
-            except (subprocess.TimeoutExpired, FileNotFoundError, Exception) as e:
-                print(f"⚠️ PDF text extraction failed: {e}, using visual analysis")
-                
-                # Fall back to analyzing common design patterns
+            else:
+                print("⚠️ No text could be extracted from PDF, using fallback items")
                 extracted_items = [
-                    {"name": "Living Room Sofa", "category": "furniture", "source": "PDF visual analysis"},
-                    {"name": "Coffee Table", "category": "furniture", "source": "PDF visual analysis"},
-                    {"name": "Table Lamp", "category": "lighting", "source": "PDF visual analysis"},
-                    {"name": "Area Rug", "category": "decor", "source": "PDF visual analysis"},
-                    {"name": "Wall Art", "category": "decor", "source": "PDF visual analysis"},
-                    {"name": "Throw Pillows", "category": "decor", "source": "PDF visual analysis"},
-                    {"name": "Floor Lamp", "category": "lighting", "source": "PDF visual analysis"},
-                    {"name": "Side Table", "category": "furniture", "source": "PDF visual analysis"}
+                    {"name": "Design Item from PDF", "category": "decor", "source": "PDF fallback", "urls": [], "full_urls": []}
                 ]
                 
         except Exception as extract_error:
             print(f"⚠️ Complete PDF extraction error: {extract_error}")
-            # Final fallback
             extracted_items = [
-                {"name": "Item from Canva PDF", "category": "decor", "source": "PDF fallback"}
+                {"name": "Item from Canva PDF", "category": "decor", "source": "PDF error fallback", "urls": [], "full_urls": []}
             ]
         
         created_items = []
