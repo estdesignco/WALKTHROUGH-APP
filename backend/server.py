@@ -960,15 +960,25 @@ def get_subcategory_color(subcategory_name: str) -> str:
 class EmailDeliveryError(Exception):
     pass
 
-def send_questionnaire_email(client_name: str, client_email: str, questionnaire_url: str, sender_name: str = "Established Design Co.") -> bool:
-    """Send questionnaire email to client using SendGrid"""
+async def send_questionnaire_email(client_name: str, client_email: str, questionnaire_url: str, sender_name: str = "Established Design Co.") -> bool:
+    """Send questionnaire email to client using Microsoft 365 SMTP"""
     try:
-        sendgrid_api_key = os.getenv('SENDGRID_API_KEY')
-        sender_email = os.getenv('SENDER_EMAIL', 'noreply@establisheddesign.com')
+        # Get SMTP configuration from environment
+        smtp_server = os.getenv('SMTP_SERVER', 'smtp-mail.outlook.com')
+        smtp_port = int(os.getenv('SMTP_PORT', '587'))
+        sender_email = os.getenv('SENDER_EMAIL')
+        sender_password = os.getenv('SENDER_PASSWORD')
         
-        if not sendgrid_api_key:
-            raise EmailDeliveryError("SendGrid API key not configured")
+        if not sender_email or not sender_password:
+            raise EmailDeliveryError("Email credentials not configured")
         
+        # Create message
+        message = MIMEMultipart('alternative')
+        message['Subject'] = f"Your Interior Design Questionnaire - {client_name}"
+        message['From'] = f"{sender_name} <{sender_email}>"
+        message['To'] = client_email
+        
+        # Create HTML content
         html_content = f"""
         <!DOCTYPE html>
         <html>
@@ -1025,18 +1035,50 @@ def send_questionnaire_email(client_name: str, client_email: str, questionnaire_
         </html>
         """
         
-        message = Mail(
-            from_email=sender_email,
-            to_emails=client_email,
-            subject=f"Your Interior Design Questionnaire - {client_name}",
-            html_content=html_content
+        # Create plain text version
+        text_content = f"""
+        Hello {client_name},
+
+        Thank you for your interest in working with Established Design Co.! We're excited to learn more about your design vision and create something beautiful together.
+
+        To get started, please complete our comprehensive client questionnaire at: {questionnaire_url}
+
+        The questionnaire takes about 10-15 minutes to complete and covers:
+        - Your design style preferences
+        - Room selections and priorities  
+        - Budget and timeline expectations
+        - Lifestyle and family needs
+        - Color and material preferences
+
+        Once you've completed the questionnaire, we'll schedule a consultation to discuss your project in detail and begin the walkthrough process.
+
+        If you have any questions, please don't hesitate to reach out. We look forward to working with you!
+
+        Best regards,
+        The {sender_name} Team
+
+        © 2025 Established Design Co. | Professional Interior Design Services
+        """
+        
+        # Attach parts
+        text_part = MIMEText(text_content, 'plain')
+        html_part = MIMEText(html_content, 'html')
+        
+        message.attach(text_part)
+        message.attach(html_part)
+        
+        # Send email using aiosmtplib
+        await aiosmtplib.send(
+            message,
+            hostname=smtp_server,
+            port=smtp_port,
+            start_tls=True,
+            username=sender_email,
+            password=sender_password,
         )
         
-        sg = SendGridAPIClient(sendgrid_api_key)
-        response = sg.send(message)
-        
-        logging.info(f"Email sent to {client_email} with status code: {response.status_code}")
-        return response.status_code == 202
+        logging.info(f"Email sent successfully to {client_email}")
+        return True
         
     except Exception as e:
         logging.error(f"Failed to send email to {client_email}: {str(e)}")
