@@ -24,7 +24,8 @@ const FFEDashboard = ({ isOffline }) => {
       console.log('🚀 Loading project:', projectId);
       
       // IMMEDIATE TEST - Force load project data
-      fetch(`https://studio-assist-1.preview.emergentagent.com/api/projects/${projectId}`)
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      fetch(`${BACKEND_URL}/api/projects/${projectId}`)
         .then(response => {
           console.log('📡 Response received:', response.status);
           if (response.ok) {
