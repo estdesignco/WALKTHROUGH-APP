@@ -273,7 +273,7 @@ const ExactFFESpreadsheet = ({
   console.log('✅ ExactFFESpreadsheet: Valid project data, proceeding to render spreadsheet');
 
   return (
-    <div className="w-full" style={{ backgroundColor: '#1A1A1A' }}>
+    <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
       
       {/* SEARCH AND FILTER SECTION - EXACTLY LIKE YOUR SCREENSHOT */}
       <div className="mb-6 p-4" style={{ backgroundColor: '#2D2D2D' }}>
