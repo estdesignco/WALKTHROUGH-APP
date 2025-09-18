@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-FF&E Backend API Testing Suite - COMPREHENSIVE STRUCTURE TESTING
-Tests all FF&E functionality including projects, rooms, categories, subcategories, and items.
-FOCUS: Testing enhanced_rooms.py comprehensive structure implementation
+Enhanced Rooms Backend API Testing Suite - CRITICAL TESTING
+Tests enhanced_rooms.py integration and backend endpoints to verify that categories, 
+subcategories, and items are being properly served. Focus on kitchen subcategories issue.
 """
 
 import requests
@@ -26,10 +26,15 @@ def get_backend_url():
     return "http://localhost:8001"
 
 BASE_URL = get_backend_url() + "/api"
-PROJECT_ID = "5cccfb11-0ac0-45ed-91ab-a56088d65b5a"  # Updated to review request project ID
+PROJECT_ID = "5cccfb11-0ac0-45ed-91ab-a56088d65b5a"  # Review request project ID
 
-print(f"Testing FF&E Backend APIs at: {BASE_URL}")
-print(f"Using Project ID: {PROJECT_ID}")
+print("=" * 80)
+print("🧪 ENHANCED ROOMS INTEGRATION TESTING")
+print("=" * 80)
+print(f"Backend URL: {BASE_URL}")
+print(f"Project ID: {PROJECT_ID}")
+print("Focus: Kitchen subcategories missing issue")
+print("=" * 80)
 
 class FFEAPITester:
     def __init__(self):
