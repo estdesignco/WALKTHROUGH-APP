@@ -1271,9 +1271,9 @@ class FFEAPITester:
         print("🚀 Starting FF&E Backend API Tests - EMAIL FUNCTIONALITY FOCUS")
         print("=" * 60)
         
-        # 🎯 REVIEW REQUEST: Test new email functionality first
-        self.test_email_functionality()         # NEW: Email functionality testing
-        self.check_backend_logs_for_email()     # NEW: Check backend logs for email activity
+        # 🎯 REVIEW REQUEST: Test Gmail SMTP email functionality first
+        self.test_gmail_smtp_email_functionality()  # NEW: Gmail SMTP email functionality testing
+        self.check_gmail_smtp_backend_logs()        # NEW: Check backend logs for Gmail SMTP email activity
         
         # Run other tests in logical order
         self.test_review_request_add_room_functionality()  # 🎯 REVIEW REQUEST: Add Room functionality
