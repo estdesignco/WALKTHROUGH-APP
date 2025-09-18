@@ -1151,14 +1151,15 @@ class FFEAPITester:
         else:
             self.log_test("Gmail SMTP - HTML Email", False, f"❌ HTML EMAIL FAILED: {response_data}")
 
-    def check_backend_logs_for_email(self):
-        """Check backend logs for email-related messages"""
-        print("\n=== 📋 CHECKING BACKEND LOGS FOR EMAIL ACTIVITY ===")
+    def check_gmail_smtp_backend_logs(self):
+        """Check backend logs for Gmail SMTP email activity"""
+        print("\n=== 📋 CHECKING BACKEND LOGS FOR GMAIL SMTP EMAIL ACTIVITY ===")
+        print("Looking for 'Email sent successfully' messages and SMTP errors...")
         
         try:
             # Check supervisor backend logs
             import subprocess
-            result = subprocess.run(['tail', '-n', '50', '/var/log/supervisor/backend.out.log'], 
+            result = subprocess.run(['tail', '-n', '100', '/var/log/supervisor/backend.out.log'], 
                                   capture_output=True, text=True, timeout=10)
             
             if result.returncode == 0:
@@ -1166,34 +1167,104 @@ class FFEAPITester:
                 
                 # Look for email-related log messages
                 email_logs = []
+                success_logs = []
+                error_logs = []
+                smtp_logs = []
+                
                 for line in log_content.split('\n'):
-                    if any(keyword in line.lower() for keyword in ['email', 'smtp', 'questionnaire', 'send']):
+                    line_lower = line.lower()
+                    if any(keyword in line_lower for keyword in ['email', 'smtp', 'questionnaire', 'send']):
                         email_logs.append(line.strip())
+                        
+                        # Categorize logs
+                        if 'email sent successfully' in line_lower:
+                            success_logs.append(line.strip())
+                        elif 'error' in line_lower or 'failed' in line_lower:
+                            error_logs.append(line.strip())
+                        elif 'smtp' in line_lower:
+                            smtp_logs.append(line.strip())
+                
+                print(f"📊 EMAIL LOG ANALYSIS:")
+                print(f"   Total email-related logs: {len(email_logs)}")
+                print(f"   Success logs: {len(success_logs)}")
+                print(f"   Error logs: {len(error_logs)}")
+                print(f"   SMTP logs: {len(smtp_logs)}")
                 
                 if email_logs:
-                    print("📧 EMAIL-RELATED LOG ENTRIES:")
-                    for log_entry in email_logs[-10:]:  # Show last 10 email-related entries
-                        print(f"   {log_entry}")
+                    print("\n📧 RECENT EMAIL-RELATED LOG ENTRIES:")
+                    for log_entry in email_logs[-15:]:  # Show last 15 email-related entries
+                        if log_entry.strip():
+                            print(f"   {log_entry}")
                     
-                    # Check for success messages
-                    success_logs = [log for log in email_logs if 'successfully' in log.lower() or 'sent' in log.lower()]
-                    error_logs = [log for log in email_logs if 'error' in log.lower() or 'failed' in log.lower()]
+                    # Check for specific success messages from review request
+                    gmail_success_logs = [log for log in success_logs if 'test@example.com' in log.lower()]
+                    if gmail_success_logs:
+                        self.log_test("Gmail SMTP - Success Logs", True, f"✅ FOUND 'Email sent successfully' messages: {len(gmail_success_logs)}")
+                        for success_log in gmail_success_logs[-3:]:  # Show last 3
+                            print(f"   ✅ SUCCESS: {success_log}")
+                    else:
+                        self.log_test("Gmail SMTP - Success Logs", False, "❌ NO 'Email sent successfully' messages found")
                     
-                    if success_logs:
-                        self.log_test("Backend Email Logs - Success", True, f"Found {len(success_logs)} success entries")
+                    # Check for SMTP authentication errors
+                    auth_error_logs = [log for log in error_logs if '535 5.7.139' in log or 'authentication unsuccessful' in log.lower()]
+                    if auth_error_logs:
+                        self.log_test("Gmail SMTP - Auth Errors", False, f"❌ STILL GETTING SMTP AUTH ERRORS: {len(auth_error_logs)}")
+                        for auth_error in auth_error_logs[-2:]:  # Show last 2
+                            print(f"   ❌ AUTH ERROR: {auth_error}")
+                    else:
+                        self.log_test("Gmail SMTP - Auth Errors", True, "✅ NO SMTP AUTHENTICATION ERRORS")
                     
-                    if error_logs:
-                        self.log_test("Backend Email Logs - Errors", True, f"Found {len(error_logs)} error entries (may be expected)")
+                    # Check for Gmail-specific logs
+                    gmail_logs = [log for log in smtp_logs if 'gmail' in log.lower()]
+                    if gmail_logs:
+                        self.log_test("Gmail SMTP - Gmail Logs", True, f"✅ FOUND GMAIL-SPECIFIC LOGS: {len(gmail_logs)}")
+                        for gmail_log in gmail_logs[-2:]:  # Show last 2
+                            print(f"   📧 GMAIL: {gmail_log}")
+                    else:
+                        self.log_test("Gmail SMTP - Gmail Logs", False, "❌ NO GMAIL-SPECIFIC LOGS FOUND")
                     
-                    if not success_logs and not error_logs:
-                        self.log_test("Backend Email Logs", True, f"Found {len(email_logs)} email-related log entries")
+                    # Overall assessment
+                    if success_logs and not auth_error_logs:
+                        self.log_test("Gmail SMTP - Overall Status", True, "✅ GMAIL SMTP APPEARS TO BE WORKING")
+                    elif auth_error_logs:
+                        self.log_test("Gmail SMTP - Overall Status", False, "❌ GMAIL SMTP STILL HAS AUTHENTICATION ISSUES")
+                    else:
+                        self.log_test("Gmail SMTP - Overall Status", False, "❌ NO CLEAR SUCCESS INDICATORS")
+                        
                 else:
-                    self.log_test("Backend Email Logs", False, "No email-related log entries found")
+                    self.log_test("Gmail SMTP - Backend Logs", False, "❌ NO EMAIL-RELATED LOG ENTRIES FOUND")
             else:
-                self.log_test("Backend Email Logs", False, f"Could not read backend logs: {result.stderr}")
+                self.log_test("Gmail SMTP - Backend Logs", False, f"❌ COULD NOT READ BACKEND LOGS: {result.stderr}")
                 
         except Exception as e:
-            self.log_test("Backend Email Logs", False, f"Error checking logs: {str(e)}")
+            self.log_test("Gmail SMTP - Backend Logs", False, f"❌ ERROR CHECKING LOGS: {str(e)}")
+            
+        # Also check error logs
+        try:
+            error_result = subprocess.run(['tail', '-n', '50', '/var/log/supervisor/backend.err.log'], 
+                                        capture_output=True, text=True, timeout=10)
+            
+            if error_result.returncode == 0:
+                error_content = error_result.stdout
+                
+                # Look for email errors
+                email_errors = []
+                for line in error_content.split('\n'):
+                    if any(keyword in line.lower() for keyword in ['email', 'smtp', 'questionnaire']):
+                        email_errors.append(line.strip())
+                
+                if email_errors:
+                    print(f"\n🚨 EMAIL ERRORS FROM ERROR LOG:")
+                    for error_entry in email_errors[-10:]:  # Show last 10 error entries
+                        if error_entry.strip():
+                            print(f"   {error_entry}")
+                    
+                    self.log_test("Gmail SMTP - Error Log", True, f"Found {len(email_errors)} email-related errors")
+                else:
+                    self.log_test("Gmail SMTP - Error Log", True, "No email-related errors in error log")
+                    
+        except Exception as e:
+            print(f"   Could not check error log: {str(e)}")
 
     def run_all_tests(self):
         """Run all FF&E backend tests"""
