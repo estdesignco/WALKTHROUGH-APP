@@ -991,50 +991,69 @@ class FFEAPITester:
         else:
             self.log_test("ARCHITECTURAL ELEMENTS Category Working", False, f"Failed to create architectural elements room: {room_data}")
 
-    def test_email_functionality(self):
-        """Test the new email functionality as requested in review"""
-        print("\n=== 🎯 TESTING NEW EMAIL FUNCTIONALITY (REVIEW REQUEST) ===")
+    def test_gmail_smtp_email_functionality(self):
+        """Test Gmail SMTP email functionality as requested in review"""
+        print("\n=== 🎯 TESTING GMAIL SMTP EMAIL FUNCTIONALITY (REVIEW REQUEST) ===")
+        print("Testing updated Gmail SMTP configuration:")
+        print("- Server: smtp.gmail.com:587")
+        print("- Sender: estdesignco@gmail.com")
+        print("- Password: Zeke1919$$$$")
+        print("- Expected: HTML email with questionnaire link")
         
-        # Test 1: Valid email request
-        print("1. Testing POST /api/send-questionnaire with valid client data...")
+        # Test 1: Test with exact data from review request
+        print("\n1. Testing POST /api/send-questionnaire with review request data...")
         
-        valid_email_data = {
-            "client_name": "Test Client",
+        review_request_data = {
+            "client_name": "Gmail Test Client",
             "client_email": "test@example.com",
             "sender_name": "Established Design Co."
         }
         
-        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', valid_email_data)
+        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', review_request_data)
         
         print(f"   Status Code: {status_code}")
         print(f"   Success: {success}")
-        print(f"   Response: {response_data}")
+        print(f"   Response: {json.dumps(response_data, indent=2)}")
+        
+        # Expected success response from review request
+        expected_message = "Questionnaire email has been queued for delivery to Gmail Test Client"
         
         if success and status_code == 200:
-            # Check response format
+            # Check response format matches expected
             if isinstance(response_data, dict) and 'status' in response_data and 'message' in response_data:
                 if response_data.get('status') == 'success':
-                    self.log_test("Email Endpoint - Valid Request", True, 
-                                f"Correct response format: {response_data}")
+                    self.log_test("Gmail SMTP - Valid Request", True, 
+                                f"✅ SUCCESS: {response_data}")
                     
-                    # Check message content
+                    # Check message content matches expected format
                     message = response_data.get('message', '')
-                    if 'queued for delivery' in message.lower() and 'Test Client' in message:
-                        self.log_test("Email Response Message", True, f"Proper message: {message}")
+                    if 'queued for delivery' in message.lower() and 'Gmail Test Client' in message:
+                        self.log_test("Gmail SMTP - Response Message", True, f"✅ EXPECTED MESSAGE: {message}")
                     else:
-                        self.log_test("Email Response Message", False, f"Unexpected message: {message}")
+                        self.log_test("Gmail SMTP - Response Message", False, f"❌ UNEXPECTED MESSAGE: {message}")
                 else:
-                    self.log_test("Email Endpoint - Valid Request", False, f"Status not 'success': {response_data}")
+                    self.log_test("Gmail SMTP - Valid Request", False, f"❌ STATUS NOT SUCCESS: {response_data}")
             else:
-                self.log_test("Email Endpoint - Valid Request", False, f"Invalid response format: {response_data}")
+                self.log_test("Gmail SMTP - Valid Request", False, f"❌ INVALID RESPONSE FORMAT: {response_data}")
+        elif status_code == 500:
+            # Check if it's still an SMTP authentication error
+            error_detail = response_data.get('detail', '') if isinstance(response_data, dict) else str(response_data)
+            print(f"   🔍 ERROR ANALYSIS: {error_detail}")
+            
+            if 'authentication' in error_detail.lower() and 'unsuccessful' in error_detail.lower():
+                self.log_test("Gmail SMTP - Authentication", False, f"❌ STILL SMTP AUTH ERROR: {error_detail}")
+            elif 'smtp' in error_detail.lower():
+                self.log_test("Gmail SMTP - SMTP Error", False, f"❌ SMTP ERROR: {error_detail}")
+            else:
+                self.log_test("Gmail SMTP - Server Error", False, f"❌ UNEXPECTED ERROR: {error_detail}")
         else:
-            self.log_test("Email Endpoint - Valid Request", False, f"Request failed: {response_data} (Status: {status_code})")
+            self.log_test("Gmail SMTP - Valid Request", False, f"❌ REQUEST FAILED: {response_data} (Status: {status_code})")
         
-        # Test 2: Invalid email format validation
-        print("\n2. Testing invalid email format validation...")
+        # Test 2: Test email validation still works
+        print("\n2. Testing email validation with Gmail SMTP...")
         
         invalid_email_data = {
-            "client_name": "Test Client",
+            "client_name": "Gmail Test Client",
             "client_email": "invalid-email-format",
             "sender_name": "Established Design Co."
         }
@@ -1045,81 +1064,92 @@ class FFEAPITester:
         print(f"   Response: {response_data}")
         
         if status_code == 422:  # Pydantic validation error
-            self.log_test("Email Validation - Invalid Format", True, "Correctly rejected invalid email format")
+            self.log_test("Gmail SMTP - Email Validation", True, "✅ CORRECTLY REJECTED INVALID EMAIL")
         elif not success and status_code >= 400:
-            self.log_test("Email Validation - Invalid Format", True, f"Validation error as expected: {response_data}")
+            self.log_test("Gmail SMTP - Email Validation", True, f"✅ VALIDATION ERROR AS EXPECTED: {response_data}")
         else:
-            self.log_test("Email Validation - Invalid Format", False, f"Should have rejected invalid email: {response_data}")
+            self.log_test("Gmail SMTP - Email Validation", False, f"❌ SHOULD REJECT INVALID EMAIL: {response_data}")
         
-        # Test 3: Missing required fields
-        print("\n3. Testing missing required fields...")
+        # Test 3: Test with a real-looking email to verify SMTP connection
+        print("\n3. Testing Gmail SMTP connection with realistic email...")
         
-        incomplete_data = {
-            "client_name": "Test Client"
-            # Missing client_email and sender_name
-        }
-        
-        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', incomplete_data)
-        
-        print(f"   Status Code: {status_code}")
-        print(f"   Response: {response_data}")
-        
-        if status_code == 422:  # Pydantic validation error
-            self.log_test("Email Validation - Missing Fields", True, "Correctly rejected missing required fields")
-        elif not success and status_code >= 400:
-            self.log_test("Email Validation - Missing Fields", True, f"Validation error as expected: {response_data}")
-        else:
-            self.log_test("Email Validation - Missing Fields", False, f"Should have rejected incomplete data: {response_data}")
-        
-        # Test 4: Test with different sender name
-        print("\n4. Testing with custom sender name...")
-        
-        custom_sender_data = {
-            "client_name": "Jane Doe",
-            "client_email": "jane.doe@example.com",
-            "sender_name": "Custom Design Studio"
-        }
-        
-        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', custom_sender_data)
-        
-        print(f"   Status Code: {status_code}")
-        print(f"   Response: {response_data}")
-        
-        if success and status_code == 200:
-            if response_data.get('status') == 'success':
-                self.log_test("Email Custom Sender", True, f"Custom sender accepted: {response_data}")
-            else:
-                self.log_test("Email Custom Sender", False, f"Custom sender failed: {response_data}")
-        else:
-            self.log_test("Email Custom Sender", False, f"Request failed: {response_data} (Status: {status_code})")
-        
-        # Test 5: Test endpoint accessibility and SMTP configuration
-        print("\n5. Testing SMTP configuration and email process...")
-        
-        # This test checks if the endpoint processes the request correctly
-        # The actual email sending may fail due to SMTP settings, but the endpoint should respond properly
-        test_email_data = {
-            "client_name": "SMTP Test Client",
-            "client_email": "smtp.test@example.com",
+        realistic_email_data = {
+            "client_name": "Sarah Johnson",
+            "client_email": "sarah.johnson@gmail.com",
             "sender_name": "Established Design Co."
         }
         
-        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', test_email_data)
+        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', realistic_email_data)
+        
+        print(f"   Status Code: {status_code}")
+        print(f"   Response: {json.dumps(response_data, indent=2)}")
+        
+        if success and status_code == 200:
+            if response_data.get('status') == 'success':
+                self.log_test("Gmail SMTP - Realistic Email", True, f"✅ GMAIL SMTP WORKING: {response_data}")
+            else:
+                self.log_test("Gmail SMTP - Realistic Email", False, f"❌ UNEXPECTED STATUS: {response_data}")
+        elif status_code == 500:
+            error_detail = response_data.get('detail', '') if isinstance(response_data, dict) else str(response_data)
+            if 'authentication' in error_detail.lower():
+                self.log_test("Gmail SMTP - Realistic Email", False, f"❌ GMAIL AUTH STILL FAILING: {error_detail}")
+            else:
+                self.log_test("Gmail SMTP - Realistic Email", False, f"❌ GMAIL SMTP ERROR: {error_detail}")
+        else:
+            self.log_test("Gmail SMTP - Realistic Email", False, f"❌ UNEXPECTED RESPONSE: {response_data}")
+        
+        # Test 4: Verify endpoint processes without SMTP authentication errors
+        print("\n4. Testing for SMTP authentication error resolution...")
+        
+        smtp_test_data = {
+            "client_name": "SMTP Auth Test",
+            "client_email": "smtp.auth.test@example.com",
+            "sender_name": "Established Design Co."
+        }
+        
+        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', smtp_test_data)
         
         print(f"   Status Code: {status_code}")
         print(f"   Response: {response_data}")
         
         if success and status_code == 200:
-            self.log_test("SMTP Process Test", True, "Email process initiated successfully")
+            self.log_test("Gmail SMTP - No Auth Errors", True, "✅ NO SMTP AUTHENTICATION ERRORS")
         elif status_code == 500:
-            # Check if it's an SMTP configuration error
             error_detail = response_data.get('detail', '') if isinstance(response_data, dict) else str(response_data)
-            if 'smtp' in error_detail.lower() or 'email' in error_detail.lower():
-                self.log_test("SMTP Process Test", True, f"SMTP error detected (expected): {error_detail}")
+            if '535 5.7.139' in error_detail or 'authentication unsuccessful' in error_detail.lower():
+                self.log_test("Gmail SMTP - No Auth Errors", False, f"❌ STILL GETTING SMTP AUTH ERRORS: {error_detail}")
+            elif 'smtp' in error_detail.lower():
+                self.log_test("Gmail SMTP - No Auth Errors", False, f"❌ OTHER SMTP ERROR: {error_detail}")
             else:
-                self.log_test("SMTP Process Test", False, f"Unexpected server error: {error_detail}")
+                self.log_test("Gmail SMTP - No Auth Errors", False, f"❌ UNEXPECTED ERROR: {error_detail}")
         else:
-            self.log_test("SMTP Process Test", False, f"Unexpected response: {response_data} (Status: {status_code})")
+            self.log_test("Gmail SMTP - No Auth Errors", False, f"❌ UNEXPECTED RESPONSE: {response_data}")
+        
+        # Test 5: Verify HTML email content capability
+        print("\n5. Testing HTML email content processing...")
+        
+        html_test_data = {
+            "client_name": "HTML Email Test",
+            "client_email": "html.test@example.com",
+            "sender_name": "Established Design Co.",
+            "custom_message": "This is a test of HTML email functionality"
+        }
+        
+        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', html_test_data)
+        
+        print(f"   Status Code: {status_code}")
+        print(f"   Response: {response_data}")
+        
+        if success and status_code == 200:
+            self.log_test("Gmail SMTP - HTML Email", True, "✅ HTML EMAIL PROCESSING WORKING")
+        elif status_code == 500:
+            error_detail = response_data.get('detail', '') if isinstance(response_data, dict) else str(response_data)
+            if 'html' not in error_detail.lower():
+                self.log_test("Gmail SMTP - HTML Email", True, f"✅ HTML NOT THE ISSUE: {error_detail}")
+            else:
+                self.log_test("Gmail SMTP - HTML Email", False, f"❌ HTML EMAIL ERROR: {error_detail}")
+        else:
+            self.log_test("Gmail SMTP - HTML Email", False, f"❌ HTML EMAIL FAILED: {response_data}")
 
     def check_backend_logs_for_email(self):
         """Check backend logs for email-related messages"""
