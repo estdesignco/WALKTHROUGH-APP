@@ -3,10 +3,10 @@ import React from 'react';
 const SimpleWalkthroughSpreadsheet = ({ project }) => {
   
   return (
-    <div className="w-full p-4" style={{ backgroundColor: '#1A1A1A' }}>
+    <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       
       {/* FILTER AND SEARCH SECTION */}
-      <div className="mb-6 p-4" style={{ backgroundColor: '#2D2D2D' }}>
+      <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
         <div className="flex flex-col gap-4">
           {/* Search Bar */}
           <div className="w-full">
@@ -56,12 +56,12 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
       <div className="overflow-x-auto">
         
         {/* LIVING ROOM HEADER (PURPLE) */}
-        <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: '#8B7355' }}>
+        <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: '#7C3AED' }}>
           LIVING ROOM
         </div>
         
         {/* LIGHTING CATEGORY HEADER (GREEN) */}
-        <div className="mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: '#8B7355' }}>
+        <div className="mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: '#065F46' }}>
           LIGHTING
         </div>
         
@@ -69,11 +69,11 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
         <table className="w-full border-collapse border border-gray-400">
           <thead>
             <tr>
-              <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B7355' }}>✓</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#B91C1C' }}>ITEM</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#B91C1C' }}>QTY</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#B91C1C' }}>SIZE</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#B91C1C' }}>REMARKS</th>
+              <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8b7355' }}>✓</th>
+              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
+              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</th>
+              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
             </tr>
           </thead>
           <tbody>
@@ -82,8 +82,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-3 h-3" />
               </td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm">Recessed Lighting</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
             </tr>
             <tr>
@@ -91,8 +91,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Chandelier</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -100,8 +100,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Sconces</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -109,8 +109,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Track Lighting</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -118,8 +118,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Ceiling Fan w/ Light</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -127,8 +127,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Art Lights</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -136,8 +136,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Pendant Lights</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -145,8 +145,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Under Cabinet Lighting</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -154,8 +154,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Cove Lighting</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
             <tr>
@@ -163,8 +163,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
                 <input type="checkbox" className="w-4 h-4" />
               </td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm">Picture Lights</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
               <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
           </tbody>
