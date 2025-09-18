@@ -53,30 +53,20 @@ const SimpleChecklistSpreadsheet = ({
     }));
   };
 
-  // Different muted room colors for checklist
-  const getRoomColor = (roomName, index = 0) => {
-    const mutedColors = [
-      '#8B5A6B',  // Muted rose
-      '#6B7C93',  // Muted blue
-      '#7A8B5A',  // Muted olive
-      '#9B6B8B',  // Muted purple
-      '#8B7A5A',  // Muted brown
-      '#5A8B7A',  // Muted teal
-      '#8B5A7A',  // Muted mauve
-      '#7A5A8B',  // Muted violet
-      '#5A7A8B',  // Muted slate
-      '#8B6B5A'   // Muted tan
-    ];
-    
-    // Use room name hash for consistent color per room
-    let hash = 0;
-    for (let i = 0; i < roomName.length; i++) {
-      hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return mutedColors[Math.abs(hash) % mutedColors.length];
+  // EXACT room colors from your original FFESpreadsheet.jsx
+  const ROOM_COLORS = {
+    'Living Room': '#8B5CF6', 'Kitchen': '#06B6D4', 'Dining Room': '#DC2626',
+    'Primary Bedroom': '#2F5233', 'Guest Bedroom': '#7C3AED', 'Home Office': '#EA580C',
+    'Primary Bathroom': '#0284C7', 'Guest Bathroom': '#7C2D12', 'Laundry Room': '#65A30D',
+    'Entryway': '#BE185D', 'Sunroom': '#0891B2', 'Nursery': '#C2410C',
+    'Master Bedroom': '#059669',
   };
 
-  const getCategoryColor = () => '#065F46';  // Dark green for categories
+  const getRoomColor = (roomName, index = 0) => {
+    return ROOM_COLORS[roomName] || '#6B7280';
+  };
+
+  const getCategoryColor = () => '#4A6741';  // EXACT color from your original code
 
   // Status colors mapping for checklist
   const getStatusColor = (status) => {
