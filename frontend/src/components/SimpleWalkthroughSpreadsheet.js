@@ -2,6 +2,34 @@ import React from 'react';
 
 const SimpleWalkthroughSpreadsheet = ({ project }) => {
   
+  const getRoomColor = (roomName) => {
+    const roomColors = {
+      'living room': '#7C3AED',
+      'dining room': '#DC2626',
+      'kitchen': '#EA580C',
+      'primary bedroom': '#059669',
+      'primary bathroom': '#2563EB',
+      'powder room': '#7C2D12',
+      'guest room': '#BE185D',
+      'guest bathroom': '#7C2D12',
+      'office': '#1E40AF',
+      'laundry room': '#374151',
+      'pantry': '#92400E',
+      'mudroom': '#6B7280',
+      'foyer': '#4C1D95',
+      'hallway': '#6B7280',
+      'closet': '#374151',
+      'basement': '#1F2937',
+      'attic': '#4B5563',
+      'garage': '#374151',
+      'outdoor': '#065F46',
+      'patio': '#059669',
+      'deck': '#0D9488',
+      'balcony': '#0891B2'
+    };
+    return roomColors[roomName.toLowerCase()] || '#6B7280';
+  };
+  
   return (
     <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       
