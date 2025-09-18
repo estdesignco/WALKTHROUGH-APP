@@ -161,6 +161,10 @@ const App = () => {
               element={<ComprehensiveQuestionnaire />}
             />
             <Route 
+              path="/project/:projectId" 
+              element={<ProjectDetailPage />}
+            />
+            <Route 
               path="/project/:projectId/questionnaire" 
               element={<QuestionnaireSheet />}
             />
