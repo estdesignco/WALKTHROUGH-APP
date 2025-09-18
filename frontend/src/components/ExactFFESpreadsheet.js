@@ -658,7 +658,7 @@ const ExactFFESpreadsheet = ({
     <div className="w-full" style={{ backgroundColor: '#0C0A09' }}>
       
       {/* SEARCH AND FILTER SECTION - EXACTLY LIKE YOUR SCREENSHOT */}
-      <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
+      <div className="mb-6 p-4" style={{ backgroundColor: '#1C1917' }}>
         <div className="flex flex-col lg:flex-row gap-4 items-center">
           {/* Search Input */}
           <div className="flex-1">
