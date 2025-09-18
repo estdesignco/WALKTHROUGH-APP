@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AddItemModal from './AddItemModal';
-import AdvancedFFEFeatures from './AdvancedFFEFeatures';
 
 const ExactFFESpreadsheet = ({ 
   project, 
@@ -14,82 +12,25 @@ const ExactFFESpreadsheet = ({
   onAddRoom,
   onReload 
 }) => {
-  // ✅ DEBUG LOGGING TO FIND EMPTY SPREADSHEET ISSUE
-  console.log('📊 ExactFFESpreadsheet - Project data:', project);
-  console.log('📊 ExactFFESpreadsheet - Rooms count:', project?.rooms?.length || 0);
-  console.log('📊 ExactFFESpreadsheet - First room:', project?.rooms?.[0] || 'No rooms');
-  
+  console.log('🎯 ExactFFESpreadsheet rendering with project:', project);
+
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
-
-  // FILTER STATE - MAKE IT ACTUALLY WORK
-  const [filteredProject, setFilteredProject] = useState(project);
-  
-  // ✅ Search and Filter State
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedCarrier, setSelectedCarrier] = useState('');
+  const [showThumbnail, setShowThumbnail] = useState({});
+  const [filteredProject, setFilteredProject] = useState(project);
 
-  // ACTUAL API CALLS - WITH PROPER ERROR HANDLING
-  const handleStatusChange = async (itemId, newStatus) => {
-    console.log('🔄 Status change request:', { itemId, newStatus });
-    
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
-      });
-      
-      console.log('📡 Status change response:', response.status, response.statusText);
-      
-      if (response.ok) {
-        console.log('✅ Status updated successfully, reloading...');
-        window.location.reload();
-      } else {
-        const errorData = await response.text();
-        console.error('❌ Status update failed:', response.status, errorData);
-        console.error(`Failed to update status: ${response.status} ${response.statusText}`, errorData);
-      }
-    } catch (error) {
-      console.error('❌ Status update error:', error);
-      console.error(`Error updating status: ${error.message}`);
-    }
-  };
-
-  const handleCarrierChange = async (itemId, newCarrier) => {
-    console.log('🔄 Carrier change request:', { itemId, newCarrier });
-    
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ carrier: newCarrier })
-      });
-      
-      if (response.ok) {
-        console.log('✅ Carrier updated successfully, reloading...');
-        window.location.reload();
-      } else {
-        const errorData = await response.text();
-        console.error('❌ Carrier update failed:', response.status, errorData);
-        console.error(`Failed to update carrier: ${response.status} ${response.statusText}`);
-      }
-    } catch (error) {
-      console.error('❌ Carrier update error:', error);
-      console.error(`Error updating carrier: ${error.message}`);
-    }
-  };
-
-  // APPLY FILTERS - SIMPLE WORKING VERSION
+  // APPLY FILTERS - WORKING FILTER LOGIC
   useEffect(() => {
-    console.log('🔍 Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier });
+    console.log('🔍 FFE Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier });
     
     if (!project) {
       setFilteredProject(null);
@@ -98,422 +39,102 @@ const ExactFFESpreadsheet = ({
 
     let filtered = { ...project };
 
-    // Apply filters if any are selected
     if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus || selectedCarrier) {
-      console.log('🔍 Applying filters...');
+      console.log('🔍 Applying FFE filters...');
       
       filtered.rooms = project.rooms.map(room => {
-        // Room filter
         if (selectedRoom && room.id !== selectedRoom) {
-          return { ...room, categories: [] }; // Hide room content but keep room header
+          return { ...room, categories: [] };
         }
         
-        // Filter categories and items
         const filteredCategories = room.categories.map(category => {
-          // Category filter
-          if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) {
+          if (selectedCategory && category.name !== selectedCategory) {
             return { ...category, subcategories: [] };
           }
           
-          // Filter subcategories and items
           const filteredSubcategories = category.subcategories.map(subcategory => {
-            const filteredItems = subcategory.items.filter(item => {
-              // Search term filter
-              if (searchTerm) {
-                const searchLower = searchTerm.toLowerCase();
-                const itemMatch = 
-                  item.name.toLowerCase().includes(searchLower) ||
-                  (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
-                  (item.sku && item.sku.toLowerCase().includes(searchLower));
-                if (!itemMatch) return false;
-              }
-              
-              // Vendor filter
-              if (selectedVendor && item.vendor !== selectedVendor) {
-                return false;
-              }
-              
-              // Status filter
-              if (selectedStatus && item.status !== selectedStatus) {
-                return false;
-              }
-              
-              // Carrier filter
-              if (selectedCarrier && item.carrier !== selectedCarrier) {
-                return false;
-              }
-              
-              return true;
-            });
+            let filteredItems = subcategory.items || [];
+            
+            if (searchTerm) {
+              filteredItems = filteredItems.filter(item =>
+                item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (item.vendor && item.vendor.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))
+              );
+            }
+            
+            if (selectedVendor) {
+              filteredItems = filteredItems.filter(item => item.vendor === selectedVendor);
+            }
+            
+            if (selectedStatus) {
+              filteredItems = filteredItems.filter(item => item.status === selectedStatus);
+            }
+            
+            if (selectedCarrier) {
+              filteredItems = filteredItems.filter(item => item.carrier === selectedCarrier);
+            }
             
             return { ...subcategory, items: filteredItems };
-          });
+          }).filter(subcategory => subcategory.items.length > 0);
           
           return { ...category, subcategories: filteredSubcategories };
-        });
+        }).filter(category => category.subcategories.length > 0);
         
         return { ...room, categories: filteredCategories };
-      });
+      }).filter(room => room.categories.length > 0);
     }
 
     setFilteredProject(filtered);
-    console.log('🔍 Filter applied, rooms:', filtered.rooms.length);
   }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier]);
 
-  // Load available categories on component mount
+  // Fetch available categories
   useEffect(() => {
-    const loadAvailableCategories = async () => {
+    const fetchCategories = async () => {
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-        const response = await fetch(`${backendUrl}/api/categories/available`);
+        const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+        const response = await fetch(`${BACKEND_URL}/api/categories/available`);
         if (response.ok) {
-          const data = await response.json();
-          setAvailableCategories(data.categories || []);
+          const categories = await response.json();
+          setAvailableCategories(categories);
         }
       } catch (error) {
-        console.error('❌ Error loading available categories:', error);
-        setAvailableCategories([
-          "Lighting", "Furniture & Storage", "Decor & Accessories", 
-          "Paint, Wallpaper & Finishes", "Architectural Elements, Built-ins & Trim",
-          "Flooring", "Window Treatments", "HVAC & Mechanical Systems",
-          "Security & Smart Home", "Appliances", "Plumbing & Fixtures"
-        ]);
+        console.error('Error fetching categories:', error);
       }
     };
     
-    loadAvailableCategories();
-    
-    // Initialize all rooms and categories as expanded by default
-    if (project?.rooms) {
-      const roomExpansion = {};
-      const categoryExpansion = {};
-      
-      project.rooms.forEach(room => {
-        roomExpansion[room.id] = true;
-        room.categories?.forEach(category => {
-          categoryExpansion[category.id] = true;
-        });
-      });
-      
-      setExpandedRooms(roomExpansion);
-      setExpandedCategories(categoryExpansion);
-    }
-  }, [project]);
+    fetchCategories();
+  }, []);
 
-  // Handle adding new items - FIX THE SUBCATEGORY SELECTION
-  const handleAddItem = async (itemData) => {
-    try {
-      // Find the first available subcategory if none selected
-      let subcategoryId = selectedSubCategoryId;
-      
-      if (!subcategoryId) {
-        // Find the first subcategory from any expanded room/category
-        for (const room of project.rooms) {
-          if (expandedRooms[room.id]) {
-            for (const category of room.categories || []) {
-              if (expandedCategories[category.id] && category.subcategories?.length > 0) {
-                subcategoryId = category.subcategories[0].id;
-                console.log(`🔍 Auto-selected subcategory: ${category.subcategories[0].name}`);
-                break;
-              }
-            }
-            if (subcategoryId) break;
-          }
-        }
-      }
-
-      if (!subcategoryId) {
-        console.error('Please expand a category first to add items to it.');
-        return;
-      }
-
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-      
-      const newItem = {
-        ...itemData,
-        subcategory_id: subcategoryId,
-        order_index: 0
-      };
-
-      console.log('📤 Creating item:', newItem);
-
-      const response = await fetch(`${backendUrl}/api/items`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newItem)
-      });
-
-      if (response.ok) {
-        console.log('✅ Item added successfully');
-        setShowAddItem(false);
-        // Force reload to show the new item
-        window.location.reload();
-      } else {
-        const errorData = await response.text();
-        console.error('❌ Backend error:', errorData);
-        throw new Error(`HTTP ${response.status}: ${errorData}`);
-      }
-    } catch (error) {
-      console.error('❌ Error adding item:', error);
-      console.error(`Failed to add item: ${error.message}`);
-    }
-  };
-
-  // Handle deleting a room
-  const handleDeleteRoom = async (roomId) => {
-    if (!roomId) {
-      console.error('❌ No room ID provided');
-      return;
-    }
-
-    if (!window.confirm('Are you sure you want to delete this room? This will delete all categories and items in this room.')) {
-      return;
-    }
-
-    try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-      const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        console.log('✅ Room deleted successfully');
-        // Force reload to show updated data
-        window.location.reload();
-      } else {
-        throw new Error(`HTTP ${response.status}`);
-      }
-    } catch (error) {
-      console.error('❌ Error deleting room:', error);
-    }
-  };
-
-  // Handle deleting an item - NO RELOAD
-  const handleDeleteItem = async (itemId) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) {
-      return;
-    }
-
-    try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        console.log('✅ Item deleted successfully');
-        console.log('Item deleted successfully!');
-        // Force reload to show updated data
-        window.location.reload();
-      } else {
-        console.error('❌ Delete failed with status:', response.status);
-        console.error(`Delete failed: ${response.status}`);
-        throw new Error(`HTTP ${response.status}`);
-      }
-    } catch (error) {
-      console.error('❌ Error deleting item:', error);
-      console.error(`Delete error: ${error.message}`);
-      console.error('Failed to delete item. Please try again.');
-    }
-  };
-
-  // Handle adding a new room - SIMPLE VERSION LIKE BEFORE
-  const handleAddRoom = () => {
-    if (onAddRoom) {
-      onAddRoom();
-    }
-  };
-
-  // Handle adding a new category WITH ALL SUBCATEGORIES AND INSTALLEDS
-  const handleAddCategory = async (roomId, categoryName) => {
-    if (!roomId || !categoryName) {
-      console.error('❌ Missing roomId or categoryName');
-      return;
-    }
-
-    try {
-      console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
-      
-      // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: `temp_${categoryName}_${Date.now()}`,
-          description: `Temporary room to extract ${categoryName} structure`,
-          project_id: "temp",
-          order_index: 999
-        })
-      });
-
-      if (tempRoomResponse.ok) {
-        const tempRoom = await tempRoomResponse.json();
-        
-        // Find the matching category from the temp room
-        const matchingCategory = tempRoom.categories.find(cat => 
-          cat.name.toLowerCase() === categoryName.toLowerCase()
-        );
-        
-        if (matchingCategory) {
-          // Add the comprehensive category to the actual room
-          const categoryData = {
-            ...matchingCategory,
-            room_id: roomId,
-            id: undefined // Let backend generate new ID
-          };
-          
-          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(categoryData)
-          });
-          
-          if (addResponse.ok) {
-            console.log('✅ Comprehensive category added successfully');
-            
-            // Delete the temp room
-            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
-              method: 'DELETE'
-            });
-            
-            // Reload to show new category with all items
-            window.location.reload();
-          }
-        }
-        
-        // Clean up temp room regardless
-        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
-          method: 'DELETE'
-        });
-      } else {
-        throw new Error('Failed to create comprehensive category structure');
-      }
-    } catch (error) {
-      console.error('❌ Error adding comprehensive category:', error);
-      console.error('Failed to add category with items. Please try again.');
-    }
-  };
-
-  // Drag and drop functionality removed
-
-  // Handle drag and drop for rooms and categories
-  const handleDragEnd = async (result) => {
-    if (!result.destination) return;
-
-    const { source, destination, type } = result;
-
-    if (type === 'room') {
-      console.log('🔄 Reordering rooms...');
-      
-      // Update backend room order
-      try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/reorder`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            source_index: source.index,
-            destination_index: destination.index,
-            project_id: project.id
-          })
-        });
-        
-        if (response.ok) {
-          console.log('✅ Room order updated');
-          // Reload to show changes
-          if (onReload) onReload();
-        }
-      } catch (err) {
-        console.error('❌ Error updating room order:', err);
-      }
-    }
-    
-    if (type === 'category') {
-      console.log('🔄 Reordering categories...');
-      
-      // Update backend category order  
-      try {
-        const roomId = source.droppableId.replace('categories-', '');
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/reorder`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            room_id: roomId,
-            source_index: source.index,
-            destination_index: destination.index
-          })
-        });
-        
-        if (response.ok) {
-          console.log('✅ Category order updated');
-          if (onReload) onReload();
-        }
-      } catch (err) {
-        console.error('❌ Error updating category order:', err);
-      }
-    }
-  };
-
-  // Toggle room expansion
+  // EXPAND/COLLAPSE HANDLERS WITH PROPER STATE PRESERVATION
   const toggleRoomExpansion = (roomId) => {
+    console.log('🎯 FFE Toggling room expansion for:', roomId);
     setExpandedRooms(prev => ({
       ...prev,
       [roomId]: !prev[roomId]
     }));
   };
 
-  // Toggle category expansion
   const toggleCategoryExpansion = (categoryId) => {
+    console.log('🎯 FFE Toggling category expansion for:', categoryId);
     setExpandedCategories(prev => ({
       ...prev,
       [categoryId]: !prev[categoryId]
     }));
   };
 
-  // Handle tracking items
-  const handleTrackItem = async (item) => {
-    if (!item.tracking_number) {
-      console.error('❌ No tracking number available');
-      return;
-    }
-
-    try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-      const response = await fetch(`${backendUrl}/api/track-shipment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          tracking_number: item.tracking_number,
-          carrier: item.carrier || 'auto-detect'
-        })
-      });
-
-      if (response.ok) {
-        const trackingData = await response.json();
-        console.log('✅ Tracking data retrieved');
-      } else {
-        console.error('❌ Failed to get tracking information');
-      }
-    } catch (error) {
-      console.error('❌ Tracking error:', error);
-    }
-  };
-
-  // MUTED ROOM COLORS USING YOUR GOLD COLOR SCHEME
+  // EXACT COLORS FROM YOUR SCREENSHOTS - BRIGHT AND VIBRANT
   const getRoomColor = (roomName, index = 0) => {
-    const mutedGoldColors = [
-      '#8B7355',  // Your main gold
-      '#A0927B',  // Lighter gold
-      '#7A6548',  // Darker gold
-      '#9A8A6E',  // Muted gold
-      '#8A7050',  // Brown gold
-      '#6B5D47',  // Dark brown gold
-      '#B5A082',  // Light muted gold
-      '#756653',  // Darker muted gold
-      '#958571',  // Gray gold
+    const vibrantRoomColors = [
+      '#008B8B',  // Dark Turquoise/Teal - like "PRIMARY BATHROOM" 
+      '#4682B4',  // Steel Blue
+      '#228B22',  // Forest Green  
+      '#B8860B',  // Dark Goldenrod
+      '#8B4513',  // Saddle Brown
+      '#483D8B',  // Dark Slate Blue
+      '#CD853F',  // Peru
+      '#2F4F4F',  // Dark Slate Gray
+      '#8B008B',  // Dark Magenta
     ];
     
     // Use room name hash for consistent color per room
@@ -521,170 +142,169 @@ const ExactFFESpreadsheet = ({
     for (let i = 0; i < roomName.length; i++) {
       hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
     }
-    return mutedGoldColors[Math.abs(hash) % mutedGoldColors.length];
+    return vibrantRoomColors[Math.abs(hash) % vibrantRoomColors.length];
   };
 
-  const getCategoryColor = () => '#8B7355';  // Your main gold color for categories
-  const getMainHeaderColor = () => '#B91C1C';  // Bright red for main headers
-  const getAdditionalInfoColor = () => '#8B7355';  // Your gold for ADDITIONAL INFO.
-  const getShippingInfoColor = () => '#7A6548';  // Darker gold for SHIPPING INFO.
-  const getNotesActionsColor = () => '#7F1D1D';  // Red for NOTES and ACTIONS
+  const getCategoryColor = () => '#556B2F';  // Olive Green - like your screenshots
+  const getMainHeaderColor = () => '#8B4513';  // Saddle Brown for main headers
+  const getAdditionalInfoColor = () => '#CD853F';  // Peru for ADDITIONAL INFO
+  const getShippingInfoColor = () => '#4682B4';  // Steel Blue for SHIPPING INFO
 
-  // Get status color
+  // Status colors for FF&E
   const getStatusColor = (status) => {
-    const colors = {
-      '': '#6B7280',                        // Gray for blank/default
-      'TO BE SELECTED': '#6B7280',          // Gray
-      'RESEARCHING': '#3B82F6',             // Blue
-      'PENDING APPROVAL': '#F59E0B',        // Amber
-      'APPROVED': '#10B981',                // Emerald
-      'ORDERED': '#10B981',                 // Emerald
-      'PICKED': '#FFD700',                  // Gold - but user wants this NOT as default
-      'CONFIRMED': '#10B981',               // Emerald
-      'IN PRODUCTION': '#F97316',           // Orange
-      'SHIPPED': '#3B82F6',                 // Blue
-      'IN TRANSIT': '#3B82F6',              // Blue  
-      'OUT FOR DELIVERY': '#3B82F6',        // Blue
-      'DELIVERED TO RECEIVER': '#8B5CF6',   // Violet
-      'DELIVERED TO JOB SITE': '#8B5CF6',   // Violet
-      'RECEIVED': '#8B5CF6',                // Violet
-      'READY FOR INSTALL': '#10B981',       // Emerald
-      'INSTALLING': '#10B981',              // Emerald
-      'INSTALLED': '#10B981',               // Emerald
-      'ON HOLD': '#EF4444',                 // Red
-      'BACKORDERED': '#EF4444',             // Red
-      'DAMAGED': '#EF4444',                 // Red
-      'RETURNED': '#EF4444',                // Red
-      'CANCELLED': '#EF4444'                // Red
+    const statusColors = {
+      '': '#6B7280',              // Gray for blank/default
+      'PICKED': '#FFFF00',        // Bright Yellow - like your screenshot
+      'ORDERED': '#22C55E',       // Green
+      'SHIPPED': '#3B82F6',       // Blue  
+      'DELIVERED': '#8B5CF6',     // Purple
+      'INSTALLED': '#10B981',     // Emerald
+      'CANCELLED': '#EF4444',     // Red
+      'BACKORDERED': '#F59E0B',   // Amber
+      'QUOTE NEEDED': '#EC4899',  // Pink
+      'ON HOLD': '#64748B'        // Slate
     };
-    return colors[status] || '#6B7280';
+    return statusColors[status] || statusColors[''];
   };
 
-  // Get carrier color to match header colors
-  const getCarrierColor = (carrier) => {
-    const colors = {
-      'FedEx': '#FF6600',           // FedEx Orange
-      'FedEx Ground': '#FF6600',    // FedEx Orange
-      'FedEx Express': '#FF6600',   // FedEx Orange
-      'UPS': '#8B4513',            // UPS Brown
-      'UPS Ground': '#8B4513',     // UPS Brown
-      'UPS Express': '#8B4513',    // UPS Brown
-      'USPS': '#004B87',           // USPS Blue
-      'DHL': '#FFD700',            // DHL Yellow
-      'Brooks': '#4682B4',         // Steel Blue
-      'Zenith': '#20B2AA',         // Light Sea Green
-      'Sunbelt': '#FF4500',        // Orange Red
-      'R+L Carriers': '#32CD32',   // Lime Green
-      'Yellow Freight': '#FFD700', // Yellow
-      'XPO Logistics': '#6A5ACD',  // Slate Blue
-      'Old Dominion': '#DC143C',   // Crimson
-      'ABF Freight': '#FF6347',    // Tomato
-      'Con-Way': '#48D1CC',        // Medium Turquoise
-      'Estes Express': '#9370DB',  // Medium Purple
-      'YRC Freight': '#FF1493',    // Deep Pink
-      'Saia': '#00CED1',           // Dark Turquoise
-      'OTHER': '#808080'           // Gray
-    };
-    return colors[carrier] || '#6B7280';
+  // Handle item editing
+  const handleItemEdit = async (itemId, field, value) => {
+    try {
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      await fetch(`${BACKEND_URL}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ [field]: value }),
+      });
+      
+      if (onReload) {
+        onReload();
+      }
+    } catch (error) {
+      console.error('Error updating item:', error);
+    }
   };
 
-  const getShipToColor = (shipTo) => {
-    const shipToColors = {
-      'CLIENT HOME': '#4169E1',
-      'JOB SITE': '#228B22',
-      'DESIGN CENTER': '#FF8C00',
-      'WAREHOUSE': '#8B4513',
-      'VENDOR LOCATION': '#9370DB'
-    };
-    return shipToColors[shipTo] || '#FEF08A';
+  const handleStatusChange = (itemId, newStatus) => {
+    handleItemEdit(itemId, 'status', newStatus);
   };
 
-  const getDeliveryStatusColor = (status) => {
-    const deliveryColors = {
-      'PENDING': '#FEF08A',
-      'SCHEDULED': '#BEF264',
-      'PROCESSING': '#FDE047',
-      'IN TRANSIT': '#FACC15',
-      'OUT FOR DELIVERY': '#A3E635',
-      'ATTEMPTED DELIVERY': '#F87171',
-      'DELIVERED': '#4ADE80',
-      'DELIVERED TO RECEIVER': '#22C55E',
-      'AVAILABLE FOR PICKUP': '#16A34A',
-      'DELAYED': '#EF4444',
-      'EXCEPTION': '#DC2626',
-      'DAMAGED': '#B91C1C',
-      'LOST': '#991B1B',
-      'RETURNED TO SENDER': '#7F1D1D'
-    };
-    return deliveryColors[status] || '#FEF08A';
+  const handleDeleteItem = async (itemId) => {
+    if (window.confirm('Are you sure you want to delete this item?')) {
+      try {
+        const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+        await fetch(`${BACKEND_URL}/api/items/${itemId}`, {
+          method: 'DELETE',
+        });
+        
+        if (onReload) {
+          onReload();
+        }
+      } catch (error) {
+        console.error('Error deleting item:', error);
+      }
+    }
   };
 
-  // FORCE VISIBLE DEBUG - Show component is rendering
-  console.log('🔍 ExactFFESpreadsheet rendering with:', { project, roomsCount: project?.rooms?.length });
+  const handleAddCategory = async (roomId, categoryName) => {
+    try {
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      await fetch(`${BACKEND_URL}/api/categories`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          room_id: roomId,
+          category_name: categoryName
+        }),
+      });
+      
+      if (onReload) {
+        onReload();
+      }
+    } catch (error) {
+      console.error('Error adding category:', error);
+    }
+  };
 
-  // ALWAYS show debug info temporarily
-  if (!project) {
+  const handleAddItem = (subcategoryId) => {
+    setSelectedSubCategoryId(subcategoryId);
+    setShowAddItem(true);
+  };
+
+  const handleAddItemComplete = () => {
+    setShowAddItem(false);
+    setSelectedSubCategoryId(null);
+    if (onReload) {
+      onReload();
+    }
+  };
+
+  const handleImageClick = (itemId) => {
+    setShowThumbnail(prev => ({
+      ...prev,
+      [itemId]: !prev[itemId]
+    }));
+  };
+
+  // Early return if no project
+  if (!filteredProject) {
+    console.log('❌ ExactFFESpreadsheet: No project data available');
     return (
-      <div className="text-center text-red-400 py-8 bg-red-900 m-4 p-4 rounded">
-        <p className="text-lg">🚨 ExactFFESpreadsheet: NO PROJECT DATA</p>
-        <p className="text-sm mt-2">Component is rendering but project is null/undefined</p>
+      <div className="flex items-center justify-center p-8">
+        <p className="text-gray-500">No project data available</p>
       </div>
     );
   }
 
-  if (!project.rooms) {
+  if (!filteredProject.rooms || filteredProject.rooms.length === 0) {
+    console.log('❌ ExactFFESpreadsheet: No rooms available in project');
     return (
-      <div className="text-center text-orange-400 py-8 bg-orange-900 m-4 p-4 rounded">
-        <p className="text-lg">🚨 ExactFFESpreadsheet: NO ROOMS PROPERTY</p>
-        <p className="text-sm mt-2">Project exists but has no 'rooms' property</p>
-        <p className="text-xs mt-1">Project keys: {Object.keys(project).join(', ')}</p>
+      <div className="flex items-center justify-center p-8">
+        <p className="text-gray-500">No rooms available. Add rooms to get started.</p>
       </div>
     );
   }
 
-  if (project.rooms.length === 0) {
-    return (
-      <div className="text-center text-yellow-400 py-8 bg-yellow-900 m-4 p-4 rounded">
-        <p className="text-lg">🚨 ExactFFESpreadsheet: EMPTY ROOMS ARRAY</p>
-        <p className="text-sm mt-2">Project has rooms property but it's empty (length: {project.rooms.length})</p>
-      </div>
-    );
-  }
-
-  // If we get here, we have valid data - show success message
   console.log('✅ ExactFFESpreadsheet: Valid project data, proceeding to render spreadsheet');
 
   return (
-    <div className="w-full" style={{ backgroundColor: '#0C0A09' }}>
+    <div className="w-full" style={{ backgroundColor: '#1A1A1A' }}>
       
       {/* SEARCH AND FILTER SECTION - EXACTLY LIKE YOUR SCREENSHOT */}
-      <div className="mb-6 p-4" style={{ backgroundColor: '#1C1917' }}>
+      <div className="mb-6 p-4" style={{ backgroundColor: '#2D2D2D' }}>
         <div className="flex flex-col lg:flex-row gap-4 items-center">
           {/* Search Input */}
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Search Items, Vendors, SKUs..."
+              placeholder="Search items, vendors, or SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
-          
-          {/* Filter Dropdowns */}
-          <div className="flex gap-3 flex-wrap">
-            <select 
+
+          {/* Room Filter */}
+          <div className="flex-1">
+            <select
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Rooms</option>
-              {project.rooms.map(room => (
+              {filteredProject.rooms.map(room => (
                 <option key={room.id} value={room.id}>{room.name}</option>
               ))}
             </select>
-            
-            <select 
+          </div>
+
+          {/* Category Filter */}
+          <div className="flex-1">
+            <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
@@ -694,578 +314,384 @@ const ExactFFESpreadsheet = ({
                 <option key={category} value={category}>{category}</option>
               ))}
             </select>
-            
-            <select 
+          </div>
+
+          {/* Vendor Filter */}
+          <div className="flex-1">
+            <select
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
               className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Vendors</option>
-              <option value="Visual Comfort">Visual Comfort</option>
-              <option value="Four Hands">Four Hands</option>
-              <option value="West Elm">West Elm</option>
-              <option value="Pottery Barn">Pottery Barn</option>
-              <option value="Williams Sonoma">Williams Sonoma</option>
-              <option value="Crate & Barrel">Crate & Barrel</option>
-              <option value="CB2">CB2</option>
-              <option value="Restoration Hardware">Restoration Hardware</option>
+              {vendorTypes && vendorTypes.map(vendor => (
+                <option key={vendor} value={vendor}>{vendor}</option>
+              ))}
             </select>
-            
-            <select 
+          </div>
+
+          {/* Status Filter */}
+          <div className="flex-1">
+            <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
-              <option value="">All Status</option>
-              <option value="TO BE SELECTED">TO BE SELECTED</option>
-              <option value="RESEARCHING">RESEARCHING</option>
-              <option value="PENDING APPROVAL">PENDING APPROVAL</option>
-              <option value="APPROVED">APPROVED</option>
-              <option value="ORDERED">ORDERED</option>
-              <option value="PICKED">PICKED</option>
-              <option value="CONFIRMED">CONFIRMED</option>
-              <option value="IN PRODUCTION">IN PRODUCTION</option>
-              <option value="SHIPPED">SHIPPED</option>
-              <option value="IN TRANSIT">IN TRANSIT</option>
-              <option value="OUT FOR DELIVERY">OUT FOR DELIVERY</option>
-              <option value="DELIVERED TO RECEIVER">DELIVERED TO RECEIVER</option>
-              <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
-              <option value="RECEIVED">RECEIVED</option>
-              <option value="READY FOR INSTALL">READY FOR INSTALL</option>
-              <option value="INSTALLING">INSTALLING</option>
-              <option value="INSTALLED">INSTALLED</option>
-              <option value="ON HOLD">ON HOLD</option>
-              <option value="BACKORDERED">BACKORDERED</option>
-              <option value="DAMAGED">DAMAGED</option>
-              <option value="RETURNED">RETURNED</option>
-              <option value="CANCELLED">CANCELLED</option>
+              <option value="">All Statuses</option>
+              {itemStatuses && itemStatuses.map(status => (
+                <option key={status} value={status}>{status}</option>
+              ))}
             </select>
-            
-            <select 
+          </div>
+
+          {/* Carrier Filter */}
+          <div className="flex-1">
+            <select
               value={selectedCarrier}
               onChange={(e) => setSelectedCarrier(e.target.value)}
               className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Carriers</option>
-              <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
-              <option value="UPS" style={{ backgroundColor: '#8B4513', color: 'white' }}>UPS</option>
-              <option value="USPS" style={{ backgroundColor: '#004B87', color: 'white' }}>USPS</option>
-              <option value="DHL" style={{ backgroundColor: '#FFD700', color: 'black' }}>DHL</option>
-              <option value="Brooks" style={{ backgroundColor: '#4682B4', color: 'white' }}>Brooks</option>
-              <option value="Zenith" style={{ backgroundColor: '#20B2AA', color: 'white' }}>Zenith</option>
-              <option value="Sunbelt" style={{ backgroundColor: '#FF4500', color: 'white' }}>Sunbelt</option>
-              <option value="R+L Carriers" style={{ backgroundColor: '#32CD32', color: 'white' }}>R+L Carriers</option>
+              {carrierTypes && carrierTypes.map(carrier => (
+                <option key={carrier} value={carrier}>{carrier}</option>
+              ))}
             </select>
-            
-            {/* Filter and Clear Buttons */}
-            <button 
-              onClick={() => {
-                console.log('🔍 FILTER APPLIED - Search:', searchTerm, 'Room:', selectedRoom, 'Category:', selectedCategory, 'Vendor:', selectedVendor, 'Status:', selectedStatus, 'Carrier:', selectedCarrier);
-                // Filters are applied automatically via useEffect
-              }}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
-            >
-              🔍 FILTER
-            </button>
-            <button 
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedRoom('');
-                setSelectedCategory('');
-                setSelectedVendor('');
-                setSelectedStatus('');
-                setSelectedCarrier('');
-                console.log('🧹 FILTER CLEARED');
-              }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium"
-            >
-              CLEAR
-            </button>
           </div>
-          
-          {/* Add Room Button - GOLD/AMBER COLOR */}
-          <button 
-            onClick={handleAddRoom}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+
+          {/* Clear Filters */}
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setSelectedRoom('');
+              setSelectedCategory('');
+              setSelectedVendor('');
+              setSelectedStatus('');
+              setSelectedCarrier('');
+            }}
+            className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-colors"
           >
-            ✚ ADD ROOM
+            Clear All
           </button>
         </div>
       </div>
 
-      {/* ORIGINAL TABLE STRUCTURE - DO NOT CHANGE */}
-      <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
-        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
+      {/* MAIN SPREADSHEET CONTENT */}
+      <div className="overflow-x-auto">
+        {filteredProject.rooms.map((room, roomIndex) => {
+          const isRoomExpanded = expandedRooms[room.id] !== false; // Default to expanded
           
-          <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
-            <table className="w-full border-collapse border border-gray-400">
-                  
-                  <thead>
-                    {/* EMPTY HEADER FOR STRUCTURE */}
-                  </thead>
+          return (
+            <div key={room.id} className="mb-8">
+              {/* ROOM HEADER WITH EXACT COLORS FROM YOUR SCREENSHOTS */}
+              <div 
+                className="px-4 py-2 text-white font-bold mb-4"
+                style={{ backgroundColor: getRoomColor(room.name, roomIndex) }}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => toggleRoomExpansion(room.id)}
+                      className="text-white hover:text-gray-200 transition-colors"
+                    >
+                      {isRoomExpanded ? '▼' : '▶'}
+                    </button>
+                    <span className="text-lg uppercase">{room.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleAddCategory(room.id, e.target.value);
+                          e.target.value = '';
+                        }
+                      }}
+                      className="bg-gray-700 text-white text-sm px-2 py-1 rounded border border-gray-600"
+                    >
+                      <option value="">Add Category</option>
+                      {availableCategories.map(category => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => onDeleteRoom && onDeleteRoom(room.id)}
+                      className="text-red-400 hover:text-red-300 px-2 py-1 text-sm"
+                    >
+                      Delete Room
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-                  {/* TABLE BODY - Keep original hierarchical structure */}
-                  <tbody>
-                {/* USE FILTERED PROJECT DATA */}
-                {(filteredProject || project).rooms.map((room, roomIndex) => {
-                  const isRoomExpanded = expandedRooms[room.id];
-                  console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
-                  
-                  return (
-                              <React.Fragment key={room.id}>
-                                {/* ROOM HEADER ROW - Full width like your screenshots */}
-                                <tr>
-                                  <td colSpan="12" 
-                                      className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
-                                      style={{ backgroundColor: getRoomColor(room.name) }}>
-                                    <div className="flex justify-between items-center">
-                                      <div className="flex items-center gap-2">
+              {/* CATEGORIES - ONLY SHOW IF ROOM IS EXPANDED */}
+              {isRoomExpanded && room.categories.map((category) => {
+                const isCategoryExpanded = expandedCategories[category.id] !== false;
+                
+                return (
+                  <div key={category.id} className="mb-6">
+                    {/* CATEGORY HEADER WITH EXACT COLORS */}
+                    <div 
+                      className="px-4 py-2 text-white font-bold mb-2"
+                      style={{ backgroundColor: getCategoryColor() }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => toggleCategoryExpansion(category.id)}
+                            className="text-white hover:text-gray-200 transition-colors"
+                          >
+                            {isCategoryExpanded ? '▼' : '▶'}
+                          </button>
+                          <span className="text-md uppercase">{category.name}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SUBCATEGORIES - ONLY SHOW IF CATEGORY IS EXPANDED */}
+                    {isCategoryExpanded && category.subcategories.map((subcategory) => {
+                      if (!subcategory.items || subcategory.items.length === 0) {
+                        return (
+                          <div key={subcategory.id} className="mb-4">
+                            <div className="bg-gray-800 p-4 rounded">
+                              <p className="text-gray-400 text-center">
+                                No items in {subcategory.name}
+                                <button
+                                  onClick={() => handleAddItem(subcategory.id)}
+                                  className="ml-4 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                                >
+                                  Add Item
+                                </button>
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      }
+                      
+                      return (
+                        <div key={subcategory.id} className="mb-4">
+                          <table className="w-full border-collapse border border-gray-400 mb-4">
+                            <thead>
+                              <tr>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#B91C1C' }}>{subcategory.name.toUpperCase()}</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#B91C1C' }}>QTY</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#B91C1C' }}>SIZE</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#B91C1C' }}>FINISH/COLOR</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-32" style={{ backgroundColor: '#B91C1C' }}>STATUS</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#B91C1C' }}>IMAGE</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#B91C1C' }}>LINK</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>VENDOR/SKU</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-24" style={{ backgroundColor: getMainHeaderColor() }}>COST</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>QTY ORDERED</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: getAdditionalInfoColor() }}>ADDITIONAL INFO</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>EST SHIPPING</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>EST INSTALL</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: getShippingInfoColor() }}>CARRIER</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#DC2626' }}>DELETE</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {subcategory.items.map((item) => (
+                                <tr key={item.id} className="hover:bg-gray-700">
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <input
+                                      type="text"
+                                      value={item.name || ''}
+                                      onChange={(e) => handleItemEdit(item.id, 'name', e.target.value)}
+                                      className="bg-transparent border-none text-white text-xs w-full focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <input
+                                      type="number"
+                                      value={item.quantity || ''}
+                                      onChange={(e) => handleItemEdit(item.id, 'quantity', e.target.value)}
+                                      className="bg-transparent border-none text-white text-xs w-full focus:outline-none text-center"
+                                    />
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <input
+                                      type="text"
+                                      value={item.size || ''}
+                                      onChange={(e) => handleItemEdit(item.id, 'size', e.target.value)}
+                                      className="bg-transparent border-none text-white text-xs w-full focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <input
+                                      type="text"
+                                      value={item.finish_color || ''}
+                                      onChange={(e) => handleItemEdit(item.id, 'finish_color', e.target.value)}
+                                      className="bg-transparent border-none text-white text-xs w-full focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <select
+                                      className="bg-gray-800 text-white text-xs border-none w-full"
+                                      value={item.status || ''}
+                                      style={{ backgroundColor: getStatusColor(item.status || ''), color: 'black' }}
+                                      onChange={(e) => handleStatusChange(item.id, e.target.value)}
+                                    >
+                                      <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>Select Status</option>
+                                      <option value="PICKED" style={{ backgroundColor: '#FFFF00', color: 'black' }}>PICKED</option>
+                                      <option value="ORDERED" style={{ backgroundColor: '#22C55E', color: 'white' }}>ORDERED</option>
+                                      <option value="SHIPPED" style={{ backgroundColor: '#3B82F6', color: 'white' }}>SHIPPED</option>
+                                      <option value="DELIVERED" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>DELIVERED</option>
+                                      <option value="INSTALLED" style={{ backgroundColor: '#10B981', color: 'white' }}>INSTALLED</option>
+                                      <option value="CANCELLED" style={{ backgroundColor: '#EF4444', color: 'white' }}>CANCELLED</option>
+                                      <option value="BACKORDERED" style={{ backgroundColor: '#F59E0B', color: 'white' }}>BACKORDERED</option>
+                                      <option value="QUOTE NEEDED" style={{ backgroundColor: '#EC4899', color: 'white' }}>QUOTE NEEDED</option>
+                                      <option value="ON HOLD" style={{ backgroundColor: '#64748B', color: 'white' }}>ON HOLD</option>
+                                    </select>
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800 text-center">
+                                    {item.image ? (
+                                      <div className="relative">
                                         <button
-                                          onClick={() => toggleRoomExpansion(room.id)}
-                                          className="text-white hover:text-gray-200"
+                                          onClick={() => handleImageClick(item.id)}
+                                          className="text-blue-400 hover:text-blue-300 text-xs"
                                         >
-                                          {isRoomExpanded ? '▼' : '▶'}
+                                          📷
                                         </button>
-                                        <span>{room.name.toUpperCase()}</span>
+                                        {showThumbnail[item.id] && (
+                                          <div className="absolute top-full left-0 z-10 mt-1">
+                                            <img 
+                                              src={item.image} 
+                                              alt={item.name} 
+                                              className="w-32 h-32 object-cover border border-gray-400 rounded"
+                                            />
+                                          </div>
+                                        )}
                                       </div>
-                                      <button
-                                        onClick={() => handleDeleteRoom(room.id)}
-                                        className="text-red-300 hover:text-red-100 text-lg ml-2"
-                                        title="Delete Room"
+                                    ) : (
+                                      <span className="text-gray-500">—</span>
+                                    )}
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800 text-center">
+                                    {item.link ? (
+                                      <a 
+                                        href={item.link} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-blue-400 hover:text-blue-300 text-xs"
                                       >
-                                        🗑️
-                                      </button>
+                                        🔗
+                                      </a>
+                                    ) : (
+                                      <span className="text-gray-500">—</span>
+                                    )}
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <div>
+                                      <input
+                                        type="text"
+                                        value={item.vendor || ''}
+                                        onChange={(e) => handleItemEdit(item.id, 'vendor', e.target.value)}
+                                        className="bg-transparent border-none text-white text-xs w-full focus:outline-none mb-1"
+                                        placeholder="Vendor"
+                                      />
+                                      <input
+                                        type="text"
+                                        value={item.sku || ''}
+                                        onChange={(e) => handleItemEdit(item.id, 'sku', e.target.value)}
+                                        className="bg-transparent border-none text-white text-xs w-full focus:outline-none"
+                                        placeholder="SKU"
+                                      />
                                     </div>
                                   </td>
-                                  <td className="border border-gray-400 px-2 py-2 text-center"
-                                      style={{ backgroundColor: getRoomColor(room.name) }}>
-                                    <button
-                                      onClick={() => handleAddRoom()}
-                                      className="text-green-300 hover:text-green-100 text-sm font-bold"
-                                      title="Add Room"
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <input
+                                      type="text"
+                                      value={item.cost || ''}
+                                      onChange={(e) => handleItemEdit(item.id, 'cost', e.target.value)}
+                                      className="bg-transparent border-none text-white text-xs w-full focus:outline-none"
+                                      placeholder="$0.00"
+                                    />
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <input
+                                      type="number"
+                                      value={item.quantity_ordered || ''}
+                                      onChange={(e) => handleItemEdit(item.id, 'quantity_ordered', e.target.value)}
+                                      className="bg-transparent border-none text-white text-xs w-full focus:outline-none text-center"
+                                    />
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <input
+                                      type="text"
+                                      value={item.additional_info || ''}
+                                      onChange={(e) => handleItemEdit(item.id, 'additional_info', e.target.value)}
+                                      className="bg-transparent border-none text-white text-xs w-full focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <input
+                                      type="date"
+                                      value={item.est_shipping || ''}
+                                      onChange={(e) => handleItemEdit(item.id, 'est_shipping', e.target.value)}
+                                      className="bg-transparent border-none text-white text-xs w-full focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <input
+                                      type="date"
+                                      value={item.est_install || ''}
+                                      onChange={(e) => handleItemEdit(item.id, 'est_install', e.target.value)}
+                                      className="bg-transparent border-none text-white text-xs w-full focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-xs bg-gray-800">
+                                    <select
+                                      value={item.carrier || ''}
+                                      onChange={(e) => handleItemEdit(item.id, 'carrier', e.target.value)}
+                                      className="bg-gray-800 text-white text-xs border-none w-full"
                                     >
-                                      +
+                                      <option value="">Select</option>
+                                      {carrierTypes && carrierTypes.map(carrier => (
+                                        <option key={carrier} value={carrier}>{carrier}</option>
+                                      ))}
+                                    </select>
+                                  </td>
+                                  <td className="border border-gray-400 px-2 py-1 text-center bg-gray-800">
+                                    <button
+                                      onClick={() => handleDeleteItem(item.id)}
+                                      className="text-red-400 hover:text-red-300 text-xs"
+                                    >
+                                      🗑️
                                     </button>
                                   </td>
                                 </tr>
-
-                                {/* ROOM CATEGORIES - Only show when expanded */}
-                                {isRoomExpanded && (
-                                      <React.Fragment>
-                                        {room.categories?.map((category, catIndex) => {
-                                          const isCategoryExpanded = expandedCategories[category.id];
-                                          console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
-                                          
-                                          return (
-                                                <React.Fragment key={category.id}>
-                                                  {/* CATEGORY HEADER ROW */}
-                                                  <tr>
-                                                    <td colSpan="14" 
-                                                        className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
-                                                        style={{ backgroundColor: getCategoryColor() }}>
-                                                      <div className="flex items-center gap-2">
-                                                        <button
-                                                          onClick={() => toggleCategoryExpansion(category.id)}
-                                                          className="text-white hover:text-gray-200"
-                                                        >
-                                                          {isCategoryExpanded ? '▼' : '▶'}
-                                                        </button>
-                                                        <span>{category.name.toUpperCase()}</span>
-                                                      </div>
-                                                    </td>
-                                                  </tr>
-
-                                                  {/* SUBCATEGORIES - Only show when category expanded */}
-                                                  {isCategoryExpanded && (
-                                                    <React.Fragment>
-                                                      {category.subcategories?.map((subcategory) => (
-                                                        <React.Fragment key={subcategory.id || subcategory.name}>
-                                                          {/* TABLE WITH SUBCATEGORY NAME IN HEADER */}
-                                                          <tr>
-                                                            <td colSpan="15">
-                                                              <table className="w-full border-collapse border border-gray-400 mb-4">
-                                                                <thead>
-                                                                  <tr>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SKU</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>COST</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>LINK</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>TRACKING</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>CARRIER</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>NOTES</th>
-                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
-                                                                  </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                  {/* ITEMS UNDER THIS SUBCATEGORY */}
-                                                                  {subcategory.items?.map((item, itemIndex) => (
-                                                        <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                                          {/* INSTALLED - INSTALLED NAME GOES HERE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.name}
-                                                          </td>
-                                                          
-                                                          {/* VENDOR/SKU - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Vendor updated:', e.target.textContent)}
-                                                            >
-                                                              {item.vendor || ''}
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* QTY - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm text-center outline-none"
-                                                              onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
-                                                            >
-                                                              {item.quantity || ''}
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* SIZE - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Size updated:', e.target.textContent)}
-                                                            >
-                                                              {item.size || ''}
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* FINISH/Color - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
-                                                            >
-                                                              {item.finish_color || ''}
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* Cost/Price - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Cost updated:', e.target.textContent)}
-                                                            >
-                                                              {item.cost ? `$${item.cost}` : ''}
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* Image - SCRAPED AUTOMATICALLY */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center text-white">
-                                                            {item.image_url ? (
-                                                              <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
-                                                            ) : (
-                                                              ''
-                                                            )}
-                                                          </td>
-                                                          
-                                                          {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
-                                                          
-                                                          {/* Order Date (ALONE) */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <input 
-                                                              type="date" 
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Order date changed:', e.target.value)}
-                                                            />
-                                                          </td>
-                                                          
-                                                          {/* Order Status/Order Number (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
-                                                            <div className="flex flex-col h-full">
-                                                              <div className="h-6 mb-1">
-                                                                <select 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  value={item.status || ''}
-                                                                  style={{ backgroundColor: getStatusColor(item.status || '') }}
-                                                                  onChange={(e) => {
-                                                                    const newStatus = e.target.value;
-                                                                    handleStatusChange(item.id, newStatus);
-                                                                  }}
-                                                                >
-                                                                  <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>—</option>
-                                                                  <option value="TO BE SELECTED" style={{ backgroundColor: '#6B7280', color: 'white' }}>🔵 TO BE SELECTED</option>
-                                                                  <option value="RESEARCHING" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 RESEARCHING</option>
-                                                                  <option value="PENDING APPROVAL" style={{ backgroundColor: '#F59E0B', color: 'white' }}>🟡 PENDING APPROVAL</option>
-                                                                  <option value="APPROVED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 APPROVED</option>
-                                                                  <option value="ORDERED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 ORDERED</option>
-                                                                  <option value="PICKED" style={{ backgroundColor: '#FFD700', color: 'black' }}>🟡 PICKED</option>
-                                                                  <option value="CONFIRMED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 CONFIRMED</option>
-                                                                  <option value="IN PRODUCTION" style={{ backgroundColor: '#F97316', color: 'white' }}>🟠 IN PRODUCTION</option>
-                                                                  <option value="SHIPPED" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 SHIPPED</option>
-                                                                  <option value="IN TRANSIT" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 IN TRANSIT</option>
-                                                                  <option value="OUT FOR DELIVERY" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 OUT FOR DELIVERY</option>
-                                                                  <option value="DELIVERED TO RECEIVER" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 DELIVERED TO RECEIVER</option>
-                                                                  <option value="DELIVERED TO JOB SITE" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 DELIVERED TO JOB SITE</option>
-                                                                  <option value="RECEIVED" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 RECEIVED</option>
-                                                                  <option value="READY FOR INSTALL" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 READY FOR INSTALL</option>
-                                                                  <option value="INSTALLING" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 INSTALLING</option>
-                                                                  <option value="INSTALLED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 INSTALLED</option>
-                                                                  <option value="ON HOLD" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 ON HOLD</option>
-                                                                  <option value="BACKORDERED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 BACKORDERED</option>
-                                                                  <option value="DAMAGED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 DAMAGED</option>
-                                                                  <option value="RETURNED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 RETURNED</option>
-                                                                  <option value="CANCELLED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 CANCELLED</option>
-                                                                </select>
-                                                              </div>
-                                                              <div className="h-6">
-                                                                <input 
-                                                                  type="text" 
-                                                                  placeholder="Order #"
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Order number changed:', e.target.value)}
-                                                                />
-                                                              </div>
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* Estimated Ship Date/Estimated Delivery Date (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
-                                                            <div className="flex flex-col h-full">
-                                                              <div className="h-6 mb-1">
-                                                                <input 
-                                                                  type="date" 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Estimated ship date changed:', e.target.value)}
-                                                                />
-                                                              </div>
-                                                              <div className="h-6">
-                                                                <input 
-                                                                  type="date" 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Estimated delivery date changed:', e.target.value)}
-                                                                />
-                                                              </div>
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* Install Date/Ship To (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
-                                                            <div className="flex flex-col h-full">
-                                                              <div className="h-6 mb-1">
-                                                                <input 
-                                                                  type="date" 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Install date changed:', e.target.value)}
-                                                                />
-                                                              </div>
-                                                              <div className="h-6">
-                                                                <select 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Ship to changed:', e.target.value)}
-                                                                >
-                                                                  <option value="">Ship To...</option>
-                                                                  <option value="CLIENT HOME">CLIENT HOME</option>
-                                                                  <option value="JOB SITE">JOB SITE</option>
-                                                                  <option value="DESIGN CENTER">DESIGN CENTER</option>
-                                                                  <option value="WAREHOUSE">WAREHOUSE</option>
-                                                                  <option value="VENDOR LOCATION">VENDOR LOCATION</option>
-                                                                  <option value="CLASSIC DESIGN SERVICES">CLASSIC DESIGN SERVICES</option>
-                                                                  <option value="RECEIVER">RECEIVER</option>
-                                                                  <option value="ADD_NEW">+ Add New Location</option>
-                                                                </select>
-                                                              </div>
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* Tracking/Carrier (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
-                                                            <div className="flex flex-col h-full">
-                                                              <div className="h-6 mb-1">
-                                                                <input 
-                                                                  type="text" 
-                                                                  placeholder="Live Tracking #"
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Live tracking changed:', e.target.value)}
-                                                                />
-                                                              </div>
-                                                              <div className="h-6">
-                                                                <select 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  value={item.carrier || ''}
-                                                                  style={{ backgroundColor: getCarrierColor(item.carrier || '') }}
-                                                                  onChange={(e) => handleCarrierChange(item.id, e.target.value)}
-                                                                >
-                                                                  <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>—</option>
-                                                                  <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
-                                                                  <option value="FedEx Ground" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx Ground</option>
-                                                                  <option value="UPS" style={{ backgroundColor: '#8B4513', color: 'white' }}>UPS</option>
-                                                                  <option value="UPS Ground" style={{ backgroundColor: '#8B4513', color: 'white' }}>UPS Ground</option>
-                                                                  <option value="USPS" style={{ backgroundColor: '#004B87', color: 'white' }}>USPS</option>
-                                                                  <option value="DHL" style={{ backgroundColor: '#FFD700', color: 'black' }}>DHL</option>
-                                                                  <option value="Brooks" style={{ backgroundColor: '#4682B4', color: 'white' }}>Brooks</option>
-                                                                  <option value="Zenith" style={{ backgroundColor: '#20B2AA', color: 'white' }}>Zenith</option>
-                                                                  <option value="Sunbelt" style={{ backgroundColor: '#FF4500', color: 'white' }}>Sunbelt</option>
-                                                                  <option value="R+L Carriers" style={{ backgroundColor: '#32CD32', color: 'white' }}>R+L Carriers</option>
-                                                                  <option value="Yellow Freight" style={{ backgroundColor: '#FFD700', color: 'black' }}>Yellow Freight</option>
-                                                                  <option value="XPO Logistics" style={{ backgroundColor: '#6A5ACD', color: 'white' }}>XPO Logistics</option>
-                                                                  <option value="Old Dominion" style={{ backgroundColor: '#DC143C', color: 'white' }}>Old Dominion</option>
-                                                                  <option value="ABF Freight" style={{ backgroundColor: '#FF6347', color: 'white' }}>ABF Freight</option>
-                                                                  <option value="Con-Way" style={{ backgroundColor: '#48D1CC', color: 'white' }}>Con-Way</option>
-                                                                  <option value="Estes Express" style={{ backgroundColor: '#9370DB', color: 'white' }}>Estes Express</option>
-                                                                  <option value="YRC Freight" style={{ backgroundColor: '#FF1493', color: 'white' }}>YRC Freight</option>
-                                                                  <option value="Saia" style={{ backgroundColor: '#00CED1', color: 'white' }}>Saia</option>
-                                                                  <option value="OTHER" style={{ backgroundColor: '#808080', color: 'white' }}>OTHER</option>
-                                                                  <option value="ADD_NEW" style={{ backgroundColor: '#6B7280', color: 'white' }}>+ Add New Carrier</option>
-                                                                </select>
-                                                              </div>
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* NOTES */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <input 
-                                                              type="text" 
-                                                              placeholder="Notes"
-                                                              className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Notes changed:', e.target.value)}
-                                                            />
-                                                          </td>
-                                                          
-                                                          {/* LINK */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.link ? (
-                                                              <a 
-                                                                href={item.link} 
-                                                                target="_blank" 
-                                                                rel="noopener noreferrer"
-                                                                className="text-blue-400 hover:text-blue-300 text-xs underline"
-                                                                title="View Product Link"
-                                                              >
-                                                                🔗 LINK
-                                                              </a>
-                                                            ) : (
-                                                              <span className="text-gray-500 text-xs">No Link</span>
-                                                            )}
-                                                          </td>
-                                                          
-                                                          {/* ACTIONS - DELETE INSTALLED */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center">
-                                                            <button 
-                                                              onClick={() => handleDeleteItem(item.id)}
-                                                              className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
-                                                              title="Delete Item"
-                                                            >
-                                                              🗑️
-                                                            </button>
-                                                          </td>
-                                                        </tr>
-                                                        ))}
-                                                                </tbody>
-                                                              </table>
-                                                            </td>
-                                                          </tr>
-                                                        </React.Fragment>
-                                                      ))}
-                                                      
-                                                      {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
-                                                      <tr>
-                                                        <td colSpan="15" className="border border-gray-400 px-6 py-2 bg-slate-900">
-                                                          <div className="flex justify-start items-center space-x-4">
-                                                            {/* Add Item Button - ROBUST WITH SUBCATEGORY */}
-                                                            <button
-                                                              onClick={() => {
-                                                                // Find the subcategory from the current context (this button is inside a category loop)
-                                                                if (category.subcategories?.length > 0) {
-                                                                  const subcategory = category.subcategories[0];
-                                                                  console.log('🎯 Setting subcategory for Add Item:', subcategory.name, subcategory.id);
-                                                                  setSelectedSubCategoryId(subcategory.id);
-                                                                  setShowAddItem(true);
-                                                                } else {
-                                                                  alert('This category has no subcategories. Please contact support.');
-                                                                }
-                                                              }}
-                                                              className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium"
-                                                            >
-                                                              ✚ Add Item
-                                                            </button>
-                                                            
-                                                            {/* Add Category Dropdown - GOLD/AMBER COLOR */}
-                                                            <select
-                                                              value=""
-                                                              onChange={(e) => {
-                                                                if (e.target.value === 'CREATE_NEW') {
-                                                                  const categoryName = window.prompt('Enter new category name:');
-                                                                  if (categoryName && categoryName.trim()) {
-                                                                    handleAddCategory(room.id, categoryName.trim());
-                                                                  }
-                                                                } else if (e.target.value) {
-                                                                  handleAddCategory(room.id, e.target.value);
-                                                                }
-                                                              }}
-                                                              className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium border-none outline-none"
-                                                            >
-                                                              <option value="">Add Category ▼</option>
-                                                              <option value="Lighting">Lighting</option>
-                                                              <option value="Furniture">Furniture</option>
-                                                              <option value="Decor & Accessories">Decor & Accessories</option>
-                                                              <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
-                                                              <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
-                                                              <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
-                                                              <option value="Furniture & Storage">Furniture & Storage</option>
-                                                              <option value="Equipment & Furniture">Equipment & Furniture</option>
-                                                              <option value="Electronics & Technology">Electronics & Technology</option>
-                                                              <option value="Appliances">Appliances</option>
-                                                              <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
-                                                              <option value="Surfaces & Materials">Surfaces & Materials</option>
-                                                              <option value="CREATE_NEW">+ Create New Category</option>
-                                                            </select>
-                                                            
-                                                            {/* Delete Section Button - RED COLOR */}
-                                                            <button
-                                                              onClick={() => handleDeleteRoom(room.id)}
-                                                              className="bg-red-700 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
-                                                            >
-                                                              🗑️ Delete Section
-                                                            </button>
-                                                          </div>
-                                                        </td>
-                                                      </tr>
-                                                    </React.Fragment>
-                                                  )}
-                                                </React.Fragment>
-                                          );
-                                        })}
-                                      </React.Fragment>
-                                )}
-                              </React.Fragment>
-                        );
-                      })}
-                  </tbody>
-                </table>
+                              ))}
+                            </tbody>
+                          </table>
+                          
+                          {/* ADD ITEM BUTTON */}
+                          <div className="text-center mb-2">
+                            <button
+                              onClick={() => handleAddItem(subcategory.id)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+                            >
+                              Add Item to {subcategory.name}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
             </div>
-          </div>
-        </div>
+          );
+        })}
+      </div>
 
-      {/* ADD INSTALLED MODAL */}
+      {/* ADD ITEM MODAL */}
       {showAddItem && (
         <AddItemModal
+          subcategoryId={selectedSubCategoryId}
           onClose={() => setShowAddItem(false)}
-          onSubmit={handleAddItem}
+          onSuccess={handleAddItemComplete}
           itemStatuses={itemStatuses}
           vendorTypes={vendorTypes}
-          loading={false}
+          carrierTypes={carrierTypes}
         />
       )}
     </div>
