@@ -84,7 +84,7 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
       <div className="overflow-x-auto">
         
         {/* LIVING ROOM HEADER (PURPLE) */}
-        <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: '#7C3AED' }}>
+        <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: getRoomColor('living room') }}>
           LIVING ROOM
         </div>
         
