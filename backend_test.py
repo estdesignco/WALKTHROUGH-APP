@@ -353,9 +353,6 @@ if __name__ == "__main__":
     else:
         print("\n❌ FAILURE: Enhanced rooms integration has issues that need to be resolved.")
         exit(1)
-            
-        # Analyze 3-level hierarchy in detail
-        rooms = data.get('rooms', [])
         if not rooms:
             self.log_test("Project Structure - Rooms", False, "No rooms found in project")
             return False
