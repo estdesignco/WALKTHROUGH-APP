@@ -527,7 +527,7 @@ const SimpleChecklistSpreadsheet = ({
     <div className="w-full" style={{ backgroundColor: '#0C0A09' }}>
       
       {/* ENHANCED FILTER SECTION - MATCHING FFE FUNCTIONALITY */}
-      <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
+      <div className="mb-6 p-4" style={{ backgroundColor: '#1C1917' }}>
         <div className="flex flex-col lg:flex-row gap-4 items-center">
           {/* Search Input */}
           <div className="flex-1">
