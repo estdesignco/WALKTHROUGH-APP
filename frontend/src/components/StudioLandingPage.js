@@ -101,36 +101,35 @@ const StudioLandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-stone-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto"></div>
-          <p className="text-gray-400 mt-4">Loading studio projects...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B7355] mx-auto"></div>
+          <p className="text-stone-400 mt-4">Loading studio projects...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-stone-900 text-stone-200">
       {/* Header with Logo */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-4xl font-bold text-white tracking-wider text-center">
-            ESTABLISHED DESIGN CO.
-          </h1>
-        </div>
+      <div className="w-full bg-[#1E293B] shadow-lg flex items-center justify-center my-8 h-auto max-h-[150px] p-4 rounded-lg border border-[#8B7355]/50 mx-4">
+        <img
+          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf5_Establishedlogo.png"
+          alt="Established Design Co."
+          className="w-full h-full object-contain"
+        />
       </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Studio Projects Header and Action Buttons */}
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-semibold text-yellow-400">Studio Projects</h2>
-          
-          <div className="flex space-x-4">
+        <div className="flex justify-between items-center pb-4 border-b border-stone-700 mb-8">
+          <h1 className="text-4xl font-bold" style={{color: '#8B7355'}}>Studio Projects</h1>
+          <div className="flex gap-3">
             <button
               onClick={handleNewClient}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+              className="bg-[#B49B7E] hover:bg-[#A08B6F] text-white font-semibold py-3 px-5 rounded-lg shadow-md transition-all duration-300 text-base flex items-center space-x-2"
             >
               <span>+</span>
               <span>New Client</span>
@@ -138,7 +137,7 @@ const StudioLandingPage = () => {
             
             <button
               onClick={handleEmailNewClient}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+              className="bg-[#8B7355] hover:bg-[#A0927B] text-white font-semibold py-3 px-5 rounded-lg shadow-md transition-all duration-300 text-base flex items-center space-x-2"
             >
               <span>📧</span>
               <span>Email New Client</span>
@@ -146,7 +145,7 @@ const StudioLandingPage = () => {
             
             <button
               onClick={handleFullQuestionnaire}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+              className="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md transition-all duration-300 text-base flex items-center space-x-2"
             >
               <span>+</span>
               <span>Full Questionnaire</span>
@@ -161,63 +160,86 @@ const StudioLandingPage = () => {
         )}
 
         {/* Projects List */}
-        <div className="space-y-4">
-          {projects.length === 0 ? (
-            <div className="bg-gray-800 rounded-xl p-12 text-center">
-              <div className="text-6xl mb-4">🏗️</div>
-              <h3 className="text-xl font-semibold text-white mb-2">No Projects Yet</h3>
-              <p className="text-gray-400 mb-6">Get started by creating your first client project</p>
-              <button
-                onClick={handleNewClient}
-                className="bg-yellow-600 hover:bg-yellow-700 text-white px-8 py-3 rounded-lg transition-colors"
-              >
-                Create Your First Project
-              </button>
-            </div>
-          ) : (
-            projects.map((project) => (
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B7355]"></div>
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="text-center py-20 bg-[#1E293B]/50 rounded-lg border-2 border-dashed border-stone-700">
+            <div className="text-6xl mb-4">🏗️</div>
+            <h3 className="mt-4 text-xl font-medium text-stone-300">Your Project Library is Empty</h3>
+            <p className="mt-2 text-md text-stone-400">Get started by creating your first project file.</p>
+            <button
+              onClick={handleNewClient}
+              className="bg-[#8B7355] hover:bg-[#A0927B] text-white px-8 py-3 rounded-lg transition-colors mt-6"
+            >
+              Create Your First Project
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {projects.map((project) => (
               <div
                 key={project.id}
-                className="bg-gray-800 rounded-lg border border-gray-700 p-6 cursor-pointer hover:bg-gray-750 transition-colors"
-                onClick={() => handleProjectClick(project)}
+                className="group relative bg-[#1E293B] hover:bg-[#2D3748] border border-stone-700 hover:border-[#8B7355] rounded-lg shadow-lg transition-all duration-300"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-bold text-white uppercase tracking-wide">
+                <div className="absolute top-3 right-3 z-10 flex gap-1">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setEmailData({ email: project.client_info?.email || '', name: project.client_info?.full_name || project.name });
+                      setShowEmailModal(true);
+                    }}
+                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/50 bg-blue-900/30 p-2 rounded"
+                    title="Email Client"
+                  >
+                    📧
+                  </button>
+                  <button
+                    onClick={(e) => handleDeleteProject(project.id, project.name, e)}
+                    disabled={deletingProject === project.id}
+                    className="text-stone-400 hover:text-red-500 hover:bg-red-900/50 p-2 rounded"
+                    title="Delete Project"
+                  >
+                    {deletingProject === project.id ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
+                    ) : (
+                      '🗑️'
+                    )}
+                  </button>
+                </div>
+                <div 
+                  className="block p-6 cursor-pointer"
+                  onClick={() => handleProjectClick(project)}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h2 className="text-2xl font-bold text-[#A0927B] group-hover:text-[#8B7355] transition-colors">
                         {project.name}
-                      </h3>
-                      <div className="flex items-center space-x-4">
-                        <span className="text-sm text-gray-400">Last Updated</span>
-                        <button
-                          onClick={(e) => handleDeleteProject(project.id, e)}
-                          className="text-gray-400 hover:text-red-400 transition-colors"
-                        >
-                          🗑️
-                        </button>
-                      </div>
+                      </h2>
+                      <p className="text-sm text-stone-400 mt-1">
+                        {project.client_info?.full_name}
+                      </p>
                     </div>
-                    
-                    <p className="text-gray-300 mb-1">
-                      {project.client_info?.full_name}
-                    </p>
-                    
-                    <p className="text-gray-400 mb-4">
-                      {project.client_info?.address}
-                    </p>
-                    
-                    <div className="text-right">
-                      <span className="text-sm text-gray-400">
+                    <div className="text-right mr-20">
+                      <p className="text-xs text-stone-500">Last Updated</p>
+                      <p className="text-sm text-stone-400">
                         {formatDate(project.updated_at || project.created_at)}
-                      </span>
+                      </p>
                     </div>
+                  </div>
+                  <div className="text-md text-stone-300 mt-4 border-t border-stone-700 pt-4 flex justify-between items-center">
+                    <span>{project.client_info?.address}</span>
+                    <span className="text-sm font-semibold text-[#8B7355] opacity-0 group-hover:opacity-100 transition-opacity duration-300 mr-20">
+                      View Project →
+                    </span>
                   </div>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-      </div>
+            ))}
+          </div>
+        )}
 
       {/* Email Modal */}
       {showEmailModal && (
