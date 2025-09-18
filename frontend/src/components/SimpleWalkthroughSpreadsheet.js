@@ -61,7 +61,7 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
         </div>
         
         {/* LIGHTING CATEGORY HEADER (GREEN) */}
-        <div className="mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: '#065F46' }}>
+        <div className="mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: '#8B7355' }}>
           LIGHTING
         </div>
         
