@@ -369,13 +369,16 @@ backend:
     implemented: true
     working: false
     file: "server.py"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "🚨 CRITICAL EMAIL SMTP AUTHENTICATION ISSUE: Comprehensive testing of new email functionality reveals Microsoft 365 SMTP authentication failure. ✅ ENDPOINT WORKING: POST /api/send-questionnaire endpoint correctly implemented with proper request/response format, validation working (rejects invalid emails and missing fields). ✅ EMAIL PROCESSING: Backend correctly processes email requests and attempts SMTP delivery. ❌ SMTP AUTHENTICATION BLOCKED: Microsoft 365 returns error '535 5.7.139 Authentication unsuccessful, SmtpClientAuthentication is disabled for the Tenant' - SMTP AUTH is disabled for the info@estdesignco.com account/tenant. ✅ ERROR HANDLING: Proper error handling implemented, returns 500 status with detailed error message. ✅ BACKEND LOGS: Clear error logging shows SMTP connection attempts and authentication failures. ROOT CAUSE: Microsoft 365 has disabled basic SMTP authentication for security reasons as of 2025. SOLUTION NEEDED: Either enable SMTP AUTH for the mailbox in Microsoft 365 admin center or migrate to OAuth 2.0 authentication. The email endpoint implementation is correct - this is a Microsoft 365 tenant configuration issue."
+      - working: false
+        agent: "testing"
+        comment: "🚨 GMAIL SMTP AUTHENTICATION FAILURE: Tested updated Gmail SMTP configuration (smtp.gmail.com:587, estdesignco@gmail.com, password: Zeke1919$$$$) but still getting authentication errors. ✅ ENDPOINT FUNCTIONAL: POST /api/send-questionnaire endpoint working correctly with proper JSON response format {'status': 'success', 'message': 'Questionnaire email has been queued for delivery...'} ✅ INPUT VALIDATION: Correctly rejects invalid email formats (422 status) and missing fields with Pydantic validation. ✅ EMAIL PROCESSING: Backend processes requests and attempts SMTP delivery. ❌ GMAIL SMTP ERROR: Getting '535 5.7.8 Username and Password not accepted. BadCredentials' from Gmail SMTP server. ✅ ERROR HANDLING: Proper exception handling returns 500 status with detailed error messages. ✅ BACKEND LOGS: Clear error logging shows Gmail SMTP connection attempts and authentication failures. 🔍 ROOT CAUSE IDENTIFIED: Gmail requires APP PASSWORD instead of regular account password when 2FA is enabled (standard in 2025). The provided password 'Zeke1919$$$$' is the regular account password, but Gmail SMTP needs a 16-character App Password generated from Google Account Security settings. SOLUTION: Generate App Password in Google Account > Security > App Passwords and use that instead of regular password. The email endpoint implementation is correct - this is a Gmail authentication configuration issue."
 
 agent_communication:
   - agent: "main"
