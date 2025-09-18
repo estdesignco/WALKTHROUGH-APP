@@ -36,14 +36,10 @@ print(f"Project ID: {PROJECT_ID}")
 print("Focus: Kitchen subcategories missing issue")
 print("=" * 80)
 
-class FFEAPITester:
+class EnhancedRoomsTester:
     def __init__(self):
         self.session = requests.Session()
         self.test_results = []
-        self.created_items = []
-        self.created_rooms = []
-        self.created_categories = []
-        self.created_subcategories = []
         
     def log_test(self, test_name: str, success: bool, details: str = ""):
         """Log test results"""
@@ -63,13 +59,13 @@ class FFEAPITester:
             url = f"{BASE_URL}{endpoint}"
             
             if method.upper() == 'GET':
-                response = self.session.get(url, params=params)
+                response = self.session.get(url, params=params, timeout=15)
             elif method.upper() == 'POST':
-                response = self.session.post(url, json=data)
+                response = self.session.post(url, json=data, timeout=15)
             elif method.upper() == 'PUT':
-                response = self.session.put(url, json=data)
+                response = self.session.put(url, json=data, timeout=15)
             elif method.upper() == 'DELETE':
-                response = self.session.delete(url)
+                response = self.session.delete(url, timeout=15)
             else:
                 return False, f"Unsupported method: {method}", 400
                 
