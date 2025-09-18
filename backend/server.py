@@ -955,6 +955,92 @@ def get_category_color(category_name: str) -> str:
 def get_subcategory_color(subcategory_name: str) -> str:
     return SUBCATEGORY_COLORS.get(subcategory_name.lower(), "#8A5A5A")
 
+# EMAIL FUNCTIONALITY
+class EmailDeliveryError(Exception):
+    pass
+
+def send_questionnaire_email(client_name: str, client_email: str, questionnaire_url: str, sender_name: str = "Established Design Co.") -> bool:
+    """Send questionnaire email to client using SendGrid"""
+    try:
+        sendgrid_api_key = os.getenv('SENDGRID_API_KEY')
+        sender_email = os.getenv('SENDER_EMAIL', 'noreply@establisheddesign.com')
+        
+        if not sendgrid_api_key:
+            raise EmailDeliveryError("SendGrid API key not configured")
+        
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Your Interior Design Questionnaire</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #f5f5f5; }}
+                .container {{ max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; }}
+                .header {{ background-color: #1f2937; color: white; padding: 30px 20px; text-align: center; }}
+                .header h1 {{ margin: 0; font-size: 28px; letter-spacing: 2px; }}
+                .content {{ padding: 30px 20px; }}
+                .button {{ display: inline-block; background-color: #d97706; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }}
+                .footer {{ background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 14px; color: #666; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>ESTABLISHED DESIGN CO.</h1>
+                </div>
+                <div class="content">
+                    <h2>Hello {client_name},</h2>
+                    <p>Thank you for your interest in working with Established Design Co.! We're excited to learn more about your design vision and create something beautiful together.</p>
+                    
+                    <p>To get started, please complete our comprehensive client questionnaire. This will help us understand your style preferences, project goals, and lifestyle needs so we can create the perfect design plan for you.</p>
+                    
+                    <p style="text-align: center;">
+                        <a href="{questionnaire_url}" class="button">Complete Your Questionnaire</a>
+                    </p>
+                    
+                    <p>The questionnaire takes about 10-15 minutes to complete and covers:</p>
+                    <ul>
+                        <li>Your design style preferences</li>
+                        <li>Room selections and priorities</li>
+                        <li>Budget and timeline expectations</li>
+                        <li>Lifestyle and family needs</li>
+                        <li>Color and material preferences</li>
+                    </ul>
+                    
+                    <p>Once you've completed the questionnaire, we'll schedule a consultation to discuss your project in detail and begin the walkthrough process.</p>
+                    
+                    <p>If you have any questions, please don't hesitate to reach out. We look forward to working with you!</p>
+                    
+                    <p>Best regards,<br>
+                    The {sender_name} Team</p>
+                </div>
+                <div class="footer">
+                    <p>© 2025 Established Design Co. | Professional Interior Design Services</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        message = Mail(
+            from_email=sender_email,
+            to_emails=client_email,
+            subject=f"Your Interior Design Questionnaire - {client_name}",
+            html_content=html_content
+        )
+        
+        sg = SendGridAPIClient(sendgrid_api_key)
+        response = sg.send(message)
+        
+        logging.info(f"Email sent to {client_email} with status code: {response.status_code}")
+        return response.status_code == 202
+        
+    except Exception as e:
+        logging.error(f"Failed to send email to {client_email}: {str(e)}")
+        raise EmailDeliveryError(f"Failed to send email: {str(e)}")
+
 # LINK SCRAPING FUNCTIONALITY
 def scrape_product_info(url: str) -> Dict[str, Any]:
     """Scrape product information from a URL"""
