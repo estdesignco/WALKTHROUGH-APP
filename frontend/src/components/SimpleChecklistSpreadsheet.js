@@ -16,8 +16,70 @@ const SimpleChecklistSpreadsheet = ({
 
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
+  const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedVendor, setSelectedVendor] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [filteredProject, setFilteredProject] = useState(project);
+
+  // APPLY FILTERS - WORKING FILTER LOGIC
+  useEffect(() => {
+    console.log('🔍 Checklist Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus });
+    
+    if (!project) {
+      setFilteredProject(null);
+      return;
+    }
+
+    let filtered = { ...project };
+
+    if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
+      console.log('🔍 Applying checklist filters...');
+      
+      filtered.rooms = project.rooms.map(room => {
+        if (selectedRoom && room.id !== selectedRoom) {
+          return { ...room, categories: [] };
+        }
+        
+        const filteredCategories = room.categories.map(category => {
+          if (selectedCategory && category.name !== selectedCategory) {
+            return { ...category, subcategories: [] };
+          }
+          
+          const filteredSubcategories = category.subcategories.map(subcategory => {
+            const filteredItems = subcategory.items.filter(item => {
+              if (searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
+                const itemMatch = 
+                  item.name.toLowerCase().includes(searchLower) ||
+                  (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
+                  (item.sku && item.sku.toLowerCase().includes(searchLower)) ||
+                  (item.remarks && item.remarks.toLowerCase().includes(searchLower));
+                if (!itemMatch) return false;
+              }
+              
+              if (selectedVendor && item.vendor !== selectedVendor) return false;
+              if (selectedStatus && item.status !== selectedStatus) return false;
+              
+              return true;
+            });
+            
+            return { ...subcategory, items: filteredItems };
+          });
+          
+          return { ...category, subcategories: filteredSubcategories };
+        });
+        
+        return { ...room, categories: filteredCategories };
+      });
+    }
+
+    setFilteredProject(filtered);
+  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
   // Initialize all rooms and categories as expanded
   useEffect(() => {
@@ -37,6 +99,35 @@ const SimpleChecklistSpreadsheet = ({
     }
   }, [project]);
 
+  // Fetch available categories from backend API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+        const response = await fetch(`${backendUrl}/api/categories/available`);
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableCategories(data.categories || []);
+          console.log('✅ Loaded categories from API:', data.categories);
+        } else {
+          console.warn('⚠️ Failed to fetch categories, using fallback');
+          setAvailableCategories([
+            "Lighting", "Furniture", "Appliances", "Plumbing", 
+            "Decor & Accessories", "Paint, Wallpaper, and Finishes"
+          ]);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching categories:', error);
+        setAvailableCategories([
+          "Lighting", "Furniture", "Appliances", "Plumbing", 
+          "Decor & Accessories", "Paint, Wallpaper, and Finishes"
+        ]);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
+
   // Toggle room expansion
   const toggleRoomExpansion = (roomId) => {
     setExpandedRooms(prev => ({
@@ -53,20 +144,30 @@ const SimpleChecklistSpreadsheet = ({
     }));
   };
 
-  // EXACT room colors from your original FFESpreadsheet.jsx
-  const ROOM_COLORS = {
-    'Living Room': '#8B5CF6', 'Kitchen': '#06B6D4', 'Dining Room': '#DC2626',
-    'Primary Bedroom': '#2F5233', 'Guest Bedroom': '#7C3AED', 'Home Office': '#EA580C',
-    'Primary Bathroom': '#0284C7', 'Guest Bathroom': '#7C2D12', 'Laundry Room': '#65A30D',
-    'Entryway': '#BE185D', 'Sunroom': '#0891B2', 'Nursery': '#C2410C',
-    'Master Bedroom': '#059669',
-  };
-
+  // Different muted room colors for checklist
   const getRoomColor = (roomName, index = 0) => {
-    return ROOM_COLORS[roomName] || '#6B7280';
+    const mutedColors = [
+      '#8B5A6B',  // Muted rose
+      '#6B7C93',  // Muted blue
+      '#7A8B5A',  // Muted olive
+      '#9B6B8B',  // Muted purple
+      '#8B7A5A',  // Muted brown
+      '#5A8B7A',  // Muted teal
+      '#8B5A7A',  // Muted mauve
+      '#7A5A8B',  // Muted violet
+      '#5A7A8B',  // Muted slate
+      '#8B6B5A'   // Muted tan
+    ];
+    
+    // Use room name hash for consistent color per room
+    let hash = 0;
+    for (let i = 0; i < roomName.length; i++) {
+      hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return mutedColors[Math.abs(hash) % mutedColors.length];
   };
 
-  const getCategoryColor = () => '#4A6741';  // EXACT color from your original code
+  const getCategoryColor = () => '#065F46';  // Dark green for categories
 
   // Status colors mapping for checklist
   const getStatusColor = (status) => {
@@ -91,7 +192,7 @@ const SimpleChecklistSpreadsheet = ({
     console.log('🔄 Checklist status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -136,7 +237,7 @@ const SimpleChecklistSpreadsheet = ({
         return;
       }
 
-      const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
       const newItem = {
         ...itemData,
@@ -158,9 +259,12 @@ const SimpleChecklistSpreadsheet = ({
       if (response.ok) {
         console.log('✅ Checklist item added successfully');
         setShowAddItem(false);
-        // Call onReload to refresh data without full page reload
+        // Call onReload to refresh data WITHOUT RESETTING MINIMIZE STATE
+        const currentExpandedState = expandedRooms;
         if (onReload) {
-          onReload();
+          await onReload();
+          // Restore expanded state after reload
+          setExpandedRooms(currentExpandedState);
         }
       } else {
         const errorData = await response.text();
@@ -180,15 +284,18 @@ const SimpleChecklistSpreadsheet = ({
     }
 
     try {
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'DELETE'
       });
 
       if (response.ok) {
         console.log('✅ Checklist item deleted successfully');
-        // Call onReload to refresh data without full page reload
+        // Call onReload to refresh data WITHOUT RESETTING MINIMIZE STATE
+        const currentExpandedState = expandedRooms;
         if (onReload) {
-          onReload();
+          await onReload();
+          // Restore expanded state after reload
+          setExpandedRooms(currentExpandedState);
         }
       } else {
         console.error('❌ Delete failed with status:', response.status);
@@ -207,7 +314,7 @@ const SimpleChecklistSpreadsheet = ({
     }
 
     try {
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/categories/${categoryId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${categoryId}`, {
         method: 'DELETE'
       });
 
@@ -227,7 +334,107 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
-  // Handle Canva PDF Upload - ENHANCED FEATURE  
+  // Handle adding a new category - COPIED FROM WORKING FFE
+  const handleAddCategory = async (roomId, categoryName) => {
+    if (!roomId || !categoryName) {
+      console.error('❌ Missing roomId or categoryName');
+      return;
+    }
+
+    try {
+      console.log('🔄 Creating comprehensive checklist category:', categoryName, 'for room:', roomId);
+      
+      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `temp_${categoryName}_${Date.now()}`,
+          description: `Temporary room to extract ${categoryName} structure`,
+          project_id: "temp",
+          order_index: 999
+        })
+      });
+
+      if (tempRoomResponse.ok) {
+        const tempRoom = await tempRoomResponse.json();
+        
+        const matchingCategory = tempRoom.categories.find(cat => 
+          cat.name.toLowerCase() === categoryName.toLowerCase()
+        );
+        
+        if (matchingCategory) {
+          // First add the category
+          const categoryData = {
+            ...matchingCategory,
+            room_id: roomId,
+            id: undefined
+          };
+          
+          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(categoryData)
+          });
+          
+          if (addResponse.ok) {
+            const newCategory = await addResponse.json();
+            console.log('✅ Category added:', newCategory.name);
+            
+            // Now add ALL subcategories with their items
+            for (const subcategory of matchingCategory.subcategories) {
+              const subcategoryData = {
+                ...subcategory,
+                category_id: newCategory.id,
+                id: undefined
+              };
+              
+              const subResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/subcategories`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(subcategoryData)
+              });
+              
+              if (subResponse.ok) {
+                const newSubcategory = await subResponse.json();
+                console.log('✅ Subcategory added:', newSubcategory.name);
+                
+                // Add ALL items for this subcategory
+                for (const item of subcategory.items) {
+                  const itemData = {
+                    ...item,
+                    subcategory_id: newSubcategory.id,
+                    id: undefined,
+                    status: '' // BLANK status for checklist items
+                  };
+                  
+                  await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(itemData)
+                  });
+                }
+              }
+            }
+            
+            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
+              method: 'DELETE'
+            });
+            
+            // Reload to show all new items
+            if (onReload) {
+              onReload();
+            }
+          }
+        }
+        
+        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
+          method: 'DELETE'
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error adding comprehensive checklist category:', error);
+    }
+  };  
   const handleCanvaPdfUpload = async (file, roomName) => {
     if (!file) {
       console.log('⚠️ No file provided');
@@ -242,7 +449,7 @@ const SimpleChecklistSpreadsheet = ({
       formData.append('room_name', roomName);
       formData.append('project_id', project.id);
       
-      const response = await fetch('https://spreadsheet-revamp.preview.emergentagent.com/api/upload-canva-pdf', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/upload-canva-pdf`, {
         method: 'POST',
         body: formData
       });
@@ -272,7 +479,7 @@ const SimpleChecklistSpreadsheet = ({
     try {
       console.log('🎨 Scraping Canva PDF for room:', roomName, 'URL:', canvaUrl);
       
-      const response = await fetch('https://spreadsheet-revamp.preview.emergentagent.com/api/scrape-canva-pdf', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/scrape-canva-pdf`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -327,20 +534,30 @@ const SimpleChecklistSpreadsheet = ({
             <input
               type="text"
               placeholder="Search Items, Vendors, SKUs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
           
           {/* Filter Dropdowns */}
           <div className="flex gap-3 flex-wrap">
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedRoom}
+              onChange={(e) => setSelectedRoom(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Rooms</option>
-              {project.rooms.map(room => (
+              {(project?.rooms || []).map(room => (
                 <option key={room.id} value={room.id}>{room.name}</option>
               ))}
             </select>
             
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Categories</option>
               <option value="Lighting">Lighting</option>
               <option value="Furniture">Furniture & Storage</option>
@@ -349,14 +566,22 @@ const SimpleChecklistSpreadsheet = ({
               <option value="Architectural">Architectural Elements</option>
             </select>
             
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedVendor}
+              onChange={(e) => setSelectedVendor(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Vendors</option>
-              {vendorTypes.map(vendor => (
+              {(vendorTypes || []).map(vendor => (
                 <option key={vendor} value={vendor}>{vendor}</option>
               ))}
             </select>
             
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Status</option>
               <option value="PICKED">PICKED</option>
               <option value="ORDER SAMPLES">ORDER SAMPLES</option>
@@ -370,10 +595,23 @@ const SimpleChecklistSpreadsheet = ({
             </select>
             
             {/* Filter and Clear Buttons */}
-            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">
+            <button 
+              onClick={() => console.log('🔍 CHECKLIST FILTER APPLIED')}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
+            >
               🔍 FILTER
             </button>
-            <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium">
+            <button 
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedRoom('');
+                setSelectedCategory('');
+                setSelectedVendor('');
+                setSelectedStatus('');
+                console.log('🧹 CHECKLIST FILTER CLEARED');
+              }}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium"
+            >
               CLEAR
             </button>
           </div>
@@ -388,9 +626,9 @@ const SimpleChecklistSpreadsheet = ({
         </div>
       </div>
 
-      {/* ENHANCED CHECKLIST TABLE WITH MINIMIZE/EXPAND */}
+      {/* ENHANCED CHECKLIST TABLE WITH MINIMIZE/EXPAND AND FILTERING */}
       <div className="w-full">
-        {project.rooms.map((room, roomIndex) => {
+        {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
           const isRoomExpanded = expandedRooms[room.id];
           
           return (
@@ -464,23 +702,23 @@ const SimpleChecklistSpreadsheet = ({
                           <span>{category.name.toUpperCase()}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          {/* ADD CATEGORY DROPDOWN */}
+                          {/* ADD CATEGORY DROPDOWN - FIXED */}
                           <select 
                             onChange={(e) => {
                               if (e.target.value) {
-                                console.log('Adding category:', e.target.value, 'to room:', room.id);
-                                // handleAddCategory(room.id, e.target.value);
+                                console.log('🎯 Adding category:', e.target.value, 'to room:', room.id);
+                                handleAddCategory(room.id, e.target.value);
                                 e.target.value = '';
                               }
                             }}
                             className="bg-green-600 text-white text-xs px-2 py-1 rounded border-none"
                           >
                             <option value="">+ Add Category</option>
-                            <option value="Lighting">Lighting</option>
-                            <option value="Furniture & Storage">Furniture & Storage</option>
-                            <option value="Decor & Accessories">Decor & Accessories</option>
-                            <option value="Paint, Wallpaper & Finishes">Paint, Wallpaper & Finishes</option>
-                            <option value="Architectural Elements, Built-ins & Trim">Architectural Elements</option>
+                            {availableCategories.map(categoryName => (
+                              <option key={categoryName} value={categoryName}>
+                                {categoryName}
+                              </option>
+                            ))}
                           </select>
                           <button
                             onClick={() => handleDeleteCategory(category.id)}
@@ -496,34 +734,38 @@ const SimpleChecklistSpreadsheet = ({
                     {/* CHECKLIST TABLE - Only show when category expanded */}
                     {isCategoryExpanded && (
                       <>
-                        <table className="w-full border-collapse border border-gray-400 mb-4">
-                          <thead>
-                            <tr>
-                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#C05A5C' }}>ITEM</th>
-                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#C05A5C' }}>QTY</th>
-                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#C05A5C' }}>SIZE</th>
-                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#C05A5C' }}>STATUS</th>
-                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#C05A5C' }}>IMAGE</th>
-                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#C05A5C' }}>LINK</th>
-                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#C05A5C' }}>REMARKS</th>
-                              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#C05A5C' }}>DELETE</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {category.subcategories?.map((subcategory) => 
-                              subcategory.items?.map((item, itemIndex) => (
-                                <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                  {/* ITEM - EDITABLE */}
-                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">
-                                    <div 
-                                      contentEditable={true}
-                                      suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-white text-sm outline-none"
-                                      onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
-                                    >
-                                      {item.name}
-                                    </div>
-                                  </td>
+                        {category.subcategories?.map((subcategory) => (
+                          <React.Fragment key={subcategory.id || subcategory.name}>
+                            {/* TABLE WITH SUBCATEGORY NAME IN HEADER */}
+                            <table className="w-full border-collapse border border-gray-400 mb-4">
+                              <thead>
+                                <tr>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>LINK</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>REMARKS</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {/* ITEMS UNDER THIS SUBCATEGORY */}
+                                {subcategory.items?.map((item, itemIndex) => (
+                                      <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
+                                        {/* ITEM - EDITABLE */}
+                                        <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                          <div 
+                                            contentEditable={true}
+                                            suppressContentEditableWarning={true}
+                                            className="w-full bg-transparent text-white text-sm outline-none"
+                                            onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
+                                          >
+                                            {item.name}
+                                          </div>
+                                        </td>
                                   
                                   {/* QTY - EDITABLE */}
                                   <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center">
@@ -546,6 +788,18 @@ const SimpleChecklistSpreadsheet = ({
                                       onBlur={(e) => console.log('Size updated:', e.target.textContent)}
                                     >
                                       {item.size || ''}
+                                    </div>
+                                  </td>
+                                  
+                                  {/* FINISH/COLOR - EDITABLE */}
+                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-white text-sm outline-none"
+                                      onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
+                                    >
+                                      {item.finish_color || ''}
                                     </div>
                                   </td>
                                   
@@ -573,8 +827,69 @@ const SimpleChecklistSpreadsheet = ({
                                   {/* IMAGE */}
                                   <td className="border border-gray-400 px-2 py-1 text-white text-sm w-20">
                                     {item.image_url ? (
-                                      <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
-                                    ) : ''}
+                                      <img 
+                                        src={item.image_url} 
+                                        alt={item.name}
+                                        className="w-12 h-12 object-cover cursor-pointer hover:scale-150 transition-transform duration-200 z-10"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          // Create full-size overlay with better styling
+                                          const overlay = document.createElement('div');
+                                          overlay.style.cssText = `
+                                            position: fixed;
+                                            top: 0;
+                                            left: 0;
+                                            width: 100%;
+                                            height: 100%;
+                                            background: rgba(0, 0, 0, 0.8);
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            z-index: 9999;
+                                            cursor: pointer;
+                                          `;
+                                          
+                                          const container = document.createElement('div');
+                                          container.style.cssText = `
+                                            max-width: 80vw;
+                                            max-height: 80vh;
+                                            padding: 20px;
+                                            text-align: center;
+                                          `;
+                                          
+                                          const img = document.createElement('img');
+                                          img.src = item.image_url;
+                                          img.alt = item.name;
+                                          img.style.cssText = `
+                                            max-width: 100%;
+                                            max-height: 100%;
+                                            object-fit: contain;
+                                            border-radius: 8px;
+                                          `;
+                                          
+                                          const title = document.createElement('p');
+                                          title.textContent = item.name;
+                                          title.style.cssText = `
+                                            color: white;
+                                            margin-top: 15px;
+                                            font-size: 18px;
+                                            font-weight: bold;
+                                          `;
+                                          
+                                          container.appendChild(img);
+                                          container.appendChild(title);
+                                          overlay.appendChild(container);
+                                          
+                                          overlay.addEventListener('click', () => {
+                                            document.body.removeChild(overlay);
+                                          });
+                                          
+                                          document.body.appendChild(overlay);
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="w-12 h-12 bg-gray-600 flex items-center justify-center text-xs">No Image</div>
+                                    )}
                                   </td>
                                   
                                   {/* LINK - EDITABLE */}
@@ -612,10 +927,11 @@ const SimpleChecklistSpreadsheet = ({
                                     </button>
                                   </td>
                                 </tr>
-                              ))
-                            )}
-                          </tbody>
-                        </table>
+                                ))}
+                              </tbody>
+                            </table>
+                          </React.Fragment>
+                        ))}
 
                         {/* ADD ITEM BUTTON - FIXED */}
                         <div className="mb-4">

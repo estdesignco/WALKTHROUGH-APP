@@ -41,7 +41,7 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -67,7 +67,7 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
@@ -164,7 +164,7 @@ const ExactFFESpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -227,7 +227,7 @@ const ExactFFESpreadsheet = ({
         return;
       }
 
-      const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
       const newItem = {
         ...itemData,
@@ -273,7 +273,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
@@ -297,7 +297,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'DELETE'
       });
@@ -337,7 +337,7 @@ const ExactFFESpreadsheet = ({
       console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
       
       // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/rooms`, {
+      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -364,7 +364,7 @@ const ExactFFESpreadsheet = ({
             id: undefined // Let backend generate new ID
           };
           
-          const addResponse = await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/categories`, {
+          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(categoryData)
@@ -374,7 +374,7 @@ const ExactFFESpreadsheet = ({
             console.log('✅ Comprehensive category added successfully');
             
             // Delete the temp room
-            await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
@@ -384,7 +384,7 @@ const ExactFFESpreadsheet = ({
         }
         
         // Clean up temp room regardless
-        await fetch(`https://spreadsheet-revamp.preview.emergentagent.com/api/rooms/${tempRoom.id}`, {
+        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
           method: 'DELETE'
         });
       } else {
@@ -409,7 +409,7 @@ const ExactFFESpreadsheet = ({
       
       // Update backend room order
       try {
-        const response = await fetch('https://spreadsheet-revamp.preview.emergentagent.com/api/rooms/reorder', {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -435,7 +435,7 @@ const ExactFFESpreadsheet = ({
       // Update backend category order  
       try {
         const roomId = source.droppableId.replace('categories-', '');
-        const response = await fetch('https://spreadsheet-revamp.preview.emergentagent.com/api/categories/reorder', {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -479,7 +479,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "https://spreadsheet-revamp.preview.emergentagent.com";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {
@@ -879,47 +879,33 @@ const ExactFFESpreadsheet = ({
                                                   {/* SUBCATEGORIES - Only show when category expanded */}
                                                   {isCategoryExpanded && (
                                                     <React.Fragment>
-                                                      {/* RED HEADER GOES AFTER CATEGORY - LAST IN HIERARCHY */}
-                                                      <tr>
-                                                        <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#7F1D1D', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
-                                                        </td>
-                                                        <td colSpan="3" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#8B4513' }}>
-                                                          ADDITIONAL INFO.
-                                                        </td>
-                                                        <td colSpan="5" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#6B46C1' }}>
-                                                          SHIPPING INFO.
-                                                        </td>
-                                                        <td colSpan="2" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#7F1D1D', borderRight: '1px solid #9CA3AF', borderLeft: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
-                                                        </td>
-                                                      </tr>
-                                                      
-                                                      {/* MAIN RED HEADER ROW */}
-                                                      <tr>
-                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>INSTALLED</td>
-                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>VENDOR/SKU</td>
-                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>QTY</td>
-                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>SIZE</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>FINISH/Color</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>Cost/Price</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>Image</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Order Date</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Order Status<br/>Order Number</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Estimated Ship Date<br/>Estimated Delivery Date</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Install Date<br/>Ship To</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Tracking<br/>Carrier</td>
-                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>NOTES</td>
-                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>LINK</td>
-                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ACTIONS</td>
-                                                      </tr>
-                                                      
-                                                      {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
-                                                      {/* ACTUAL INSTALLEDS FROM BACKEND DATA */}
                                                       {category.subcategories?.map((subcategory) => (
-                                                        subcategory.items?.map((item, itemIndex) => (
+                                                        <React.Fragment key={subcategory.id || subcategory.name}>
+                                                          {/* TABLE WITH SUBCATEGORY NAME IN HEADER */}
+                                                          <tr>
+                                                            <td colSpan="15">
+                                                              <table className="w-full border-collapse border border-gray-400 mb-4">
+                                                                <thead>
+                                                                  <tr>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SKU</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>COST</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#8B4444' }}>LINK</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>TRACKING</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>CARRIER</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>NOTES</th>
+                                                                    <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                                                                  </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                  {/* ITEMS UNDER THIS SUBCATEGORY */}
+                                                                  {subcategory.items?.map((item, itemIndex) => (
                                                         <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
                                                           {/* INSTALLED - INSTALLED NAME GOES HERE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
@@ -1186,20 +1172,27 @@ const ExactFFESpreadsheet = ({
                                                             </button>
                                                           </td>
                                                         </tr>
-                                                        ))
+                                                        ))}
+                                                                </tbody>
+                                                              </table>
+                                                            </td>
+                                                          </tr>
+                                                        </React.Fragment>
                                                       ))}
                                                       
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
                                                       <tr>
                                                         <td colSpan="15" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                                           <div className="flex justify-start items-center space-x-4">
-                                                            {/* Add Item Button - FIXED */}
+                                                            {/* Add Item Button - ROBUST WITH SUBCATEGORY */}
                                                             <button
                                                               onClick={() => {
+                                                                // Find the subcategory from the current context (this button is inside a category loop)
                                                                 if (category.subcategories?.length > 0) {
-                                                                  setSelectedSubCategoryId(category.subcategories[0].id);
+                                                                  const subcategory = category.subcategories[0];
+                                                                  console.log('🎯 Setting subcategory for Add Item:', subcategory.name, subcategory.id);
+                                                                  setSelectedSubCategoryId(subcategory.id);
                                                                   setShowAddItem(true);
-                                                                  console.log('🎯 Selected subcategory for FFE item:', category.subcategories[0].id);
                                                                 } else {
                                                                   alert('This category has no subcategories. Please contact support.');
                                                                 }
