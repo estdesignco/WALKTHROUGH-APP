@@ -340,6 +340,19 @@ class EnhancedRoomsTester:
             print("❌ This explains why kitchen subcategories are missing.")
         
         return passed_tests == total_tests
+
+
+# Main execution
+if __name__ == "__main__":
+    tester = EnhancedRoomsTester()
+    success = tester.run_all_tests()
+    
+    if success:
+        print("\n🎉 SUCCESS: Enhanced rooms integration is working correctly!")
+        exit(0)
+    else:
+        print("\n❌ FAILURE: Enhanced rooms integration has issues that need to be resolved.")
+        exit(1)
             return False
         else:
             self.log_test("Project Structure - Required Fields", True, "All required fields present")
