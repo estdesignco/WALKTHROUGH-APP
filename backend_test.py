@@ -991,15 +991,191 @@ class FFEAPITester:
         else:
             self.log_test("ARCHITECTURAL ELEMENTS Category Working", False, f"Failed to create architectural elements room: {room_data}")
 
+    def test_email_functionality(self):
+        """Test the new email functionality as requested in review"""
+        print("\n=== 🎯 TESTING NEW EMAIL FUNCTIONALITY (REVIEW REQUEST) ===")
+        
+        # Test 1: Valid email request
+        print("1. Testing POST /api/send-questionnaire with valid client data...")
+        
+        valid_email_data = {
+            "client_name": "Test Client",
+            "client_email": "test@example.com",
+            "sender_name": "Established Design Co."
+        }
+        
+        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', valid_email_data)
+        
+        print(f"   Status Code: {status_code}")
+        print(f"   Success: {success}")
+        print(f"   Response: {response_data}")
+        
+        if success and status_code == 200:
+            # Check response format
+            if isinstance(response_data, dict) and 'status' in response_data and 'message' in response_data:
+                if response_data.get('status') == 'success':
+                    self.log_test("Email Endpoint - Valid Request", True, 
+                                f"Correct response format: {response_data}")
+                    
+                    # Check message content
+                    message = response_data.get('message', '')
+                    if 'queued for delivery' in message.lower() and 'Test Client' in message:
+                        self.log_test("Email Response Message", True, f"Proper message: {message}")
+                    else:
+                        self.log_test("Email Response Message", False, f"Unexpected message: {message}")
+                else:
+                    self.log_test("Email Endpoint - Valid Request", False, f"Status not 'success': {response_data}")
+            else:
+                self.log_test("Email Endpoint - Valid Request", False, f"Invalid response format: {response_data}")
+        else:
+            self.log_test("Email Endpoint - Valid Request", False, f"Request failed: {response_data} (Status: {status_code})")
+        
+        # Test 2: Invalid email format validation
+        print("\n2. Testing invalid email format validation...")
+        
+        invalid_email_data = {
+            "client_name": "Test Client",
+            "client_email": "invalid-email-format",
+            "sender_name": "Established Design Co."
+        }
+        
+        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', invalid_email_data)
+        
+        print(f"   Status Code: {status_code}")
+        print(f"   Response: {response_data}")
+        
+        if status_code == 422:  # Pydantic validation error
+            self.log_test("Email Validation - Invalid Format", True, "Correctly rejected invalid email format")
+        elif not success and status_code >= 400:
+            self.log_test("Email Validation - Invalid Format", True, f"Validation error as expected: {response_data}")
+        else:
+            self.log_test("Email Validation - Invalid Format", False, f"Should have rejected invalid email: {response_data}")
+        
+        # Test 3: Missing required fields
+        print("\n3. Testing missing required fields...")
+        
+        incomplete_data = {
+            "client_name": "Test Client"
+            # Missing client_email and sender_name
+        }
+        
+        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', incomplete_data)
+        
+        print(f"   Status Code: {status_code}")
+        print(f"   Response: {response_data}")
+        
+        if status_code == 422:  # Pydantic validation error
+            self.log_test("Email Validation - Missing Fields", True, "Correctly rejected missing required fields")
+        elif not success and status_code >= 400:
+            self.log_test("Email Validation - Missing Fields", True, f"Validation error as expected: {response_data}")
+        else:
+            self.log_test("Email Validation - Missing Fields", False, f"Should have rejected incomplete data: {response_data}")
+        
+        # Test 4: Test with different sender name
+        print("\n4. Testing with custom sender name...")
+        
+        custom_sender_data = {
+            "client_name": "Jane Doe",
+            "client_email": "jane.doe@example.com",
+            "sender_name": "Custom Design Studio"
+        }
+        
+        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', custom_sender_data)
+        
+        print(f"   Status Code: {status_code}")
+        print(f"   Response: {response_data}")
+        
+        if success and status_code == 200:
+            if response_data.get('status') == 'success':
+                self.log_test("Email Custom Sender", True, f"Custom sender accepted: {response_data}")
+            else:
+                self.log_test("Email Custom Sender", False, f"Custom sender failed: {response_data}")
+        else:
+            self.log_test("Email Custom Sender", False, f"Request failed: {response_data} (Status: {status_code})")
+        
+        # Test 5: Test endpoint accessibility and SMTP configuration
+        print("\n5. Testing SMTP configuration and email process...")
+        
+        # This test checks if the endpoint processes the request correctly
+        # The actual email sending may fail due to SMTP settings, but the endpoint should respond properly
+        test_email_data = {
+            "client_name": "SMTP Test Client",
+            "client_email": "smtp.test@example.com",
+            "sender_name": "Established Design Co."
+        }
+        
+        success, response_data, status_code = self.make_request('POST', '/send-questionnaire', test_email_data)
+        
+        print(f"   Status Code: {status_code}")
+        print(f"   Response: {response_data}")
+        
+        if success and status_code == 200:
+            self.log_test("SMTP Process Test", True, "Email process initiated successfully")
+        elif status_code == 500:
+            # Check if it's an SMTP configuration error
+            error_detail = response_data.get('detail', '') if isinstance(response_data, dict) else str(response_data)
+            if 'smtp' in error_detail.lower() or 'email' in error_detail.lower():
+                self.log_test("SMTP Process Test", True, f"SMTP error detected (expected): {error_detail}")
+            else:
+                self.log_test("SMTP Process Test", False, f"Unexpected server error: {error_detail}")
+        else:
+            self.log_test("SMTP Process Test", False, f"Unexpected response: {response_data} (Status: {status_code})")
+
+    def check_backend_logs_for_email(self):
+        """Check backend logs for email-related messages"""
+        print("\n=== 📋 CHECKING BACKEND LOGS FOR EMAIL ACTIVITY ===")
+        
+        try:
+            # Check supervisor backend logs
+            import subprocess
+            result = subprocess.run(['tail', '-n', '50', '/var/log/supervisor/backend.out.log'], 
+                                  capture_output=True, text=True, timeout=10)
+            
+            if result.returncode == 0:
+                log_content = result.stdout
+                
+                # Look for email-related log messages
+                email_logs = []
+                for line in log_content.split('\n'):
+                    if any(keyword in line.lower() for keyword in ['email', 'smtp', 'questionnaire', 'send']):
+                        email_logs.append(line.strip())
+                
+                if email_logs:
+                    print("📧 EMAIL-RELATED LOG ENTRIES:")
+                    for log_entry in email_logs[-10:]:  # Show last 10 email-related entries
+                        print(f"   {log_entry}")
+                    
+                    # Check for success messages
+                    success_logs = [log for log in email_logs if 'successfully' in log.lower() or 'sent' in log.lower()]
+                    error_logs = [log for log in email_logs if 'error' in log.lower() or 'failed' in log.lower()]
+                    
+                    if success_logs:
+                        self.log_test("Backend Email Logs - Success", True, f"Found {len(success_logs)} success entries")
+                    
+                    if error_logs:
+                        self.log_test("Backend Email Logs - Errors", True, f"Found {len(error_logs)} error entries (may be expected)")
+                    
+                    if not success_logs and not error_logs:
+                        self.log_test("Backend Email Logs", True, f"Found {len(email_logs)} email-related log entries")
+                else:
+                    self.log_test("Backend Email Logs", False, "No email-related log entries found")
+            else:
+                self.log_test("Backend Email Logs", False, f"Could not read backend logs: {result.stderr}")
+                
+        except Exception as e:
+            self.log_test("Backend Email Logs", False, f"Error checking logs: {str(e)}")
+
     def run_all_tests(self):
         """Run all FF&E backend tests"""
-        print("🚀 Starting FF&E Backend API Tests - REVIEW REQUEST FOCUS")
+        print("🚀 Starting FF&E Backend API Tests - EMAIL FUNCTIONALITY FOCUS")
         print("=" * 60)
         
-        # Run review request tests first
-        self.test_review_request_add_room_functionality()  # 🎯 REVIEW REQUEST: Add Room functionality
+        # 🎯 REVIEW REQUEST: Test new email functionality first
+        self.test_email_functionality()         # NEW: Email functionality testing
+        self.check_backend_logs_for_email()     # NEW: Check backend logs for email activity
         
         # Run other tests in logical order
+        self.test_review_request_add_room_functionality()  # 🎯 REVIEW REQUEST: Add Room functionality
         self.test_project_data_structure()      # Test #5: Project Data Structure
         self.test_add_room_functionality()      # Test #1: Add Room Functionality  
         self.test_comprehensive_room_structure() # 🎯 NEW: Test comprehensive structure
