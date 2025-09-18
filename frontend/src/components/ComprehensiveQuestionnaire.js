@@ -342,65 +342,102 @@ const ComprehensiveQuestionnaire = () => {
                 value={formData.best_time_to_call || ''} 
                 onChange={(e) => handleFormChange('best_time_to_call', e.target.value)} 
               />
-            </Section>
-
-            {/* Project Type & Budget */}
-            <Section title="Project Details">
-              <FieldWrapper label="What type of project is this?">
+              <FieldWrapper label="Have you worked with a designer before? If not, what are your hesitations?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.worked_with_designer_before || ''} 
+                  onChange={(e) => handleFormChange('worked_with_designer_before', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <InputField 
+                label="Who will be the primary decision maker(s) for this project?" 
+                id="primary_decision_maker" 
+                value={formData.primary_decision_maker || ''} 
+                onChange={(e) => handleFormChange('primary_decision_maker', e.target.value)} 
+              />
+              <FieldWrapper label="How involved would you like to be in the design process?">
                 <div className="space-y-2">
-                  {["New Build", "Renovation", "Furniture/Styling Refresh", "Other"].map(option => (
+                  {["Very involved - I want to approve every detail", "Somewhat involved - I want to approve major decisions", "Minimally involved - I trust your expertise"].map(option => (
                     <div key={option} className="flex items-center space-x-2">
                       <input
                         type="radio"
-                        name="project_type"
+                        name="involvement_level"
                         value={option}
-                        id={`type-${option}`}
-                        checked={formData.project_type === option}
-                        onChange={(e) => handleFormChange('project_type', e.target.value)}
+                        id={`involvement-${option}`}
+                        checked={formData.involvement_level === option}
+                        onChange={(e) => handleFormChange('involvement_level', e.target.value)}
                         className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
                       />
-                      <label htmlFor={`type-${option}`} className="text-sm text-stone-200">{option}</label>
+                      <label htmlFor={`involvement-${option}`} className="text-sm text-stone-200">{option}</label>
                     </div>
                   ))}
                 </div>
               </FieldWrapper>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                <InputField 
-                  label="Your Timeline" 
-                  id="timeline" 
-                  value={formData.timeline} 
-                  onChange={(e) => handleFormChange('timeline', e.target.value)} 
-                />
-                <div>
-                  <label htmlFor="budget_range" className="font-semibold text-stone-300">Budget Range</label>
-                  <select 
-                    value={formData.budget_range} 
-                    onChange={(e) => handleFormChange('budget_range', e.target.value)}
-                    className={inputStyles}
-                  >
-                    <option value="">Select...</option>
-                    <option value="35k-65k">$35k - $65k</option>
-                    <option value="75k-100k">$75k - $100k</option>
-                    <option value="125k-500k">$125k - $500k</option>
-                    <option value="600k-1M">$600k - $1M</option>
-                    <option value="2M-5M">$2M - $5M</option>
-                    <option value="7M-10M">$7M - $10M</option>
-                    <option value="other">Other</option>
-                  </select>
+              <FieldWrapper label="What is your ideal sofa price point?">
+                <select 
+                  value={formData.ideal_sofa_price || ''} 
+                  onChange={(e) => handleFormChange('ideal_sofa_price', e.target.value)}
+                  className={inputStyles}
+                >
+                  <option value="">Select...</option>
+                  <option value="$2,000-$4,000">$2,000-$4,000</option>
+                  <option value="$4,000-$8,000">$4,000-$8,000</option>
+                  <option value="$8,000-$12,000">$8,000-$12,000</option>
+                  <option value="$12,000+">$12,000+</option>
+                </select>
+              </FieldWrapper>
+            </Section>
+
+            {/* Total Scope of Work */}
+            <Section title="Total Scope of Work for Your Project">
+              <FieldWrapper label="What type of property is this?">
+                <div className="space-y-2">
+                  {["Primary Residence", "Vacation Home", "Rental Property", "Commercial Space", "Other"].map(option => (
+                    <div key={option} className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="property_type"
+                        value={option}
+                        id={`property-${option}`}
+                        checked={formData.property_type === option}
+                        onChange={(e) => handleFormChange('property_type', e.target.value)}
+                        className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
+                      />
+                      <label htmlFor={`property-${option}`} className="text-sm text-stone-200">{option}</label>
+                    </div>
+                  ))}
                 </div>
-              </div>
-              <FieldWrapper label="Project Priorities">
+              </FieldWrapper>
+              <InputField 
+                label="What is your desired timeline for project completion?" 
+                id="timeline" 
+                value={formData.timeline || ''} 
+                onChange={(e) => handleFormChange('timeline', e.target.value)} 
+              />
+              <FieldWrapper label="Investment / Budget Range">
+                <select 
+                  value={formData.budget_range || ''} 
+                  onChange={(e) => handleFormChange('budget_range', e.target.value)}
+                  className={inputStyles}
+                >
+                  <option value="">Select...</option>
+                  <option value="$15k-$30k">$15k-$30k</option>
+                  <option value="$30k-$50k">$30k-$50k</option>
+                  <option value="$50k-$75k">$50k-$75k</option>
+                  <option value="$75k-$100k">$75k-$100k</option>
+                  <option value="$100k-$150k">$100k-$150k</option>
+                  <option value="$150k+">$150k+</option>
+                </select>
+              </FieldWrapper>
+              <FieldWrapper label="What is your priority for this project? (Check all that apply)">
                 <CheckboxGroup 
                   options={projectPriorityOptions} 
                   value={formData.project_priority} 
                   onChange={(v) => handleFormChange('project_priority', v)} 
                 />
               </FieldWrapper>
-            </Section>
-
-            {/* Rooms */}
-            <Section title="Rooms Involved">
-              <FieldWrapper label="Select rooms involved in this project">
+              <FieldWrapper label="Which rooms are involved in this project?">
                 <CheckboxGroup 
                   options={roomsOptionsUpdated} 
                   value={formData.rooms_involved} 
@@ -442,29 +479,252 @@ const ComprehensiveQuestionnaire = () => {
               </FieldWrapper>
             </Section>
 
-            {/* Design Preferences */}
-            <Section title="Design Preferences">
-              <FieldWrapper label="Style Preferences">
-                <CheckboxGroup 
-                  options={stylePrefOptions} 
-                  value={formData.design_styles_preference} 
-                  onChange={(v) => handleFormChange('design_styles_preference', v)} 
+            {/* Project Type */}
+            <Section title="Type of Project">
+              <FieldWrapper label="What type of project is this?">
+                <div className="space-y-2">
+                  {["New Build", "Renovation", "Furniture/Styling Refresh", "Other"].map(option => (
+                    <div key={option} className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="project_type"
+                        value={option}
+                        id={`type-${option}`}
+                        checked={formData.project_type === option}
+                        onChange={(e) => handleFormChange('project_type', e.target.value)}
+                        className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
+                      />
+                      <label htmlFor={`type-${option}`} className="text-sm text-stone-200">{option}</label>
+                    </div>
+                  ))}
+                </div>
+              </FieldWrapper>
+
+              {/* CONDITIONAL SECTIONS BASED ON PROJECT TYPE */}
+              {formData.project_type === "New Build" && (
+                <div className="space-y-4 mt-6 p-4 bg-gray-800 rounded-lg">
+                  <h4 className="text-md font-semibold text-[#8B7355]">New Build Details</h4>
+                  <InputField 
+                    label="New Build Address" 
+                    id="new_build_address" 
+                    value={formData.new_build_address || ''} 
+                    onChange={(e) => handleFormChange('new_build_address', e.target.value)} 
+                  />
+                  <InputField 
+                    label="Architect" 
+                    id="new_build_architect" 
+                    value={formData.new_build_architect || ''} 
+                    onChange={(e) => handleFormChange('new_build_architect', e.target.value)} 
+                  />
+                  <InputField 
+                    label="Builder" 
+                    id="new_build_builder" 
+                    value={formData.new_build_builder || ''} 
+                    onChange={(e) => handleFormChange('new_build_builder', e.target.value)} 
+                  />
+                  <FieldWrapper label="Do you have plans?">
+                    <div className="space-y-2">
+                      {["Yes", "No", "In Progress"].map(option => (
+                        <div key={option} className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="new_build_has_plans"
+                            value={option}
+                            id={`plans-${option}`}
+                            checked={formData.new_build_has_plans === option}
+                            onChange={(e) => handleFormChange('new_build_has_plans', e.target.value)}
+                            className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
+                          />
+                          <label htmlFor={`plans-${option}`} className="text-sm text-stone-200">{option}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </FieldWrapper>
+                  <FieldWrapper label="What stage of the process are you in?">
+                    <textarea 
+                      className={inputStyles} 
+                      value={formData.new_build_process_stage || ''} 
+                      onChange={(e) => handleFormChange('new_build_process_stage', e.target.value)} 
+                      rows="3"
+                    />
+                  </FieldWrapper>
+                  <FieldWrapper label="Do you need help selecting furniture and decor?">
+                    <div className="space-y-2">
+                      {["Yes", "No", "Maybe"].map(option => (
+                        <div key={option} className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="new_build_need_furniture"
+                            value={option}
+                            id={`furniture-${option}`}
+                            checked={formData.new_build_need_furniture === option}
+                            onChange={(e) => handleFormChange('new_build_need_furniture', e.target.value)}
+                            className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
+                          />
+                          <label htmlFor={`furniture-${option}`} className="text-sm text-stone-200">{option}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </FieldWrapper>
+                  <FieldWrapper label="Please share any additional notes about your new build project">
+                    <textarea 
+                      className={inputStyles} 
+                      value={formData.new_build_scope_notes || ''} 
+                      onChange={(e) => handleFormChange('new_build_scope_notes', e.target.value)} 
+                      rows="4"
+                    />
+                  </FieldWrapper>
+                </div>
+              )}
+
+              {formData.project_type === "Renovation" && (
+                <div className="space-y-4 mt-6 p-4 bg-gray-800 rounded-lg">
+                  <h4 className="text-md font-semibold text-[#8B7355]">Renovation Details</h4>
+                  <InputField 
+                    label="Renovation Address" 
+                    id="renovation_address" 
+                    value={formData.renovation_address || ''} 
+                    onChange={(e) => handleFormChange('renovation_address', e.target.value)} 
+                  />
+                  <InputField 
+                    label="Move-in Date (if applicable)" 
+                    id="renovation_move_in_date" 
+                    value={formData.renovation_move_in_date || ''} 
+                    onChange={(e) => handleFormChange('renovation_move_in_date', e.target.value)} 
+                  />
+                  <InputField 
+                    label="Builder/Contractor" 
+                    id="renovation_builder" 
+                    value={formData.renovation_builder || ''} 
+                    onChange={(e) => handleFormChange('renovation_builder', e.target.value)} 
+                  />
+                  <InputField 
+                    label="Architect" 
+                    id="renovation_architect" 
+                    value={formData.renovation_architect || ''} 
+                    onChange={(e) => handleFormChange('renovation_architect', e.target.value)} 
+                  />
+                  <FieldWrapper label="What is the existing condition of the home?">
+                    <textarea 
+                      className={inputStyles} 
+                      value={formData.renovation_existing_condition || ''} 
+                      onChange={(e) => handleFormChange('renovation_existing_condition', e.target.value)} 
+                      rows="3"
+                    />
+                  </FieldWrapper>
+                  <FieldWrapper label="Do you have current plans for the renovation?">
+                    <div className="space-y-2">
+                      {["Yes", "No", "In Progress"].map(option => (
+                        <div key={option} className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="renovation_has_current_plans"
+                            value={option}
+                            id={`renovation-plans-${option}`}
+                            checked={formData.renovation_has_current_plans === option}
+                            onChange={(e) => handleFormChange('renovation_has_current_plans', e.target.value)}
+                            className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
+                          />
+                          <label htmlFor={`renovation-plans-${option}`} className="text-sm text-stone-200">{option}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </FieldWrapper>
+                  <FieldWrapper label="Do you need help selecting furniture and decor?">
+                    <div className="space-y-2">
+                      {["Yes", "No", "Maybe"].map(option => (
+                        <div key={option} className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="renovation_need_furniture"
+                            value={option}
+                            id={`renovation-furniture-${option}`}
+                            checked={formData.renovation_need_furniture === option}
+                            onChange={(e) => handleFormChange('renovation_need_furniture', e.target.value)}
+                            className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
+                          />
+                          <label htmlFor={`renovation-furniture-${option}`} className="text-sm text-stone-200">{option}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </FieldWrapper>
+                  <FieldWrapper label="Are there any memories or sentimental value attached to your current home that we should preserve?">
+                    <textarea 
+                      className={inputStyles} 
+                      value={formData.renovation_memories || ''} 
+                      onChange={(e) => handleFormChange('renovation_memories', e.target.value)} 
+                      rows="4"
+                    />
+                  </FieldWrapper>
+                  <FieldWrapper label="Please share any additional notes about your renovation project">
+                    <textarea 
+                      className={inputStyles} 
+                      value={formData.renovation_scope_notes || ''} 
+                      onChange={(e) => handleFormChange('renovation_scope_notes', e.target.value)} 
+                      rows="4"
+                    />
+                  </FieldWrapper>
+                </div>
+              )}
+
+              {formData.project_type === "Furniture/Styling Refresh" && (
+                <div className="space-y-4 mt-6 p-4 bg-gray-800 rounded-lg">
+                  <h4 className="text-md font-semibold text-[#8B7355]">Furniture/Styling Refresh Details</h4>
+                  <FieldWrapper label="What is the current condition of your home?">
+                    <textarea 
+                      className={inputStyles} 
+                      value={formData.furniture_refresh_condition || ''} 
+                      onChange={(e) => handleFormChange('furniture_refresh_condition', e.target.value)} 
+                      rows="3"
+                    />
+                  </FieldWrapper>
+                  <FieldWrapper label="Do you have current plans for the refresh?">
+                    <div className="space-y-2">
+                      {["Yes", "No", "Some ideas"].map(option => (
+                        <div key={option} className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="furniture_has_current_plans"
+                            value={option}
+                            id={`furniture-plans-${option}`}
+                            checked={formData.furniture_has_current_plans === option}
+                            onChange={(e) => handleFormChange('furniture_has_current_plans', e.target.value)}
+                            className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
+                          />
+                          <label htmlFor={`furniture-plans-${option}`} className="text-sm text-stone-200">{option}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </FieldWrapper>
+                  <InputField 
+                    label="When would you like to complete this refresh?" 
+                    id="furniture_move_in_date" 
+                    value={formData.furniture_move_in_date || ''} 
+                    onChange={(e) => handleFormChange('furniture_move_in_date', e.target.value)} 
+                  />
+                  <FieldWrapper label="Please share any additional notes about your furniture/styling refresh">
+                    <textarea 
+                      className={inputStyles} 
+                      value={formData.furniture_scope_notes || ''} 
+                      onChange={(e) => handleFormChange('furniture_scope_notes', e.target.value)} 
+                      rows="4"
+                    />
+                  </FieldWrapper>
+                </div>
+              )}
+
+              <FieldWrapper label="Tell us more about your project and what you would love to accomplish">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.other_project_description || ''} 
+                  onChange={(e) => handleFormChange('other_project_description', e.target.value)} 
+                  rows="4"
                 />
               </FieldWrapper>
-              <FieldWrapper label="Color Palette Preference">
-                <CheckboxGroup 
-                  options={colorPrefOptions} 
-                  value={formData.design_preferred_palette} 
-                  onChange={(v) => handleFormChange('design_preferred_palette', v)} 
-                />
-              </FieldWrapper>
-              <FieldWrapper label="Artwork Preferences">
-                <CheckboxGroup 
-                  options={artworkPrefOptions} 
-                  value={formData.design_artwork_preference} 
-                  onChange={(v) => handleFormChange('design_artwork_preference', v)} 
-                />
-              </FieldWrapper>
+            </Section>
+
+            {/* Design Questions */}
+            <Section title="Design Questions">
               <FieldWrapper label="What do you love about your current home?">
                 <textarea 
                   className={inputStyles} 
@@ -473,7 +733,23 @@ const ComprehensiveQuestionnaire = () => {
                   rows="3"
                 />
               </FieldWrapper>
-              <FieldWrapper label="First impression you want guests to have">
+              <FieldWrapper label="How will the spaces be used? (e.g., formal dining, casual living, etc.)">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_space_use || ''} 
+                  onChange={(e) => handleFormChange('design_space_use', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="How are you currently using these spaces?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_current_use || ''} 
+                  onChange={(e) => handleFormChange('design_current_use', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What is the first impression you want guests to have when they enter your home?">
                 <textarea 
                   className={inputStyles} 
                   value={formData.design_first_impression || ''} 
@@ -481,11 +757,111 @@ const ComprehensiveQuestionnaire = () => {
                   rows="3"
                 />
               </FieldWrapper>
+              <FieldWrapper label="What is your current home's color palette?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_common_color_palette || ''} 
+                  onChange={(e) => handleFormChange('design_common_color_palette', e.target.value)} 
+                  rows="2"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What color palette do you prefer?">
+                <CheckboxGroup 
+                  options={colorPrefOptions} 
+                  value={formData.design_preferred_palette} 
+                  onChange={(v) => handleFormChange('design_preferred_palette', v)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Are there any colors you strongly dislike?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_disliked_colors || ''} 
+                  onChange={(e) => handleFormChange('design_disliked_colors', e.target.value)} 
+                  rows="2"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Which interior design styles do you prefer? (Select all that apply)">
+                <CheckboxGroup 
+                  options={stylePrefOptions} 
+                  value={formData.design_styles_preference} 
+                  onChange={(v) => handleFormChange('design_styles_preference', v)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Tell us more about the styles you love">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_styles_love || ''} 
+                  onChange={(e) => handleFormChange('design_styles_love', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What are your preferences for artwork?">
+                <CheckboxGroup 
+                  options={artworkPrefOptions} 
+                  value={formData.design_artwork_preference} 
+                  onChange={(v) => handleFormChange('design_artwork_preference', v)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Is there a piece of art, furniture, or a souvenir that holds significant personal meaning to you?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_meaningful_item || ''} 
+                  onChange={(e) => handleFormChange('design_meaningful_item', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Do you have existing furniture that you would like to keep?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_existing_furniture || ''} 
+                  onChange={(e) => handleFormChange('design_existing_furniture', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Finishes and Patterns (Select all that apply)">
+                <CheckboxGroup 
+                  options={finishesOptions} 
+                  value={formData.finishes_patterns_preference} 
+                  onChange={(v) => handleFormChange('finishes_patterns_preference', v)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Do you have any specific materials you prefer or want to avoid?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_materials_to_avoid || ''} 
+                  onChange={(e) => handleFormChange('design_materials_to_avoid', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Are there any special requirements or accessibility needs we should consider?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_special_requirements || ''} 
+                  onChange={(e) => handleFormChange('design_special_requirements', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Pinterest/Houzz Links or Inspiration Sources">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_pinterest_houzz || ''} 
+                  onChange={(e) => handleFormChange('design_pinterest_houzz', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Any additional design comments or thoughts?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_additional_comments || ''} 
+                  onChange={(e) => handleFormChange('design_additional_comments', e.target.value)} 
+                  rows="4"
+                />
+              </FieldWrapper>
             </Section>
 
-            {/* Personal Information */}
-            <Section title="Getting to Know You">
-              <FieldWrapper label="Household members (include ages of children)">
+            {/* Getting to Know You Better */}
+            <Section title="Getting to Know You Better">
+              <FieldWrapper label="Who lives in your household? (Include ages of children if applicable)">
                 <textarea 
                   className={inputStyles} 
                   value={formData.know_you_household || ''} 
@@ -493,23 +869,39 @@ const ComprehensiveQuestionnaire = () => {
                   rows="3"
                 />
               </FieldWrapper>
-              <FieldWrapper label="Pets">
+              <FieldWrapper label="Do you have pets? If yes, please specify">
                 <textarea 
                   className={inputStyles} 
                   value={formData.know_you_pets || ''} 
                   onChange={(e) => handleFormChange('know_you_pets', e.target.value)} 
-                  rows="3"
+                  rows="2"
                 />
               </FieldWrapper>
-              <FieldWrapper label="Hobbies">
+              <FieldWrapper label="Describe a typical weekday at your home">
                 <textarea 
                   className={inputStyles} 
-                  value={formData.know_you_hobbies || ''} 
-                  onChange={(e) => handleFormChange('know_you_hobbies', e.target.value)} 
+                  value={formData.know_you_weekday_routine || ''} 
+                  onChange={(e) => handleFormChange('know_you_weekday_routine', e.target.value)} 
                   rows="3"
                 />
               </FieldWrapper>
-              <FieldWrapper label="How do you entertain guests?">
+              <FieldWrapper label="Describe a typical weekend at your home">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_weekend_routine || ''} 
+                  onChange={(e) => handleFormChange('know_you_weekend_routine', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What are your lighting preferences?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_lighting_preference || ''} 
+                  onChange={(e) => handleFormChange('know_you_lighting_preference', e.target.value)} 
+                  rows="2"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="How do you typically entertain guests?">
                 <textarea 
                   className={inputStyles} 
                   value={formData.know_you_entertaining_style || ''} 
@@ -517,10 +909,126 @@ const ComprehensiveQuestionnaire = () => {
                   rows="3"
                 />
               </FieldWrapper>
+              <FieldWrapper label="Where do you go to relax in your home?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_relax_space || ''} 
+                  onChange={(e) => handleFormChange('know_you_relax_space', e.target.value)} 
+                  rows="2"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Do you have any future plans for your family (children, aging parents, etc.)?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_future_plans || ''} 
+                  onChange={(e) => handleFormChange('know_you_future_plans', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Are you active on social media? If so, which platforms?">
+                <input 
+                  className={inputStyles} 
+                  value={formData.know_you_social_media || ''} 
+                  onChange={(e) => handleFormChange('know_you_social_media', e.target.value)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Tell us about your hobbies">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_hobbies || ''} 
+                  onChange={(e) => handleFormChange('know_you_hobbies', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What do you do for fun?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_fun || ''} 
+                  onChange={(e) => handleFormChange('know_you_fun', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What makes you HAPPY?!">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_happy || ''} 
+                  onChange={(e) => handleFormChange('know_you_happy', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="When are your family birthdays?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_family_birthdays || ''} 
+                  onChange={(e) => handleFormChange('know_you_family_birthdays', e.target.value)} 
+                  rows="2"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="When is your anniversary?">
+                <input 
+                  className={inputStyles} 
+                  value={formData.know_you_anniversary || ''} 
+                  onChange={(e) => handleFormChange('know_you_anniversary', e.target.value)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What does your family like to do together?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_family_together || ''} 
+                  onChange={(e) => handleFormChange('know_you_family_together', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What is your FAVORITE restaurant?">
+                <input 
+                  className={inputStyles} 
+                  value={formData.know_you_favorite_restaurant || ''} 
+                  onChange={(e) => handleFormChange('know_you_favorite_restaurant', e.target.value)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What is your favorite place to vacation?">
+                <input 
+                  className={inputStyles} 
+                  value={formData.know_you_favorite_vacation || ''} 
+                  onChange={(e) => handleFormChange('know_you_favorite_vacation', e.target.value)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What are your favorite foods?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_favorite_foods || ''} 
+                  onChange={(e) => handleFormChange('know_you_favorite_foods', e.target.value)} 
+                  rows="2"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="When you come home after a long day, what space do you naturally gravitate toward, and what feeling do you want that space to evoke?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_evoke_space || ''} 
+                  onChange={(e) => handleFormChange('know_you_evoke_space', e.target.value)} 
+                  rows="4"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="How do you like your home to support your social life?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_support_social_life || ''} 
+                  onChange={(e) => handleFormChange('know_you_support_social_life', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Is there ANYTHING ELSE that you would like to share with us?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_share_more || ''} 
+                  onChange={(e) => handleFormChange('know_you_share_more', e.target.value)} 
+                  rows="4"
+                />
+              </FieldWrapper>
             </Section>
 
-            {/* Additional Questions */}
-            <Section title="Additional Information">
+            {/* How Did You Hear About Us */}
+            <Section title="How Did You Hear About Us">
               <FieldWrapper label="How did you hear about us?">
                 <div className="space-y-2">
                   {["Internet Search", "Social Media", "Friend Referral", "Magazine", "Google", "Market Event", "Other"].map(option => (
@@ -539,22 +1047,15 @@ const ComprehensiveQuestionnaire = () => {
                   ))}
                 </div>
               </FieldWrapper>
-              <FieldWrapper label="Pinterest/Houzz Links">
-                <textarea 
-                  className={inputStyles} 
-                  value={formData.design_pinterest_houzz || ''} 
-                  onChange={(e) => handleFormChange('design_pinterest_houzz', e.target.value)} 
-                  rows="3"
-                />
-              </FieldWrapper>
-              <FieldWrapper label="Additional Comments">
-                <textarea 
-                  className={inputStyles} 
-                  value={formData.design_additional_comments || ''} 
-                  onChange={(e) => handleFormChange('design_additional_comments', e.target.value)} 
-                  rows="4"
-                />
-              </FieldWrapper>
+              {formData.how_heard === "Other" && (
+                <FieldWrapper label="Please specify">
+                  <input 
+                    className={inputStyles} 
+                    value={formData.how_heard_other || ''} 
+                    onChange={(e) => handleFormChange('how_heard_other', e.target.value)} 
+                  />
+                </FieldWrapper>
+              )}
             </Section>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-stone-700">
