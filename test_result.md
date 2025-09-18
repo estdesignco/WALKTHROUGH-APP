@@ -325,14 +325,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Categories Available Endpoint: CONFIRMED WORKING - returns all 14 categories from enhanced_rooms.py"
-    - "Add Item Functionality: CONFIRMED WORKING - no issues found"
-    - "Add Category Functionality: CONFIRMED WORKING - no issues found"  
-    - "Four Hands Scraping: CONFIRMED WORKING - Playwright installed successfully"
+    - "Studio Landing Page Visual Styling Updates: CONFIRMED WORKING - logo, gold color scheme, professional styling all operational"
+    - "Walkthrough Spreadsheet Color Updates: CONFIRMED WORKING - stone/gold theme, red headers, button styling all operational"
+    - "Email Modal Functionality: CONFIRMED WORKING - modal opens, form validation, pre-fill data all working"
+    - "Comprehensive Questionnaire Form Implementation: ROUTING ISSUE - component implemented but URLs redirect to landing page"
   stuck_tasks:
-    - "Canva PDF Scraping - Database query inconsistency bug in server.py"
+    - "Questionnaire Routing Issue - /questionnaire/new and /questionnaire/demo redirect to landing page"
   test_all: false
-  test_priority: "categories_endpoint_verified"
+  test_priority: "visual_styling_updates_verified"
 
   - task: "Add Room and Add Category Backend Data Structure Fix"
     implemented: true
