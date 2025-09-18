@@ -126,23 +126,32 @@ const ExactFFESpreadsheet = ({
     }));
   };
 
-  // EXACT ROOM COLORS FROM YOUR ORIGINAL CODE
-  const ROOM_COLORS = {
-    'Living Room': '#8B5CF6', 'Kitchen': '#06B6D4', 'Dining Room': '#DC2626',
-    'Primary Bedroom': '#2F5233', 'Guest Bedroom': '#7C3AED', 'Home Office': '#EA580C',
-    'Primary Bathroom': '#0284C7', 'Guest Bathroom': '#7C2D12', 'Laundry Room': '#65A30D',
-    'Entryway': '#BE185D', 'Sunroom': '#0891B2', 'Nursery': '#C2410C',
-    'Master Bedroom': '#059669',
-  };
-
+  // EXACT COLORS FROM YOUR SCREENSHOTS - BRIGHT AND VIBRANT
   const getRoomColor = (roomName, index = 0) => {
-    return ROOM_COLORS[roomName] || '#6B7280';
+    const vibrantRoomColors = [
+      '#008B8B',  // Dark Turquoise/Teal - like "PRIMARY BATHROOM" 
+      '#4682B4',  // Steel Blue
+      '#228B22',  // Forest Green  
+      '#B8860B',  // Dark Goldenrod
+      '#8B4513',  // Saddle Brown
+      '#483D8B',  // Dark Slate Blue
+      '#CD853F',  // Peru
+      '#2F4F4F',  // Dark Slate Gray
+      '#8B008B',  // Dark Magenta
+    ];
+    
+    // Use room name hash for consistent color per room
+    let hash = 0;
+    for (let i = 0; i < roomName.length; i++) {
+      hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return vibrantRoomColors[Math.abs(hash) % vibrantRoomColors.length];
   };
 
-  const getCategoryColor = () => '#4A6741';  // EXACT color from your original code
-  const getMainHeaderColor = () => '#8B5A3D';  // EXACT color for main headers from your code
-  const getAdditionalInfoColor = () => '#8B5A3D';  // EXACT color for ADDITIONAL INFO
-  const getShippingInfoColor = () => '#5B4A75';  // EXACT color for SHIPPING INFO
+  const getCategoryColor = () => '#556B2F';  // Olive Green - like your screenshots
+  const getMainHeaderColor = () => '#8B4513';  // Saddle Brown for main headers
+  const getAdditionalInfoColor = () => '#CD853F';  // Peru for ADDITIONAL INFO
+  const getShippingInfoColor = () => '#4682B4';  // Steel Blue for SHIPPING INFO
 
   // Status colors for FF&E
   const getStatusColor = (status) => {
@@ -465,13 +474,13 @@ const ExactFFESpreadsheet = ({
                           <table className="w-full border-collapse border border-gray-400 mb-4">
                             <thead>
                               <tr>
-                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#C05A5C' }}>{subcategory.name.toUpperCase()}</th>
-                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#C05A5C' }}>QTY</th>
-                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#C05A5C' }}>SIZE</th>
-                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#C05A5C' }}>FINISH/COLOR</th>
-                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-32" style={{ backgroundColor: '#C05A5C' }}>STATUS</th>
-                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#C05A5C' }}>IMAGE</th>
-                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#C05A5C' }}>LINK</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#B91C1C' }}>{subcategory.name.toUpperCase()}</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#B91C1C' }}>QTY</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#B91C1C' }}>SIZE</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#B91C1C' }}>FINISH/COLOR</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-32" style={{ backgroundColor: '#B91C1C' }}>STATUS</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#B91C1C' }}>IMAGE</th>
+                                <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-20" style={{ backgroundColor: '#B91C1C' }}>LINK</th>
                                 <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>VENDOR/SKU</th>
                                 <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-24" style={{ backgroundColor: getMainHeaderColor() }}>COST</th>
                                 <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: getMainHeaderColor() }}>QTY ORDERED</th>
