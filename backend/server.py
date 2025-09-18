@@ -3152,6 +3152,37 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         finally:
             await browser.close()
 
+@api_router.post("/send-questionnaire", response_model=EmailResponse)
+async def send_questionnaire_to_client(request: EmailQuestionnaireRequest, background_tasks: BackgroundTasks):
+    """Send questionnaire email to client"""
+    try:
+        # Generate questionnaire URL (will be handled by frontend routing)
+        backend_url = os.getenv('REACT_APP_BACKEND_URL', 'http://localhost:3000')
+        questionnaire_url = f"{backend_url}/questionnaire/{request.client_email}"
+        
+        # Add email sending to background tasks for better performance
+        background_tasks.add_task(
+            send_questionnaire_email,
+            request.client_name,
+            request.client_email,
+            questionnaire_url,
+            request.sender_name
+        )
+        
+        logging.info(f"Questionnaire email queued for {request.client_name} ({request.client_email})")
+        
+        return EmailResponse(
+            status="success",
+            message=f"Questionnaire email has been queued for delivery to {request.client_name}"
+        )
+        
+    except EmailDeliveryError as e:
+        logging.error(f"Email delivery error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        logging.error(f"Unexpected error sending questionnaire: {str(e)}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred while sending the questionnaire")
+
 @api_router.post("/scrape-product")
 async def scrape_product_advanced(data: dict):
     """
