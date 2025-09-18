@@ -75,14 +75,18 @@ const StudioLandingPage = () => {
     navigate(`/project/${project.id}/walkthrough`);
   };
 
-  const handleDeleteProject = async (projectId, e) => {
+  const handleDeleteProject = async (projectId, projectName, e) => {
     e.stopPropagation();
-    if (window.confirm('Are you sure you want to delete this project?')) {
+    if (window.confirm(`Are you sure you want to delete "${projectName}"? This will also delete all associated rooms and items. This cannot be undone.`)) {
+      setDeletingProject(projectId);
       try {
         await projectAPI.delete(projectId);
         loadProjects();
       } catch (err) {
         console.error('Error deleting project:', err);
+        alert("There was an error deleting the project.");
+      } finally {
+        setDeletingProject(null);
       }
     }
   };
