@@ -3,7 +3,7 @@ import React from 'react';
 const SimpleWalkthroughSpreadsheet = ({ project }) => {
   
   return (
-    <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
+    <div className="w-full p-4" style={{ backgroundColor: '#0C0A09' }}>
       
       {/* FILTER AND SEARCH SECTION */}
       <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
