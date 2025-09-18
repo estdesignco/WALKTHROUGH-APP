@@ -934,6 +934,17 @@ class Project(ProjectBase):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Email Models
+class EmailQuestionnaireRequest(BaseModel):
+    client_name: str
+    client_email: EmailStr
+    sender_name: str = "Established Design Co."
+    custom_message: Optional[str] = None
+
+class EmailResponse(BaseModel):
+    status: str
+    message: str
+
 # Helper function to get room color
 def get_room_color(room_name: str) -> str:
     return ROOM_COLORS.get(room_name.lower(), "#7A5A8A")
