@@ -41,11 +41,33 @@ const StudioLandingPage = () => {
   };
 
   const handleSendEmail = async () => {
-    // TODO: Implement email sending functionality
-    console.log('Sending questionnaire to:', emailData);
-    // This will be implemented with SendGrid integration
-    setShowEmailModal(false);
-    setEmailData({ email: '', name: '' });
+    try {
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${BACKEND_URL}/api/send-questionnaire`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          client_name: emailData.name,
+          client_email: emailData.email,
+          sender_name: 'Established Design Co.'
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(`Success! Questionnaire email sent to ${emailData.name} at ${emailData.email}`);
+        setShowEmailModal(false);
+        setEmailData({ email: '', name: '' });
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to send email');
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert(`Failed to send email: ${error.message}`);
+    }
   };
 
   const handleProjectClick = (project) => {
