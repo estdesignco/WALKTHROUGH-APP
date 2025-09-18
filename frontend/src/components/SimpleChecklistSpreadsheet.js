@@ -144,30 +144,28 @@ const SimpleChecklistSpreadsheet = ({
     }));
   };
 
-  // Different muted room colors for checklist
+  // Different muted room colors using your gold color scheme
   const getRoomColor = (roomName, index = 0) => {
-    const mutedColors = [
-      '#8B5A6B',  // Muted rose
-      '#6B7C93',  // Muted blue
-      '#7A8B5A',  // Muted olive
-      '#9B6B8B',  // Muted purple
-      '#8B7A5A',  // Muted brown
-      '#5A8B7A',  // Muted teal
-      '#8B5A7A',  // Muted mauve
-      '#7A5A8B',  // Muted violet
-      '#5A7A8B',  // Muted slate
-      '#8B6B5A'   // Muted tan
+    const mutedGoldColors = [
+      '#8B7355',  // Your main gold
+      '#A0927B',  // Lighter gold
+      '#7A6548',  // Darker gold
+      '#9A8A6E',  // Muted gold
+      '#8A7050',  // Brown gold
+      '#6B5D47',  // Dark brown gold
+      '#B5A082',  // Light muted gold
+      '#756653',  // Darker muted gold
+      '#958571',  // Gray gold
     ];
     
-    // Use room name hash for consistent color per room
     let hash = 0;
     for (let i = 0; i < roomName.length; i++) {
       hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
     }
-    return mutedColors[Math.abs(hash) % mutedColors.length];
+    return mutedGoldColors[Math.abs(hash) % mutedGoldColors.length];
   };
 
-  const getCategoryColor = () => '#065F46';  // Dark green for categories
+  const getCategoryColor = () => '#8B7355';  // Your main gold color for categories
 
   // Status colors mapping for checklist
   const getStatusColor = (status) => {
