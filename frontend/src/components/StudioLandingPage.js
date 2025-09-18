@@ -8,6 +8,7 @@ const StudioLandingPage = () => {
   const [error, setError] = useState(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailData, setEmailData] = useState({ email: '', name: '' });
+  const [deletingProject, setDeletingProject] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
