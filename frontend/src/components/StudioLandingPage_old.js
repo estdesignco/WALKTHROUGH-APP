@@ -160,7 +160,11 @@ const StudioLandingPage = () => {
         )}
 
         {/* Projects List */}
-        {projects.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B7355]"></div>
+          </div>
+        ) : projects.length === 0 ? (
           <div className="text-center py-20 bg-[#1E293B]/50 rounded-lg border-2 border-dashed border-stone-700">
             <div className="text-6xl mb-4">🏗️</div>
             <h3 className="mt-4 text-xl font-medium text-stone-300">Your Project Library is Empty</h3>
@@ -236,7 +240,6 @@ const StudioLandingPage = () => {
             ))}
           </div>
         )}
-      </div>
 
       {/* Email Modal */}
       {showEmailModal && (
