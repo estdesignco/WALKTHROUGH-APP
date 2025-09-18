@@ -6,7 +6,7 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
     <div className="w-full p-4" style={{ backgroundColor: '#1A1A1A' }}>
       
       {/* FILTER AND SEARCH SECTION */}
-      <div className="mb-6 p-4" style={{ backgroundColor: '#1C1917' }}>
+      <div className="mb-6 p-4" style={{ backgroundColor: '#2D2D2D' }}>
         <div className="flex flex-col gap-4">
           {/* Search Bar */}
           <div className="w-full">
