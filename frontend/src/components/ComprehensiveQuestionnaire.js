@@ -87,88 +87,64 @@ const ComprehensiveQuestionnaire = () => {
     how_heard_other: '',
   });
 
-  const [currentSection, setCurrentSection] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [newRoomName, setNewRoomName] = useState("");
 
-  const roomOptions = [
-    'Living Room', 'Family Room', 'Great Room', 'Primary Bedroom', 'Guest Bedroom',
-    'Children\'s Bedroom', 'Nursery', 'Home Office', 'Study', 'Library',
-    'Primary Bathroom', 'Guest Bathroom', 'Half Bathroom', 'Jack and Jill Bathroom',
-    'Kitchen', 'Pantry', 'Butler\'s Pantry', 'Dining Room', 'Breakfast Nook',
-    'Bar Area', 'Wine Cellar', 'Laundry Room', 'Mudroom', 'Utility Room',
-    'Linen Closet', 'Walk-in Closet', 'Basement', 'Home Theater', 'Media Room',
-    'Game Room', 'Home Gym', 'Play Room', 'Craft Room', 'Music Room',
-    'Art Studio', 'Workshop', 'Foyer', 'Entryway', 'Hallway',
-    'Sunroom', 'Screened Porch', 'Patio', 'Deck', 'Outdoor Kitchen',
-    'Pool House', 'Guest House'
-  ];
-
-  const sections = [
-    'Client Information',
-    'Scope of Work',
-    'Project Type',
-    'Design Questions',
-    'Lifestyle',
-    'Referral Source'
-  ];
-
-  const handleInputChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleMultiSelectChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: prev[name].includes(value)
-        ? prev[name].filter(item => item !== value)
-        : [...prev[name], value]
-    }));
-  };
-
-  const handleFileChange = (name, files) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: files
-    }));
-  };
-
-  const nextSection = () => {
-    if (currentSection < sections.length - 1) {
-      setCurrentSection(currentSection + 1);
+  const handleFormChange = (field, value) => {
+    if (field === 'phone') {
+      const onlyNums = value.replace(/[^\d]/g, '');
+      let formatted = onlyNums;
+      if (onlyNums.length > 3 && onlyNums.length <= 6) {
+        formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`;
+      } else if (onlyNums.length > 6) {
+        formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 6)}-${onlyNums.slice(6, 10)}`;
+      }
+      setFormData(prev => ({ ...prev, [field]: formatted }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
     }
   };
 
-  const prevSection = () => {
-    if (currentSection > 0) {
-      setCurrentSection(currentSection - 1);
+  const handleRoomsChange = (newRooms) => {
+    handleFormChange('rooms_involved', newRooms);
+  };
+
+  const handleAddRoom = () => {
+    if (newRoomName && !formData.rooms_involved.includes(newRoomName)) {
+      handleRoomsChange([...formData.rooms_involved, newRoomName]);
+      setNewRoomName("");
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleRemoveRoom = (roomNameToRemove) => {
+    handleRoomsChange(formData.rooms_involved.filter(room => room !== roomNameToRemove));
+  };
+
+  const handleCreateProject = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
+    if (!formData.name && !formData.client_name) {
+      alert('Please provide at least a project name or client name.');
+      return;
+    }
+    setIsLoading(true);
     try {
       // Create project from questionnaire data
       const projectData = {
-        name: formData.project_name || `${formData.full_name} Project`,
+        name: formData.name || `${formData.client_name} Project`,
         client_info: {
-          full_name: formData.full_name,
+          full_name: formData.client_name,
           email: formData.email,
           phone: formData.phone,
           address: formData.address,
-          communication_method: formData.communication_method,
-          call_time: formData.call_time
+          communication_method: formData.contact_preferences.join(', '),
+          call_time: formData.best_time_to_call
         },
         project_type: formData.project_type,
         timeline: formData.timeline,
         budget: formData.budget_range,
-        style_preferences: formData.design_styles,
-        color_palette: formData.preferred_color_palette,
-        special_requirements: formData.special_requirements,
+        style_preferences: formData.design_styles_preference,
+        color_palette: formData.design_preferred_palette.join(', '),
+        special_requirements: formData.design_special_requirements,
         questionnaire_data: formData
       };
 
@@ -185,8 +161,8 @@ const ComprehensiveQuestionnaire = () => {
         const project = await response.json();
         
         // Add selected rooms to the project
-        if (formData.selected_rooms.length > 0) {
-          for (const roomName of formData.selected_rooms) {
+        if (formData.rooms_involved && formData.rooms_involved.length > 0) {
+          for (const roomName of formData.rooms_involved) {
             await fetch(`${BACKEND_URL}/api/rooms`, {
               method: 'POST',
               headers: {
@@ -210,627 +186,404 @@ const ComprehensiveQuestionnaire = () => {
       console.error('Error submitting questionnaire:', error);
       alert('Failed to submit questionnaire. Please try again.');
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
-  const renderClientInformation = () => (
-    <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-white mb-4">CLIENT INFORMATION</h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Full Name *</label>
-          <input
-            type="text"
-            value={formData.full_name}
-            onChange={(e) => handleInputChange('full_name', e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Project Name *</label>
-          <input
-            type="text"
-            value={formData.project_name}
-            onChange={(e) => handleInputChange('project_name', e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-          <input
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
-          <input
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => handleInputChange('phone', e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          />
-        </div>
-      </div>
-      
+  // Helper components for the form
+  const Section = ({ title, description, children }) => (
+    <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Project Address</label>
-        <input
-          type="text"
-          value={formData.address}
-          onChange={(e) => handleInputChange('address', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        />
+        <h3 className="text-lg font-bold text-[#8B7355]">{title}</h3>
+        {description && <p className="text-sm text-stone-400">{description}</p>}
       </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Preferred Method of Communication</label>
-        <div className="space-y-2">
-          {['Email', 'Phone Call', 'Text Message'].map(method => (
-            <label key={method} className="flex items-center">
-              <input
-                type="radio"
-                name="communication_method"
-                value={method}
-                checked={formData.communication_method === method}
-                onChange={(e) => handleInputChange('communication_method', e.target.value)}
-                className="mr-2"
-              />
-              <span className="text-gray-300">{method}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Best Time to Call</label>
-        <input
-          type="text"
-          value={formData.call_time}
-          onChange={(e) => handleInputChange('call_time', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Have you worked with a designer before? If not, what are your hesitations?</label>
-        <textarea
-          value={formData.designer_experience}
-          onChange={(e) => handleInputChange('designer_experience', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Who will be the primary decision maker(s) for this project?</label>
-        <input
-          type="text"
-          value={formData.decision_makers}
-          onChange={(e) => handleInputChange('decision_makers', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">How involved would you like to be in the design process?</label>
-        <select
-          value={formData.involvement_level}
-          onChange={(e) => handleInputChange('involvement_level', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        >
-          <option value="Very involved - I want to approve every detail">Very involved - I want to approve every detail</option>
-          <option value="Somewhat involved - I want to approve major decisions">Somewhat involved - I want to approve major decisions</option>
-          <option value="Minimally involved - I trust your expertise">Minimally involved - I trust your expertise</option>
-        </select>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What is your ideal sofa price point?</label>
-        <select
-          value={formData.sofa_price_point}
-          onChange={(e) => handleInputChange('sofa_price_point', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        >
-          <option value="$2,000-$4,000">$2,000-$4,000</option>
-          <option value="$4,000-$8,000">$4,000-$8,000</option>
-          <option value="$8,000-$12,000">$8,000-$12,000</option>
-          <option value="$12,000+">$12,000+</option>
-        </select>
+      <div className="space-y-3">
+        {children}
       </div>
     </div>
   );
 
-  const renderScopeOfWork = () => (
-    <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-white mb-4">TOTAL SCOPE OF WORK FOR YOUR PROJECT</h3>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What type of property is this?</label>
-        <select
-          value={formData.property_type}
-          onChange={(e) => handleInputChange('property_type', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        >
-          <option value="Primary Residence">Primary Residence</option>
-          <option value="Vacation Home">Vacation Home</option>
-          <option value="Rental Property">Rental Property</option>
-          <option value="Commercial Space">Commercial Space</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What is your desired timeline for project completion?</label>
-        <input
-          type="text"
-          value={formData.timeline}
-          onChange={(e) => handleInputChange('timeline', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Investment / Budget Range</label>
-        <select
-          value={formData.budget_range}
-          onChange={(e) => handleInputChange('budget_range', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        >
-          <option value="$15k-$30k">$15k-$30k</option>
-          <option value="$30k-$50k">$30k-$50k</option>
-          <option value="$50k-$75k">$50k-$75k</option>
-          <option value="$75k-$100k">$75k-$100k</option>
-          <option value="$100k-$150k">$100k-$150k</option>
-          <option value="$150k+">$150k+</option>
-        </select>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What is your priority for this project? (Check all that apply)</label>
-        <div className="space-y-2">
-          {[
-            'Turn-Key Furnishings',
-            'Art & Decor',
-            'Custom Window Treatments',
-            'Custom Millwork',
-            'Finishes & Fixtures',
-            'Follow a plan we have created in a specific timeframe',
-            'Other'
-          ].map(priority => (
-            <label key={priority} className="flex items-center">
-              <input
-                type="checkbox"
-                checked={formData.project_priorities.includes(priority)}
-                onChange={() => handleMultiSelectChange('project_priorities', priority)}
-                className="mr-2"
-              />
-              <span className="text-gray-300">{priority}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Which rooms are involved in this project?</label>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-64 overflow-y-auto">
-          {roomOptions.map(room => (
-            <label key={room} className="flex items-center">
-              <input
-                type="checkbox"
-                checked={formData.selected_rooms.includes(room)}
-                onChange={() => handleMultiSelectChange('selected_rooms', room)}
-                className="mr-2"
-              />
-              <span className="text-gray-300 text-sm">{room}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Add Custom Room (optional)</label>
-        <input
-          type="text"
-          value={formData.custom_rooms}
-          onChange={(e) => handleInputChange('custom_rooms', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          placeholder="Enter custom room name"
-        />
-      </div>
+  const InputField = ({ label, id, value, onChange, type = "text", placeholder = "", className = "" }) => (
+    <div className="space-y-1">
+      <label htmlFor={id} className="text-sm font-medium text-stone-300">{label}</label>
+      <input 
+        id={id} 
+        type={type} 
+        value={value} 
+        onChange={onChange} 
+        placeholder={placeholder} 
+        className={`${inputStyles} ${className}`} 
+      />
     </div>
   );
 
-  const renderProjectType = () => (
-    <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-white mb-4">TYPE OF PROJECT</h3>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What type of project is this?</label>
-        <div className="space-y-2">
-          {['New Build', 'Renovation', 'Furniture/Styling Refresh', 'Other'].map(type => (
-            <label key={type} className="flex items-center">
-              <input
-                type="radio"
-                name="project_type"
-                value={type}
-                checked={formData.project_type === type}
-                onChange={(e) => handleInputChange('project_type', e.target.value)}
-                className="mr-2"
-              />
-              <span className="text-gray-300">{type}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Tell us more about your project and what you would love to accomplish</label>
-        <textarea
-          value={formData.project_description}
-          onChange={(e) => handleInputChange('project_description', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="4"
-        />
-      </div>
+  const FieldWrapper = ({ label, children }) => (
+    <div className="space-y-1">
+      <label className="text-sm font-medium text-stone-300">{label}</label>
+      {children}
     </div>
   );
 
-  const renderDesignQuestions = () => (
-    <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-white mb-4">DESIGN QUESTIONS</h3>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What do you love about your current home?</label>
-        <textarea
-          value={formData.home_loves}
-          onChange={(e) => handleInputChange('home_loves', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">How will the spaces be used? (e.g., formal dining, casual living, etc.)</label>
-        <textarea
-          value={formData.space_usage}
-          onChange={(e) => handleInputChange('space_usage', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What is the first impression you want guests to have when they enter your home?</label>
-        <textarea
-          value={formData.first_impression}
-          onChange={(e) => handleInputChange('first_impression', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What color palette do you prefer?</label>
-        <select
-          value={formData.preferred_color_palette}
-          onChange={(e) => handleInputChange('preferred_color_palette', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        >
-          <option value="Dark & Moody">Dark & Moody</option>
-          <option value="Light & Airy">Light & Airy</option>
-          <option value="Warm Neutral">Warm Neutral</option>
-          <option value="Cool Neutral">Cool Neutral</option>
-          <option value="Bold & Vibrant">Bold & Vibrant</option>
-          <option value="Earthy & Organic">Earthy & Organic</option>
-          <option value="Monochromatic">Monochromatic</option>
-          <option value="Pastel">Pastel</option>
-        </select>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Which interior design styles do you prefer? (Select all that apply)</label>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {[
-            'Modern', 'Industrial', 'Coastal', 'Contemporary', 'Mid-Century Modern',
-            'Eclectic', 'Traditional', 'Transitional', 'Rustic', 'Farmhouse',
-            'Bohemian', 'Minimalist', 'Scandinavian'
-          ].map(style => (
-            <label key={style} className="flex items-center">
-              <input
-                type="checkbox"
-                checked={formData.design_styles.includes(style)}
-                onChange={() => handleMultiSelectChange('design_styles', style)}
-                className="mr-2"
-              />
-              <span className="text-gray-300 text-sm">{style}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What are your preferences for artwork?</label>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {[
-            'Abstract', 'Landscape', 'Nature', 'Photographs', 'Architecture',
-            'Painting', 'Water Color', 'Minimalist', 'Black and White',
-            'Pop-art', 'Vintage', 'Pattern', 'Other'
-          ].map(art => (
-            <label key={art} className="flex items-center">
-              <input
-                type="checkbox"
-                checked={formData.artwork_preferences.includes(art)}
-                onChange={() => handleMultiSelectChange('artwork_preferences', art)}
-                className="mr-2"
-              />
-              <span className="text-gray-300 text-sm">{art}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Is there a piece of art, furniture, or a souvenir that holds significant personal meaning to you?</label>
-        <textarea
-          value={formData.meaningful_pieces}
-          onChange={(e) => handleInputChange('meaningful_pieces', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Finishes and Patterns (Select all that apply)</label>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {[
-            'Warm wood tones', 'Neutral wood tones', 'Cool wood tones', 'Leather',
-            'Silver', 'Bronze', 'Gold', 'Brass', 'Chrome', 'Brushed Nickel',
-            'Matte Black', 'Solid', 'Geometric', 'Stripes', 'Floral', 'Animal',
-            'Rattan', 'Concrete', 'Glass', 'Marble', 'Other'
-          ].map(material => (
-            <label key={material} className="flex items-center">
-              <input
-                type="checkbox"
-                checked={formData.materials_preferences.includes(material)}
-                onChange={() => handleMultiSelectChange('materials_preferences', material)}
-                className="mr-2"
-              />
-              <span className="text-gray-300 text-sm">{material}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Do you have any specific materials you prefer or want to avoid?</label>
-        <textarea
-          value={formData.material_preferences_notes}
-          onChange={(e) => handleInputChange('material_preferences_notes', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
-      </div>
-    </div>
-  );
+  const CheckboxGroup = ({ options, value = [], onChange }) => {
+    const handleCheckedChange = (option, checked) => {
+      if (checked) {
+        onChange([...value, option]);
+      } else {
+        onChange(value.filter(item => item !== option));
+      }
+    };
 
-  const renderLifestyle = () => (
-    <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-white mb-4">GETTING TO KNOW YOU BETTER...</h3>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Who lives in your household? (Include ages of children if applicable)</label>
-        <textarea
-          value={formData.household_members}
-          onChange={(e) => handleInputChange('household_members', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
+    return (
+      <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+        {options.map(option => (
+          <div key={option} className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id={option}
+              checked={value.includes(option)}
+              onChange={(e) => handleCheckedChange(option, e.target.checked)}
+              className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
+            />
+            <label htmlFor={option} className="text-xs text-stone-300">
+              {option}
+            </label>
+          </div>
+        ))}
       </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Do you have pets? If yes, please specify</label>
-        <input
-          type="text"
-          value={formData.pets}
-          onChange={(e) => handleInputChange('pets', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">How do you typically entertain guests?</label>
-        <textarea
-          value={formData.entertaining_style}
-          onChange={(e) => handleInputChange('entertaining_style', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Tell us about your hobbies</label>
-        <textarea
-          value={formData.hobbies}
-          onChange={(e) => handleInputChange('hobbies', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What makes you HAPPY?!</label>
-        <textarea
-          value={formData.happiness}
-          onChange={(e) => handleInputChange('happiness', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What is your FAVORITE restaurant?</label>
-        <input
-          type="text"
-          value={formData.favorite_restaurant}
-          onChange={(e) => handleInputChange('favorite_restaurant', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">What is your favorite place to vacation?</label>
-        <input
-          type="text"
-          value={formData.favorite_vacation}
-          onChange={(e) => handleInputChange('favorite_vacation', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">When you come home after a long day, what space do you naturally gravitate toward, and what feeling do you want that space to evoke?</label>
-        <textarea
-          value={formData.favorite_space}
-          onChange={(e) => handleInputChange('favorite_space', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="3"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Is there ANYTHING ELSE that you would like to share with us?</label>
-        <textarea
-          value={formData.additional_sharing}
-          onChange={(e) => handleInputChange('additional_sharing', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          rows="4"
-        />
-      </div>
-    </div>
-  );
-
-  const renderReferralSource = () => (
-    <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-white mb-4">HOW DID YOU HEAR ABOUT US</h3>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">How did you hear about us?</label>
-        <select
-          value={formData.referral_source}
-          onChange={(e) => handleInputChange('referral_source', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-        >
-          <option value="Internet Search">Internet Search</option>
-          <option value="Social Media">Social Media</option>
-          <option value="Friend Referral">Friend Referral</option>
-          <option value="Magazine">Magazine</option>
-          <option value="Google">Google</option>
-          <option value="Market Event">Market Event</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-    </div>
-  );
-
-  const renderCurrentSection = () => {
-    switch (currentSection) {
-      case 0: return renderClientInformation();
-      case 1: return renderScopeOfWork();
-      case 2: return renderProjectType();
-      case 3: return renderDesignQuestions();
-      case 4: return renderLifestyle();
-      case 5: return renderReferralSource();
-      default: return renderClientInformation();
-    }
+    );
   };
+
+  const inputStyles = "bg-gray-700 border-gray-600 text-stone-200 focus:border-[#8B7355] placeholder:text-stone-500 text-sm w-full px-3 py-2 rounded-md";
+
+  // Options arrays from your previous app
+  const roomsOptionsUpdated = [
+    "Entire Home",
+    "Living Room", "Family Room", "Great Room", "Primary Bedroom", "Guest Bedroom", "Children's Bedroom", "Nursery",
+    "Home Office", "Study", "Library", "Primary Bathroom", "Guest Bathroom", "Half Bathroom", "Jack and Jill Bathroom",
+    "Kitchen", "Pantry", "Butler's Pantry", "Dining Room", "Breakfast Nook", "Bar Area", "Wine Cellar",
+    "Laundry Room", "Mudroom", "Utility Room", "Linen Closet", "Walk-in Closet", "Basement", "Home Theater",
+    "Media Room", "Game Room", "Home Gym", "Play Room", "Craft Room", "Music Room", "Art Studio",
+    "Workshop", "Foyer", "Entryway", "Hallway", "Sunroom", "Screened Porch", "Patio", "Deck",
+    "Outdoor Kitchen", "Pool House", "Guest House"
+  ];
+
+  const projectPriorityOptions = ["Turn-Key Furnishings", "Art & Decor", "Custom Window Treatments", "Custom Millwork", "Finishes & Fixtures", "Follow a plan we have created in a specific timeframe", "Other"];
+  const contactPrefOptions = ["Email", "Phone Call", "Text Message"];
+  const stylePrefOptions = ["Modern", "Industrial", "Coastal", "Contemporary", "Mid-Century Modern", "Eclectic", "Traditional", "Transitional", "Rustic", "Farmhouse", "Bohemian", "Minimalist", "Scandinavian", "Classic"];
+  const artworkPrefOptions = ["Abstract", "Landscape", "Nature", "Photographs", "Architecture", "Painting", "Water Color", "Minimalist", "Black and White", "Pop-art", "Vintage", "Pattern", "Other"];
+  const colorPrefOptions = ["Dark & Moody", "Light & Airy", "Warm Neutral", "Cool Neutral", "Bold & Vibrant", "Earthy & Organic", "Monochromatic", "Pastel"];
+  const finishesOptions = ["Warm wood tones", "Neutral wood tones", "Cool wood tones", "Leather", "Silver", "Bronze", "Gold", "Brass", "Chrome", "Brushed Nickel", "Matte Black", "Solid", "Geometric", "Stripes", "Floral", "Animal", "Rattan", "Concrete", "Glass", "Marble", "Other"];
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-white tracking-wider text-center">
-            ESTABLISHED DESIGN CO.
-          </h1>
-          <h2 className="text-xl text-yellow-400 text-center mt-2">
-            COMPREHENSIVE CLIENT QUESTIONNAIRE
-          </h2>
-        </div>
+    <div className="min-h-screen bg-stone-900 text-stone-200">
+      {/* Header with Logo */}
+      <div className="w-full bg-[#1E293B] shadow-lg flex items-center justify-center my-8 h-auto max-h-[150px] p-4 rounded-lg border border-[#8B7355]/50 mx-4">
+        <img
+          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf5_Establishedlogo.png"
+          alt="Established Design Co."
+          className="w-full h-full object-contain"
+        />
       </div>
 
-      {/* Progress Bar */}
-      <div className="max-w-4xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-between mb-2">
-          {sections.map((section, index) => (
-            <div
-              key={section}
-              className={`flex-1 text-center text-sm ${
-                index === currentSection
-                  ? 'text-yellow-400 font-semibold'
-                  : index < currentSection
-                  ? 'text-green-400'
-                  : 'text-gray-500'
-              }`}
-            >
-              {section}
-            </div>
-          ))}
-        </div>
-        <div className="w-full bg-gray-700 rounded-full h-2">
-          <div
-            className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((currentSection + 1) / sections.length) * 100}%` }}
-          ></div>
-        </div>
-      </div>
-
-      {/* Form Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <form onSubmit={handleSubmit}>
-          <div className="bg-gray-800 rounded-lg p-8">
-            {renderCurrentSection()}
-          </div>
+        <form onSubmit={handleCreateProject} className="space-y-6">
+          <div className="bg-[#2D3748] border border-stone-700 text-stone-200 rounded-lg p-8">
+            
+            {/* Client Information */}
+            <Section title="Client Information">
+              <div className="grid grid-cols-2 gap-3">
+                <InputField 
+                  label="Client Name" 
+                  id="client_name" 
+                  value={formData.client_name || ''} 
+                  onChange={(e) => handleFormChange('client_name', e.target.value)} 
+                />
+                <InputField 
+                  label="Project Name" 
+                  id="name" 
+                  value={formData.name || ''} 
+                  onChange={(e) => handleFormChange('name', e.target.value)} 
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <InputField 
+                  label="Email Address" 
+                  id="email" 
+                  type="email" 
+                  value={formData.email || ''} 
+                  onChange={(e) => handleFormChange('email', e.target.value)} 
+                />
+                <InputField 
+                  label="Phone Number" 
+                  id="phone" 
+                  type="tel" 
+                  value={formData.phone || ''} 
+                  onChange={(e) => handleFormChange('phone', e.target.value)} 
+                />
+              </div>
+              <FieldWrapper label="Project Address">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.address || ''} 
+                  onChange={(e) => handleFormChange('address', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Contact Preferences">
+                <CheckboxGroup 
+                  options={contactPrefOptions} 
+                  value={formData.contact_preferences} 
+                  onChange={(v) => handleFormChange('contact_preferences', v)} 
+                />
+              </FieldWrapper>
+              <InputField 
+                label="Best Time to Call" 
+                id="best_time_to_call" 
+                value={formData.best_time_to_call || ''} 
+                onChange={(e) => handleFormChange('best_time_to_call', e.target.value)} 
+              />
+            </Section>
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8">
-            <button
-              type="button"
-              onClick={prevSection}
-              disabled={currentSection === 0}
-              className="px-6 py-3 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 text-white rounded-lg transition-colors"
-            >
-              Previous
-            </button>
+            {/* Project Type & Budget */}
+            <Section title="Project Details">
+              <FieldWrapper label="What type of project is this?">
+                <div className="space-y-2">
+                  {["New Build", "Renovation", "Furniture/Styling Refresh", "Other"].map(option => (
+                    <div key={option} className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="project_type"
+                        value={option}
+                        id={`type-${option}`}
+                        checked={formData.project_type === option}
+                        onChange={(e) => handleFormChange('project_type', e.target.value)}
+                        className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
+                      />
+                      <label htmlFor={`type-${option}`} className="text-sm text-stone-200">{option}</label>
+                    </div>
+                  ))}
+                </div>
+              </FieldWrapper>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <InputField 
+                  label="Your Timeline" 
+                  id="timeline" 
+                  value={formData.timeline} 
+                  onChange={(e) => handleFormChange('timeline', e.target.value)} 
+                />
+                <div>
+                  <label htmlFor="budget_range" className="font-semibold text-stone-300">Budget Range</label>
+                  <select 
+                    value={formData.budget_range} 
+                    onChange={(e) => handleFormChange('budget_range', e.target.value)}
+                    className={inputStyles}
+                  >
+                    <option value="">Select...</option>
+                    <option value="35k-65k">$35k - $65k</option>
+                    <option value="75k-100k">$75k - $100k</option>
+                    <option value="125k-500k">$125k - $500k</option>
+                    <option value="600k-1M">$600k - $1M</option>
+                    <option value="2M-5M">$2M - $5M</option>
+                    <option value="7M-10M">$7M - $10M</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <FieldWrapper label="Project Priorities">
+                <CheckboxGroup 
+                  options={projectPriorityOptions} 
+                  value={formData.project_priority} 
+                  onChange={(v) => handleFormChange('project_priority', v)} 
+                />
+              </FieldWrapper>
+            </Section>
 
-            <div className="flex space-x-4">
-              {currentSection < sections.length - 1 ? (
-                <button
-                  type="button"
-                  onClick={nextSection}
-                  className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !formData.full_name || !formData.project_name}
-                  className="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors"
-                >
-                  {isSubmitting ? 'Creating Project...' : 'Submit Questionnaire'}
-                </button>
-              )}
+            {/* Rooms */}
+            <Section title="Rooms Involved">
+              <FieldWrapper label="Select rooms involved in this project">
+                <CheckboxGroup 
+                  options={roomsOptionsUpdated} 
+                  value={formData.rooms_involved} 
+                  onChange={handleRoomsChange} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Add Custom Room">
+                <div className="flex items-center gap-2">
+                  <input
+                    className={inputStyles}
+                    value={newRoomName}
+                    onChange={(e) => setNewRoomName(e.target.value)}
+                    placeholder="e.g., Wine Cellar"
+                  />
+                  <button 
+                    type="button" 
+                    onClick={handleAddRoom} 
+                    className="bg-[#B49B7E] hover:bg-[#A08B6F] text-white px-4 py-2 rounded-md shrink-0"
+                  >
+                    + Add
+                  </button>
+                </div>
+                {formData.rooms_involved.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {formData.rooms_involved.map(room => (
+                      <span key={room} className="flex items-center bg-gray-600 text-stone-200 px-2 py-1 rounded-full text-xs">
+                        {room}
+                        <button 
+                          type="button" 
+                          onClick={() => handleRemoveRoom(room)} 
+                          className="ml-1 text-stone-300 hover:text-red-400"
+                        >
+                          &times;
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </FieldWrapper>
+            </Section>
+
+            {/* Design Preferences */}
+            <Section title="Design Preferences">
+              <FieldWrapper label="Style Preferences">
+                <CheckboxGroup 
+                  options={stylePrefOptions} 
+                  value={formData.design_styles_preference} 
+                  onChange={(v) => handleFormChange('design_styles_preference', v)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Color Palette Preference">
+                <CheckboxGroup 
+                  options={colorPrefOptions} 
+                  value={formData.design_preferred_palette} 
+                  onChange={(v) => handleFormChange('design_preferred_palette', v)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Artwork Preferences">
+                <CheckboxGroup 
+                  options={artworkPrefOptions} 
+                  value={formData.design_artwork_preference} 
+                  onChange={(v) => handleFormChange('design_artwork_preference', v)} 
+                />
+              </FieldWrapper>
+              <FieldWrapper label="What do you love about your current home?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_love_home || ''} 
+                  onChange={(e) => handleFormChange('design_love_home', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="First impression you want guests to have">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_first_impression || ''} 
+                  onChange={(e) => handleFormChange('design_first_impression', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+            </Section>
+
+            {/* Personal Information */}
+            <Section title="Getting to Know You">
+              <FieldWrapper label="Household members (include ages of children)">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_household || ''} 
+                  onChange={(e) => handleFormChange('know_you_household', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Pets">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_pets || ''} 
+                  onChange={(e) => handleFormChange('know_you_pets', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Hobbies">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_hobbies || ''} 
+                  onChange={(e) => handleFormChange('know_you_hobbies', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="How do you entertain guests?">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.know_you_entertaining_style || ''} 
+                  onChange={(e) => handleFormChange('know_you_entertaining_style', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+            </Section>
+
+            {/* Additional Questions */}
+            <Section title="Additional Information">
+              <FieldWrapper label="How did you hear about us?">
+                <div className="space-y-2">
+                  {["Internet Search", "Social Media", "Friend Referral", "Magazine", "Google", "Market Event", "Other"].map(option => (
+                    <div key={option} className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="how_heard"
+                        value={option}
+                        id={`heard-${option}`}
+                        checked={formData.how_heard === option}
+                        onChange={(e) => handleFormChange('how_heard', e.target.value)}
+                        className="border-stone-400 text-[#8B7355] focus:ring-[#8B7355]"
+                      />
+                      <label htmlFor={`heard-${option}`} className="text-sm text-stone-200">{option}</label>
+                    </div>
+                  ))}
+                </div>
+              </FieldWrapper>
+              <FieldWrapper label="Pinterest/Houzz Links">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_pinterest_houzz || ''} 
+                  onChange={(e) => handleFormChange('design_pinterest_houzz', e.target.value)} 
+                  rows="3"
+                />
+              </FieldWrapper>
+              <FieldWrapper label="Additional Comments">
+                <textarea 
+                  className={inputStyles} 
+                  value={formData.design_additional_comments || ''} 
+                  onChange={(e) => handleFormChange('design_additional_comments', e.target.value)} 
+                  rows="4"
+                />
+              </FieldWrapper>
+            </Section>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-stone-700">
+              <button 
+                type="button" 
+                onClick={() => navigate('/')} 
+                className="text-stone-200 border-stone-600 hover:bg-stone-700 hover:text-white px-6 py-3 rounded-lg border"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                disabled={isLoading} 
+                className="bg-[#8B7355] hover:bg-[#A0927B] text-white px-6 py-3 rounded-lg flex items-center space-x-2"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Creating Project...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>+</span>
+                    <span>Create Project</span>
+                  </>
+                )}
+              </button>
             </div>
+
           </div>
         </form>
       </div>
