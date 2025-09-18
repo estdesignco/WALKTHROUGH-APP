@@ -244,32 +244,32 @@ const StudioLandingPage = () => {
       {/* Email Modal */}
       {showEmailModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-xl font-semibold text-white mb-4">Email Client Questionnaire</h3>
+          <div className="bg-[#2D3748] border border-stone-700 text-stone-200 rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-xl font-semibold text-[#8B7355] mb-4">Email Client Questionnaire</h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-stone-300 mb-2">
                   Client Name
                 </label>
                 <input
                   type="text"
                   value={emailData.name}
                   onChange={(e) => setEmailData({ ...emailData, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-stone-200 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
                   placeholder="Enter client name"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-stone-300 mb-2">
                   Email Address
                 </label>
                 <input
                   type="email"
                   value={emailData.email}
                   onChange={(e) => setEmailData({ ...emailData, email: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-stone-200 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
                   placeholder="Enter email address"
                 />
               </div>
@@ -278,14 +278,14 @@ const StudioLandingPage = () => {
             <div className="flex space-x-3 mt-6">
               <button
                 onClick={() => setShowEmailModal(false)}
-                className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
+                className="flex-1 px-4 py-2 text-stone-200 border-stone-600 hover:bg-stone-700 hover:text-white bg-gray-600 text-white rounded-md transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSendEmail}
                 disabled={!emailData.email || !emailData.name}
-                className="flex-1 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white rounded-md transition-colors"
+                className="flex-1 px-4 py-2 bg-[#8B7355] hover:bg-[#A0927B] disabled:bg-gray-600 text-white rounded-md transition-colors"
               >
                 Send Questionnaire
               </button>
