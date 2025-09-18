@@ -72,7 +72,7 @@ const StudioLandingPage = () => {
   };
 
   const handleProjectClick = (project) => {
-    navigate(`/project/${project.id}/walkthrough`);
+    navigate(`/project/${project.id}`);
   };
 
   const handleDeleteProject = async (projectId, projectName, e) => {
