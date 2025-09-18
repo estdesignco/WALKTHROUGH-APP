@@ -2,32 +2,17 @@ import React from 'react';
 
 const SimpleWalkthroughSpreadsheet = ({ project }) => {
   
-  const getRoomColor = (roomName) => {
-    const roomColors = {
-      'living room': '#7C3AED',
-      'dining room': '#DC2626',
-      'kitchen': '#EA580C',
-      'primary bedroom': '#059669',
-      'primary bathroom': '#2563EB',
-      'powder room': '#7C2D12',
-      'guest room': '#BE185D',
-      'guest bathroom': '#7C2D12',
-      'office': '#1E40AF',
-      'laundry room': '#374151',
-      'pantry': '#92400E',
-      'mudroom': '#6B7280',
-      'foyer': '#4C1D95',
-      'hallway': '#6B7280',
-      'closet': '#374151',
-      'basement': '#1F2937',
-      'attic': '#4B5563',
-      'garage': '#374151',
-      'outdoor': '#065F46',
-      'patio': '#059669',
-      'deck': '#0D9488',
-      'balcony': '#0891B2'
-    };
-    return roomColors[roomName.toLowerCase()] || '#6B7280';
+  // EXACT room colors from your original FFESpreadsheet.jsx
+  const ROOM_COLORS = {
+    'Living Room': '#8B5CF6', 'Kitchen': '#06B6D4', 'Dining Room': '#DC2626',
+    'Primary Bedroom': '#2F5233', 'Guest Bedroom': '#7C3AED', 'Home Office': '#EA580C',
+    'Primary Bathroom': '#0284C7', 'Guest Bathroom': '#7C2D12', 'Laundry Room': '#65A30D',
+    'Entryway': '#BE185D', 'Sunroom': '#0891B2', 'Nursery': '#C2410C',
+    'Master Bedroom': '#059669',
+  };
+
+  const getRoomColor = (roomName, index = 0) => {
+    return ROOM_COLORS[roomName] || '#6B7280';
   };
   
   return (
