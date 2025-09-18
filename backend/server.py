@@ -3203,9 +3203,8 @@ async def send_questionnaire_to_client(request: EmailQuestionnaireRequest, backg
         backend_url = os.getenv('REACT_APP_BACKEND_URL', 'http://localhost:3000')
         questionnaire_url = f"{backend_url}/questionnaire/{request.client_email}"
         
-        # Add email sending to background tasks for better performance
-        background_tasks.add_task(
-            send_questionnaire_email,
+        # Send email directly (async function)
+        await send_questionnaire_email(
             request.client_name,
             request.client_email,
             questionnaire_url,
