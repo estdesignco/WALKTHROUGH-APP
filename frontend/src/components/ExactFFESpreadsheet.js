@@ -96,13 +96,10 @@ const ExactFFESpreadsheet = ({
         const response = await fetch(`${BACKEND_URL}/api/categories/available`);
         if (response.ok) {
           const categories = await response.json();
-          setAvailableCategories(Array.isArray(categories) ? categories : []);
-        } else {
-          setAvailableCategories([]);
+          setAvailableCategories(categories);
         }
       } catch (error) {
         console.error('Error fetching categories:', error);
-        setAvailableCategories([]);
       }
     };
     
