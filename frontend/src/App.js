@@ -136,12 +136,28 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
+              element={<StudioLandingPage />}
+            />
+            <Route 
+              path="/projects" 
               element={
                 <ProjectList 
                   onSelectProject={setCurrentProject}
                   isOffline={isOffline}
                 />
               }
+            />
+            <Route 
+              path="/questionnaire/new" 
+              element={<ComprehensiveQuestionnaire />}
+            />
+            <Route 
+              path="/questionnaire/demo" 
+              element={<ComprehensiveQuestionnaire />}
+            />
+            <Route 
+              path="/questionnaire/:clientEmail" 
+              element={<ComprehensiveQuestionnaire />}
             />
             <Route 
               path="/project/:projectId/questionnaire" 
