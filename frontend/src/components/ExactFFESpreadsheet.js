@@ -123,18 +123,19 @@ const ExactFFESpreadsheet = ({
     }));
   };
 
-  // EXACT COLORS FROM YOUR SCREENSHOTS - BRIGHT AND VIBRANT
+  // MUTED ROOM COLORS FOR FFE - CONSISTENT WITH OTHER SHEETS
   const getRoomColor = (roomName, index = 0) => {
-    const vibrantRoomColors = [
-      '#008B8B',  // Dark Turquoise/Teal - like "PRIMARY BATHROOM" 
-      '#4682B4',  // Steel Blue
-      '#228B22',  // Forest Green  
-      '#B8860B',  // Dark Goldenrod
-      '#8B4513',  // Saddle Brown
-      '#483D8B',  // Dark Slate Blue
-      '#CD853F',  // Peru
-      '#2F4F4F',  // Dark Slate Gray
-      '#8B008B',  // Dark Magenta
+    const mutedColors = [
+      '#8B5A6B',  // Muted rose
+      '#6B7C93',  // Muted blue  
+      '#7A8B5A',  // Muted olive
+      '#9B6B8B',  // Muted purple
+      '#8B7A5A',  // Muted brown
+      '#5A8B7A',  // Muted teal
+      '#8B5A7A',  // Muted mauve
+      '#7A5A8B',  // Muted violet
+      '#5A7A8B',  // Muted slate
+      '#8B6B5A'   // Muted tan
     ];
     
     // Use room name hash for consistent color per room
@@ -142,13 +143,13 @@ const ExactFFESpreadsheet = ({
     for (let i = 0; i < roomName.length; i++) {
       hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
     }
-    return vibrantRoomColors[Math.abs(hash) % vibrantRoomColors.length];
+    return mutedColors[Math.abs(hash) % mutedColors.length];
   };
 
-  const getCategoryColor = () => '#556B2F';  // Olive Green - like your screenshots
-  const getMainHeaderColor = () => '#8B4513';  // Saddle Brown for main headers
-  const getAdditionalInfoColor = () => '#CD853F';  // Peru for ADDITIONAL INFO
-  const getShippingInfoColor = () => '#4682B4';  // Steel Blue for SHIPPING INFO
+  const getCategoryColor = () => '#065F46';  // Dark green
+  const getMainHeaderColor = () => '#7F1D1D';  // Dark red for main headers
+  const getAdditionalInfoColor = () => '#92400E';  // Brown for ADDITIONAL INFO.
+  const getShippingInfoColor = () => '#6B21A8';  // Purple for SHIPPING INFO.
 
   // Status colors for FF&E
   const getStatusColor = (status) => {
