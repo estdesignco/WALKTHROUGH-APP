@@ -126,32 +126,23 @@ const ExactFFESpreadsheet = ({
     }));
   };
 
-  // EXACT COLORS FROM YOUR SCREENSHOTS - BRIGHT AND VIBRANT
-  const getRoomColor = (roomName, index = 0) => {
-    const vibrantRoomColors = [
-      '#008B8B',  // Dark Turquoise/Teal - like "PRIMARY BATHROOM" 
-      '#4682B4',  // Steel Blue
-      '#228B22',  // Forest Green  
-      '#B8860B',  // Dark Goldenrod
-      '#8B4513',  // Saddle Brown
-      '#483D8B',  // Dark Slate Blue
-      '#CD853F',  // Peru
-      '#2F4F4F',  // Dark Slate Gray
-      '#8B008B',  // Dark Magenta
-    ];
-    
-    // Use room name hash for consistent color per room
-    let hash = 0;
-    for (let i = 0; i < roomName.length; i++) {
-      hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return vibrantRoomColors[Math.abs(hash) % vibrantRoomColors.length];
+  // EXACT ROOM COLORS FROM YOUR ORIGINAL CODE
+  const ROOM_COLORS = {
+    'Living Room': '#8B5CF6', 'Kitchen': '#06B6D4', 'Dining Room': '#DC2626',
+    'Primary Bedroom': '#2F5233', 'Guest Bedroom': '#7C3AED', 'Home Office': '#EA580C',
+    'Primary Bathroom': '#0284C7', 'Guest Bathroom': '#7C2D12', 'Laundry Room': '#65A30D',
+    'Entryway': '#BE185D', 'Sunroom': '#0891B2', 'Nursery': '#C2410C',
+    'Master Bedroom': '#059669',
   };
 
-  const getCategoryColor = () => '#556B2F';  // Olive Green - like your screenshots
-  const getMainHeaderColor = () => '#8B4513';  // Saddle Brown for main headers
-  const getAdditionalInfoColor = () => '#CD853F';  // Peru for ADDITIONAL INFO
-  const getShippingInfoColor = () => '#4682B4';  // Steel Blue for SHIPPING INFO
+  const getRoomColor = (roomName, index = 0) => {
+    return ROOM_COLORS[roomName] || '#6B7280';
+  };
+
+  const getCategoryColor = () => '#4A6741';  // EXACT color from your original code
+  const getMainHeaderColor = () => '#8B5A3D';  // EXACT color for main headers from your code
+  const getAdditionalInfoColor = () => '#8B5A3D';  // EXACT color for ADDITIONAL INFO
+  const getShippingInfoColor = () => '#5B4A75';  // EXACT color for SHIPPING INFO
 
   // Status colors for FF&E
   const getStatusColor = (status) => {
