@@ -524,7 +524,7 @@ const SimpleChecklistSpreadsheet = ({
   console.log('✅ SimpleChecklistSpreadsheet: Rendering with', project.rooms.length, 'rooms');
 
   return (
-    <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
+    <div className="w-full" style={{ backgroundColor: '#0C0A09' }}>
       
       {/* ENHANCED FILTER SECTION - MATCHING FFE FUNCTIONALITY */}
       <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
