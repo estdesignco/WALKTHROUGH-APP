@@ -438,21 +438,24 @@ export default function ProjectPage() {
 
     const tabs = [
         { name: "Questionnaire", icon: FileQuestion, component: <CompleteFilledQuestionnaire /> },
-        { name: "Walkthrough", icon: Aperture, component: project ? (
-            <div style={{ marginTop: '-20px' }}>
-                <WalkthroughDashboard isOffline={false} />
+        { name: "Walkthrough", icon: Aperture, component: (
+            <div className="p-6">
+                <h2 className="text-2xl font-bold text-[#8B7355] mb-4">WALKTHROUGH</h2>
+                <p className="text-stone-400">Walkthrough functionality will be displayed here.</p>
             </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading walkthrough...</div> },
-        { name: "Checklist", icon: CheckSquare, component: project ? (
-            <div style={{ marginTop: '-20px' }}>
-                <ChecklistDashboard isOffline={false} />
+        )},
+        { name: "Checklist", icon: CheckSquare, component: (
+            <div className="p-6">
+                <h2 className="text-2xl font-bold text-[#8B7355] mb-4">CHECKLIST</h2>
+                <p className="text-stone-400">Checklist functionality will be displayed here.</p>
             </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading checklist...</div> },
-        { name: "FF&E", icon: Trello, component: project ? (
-            <div style={{ marginTop: '-20px' }}>
-                <FFEDashboard isOffline={false} />
+        )},
+        { name: "FF&E", icon: Trello, component: (
+            <div className="p-6">
+                <h2 className="text-2xl font-bold text-[#8B7355] mb-4">FF&E</h2>
+                <p className="text-stone-400">FF&E functionality will be displayed here.</p>
             </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading FF&E...</div> },
+        )},
     ];
 
     if (isLoading) {
