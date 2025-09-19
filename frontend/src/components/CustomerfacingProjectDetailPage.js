@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
