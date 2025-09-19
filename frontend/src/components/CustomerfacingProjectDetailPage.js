@@ -639,7 +639,9 @@ export default function ProjectPage() {
         if (projectId) {
             setIsLoading(true);
             try {
+                console.log('Fetching project:', projectId);
                 const projectData = await Project.get(projectId);
+                console.log('Project data received:', projectData);
                 setProject(projectData);
             } catch (error) {
                 console.error("Failed to fetch project:", error);
