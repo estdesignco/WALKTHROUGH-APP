@@ -663,6 +663,7 @@ export default function ProjectPage() {
     ];
 
     if (isLoading) {
+        console.log('Currently loading project...');
         return (
             <div className="flex items-center justify-center h-full">
                 <Loader2 className="w-12 h-12 mr-2 animate-spin text-stone-400" /> <span className="text-stone-300">Loading project...</span>
@@ -671,8 +672,11 @@ export default function ProjectPage() {
     }
     
     if (!project) {
+        console.log('Project not found or null');
         return <div className="text-center text-stone-300">Project not found.</div>;
     }
+
+    console.log('Rendering project page with project:', project);
 
     return (
         <div className="space-y-6">
