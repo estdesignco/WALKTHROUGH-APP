@@ -339,7 +339,7 @@ export default function Questionnaire() {
                 know_you_share_more: '', how_heard: '', how_heard_other: '',
             });
             // Redirect after successful project creation
-            window.location.href = createPageUrl(`Project?id=${newProject.id}`);
+            window.location.href = `/customer/project/${newProject.id}`;
         } catch (error) {
             console.error("Failed to create project:", error);
             setSubmissionStatus('error');
