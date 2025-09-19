@@ -679,8 +679,113 @@ export default function ProjectPage() {
         };
     }, [fetchProject]);
     
+    // Complete Filled Questionnaire Component
+    const CompleteFilledQuestionnaire = () => {
+        if (!project) return <div className="text-center text-stone-300 py-8">Loading questionnaire...</div>;
+        
+        return (
+            <div className="space-y-8 p-6">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-[#8B7355]">COMPREHENSIVE CLIENT QUESTIONNAIRE</h2>
+                    <button className="px-4 py-2 bg-[#8B7355] text-white rounded hover:bg-[#9c8563] transition-colors">
+                        Edit Answers
+                    </button>
+                </div>
+
+                {/* Client Information */}
+                <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
+                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">CLIENT INFORMATION</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Full Name</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.client_info?.full_name || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Project Name</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.name || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Email Address</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.client_info?.email || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Phone Number</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.client_info?.phone || 'Not provided'}
+                            </div>
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Project Address</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.client_info?.address || 'Not provided'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Project Details */}
+                <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
+                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">PROJECT DETAILS</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Project Type</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.project_type || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Timeline</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.timeline || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Budget Range</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.budget_range || project.budget || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Property Type</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.property_type || 'Not specified'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Project Rooms */}
+                <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
+                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">PROJECT ROOMS</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {project.rooms?.map((room, index) => (
+                            <div key={room.id || index} className="p-3 bg-stone-700 rounded border border-stone-600">
+                                <h4 className="font-semibold text-[#8B7355]">{room.name}</h4>
+                                {room.description && <p className="text-sm text-stone-400 mt-1">{room.description}</p>}
+                            </div>
+                        )) || (
+                            <p className="text-stone-400 col-span-full">No rooms specified</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Additional questionnaire sections can be added here */}
+                <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
+                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">ADDITIONAL INFORMATION</h3>
+                    <p className="text-stone-400">Complete questionnaire answers will be displayed here when available.</p>
+                </div>
+            </div>
+        );
+    };
+
     const tabs = [
-        { name: "Questionnaire", icon: FileQuestion, component: <div className="text-center text-stone-300 py-8">Complete questionnaire answers will be displayed here</div> },
+        { name: "Questionnaire", icon: FileQuestion, component: <CompleteFilledQuestionnaire /> },
         { name: "Walkthrough", icon: Aperture, component: <div className="text-center text-stone-300 py-8">Walkthrough spreadsheet will be displayed here</div> },
         { name: "Checklist", icon: CheckSquare, component: <div className="text-center text-stone-300 py-8">Checklist spreadsheet will be displayed here</div> },
         { name: "FF&E", icon: Trello, component: <div className="text-center text-stone-300 py-8">FF&E spreadsheet will be displayed here</div> },
