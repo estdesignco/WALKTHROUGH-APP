@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,71 +12,72 @@ import { Link } from 'react-router-dom';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-// API functions for projects
-const projectAPI = {
-  list: async (sort) => {
-    const response = await fetch(`${BACKEND_URL}/api/projects?sort=${sort || '-updated_date'}`);
-    if (!response.ok) throw new Error('Failed to fetch projects');
-    return await response.json();
-  },
-  create: async (data) => {
-    const response = await fetch(`${BACKEND_URL}/api/projects`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to create project');
-    return await response.json();
-  },
-  delete: async (id) => {
-    const response = await fetch(`${BACKEND_URL}/api/projects/${id}`, {
-      method: 'DELETE'
-    });
-    if (!response.ok) throw new Error('Failed to delete project');
-    return true;
-  }
+// API functions
+const Project = {
+    list: async (sort) => {
+        const response = await fetch(`${BACKEND_URL}/api/projects?sort=${sort || '-updated_date'}`);
+        if (!response.ok) throw new Error('Failed to fetch projects');
+        return await response.json();
+    },
+    create: async (data) => {
+        const response = await fetch(`${BACKEND_URL}/api/projects`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Failed to create project');
+        return await response.json();
+    },
+    delete: async (id) => {
+        const response = await fetch(`${BACKEND_URL}/api/projects/${id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete project');
+        return true;
+    }
 };
 
-// API functions for rooms
-const roomAPI = {
-  create: async (data) => {
-    const response = await fetch(`${BACKEND_URL}/api/rooms`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to create room');
-    return await response.json();
-  }
+const Room = {
+    create: async (data) => {
+        const response = await fetch(`${BACKEND_URL}/api/rooms`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Failed to create room');
+        return await response.json();
+    }
 };
 
-// API functions for items
-const itemAPI = {
-  bulkCreate: async (items) => {
-    const response = await fetch(`${BACKEND_URL}/api/items/bulk`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(items)
-    });
-    if (!response.ok) throw new Error('Failed to create items');
-    return await response.json();
-  }
+const Item = {
+    bulkCreate: async (items) => {
+        const response = await fetch(`${BACKEND_URL}/api/items/bulk`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(items)
+        });
+        if (!response.ok) throw new Error('Failed to create items');
+        return await response.json();
+    }
 };
 
-// Email sending function
 const SendEmail = async ({ to, subject, body, from_name }) => {
-  const response = await fetch(`${BACKEND_URL}/api/send-questionnaire-email`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      to,
-      subject,
-      body,
-      from_name
-    })
-  });
-  if (!response.ok) throw new Error('Failed to send email');
-  return await response.json();
+    const response = await fetch(`${BACKEND_URL}/api/send-questionnaire-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            to,
+            subject,
+            body,
+            from_name
+        })
+    });
+    if (!response.ok) throw new Error('Failed to send email');
+    return await response.json();
+};
+
+const createPageUrl = (page) => {
+    return `/customer/${page.toLowerCase()}`;
 };
 
 const NewProjectDialog = ({ isOpen, onOpenChange }) => {
@@ -202,14 +203,14 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
         }
         setIsLoading(true);
         try {
-            const newProject = await projectAPI.create(formData);
+            const newProject = await Project.create(formData);
 
             // Create rooms WITH THE CORRECT STARTER ITEMS
             if (formData.rooms_involved && formData.rooms_involved.length > 0) {
                 const uniqueRooms = [...new Set(formData.rooms_involved)];
                 
                 for (const roomName of uniqueRooms) {
-                    const newRoom = await roomAPI.create({ 
+                    const newRoom = await Room.create({ 
                         project_id: newProject.id, 
                         name: roomName, 
                         notes: '' 
@@ -254,11 +255,11 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                         quantity: 1,
                     }));
 
-                    await itemAPI.bulkCreate(itemsToCreate);
+                    await Item.bulkCreate(itemsToCreate);
                 }
             }
 
-            window.location.href = `/customer/project/${newProject.id}`;
+            window.location.href = createPageUrl(`Project?id=${newProject.id}`);
         } catch (error) {
             console.error('Failed to create project:', error);
             alert('Failed to create project. Please try again.');
@@ -479,6 +480,63 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                         </FieldWrapper>
                     </Section>
 
+                    {/* Design Preferences */}
+                    <Section title="Design Preferences">
+                        <FieldWrapper label="Style Preferences">
+                            <CheckboxGroup options={stylePrefOptions} value={formData.design_styles_preference} onChange={(v) => handleFormChange('design_styles_preference', v)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Color Palette Preference">
+                            <CheckboxGroup options={colorPrefOptions} value={formData.design_preferred_palette} onChange={(v) => handleFormChange('design_preferred_palette', v)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Artwork Preferences">
+                            <CheckboxGroup options={artworkPrefOptions} value={formData.design_artwork_preference} onChange={(v) => handleFormChange('design_artwork_preference', v)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="What do you love about your current home?">
+                            <Textarea className={inputStyles} value={formData.design_love_home || ''} onChange={(e) => handleFormChange('design_love_home', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="First impression you want guests to have">
+                            <Textarea className={inputStyles} value={formData.design_first_impression || ''} onChange={(e) => handleFormChange('design_first_impression', e.target.value)} />
+                        </FieldWrapper>
+                    </Section>
+
+                    {/* Personal Information */}
+                    <Section title="Getting to Know You">
+                        <FieldWrapper label="Household members (include ages of children)">
+                            <Textarea className={inputStyles} value={formData.know_you_household || ''} onChange={(e) => handleFormChange('know_you_household', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Pets">
+                            <Textarea className={inputStyles} value={formData.know_you_pets || ''} onChange={(e) => handleFormChange('know_you_pets', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Hobbies">
+                            <Textarea className={inputStyles} value={formData.know_you_hobbies || ''} onChange={(e) => handleFormChange('know_you_hobbies', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="How do you entertain guests?">
+                            <Textarea className={inputStyles} value={formData.know_you_entertaining_style || ''} onChange={(e) => handleFormChange('know_you_entertaining_style', e.target.value)} />
+                        </FieldWrapper>
+                    </Section>
+
+                    {/* Additional Questions */}
+                    <Section title="Additional Information">
+                        <FieldWrapper label="How did you hear about us?">
+                            <RadioGroup value={formData.how_heard} onValueChange={(value) => handleFormChange('how_heard', value)} className="text-stone-200">
+                                <div className="grid grid-cols-2 gap-2">
+                                    {["Internet Search", "Social Media", "Friend Referral", "Magazine", "Google", "Market Event", "Other"].map(option => (
+                                        <div key={option} className="flex items-center space-x-2">
+                                            <RadioGroupItem value={option} id={`heard-${option}`} className="border-stone-400 text-[#8B7355]" />
+                                            <Label htmlFor={`heard-${option}`} className="text-sm text-stone-200">{option}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </RadioGroup>
+                        </FieldWrapper>
+                        <FieldWrapper label="Pinterest/Houzz Links">
+                            <Textarea className={inputStyles} value={formData.design_pinterest_houzz || ''} onChange={(e) => handleFormChange('design_pinterest_houzz', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Additional Comments">
+                            <Textarea className={inputStyles} value={formData.design_additional_comments || ''} onChange={(e) => handleFormChange('design_additional_comments', e.target.value)} />
+                        </FieldWrapper>
+                    </Section>
+
                     <div className="flex justify-end gap-3 pt-4 border-t border-stone-700">
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="text-stone-200 border-stone-600 hover:bg-stone-700 hover:text-white">
                             Cancel
@@ -661,7 +719,7 @@ The Established Design Co. Team`
     );
 };
 
-export default function CustomerfacingLandingPage() {
+export default function Index() {
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingProject, setDeletingProject] = useState(null);
@@ -672,7 +730,7 @@ export default function CustomerfacingLandingPage() {
   const fetchProjects = async () => {
     setIsLoading(true);
     try {
-      const projectList = await projectAPI.list('-updated_date');
+      const projectList = await Project.list('-updated_date');
       setProjects(projectList);
     } catch (error) {
       console.error("Failed to fetch projects:", error);
@@ -689,7 +747,7 @@ export default function CustomerfacingLandingPage() {
     if (window.confirm(`Are you sure you want to delete "${projectName}"? This will also delete all associated rooms and items. This cannot be undone.`)) {
       setDeletingProject(projectId);
       try {
-        await projectAPI.delete(projectId);
+        await Project.delete(projectId);
         await fetchProjects(); // Refresh the list
       } catch (error) {
         console.error("Failed to delete project:", error);
@@ -727,7 +785,7 @@ export default function CustomerfacingLandingPage() {
                       </Button>
                   </DialogTrigger>
               </Dialog>
-              <Link to="/customer/questionnaire">
+              <Link to={createPageUrl("Questionnaire")}>
                   <Button className="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md transition-all duration-300 text-base">
                       <Plus className="mr-2 h-5 w-5" /> Full Questionnaire
                   </Button>
@@ -782,7 +840,7 @@ export default function CustomerfacingLandingPage() {
                             )}
                         </Button>
                       </div>
-                    <Link to={`/customer/project/${project.id}`} className="block p-6">
+                    <Link to={createPageUrl(`Project?id=${project.id}`)} className="block p-6">
                         <div className="flex justify-between items-start">
                             <div>
                                 <h2 className="text-2xl font-bold text-[#A0927B] group-hover:text-[#8B7355] transition-colors">{project.name}</h2>
