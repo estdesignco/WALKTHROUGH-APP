@@ -259,7 +259,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                 }
             }
 
-            window.location.href = `/customer/project/${newProject.id}`;
+            window.location.href = `/project/${newProject.id}/detail`;
         } catch (error) {
             console.error('Failed to create project:', error);
             alert('Failed to create project. Please try again.');
