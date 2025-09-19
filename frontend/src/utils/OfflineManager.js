@@ -84,7 +84,7 @@ class OfflineManager {
         });
 
       case 'UPDATE_INSTALLED':
-        return fetch(`https://interiormate-1.preview.emergentagent.com/api/items/${data.id}`, {
+        return fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items/${data.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
