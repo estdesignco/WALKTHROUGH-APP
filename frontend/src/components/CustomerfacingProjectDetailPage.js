@@ -175,9 +175,21 @@ export default function ProjectPage() {
 
     const tabs = [
         { name: "Questionnaire", icon: FileQuestion, component: <CompleteFilledQuestionnaire /> },
-        { name: "Walkthrough", icon: Aperture, component: <WalkthroughDashboard isOffline={false} /> },
-        { name: "Checklist", icon: CheckSquare, component: <ChecklistDashboard isOffline={false} /> },
-        { name: "FF&E", icon: Trello, component: <FFEDashboard isOffline={false} /> },
+        { name: "Walkthrough", icon: Aperture, component: project ? (
+            <div style={{ marginTop: '-20px' }}>
+                <WalkthroughDashboard isOffline={false} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading walkthrough...</div> },
+        { name: "Checklist", icon: CheckSquare, component: project ? (
+            <div style={{ marginTop: '-20px' }}>
+                <ChecklistDashboard isOffline={false} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading checklist...</div> },
+        { name: "FF&E", icon: Trello, component: project ? (
+            <div style={{ marginTop: '-20px' }}>
+                <FFEDashboard isOffline={false} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading FF&E...</div> },
     ];
 
     if (isLoading) {
