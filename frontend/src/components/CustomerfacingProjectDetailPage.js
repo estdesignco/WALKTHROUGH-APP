@@ -96,34 +96,49 @@ const EditableQuestionnaireTab = ({ project, onUpdate }) => {
 
     useEffect(() => {
         if (project) {
-            const initialData = { ...project };
-            
-            const contactFields = [
-                'new_build_architect_additional_contacts', 'new_build_builder_additional_contacts',
-                'renovation_architect_additional_contacts', 'renovation_builder_additional_contacts'
-            ];
-            contactFields.forEach(field => {
-                if (typeof initialData[field] === 'string') {
-                    initialData[field] = initialData[field].split(',').map(s => s.trim()).filter(Boolean);
-                } else if (!Array.isArray(initialData[field])) {
-                    initialData[field] = [];
+            try {
+                console.log('Processing project data for form:', project);
+                const initialData = { ...project };
+                
+                // Handle client_info mapping
+                if (project.client_info) {
+                    initialData.full_name = project.client_info.full_name || '';
+                    initialData.email = project.client_info.email || '';
+                    initialData.phone = project.client_info.phone || '';
+                    initialData.address = project.client_info.address || '';
                 }
-            });
+                
+                const contactFields = [
+                    'new_build_architect_additional_contacts', 'new_build_builder_additional_contacts',
+                    'renovation_architect_additional_contacts', 'renovation_builder_additional_contacts'
+                ];
+                contactFields.forEach(field => {
+                    if (typeof initialData[field] === 'string') {
+                        initialData[field] = initialData[field].split(',').map(s => s.trim()).filter(Boolean);
+                    } else if (!Array.isArray(initialData[field])) {
+                        initialData[field] = [];
+                    }
+                });
 
-            const arrayStringFields = [
-                'contact_preferences', 'project_priority', 'rooms_involved', 'additional_rooms_involved',
-                'design_preferred_palette', 'design_artwork_preference', 'design_styles_preference', 
-                'finishes_patterns_preference'
-            ];
-            arrayStringFields.forEach(field => {
-                if (Array.isArray(initialData[field])) {
-                    initialData[field] = initialData[field].join(', ');
-                } else if (typeof initialData[field] !== 'string') {
-                    initialData[field] = '';
-                }
-            });
-            
-            setFormData(initialData);
+                const arrayStringFields = [
+                    'contact_preferences', 'project_priority', 'rooms_involved', 'additional_rooms_involved',
+                    'design_preferred_palette', 'design_artwork_preference', 'design_styles_preference', 
+                    'finishes_patterns_preference'
+                ];
+                arrayStringFields.forEach(field => {
+                    if (Array.isArray(initialData[field])) {
+                        initialData[field] = initialData[field].join(', ');
+                    } else if (typeof initialData[field] !== 'string') {
+                        initialData[field] = '';
+                    }
+                });
+                
+                console.log('Form data processed successfully:', initialData);
+                setFormData(initialData);
+            } catch (error) {
+                console.error('Error processing form data:', error);
+                setFormData({ ...project });
+            }
         }
     }, [project]);
 
