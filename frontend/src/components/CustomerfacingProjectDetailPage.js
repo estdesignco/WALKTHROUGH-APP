@@ -671,6 +671,11 @@ export default function ProjectPage() {
 
     useEffect(() => {
         fetchProject();
+        
+        // Cleanup function to reset fetch flag on unmount
+        return () => {
+            hasFetched.current = false;
+        };
     }, [fetchProject]);
     
     // Simple Editable Questionnaire Component
