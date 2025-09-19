@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
     Select,
     SelectContent,
@@ -12,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import {
     Accordion,
     AccordionContent,
@@ -22,71 +23,71 @@ import {
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 // API functions
-const projectAPI = {
-  get: async (id) => {
-    const response = await fetch(`${BACKEND_URL}/api/projects/${id}`);
-    if (!response.ok) throw new Error('Failed to fetch project');
-    return await response.json();
-  },
-  update: async (id, data) => {
-    const response = await fetch(`${BACKEND_URL}/api/projects/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to update project');
-    return await response.json();
-  }
+const Project = {
+    get: async (id) => {
+        const response = await fetch(`${BACKEND_URL}/api/projects/${id}`);
+        if (!response.ok) throw new Error('Failed to fetch project');
+        return await response.json();
+    },
+    update: async (id, data) => {
+        const response = await fetch(`${BACKEND_URL}/api/projects/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Failed to update project');
+        return await response.json();
+    }
 };
 
-const roomAPI = {
-  filter: async (filter) => {
-    const params = new URLSearchParams(filter);
-    const response = await fetch(`${BACKEND_URL}/api/rooms?${params}`);
-    if (!response.ok) throw new Error('Failed to fetch rooms');
-    return await response.json();
-  },
-  create: async (data) => {
-    const response = await fetch(`${BACKEND_URL}/api/rooms`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to create room');
-    return await response.json();
-  },
-  delete: async (id) => {
-    const response = await fetch(`${BACKEND_URL}/api/rooms/${id}`, {
-      method: 'DELETE'
-    });
-    if (!response.ok) throw new Error('Failed to delete room');
-    return true;
-  }
+const Room = {
+    filter: async (filter) => {
+        const params = new URLSearchParams(filter);
+        const response = await fetch(`${BACKEND_URL}/api/rooms?${params}`);
+        if (!response.ok) throw new Error('Failed to fetch rooms');
+        return await response.json();
+    },
+    create: async (data) => {
+        const response = await fetch(`${BACKEND_URL}/api/rooms`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Failed to create room');
+        return await response.json();
+    },
+    delete: async (id) => {
+        const response = await fetch(`${BACKEND_URL}/api/rooms/${id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete room');
+        return true;
+    }
 };
 
-const itemAPI = {
-  filter: async (filter) => {
-    const params = new URLSearchParams(filter);
-    const response = await fetch(`${BACKEND_URL}/api/items?${params}`);
-    if (!response.ok) throw new Error('Failed to fetch items');
-    return await response.json();
-  },
-  bulkCreate: async (items) => {
-    const response = await fetch(`${BACKEND_URL}/api/items/bulk`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(items)
-    });
-    if (!response.ok) throw new Error('Failed to create items');
-    return await response.json();
-  },
-  delete: async (id) => {
-    const response = await fetch(`${BACKEND_URL}/api/items/${id}`, {
-      method: 'DELETE'
-    });
-    if (!response.ok) throw new Error('Failed to delete item');
-    return true;
-  }
+const Item = {
+    filter: async (filter) => {
+        const params = new URLSearchParams(filter);
+        const response = await fetch(`${BACKEND_URL}/api/items?${params}`);
+        if (!response.ok) throw new Error('Failed to fetch items');
+        return await response.json();
+    },
+    bulkCreate: async (items) => {
+        const response = await fetch(`${BACKEND_URL}/api/items/bulk`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(items)
+        });
+        if (!response.ok) throw new Error('Failed to create items');
+        return await response.json();
+    },
+    delete: async (id) => {
+        const response = await fetch(`${BACKEND_URL}/api/items/${id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete item');
+        return true;
+    }
 };
 
 const EditableQuestionnaireTab = ({ project, onUpdate }) => {
@@ -186,24 +187,24 @@ const EditableQuestionnaireTab = ({ project, onUpdate }) => {
             // Room sync logic
             const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
             const newRoomsInvolved = new Set([...(dataToSave.rooms_involved || []), ...(dataToSave.additional_rooms_involved || [])]);
-            const currentRooms = await roomAPI.filter({ project_id: project.id });
+            const currentRooms = await Room.filter({ project_id: project.id });
             const currentRoomNames = new Set(currentRooms.map(r => r.name));
 
             const roomsToAdd = Array.from(newRoomsInvolved).filter(name => !currentRoomNames.has(name));
             const roomsToDelete = currentRooms.filter(room => !newRoomsInvolved.has(room.name));
 
             for (const roomToDelete of roomsToDelete) {
-                const roomItems = await itemAPI.filter({ room_id: roomToDelete.id });
+                const roomItems = await Item.filter({ room_id: roomToDelete.id });
                 for (const item of roomItems) {
-                    await itemAPI.delete(item.id);
+                    await Item.delete(item.id);
                     await sleep(100);
                 }
-                await roomAPI.delete(roomToDelete.id);
+                await Room.delete(roomToDelete.id);
             }
 
-            // Create new rooms with basic items
+            // THIS IS THE CORRECTED, SIMPLIFIED ITEM POPULATION LOGIC
             for (const roomNameToAdd of roomsToAdd) {
-                const newRoom = await roomAPI.create({ project_id: project.id, name: roomNameToAdd });
+                const newRoom = await Room.create({ project_id: project.id, name: roomNameToAdd });
                 
                 const basicItems = [
                     { category: 'LIGHTING', sub_category: 'CEILING', name: 'Ceiling Light - Click to edit' },
@@ -243,10 +244,10 @@ const EditableQuestionnaireTab = ({ project, onUpdate }) => {
                     quantity: 1,
                 }));
 
-                await itemAPI.bulkCreate(itemsToCreate);
+                await Item.bulkCreate(itemsToCreate);
             }
             
-            await projectAPI.update(project.id, dataToSave);
+            await Project.update(project.id, dataToSave);
             onUpdate();
             alert('Project updated successfully!');
 
@@ -270,6 +271,7 @@ const EditableQuestionnaireTab = ({ project, onUpdate }) => {
     };
 
     const handlePhoneChange = (value) => {
+        // Only update if value is valid for phone formatting or empty
         if (/^[\d-]*$/.test(value) || value === '') {
             handleFieldChange('phone', formatPhone(value));
         }
@@ -290,7 +292,7 @@ const EditableQuestionnaireTab = ({ project, onUpdate }) => {
         </div>
     );
 
-    // Helper for rendering textarea fields
+    // Helper for rendering textarea fields - simplified to handle strings naturally
     const renderTextarea = (label, field, placeholder = "") => (
         <div>
             <Label htmlFor={field} className="text-stone-300">{label}</Label>
@@ -358,9 +360,11 @@ const EditableQuestionnaireTab = ({ project, onUpdate }) => {
             </div>
 
             {/* Client & Project Information */}
-            <div className="bg-[#1E293B] border-stone-700 shadow-lg rounded-lg p-6">
-                <h3 className="text-[#8B7355] text-xl font-semibold mb-4">Client & Project Information</h3>
-                <div className="space-y-4">
+            <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-[#8B7355]">Client & Project Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {renderInput("Project Name", "name")}
                         {renderInput("Client Name", "client_name")}
@@ -389,13 +393,15 @@ const EditableQuestionnaireTab = ({ project, onUpdate }) => {
                             { value: "low", label: "Low - I trust you to make most decisions" },
                         ])}
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
             {/* Scope & Budget */}
-            <div className="bg-[#1E293B] border-stone-700 shadow-lg rounded-lg p-6">
-                <h3 className="text-[#8B7355] text-xl font-semibold mb-4">Scope & Budget</h3>
-                <div className="space-y-4">
+            <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-[#8B7355]">Scope & Budget</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {renderSelect("Project Type", "project_type", [
                             { value: "New Build", label: "New Build" },
@@ -423,13 +429,135 @@ const EditableQuestionnaireTab = ({ project, onUpdate }) => {
                             {renderTextarea("Other Project Description", "other_project_description")}
                         </div>
                     )}
-                </div>
-            </div>
+                </CardContent>
+            </Card>
+
+            {/* Conditional Sections based on Project Type */}
+            {formData.project_type === 'New Build' && (
+                <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                    <CardHeader>
+                        <CardTitle className="text-[#8B7355]">New Build Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <Accordion type="multiple" className="w-full" defaultValue={['architect', 'builder']}>
+                            <AccordionItem value="architect" className="border-b-stone-600">
+                                <AccordionTrigger className="text-lg text-stone-300 hover:no-underline">Architect Information</AccordionTrigger>
+                                <AccordionContent className="pt-4 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderInput("Architect", "new_build_architect")}
+                                        {renderInput("Architect Main Contact", "new_build_architect_main_contact")}
+                                        {renderInput("Architect Email", "new_build_architect_email", "email")}
+                                        {renderInput("Architect Phone", "new_build_architect_phone")}
+                                        {renderContactList("Architect Additional Contacts", "new_build_architect_additional_contacts")}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="builder" className="border-b-stone-600">
+                                <AccordionTrigger className="text-lg text-stone-300 hover:no-underline">Builder Information</AccordionTrigger>
+                                <AccordionContent className="pt-4 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderInput("Builder", "new_build_builder")}
+                                        {renderInput("Builder Main Contact", "new_build_builder_main_contact")}
+                                        {renderInput("Builder Email", "new_build_builder_email", "email")}
+                                        {renderInput("Builder Phone", "new_build_builder_phone")}
+                                        {renderContactList("Builder Additional Contacts", "new_build_builder_additional_contacts")}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-stone-600 pt-6">
+                            {renderInput("New Build Address", "new_build_address")}
+                             {renderSelect("Has Plans", "new_build_has_plans", [
+                                { value: "yes", label: "Yes" },
+                                { value: "no", label: "No" },
+                            ])}
+                            {renderInput("Process Stage", "new_build_process_stage")}
+                            {renderSelect("Needs Furniture", "new_build_need_furniture", [
+                                { value: "yes", label: "Yes" },
+                                { value: "no", label: "No" },
+                            ])}
+                        </div>
+                        {renderTextarea("New Build Scope Notes", "new_build_scope_notes")}
+                    </CardContent>
+                </Card>
+            )}
+
+            {formData.project_type === 'Renovation' && (
+                <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                    <CardHeader>
+                        <CardTitle className="text-[#8B7355]">Renovation Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                       <Accordion type="multiple" className="w-full" defaultValue={['architect', 'builder']}>
+                            <AccordionItem value="architect" className="border-b-stone-600">
+                                <AccordionTrigger className="text-lg text-stone-300 hover:no-underline">Architect Information</AccordionTrigger>
+                                <AccordionContent className="pt-4 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderInput("Architect", "renovation_architect")}
+                                        {renderInput("Architect Main Contact", "renovation_architect_main_contact")}
+                                        {renderInput("Architect Email", "renovation_architect_email", "email")}
+                                        {renderInput("Architect Phone", "renovation_architect_phone")}
+                                        {renderContactList("Architect Additional Contacts", "renovation_architect_additional_contacts")}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="builder" className="border-b-stone-600">
+                                <AccordionTrigger className="text-lg text-stone-300 hover:no-underline">Builder Information</AccordionTrigger>
+                                <AccordionContent className="pt-4 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderInput("Builder", "renovation_builder")}
+                                        {renderInput("Builder Main Contact", "renovation_builder_main_contact")}
+                                        {renderInput("Builder Email", "renovation_builder_email", "email")}
+                                        {renderInput("Builder Phone", "renovation_builder_phone")}
+                                        {renderContactList("Builder Additional Contacts", "renovation_builder_additional_contacts")}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-stone-600 pt-6">
+                            {renderInput("Renovation Address", "renovation_address")}
+                            {renderInput("Move-in Date", "renovation_move_in_date", "date")}
+                            {renderSelect("Has Updated Plans", "renovation_has_updated_plans", [
+                                { value: "yes", label: "Yes" },
+                                { value: "no", label: "No" },
+                            ])}
+                            {renderSelect("Needs Furniture", "renovation_need_furniture", [
+                                { value: "yes", label: "Yes" },
+                                { value: "no", label: "No" },
+                            ])}
+                        </div>
+                        {renderTextarea("Existing Condition", "renovation_existing_condition")}
+                        {renderTextarea("Renovation Memories", "renovation_memories")}
+                        {renderTextarea("Renovation Scope Notes", "renovation_scope_notes")}
+                    </CardContent>
+                </Card>
+            )}
+
+            {formData.project_type === 'Furniture/Styling Refresh' && (
+                <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                    <CardHeader>
+                        <CardTitle className="text-[#8B7355]">Furniture/Styling Refresh Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {renderSelect("Has Current Plans", "furniture_has_current_plans", [
+                                { value: "yes", label: "Yes" },
+                                { value: "no", label: "No" },
+                            ])}
+                            {renderInput("Move-in Date", "furniture_move_in_date", "date")}
+                        </div>
+                        {renderTextarea("Condition of Refresh", "furniture_refresh_condition")}
+                        {renderTextarea("Furniture Scope Notes", "furniture_scope_notes")}
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Design & Style Preferences */}
-            <div className="bg-[#1E293B] border-stone-700 shadow-lg rounded-lg p-6">
-                <h3 className="text-[#8B7355] text-xl font-semibold mb-4">Design & Style Preferences</h3>
-                <div className="space-y-4">
+            <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-[#8B7355]">Design & Style Preferences</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {renderTextarea("What They Love About Home", "design_love_home")}
                         {renderTextarea("How Space Will Be Used", "design_space_use")}
@@ -449,13 +577,15 @@ const EditableQuestionnaireTab = ({ project, onUpdate }) => {
                         {renderInput("Pinterest/Houzz Links", "design_pinterest_houzz")}
                         {renderTextarea("Additional Design Comments", "design_additional_comments")}
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
             {/* Get To Know You */}
-            <div className="bg-[#1E293B] border-stone-700 shadow-lg rounded-lg p-6">
-                <h3 className="text-[#8B7355] text-xl font-semibold mb-4">Get To Know You</h3>
-                <div className="space-y-4">
+            <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-[#8B7355]">Get To Know You</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {renderTextarea("Household Members", "know_you_household")}
                         {renderTextarea("Pets", "know_you_pets")}
@@ -479,24 +609,26 @@ const EditableQuestionnaireTab = ({ project, onUpdate }) => {
                         {renderTextarea("Future Family Plans (5-10 years)", "know_you_future_plans")}
                         {renderTextarea("Anything Else to Share", "know_you_share_more")}
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
             {/* Referral */}
-            <div className="bg-[#1E293B] border-stone-700 shadow-lg rounded-lg p-6">
-                <h3 className="text-[#8B7355] text-xl font-semibold mb-4">Referral</h3>
-                <div className="space-y-4">
+            <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-[#8B7355]">Referral</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {renderInput("How They Heard About Us", "how_heard")}
                         {renderTextarea("Other Referral Details", "how_heard_other")}
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
 };
 
-export default function CustomerfacingProjectDetailPage() {
+export default function ProjectPage() {
     const { projectId } = useParams();
     
     const [project, setProject] = useState(null);
@@ -507,7 +639,7 @@ export default function CustomerfacingProjectDetailPage() {
         if (projectId) {
             setIsLoading(true);
             try {
-                const projectData = await projectAPI.get(projectId);
+                const projectData = await Project.get(projectId);
                 setProject(projectData);
             } catch (error) {
                 console.error("Failed to fetch project:", error);
