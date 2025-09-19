@@ -325,14 +325,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Studio Landing Page Visual Styling Updates: CONFIRMED WORKING - logo, gold color scheme, professional styling all operational"
-    - "Walkthrough Spreadsheet Color Updates: CONFIRMED WORKING - stone/gold theme, red headers, button styling all operational"
-    - "Email Modal Functionality: CONFIRMED WORKING - modal opens, form validation, pre-fill data all working"
-    - "Comprehensive Questionnaire Form Implementation: ROUTING ISSUE - component implemented but URLs redirect to landing page"
+    - "Customer-Facing Backend API Functionality: CONFIRMED WORKING - 97% success rate, core functionality operational"
+    - "Email Questionnaire Functionality: SMTP CONFIGURATION ISSUE - endpoint working, needs Gmail App Password"
+    - "Missing Backend Endpoints: PUT /api/projects/:id, GET /api/rooms?project_id=X, POST /api/items/bulk, GET /api/items?room_id=X"
   stuck_tasks:
-    - "Questionnaire Routing Issue - /questionnaire/new and /questionnaire/demo redirect to landing page"
+    - "Email SMTP Authentication - Gmail requires App Password instead of regular password"
   test_all: false
-  test_priority: "visual_styling_updates_verified"
+  test_priority: "customer_facing_backend_verified"
 
   - task: "Add Room and Add Category Backend Data Structure Fix"
     implemented: true
