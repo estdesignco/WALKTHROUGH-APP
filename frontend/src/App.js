@@ -187,6 +187,19 @@ const App = () => {
               path="/scraping-test" 
               element={<ScrapingTestPage />}
             />
+            {/* Customer-facing routes */}
+            <Route 
+              path="/customer" 
+              element={<CustomerfacingLandingPage />}
+            />
+            <Route 
+              path="/customer/questionnaire" 
+              element={<CustomerfacingQuestionnaire />}
+            />
+            <Route 
+              path="/customer/project/:projectId" 
+              element={<CustomerfacingProjectDetailPage />}
+            />
           </Routes>
         </main>
       </BrowserRouter>
