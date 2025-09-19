@@ -8,9 +8,10 @@ import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 
-const WalkthroughDashboard = ({ isOffline, hideNavigation = false }) => {
+const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.error("🚨 WALKTHROUGH DASHBOARD IS LOADING!");
-  const { projectId } = useParams();
+  const { projectId: paramProjectId } = useParams();
+  const projectId = propProjectId || paramProjectId;
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
