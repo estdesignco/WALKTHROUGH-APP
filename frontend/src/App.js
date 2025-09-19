@@ -140,6 +140,10 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
+              element={<CustomerfacingLandingPage />}
+            />
+            <Route 
+              path="/studio" 
               element={<StudioLandingPage />}
             />
             <Route 
@@ -198,6 +202,14 @@ const App = () => {
             />
             <Route 
               path="/customer/project/:projectId" 
+              element={<CustomerfacingProjectDetailPage />}
+            />
+            <Route 
+              path="/questionnaire" 
+              element={<CustomerfacingQuestionnaire />}
+            />
+            <Route 
+              path="/project/:projectId/detail" 
               element={<CustomerfacingProjectDetailPage />}
             />
           </Routes>
