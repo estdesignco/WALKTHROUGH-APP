@@ -652,7 +652,8 @@ export default function ProjectPage() {
     const hasFetched = useRef(false);
 
     const fetchProject = useCallback(async () => {
-        if (projectId) {
+        if (projectId && !hasFetched.current) {
+            hasFetched.current = true;
             setIsLoading(true);
             try {
                 console.log('Fetching project:', projectId);
@@ -661,6 +662,7 @@ export default function ProjectPage() {
                 setProject(projectData);
             } catch (error) {
                 console.error("Failed to fetch project:", error);
+                hasFetched.current = false; // Reset on error to allow retry
             } finally {
                 setIsLoading(false);
             }
