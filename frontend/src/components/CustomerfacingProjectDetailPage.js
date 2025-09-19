@@ -656,7 +656,7 @@ export default function ProjectPage() {
     }, [fetchProject]);
     
     const tabs = [
-        { name: "Questionnaire", icon: FileQuestion, component: <EditableQuestionnaireTab project={project} onUpdate={fetchProject} /> },
+        { name: "Questionnaire", icon: FileQuestion, component: <div className="text-center text-stone-300 py-8">Questionnaire will be displayed here</div> },
         { name: "Walkthrough", icon: Aperture, component: <div className="text-center text-stone-300 py-8">Walkthrough spreadsheet will be displayed here</div> },
         { name: "Checklist", icon: CheckSquare, component: <div className="text-center text-stone-300 py-8">Checklist spreadsheet will be displayed here</div> },
         { name: "FF&E", icon: Trello, component: <div className="text-center text-stone-300 py-8">FF&E spreadsheet will be displayed here</div> },
