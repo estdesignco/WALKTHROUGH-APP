@@ -96,7 +96,7 @@ class OfflineManager {
         });
 
       case 'CREATE_ROOM':
-        return fetch(`https://interiormate-1.preview.emergentagent.com/api/rooms`, {
+        return fetch(`${process.env.REACT_APP_BACKEND_URL}/api/rooms`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
