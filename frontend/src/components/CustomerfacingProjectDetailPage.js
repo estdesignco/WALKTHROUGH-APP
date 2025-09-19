@@ -680,7 +680,7 @@ export default function ProjectPage() {
                     Back to All Projects
                 </Link>
                 <h1 className="text-6xl font-bold" style={{color: '#8B7355'}}>{project.name}</h1>
-                <p className="text-stone-300 mt-1 text-lg">{project.client_name} - {project.address}</p>
+                <p className="text-stone-300 mt-1 text-lg">{project.client_info?.full_name || project.client_name} - {project.client_info?.address || project.address}</p>
             </div>
 
             <div className="border-b border-stone-700">
