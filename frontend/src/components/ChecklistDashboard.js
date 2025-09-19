@@ -259,58 +259,62 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false }) => {
           />
         </div>
 
-        {/* FF&E TITLE WITH EXPORT BUTTONS */}
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>CHECKLIST - GREENE</h3>
-          <div className="flex space-x-4">
-            <button
-              style={{ backgroundColor: '#8b7355' }}
-              className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
-            >
-              <span>📥</span>
-              <span>Export FF&E</span>
-            </button>
-            <button
-              style={{ backgroundColor: '#8b7355' }}
-              className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
-            >
-              <span>📋</span>
-              <span>Spec Sheet</span>
-            </button>
-          </div>
-        </div>
+        {!hideNavigation && (
+          <>
+            {/* FF&E TITLE WITH EXPORT BUTTONS */}
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>CHECKLIST - GREENE</h3>
+              <div className="flex space-x-4">
+                <button
+                  style={{ backgroundColor: '#8b7355' }}
+                  className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
+                >
+                  <span>📥</span>
+                  <span>Export FF&E</span>
+                </button>
+                <button
+                  style={{ backgroundColor: '#8b7355' }}
+                  className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
+                >
+                  <span>📋</span>
+                  <span>Spec Sheet</span>
+                </button>
+              </div>
+            </div>
 
-        {/* PIE CHART AND STATUS BREAKDOWN */}
-        <ChecklistStatusOverview
-          totalItems={getTotalItems()}
-          statusBreakdown={getStatusBreakdown()}
-          carrierBreakdown={getCarrierBreakdown()}
-          itemStatuses={itemStatuses}
-        />
-
-        {/* SEARCH BAR AND ADD ROOM BUTTON */}
-        <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
-          <div className="flex items-center space-x-4 flex-1">
-            <input
-              type="text"
-              placeholder="Search Items..."
-              className="flex-1 bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500"
+            {/* PIE CHART AND STATUS BREAKDOWN */}
+            <ChecklistStatusOverview
+              totalItems={getTotalItems()}
+              statusBreakdown={getStatusBreakdown()}
+              carrierBreakdown={getCarrierBreakdown()}
+              itemStatuses={itemStatuses}
             />
-            <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
-              <option>All Rooms</option>
-            </select>
-            <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
-              <option>All Statuses</option>
-            </select>
-          </div>
-          <button
-            onClick={() => setShowAddRoom(true)}
-            style={{ backgroundColor: '#8b7355' }}
-            className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors ml-4"
-          >
-            ➕ Add Room
-          </button>
-        </div>
+
+            {/* SEARCH BAR AND ADD ROOM BUTTON */}
+            <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
+              <div className="flex items-center space-x-4 flex-1">
+                <input
+                  type="text"
+                  placeholder="Search Items..."
+                  className="flex-1 bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500"
+                />
+                <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+                  <option>All Rooms</option>
+                </select>
+                <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+                  <option>All Statuses</option>
+                </select>
+              </div>
+              <button
+                onClick={() => setShowAddRoom(true)}
+                style={{ backgroundColor: '#8b7355' }}
+                className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors ml-4"
+              >
+                ➕ Add Room
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       {/* FF&E Spreadsheet */}
