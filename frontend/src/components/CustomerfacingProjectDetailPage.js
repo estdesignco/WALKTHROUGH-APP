@@ -689,7 +689,7 @@ export default function ProjectPage() {
                             type="text"
                             value={project?.name || ''}
                             readOnly
-                            className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
+                            readOnly className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
                     <div>
@@ -697,7 +697,7 @@ export default function ProjectPage() {
                         <input
                             type="text"
                             value={project?.client_info?.full_name || ''}
-                            className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
+                            readOnly className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
                     <div>
@@ -705,7 +705,7 @@ export default function ProjectPage() {
                         <input
                             type="email"
                             value={project?.client_info?.email || ''}
-                            className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
+                            readOnly className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
                     <div>
@@ -713,7 +713,7 @@ export default function ProjectPage() {
                         <input
                             type="text"
                             value={project?.client_info?.phone || ''}
-                            className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
+                            readOnly className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
                     <div className="md:col-span-2">
@@ -721,14 +721,14 @@ export default function ProjectPage() {
                         <input
                             type="text"
                             value={project?.client_info?.address || ''}
-                            className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
+                            readOnly className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-stone-300 mb-2">Project Type</label>
                         <select
                             value={project?.project_type || ''}
-                            className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
+                            readOnly className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         >
                             <option value="">Select...</option>
                             <option value="New Build">New Build</option>
@@ -741,7 +741,7 @@ export default function ProjectPage() {
                         <input
                             type="text"
                             value={project?.timeline || ''}
-                            className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"  
+                            readOnly className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"  
                         />
                     </div>
                     <div className="md:col-span-2">
@@ -749,7 +749,7 @@ export default function ProjectPage() {
                         <input
                             type="text"
                             value={project?.budget || ''}
-                            className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
+                            readOnly className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
                 </div>
