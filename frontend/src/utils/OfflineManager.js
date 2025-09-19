@@ -77,26 +77,26 @@ class OfflineManager {
 
     switch (type) {
       case 'CREATE_INSTALLED':
-        return fetch(`https://studio-assist-1.preview.emergentagent.com/api/items`, {
+        return fetch(`https://interiormate-1.preview.emergentagent.com/api/items`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
 
       case 'UPDATE_INSTALLED':
-        return fetch(`https://studio-assist-1.preview.emergentagent.com/api/items/${data.id}`, {
+        return fetch(`https://interiormate-1.preview.emergentagent.com/api/items/${data.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
 
       case 'DELETE_INSTALLED':
-        return fetch(`https://studio-assist-1.preview.emergentagent.com/api/items/${data.id}`, {
+        return fetch(`https://interiormate-1.preview.emergentagent.com/api/items/${data.id}`, {
           method: 'DELETE'
         });
 
       case 'CREATE_ROOM':
-        return fetch(`https://studio-assist-1.preview.emergentagent.com/api/rooms`, {
+        return fetch(`https://interiormate-1.preview.emergentagent.com/api/rooms`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
