@@ -216,25 +216,29 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
           <p className="text-gray-300">Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex justify-center space-x-8 mb-6">
-          <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
-            <span>📋</span>
-            <span>Questionnaire</span>
-          </a>
-          <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
-            <span>🚶</span>
-            <span>Walkthrough</span>
-          </a>
-          <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
-            <span>✅</span>
-            <span>Checklist</span>
-          </a>
-          <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
-            <span>📊</span>
-            <span className="font-semibold">FF&E</span>
-          </div>
-        </div>
+        {!hideNavigation && (
+          <>
+            {/* Navigation Tabs */}
+            <div className="flex justify-center space-x-8 mb-6">
+              <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>📋</span>
+                <span>Questionnaire</span>
+              </a>
+              <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>🚶</span>
+                <span>Walkthrough</span>
+              </a>
+              <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>✅</span>
+                <span>Checklist</span>
+              </a>
+              <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
+                <span>📊</span>
+                <span className="font-semibold">FF&E</span>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* LOGO BANNER */}
         <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}>
