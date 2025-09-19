@@ -688,6 +688,7 @@ export default function ProjectPage() {
                         <input
                             type="text"
                             value={project?.name || ''}
+                            readOnly
                             className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
