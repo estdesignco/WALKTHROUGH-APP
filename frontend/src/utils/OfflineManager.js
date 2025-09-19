@@ -77,7 +77,7 @@ class OfflineManager {
 
     switch (type) {
       case 'CREATE_INSTALLED':
-        return fetch(`https://interiormate-1.preview.emergentagent.com/api/items`, {
+        return fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
