@@ -678,89 +678,55 @@ export default function ProjectPage() {
         };
     }, [fetchProject]);
     
-    // Simple Editable Questionnaire Component
-    const SimpleEditableQuestionnaire = ({ project }) => {
-        const [formData, setFormData] = useState({});
-        
-        useEffect(() => {
-            if (project) {
-                setFormData({
-                    name: project.name || '',
-                    full_name: project.client_info?.full_name || '',
-                    email: project.client_info?.email || '',
-                    phone: project.client_info?.phone || '',
-                    address: project.client_info?.address || '',
-                    project_type: project.project_type || '',
-                    timeline: project.timeline || '',
-                    budget: project.budget || ''
-                });
-            }
-        }, [project]);
-
-        const handleChange = (field, value) => {
-            setFormData(prev => ({ ...prev, [field]: value }));
-        };
-
-        return (
+    const tabs = [
+        { name: "Questionnaire", icon: FileQuestion, component: (
             <div className="space-y-6 p-6">
                 <h3 className="text-xl font-bold text-[#8B7355] mb-4">FILLED QUESTIONNAIRE (EDITABLE)</h3>
-                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-stone-300 mb-2">Project Name</label>
                         <input
                             type="text"
-                            value={formData.name || ''}
-                            onChange={(e) => handleChange('name', e.target.value)}
+                            value={project?.name || ''}
                             className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
-                    
                     <div>
                         <label className="block text-sm font-medium text-stone-300 mb-2">Client Name</label>
                         <input
                             type="text"
-                            value={formData.full_name || ''}
-                            onChange={(e) => handleChange('full_name', e.target.value)}
+                            value={project?.client_info?.full_name || ''}
                             className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
-                    
                     <div>
                         <label className="block text-sm font-medium text-stone-300 mb-2">Email</label>
                         <input
                             type="email"
-                            value={formData.email || ''}
-                            onChange={(e) => handleChange('email', e.target.value)}
+                            value={project?.client_info?.email || ''}
                             className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
-                    
                     <div>
                         <label className="block text-sm font-medium text-stone-300 mb-2">Phone</label>
                         <input
                             type="text"
-                            value={formData.phone || ''}
-                            onChange={(e) => handleChange('phone', e.target.value)}
+                            value={project?.client_info?.phone || ''}
                             className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
-                    
                     <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-stone-300 mb-2">Address</label>
                         <input
                             type="text"
-                            value={formData.address || ''}
-                            onChange={(e) => handleChange('address', e.target.value)}  
+                            value={project?.client_info?.address || ''}
                             className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
-                    
                     <div>
                         <label className="block text-sm font-medium text-stone-300 mb-2">Project Type</label>
                         <select
-                            value={formData.project_type || ''}
-                            onChange={(e) => handleChange('project_type', e.target.value)}
+                            value={project?.project_type || ''}
                             className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         >
                             <option value="">Select...</option>
@@ -769,39 +735,28 @@ export default function ProjectPage() {
                             <option value="Furniture Refresh">Furniture Refresh</option>
                         </select>
                     </div>
-                    
                     <div>
                         <label className="block text-sm font-medium text-stone-300 mb-2">Timeline</label>
                         <input
                             type="text"
-                            value={formData.timeline || ''}
-                            onChange={(e) => handleChange('timeline', e.target.value)}
-                            className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
+                            value={project?.timeline || ''}
+                            className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"  
                         />
                     </div>
-                    
                     <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-stone-300 mb-2">Budget</label>
                         <input
                             type="text"
-                            value={formData.budget || ''}
-                            onChange={(e) => handleChange('budget', e.target.value)}
+                            value={project?.budget || ''}
                             className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
                         />
                     </div>
                 </div>
-                
-                <button
-                    className="mt-6 px-6 py-3 bg-[#8B7355] text-white rounded hover:bg-[#9c8563] transition-colors"
-                >
+                <button className="mt-6 px-6 py-3 bg-[#8B7355] text-white rounded hover:bg-[#9c8563] transition-colors">
                     Save Changes
                 </button>
             </div>
-        );
-    };
-
-    const tabs = [
-        { name: "Questionnaire", icon: FileQuestion, component: project ? <SimpleEditableQuestionnaire project={project} /> : <div className="text-center text-stone-300 py-8">Loading questionnaire...</div> },
+        )},
         { name: "Walkthrough", icon: Aperture, component: <div className="text-center text-stone-300 py-8">Walkthrough spreadsheet will be displayed here</div> },
         { name: "Checklist", icon: CheckSquare, component: <div className="text-center text-stone-300 py-8">Checklist spreadsheet will be displayed here</div> },
         { name: "FF&E", icon: Trello, component: <div className="text-center text-stone-300 py-8">FF&E spreadsheet will be displayed here</div> },
