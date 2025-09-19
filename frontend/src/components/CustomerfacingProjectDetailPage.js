@@ -435,9 +435,7 @@ export default function ProjectPage() {
         );
     };
 
-    const tabs = [
-        { name: "Questionnaire", icon: FileQuestion, component: <CompleteFilledQuestionnaire /> },
-    ];
+
 
     if (isLoading) {
         return (
