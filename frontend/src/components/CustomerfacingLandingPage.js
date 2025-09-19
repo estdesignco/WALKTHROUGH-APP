@@ -840,7 +840,7 @@ export default function Index() {
                             )}
                         </Button>
                       </div>
-                    <Link to={createPageUrl(`Project?id=${project.id}`)} className="block p-6">
+                    <Link to={`/customer/project/${project.id}`} className="block p-6">
                         <div className="flex justify-between items-start">
                             <div>
                                 <h2 className="text-2xl font-bold text-[#A0927B] group-hover:text-[#8B7355] transition-colors">{project.name}</h2>
