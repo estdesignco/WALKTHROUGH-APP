@@ -7,8 +7,10 @@ import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 
-const FFEDashboard = ({ isOffline, hideNavigation = false }) => {
-  const { projectId } = useParams();
+const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
+  console.error("🚨 FFE DASHBOARD IS LOADING!");
+  const { projectId: paramProjectId } = useParams();
+  const projectId = propProjectId || paramProjectId;
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
