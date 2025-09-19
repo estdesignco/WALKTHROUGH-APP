@@ -20,6 +20,7 @@ export default function ProjectPage() {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState("Questionnaire");
 
     useEffect(() => {
         const fetchProject = async () => {
