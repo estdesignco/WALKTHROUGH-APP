@@ -654,18 +654,18 @@ export default function ProjectPage() {
 
     const fetchProject = useCallback(async () => {
         if (projectId && !hasFetched.current) {
-            hasFetched.current = true;
             setIsLoading(true);
             try {
                 console.log('Fetching project:', projectId);
                 const projectData = await Project.get(projectId);
                 console.log('Project data received:', projectData);
                 setProject(projectData);
+                hasFetched.current = true; // Only set after successful API response
             } catch (error) {
                 console.error("Failed to fetch project:", error);
                 hasFetched.current = false; // Reset on error to allow retry
             } finally {
-                setIsLoading(false);
+                setIsLoading(false); // Always clear loading state
             }
         }
     }, [projectId]);
