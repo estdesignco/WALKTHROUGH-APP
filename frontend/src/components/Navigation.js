@@ -11,7 +11,7 @@ const Navigation = ({ currentProject, isOffline }) => {
           {/* Logo */}
           <div className="flex items-center space-x-4">
             <img 
-              src="https://customer-assets.emergentagent.com/job_design-workflow/artifacts/77hyqwhu_Established%20logo.png" 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf5_Establishedlogo.png" 
               alt="Established Design Co." 
               className="h-12 w-auto"
             />
