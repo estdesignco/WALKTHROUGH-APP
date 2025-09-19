@@ -483,32 +483,6 @@ export default function ProjectPage() {
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading FF&E...</div> },
     ];
-
-            <div className="border-b border-stone-700">
-                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                    {tabs.map((tab) => {
-                        const Icon = tab.icon;
-                        return (
-                            <button
-                                key={tab.name}
-                                onClick={() => setActiveTab(tab.name)}
-                                className={`${
-                                    activeTab === tab.name
-                                        ? 'border-stone-400 text-stone-200'
-                                        : 'border-transparent text-stone-400 hover:text-stone-200 hover:border-stone-300'
-                                } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2`}
-                            >
-                                <Icon className="w-4 h-4" />
-                                <span>{tab.name}</span>
-                            </button>
-                        );
-                    })}
-                </nav>
-            </div>
-
-            <div className="py-4">
-                {tabs.find(tab => tab.name === activeTab)?.component}
-            </div>
         </div>
     );
 }
