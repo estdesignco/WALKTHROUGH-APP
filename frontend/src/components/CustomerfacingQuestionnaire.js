@@ -399,9 +399,9 @@ export default function Questionnaire() {
                 {/* Header that matches your drawing - bigger and more proportionate container */}
                 <div className="w-full bg-[#8B7355] shadow-lg flex items-center justify-center my-8" style={{ height: '130px' }}>
                     <img
-                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf2_Establishedlogo.png"
+                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf5_Establishedlogo.png"
                         alt="Established Design Co."
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                     />
                 </div>
 
