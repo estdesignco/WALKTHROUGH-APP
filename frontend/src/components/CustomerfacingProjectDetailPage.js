@@ -440,17 +440,17 @@ export default function ProjectPage() {
         { name: "Questionnaire", icon: FileQuestion, component: <CompleteFilledQuestionnaire /> },
         { name: "Walkthrough", icon: Aperture, component: project ? (
             <div className="walkthrough-content">
-                <WalkthroughDashboard isOffline={false} hideNavigation={true} />
+                <WalkthroughDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading walkthrough...</div> },
         { name: "Checklist", icon: CheckSquare, component: project ? (
             <div className="checklist-content">
-                <ChecklistDashboard isOffline={false} hideNavigation={true} />
+                <ChecklistDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading checklist...</div> },
         { name: "FF&E", icon: Trello, component: project ? (
             <div className="ffe-content">
-                <FFEDashboard isOffline={false} hideNavigation={true} />
+                <FFEDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading FF&E...</div> },
     ];
