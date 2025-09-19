@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,53 +12,57 @@ import { Loader2, PlusCircle, XCircle } from 'lucide-react';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 // API functions
-const projectAPI = {
-  create: async (data) => {
-    const response = await fetch(`${BACKEND_URL}/api/projects`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to create project');
-    return await response.json();
-  }
+const Project = {
+    create: async (data) => {
+        const response = await fetch(`${BACKEND_URL}/api/projects`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Failed to create project');
+        return await response.json();
+    }
 };
 
-const roomAPI = {
-  create: async (data) => {
-    const response = await fetch(`${BACKEND_URL}/api/rooms`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to create room');
-    return await response.json();
-  }
+const Room = {
+    create: async (data) => {
+        const response = await fetch(`${BACKEND_URL}/api/rooms`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Failed to create room');
+        return await response.json();
+    }
 };
 
-const itemAPI = {
-  bulkCreate: async (items) => {
-    const response = await fetch(`${BACKEND_URL}/api/items/bulk`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(items)
-    });
-    if (!response.ok) throw new Error('Failed to create items');
-    return await response.json();
-  }
+const Item = {
+    bulkCreate: async (items) => {
+        const response = await fetch(`${BACKEND_URL}/api/items/bulk`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(items)
+        });
+        if (!response.ok) throw new Error('Failed to create items');
+        return await response.json();
+    }
+};
+
+const createPageUrl = (page) => {
+    return `/customer/${page.toLowerCase()}`;
 };
 
 // Section wrapper component
 const Section = ({ title, description, children }) => (
-    <div className="bg-gray-800 border-stone-700 shadow-lg rounded-lg p-6 space-y-6">
-        <div>
-            <h2 className="text-2xl font-bold text-stone-300">{title}</h2>
-            {description && <p className="text-md text-stone-400 mt-2">{description}</p>}
-        </div>
-        <div className="space-y-6">
+    <Card className="bg-gray-800 border-stone-700 shadow-lg">
+        <CardHeader>
+            <CardTitle className="text-2xl font-bold text-stone-300">{title}</CardTitle>
+            {description && <CardDescription className="text-md text-stone-400">{description}</CardDescription>}
+        </CardHeader>
+        <CardContent className="space-y-6">
             {children}
-        </div>
-    </div>
+        </CardContent>
+    </Card>
 );
 
 const FieldWrapper = ({ label, children, required }) => (
@@ -116,7 +121,7 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
     );
 };
 
-export default function CustomerfacingQuestionnaire() {
+export default function Questionnaire() {
     const [formData, setFormData] = useState({
         rooms_involved: [],
         ideal_sofa_price: '',
@@ -237,14 +242,14 @@ export default function CustomerfacingQuestionnaire() {
         setIsSubmitting(true);
         setSubmissionStatus(null);
         try {
-            const newProject = await projectAPI.create(formData);
+            const newProject = await Project.create(formData);
 
             // Create rooms WITH THE CORRECT STARTER ITEMS
             if (formData.rooms_involved && formData.rooms_involved.length > 0) {
                 const uniqueRooms = [...new Set(formData.rooms_involved)];
                 
                 for (const roomName of uniqueRooms) {
-                    const newRoom = await roomAPI.create({ 
+                    const newRoom = await Room.create({ 
                         project_id: newProject.id, 
                         name: roomName, 
                         notes: '' 
@@ -298,7 +303,7 @@ export default function CustomerfacingQuestionnaire() {
                         quantity: 1,
                     }));
 
-                    await itemAPI.bulkCreate(itemsToCreate);
+                    await Item.bulkCreate(itemsToCreate);
                 }
             }
 
@@ -334,7 +339,7 @@ export default function CustomerfacingQuestionnaire() {
                 know_you_share_more: '', how_heard: '', how_heard_other: '',
             });
             // Redirect after successful project creation
-            window.location.href = `/customer/project/${newProject.id}`;
+            window.location.href = createPageUrl(`Project?id=${newProject.id}`);
         } catch (error) {
             console.error("Failed to create project:", error);
             setSubmissionStatus('error');
@@ -343,9 +348,9 @@ export default function CustomerfacingQuestionnaire() {
         }
     };
 
-    // Updated roomsOptions
+    // Updated roomsOptions to include Entire Home and Classic style
     const roomsOptionsUpdated = [
-        "Entire Home",
+        "Entire Home", // Added 'Entire Home'
         "Living Room", "Family Room", "Great Room", "Primary Bedroom", "Guest Bedroom", "Children's Bedroom", "Nursery",
         "Home Office", "Study", "Library", "Primary Bathroom", "Guest Bathroom", "Half Bathroom", "Jack and Jill Bathroom",
         "Kitchen", "Pantry", "Butler's Pantry", "Dining Room", "Breakfast Nook", "Bar Area", "Wine Cellar",
@@ -355,19 +360,22 @@ export default function CustomerfacingQuestionnaire() {
         "Outdoor Kitchen", "Pool House", "Guest House"
     ];
 
+    // Updated projectPriorityOptions from outline's formConfig
     const projectPriorityOptions = ["Turn-Key Furnishings", "Art & Decor", "Custom Window Treatments", "Custom Millwork", "Finishes & Fixtures", "Follow a plan we have created in a specific timeframe", "Other"];
+
+    // Retaining original options not specified in the outline's partial formConfig
     const contactPrefOptions = ["Email", "Phone Call", "Text Message"];
-    const stylePrefOptions = ["Modern", "Industrial", "Coastal", "Contemporary", "Mid-Century Modern", "Eclectic", "Traditional", "Transitional", "Rustic", "Farmhouse", "Bohemian", "Minimalist", "Scandinavian", "Classic"];
+    const stylePrefOptions = ["Modern", "Industrial", "Coastal", "Contemporary", "Mid-Century Modern", "Eclectic", "Traditional", "Transitional", "Rustic", "Farmhouse", "Bohemian", "Minimalist", "Scandinavian", "Classic"]; // Added 'Classic'
     const artworkPrefOptions = ["Abstract", "Landscape", "Nature", "Photographs", "Architecture", "Painting", "Water Color", "Minimalist", "Black and White", "Pop-art", "Vintage", "Pattern", "Other"];
     const colorPrefOptions = ["Dark & Moody", "Light & Airy", "Warm Neutral", "Cool Neutral", "Bold & Vibrant", "Earthy & Organic", "Monochromatic", "Pastel"];
     const finishesOptions = ["Warm wood tones", "Neutral wood tones", "Cool wood tones", "Leather", "Silver", "Bronze", "Gold", "Brass", "Chrome", "Brushed Nickel", "Matte Black", "Solid", "Geometric", "Stripes", "Floral", "Animal", "Rattan", "Concrete", "Glass", "Marble", "Other"];
 
     const PREVIEW_ROOM_COLORS = {
-        'Entire Home': '#4B5563',
+        'Entire Home': '#4B5563', // New color for Entire Home
         'Living Room': '#7C6B7F', 'Family Room': '#7C6B7F', 'Sunroom': '#3B7A6C', 'Primary Bedroom': '#4A6741',
         'Guest Bedroom': '#6B4C75', 'Children\'s Bedroom': '#C07B3A', 'Nursery': '#8B5A3D', 'Home Office': '#C07B3A',
         'Primary Bathroom': '#3B6B8C', 'Guest Bathroom': '#6B4037', 'Half Bathroom': '#9B3B7A', 'Jack and Jill Bathroom': '#9B3B7A',
-        'Kitchen': '#5B9AA0', 'Pantry': '#5B9AA0', 'Butler\'s Pantry': '#5B9AA0',
+        'Kitchen': '#5B9AA0', 'Pantry': '#5B9AA0', 'Butler\'s Pantry': '#5B9AA0', // Added Butler's Pantry color
         'Dining Room': '#B8484A', 'Breakfast Nook': '#B8484A',
         'Bar Area': '#6B7280', 'Laundry Room': '#5B7A2F', 'Mudroom': '#A56A43', 'Utility Room': '#6B7280',
         'Linen Closet': '#6B7280', 'Walk-in Closet': '#6B7280', 'Basement': '#374151', 'Home Theater': '#374151',
@@ -380,8 +388,10 @@ export default function CustomerfacingQuestionnaire() {
     };
 
     // Logic to find which custom rooms have been added
+    // Use the updated list for predefined rooms to filter custom ones
     const predefinedRoomsSet = new Set(roomsOptionsUpdated);
     const customRoomsAdded = formData.rooms_involved.filter(room => !predefinedRoomsSet.has(room));
+
 
     return (
         <div className="bg-[#1E293B] min-h-screen p-4 sm:p-6 lg:p-8" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
@@ -464,6 +474,7 @@ export default function CustomerfacingQuestionnaire() {
                             </RadioGroup>
                         </FieldWrapper>
 
+                        {/* Updated to use InputField and Select */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                             <InputField label="Desired timeline for project completion" id="timeline" value={formData.timeline} onChange={(e) => handleFormChange('timeline', e.target.value)} />
                             <div>
@@ -545,7 +556,224 @@ export default function CustomerfacingQuestionnaire() {
                         )}
                     </Section>
 
-                    {/* Conditional Sections for New Build, Renovation, and Furniture Refresh would continue here following the same structure from the original code... */}
+                    {/* Section 4: New Build (Conditional) */}
+                    {formData.project_type === 'New Build' && (
+                        <Section title="NEW BUILD" description="If you are not currently building a new home, please feel free to skip these questions!">
+                            <FieldWrapper label="Please list NEW BUILD address">
+                                <Textarea className={inputStyles} value={formData.new_build_address || ''} onChange={(e) => handleFormChange('new_build_address', e.target.value)} />
+                            </FieldWrapper>
+                            <FieldWrapper label="Do you have an Architect? If so, please list Name and phone number below?">
+                                <Textarea className={inputStyles} value={formData.new_build_architect || ''} onChange={(e) => handleFormChange('new_build_architect', e.target.value)} />
+                            </FieldWrapper>
+                            <FieldWrapper label="Do you have a builder? If so, please list Name and phone number below?">
+                                <Textarea className={inputStyles} value={formData.new_build_builder || ''} onChange={(e) => handleFormChange('new_build_builder', e.target.value)} />
+                            </FieldWrapper>
+                            <InputField label="Do you have plans drawn?" id="new_build_has_plans" value={formData.new_build_has_plans || ''} onChange={(e) => handleFormChange('new_build_has_plans', e.target.value)} />
+                            <InputField label="How far along in the building process are you?" id="new_build_process_stage" value={formData.new_build_process_stage || ''} onChange={(e) => handleFormChange('new_build_process_stage', e.target.value)} />
+                            <FieldWrapper label="Once home is complete, will you be needing furniture? If so, give us an idea of what items you would love to procure!">
+                                <Textarea className={inputStyles} value={formData.new_build_need_furniture || ''} onChange={(e) => handleFormChange('new_build_need_furniture', e.target.value)} />
+                            </FieldWrapper>
+                            <FieldWrapper label="Is there anything else we need to know about the scope of this project?">
+                                <Textarea className={inputStyles} value={formData.new_build_scope_notes || ''} onChange={(e) => handleFormChange('new_build_scope_notes', e.target.value)} />
+                            </FieldWrapper>
+                        </Section>
+                    )}
+
+                    {/* Section 5: Renovation (Conditional) */}
+                    {formData.project_type === 'Renovation' && (
+                        <Section title="RENOVATION" description="If you are not looking to renovate, please feel free to skip these questions!">
+                            <FieldWrapper label="Please list Renovation Address (If different!)">
+                                <Textarea className={inputStyles} value={formData.renovation_address || ''} onChange={(e) => handleFormChange('renovation_address', e.target.value)} />
+                            </FieldWrapper>
+                            <InputField label="When did you move into this home?" id="renovation_move_in_date" type="date" value={formData.renovation_move_in_date || ''} onChange={(e) => handleFormChange('renovation_move_in_date', e.target.value)} />
+                            <FieldWrapper label="Do you have a builder? If so, please list Name and phone number below?">
+                                <Textarea className={inputStyles} value={formData.renovation_builder || ''} onChange={(e) => handleFormChange('renovation_builder', e.target.value)} />
+                            </FieldWrapper>
+                            <InputField label="Do you have the CURRENT plans/drawings for your home?" id="renovation_has_current_plans" value={formData.renovation_has_current_plans || ''} onChange={(e) => handleFormChange('renovation_has_current_plans', e.target.value)} />
+                            <FieldWrapper label="Do you have an Architect? If so, please list Name and phone number below?">
+                                <Textarea className={inputStyles} value={formData.renovation_architect || ''} onChange={(e) => handleFormChange('renovation_architect', e.target.value)} />
+                            </FieldWrapper>
+                            <InputField label="Do you have NEW UPDATED plans drawn?" id="renovation_has_new_plans" value={formData.renovation_has_new_plans || ''} onChange={(e) => handleFormChange('renovation_has_new_plans', e.target.value)} />
+                            <FieldWrapper label="Briefly describe the existing condition of the space.">
+                                <Textarea className={inputStyles} value={formData.renovation_existing_condition || ''} onChange={(e) => handleFormChange('renovation_existing_condition', e.target.value)} />
+                            </FieldWrapper>
+                            <FieldWrapper label="Once home is complete, will you be needing furniture? If so, give us an idea of what items you would love to procure!">
+                                <Textarea className={inputStyles} value={formData.renovation_need_furniture || ''} onChange={(e) => handleFormChange('renovation_need_furniture', e.target.value)} />
+                            </FieldWrapper>
+                            <FieldWrapper label="Are there any physical MEMORIES in this home that you would like to preserve?">
+                                <Textarea className={inputStyles} value={formData.renovation_memories || ''} onChange={(e) => handleFormChange('renovation_memories', e.target.value)} />
+                            </FieldWrapper>
+                            <FieldWrapper label="Is there anything else we need to know about the scope of this project?">
+                                <Textarea className={inputStyles} value={formData.renovation_scope_notes || ''} onChange={(e) => handleFormChange('renovation_scope_notes', e.target.value)} />
+                            </FieldWrapper>
+                        </Section>
+                    )}
+
+                    {/* Section 6: Furniture Refresh (Conditional) */}
+                    {formData.project_type === 'Furniture/Styling Refresh' && (
+                        <Section title="FURNITURE REFRESH" description="If you are not looking for a furniture refresh, please feel free to skip these questions!">
+                            <FieldWrapper label="Briefly describe the existing condition of the space.">
+                                <Textarea className={inputStyles} value={formData.furniture_refresh_condition || ''} onChange={(e) => handleFormChange('furniture_refresh_condition', e.target.value)} />
+                            </FieldWrapper>
+                            <InputField label="Do you have the CURRENT plans/drawings for your home?" id="furniture_has_current_plans" value={formData.furniture_has_current_plans || ''} onChange={(e) => handleFormChange('furniture_has_current_plans', e.target.value)} />
+                            <InputField label="When did you move into this home?" id="furniture_move_in_date" type="date" value={formData.furniture_move_in_date || ''} onChange={(e) => handleFormChange('furniture_move_in_date', e.target.value)} />
+                            <FieldWrapper label="Is there anything else we need to know about the scope of this project?">
+                                <Textarea className={inputStyles} value={formData.furniture_scope_notes || ''} onChange={(e) => handleFormChange('furniture_scope_notes', e.target.value)} />
+                            </FieldWrapper>
+                        </Section>
+                    )}
+
+                    {/* Section 7: Design Questions */}
+                    <Section title="DESIGN QUESTIONS">
+                        <FieldWrapper label="What do you love about your current home?">
+                            <Textarea className={inputStyles} value={formData.design_love_home || ''} onChange={(e) => handleFormChange('design_love_home', e.target.value)} />
+                        </FieldWrapper>
+                        <InputField label="How will the spaces be used? (e.g., formal dining, casual living, etc.)" id="design_space_use" value={formData.design_space_use || ''} onChange={(e) => handleFormChange('design_space_use', e.target.value)} />
+                        <InputField label="What are their current uses?" id="design_current_use" value={formData.design_current_use || ''} onChange={(e) => handleFormChange('design_current_use', e.target.value)} />
+                        <FieldWrapper label="What is the first impression you want guests to have when they enter your home?">
+                            <Textarea className={inputStyles} value={formData.design_first_impression || ''} onChange={(e) => handleFormChange('design_first_impression', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Is there a common color palette in your home that you love?">
+                            <Textarea className={inputStyles} value={formData.design_common_color_palette || ''} onChange={(e) => handleFormChange('design_common_color_palette', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="What color palette do you prefer?">
+                            <CheckboxGroup options={colorPrefOptions} value={formData.design_preferred_palette} onChange={(v) => handleFormChange('design_preferred_palette', v)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Are there any colors do you dislike?">
+                            <Textarea className={inputStyles} value={formData.design_disliked_colors || ''} onChange={(e) => handleFormChange('design_disliked_colors', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Which interior design styles do you prefer? (Select all that apply)">
+                            <CheckboxGroup options={stylePrefOptions} value={formData.design_styles_preference} onChange={(v) => handleFormChange('design_styles_preference', v)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="What do you like about these styles?">
+                            <Textarea className={inputStyles} value={formData.design_styles_love || ''} onChange={(e) => handleFormChange('design_styles_love', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="What are your preferences for artwork?">
+                            <CheckboxGroup options={artworkPrefOptions} value={formData.design_artwork_preference} onChange={(v) => handleFormChange('design_artwork_preference', v)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Is there a piece of art, furniture, or a souvenir that holds significant personal meaning to you? Tell us the story behind it.">
+                            <Textarea className={inputStyles} value={formData.design_meaningful_item || ''} onChange={(e) => handleFormChange('design_meaningful_item', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Are there any existing furniture pieces or decor items you'd like to keep in the space? If so, please let us know the measurements and attach a photo below for reference.">
+                            <Textarea className={inputStyles} value={formData.design_existing_furniture || ''} onChange={(e) => handleFormChange('design_existing_furniture', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Please upload any photos of the existing spaces you'd like us to see.">
+                            <div className="p-4 border-2 border-dashed border-stone-400 rounded-lg text-center">
+                                <p className="text-stone-400 text-sm italic mb-2">These can be quick phone shots — no need for anything fancy!</p>
+                                <Button type="button" variant="outline" className="border-[#8B7355] text-[#8B7355]">
+                                    Add file
+                                </Button>
+                            </div>
+                        </FieldWrapper>
+                        <FieldWrapper label="Finishes and Patterns">
+                            <CheckboxGroup options={finishesOptions} value={formData.finishes_patterns_preference} onChange={(v) => handleFormChange('finishes_patterns_preference', v)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Do you have any specific materials you prefer or want to avoid?">
+                            <Textarea className={inputStyles} value={formData.design_materials_to_avoid || ''} onChange={(e) => handleFormChange('design_materials_to_avoid', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Do you have any special requirements or considerations? (e.g., accessibility needs, allergies, etc.)">
+                            <Textarea className={inputStyles} value={formData.design_special_requirements || ''} onChange={(e) => handleFormChange('design_special_requirements', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Do you have any images that reflect your vision? OR Any Inspiration Photos? (optional)">
+                            <div className="p-4 border-2 border-dashed border-stone-400 rounded-lg text-center">
+                                <Button type="button" variant="outline" className="border-[#8B7355] text-[#8B7355]">
+                                    Add file
+                                </Button>
+                            </div>
+                        </FieldWrapper>
+                        <FieldWrapper label="Do you have a Houzz or Pinterest page? Please list your accounts below, and you can also invite us to your boards.">
+                            <div className="space-y-2">
+                                <p className="text-[#F5F5DC] text-sm">at https://www.pinterest.com/estdesignco/ and https://www.houzz.com/professionals/interior-designers-and-decorators/established-design-co-pfvwus-pf~1101592055</p>
+                                <Textarea className={inputStyles} value={formData.design_pinterest_houzz || ''} onChange={(e) => handleFormChange('design_pinterest_houzz', e.target.value)} />
+                            </div>
+                        </FieldWrapper>
+                        <FieldWrapper label="Any additional comments or questions?">
+                            <Textarea className={inputStyles} value={formData.design_additional_comments || ''} onChange={(e) => handleFormChange('design_additional_comments', e.target.value)} />
+                        </FieldWrapper>
+                    </Section>
+
+                    {/* Section 8: Getting to Know You Better */}
+                    <Section title="GETTING TO KNOW YOU BETTER..." description="We want to get to know you better so we can serve you in the best way possible! We not only want to help design your home, but want your experience with us to be tailor-made JUST FOR YOU!">
+                        <FieldWrapper label="Who lives in your household? (Include ages of children if applicable)">
+                            <Textarea className={inputStyles} value={formData.know_you_household || ''} onChange={(e) => handleFormChange('know_you_household', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Do you have pets? If yes, please specify">
+                            <Textarea className={inputStyles} value={formData.know_you_pets || ''} onChange={(e) => handleFormChange('know_you_pets', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Describe a typical weekday for your household. What activities take place in the home?">
+                            <Textarea className={inputStyles} value={formData.know_you_weekday_routine || ''} onChange={(e) => handleFormChange('know_you_weekday_routine', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Describe a typical weekend for your household.">
+                            <Textarea className={inputStyles} value={formData.know_you_weekend_routine || ''} onChange={(e) => handleFormChange('know_you_weekend_routine', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Are you early birds or night owls? How does natural and artificial lighting play a role in your daily routines?">
+                            <Textarea className={inputStyles} value={formData.know_you_lighting_preference || ''} onChange={(e) => handleFormChange('know_you_lighting_preference', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="How do you typically entertain guests? (e.g., large formal dinners, casual get-togethers, intimate cocktails, kids' parties)">
+                            <Textarea className={inputStyles} value={formData.know_you_entertaining_style || ''} onChange={(e) => handleFormChange('know_you_entertaining_style', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Where does each family member go to relax and have personal time? What activities do they do there?">
+                            <Textarea className={inputStyles} value={formData.know_you_relax_space || ''} onChange={(e) => handleFormChange('know_you_relax_space', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="How do you see your family's needs changing in the next 5-10 years? (e.g., growing children, aging in place, working from home more)">
+                            <Textarea className={inputStyles} value={formData.know_you_future_plans || ''} onChange={(e) => handleFormChange('know_you_future_plans', e.target.value)} />
+                        </FieldWrapper>
+                        <InputField label="Do you have social media pages that you would mind sharing with us?" id="know_you_social_media" value={formData.know_you_social_media || ''} onChange={(e) => handleFormChange('know_you_social_media', e.target.value)} />
+                        <FieldWrapper label="Tell us about your hobbies">
+                            <div className="space-y-2">
+                                <p className="text-[#F5F5DC] text-sm italic">Don't be shy, tell us about you and your spouse, and your kids' favorite hobbies!</p>
+                                <Textarea className={inputStyles} value={formData.know_you_hobbies || ''} onChange={(e) => handleFormChange('know_you_hobbies', e.target.value)} />
+                            </div>
+                        </FieldWrapper>
+                        <FieldWrapper label="What do you you like to do for fun?">
+                            <Textarea className={inputStyles} value={formData.know_you_fun || ''} onChange={(e) => handleFormChange('know_you_fun', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="What makes you HAPPY?!">
+                            <Textarea className={inputStyles} value={formData.know_you_happy || ''} onChange={(e) => handleFormChange('know_you_happy', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="When are your families Birthdays?">
+                            <Textarea className={inputStyles} value={formData.know_you_family_birthdays || ''} onChange={(e) => handleFormChange('know_you_family_birthdays', e.target.value)} />
+                        </FieldWrapper>
+                        <InputField label="When is your Anniversary?" id="know_you_anniversary" type="date" value={formData.know_you_anniversary || ''} onChange={(e) => handleFormChange('know_you_anniversary', e.target.value)} />
+                        <FieldWrapper label="What does your Family like to do together for fun?">
+                            <Textarea className={inputStyles} value={formData.know_you_family_together || ''} onChange={(e) => handleFormChange('know_you_family_together', e.target.value)} />
+                        </FieldWrapper>
+                        <InputField label="What is your FAVORITE restaurant" id="know_you_favorite_restaurant" value={formData.know_you_favorite_restaurant || ''} onChange={(e) => handleFormChange('know_you_favorite_restaurant', e.target.value)} />
+                        <FieldWrapper label="What is your favorite place to vacation?">
+                            <Textarea className={inputStyles} value={formData.know_you_favorite_vacation || ''} onChange={(e) => handleFormChange('know_you_favorite_vacation', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Tell us about your favorite foods, snacks, drinks, wine, beer, etc... OR ANYTHING ELSE that you just LOVE that we should know about!">
+                            <Textarea className={inputStyles} value={formData.know_you_favorite_foods || ''} onChange={(e) => handleFormChange('know_you_favorite_foods', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="When you come home after a long day, what space do you naturally gravitate toward, and what feeling do you want that space to evoke?">
+                            <Textarea className={inputStyles} value={formData.know_you_evoke_space || ''} onChange={(e) => handleFormChange('know_you_evoke_space', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="How do you want your home to support your social life?">
+                            <Textarea className={inputStyles} value={formData.know_you_support_social_life || ''} onChange={(e) => handleFormChange('know_you_support_social_life', e.target.value)} />
+                        </FieldWrapper>
+                        <FieldWrapper label="Is there ANYTHING ELSE that you would like to share with us to let us know how we can best serve you such as favorite memories of your last or current home, or favorite places, or just ANYTHING you want to share with us we would LOVE to to know about it as we get to know each other better!">
+                            <Textarea className={inputStyles} value={formData.know_you_share_more || ''} onChange={(e) => handleFormChange('know_you_share_more', e.target.value)} />
+                        </FieldWrapper>
+                    </Section>
+
+                    {/* Section 9: How Did You Hear About Us */}
+                    <Section title="HOW DID YOU HEAR ABOUT US AND HOW TO STAY IN TOUCH">
+                        <FieldWrapper label="How did you hear about us?">
+                            <RadioGroup value={formData.how_heard} onValueChange={(value) => handleFormChange('how_heard', value)} className="text-[#F5F5DC]">
+                                <div className="flex flex-col space-y-2">
+                                    {["Internet Search", "Social Media", "Friend Referral", "Magazine", "Google", "Market Event", "Other"].map(option => (
+                                        <div key={option} className="flex items-center space-x-2">
+                                            <RadioGroupItem value={option} id={`heard-${option}`} className="border-stone-400 text-[#8B7355]" />
+                                            <Label htmlFor={`heard-${option}`} className="text-[#F5F5DC]">{option}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </RadioGroup>
+                        </FieldWrapper>
+                        {formData.how_heard === 'Other' && (
+                            <InputField label="Please specify how you heard about us" id="how_heard_other" value={formData.how_heard_other || ''} onChange={(e) => handleFormChange('how_heard_other', e.target.value)} />
+                        )}
+                    </Section>
 
                     {/* Rooms Preview Section */}
                     {formData.rooms_involved && formData.rooms_involved.length > 0 && (
