@@ -680,7 +680,7 @@ export default function ProjectPage() {
     }, [fetchProject]);
     
     const tabs = [
-        { name: "Questionnaire", icon: FileQuestion, component: project ? <FullFilledQuestionnaire project={project} /> : <div className="text-center text-stone-300 py-8">Loading questionnaire...</div> },
+        { name: "Questionnaire", icon: FileQuestion, component: <div className="text-center text-stone-300 py-8">Complete questionnaire answers will be displayed here</div> },
         { name: "Walkthrough", icon: Aperture, component: <div className="text-center text-stone-300 py-8">Walkthrough spreadsheet will be displayed here</div> },
         { name: "Checklist", icon: CheckSquare, component: <div className="text-center text-stone-300 py-8">Checklist spreadsheet will be displayed here</div> },
         { name: "FF&E", icon: Trello, component: <div className="text-center text-stone-300 py-8">FF&E spreadsheet will be displayed here</div> },
