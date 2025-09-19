@@ -649,6 +649,7 @@ export default function ProjectPage() {
     const [project, setProject] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("Questionnaire");
+    const hasFetched = useRef(false);
 
     const fetchProject = useCallback(async () => {
         if (projectId) {
