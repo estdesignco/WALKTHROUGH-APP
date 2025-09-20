@@ -296,7 +296,21 @@ const SimpleWalkthroughSpreadsheet = ({
     }
   };
 
-  // Handle deleting an item - NO PAGE RELOAD
+  // Toggle room expansion
+  const toggleRoomExpansion = (roomId) => {
+    setExpandedRooms(prev => ({
+      ...prev,
+      [roomId]: !prev[roomId]
+    }));
+  };
+
+  // Toggle category expansion  
+  const toggleCategoryExpansion = (categoryId) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }));
+  };
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm('Are you sure you want to delete this item?')) {
       return;
