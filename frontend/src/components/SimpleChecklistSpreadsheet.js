@@ -26,9 +26,9 @@ const SimpleChecklistSpreadsheet = ({
   const [selectedStatus, setSelectedStatus] = useState('');
   const [filteredProject, setFilteredProject] = useState(project);
 
-  // APPLY FILTERS - WORKING FILTER LOGIC
+  // APPLY FILTERS - ENHANCED COMBINATION FILTER LOGIC
   useEffect(() => {
-    console.log('🔍 Checklist Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus });
+    console.log('🔍 Enhanced Checklist Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus });
     
     if (!project) {
       setFilteredProject(null);
@@ -38,15 +38,17 @@ const SimpleChecklistSpreadsheet = ({
     let filtered = { ...project };
 
     if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
-      console.log('🔍 Applying checklist filters...');
+      console.log('🔍 Applying COMBINATION checklist filters...');
       
       filtered.rooms = project.rooms.map(room => {
+        // Room filter - if room is selected and this isn't it, hide all categories
         if (selectedRoom && room.id !== selectedRoom) {
           return { ...room, categories: [] };
         }
         
         const filteredCategories = room.categories.map(category => {
-          if (selectedCategory && category.name !== selectedCategory) {
+          // Category filter - if category is selected and this isn't it, hide all subcategories
+          if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) {
             return { ...category, subcategories: [] };
           }
           
