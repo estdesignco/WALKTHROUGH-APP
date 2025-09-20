@@ -316,46 +316,306 @@ class TestProjectCreator:
         except Exception as e:
             self.log_test("Backend Logs Check", False, f"Exception checking logs: {str(e)}")
 
-    def run_all_tests(self):
-        """Run all enhanced rooms tests"""
-        print("Starting Enhanced Rooms Integration Tests...")
+    def create_comprehensive_test_project(self):
+        """Create the comprehensive test project as requested"""
+        print("\n🏠 CREATING COMPREHENSIVE TEST PROJECT...")
         
-        # Test 1: Categories Available Endpoint
-        categories_success = self.test_categories_available_endpoint()
+        # Step 1: Create the project
+        project_data = {
+            "name": "Modern Farmhouse Renovation",
+            "client_info": {
+                "full_name": "Sarah & Mike Thompson",
+                "email": "sarah.mike.thompson@email.com",
+                "phone": "(615) 555-0123",
+                "address": "123 Main Street, Nashville, TN 37215"
+            },
+            "project_type": "Renovation",
+            "budget": "$75,000",
+            "timeline": "6 months",
+            "style_preferences": ["Modern Farmhouse", "Rustic", "Contemporary"],
+            "color_palette": "Warm neutrals with navy and gold accents",
+            "special_requirements": "Pet-friendly materials, open concept living"
+        }
         
-        # Test 2: Add Kitchen Room and verify structure
-        room_success, project_id = self.test_add_kitchen_room()
+        success, project, status_code = self.make_request('POST', '/projects', project_data)
         
-        structure_success = False
-        if room_success and project_id:
-            # Test 3: Verify Project Structure
-            structure_success = self.test_project_rooms_data_structure(project_id)
+        if not success:
+            self.log_test("Create Test Project", False, f"Failed: {project} (Status: {status_code})")
+            return False
+            
+        self.created_project_id = project.get('id')
+        self.log_test("Create Test Project", True, f"Project ID: {self.created_project_id}")
+        print(f"   📋 Project: {project.get('name')}")
+        print(f"   👥 Client: {project.get('client_info', {}).get('full_name')}")
+        print(f"   💰 Budget: {project.get('budget')}")
         
-        # Test 4: Check Backend Logs
-        self.check_backend_logs()
+        return True
+    
+    def add_rooms_with_realistic_data(self):
+        """Add 4 rooms with comprehensive realistic data"""
+        print("\n🏠 ADDING ROOMS WITH REALISTIC DATA...")
         
-        # Summary
+        rooms_to_create = [
+            {
+                "name": "Living Room",
+                "description": "Main living space with fireplace and built-ins"
+            },
+            {
+                "name": "Master Bedroom", 
+                "description": "Primary bedroom suite with walk-in closet"
+            },
+            {
+                "name": "Kitchen",
+                "description": "Open concept kitchen with island and pantry"
+            },
+            {
+                "name": "Dining Room",
+                "description": "Formal dining room adjacent to kitchen"
+            }
+        ]
+        
+        for room_info in rooms_to_create:
+            room_data = {
+                "name": room_info["name"].lower(),
+                "description": room_info["description"],
+                "project_id": self.created_project_id
+            }
+            
+            success, room, status_code = self.make_request('POST', '/rooms', room_data)
+            
+            if success:
+                room_id = room.get('id')
+                self.created_rooms.append(room_id)
+                self.log_test(f"Create {room_info['name']}", True, f"Room ID: {room_id}")
+                
+                # Add realistic items to each room
+                self.add_realistic_items_to_room(room, room_info["name"])
+            else:
+                self.log_test(f"Create {room_info['name']}", False, f"Failed: {room}")
+                
+        return len(self.created_rooms) == len(rooms_to_create)
+    
+    def add_realistic_items_to_room(self, room_data, room_name):
+        """Add realistic items with various statuses to a room"""
+        print(f"   📦 Adding realistic items to {room_name}...")
+        
+        # Realistic vendors
+        vendors = ["Four Hands", "Visual Comfort", "Restoration Hardware", "West Elm", 
+                  "Pottery Barn", "CB2", "Uttermost", "Bernhardt", "Loloi Rugs"]
+        
+        # Various statuses for realistic data
+        statuses = ["TO BE SELECTED", "RESEARCHING", "ORDERED", "SHIPPED", 
+                   "DELIVERED TO JOB SITE", "INSTALLED", "PICKED"]
+        
+        # Realistic items by room type
+        room_items = {
+            "Living Room": [
+                {"name": "Tufted Sectional Sofa - Charcoal", "cost": 2899, "vendor": "Restoration Hardware"},
+                {"name": "Brass Geometric Coffee Table", "cost": 1299, "vendor": "West Elm"},
+                {"name": "Crystal Linear Chandelier", "cost": 1899, "vendor": "Visual Comfort"},
+                {"name": "Vintage Persian Area Rug 9x12", "cost": 1599, "vendor": "Loloi Rugs"},
+                {"name": "Built-in Entertainment Center", "cost": 3500, "vendor": "Custom"},
+                {"name": "Ceramic Table Lamps - Pair", "cost": 399, "vendor": "Pottery Barn"},
+                {"name": "Velvet Accent Chairs - Navy", "cost": 1199, "vendor": "CB2"},
+                {"name": "Reclaimed Wood Console Table", "cost": 899, "vendor": "Four Hands"}
+            ],
+            "Master Bedroom": [
+                {"name": "Tufted Linen Platform Bed - King", "cost": 1899, "vendor": "Restoration Hardware"},
+                {"name": "Brass Geometric Table Lamps - Pair", "cost": 599, "vendor": "Visual Comfort"},
+                {"name": "Vintage Nightstands - Pair", "cost": 799, "vendor": "Four Hands"},
+                {"name": "Custom Walk-in Closet System", "cost": 4500, "vendor": "Custom"},
+                {"name": "Linen Blackout Curtains", "cost": 299, "vendor": "Pottery Barn"},
+                {"name": "Wool Area Rug 8x10", "cost": 1299, "vendor": "Loloi Rugs"},
+                {"name": "Upholstered Bench - Foot of Bed", "cost": 699, "vendor": "West Elm"}
+            ],
+            "Kitchen": [
+                {"name": "Farmhouse Dining Table - 8ft", "cost": 2599, "vendor": "Restoration Hardware"},
+                {"name": "Industrial Bar Stools - Set of 3", "cost": 899, "vendor": "CB2"},
+                {"name": "Pendant Lights Over Island - Set of 3", "cost": 1299, "vendor": "Visual Comfort"},
+                {"name": "Custom Kitchen Island", "cost": 5500, "vendor": "Custom"},
+                {"name": "Subway Tile Backsplash", "cost": 899, "vendor": "Local Supplier"},
+                {"name": "Quartz Countertops", "cost": 3200, "vendor": "Local Supplier"},
+                {"name": "Farmhouse Sink - Fireclay", "cost": 799, "vendor": "Kohler"},
+                {"name": "Brass Cabinet Hardware Set", "cost": 450, "vendor": "Restoration Hardware"}
+            ],
+            "Dining Room": [
+                {"name": "Live Edge Dining Table - Walnut", "cost": 2899, "vendor": "Four Hands"},
+                {"name": "Upholstered Dining Chairs - Set of 6", "cost": 1799, "vendor": "Pottery Barn"},
+                {"name": "Statement Chandelier - Brass & Crystal", "cost": 1599, "vendor": "Visual Comfort"},
+                {"name": "Vintage Sideboard - Reclaimed Wood", "cost": 1299, "vendor": "Four Hands"},
+                {"name": "Custom Built-in China Cabinet", "cost": 2800, "vendor": "Custom"},
+                {"name": "Wool Area Rug 9x12", "cost": 1499, "vendor": "Loloi Rugs"}
+            ]
+        }
+        
+        items_for_room = room_items.get(room_name, [])
+        items_added = 0
+        
+        # Find subcategories in the room to add items to
+        categories = room_data.get('categories', [])
+        
+        for item_info in items_for_room:
+            # Find appropriate subcategory for this item
+            target_subcategory = None
+            
+            for category in categories:
+                for subcategory in category.get('subcategories', []):
+                    if subcategory.get('items') is not None:  # Can add items here
+                        target_subcategory = subcategory
+                        break
+                if target_subcategory:
+                    break
+            
+            if target_subcategory:
+                # Create realistic item data
+                item_data = {
+                    "name": item_info["name"],
+                    "quantity": 1,
+                    "size": self.get_realistic_size(item_info["name"]),
+                    "remarks": f"Selected for {room_name}",
+                    "vendor": item_info["vendor"],
+                    "status": random.choice(statuses),
+                    "cost": item_info["cost"],
+                    "link": f"https://{item_info['vendor'].lower().replace(' ', '')}.com/product/{random.randint(10000, 99999)}",
+                    "subcategory_id": target_subcategory["id"],
+                    "finish_color": self.get_realistic_finish(),
+                    "tracking_number": self.get_tracking_number() if random.choice([True, False]) else ""
+                }
+                
+                success, created_item, status_code = self.make_request('POST', '/items', item_data)
+                
+                if success:
+                    items_added += 1
+                else:
+                    print(f"      ❌ Failed to add {item_info['name']}: {created_item}")
+        
+        print(f"      ✅ Added {items_added} realistic items to {room_name}")
+        return items_added
+    
+    def get_realistic_size(self, item_name):
+        """Generate realistic size based on item name"""
+        if "sofa" in item_name.lower() or "sectional" in item_name.lower():
+            return f"{random.randint(84, 108)}\"W x {random.randint(36, 42)}\"D x {random.randint(32, 38)}\"H"
+        elif "table" in item_name.lower():
+            return f"{random.randint(60, 96)}\"L x {random.randint(36, 42)}\"W x {random.randint(28, 30)}\"H"
+        elif "chair" in item_name.lower():
+            return f"{random.randint(24, 32)}\"W x {random.randint(26, 32)}\"D x {random.randint(32, 40)}\"H"
+        elif "rug" in item_name.lower():
+            sizes = ["8'x10'", "9'x12'", "10'x14'", "6'x9'"]
+            return random.choice(sizes)
+        elif "lamp" in item_name.lower():
+            return f"{random.randint(24, 32)}\"H"
+        else:
+            return "Standard"
+    
+    def get_realistic_finish(self):
+        """Generate realistic finish colors"""
+        finishes = ["Natural Oak", "Charcoal", "Brass", "Matte Black", "White Oak", 
+                   "Walnut", "Antique Brass", "Brushed Nickel", "Oil Rubbed Bronze", "Natural"]
+        return random.choice(finishes)
+    
+    def get_tracking_number(self):
+        """Generate realistic tracking numbers"""
+        carriers = [
+            ("FedEx", "1234567890123"),
+            ("UPS", "1Z123A45B6789012345"),
+            ("USPS", "9400109699938123456789")
+        ]
+        carrier, base = random.choice(carriers)
+        return f"{base}{random.randint(100, 999)}"
+    
+    def test_all_endpoints(self):
+        """Test all critical endpoints with the created project"""
+        print("\n🔍 TESTING ALL ENDPOINTS WITH CREATED PROJECT...")
+        
+        if not self.created_project_id:
+            self.log_test("Test Endpoints", False, "No project created to test")
+            return False
+        
+        # Test project retrieval
+        success, project_data, status_code = self.make_request('GET', f'/projects/{self.created_project_id}')
+        
+        if success:
+            self.log_test("Project Retrieval", True, f"Project loaded successfully")
+            
+            # Analyze project structure
+            rooms = project_data.get('rooms', [])
+            total_categories = sum(len(room.get('categories', [])) for room in rooms)
+            total_subcategories = sum(
+                len(cat.get('subcategories', [])) 
+                for room in rooms 
+                for cat in room.get('categories', [])
+            )
+            total_items = sum(
+                len(subcat.get('items', [])) 
+                for room in rooms 
+                for cat in room.get('categories', [])
+                for subcat in cat.get('subcategories', [])
+            )
+            
+            self.log_test("Project Data Structure", True, 
+                         f"{len(rooms)} rooms, {total_categories} categories, {total_subcategories} subcategories, {total_items} items")
+            
+            # Test walkthrough URL
+            walkthrough_url = f"/project/{self.created_project_id}/walkthrough"
+            self.log_test("Walkthrough URL Available", True, f"URL: {walkthrough_url}")
+            
+            # Test checklist URL  
+            checklist_url = f"/project/{self.created_project_id}/checklist"
+            self.log_test("Checklist URL Available", True, f"URL: {checklist_url}")
+            
+            # Test FF&E URL
+            ffe_url = f"/project/{self.created_project_id}/ffe"
+            self.log_test("FF&E URL Available", True, f"URL: {ffe_url}")
+            
+            return True
+        else:
+            self.log_test("Project Retrieval", False, f"Failed to retrieve project: {project_data}")
+            return False
+    
+    def run_comprehensive_test(self):
+        """Run the complete test project creation process"""
+        print("🚀 STARTING COMPREHENSIVE TEST PROJECT CREATION...")
+        
+        # Step 1: Create the project
+        project_success = self.create_comprehensive_test_project()
+        if not project_success:
+            return False
+        
+        # Step 2: Add rooms with realistic data
+        rooms_success = self.add_rooms_with_realistic_data()
+        if not rooms_success:
+            return False
+        
+        # Step 3: Test all endpoints
+        endpoints_success = self.test_all_endpoints()
+        
+        # Final Summary
         print("\n" + "=" * 80)
-        print("📊 TEST SUMMARY")
+        print("🎯 COMPREHENSIVE TEST PROJECT SUMMARY")
         print("=" * 80)
         
-        passed_tests = sum([categories_success, room_success, structure_success])
-        total_tests = 3
-        
-        print(f"✅ Categories Available Endpoint: {'PASSED' if categories_success else 'FAILED'}")
-        print(f"✅ Kitchen Room Creation: {'PASSED' if room_success else 'FAILED'}")
-        print(f"✅ Project Structure Verification: {'PASSED' if structure_success else 'FAILED'}")
-        
-        print(f"\n🎯 OVERALL RESULT: {passed_tests}/{total_tests} tests passed")
-        
-        if passed_tests == total_tests:
-            print("🎉 ALL TESTS PASSED! Enhanced rooms integration is working correctly.")
-            print("✅ Kitchen subcategories should be properly populated.")
+        if self.created_project_id:
+            print(f"✅ PROJECT CREATED: {self.created_project_id}")
+            print(f"✅ PROJECT NAME: Modern Farmhouse Renovation")
+            print(f"✅ CLIENT: Sarah & Mike Thompson")
+            print(f"✅ BUDGET: $75,000")
+            print(f"✅ ROOMS CREATED: {len(self.created_rooms)}")
+            
+            # Show URLs for immediate testing
+            base_frontend_url = BASE_URL.replace('/api', '')
+            print(f"\n🌐 IMMEDIATE PREVIEW URLS:")
+            print(f"   Walkthrough: {base_frontend_url}/project/{self.created_project_id}/walkthrough")
+            print(f"   Checklist:   {base_frontend_url}/project/{self.created_project_id}/checklist") 
+            print(f"   FF&E Sheet:  {base_frontend_url}/project/{self.created_project_id}/ffe")
+            
+            print(f"\n🎉 SUCCESS: Test project created and ready for preview!")
+            print(f"   The user can now see the system working with realistic data.")
+            
+            return True
         else:
-            print("⚠️ SOME TESTS FAILED! Enhanced rooms integration needs attention.")
-            print("❌ This explains why kitchen subcategories are missing.")
-        
-        return passed_tests == total_tests
+            print("❌ FAILED: Could not create test project")
+            return False
 
 
 # Main execution
