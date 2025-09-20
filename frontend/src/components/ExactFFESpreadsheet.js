@@ -253,7 +253,9 @@ const ExactFFESpreadsheet = ({
         console.log('✅ Item added successfully');
         setShowAddItem(false);
         // Force reload to show the new item
-        window.location.reload();
+        if (onReload) {
+          onReload();
+        }
       } else {
         const errorData = await response.text();
         console.error('❌ Backend error:', errorData);
