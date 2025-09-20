@@ -933,8 +933,11 @@ const SimpleChecklistSpreadsheet = ({
                           </React.Fragment>
                         ))}
 
-                        {/* ADD ITEM BUTTON - FIXED */}
-                        <div className="mb-4">
+                        {/* ADD CATEGORY AND ADD ITEM BUTTONS - BOTTOM SECTION */}
+                        <div className="mb-4 flex gap-3">
+                          <button className="text-white px-4 py-2 rounded font-medium" style={{ backgroundColor: '#8b7355' }}>
+                            + ADD CATEGORY
+                          </button>
                           <button 
                             onClick={() => {
                               if (category.subcategories?.length > 0) {
@@ -947,7 +950,7 @@ const SimpleChecklistSpreadsheet = ({
                             }}
                             className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
                           >
-                            + Add Item
+                            + ADD ITEM
                           </button>
                         </div>
                       </>
