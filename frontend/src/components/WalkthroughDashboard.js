@@ -26,26 +26,40 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
     if (projectId) {
       console.log('🚀 Loading project:', projectId);
       
-      // IMMEDIATE TEST - Force load project data
-      fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}`)
-        .then(response => {
+      const loadProjectData = async () => {
+        try {
+          const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+          console.log('🌐 Using backend URL:', backendUrl);
+          
+          const response = await fetch(`${backendUrl}/api/projects/${projectId}`, {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
           console.log('📡 Response received:', response.status);
+          
           if (response.ok) {
-            return response.json();
+            const projectData = await response.json();
+            console.log('✅ SUCCESS - Project data loaded:', projectData.name);
+            setProject(projectData);
+            setError(null);
           } else {
-            throw new Error(`HTTP ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
           }
-        })
-        .then(projectData => {
-          console.log('✅ SUCCESS - Project data:', projectData.name);
-          setProject(projectData);
-          setLoading(false);
-        })
-        .catch(err => {
+        } catch (err) {
           console.error('❌ ERROR loading project:', err);
           setError('Failed to load project: ' + err.message);
+        } finally {
           setLoading(false);
-        });
+        }
+      };
+      
+      loadProjectData();
+    } else {
+      setLoading(false);
+      setError('No project ID provided');
     }
   }, [projectId]);
 
