@@ -1250,25 +1250,43 @@ const ExactFFESpreadsheet = ({
 
         {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS - MATCHING WALKTHROUGH */}
         <div className="mt-6 flex gap-3">
-          <button 
-            onClick={() => {
+          <select
+            value=""
+            onChange={(e) => {
               // Find first room to add category to
               const firstRoom = project?.rooms?.[0];
               if (firstRoom) {
-                const categoryName = window.prompt('Enter new category name:');
-                if (categoryName && categoryName.trim()) {
-                  handleAddCategory(firstRoom.id, categoryName.trim());
+                if (e.target.value === 'CREATE_NEW') {
+                  const categoryName = window.prompt('Enter new category name:');
+                  if (categoryName && categoryName.trim()) {
+                    handleAddCategory(firstRoom.id, categoryName.trim());
+                  }
+                } else if (e.target.value) {
+                  handleAddCategory(firstRoom.id, e.target.value);
                 }
               } else {
                 console.error('❌ No rooms available. Please add a room first.');
                 alert('Please add a room first before adding categories.');
               }
             }}
-            className="text-white px-4 py-2 rounded font-medium" 
+            className="text-white px-4 py-2 rounded font-medium border-none outline-none" 
             style={{ backgroundColor: '#8b7355' }}
           >
-            + ADD CATEGORY
-          </button>
+            <option value="">+ ADD CATEGORY ▼</option>
+            <option value="Lighting">Lighting</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Decor & Accessories">Decor & Accessories</option>
+            <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
+            <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
+            <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
+            <option value="Furniture & Storage">Furniture & Storage</option>
+            <option value="Equipment & Furniture">Equipment & Furniture</option>
+            <option value="Electronics & Technology">Electronics & Technology</option>
+            <option value="Appliances">Appliances</option>
+            <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
+            <option value="Surfaces & Materials">Surfaces & Materials</option>
+            <option value="CREATE_NEW">+ Create New Category</option>
+          </select>
           <button 
             onClick={() => {
               console.log('🚀 FF&E Transfer button clicked');
