@@ -712,6 +712,13 @@ const SimpleWalkthroughSpreadsheet = ({
                               </button>
                               <span>{category.name.toUpperCase()}</span>
                             </div>
+                            <button
+                              onClick={() => handleDeleteCategory(category.id)}
+                              className="text-red-300 hover:text-red-100 text-lg"
+                              title="Delete Category"
+                            >
+                              🗑️
+                            </button>
                           </div>
                         </div>
                         
