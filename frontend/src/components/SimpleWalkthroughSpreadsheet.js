@@ -78,10 +78,19 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
           </thead>
           <tbody>
             <tr>
-              <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                <input type="checkbox" className="w-3 h-3" />
+              <td className="border border-gray-400 px-1 py-1 text-center w-8">
+                <input type="checkbox" className="w-2 h-2" />
               </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Recessed Lighting</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                <select className="bg-gray-700 text-white text-xs px-1 py-1 rounded border border-gray-600 w-full">
+                  <option value="">Select...</option>
+                  <option value="installed">Installed</option>
+                  <option value="portable">Portable</option>
+                  <option value="piece">Piece</option>
+                  <option value="fixture">Fixture</option>
+                  <option value="accessory">Accessory</option>
+                </select>
+              </td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
