@@ -106,7 +106,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "User reported extensive list of broken functionality - SCRAPING NOT WORKING IN 'ADD ITEM' AGAIN! Filter is NOT WORKING, PIE CHARTS NOT WORKING! Cells need to match carrier colors, need to clear all columns except 'ITEMS' as default, STATUS should be BLANK not PICKED, categories need comprehensive loading, need to add subcategories for kitchen/laundry/bar/primary bath, need RED sub like 'INSTALLED' for various categories, need BIG CATEGORIES: CABINETS, ARCHITECTURAL ELEMENTS, AND TRIM"
+  "URGENT: WALKTHROUGH DELETE FUNCTIONALITY AND PAGE REDIRECT ISSUES - User reports: 1) WALKTHROUGH - Delete buttons don't work (rooms, categories, items), 2) ALL SHEETS - Page keeps resetting to landing page every 2 seconds, 3) ALL SHEETS - Finish and color default is blank. Critical system failure preventing walkthrough sheet usage."
 
 backend:
   - task: "FF&E and Checklist Backend Functionality Testing - Review Request"
