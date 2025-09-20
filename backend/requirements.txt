@@ -1,3 +1,4 @@
+aiohttp==3.10.13
 aiosmtplib==4.0.2
 annotated-types==0.7.0
 anyio==4.10.0
