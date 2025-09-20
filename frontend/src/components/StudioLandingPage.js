@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { projectAPI } from '../App';
 import TeamsIntegration from './TeamsIntegration';
+import UnifiedFurnitureSearch from './UnifiedFurnitureSearch';
 
 const StudioLandingPage = () => {
   const [projects, setProjects] = useState([]);
