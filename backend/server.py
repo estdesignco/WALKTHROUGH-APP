@@ -790,7 +790,7 @@ class ItemBase(BaseModel):
     
     # NEW ENHANCED TRACKING FIELDS
     sku: Optional[str] = ""
-    finish_color: Optional[str] = ""
+    finish_color: Optional[str] = "Natural"
     price: Optional[float] = 0.0  # Retail price vs cost
     description: Optional[str] = ""
     availability: Optional[str] = ""
