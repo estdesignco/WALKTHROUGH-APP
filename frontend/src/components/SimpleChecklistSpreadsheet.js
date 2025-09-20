@@ -973,42 +973,12 @@ const SimpleChecklistSpreadsheet = ({
 
                         {/* ADD CATEGORY AND ADD ITEM BUTTONS - BOTTOM SECTION */}
                         <div className="mb-4 flex gap-3">
-                          <select
-                            value=""
-                            onChange={(e) => {
-                              if (e.target.value === 'CREATE_NEW') {
-                                const categoryName = window.prompt('Enter new category name:');
-                                if (categoryName && categoryName.trim() && room.id) {
-                                  handleAddCategory(room.id, categoryName.trim());
-                                }
-                              } else if (e.target.value && room.id) {
-                                handleAddCategory(room.id, e.target.value);
-                              }
-                            }}
-                            className="text-white px-4 py-2 rounded font-medium border-none outline-none"
-                            style={{ backgroundColor: '#8b7355' }}
-                          >
-                            <option value="">+ ADD CATEGORY ▼</option>
-                            <option value="Lighting">Lighting</option>
-                            <option value="Furniture">Furniture</option>
-                            <option value="Decor & Accessories">Decor & Accessories</option>
-                            <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
-                            <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
-                            <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
-                            <option value="Furniture & Storage">Furniture & Storage</option>
-                            <option value="Equipment & Furniture">Equipment & Furniture</option>
-                            <option value="Electronics & Technology">Electronics & Technology</option>
-                            <option value="Appliances">Appliances</option>
-                            <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
-                            <option value="Surfaces & Materials">Surfaces & Materials</option>
-                            <option value="CREATE_NEW">+ Create New Category</option>
-                          </select>
                           <button 
                             onClick={() => {
                               if (category.subcategories?.length > 0) {
                                 setSelectedSubCategoryId(category.subcategories[0].id);
                                 setShowAddItem(true);
-                                console.log('🎯 Selected subcategory for new item:', category.subcategories[0].id);
+                                console.log('🎯 Selected subcategory for checklist item:', category.subcategories[0].id);
                               } else {
                                 alert('This category has no subcategories. Please contact support.');
                               }
