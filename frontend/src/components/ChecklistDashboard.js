@@ -288,14 +288,6 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
               </div>
             </div>
 
-            {/* PIE CHART AND STATUS BREAKDOWN */}
-            <ChecklistStatusOverview
-              totalItems={getTotalItems()}
-              statusBreakdown={getStatusBreakdown()}
-              carrierBreakdown={getCarrierBreakdown()}
-              itemStatuses={itemStatuses}
-            />
-
             {/* SEARCH BAR AND ADD ROOM BUTTON */}
             <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
               <div className="flex items-center space-x-4 flex-1">
@@ -321,6 +313,14 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
             </div>
           </>
         )}
+
+        {/* PIE CHART AND STATUS BREAKDOWN - ALWAYS VISIBLE */}
+        <ChecklistStatusOverview
+          totalItems={getTotalItems()}
+          statusBreakdown={getStatusBreakdown()}
+          carrierBreakdown={getCarrierBreakdown()}
+          itemStatuses={itemStatuses}
+        />
       </div>
 
       {/* FF&E Spreadsheet */}
