@@ -1133,9 +1133,12 @@ const ExactFFESpreadsheet = ({
                                                               <div className="h-6">
                                                                 <input 
                                                                   type="text" 
+                                                                  value={item.order_number || ''}
                                                                   placeholder="Order #"
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Order number changed:', e.target.value)}
+                                                                  onChange={(e) => {
+                                                                    handleItemFieldChange(item.id, 'order_number', e.target.value);
+                                                                  }}
                                                                 />
                                                               </div>
                                                             </div>
