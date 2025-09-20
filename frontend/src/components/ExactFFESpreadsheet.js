@@ -37,31 +37,39 @@ const ExactFFESpreadsheet = ({
   const [selectedCarrier, setSelectedCarrier] = useState('');
 
   // ACTUAL API CALLS - WITH PROPER ERROR HANDLING
+  // Handle status change with improved error handling
   const handleStatusChange = async (itemId, newStatus) => {
-    console.log('🔄 Status change request:', { itemId, newStatus });
+    console.log('🔄 FFE status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      console.log('🌐 Using backend URL:', backendUrl);
+      
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
       
-      console.log('📡 Status change response:', response.status, response.statusText);
+      console.log('📡 Response status:', response.status, response.statusText);
       
       if (response.ok) {
-        console.log('✅ Status updated successfully, reloading...');
+        console.log('✅ FFE status updated successfully');
+        // Use onReload instead of window.location.reload to prevent navigation issues
         if (onReload) {
+          console.log('🔄 Calling onReload function');
           onReload();
+        } else {
+          console.warn('⚠️ No onReload function provided');
         }
       } else {
         const errorData = await response.text();
-        console.error('❌ Status update failed:', response.status, errorData);
-        console.error(`Failed to update status: ${response.status} ${response.statusText}`, errorData);
+        console.error('❌ FFE status update failed:', response.status, errorData);
+        alert(`Failed to update status: ${response.status} ${errorData}`);
       }
     } catch (error) {
-      console.error('❌ Status update error:', error);
-      console.error(`Error updating status: ${error.message}`);
+      console.error('❌ FFE status update error:', error);
+      alert(`Error updating status: ${error.message}`);
     }
   };
 
