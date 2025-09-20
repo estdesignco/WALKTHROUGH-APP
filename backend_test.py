@@ -1,15 +1,28 @@
 #!/usr/bin/env python3
 """
-SCRAPING FUNCTIONALITY DIAGNOSTIC TESTING - REVIEW REQUEST
-Quick test of scraping functionality to debug reported issues:
-- Test Enhanced Scraping with specific URLs
-- Check Response Structure and data field population
-- Verify if size, finish_color fields are being populated correctly
+CREATE TEST PROJECT FOR PREVIEW - URGENT REVIEW REQUEST
+
+The user reports there is no preview available. Create a comprehensive test project immediately:
+
+1. **Create Test Project** via API:
+   - Project Name: "Modern Farmhouse Renovation" 
+   - Client Name: "Sarah & Mike Thompson"
+   - Address: "123 Main Street, Nashville, TN"
+   - Budget: "$75,000"
+
+2. **Populate with Realistic Data**:
+   - Add 3-4 rooms (Living Room, Master Bedroom, Kitchen, Dining Room)
+   - Add categories and subcategories for each room
+   - Add sample items with realistic names, vendors, pricing
+   - Set various statuses (TO BE SELECTED, ORDERED, SHIPPED, etc.)
+
+3. **Test All Endpoints** and return project ID for immediate preview
 """
 
 import requests
 import json
 import uuid
+import random
 from datetime import datetime
 from typing import Dict, Any, List
 import sys
@@ -28,14 +41,13 @@ def get_backend_url():
     return "http://localhost:8001"
 
 BASE_URL = get_backend_url() + "/api"
-PROJECT_ID = "5cccfb11-0ac0-45ed-91ab-a56088d65b5a"  # Greene Renovation project ID
 
 print("=" * 80)
-print("🎯 FF&E AND CHECKLIST BACKEND TESTING - REVIEW REQUEST")
+print("🚨 CREATE TEST PROJECT FOR PREVIEW - URGENT")
 print("=" * 80)
 print(f"Backend URL: {BASE_URL}")
-print(f"Project ID: {PROJECT_ID} (Greene Renovation)")
-print("Focus: FF&E Sheet Access, Checklist Sheet Access, Add Category API, Transfer Button Infrastructure")
+print("Creating: Modern Farmhouse Renovation - Sarah & Mike Thompson")
+print("Goal: Comprehensive test project with realistic data for immediate preview")
 print("=" * 80)
 
 class EnhancedRoomsTester:
