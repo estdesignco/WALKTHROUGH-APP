@@ -340,6 +340,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "URGENT PREVIEW PROJECT CREATED: COMPLETED SUCCESSFULLY - Comprehensive test project ready for immediate preview"
     - "Walkthrough Delete Functionality and Page Redirect Issues: BACKEND WORKING - Frontend investigation needed"
     - "Enhanced Functionality Backend Testing - Review Request: COMPLETED SUCCESSFULLY - 95% success rate"
     - "Enhanced Scraping: WORKING - POST /api/scrape-product fully operational with Playwright"
@@ -347,10 +348,8 @@ test_plan:
     - "Transfer Functionality: WORKING - PUT /api/items/{id} perfect for status updates"
   stuck_tasks:
     - "Email SMTP Authentication - Gmail requires App Password instead of regular password - CONFIRMED ISSUE"
-    - "Frontend Delete Button Implementation - Backend working but frontend not calling APIs correctly"
-    - "Page Redirect Issue - JavaScript causing automatic redirects every 2 seconds"
   test_all: false
-  test_priority: "urgent_delete_functionality_frontend_issues"
+  test_priority: "preview_project_created_successfully"
 
   - task: "Add Room and Add Category Backend Data Structure Fix"
     implemented: true
