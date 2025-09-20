@@ -452,6 +452,76 @@ const SimpleChecklistSpreadsheet = ({
       console.error('❌ Error adding comprehensive checklist category:', error);
     }
   };  
+
+  // Handle Canva items extracted
+  const handleCanvaItemsExtracted = async (extractedItems) => {
+    console.log('🎨 Processing Canva extracted items:', extractedItems);
+    
+    try {
+      let addedCount = 0;
+      
+      for (const item of extractedItems) {
+        // Find first available subcategory for each item
+        let targetSubcategoryId = null;
+        
+        for (const room of project?.rooms || []) {
+          for (const category of room.categories || []) {
+            if (category.subcategories && category.subcategories.length > 0) {
+              targetSubcategoryId = category.subcategories[0].id;
+              break;
+            }
+          }
+          if (targetSubcategoryId) break;
+        }
+        
+        if (targetSubcategoryId) {
+          const itemData = {
+            name: item.name || 'Canva Import Item',
+            vendor: item.vendor || '',
+            sku: item.sku || '',
+            cost: item.cost || '',
+            size: '',
+            finish_color: item.finish_color || '',
+            quantity: 1,
+            status: 'PICKED',
+            link: item.link || '',
+            image_url: item.image_url || '',
+            subcategory_id: targetSubcategoryId,
+            order_index: 0
+          };
+          
+          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(itemData)
+          });
+          
+          if (response.ok) {
+            addedCount++;
+          }
+        }
+      }
+      
+      alert(`✅ Successfully imported ${addedCount} items from Canva!`);
+      
+      if (onReload) {
+        onReload();
+      }
+      
+      setShowCanvaModal(false);
+      
+    } catch (error) {
+      console.error('❌ Error importing Canva items:', error);
+      alert('❌ Failed to import some items from Canva: ' + error.message);
+    }
+  };
+
+  // Handle upload to Canva - NOW OPENS IMPORT MODAL
+  const handleUploadToCanva = () => {
+    console.log('🎨 Opening Canva import modal');
+    setShowCanvaModal(true);
+  };
+
   const handleCanvaPdfUpload = async (file, roomName) => {
     if (!file) {
       console.log('⚠️ No file provided');
