@@ -690,7 +690,6 @@ const SimpleWalkthroughSpreadsheet = ({
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 };
