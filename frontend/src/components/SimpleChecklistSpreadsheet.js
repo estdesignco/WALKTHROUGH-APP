@@ -616,13 +616,24 @@ const SimpleChecklistSpreadsheet = ({
             </button>
           </div>
           
-          {/* Add Room Button */}
-          <button 
-            onClick={onAddRoom}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
-          >
-            ✚ ADD ROOM
-          </button>
+          {/* Action Buttons - ADD ROOM AND TRANSFER */}
+          <div className="flex gap-3">
+            <button 
+              onClick={onAddRoom}
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+            >
+              ✚ ADD ROOM
+            </button>
+            <button 
+              onClick={() => {
+                console.log('🚀 Checklist Transfer button clicked');
+                alert('Transfer functionality will be implemented next.');
+              }}
+              className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
+            >
+              → TRANSFER TO FF&E
+            </button>
+          </div>
         </div>
       </div>
 
