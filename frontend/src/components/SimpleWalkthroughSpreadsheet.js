@@ -326,10 +326,29 @@ const SimpleWalkthroughSpreadsheet = ({
     }
   };
   
+  if (!project) {
+    return (
+      <div className="text-center text-red-400 py-8 bg-red-900 m-4 p-4 rounded">
+        <p className="text-lg">🚨 SimpleWalkthroughSpreadsheet: NO PROJECT DATA</p>
+      </div>
+    );
+  }
+
+  if (!project.rooms || project.rooms.length === 0) {
+    return (
+      <div className="text-center text-yellow-400 py-8 bg-yellow-900 m-4 p-4 rounded">
+        <p className="text-lg">🚨 SimpleWalkthroughSpreadsheet: NO ROOMS</p>
+        <p className="text-sm mt-2">Project has {project.rooms?.length || 0} rooms</p>
+      </div>
+    );
+  }
+
+  console.log('✅ SimpleWalkthroughSpreadsheet: Rendering with', project.rooms.length, 'rooms');
+
   return (
     <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       
-      {/* FILTER AND SEARCH SECTION */}
+      {/* ENHANCED FILTER SECTION - MATCHING OTHER SHEETS FUNCTIONALITY */}
       <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
         <div className="flex flex-col gap-4">
           {/* Search Bar */}
@@ -337,42 +356,103 @@ const SimpleWalkthroughSpreadsheet = ({
             <input
               type="text"
               placeholder="Search Items, Vendors, SKUs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
           
           {/* Filter Dropdowns */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedRoom}
+              onChange={(e) => setSelectedRoom(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Rooms</option>
+              {(project?.rooms || []).map(room => (
+                <option key={room.id} value={room.id}>{room.name}</option>
+              ))}
             </select>
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Categories</option>
+              <option value="Lighting">Lighting</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Decor">Decor & Accessories</option>
+              <option value="Paint">Paint, Wallpaper & Finishes</option>
+              <option value="Architectural">Architectural Elements</option>
             </select>
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedVendor}
+              onChange={(e) => setSelectedVendor(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Vendors</option>
+              {(vendorTypes || []).map(vendor => (
+                <option key={vendor} value={vendor}>{vendor}</option>
+              ))}
             </select>
-            <select className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <select 
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+            >
               <option value="">All Status</option>
+              <option value="PICKED">PICKED</option>
+              <option value="ORDER SAMPLES">ORDER SAMPLES</option>
+              <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
+              <option value="ASK NEIL">ASK NEIL</option>
+              <option value="ASK CHARLENE">ASK CHARLENE</option>
+              <option value="ASK JALA">ASK JALA</option>
+              <option value="GET QUOTE">GET QUOTE</option>
+              <option value="WAITING ON QT">WAITING ON QT</option>
+              <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
             </select>
           </div>
           
           {/* Filter Buttons - TONED DOWN */}
           <div className="flex gap-4">
-            <button className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded font-medium opacity-80">
+            <button 
+              onClick={() => console.log('🔍 WALKTHROUGH FILTER APPLIED')}
+              className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded font-medium opacity-80"
+            >
               🔍 FILTER
             </button>
-            <button className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded font-medium opacity-80">
+            <button 
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedRoom('');
+                setSelectedCategory('');
+                setSelectedVendor('');
+                setSelectedStatus('');
+                console.log('🧹 WALKTHROUGH FILTER CLEARED');
+              }}
+              className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded font-medium opacity-80"
+            >
               CLEAR
             </button>
           </div>
           
           {/* Action Buttons */}
           <div className="flex gap-3">
-            <button className="text-white px-4 py-2 rounded font-medium" style={{ backgroundColor: '#8b7355' }}>
+            <button 
+              onClick={onAddRoom}
+              className="text-white px-4 py-2 rounded font-medium" 
+              style={{ backgroundColor: '#8b7355' }}
+            >
               + ADD ROOM
             </button>
-            <button className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium">
+            <button 
+              onClick={() => {
+                console.log('🚀 Walkthrough Transfer button clicked');
+                alert('Transfer functionality will be implemented next.');
+              }}
+              className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
+            >
               → TRANSFER TO CHECKLIST
             </button>
           </div>
