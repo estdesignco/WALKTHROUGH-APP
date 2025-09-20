@@ -50,10 +50,12 @@ print("Creating: Modern Farmhouse Renovation - Sarah & Mike Thompson")
 print("Goal: Comprehensive test project with realistic data for immediate preview")
 print("=" * 80)
 
-class EnhancedRoomsTester:
+class TestProjectCreator:
     def __init__(self):
         self.session = requests.Session()
         self.test_results = []
+        self.created_project_id = None
+        self.created_rooms = []
         
     def log_test(self, test_name: str, success: bool, details: str = ""):
         """Log test results"""
