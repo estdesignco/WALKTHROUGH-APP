@@ -89,17 +89,53 @@ export default function ProjectPage() {
                                 {project.client_info?.address || 'Not provided'}
                             </div>
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Best Time to Call</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.best_time_to_call || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Communication</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {Array.isArray(project.contact_preferences) ? project.contact_preferences.join(', ') : project.contact_preferences || 'Not specified'}
+                            </div>
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Previous Designer Experience</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {project.worked_with_designer_before || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Primary Decision Maker(s)</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.primary_decision_maker || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Involvement Level</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.involvement_level || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Ideal Sofa Price Point</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.ideal_sofa_price || 'Not specified'}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Additional questionnaire sections */}
+                {/* Total Scope of Work */}
                 <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
-                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">PROJECT DETAILS</h3>
+                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">TOTAL SCOPE OF WORK</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Project Type</label>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Property Type</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {project.project_type || 'Not specified'}
+                                {project.property_type || 'Not specified'}
                             </div>
                         </div>
                         <div>
@@ -112,6 +148,219 @@ export default function ProjectPage() {
                             <label className="block text-sm font-medium text-stone-300 mb-2">Budget Range</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
                                 {project.budget_range || project.budget || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Project Priority</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {Array.isArray(project.project_priority) ? project.project_priority.join(', ') : project.project_priority || 'Not specified'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Project Type Specific */}
+                <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
+                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">PROJECT TYPE - {project.project_type?.toUpperCase() || 'NOT SPECIFIED'}</h3>
+                    
+                    {project.project_type === "New Build" && (
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-300 mb-2">Working with Architect?</label>
+                                    <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                        {project.new_build_architect || 'Not specified'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-300 mb-2">Working with Builder?</label>
+                                    <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                        {project.new_build_builder || 'Not specified'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-300 mb-2">Square Footage</label>
+                                    <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                        {project.new_build_square_footage || 'Not specified'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {project.project_type === "Renovation" && (
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-300 mb-2">Working with Architect?</label>
+                                    <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                        {project.renovation_architect || 'Not specified'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-300 mb-2">Working with Builder?</label>
+                                    <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                        {project.renovation_builder || 'Not specified'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-300 mb-2">Square Footage Being Renovated</label>
+                                    <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                        {project.renovation_square_footage || 'Not specified'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-300 mb-2">Changing Layout/Footprint?</label>
+                                    <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                        {project.renovation_layout_change || 'Not specified'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {project.project_type === "Furniture Refresh" && (
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-300 mb-2">Square Footage Being Refreshed</label>
+                                    <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                        {project.furniture_refresh_square_footage || 'Not specified'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-stone-300 mb-2">Keeping Any Existing Pieces?</label>
+                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                    {project.furniture_refresh_keeping_pieces || 'Not specified'}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Design Questions */}
+                <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
+                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">DESIGN QUESTIONS</h3>
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-stone-300 mb-2">Style in 3 Words</label>
+                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                    {project.design_style_words || 'Not provided'}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Colors</label>
+                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                    {project.design_preferred_colors || 'Not provided'}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-stone-300 mb-2">Disliked Colors</label>
+                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                    {project.design_disliked_colors || 'Not provided'}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Palette</label>
+                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                    {Array.isArray(project.design_preferred_palette) ? project.design_preferred_palette.join(', ') : project.design_preferred_palette || 'Not specified'}
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Artwork Preference</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {Array.isArray(project.design_artwork_preference) ? project.design_artwork_preference.join(', ') : project.design_artwork_preference || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Liked Design Styles</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {Array.isArray(project.design_styles_preference) ? project.design_styles_preference.join(', ') : project.design_styles_preference || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Disliked Design Styles</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {project.design_styles_dislike || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Patterns & Textures Preference</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {Array.isArray(project.finishes_patterns_preference) ? project.finishes_patterns_preference.join(', ') : project.finishes_patterns_preference || 'Not provided'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Getting to Know You Better */}
+                <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
+                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">GETTING TO KNOW YOU BETTER</h3>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Tell us about your family</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {project.family_info || 'Not provided'}
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-stone-300 mb-2">Do you have pets?</label>
+                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                    {project.pets_info || 'Not provided'}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-stone-300 mb-2">How do you entertain?</label>
+                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                    {project.entertaining_style || 'Not provided'}
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">What are your hobbies?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[60px]">
+                                {project.hobbies || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">What is your lifestyle like?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {project.lifestyle || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Any special requests or needs?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {project.special_requests || project.notes || 'No special requests'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* How Did You Hear About Us */}
+                <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
+                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">HOW DID YOU HEAR ABOUT US</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">How did you hear about us?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.how_heard_about_us || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Newsletter signup?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.newsletter_signup || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Social media preferences</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {project.social_media_preferences || 'Not provided'}
                             </div>
                         </div>
                     </div>
