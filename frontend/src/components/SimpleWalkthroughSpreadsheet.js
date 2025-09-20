@@ -698,8 +698,6 @@ const SimpleWalkthroughSpreadsheet = ({
           
           return (
             <div key={room.id} className="mb-8">
-          return (
-            <div key={room.id} className="mb-8">
               {/* ROOM HEADER WITH DIFFERENT COLORS AND EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
               <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: roomIndex % 2 === 0 ? '#7C3AED' : '#059669' }}>
                 <div className="flex justify-between items-center">
