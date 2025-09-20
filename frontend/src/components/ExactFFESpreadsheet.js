@@ -1030,16 +1030,18 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
-                                                          {/* SIZE - EDITABLE INLINE */}
+                                                          {/* SIZE - PROPER INPUT FIELD */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Size updated:', e.target.textContent)}
-                                                            >
-                                                              {item.size || ''}
-                                                            </div>
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.size || ''}
+                                                              placeholder="Size"
+                                                              className="w-full bg-transparent text-white text-sm outline-none border-none"
+                                                              onChange={(e) => {
+                                                                handleItemFieldChange(item.id, 'size', e.target.value);
+                                                              }}
+                                                              onBlur={(e) => console.log('Size updated:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
                                                           {/* FINISH/Color - EDITABLE INLINE */}
