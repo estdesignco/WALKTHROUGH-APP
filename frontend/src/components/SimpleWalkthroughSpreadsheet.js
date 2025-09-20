@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 const SimpleWalkthroughSpreadsheet = ({ 
   project, 
