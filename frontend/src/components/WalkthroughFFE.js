@@ -920,7 +920,7 @@ const WalkthroughFFE = ({
                                                               type="checkbox" 
                                                               checked={item.status === 'INSTALLED' || false}
                                                               onChange={(e) => console.log('Checkbox toggled:', e.target.checked)}
-                                                              className="w-4 h-4"
+                                                              className="w-3 h-3"
                                                             />
                                                           </td>
                                                           
