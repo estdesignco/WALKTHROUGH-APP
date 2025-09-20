@@ -2401,6 +2401,104 @@ async def add_manual_furniture_item(item_data: dict):
         logging.error(f"Failed to add manual furniture item: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to add manual furniture item: {str(e)}")
 
+# LIVE SHIPPING TRACKING ENDPOINTS
+@api_router.get("/shipping/track/{tracking_number}")
+async def track_single_shipment(tracking_number: str, carrier: Optional[str] = None):
+    """Track a single shipment by tracking number"""
+    try:
+        from shipping_tracker import track_shipment_by_number
+        
+        result = await track_shipment_by_number(tracking_number, carrier)
+        return result
+        
+    except Exception as e:
+        logging.error(f"Shipping tracking failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to track shipment: {str(e)}")
+
+@api_router.post("/shipping/track-multiple")
+async def track_multiple_shipments_endpoint(tracking_data: dict):
+    """Track multiple shipments at once"""
+    try:
+        from shipping_tracker import track_multiple_shipments
+        
+        tracking_numbers = tracking_data.get('tracking_numbers', [])
+        
+        if not tracking_numbers:
+            raise HTTPException(status_code=400, detail="No tracking numbers provided")
+        
+        results = await track_multiple_shipments(tracking_numbers)
+        
+        return {
+            "status": "success",
+            "total_shipments": len(tracking_numbers),
+            "results": results
+        }
+        
+    except Exception as e:
+        logging.error(f"Multiple shipment tracking failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to track shipments: {str(e)}")
+
+@api_router.get("/shipping/project-tracking/{project_id}")
+async def track_project_shipments(project_id: str):
+    """Get tracking information for all items in a project with tracking numbers"""
+    try:
+        from shipping_tracker import track_multiple_shipments
+        
+        # Get all items in the project that have tracking numbers
+        project_doc = await db.projects.find_one({"id": project_id})
+        if not project_doc:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Collect all tracking numbers from project items
+        tracking_numbers = []
+        items_with_tracking = []
+        
+        for room in project_doc.get('rooms', []):
+            for category in room.get('categories', []):
+                for subcategory in category.get('subcategories', []):
+                    for item in subcategory.get('items', []):
+                        tracking_number = item.get('tracking_number', '').strip()
+                        if tracking_number:
+                            tracking_numbers.append(tracking_number)
+                            items_with_tracking.append({
+                                'item_id': item['id'],
+                                'item_name': item['name'],
+                                'room_name': room['name'],
+                                'tracking_number': tracking_number,
+                                'vendor': item.get('vendor', ''),
+                                'status': item.get('status', '')
+                            })
+        
+        if not tracking_numbers:
+            return {
+                "status": "success",
+                "project_id": project_id,
+                "message": "No items with tracking numbers found in this project",
+                "tracking_results": []
+            }
+        
+        # Track all shipments
+        tracking_results = await track_multiple_shipments(tracking_numbers)
+        
+        # Combine item info with tracking results
+        combined_results = []
+        for i, item_info in enumerate(items_with_tracking):
+            combined_results.append({
+                **item_info,
+                "tracking_info": tracking_results[i] if i < len(tracking_results) else None
+            })
+        
+        return {
+            "status": "success",
+            "project_id": project_id,
+            "total_tracked_items": len(tracking_numbers),
+            "tracking_results": combined_results
+        }
+        
+    except Exception as e:
+        logging.error(f"Project shipment tracking failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to track project shipments: {str(e)}")
+
 @api_router.get("/paint-colors")
 async def get_paint_colors():
     """Get comprehensive paint color catalog for interior design"""
