@@ -477,116 +477,147 @@ const SimpleWalkthroughSpreadsheet = ({
       <div className="overflow-x-auto">
         
         {/* USE FILTERED PROJECT DATA */}
-        {((filteredProject || project)?.rooms || []).map((room, roomIndex) => (
-          <div key={room.id} className="mb-8">
-            {/* ROOM HEADER WITH DIFFERENT COLORS */}
-            <div className="mt-8 mb-4 px-4 py-2 text-white font-bold flex justify-between items-center" style={{ backgroundColor: roomIndex % 2 === 0 ? '#7C3AED' : '#059669' }}>
-              <span>{room.name.toUpperCase()}</span>
-              <button className="text-white hover:text-gray-200">
-                ➖
-              </button>
-            </div>
-            
-            {/* CATEGORIES */}
-            {(room.categories || []).map((category, catIndex) => (
-              <div key={category.id} className="mb-4">
-                {/* CATEGORY HEADER (GREEN) WITH MINIMIZE */}
-                <div className="mb-4 px-4 py-2 text-white font-bold flex justify-between items-center" style={{ backgroundColor: '#065F46' }}>
-                  <span>{category.name.toUpperCase()}</span>
-                  <button className="text-white hover:text-gray-200">
-                    ➖
-                  </button>
-                </div>
-                
-                {/* TABLE WITH CORRECT HEADERS - MATCHING CHECKLIST EXACTLY */}
-                <table className="w-full border-collapse border border-gray-400 mb-6">
-                  <thead>
-                    <tr>
-                      <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-8" style={{ backgroundColor: '#8b7355' }}>✓</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
-                      <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {/* REAL DATA FROM SUBCATEGORIES */}
-                    {(category.subcategories || []).map((subcategory) => 
-                      (subcategory.items || []).map((item, itemIndex) => (
-                        <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                          <td className="border border-gray-400 px-1 py-1 text-center w-8">
-                            <input type="checkbox" className="w-2 h-2" />
-                          </td>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.name}</td>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">{item.quantity || 1}</td>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.size || ''}</td>
-                          <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.finish_color || ''}</td>
-                          <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                            <button 
-                              onClick={() => handleDeleteItem(item.id)}
-                              className="text-red-400 hover:text-red-300 text-xs"
-                            >
-                              🗑️
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-                
-                {/* ADD CATEGORY AND ADD ITEM BUTTONS WITHIN EACH CATEGORY */}
-                <div className="mb-4 flex gap-3">
-                  <select
-                    value=""
-                    onChange={(e) => {
-                      if (e.target.value === 'CREATE_NEW') {
-                        const categoryName = window.prompt('Enter new category name:');
-                        if (categoryName && categoryName.trim() && room.id) {
-                          handleAddCategory(room.id, categoryName.trim());
-                        }
-                      } else if (e.target.value && room.id) {
-                        handleAddCategory(room.id, e.target.value);
-                      }
-                    }}
-                    className="text-white px-4 py-2 rounded font-medium border-none outline-none"
-                    style={{ backgroundColor: '#8b7355' }}
-                  >
-                    <option value="">+ ADD CATEGORY ▼</option>
-                    <option value="Lighting">Lighting</option>
-                    <option value="Furniture">Furniture</option>
-                    <option value="Decor & Accessories">Decor & Accessories</option>
-                    <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
-                    <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
-                    <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
-                    <option value="Furniture & Storage">Furniture & Storage</option>
-                    <option value="Equipment & Furniture">Equipment & Furniture</option>
-                    <option value="Electronics & Technology">Electronics & Technology</option>
-                    <option value="Appliances">Appliances</option>
-                    <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
-                    <option value="Surfaces & Materials">Surfaces & Materials</option>
-                    <option value="CREATE_NEW">+ Create New Category</option>
-                  </select>
-                  <button 
-                    onClick={() => {
-                      if (category.subcategories?.length > 0) {
-                        setSelectedSubCategoryId(category.subcategories[0].id);
-                        setShowAddItem(true);
-                        console.log('🎯 Selected subcategory for walkthrough item:', category.subcategories[0].id);
-                      } else {
-                        alert('This category has no subcategories. Please contact support.');
-                      }
-                    }}
-                    className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
-                  >
-                    + ADD ITEM
-                  </button>
+        {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
+          const isRoomExpanded = expandedRooms[room.id];
+          
+          return (
+            <div key={room.id} className="mb-8">
+              {/* ROOM HEADER WITH DIFFERENT COLORS AND EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
+              <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: roomIndex % 2 === 0 ? '#7C3AED' : '#059669' }}>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => toggleRoomExpansion(room.id)}
+                      className="text-white hover:text-gray-200"
+                    >
+                      {isRoomExpanded ? '▼' : '▶'}
+                    </button>
+                    <span>{room.name.toUpperCase()}</span>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        ))}
+              
+              {/* CATEGORIES - ONLY SHOW WHEN EXPANDED */}
+              {isRoomExpanded && (
+                <div>
+                  {(room.categories || []).map((category, catIndex) => {
+                    const isCategoryExpanded = expandedCategories[category.id];
+                    
+                    return (
+                      <div key={category.id} className="mb-4">
+                        {/* CATEGORY HEADER (GREEN) WITH EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
+                        <div className="mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: '#065F46' }}>
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => toggleCategoryExpansion(category.id)}
+                                className="text-white hover:text-gray-200"
+                              >
+                                {isCategoryExpanded ? '▼' : '▶'}
+                              </button>
+                              <span>{category.name.toUpperCase()}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* TABLE - ONLY SHOW WHEN CATEGORY EXPANDED */}
+                        {isCategoryExpanded && (
+                          <div>
+                            {/* TABLE WITH CORRECT HEADERS - MATCHING CHECKLIST EXACTLY */}
+                            <table className="w-full border-collapse border border-gray-400 mb-6">
+                              <thead>
+                                <tr>
+                                  <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-8" style={{ backgroundColor: '#8b7355' }}>✓</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                                  <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {/* REAL DATA FROM SUBCATEGORIES */}
+                                {(category.subcategories || []).map((subcategory) => 
+                                  (subcategory.items || []).map((item, itemIndex) => (
+                                    <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
+                                      <td className="border border-gray-400 px-1 py-1 text-center w-8">
+                                        <input type="checkbox" className="w-2 h-2" />
+                                      </td>
+                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.name}</td>
+                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">{item.quantity || 1}</td>
+                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.size || ''}</td>
+                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.finish_color || ''}</td>
+                                      <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                                        <button 
+                                          onClick={() => handleDeleteItem(item.id)}
+                                          className="text-red-400 hover:text-red-300 text-xs"
+                                        >
+                                          🗑️
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  ))
+                                )}
+                              </tbody>
+                            </table>
+                            
+                            {/* ADD CATEGORY AND ADD ITEM BUTTONS WITHIN EACH CATEGORY */}
+                            <div className="mb-4 flex gap-3">
+                              <select
+                                value=""
+                                onChange={(e) => {
+                                  if (e.target.value === 'CREATE_NEW') {
+                                    const categoryName = window.prompt('Enter new category name:');
+                                    if (categoryName && categoryName.trim() && room.id) {
+                                      handleAddCategory(room.id, categoryName.trim());
+                                    }
+                                  } else if (e.target.value && room.id) {
+                                    handleAddCategory(room.id, e.target.value);
+                                  }
+                                }}
+                                className="text-white px-4 py-2 rounded font-medium border-none outline-none"
+                                style={{ backgroundColor: '#8b7355' }}
+                              >
+                                <option value="">+ ADD CATEGORY ▼</option>
+                                <option value="Lighting">Lighting</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Decor & Accessories">Decor & Accessories</option>
+                                <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
+                                <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
+                                <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
+                                <option value="Furniture & Storage">Furniture & Storage</option>
+                                <option value="Equipment & Furniture">Equipment & Furniture</option>
+                                <option value="Electronics & Technology">Electronics & Technology</option>
+                                <option value="Appliances">Appliances</option>
+                                <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
+                                <option value="Surfaces & Materials">Surfaces & Materials</option>
+                                <option value="CREATE_NEW">+ Create New Category</option>
+                              </select>
+                              <button 
+                                onClick={() => {
+                                  if (category.subcategories?.length > 0) {
+                                    setSelectedSubCategoryId(category.subcategories[0].id);
+                                    setShowAddItem(true);
+                                    console.log('🎯 Selected subcategory for walkthrough item:', category.subcategories[0].id);
+                                  } else {
+                                    alert('This category has no subcategories. Please contact support.');
+                                  }
+                                }}
+                                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
+                              >
+                                + ADD ITEM
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
         
         {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS - MATCHING OTHER SHEETS */}
         <div className="mt-6 flex gap-3">
