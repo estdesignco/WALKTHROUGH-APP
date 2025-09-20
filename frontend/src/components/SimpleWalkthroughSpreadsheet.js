@@ -107,6 +107,9 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
               <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
+              </td>
             </tr>
             <tr>
               <td className="border border-gray-400 px-1 py-1 text-center w-8">
@@ -125,6 +128,9 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
               <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
+              </td>
             </tr>
             <tr>
               <td className="border border-gray-400 px-2 py-2 text-center">
