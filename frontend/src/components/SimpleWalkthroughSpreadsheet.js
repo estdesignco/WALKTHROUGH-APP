@@ -883,9 +883,16 @@ const SimpleWalkthroughSpreadsheet = ({
                   })}
                 </div>
               )}
-            </div>
-          );
-        })}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </div>
+      </DragDropContext>
         
         {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS - MATCHING OTHER SHEETS */}
         <div className="mt-6 flex gap-3">
