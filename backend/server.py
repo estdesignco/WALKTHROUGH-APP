@@ -2499,6 +2499,125 @@ async def track_project_shipments(project_id: str):
         logging.error(f"Project shipment tracking failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to track project shipments: {str(e)}")
 
+# ENHANCED CANVA INTEGRATION ENDPOINTS
+@api_router.post("/canva/extract-board")
+async def extract_canva_board_products(canva_data: dict):
+    """Extract product information from Canva design board"""
+    try:
+        from canva_integration import extract_products_from_canva_board
+        
+        canva_url = canva_data.get('canva_url', '')
+        
+        if not canva_url:
+            raise HTTPException(status_code=400, detail="Canva URL is required")
+        
+        result = await extract_products_from_canva_board(canva_url)
+        return result
+        
+    except Exception as e:
+        logging.error(f"Canva board extraction failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to extract Canva board: {str(e)}")
+
+@api_router.post("/canva/create-room-checklist")
+async def create_canva_room_checklist_endpoint(checklist_data: dict):
+    """Create a small checklist for Canva board for a specific room"""
+    try:
+        from canva_integration import create_canva_room_checklist
+        
+        room_name = checklist_data.get('room_name', '')
+        project_name = checklist_data.get('project_name', '')
+        products = checklist_data.get('products', [])
+        
+        if not room_name or not project_name:
+            raise HTTPException(status_code=400, detail="Room name and project name are required")
+        
+        result = await create_canva_room_checklist(room_name, products, project_name)
+        return result
+        
+    except Exception as e:
+        logging.error(f"Canva checklist creation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create Canva checklist: {str(e)}")
+
+@api_router.post("/canva/sync-with-project")
+async def sync_canva_with_project_endpoint(sync_data: dict):
+    """Sync Canva board products back to main project checklist"""
+    try:
+        from canva_integration import sync_canva_with_project
+        
+        canva_url = sync_data.get('canva_url', '')
+        project_id = sync_data.get('project_id', '')
+        room_name = sync_data.get('room_name', '')
+        
+        if not canva_url or not project_id:
+            raise HTTPException(status_code=400, detail="Canva URL and project ID are required")
+        
+        result = await sync_canva_with_project(canva_url, project_id, room_name)
+        
+        # If sync was successful, you might want to update the actual project items here
+        if result['success'] and result['sync_results']['products_added'] > 0:
+            logging.info(f"Successfully synced {result['sync_results']['products_added']} products from Canva to project {project_id}")
+        
+        return result
+        
+    except Exception as e:
+        logging.error(f"Canva-project sync failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to sync Canva with project: {str(e)}")
+
+@api_router.get("/canva/project-checklists/{project_id}")
+async def generate_all_room_checklists(project_id: str):
+    """Generate Canva checklists for all rooms in a project"""
+    try:
+        from canva_integration import create_canva_room_checklist
+        
+        # Get project data
+        project_doc = await db.projects.find_one({"id": project_id})
+        if not project_doc:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        checklists = []
+        
+        for room in project_doc.get('rooms', []):
+            # Collect all items in this room
+            room_products = []
+            
+            for category in room.get('categories', []):
+                for subcategory in category.get('subcategories', []):
+                    for item in subcategory.get('items', []):
+                        room_products.append({
+                            'name': item.get('name', 'Unknown Item'),
+                            'status': item.get('status', 'TO BE SELECTED'),
+                            'vendor': item.get('vendor', ''),
+                            'link': item.get('link', '')
+                        })
+            
+            # Create checklist for this room
+            if room_products:  # Only create if there are items
+                room_checklist = await create_canva_room_checklist(
+                    room['name'], 
+                    room_products, 
+                    project_doc['name']
+                )
+                
+                if room_checklist['success']:
+                    checklists.append({
+                        'room_name': room['name'],
+                        'total_items': len(room_products),
+                        'checklist_html': room_checklist['checklist_html'],
+                        'checklist_data': room_checklist['checklist_data']
+                    })
+        
+        return {
+            "status": "success",
+            "project_id": project_id,
+            "project_name": project_doc['name'],
+            "total_rooms": len(checklists),
+            "room_checklists": checklists
+        }
+        
+    except Exception as e:
+        logging.error(f"Failed to generate room checklists: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate room checklists: {str(e)}")
+
 @api_router.get("/paint-colors")
 async def get_paint_colors():
     """Get comprehensive paint color catalog for interior design"""
