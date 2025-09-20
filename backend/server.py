@@ -3738,8 +3738,73 @@ async def scrape_canva_pdf(data: dict):
                 # Navigate to Canva URL
                 await page.goto(canva_url, wait_until='networkidle', timeout=30000)
                 
-                # Wait for content to load
+                # Wait for content to load - EXTENDED FOR THOROUGH SCRAPING
+                await page.wait_for_timeout(5000)
+                
+                # Scroll to load all content
+                await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
                 await page.wait_for_timeout(3000)
+                await page.evaluate("window.scrollTo(0, 0)")
+                await page.wait_for_timeout(2000)
+                
+                # Extract ALL LINKS from the Canva page
+                all_links = await page.evaluate('''
+                    () => {
+                        const links = [];
+                        
+                        // Get all anchor tags
+                        const anchors = document.querySelectorAll('a[href]');
+                        anchors.forEach(a => {
+                            const href = a.href;
+                            if (href && (
+                                href.includes('fourhandshome.com') ||
+                                href.includes('wayfair.com') ||
+                                href.includes('overstock.com') ||
+                                href.includes('homedepot.com') ||
+                                href.includes('lowes.com') ||
+                                href.includes('amazon.com') ||
+                                href.includes('target.com') ||
+                                href.includes('walmart.com') ||
+                                href.includes('westelm.com') ||
+                                href.includes('potterybarn.com') ||
+                                href.includes('crateandbarrel.com') ||
+                                href.includes('roomandboard.com') ||
+                                href.includes('cb2.com') ||
+                                href.includes('article.com') ||
+                                href.includes('allmodern.com') ||
+                                href.includes('perigold.com') ||
+                                href.includes('ballarddesigns.com') ||
+                                href.includes('serenaandlily.com') ||
+                                href.includes('.com') // Any commercial link
+                            )) {
+                                links.push({
+                                    url: href,
+                                    text: a.innerText?.trim() || '',
+                                    title: a.title || ''
+                                });
+                            }
+                        });
+                        
+                        // Also look for links in text content using regex
+                        const textContent = document.body.innerText;
+                        const urlRegex = /https?:\/\/[^\s]+/g;
+                        const textUrls = textContent.match(urlRegex) || [];
+                        
+                        textUrls.forEach(url => {
+                            if (!links.some(link => link.url === url)) {
+                                links.push({
+                                    url: url,
+                                    text: 'Found in text',
+                                    title: ''
+                                });
+                            }
+                        });
+                        
+                        return links;
+                    }
+                ''');
+                
+                print(f"🔗 Found {len(all_links)} links in Canva page");
                 
                 # Extract basic information
                 title = await page.title()
