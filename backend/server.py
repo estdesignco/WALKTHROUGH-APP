@@ -2247,6 +2247,160 @@ async def test_teams_notification():
         logging.error(f"Teams test notification failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to send test notification: {str(e)}")
 
+# UNIFIED FURNITURE DATABASE ENDPOINTS - "THE DREAM"
+@api_router.post("/furniture/scrape-vendors")
+async def scrape_all_vendors():
+    """Scrape all vendor sites and build unified furniture database"""
+    try:
+        from furniture_database import scrape_all_furniture_vendors
+        
+        # Run scraping in background (this can take a while)
+        results = await scrape_all_furniture_vendors()
+        
+        return {
+            "status": "success",
+            "message": "Furniture database updated successfully",
+            "results": results
+        }
+        
+    except Exception as e:
+        logging.error(f"Furniture scraping failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to scrape furniture vendors: {str(e)}")
+
+@api_router.get("/furniture/search")
+async def search_furniture_database(
+    query: Optional[str] = None,
+    vendor: Optional[str] = None,
+    category: Optional[str] = None,
+    min_price: Optional[str] = None,
+    max_price: Optional[str] = None
+):
+    """Search the unified furniture database - NO MORE 1000 TABS!"""
+    try:
+        from furniture_database import search_unified_furniture
+        
+        filters = {}
+        if vendor:
+            filters['vendor'] = vendor
+        if category:
+            filters['category'] = category
+        if min_price:
+            filters['min_price'] = min_price
+        if max_price:
+            filters['max_price'] = max_price
+        
+        results = await search_unified_furniture(query or "", filters)
+        
+        return {
+            "status": "success",
+            "query": query,
+            "filters": filters,
+            "total_results": len(results),
+            "products": results
+        }
+        
+    except Exception as e:
+        logging.error(f"Furniture search failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to search furniture: {str(e)}")
+
+@api_router.get("/furniture/vendors")
+async def get_available_vendors():
+    """Get list of all vendors in the furniture database"""
+    try:
+        # Get unique vendors from database
+        vendors = await db.furniture_products.distinct("vendor")
+        
+        return {
+            "status": "success",
+            "vendors": sorted(vendors) if vendors else []
+        }
+        
+    except Exception as e:
+        logging.error(f"Failed to get vendors: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get vendors: {str(e)}")
+
+@api_router.get("/furniture/categories")
+async def get_furniture_categories():
+    """Get list of all categories in the furniture database"""
+    try:
+        # Get unique categories from database
+        categories = await db.furniture_products.distinct("category")
+        
+        return {
+            "status": "success",
+            "categories": sorted(categories) if categories else []
+        }
+        
+    except Exception as e:
+        logging.error(f"Failed to get categories: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get categories: {str(e)}")
+
+@api_router.get("/furniture/stats")
+async def get_furniture_database_stats():
+    """Get statistics about the furniture database"""
+    try:
+        total_products = await db.furniture_products.count_documents({})
+        
+        # Get counts by vendor
+        vendor_pipeline = [
+            {"$group": {"_id": "$vendor", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]
+        vendor_counts = await db.furniture_products.aggregate(vendor_pipeline).to_list(100)
+        
+        # Get counts by category  
+        category_pipeline = [
+            {"$group": {"_id": "$category", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]
+        category_counts = await db.furniture_products.aggregate(category_pipeline).to_list(100)
+        
+        return {
+            "status": "success",
+            "total_products": total_products,
+            "vendors": vendor_counts,
+            "categories": category_counts,
+            "last_updated": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logging.error(f"Failed to get database stats: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get database stats: {str(e)}")
+
+@api_router.post("/furniture/add-manual")
+async def add_manual_furniture_item(item_data: dict):
+    """Manually add furniture item to database (for items not found by scraping)"""
+    try:
+        # Validate required fields
+        required_fields = ['name', 'vendor', 'price']
+        for field in required_fields:
+            if not item_data.get(field):
+                raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
+        
+        # Create unique ID
+        unique_id = f"{item_data['vendor']}_{item_data['name']}_{item_data.get('sku', 'manual')}".lower()
+        unique_id = re.sub(r'[^a-z0-9_]', '', unique_id)
+        
+        # Add metadata
+        item_data['unique_id'] = unique_id
+        item_data['scraped_at'] = datetime.utcnow()
+        item_data['last_updated'] = datetime.utcnow()
+        item_data['source'] = 'manual'
+        
+        # Insert into database
+        result = await db.furniture_products.insert_one(item_data)
+        
+        return {
+            "status": "success",
+            "message": "Manual furniture item added successfully",
+            "item_id": str(result.inserted_id),
+            "unique_id": unique_id
+        }
+        
+    except Exception as e:
+        logging.error(f"Failed to add manual furniture item: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to add manual furniture item: {str(e)}")
+
 @api_router.get("/paint-colors")
 async def get_paint_colors():
     """Get comprehensive paint color catalog for interior design"""
