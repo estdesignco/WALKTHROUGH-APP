@@ -491,7 +491,7 @@ const ExactFFESpreadsheet = ({
     }));
   };
 
-  // Handle item field changes
+  // Handle item field changes - FIXES CURSOR JUMPING BUG
   const handleItemFieldChange = async (itemId, field, value) => {
     console.log('🔄 Item field change request:', { itemId, field, value });
     
