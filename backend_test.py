@@ -620,14 +620,15 @@ class TestProjectCreator:
 
 # Main execution
 if __name__ == "__main__":
-    tester = EnhancedRoomsTester()
-    success = tester.run_all_tests()
+    creator = TestProjectCreator()
+    success = creator.run_comprehensive_test()
     
     if success:
-        print("\n🎉 SUCCESS: Enhanced rooms integration is working correctly!")
+        print("\n🎉 SUCCESS: Comprehensive test project created and ready for preview!")
+        print(f"🆔 PROJECT ID: {creator.created_project_id}")
         exit(0)
     else:
-        print("\n❌ FAILURE: Enhanced rooms integration has issues that need to be resolved.")
+        print("\n❌ FAILURE: Could not create comprehensive test project.")
         exit(1)
         if not rooms:
             self.log_test("Project Structure - Rooms", False, "No rooms found in project")
