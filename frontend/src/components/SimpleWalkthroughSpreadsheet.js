@@ -779,10 +779,7 @@ const SimpleWalkthroughSpreadsheet = ({
             <option value="CREATE_NEW">+ Create New Category</option>
           </select>
           <button 
-            onClick={() => {
-              console.log('🚀 Walkthrough Transfer button clicked');
-              alert('Transfer functionality will be implemented next.');
-            }}
+            onClick={handleTransferToChecklist}
             className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
           >
             → TRANSFER TO CHECKLIST
