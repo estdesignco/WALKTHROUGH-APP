@@ -751,11 +751,22 @@ const SimpleWalkthroughSpreadsheet = ({
         </div>
       </div>
       
-      {/* DYNAMIC SPREADSHEET WITH REAL DATA */}
-      <div className="overflow-x-auto">
-        
-        {/* USE FILTERED PROJECT DATA */}
-        {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
+      {/* DYNAMIC SPREADSHEET WITH REAL DATA - DRAG & DROP ENABLED */}
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="overflow-x-auto">
+          
+          {/* USE FILTERED PROJECT DATA WITH DRAG & DROP */}
+          <Droppable droppableId="rooms" type="ROOM">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {((filteredProject || project)?.rooms || []).map((room, roomIndex) => (
+                  <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className={`mb-8 ${snapshot.isDragging ? 'opacity-75 transform rotate-2 shadow-2xl' : ''}`}
+                      >
           const isRoomExpanded = expandedRooms[room.id];
           
           return (
