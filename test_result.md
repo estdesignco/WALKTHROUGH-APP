@@ -337,7 +337,7 @@ test_plan:
     - "Transfer Functionality: WORKING - PUT /api/items/{id} perfect for status updates"
     - "Walkthrough Add Item: WORKING - blank row creation successful"
   stuck_tasks:
-    - "Email SMTP Authentication - Gmail requires App Password instead of regular password"
+    - "Email SMTP Authentication - Gmail requires App Password instead of regular password - CONFIRMED ISSUE"
   test_all: false
   test_priority: "enhanced_functionality_verified"
 
