@@ -2657,8 +2657,14 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             except:
                 pass  # Continue even if network doesn't become idle
             
-            # Wait for potential dynamic content to load
-            await page.wait_for_timeout(3000)
+            # Wait for potential dynamic content to load - EXTENDED FOR THOROUGH SCRAPING
+            await page.wait_for_timeout(5000)  # Extended wait time
+            
+            # Try scrolling to load lazy-loaded content
+            await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            await page.wait_for_timeout(2000)
+            await page.evaluate("window.scrollTo(0, 0)")
+            await page.wait_for_timeout(1000)
             
             # Try to wait for common product elements to appear
             try:
