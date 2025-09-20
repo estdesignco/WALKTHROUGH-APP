@@ -1017,16 +1017,17 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
-                                                          {/* QTY - EDITABLE INLINE */}
+                                                          {/* QTY - PROPER INPUT FIELD */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm text-center outline-none"
-                                                              onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
-                                                            >
-                                                              {item.quantity || ''}
-                                                            </div>
+                                                            <input 
+                                                              type="number" 
+                                                              value={item.quantity || 1}
+                                                              className="w-full bg-transparent text-white text-sm text-center outline-none border-none"
+                                                              onChange={(e) => {
+                                                                handleItemFieldChange(item.id, 'quantity', parseInt(e.target.value) || 1);
+                                                              }}
+                                                              onBlur={(e) => console.log('Quantity updated:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
                                                           {/* SIZE - EDITABLE INLINE */}
