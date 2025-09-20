@@ -468,11 +468,8 @@ const SimpleWalkthroughSpreadsheet = ({
             {/* ROOM HEADER WITH DIFFERENT COLORS */}
             <div className="mt-8 mb-4 px-4 py-2 text-white font-bold flex justify-between items-center" style={{ backgroundColor: roomIndex % 2 === 0 ? '#7C3AED' : '#059669' }}>
               <span>{room.name.toUpperCase()}</span>
-              <button 
-                onClick={() => handleDeleteItem(room.id)}
-                className="text-white hover:text-gray-300 px-2 py-1 rounded"
-              >
-                ➖ MINIMIZE
+              <button className="text-white hover:text-gray-200">
+                ➖
               </button>
             </div>
             
