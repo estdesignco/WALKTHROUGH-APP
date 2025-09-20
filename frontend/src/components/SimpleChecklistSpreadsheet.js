@@ -1084,6 +1084,15 @@ const SimpleChecklistSpreadsheet = ({
           availableStatuses={itemStatuses}
         />
       )}
+
+      {/* Canva Integration Modal */}
+      {showCanvaModal && (
+        <CanvaIntegrationModal
+          onClose={() => setShowCanvaModal(false)}
+          onItemsExtracted={handleCanvaItemsExtracted}
+          project={project}
+        />
+      )}
     </div>
   );
 };
