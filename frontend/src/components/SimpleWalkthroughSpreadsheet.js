@@ -229,7 +229,66 @@ const SimpleWalkthroughSpreadsheet = ({
     }
   };
 
-  // Handle adding new items - COPIED FROM WORKING FF&E
+  // Handle adding new BLANK ROWS for Walkthrough (not actual items like other sheets)
+  const handleAddBlankRow = async (categoryId) => {
+    try {
+      // Find the category's first subcategory to add a blank row to
+      let subcategoryId = null;
+      
+      for (const room of project.rooms) {
+        for (const category of room.categories || []) {
+          if (category.id === categoryId && category.subcategories?.length > 0) {
+            subcategoryId = category.subcategories[0].id;
+            break;
+          }
+        }
+        if (subcategoryId) break;
+      }
+
+      if (!subcategoryId) {
+        console.error('No subcategory found to add blank row to');
+        return;
+      }
+
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      
+      // Create a blank row item
+      const blankItem = {
+        name: 'New Item',
+        vendor: '',
+        sku: '',
+        cost: '',
+        size: '',
+        finish_color: '',
+        quantity: 1,
+        subcategory_id: subcategoryId,
+        status: '',
+        order_index: 0
+      };
+
+      console.log('📝 Creating blank row for walkthrough:', blankItem);
+
+      const response = await fetch(`${backendUrl}/api/items`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(blankItem)
+      });
+
+      if (response.ok) {
+        console.log('✅ Blank row added successfully');
+        if (onReload) {
+          onReload();
+        }
+      } else {
+        const errorData = await response.text();
+        console.error('❌ Backend error:', errorData);
+      }
+    } catch (error) {
+      console.error('❌ Error adding blank row:', error);
+    }
+  };
   const handleAddItem = async (itemData) => {
     try {
       // Find the first available subcategory if none selected
