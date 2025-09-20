@@ -760,30 +760,29 @@ const SimpleWalkthroughSpreadsheet = ({
           
           return (
             <div key={room.id} className="mb-8">
-                        {/* ROOM HEADER WITH DRAG HANDLE AND EXPAND/COLLAPSE */}
-                        <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: roomIndex % 2 === 0 ? '#7C3AED' : '#059669' }}>
-                          <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                              <div {...provided.dragHandleProps} className="cursor-move text-white hover:text-gray-200 px-2">
-                                ⋮⋮
-                              </div>
-                              <button
-                                onClick={() => toggleRoomExpansion(room.id)}
-                                className="text-white hover:text-gray-200"
-                              >
-                                {isRoomExpanded ? '▼' : '▶'}
-                              </button>
-                              <span>{room.name.toUpperCase()}</span>
-                            </div>
-                            <button
-                              onClick={() => handleDeleteRoom(room.id)}
-                              className="text-red-300 hover:text-red-100 text-lg"
-                              title="Delete Room"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </div>
+          return (
+            <div key={room.id} className="mb-8">
+              {/* ROOM HEADER WITH DIFFERENT COLORS AND EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
+              <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: roomIndex % 2 === 0 ? '#7C3AED' : '#059669' }}>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => toggleRoomExpansion(room.id)}
+                      className="text-white hover:text-gray-200"
+                    >
+                      {isRoomExpanded ? '▼' : '▶'}
+                    </button>
+                    <span>{room.name.toUpperCase()}</span>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteRoom(room.id)}
+                    className="text-red-300 hover:text-red-100 text-lg"
+                    title="Delete Room"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
               
               {/* CATEGORIES - ONLY SHOW WHEN EXPANDED */}
               {isRoomExpanded && (
