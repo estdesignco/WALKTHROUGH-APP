@@ -252,7 +252,7 @@ const SimpleWalkthroughSpreadsheet = ({
 
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
-      // Create a blank row item
+      // Create a blank row item - ONLY ITEM NAME, rest blank for designer to fill
       const blankItem = {
         name: 'New Item',
         vendor: '',
@@ -260,7 +260,7 @@ const SimpleWalkthroughSpreadsheet = ({
         cost: '',
         size: '',
         finish_color: '',
-        quantity: 1,
+        quantity: '',
         subcategory_id: subcategoryId,
         status: '',
         order_index: 0
