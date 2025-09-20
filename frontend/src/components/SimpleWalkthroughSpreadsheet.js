@@ -371,7 +371,57 @@ const SimpleWalkthroughSpreadsheet = ({
     }));
   };
 
-  // TRANSFER FUNCTIONALITY - Transfer from Walkthrough to Checklist
+  // Handle deleting a room
+  const handleDeleteRoom = async (roomId) => {
+    if (!window.confirm('Are you sure you want to delete this entire room? This will delete all categories and items in this room.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${roomId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        console.log('✅ Walkthrough room deleted successfully');
+        if (onReload) {
+          onReload();
+        }
+      } else {
+        console.error('❌ Delete room failed with status:', response.status);
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('❌ Error deleting walkthrough room:', error);
+      alert('Failed to delete room: ' + error.message);
+    }
+  };
+
+  // Handle deleting a category
+  const handleDeleteCategory = async (categoryId) => {
+    if (!window.confirm('Are you sure you want to delete this category? This will delete all items in this category.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${categoryId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        console.log('✅ Walkthrough category deleted successfully');
+        if (onReload) {
+          onReload();
+        }
+      } else {
+        console.error('❌ Delete category failed with status:', response.status);
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('❌ Error deleting walkthrough category:', error);
+      alert('Failed to delete category: ' + error.message);
+    }
+  };
   const handleTransferToChecklist = async () => {
     try {
       console.log('🚀 Starting transfer from Walkthrough to Checklist');
