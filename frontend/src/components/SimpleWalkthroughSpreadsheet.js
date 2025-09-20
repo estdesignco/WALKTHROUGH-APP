@@ -875,7 +875,6 @@ const SimpleWalkthroughSpreadsheet = ({
             + ADD ITEM
           </button>
         </div>
-      </div>
       
       {/* ADD ITEM MODAL */}
       {showAddItem && (
