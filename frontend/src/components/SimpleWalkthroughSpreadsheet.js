@@ -435,6 +435,70 @@ const SimpleWalkthroughSpreadsheet = ({
       alert('Failed to delete category: ' + error.message);
     }
   };
+
+  // Handle drag and drop reordering
+  const handleDragEnd = async (result) => {
+    if (!result.destination) return;
+    
+    const { source, destination, type } = result;
+    
+    try {
+      if (type === 'ROOM') {
+        // Handle room reordering
+        console.log('🔄 Reordering rooms:', { source, destination });
+        
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/reorder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            source_index: source.index,
+            destination_index: destination.index
+          })
+        });
+        
+        if (response.ok && onReload) {
+          onReload();
+        }
+      } else if (type === 'CATEGORY') {
+        // Handle category reordering within room
+        console.log('🔄 Reordering categories:', { source, destination });
+        
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/reorder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            source_index: source.index,
+            destination_index: destination.index,
+            room_id: source.droppableId
+          })
+        });
+        
+        if (response.ok && onReload) {
+          onReload();
+        }
+      } else if (type === 'ITEM') {
+        // Handle item reordering within subcategory
+        console.log('🔄 Reordering items:', { source, destination });
+        
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/reorder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            source_index: source.index,
+            destination_index: destination.index,
+            subcategory_id: source.droppableId
+          })
+        });
+        
+        if (response.ok && onReload) {
+          onReload();
+        }
+      }
+    } catch (error) {
+      console.error('❌ Drag and drop error:', error);
+    }
+  };
+
   const handleTransferToChecklist = async () => {
     try {
       console.log('🚀 Starting transfer from Walkthrough to Checklist');
