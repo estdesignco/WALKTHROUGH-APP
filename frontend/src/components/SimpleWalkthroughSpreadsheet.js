@@ -682,6 +682,13 @@ const SimpleWalkthroughSpreadsheet = ({
                     </button>
                     <span>{room.name.toUpperCase()}</span>
                   </div>
+                  <button
+                    onClick={() => handleDeleteRoom(room.id)}
+                    className="text-red-300 hover:text-red-100 text-lg"
+                    title="Delete Room"
+                  >
+                    🗑️
+                  </button>
                 </div>
               </div>
               
