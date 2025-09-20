@@ -874,7 +874,7 @@ const SimpleWalkthroughSpreadsheet = ({
           );
         })}
       </div>
-        
+
       {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS - MATCHING OTHER SHEETS */}
       <div className="mt-6 flex gap-3">
           <select
