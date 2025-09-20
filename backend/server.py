@@ -3852,6 +3852,7 @@ async def scrape_canva_pdf(data: dict):
                 canva_data = {
                     "title": title or "Canva Design",
                     "url": canva_url,
+                    "links": all_links,  # Include ALL extracted links
                     "images": list(set(images))[:3],  # Remove duplicates, limit to 3
                     "colors": list(set(colors))[:5],  # Remove duplicates, limit to 5
                     "description": description[:200],  # Limit description
