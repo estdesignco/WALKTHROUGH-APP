@@ -1087,8 +1087,11 @@ const ExactFFESpreadsheet = ({
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             <input 
                                                               type="date" 
+                                                              value={item.order_date || ''}
                                                               className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Order date changed:', e.target.value)}
+                                                              onChange={(e) => {
+                                                                handleItemFieldChange(item.id, 'order_date', e.target.value);
+                                                              }}
                                                             />
                                                           </td>
                                                           
