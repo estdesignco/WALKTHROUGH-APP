@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """
-FF&E and Checklist Backend API Testing Suite - REVIEW REQUEST TESTING
-Tests FF&E and Checklist backend functionality after recent button updates.
-Focus on project loading, Add Category API, Transfer Button Infrastructure, and Project Data Structure.
+SCRAPING FUNCTIONALITY DIAGNOSTIC TESTING - REVIEW REQUEST
+Quick test of scraping functionality to debug reported issues:
+- Test Enhanced Scraping with specific URLs
+- Check Response Structure and data field population
+- Verify if size, finish_color fields are being populated correctly
 """
 
 import requests
