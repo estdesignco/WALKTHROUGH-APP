@@ -204,10 +204,13 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
           </tbody>
         </table>
         
-        {/* ADD ITEM BUTTON */}
-        <div className="mt-4">
-          <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded">
-            + Add Item
+        {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS */}
+        <div className="mt-6 flex gap-3">
+          <button className="text-white px-4 py-2 rounded font-medium" style={{ backgroundColor: '#8b7355' }}>
+            + ADD CATEGORY
+          </button>
+          <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium">
+            + ADD ITEM
           </button>
         </div>
       </div>
