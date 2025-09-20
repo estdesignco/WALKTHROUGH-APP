@@ -26,6 +26,7 @@ const SimpleChecklistSpreadsheet = ({
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [filteredProject, setFilteredProject] = useState(project);
+  const [showCanvaModal, setShowCanvaModal] = useState(false);
 
   // APPLY FILTERS - ENHANCED COMBINATION FILTER LOGIC
   useEffect(() => {
