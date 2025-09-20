@@ -200,7 +200,9 @@ const SimpleChecklistSpreadsheet = ({
       
       if (response.ok) {
         console.log('✅ Checklist status updated successfully, reloading...');
-        window.location.reload();
+        if (onReload) {
+          onReload();
+        }
       } else {
         const errorData = await response.text();
         console.error('❌ Checklist status update failed:', response.status, errorData);
