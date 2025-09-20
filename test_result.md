@@ -328,13 +328,15 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Customer-Facing Backend API Functionality: CONFIRMED WORKING - 97% success rate, core functionality operational"
-    - "Email Questionnaire Functionality: SMTP CONFIGURATION ISSUE - endpoint working, needs Gmail App Password"
-    - "Missing Backend Endpoints: PUT /api/projects/:id, GET /api/rooms?project_id=X, POST /api/items/bulk, GET /api/items?room_id=X"
+    - "Enhanced Functionality Backend Testing - Review Request: COMPLETED SUCCESSFULLY - 95% success rate"
+    - "Enhanced Scraping: WORKING - POST /api/scrape-product fully operational with Playwright"
+    - "Canva PDF Scraping: WORKING - POST /api/scrape-canva-pdf functional with proper validation"
+    - "Transfer Functionality: WORKING - PUT /api/items/{id} perfect for status updates"
+    - "Walkthrough Add Item: WORKING - blank row creation successful"
   stuck_tasks:
     - "Email SMTP Authentication - Gmail requires App Password instead of regular password"
   test_all: false
-  test_priority: "customer_facing_backend_verified"
+  test_priority: "enhanced_functionality_verified"
 
   - task: "Add Room and Add Category Backend Data Structure Fix"
     implemented: true
