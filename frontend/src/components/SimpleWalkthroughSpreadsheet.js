@@ -363,12 +363,76 @@ const SimpleWalkthroughSpreadsheet = ({
     }));
   };
 
-  // Toggle category expansion  
-  const toggleCategoryExpansion = (categoryId) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [categoryId]: !prev[categoryId]
-    }));
+  // TRANSFER FUNCTIONALITY - Transfer from Walkthrough to Checklist
+  const handleTransferToChecklist = async () => {
+    try {
+      console.log('🚀 Starting transfer from Walkthrough to Checklist');
+      
+      // Get all items from current walkthrough project
+      const allItems = [];
+      
+      if (filteredProject?.rooms) {
+        filteredProject.rooms.forEach(room => {
+          room.categories?.forEach(category => {
+            category.subcategories?.forEach(subcategory => {
+              subcategory.items?.forEach(item => {
+                if (item.name && item.name !== 'New Item') {  // Only transfer real items
+                  allItems.push({
+                    ...item,
+                    status: 'PICKED',  // Set status to PICKED for checklist
+                    source_sheet: 'walkthrough'
+                  });
+                }
+              });
+            });
+          });
+        });
+      }
+
+      console.log(`📝 Found ${allItems.length} items to transfer`);
+
+      if (allItems.length === 0) {
+        alert('No items found to transfer. Please add some items first.');
+        return;
+      }
+
+      // Transfer each item to checklist by updating status
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      let successCount = 0;
+
+      for (const item of allItems) {
+        try {
+          const response = await fetch(`${backendUrl}/api/items/${item.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...item,
+              status: 'PICKED',
+              transferred_from: 'walkthrough',
+              transferred_at: new Date().toISOString()
+            })
+          });
+
+          if (response.ok) {
+            successCount++;
+          } else {
+            console.error(`❌ Failed to transfer item ${item.name}`);
+          }
+        } catch (error) {
+          console.error(`❌ Error transferring item ${item.name}:`, error);
+        }
+      }
+
+      alert(`✅ Successfully transferred ${successCount} items from Walkthrough to Checklist!`);
+      
+      if (onReload) {
+        onReload();
+      }
+
+    } catch (error) {
+      console.error('❌ Transfer error:', error);
+      alert('Transfer failed: ' + error.message);
+    }
   };
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm('Are you sure you want to delete this item?')) {
