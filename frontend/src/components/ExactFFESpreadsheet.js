@@ -491,6 +491,42 @@ const ExactFFESpreadsheet = ({
     }));
   };
 
+  // Handle item field changes
+  const handleItemFieldChange = async (itemId, field, value) => {
+    console.log('🔄 Item field change request:', { itemId, field, value });
+    
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      console.log('🌐 Using backend URL:', backendUrl);
+      
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value })
+      });
+      
+      console.log('📡 Response status:', response.status, response.statusText);
+      
+      if (response.ok) {
+        console.log(`✅ Item ${field} updated successfully`);
+        // Use onReload instead of window.location.reload to prevent navigation issues
+        if (onReload) {
+          console.log('🔄 Calling onReload function');
+          onReload();
+        } else {
+          console.warn('⚠️ No onReload function provided');
+        }
+      } else {
+        const errorData = await response.text();
+        console.error(`❌ Item ${field} update failed:`, response.status, errorData);
+        alert(`Failed to update ${field}: ${response.status} ${errorData}`);
+      }
+    } catch (error) {
+      console.error(`❌ Item ${field} update error:`, error);
+      alert(`Error updating ${field}: ${error.message}`);
+    }
+  };
+
   // Handle tracking items
   const handleTrackItem = async (item) => {
     if (!item.tracking_number) {
