@@ -479,8 +479,8 @@ const SimpleWalkthroughSpreadsheet = ({
                 {/* CATEGORY HEADER (GREEN) WITH MINIMIZE */}
                 <div className="mb-4 px-4 py-2 text-white font-bold flex justify-between items-center" style={{ backgroundColor: '#065F46' }}>
                   <span>{category.name.toUpperCase()}</span>
-                  <button className="text-white hover:text-gray-300 px-2 py-1 rounded">
-                    ➖ MINIMIZE
+                  <button className="text-white hover:text-gray-200">
+                    ➖
                   </button>
                 </div>
                 
