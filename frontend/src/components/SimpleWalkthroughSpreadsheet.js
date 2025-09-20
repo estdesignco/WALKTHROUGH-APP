@@ -510,26 +510,39 @@ const SimpleWalkthroughSpreadsheet = ({
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
-        method: 'DELETE'
+      console.log('🗑️ DELETING ITEM:', itemId);
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      console.log('🌐 Using backend URL:', backendUrl);
+
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
+
+      console.log('📡 Delete response status:', response.status);
 
       if (response.ok) {
         console.log('✅ Walkthrough item deleted successfully');
+        alert('✅ Item deleted successfully!');
+        
         // Call onReload to refresh data WITHOUT RESETTING MINIMIZE STATE
         const currentExpandedState = expandedRooms;
         if (onReload) {
+          console.log('🔄 Calling onReload after successful delete');
           await onReload();
           // Restore expanded state after reload
           setExpandedRooms(currentExpandedState);
         }
       } else {
-        console.error('❌ Delete failed with status:', response.status);
-        throw new Error(`HTTP ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ Delete item failed with status:', response.status, 'Error:', errorText);
+        alert(`❌ Failed to delete item: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error('❌ Error deleting walkthrough item:', error);
-      alert('Failed to delete item: ' + error.message);
+      alert('❌ Failed to delete item: ' + error.message);
     }
   };
   
