@@ -497,7 +497,9 @@ const SimpleChecklistSpreadsheet = ({
         const canvaData = await response.json();
         console.log('✅ Canva PDF scraped successfully:', canvaData);
         alert(`Success! Scraped ${canvaData.items_created || 0} items from Canva PDF`);
-        window.location.reload();
+        if (onReload) {
+          onReload();
+        }
       } else {
         console.error('❌ Canva PDF scraping failed:', response.status);
         alert('Failed to scrape Canva PDF. Please check the URL.');
