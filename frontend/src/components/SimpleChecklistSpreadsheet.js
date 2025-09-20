@@ -460,7 +460,9 @@ const SimpleChecklistSpreadsheet = ({
         const result = await response.json();
         console.log('✅ Canva PDF uploaded successfully:', result);
         alert(`Success! Processed ${result.items_created || 0} items from Canva PDF`);
-        window.location.reload();
+        if (onReload) {
+          onReload();
+        }
       } else {
         console.error('❌ Canva PDF upload failed:', response.status);
         alert('Failed to upload Canva PDF. Please try again.');
