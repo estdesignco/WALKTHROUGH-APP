@@ -1237,6 +1237,57 @@ const ExactFFESpreadsheet = ({
           </div>
         </div>
 
+        {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS - MATCHING WALKTHROUGH */}
+        <div className="mt-6 flex gap-3">
+          <button 
+            onClick={() => {
+              // Find first room to add category to
+              const firstRoom = project?.rooms?.[0];
+              if (firstRoom) {
+                const categoryName = window.prompt('Enter new category name:');
+                if (categoryName && categoryName.trim()) {
+                  handleAddCategory(firstRoom.id, categoryName.trim());
+                }
+              } else {
+                console.error('❌ No rooms available. Please add a room first.');
+                alert('Please add a room first before adding categories.');
+              }
+            }}
+            className="text-white px-4 py-2 rounded font-medium" 
+            style={{ backgroundColor: '#8b7355' }}
+          >
+            + ADD CATEGORY
+          </button>
+          <button 
+            onClick={() => {
+              console.log('🚀 FF&E Transfer button clicked');
+              alert('Transfer functionality will be implemented next.');
+            }}
+            className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
+          >
+            → TRANSFER TO CHECKLIST
+          </button>
+          <button 
+            onClick={() => {
+              // Find first available subcategory to add item to
+              const firstRoom = project?.rooms?.[0];
+              const firstCategory = firstRoom?.categories?.[0];
+              const firstSubcategory = firstCategory?.subcategories?.[0];
+              
+              if (firstSubcategory) {
+                setSelectedSubCategoryId(firstSubcategory.id);
+                setShowAddItem(true);
+                console.log('🎯 Adding item to first available subcategory:', firstSubcategory.id);
+              } else {
+                alert('Please add a category first before adding items.');
+              }
+            }}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium"
+          >
+            + ADD ITEM
+          </button>
+        </div>
+
       {/* ADD INSTALLED MODAL */}
       {showAddItem && (
         <AddItemModal
