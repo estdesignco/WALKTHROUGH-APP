@@ -363,6 +363,14 @@ const SimpleWalkthroughSpreadsheet = ({
     }));
   };
 
+  // Toggle category expansion  
+  const toggleCategoryExpansion = (categoryId) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }));
+  };
+
   // TRANSFER FUNCTIONALITY - Transfer from Walkthrough to Checklist
   const handleTransferToChecklist = async () => {
     try {
