@@ -1044,16 +1044,18 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
-                                                          {/* FINISH/Color - EDITABLE INLINE */}
+                                                          {/* FINISH/Color - PROPER INPUT FIELD */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
-                                                            >
-                                                              {item.finish_color || ''}
-                                                            </div>
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.finish_color || ''}
+                                                              placeholder="Finish/Color"
+                                                              className="w-full bg-transparent text-white text-sm outline-none border-none"
+                                                              onChange={(e) => {
+                                                                handleItemFieldChange(item.id, 'finish_color', e.target.value);
+                                                              }}
+                                                              onBlur={(e) => console.log('Finish/Color updated:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
                                                           {/* Cost/Price - EDITABLE INLINE */}
