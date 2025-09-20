@@ -21,8 +21,14 @@ import sys
 import os
 import random
 
-# Get backend URL from frontend .env file
+# Get backend URL from environment
 def get_backend_url():
+    # Check environment variable first
+    backend_url = os.environ.get('base_url')
+    if backend_url:
+        return backend_url
+    
+    # Fallback to checking frontend .env file
     try:
         with open('/app/frontend/.env', 'r') as f:
             for line in f:
@@ -30,7 +36,7 @@ def get_backend_url():
                     return line.split('=', 1)[1].strip()
     except Exception as e:
         print(f"Error reading frontend .env: {e}")
-        return "http://localhost:8001"
+    
     return "http://localhost:8001"
 
 BASE_URL = get_backend_url() + "/api"
