@@ -784,13 +784,24 @@ const ExactFFESpreadsheet = ({
             </button>
           </div>
           
-          {/* Add Room Button - GOLD/AMBER COLOR */}
-          <button 
-            onClick={handleAddRoom}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
-          >
-            ✚ ADD ROOM
-          </button>
+          {/* Action Buttons - ADD ROOM AND TRANSFER */}
+          <div className="flex gap-3">
+            <button 
+              onClick={handleAddRoom}
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+            >
+              ✚ ADD ROOM
+            </button>
+            <button 
+              onClick={() => {
+                console.log('🚀 FF&E Filter Transfer button clicked');
+                alert('Transfer functionality will be implemented next.');
+              }}
+              className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
+            >
+              → TRANSFER FROM CHECKLIST
+            </button>
+          </div>
         </div>
       </div>
 
