@@ -220,6 +220,11 @@ const StudioLandingPage = () => {
         <TeamsIntegration />
       </div>
 
+      {/* Unified Furniture Search - THE DREAM! */}
+      <div className="mb-8">
+        <UnifiedFurnitureSearch />
+      </div>
+
       {/* Email Modal */}
       {showEmailModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
