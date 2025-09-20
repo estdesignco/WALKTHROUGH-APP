@@ -1058,16 +1058,18 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
-                                                          {/* Cost/Price - EDITABLE INLINE */}
+                                                          {/* Cost/Price - PROPER INPUT FIELD */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Cost updated:', e.target.textContent)}
-                                                            >
-                                                              {item.cost ? `$${item.cost}` : ''}
-                                                            </div>
+                                                            <input 
+                                                              type="number" 
+                                                              value={item.cost || ''}
+                                                              placeholder="Cost"
+                                                              className="w-full bg-transparent text-white text-sm outline-none border-none"
+                                                              onChange={(e) => {
+                                                                handleItemFieldChange(item.id, 'cost', parseFloat(e.target.value) || 0);
+                                                              }}
+                                                              onBlur={(e) => console.log('Cost updated:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
                                                           {/* Image - SCRAPED AUTOMATICALLY */}
