@@ -184,7 +184,11 @@ const WalkthroughSheet = () => {
             </button>
             <button 
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-              onClick={() => window.location.href = `/project/${projectId}/ffe`}
+              onClick={() => {
+                // Use React Router navigation instead of window.location
+                console.log('Moving to Selection (FFE) page');
+                // This should be handled by parent component with proper navigation
+              }}
             >
               ➡️ Move to Selection
             </button>
