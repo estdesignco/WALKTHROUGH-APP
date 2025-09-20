@@ -1003,16 +1003,18 @@ const ExactFFESpreadsheet = ({
                                                             {item.name}
                                                           </td>
                                                           
-                                                          {/* VENDOR/SKU - EDITABLE INLINE */}
+                                                          {/* VENDOR/SKU - PROPER INPUT FIELD */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Vendor updated:', e.target.textContent)}
-                                                            >
-                                                              {item.vendor || ''}
-                                                            </div>
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.vendor || ''}
+                                                              placeholder="Vendor/SKU"
+                                                              className="w-full bg-transparent text-white text-sm outline-none border-none"
+                                                              onChange={(e) => {
+                                                                handleItemFieldChange(item.id, 'vendor', e.target.value);
+                                                              }}
+                                                              onBlur={(e) => console.log('Vendor updated:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
                                                           {/* QTY - EDITABLE INLINE */}
