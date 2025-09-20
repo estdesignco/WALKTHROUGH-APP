@@ -1209,36 +1209,7 @@ const ExactFFESpreadsheet = ({
                                                               ✚ Add Item
                                                             </button>
                                                             
-                                                            {/* Add Category Dropdown - GOLD/AMBER COLOR */}
-                                                            <select
-                                                              value=""
-                                                              onChange={(e) => {
-                                                                if (e.target.value === 'CREATE_NEW') {
-                                                                  const categoryName = window.prompt('Enter new category name:');
-                                                                  if (categoryName && categoryName.trim()) {
-                                                                    handleAddCategory(room.id, categoryName.trim());
-                                                                  }
-                                                                } else if (e.target.value) {
-                                                                  handleAddCategory(room.id, e.target.value);
-                                                                }
-                                                              }}
-                                                              className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium border-none outline-none"
-                                                            >
-                                                              <option value="">Add Category ▼</option>
-                                                              <option value="Lighting">Lighting</option>
-                                                              <option value="Furniture">Furniture</option>
-                                                              <option value="Decor & Accessories">Decor & Accessories</option>
-                                                              <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
-                                                              <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
-                                                              <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
-                                                              <option value="Furniture & Storage">Furniture & Storage</option>
-                                                              <option value="Equipment & Furniture">Equipment & Furniture</option>
-                                                              <option value="Electronics & Technology">Electronics & Technology</option>
-                                                              <option value="Appliances">Appliances</option>
-                                                              <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
-                                                              <option value="Surfaces & Materials">Surfaces & Materials</option>
-                                                              <option value="CREATE_NEW">+ Create New Category</option>
-                                                            </select>
+
                                                             
                                                             {/* Delete Section Button - RED COLOR */}
                                                             <button
