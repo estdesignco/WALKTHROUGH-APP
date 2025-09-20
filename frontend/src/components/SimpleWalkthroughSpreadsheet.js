@@ -91,16 +91,19 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
               <td className="border border-gray-400 px-1 py-1 text-center w-8">
                 <input type="checkbox" className="w-2 h-2" />
               </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">
-                <select className="bg-gray-700 text-white text-xs px-1 py-1 rounded border border-gray-600 w-full">
-                  <option value="">Select...</option>
-                  <option value="installed">Installed</option>
-                  <option value="portable">Portable</option>
-                  <option value="piece">Piece</option>
-                  <option value="fixture">Fixture</option>
-                  <option value="accessory">Accessory</option>
-                </select>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Pendant Lights (Island/Bar)</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Bronze/Brass</td>
+              <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
               </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-400 px-1 py-1 text-center w-8">
+                <input type="checkbox" className="w-2 h-2" />
+              </td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Sconces</td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
@@ -112,16 +115,7 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
               <td className="border border-gray-400 px-1 py-1 text-center w-8">
                 <input type="checkbox" className="w-2 h-2" />
               </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">
-                <select className="bg-gray-700 text-white text-xs px-1 py-1 rounded border border-gray-600 w-full">
-                  <option value="">Select...</option>
-                  <option value="installed">Installed</option>
-                  <option value="portable">Portable</option>
-                  <option value="piece">Piece</option>
-                  <option value="fixture">Fixture</option>
-                  <option value="accessory">Accessory</option>
-                </select>
-              </td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Track Lighting</td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
               <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
@@ -130,76 +124,76 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
               </td>
             </tr>
             <tr>
-              <td className="border border-gray-400 px-2 py-2 text-center">
-                <input type="checkbox" className="w-4 h-4" />
+              <td className="border border-gray-400 px-1 py-1 text-center w-8">
+                <input type="checkbox" className="w-2 h-2" />
               </td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm">Sconces</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Ceiling Fan w/ Light</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
+              </td>
             </tr>
             <tr>
-              <td className="border border-gray-400 px-2 py-2 text-center">
-                <input type="checkbox" className="w-4 h-4" />
+              <td className="border border-gray-400 px-1 py-1 text-center w-8">
+                <input type="checkbox" className="w-2 h-2" />
               </td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm">Track Lighting</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Art Lights</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
+              </td>
             </tr>
             <tr>
-              <td className="border border-gray-400 px-2 py-2 text-center">
-                <input type="checkbox" className="w-4 h-4" />
+              <td className="border border-gray-400 px-1 py-1 text-center w-8">
+                <input type="checkbox" className="w-2 h-2" />
               </td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm">Ceiling Fan w/ Light</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Pendant Lights</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
+              </td>
             </tr>
             <tr>
-              <td className="border border-gray-400 px-2 py-2 text-center">
-                <input type="checkbox" className="w-4 h-4" />
+              <td className="border border-gray-400 px-1 py-1 text-center w-8">
+                <input type="checkbox" className="w-2 h-2" />
               </td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm">Art Lights</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Under Cabinet Lighting</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
+              </td>
             </tr>
             <tr>
-              <td className="border border-gray-400 px-2 py-2 text-center">
-                <input type="checkbox" className="w-4 h-4" />
+              <td className="border border-gray-400 px-1 py-1 text-center w-8">
+                <input type="checkbox" className="w-2 h-2" />
               </td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm">Pendant Lights</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Cove Lighting</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
+              </td>
             </tr>
             <tr>
-              <td className="border border-gray-400 px-2 py-2 text-center">
-                <input type="checkbox" className="w-4 h-4" />
+              <td className="border border-gray-400 px-1 py-1 text-center w-8">
+                <input type="checkbox" className="w-2 h-2" />
               </td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm">Under Cabinet Lighting</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-2 py-2 text-center">
-                <input type="checkbox" className="w-4 h-4" />
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Picture Lights</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
+              <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
               </td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm">Cove Lighting</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-2 py-2 text-center">
-                <input type="checkbox" className="w-4 h-4" />
-              </td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm">Picture Lights</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">1</td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
-              <td className="border border-gray-400 px-3 py-2 text-white text-sm"></td>
             </tr>
           </tbody>
         </table>
