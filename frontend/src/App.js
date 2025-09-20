@@ -192,6 +192,10 @@ const App = () => {
               path="/scraping-test" 
               element={<ScrapingTestPage />}
             />
+            <Route 
+              path="/advanced-features" 
+              element={<AdvancedFeaturesDashboard />}
+            />
             {/* Customer-facing routes */}
             <Route 
               path="/customer" 
