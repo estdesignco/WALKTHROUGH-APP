@@ -366,20 +366,7 @@ export default function ProjectPage() {
                     </div>
                 </div>
 
-                {/* Project Rooms */}
-                <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
-                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">PROJECT ROOMS</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {project.rooms?.map((room, index) => (
-                            <div key={room.id || index} className="p-3 bg-stone-700 rounded border border-stone-600">
-                                <h4 className="font-semibold text-[#8B7355]">{room.name}</h4>
-                                {room.description && <p className="text-sm text-stone-400 mt-1">{room.description}</p>}
-                            </div>
-                        )) || (
-                            <p className="text-stone-400 col-span-full">No rooms specified</p>
-                        )}
-                    </div>
-                </div>
+
             </div>
         );
     };
