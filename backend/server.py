@@ -2183,7 +2183,69 @@ async def get_vendor_types():
 
 @api_router.get("/carrier-types")
 async def get_carrier_types():
-    return [carrier.value for carrier in CarrierType]
+    """Get all available carrier types with colors"""
+    return CARRIER_OPTIONS
+
+# TEAMS INTEGRATION ENDPOINTS
+@api_router.post("/teams/configure-webhook")
+async def configure_teams_webhook(webhook_data: dict):
+    """Configure Microsoft Teams webhook URL for to-do notifications"""
+    try:
+        webhook_url = webhook_data.get("webhook_url", "")
+        
+        if not webhook_url:
+            raise HTTPException(status_code=400, detail="Webhook URL is required")
+        
+        # Update environment variable (in production, this would update a config file)
+        os.environ['TEAMS_WEBHOOK_URL'] = webhook_url
+        
+        # Test the webhook with a sample message
+        from teams_integration import teams_integration
+        test_result = await teams_integration._send_teams_webhook({
+            "@type": "MessageCard",
+            "@context": "http://schema.org/extensions",
+            "summary": "Interior Design Teams Integration Test",
+            "themeColor": "0076D7",
+            "sections": [{
+                "activityTitle": "✅ Teams Integration Configured Successfully!",
+                "activitySubtitle": "Your Interior Design Management System is now connected to Microsoft Teams",
+                "text": "You will receive automatic to-do notifications when furniture and fixture statuses change."
+            }]
+        })
+        
+        if test_result:
+            return {"status": "success", "message": "Teams webhook configured and tested successfully"}
+        else:
+            return {"status": "warning", "message": "Teams webhook configured but test message failed"}
+            
+    except Exception as e:
+        logging.error(f"Teams webhook configuration failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to configure Teams webhook: {str(e)}")
+
+@api_router.post("/teams/test-notification")
+async def test_teams_notification():
+    """Send a test notification to Teams"""
+    try:
+        from teams_integration import notify_status_change
+        
+        result = await notify_status_change(
+            project_name="Test Project",
+            item_name="Sample Dining Chair",
+            old_status="TO BE SELECTED",
+            new_status="ORDERED",
+            room_name="Dining Room",
+            vendor="Four Hands",
+            cost=1299.00
+        )
+        
+        if result:
+            return {"status": "success", "message": "Test notification sent to Teams successfully"}
+        else:
+            return {"status": "error", "message": "Failed to send test notification"}
+            
+    except Exception as e:
+        logging.error(f"Teams test notification failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to send test notification: {str(e)}")
 
 @api_router.get("/paint-colors")
 async def get_paint_colors():
