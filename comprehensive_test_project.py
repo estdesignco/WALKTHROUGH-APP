@@ -118,7 +118,7 @@ class ComprehensiveProjectTester:
                 "phone": "(615) 555-0123",
                 "address": "1234 Maple Lane, Nashville, TN 37215"
             },
-            "project_type": "Full Home Renovation",
+            "project_type": "Renovation",
             "timeline": "6 months",
             "budget": "$150,000",
             "style_preferences": ["Modern Farmhouse", "Transitional", "Rustic Chic"],
