@@ -459,158 +459,237 @@ const SimpleWalkthroughSpreadsheet = ({
         </div>
       </div>
       
-      {/* FIXED SPREADSHEET - EXACTLY WHAT USER WANTS */}
+      {/* DYNAMIC SPREADSHEET WITH REAL DATA */}
       <div className="overflow-x-auto">
         
-        {/* LIVING ROOM HEADER (PURPLE) WITH MINIMIZE */}
-        <div className="mt-8 mb-4 px-4 py-2 text-white font-bold flex justify-between items-center" style={{ backgroundColor: '#7C3AED' }}>
-          <span>LIVING ROOM</span>
-          <button className="text-white hover:text-gray-300 px-2 py-1 rounded">
-            ➖ MINIMIZE
-          </button>
-        </div>
+        {/* USE FILTERED PROJECT DATA */}
+        {((filteredProject || project)?.rooms || []).map((room, roomIndex) => (
+          <div key={room.id} className="mb-8">
+            {/* ROOM HEADER WITH DIFFERENT COLORS */}
+            <div className="mt-8 mb-4 px-4 py-2 text-white font-bold flex justify-between items-center" style={{ backgroundColor: roomIndex % 2 === 0 ? '#7C3AED' : '#059669' }}>
+              <span>{room.name.toUpperCase()}</span>
+              <button 
+                onClick={() => handleDeleteItem(room.id)}
+                className="text-white hover:text-gray-300 px-2 py-1 rounded"
+              >
+                ➖ MINIMIZE
+              </button>
+            </div>
+            
+            {/* CATEGORIES */}
+            {(room.categories || []).map((category, catIndex) => (
+              <div key={category.id} className="mb-4">
+                {/* CATEGORY HEADER (GREEN) WITH MINIMIZE */}
+                <div className="mb-4 px-4 py-2 text-white font-bold flex justify-between items-center" style={{ backgroundColor: '#065F46' }}>
+                  <span>{category.name.toUpperCase()}</span>
+                  <button className="text-white hover:text-gray-300 px-2 py-1 rounded">
+                    ➖ MINIMIZE
+                  </button>
+                </div>
+                
+                {/* TABLE WITH CORRECT HEADERS - MATCHING CHECKLIST EXACTLY */}
+                <table className="w-full border-collapse border border-gray-400 mb-6">
+                  <thead>
+                    <tr>
+                      <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-8" style={{ backgroundColor: '#8b7355' }}>✓</th>
+                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
+                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                      <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* REAL DATA FROM SUBCATEGORIES */}
+                    {(category.subcategories || []).map((subcategory) => 
+                      (subcategory.items || []).map((item, itemIndex) => (
+                        <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
+                          <td className="border border-gray-400 px-1 py-1 text-center w-8">
+                            <input type="checkbox" className="w-2 h-2" />
+                          </td>
+                          <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.name}</td>
+                          <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">{item.quantity || 1}</td>
+                          <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.size || ''}</td>
+                          <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.finish_color || ''}</td>
+                          <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                            <button 
+                              onClick={() => handleDeleteItem(item.id)}
+                              className="text-red-400 hover:text-red-300 text-xs"
+                            >
+                              🗑️
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+                
+                {/* ADD CATEGORY AND ADD ITEM BUTTONS WITHIN EACH CATEGORY */}
+                <div className="mb-4 flex gap-3">
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value === 'CREATE_NEW') {
+                        const categoryName = window.prompt('Enter new category name:');
+                        if (categoryName && categoryName.trim() && room.id) {
+                          handleAddCategory(room.id, categoryName.trim());
+                        }
+                      } else if (e.target.value && room.id) {
+                        handleAddCategory(room.id, e.target.value);
+                      }
+                    }}
+                    className="text-white px-4 py-2 rounded font-medium border-none outline-none"
+                    style={{ backgroundColor: '#8b7355' }}
+                  >
+                    <option value="">+ ADD CATEGORY ▼</option>
+                    <option value="Lighting">Lighting</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Decor & Accessories">Decor & Accessories</option>
+                    <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
+                    <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
+                    <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
+                    <option value="Furniture & Storage">Furniture & Storage</option>
+                    <option value="Equipment & Furniture">Equipment & Furniture</option>
+                    <option value="Electronics & Technology">Electronics & Technology</option>
+                    <option value="Appliances">Appliances</option>
+                    <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
+                    <option value="Surfaces & Materials">Surfaces & Materials</option>
+                    <option value="CREATE_NEW">+ Create New Category</option>
+                  </select>
+                  <button 
+                    onClick={() => {
+                      if (category.subcategories?.length > 0) {
+                        setSelectedSubCategoryId(category.subcategories[0].id);
+                        setShowAddItem(true);
+                        console.log('🎯 Selected subcategory for walkthrough item:', category.subcategories[0].id);
+                      } else {
+                        alert('This category has no subcategories. Please contact support.');
+                      }
+                    }}
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
+                  >
+                    + ADD ITEM
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
         
-        {/* LIGHTING CATEGORY HEADER (GREEN) WITH MINIMIZE */}
-        <div className="mb-4 px-4 py-2 text-white font-bold flex justify-between items-center" style={{ backgroundColor: '#065F46' }}>
-          <span>LIGHTING</span>
-          <button className="text-white hover:text-gray-300 px-2 py-1 rounded">
-            ➖ MINIMIZE
-          </button>
-        </div>
-        
-        {/* TABLE WITH CORRECT HEADERS - MATCHING CHECKLIST EXACTLY */}
-        <table className="w-full border-collapse border border-gray-400">
-          <thead>
-            <tr>
-              <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-8" style={{ backgroundColor: '#8b7355' }}>✓</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
-              <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border border-gray-400 px-1 py-1 text-center w-8">
-                <input type="checkbox" className="w-2 h-2" />
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Pendant Lights (Island/Bar)</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Bronze/Brass</td>
-              <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-1 py-1 text-center w-8">
-                <input type="checkbox" className="w-2 h-2" />
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Sconces</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-1 py-1 text-center w-8">
-                <input type="checkbox" className="w-2 h-2" />
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Track Lighting</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-1 py-1 text-center w-8">
-                <input type="checkbox" className="w-2 h-2" />
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Ceiling Fan w/ Light</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-1 py-1 text-center w-8">
-                <input type="checkbox" className="w-2 h-2" />
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Art Lights</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-1 py-1 text-center w-8">
-                <input type="checkbox" className="w-2 h-2" />
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Pendant Lights</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-1 py-1 text-center w-8">
-                <input type="checkbox" className="w-2 h-2" />
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Under Cabinet Lighting</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-1 py-1 text-center w-8">
-                <input type="checkbox" className="w-2 h-2" />
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Cove Lighting</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-1 py-1 text-center w-8">
-                <input type="checkbox" className="w-2 h-2" />
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm">Picture Lights</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">1</td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-2 py-1 text-white text-sm"></td>
-              <td className="border border-gray-400 px-1 py-1 text-center w-12">
-                <button className="text-red-400 hover:text-red-300 text-xs">🗑️</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        
-        {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS */}
+        {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS - MATCHING OTHER SHEETS */}
         <div className="mt-6 flex gap-3">
-          <button className="text-white px-4 py-2 rounded font-medium" style={{ backgroundColor: '#8b7355' }}>
-            + ADD CATEGORY
+          <select
+            value=""
+            onChange={(e) => {
+              // Find first room to add category to
+              const firstRoom = project?.rooms?.[0];
+              if (firstRoom) {
+                if (e.target.value === 'CREATE_NEW') {
+                  const categoryName = window.prompt('Enter new category name:');
+                  if (categoryName && categoryName.trim()) {
+                    handleAddCategory(firstRoom.id, categoryName.trim());
+                  }
+                } else if (e.target.value) {
+                  handleAddCategory(firstRoom.id, e.target.value);
+                }
+              } else {
+                console.error('❌ No rooms available. Please add a room first.');
+                alert('Please add a room first before adding categories.');
+              }
+            }}
+            className="text-white px-4 py-2 rounded font-medium border-none outline-none" 
+            style={{ backgroundColor: '#8b7355' }}
+          >
+            <option value="">+ ADD CATEGORY ▼</option>
+            <option value="Lighting">Lighting</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Decor & Accessories">Decor & Accessories</option>
+            <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
+            <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
+            <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
+            <option value="Furniture & Storage">Furniture & Storage</option>
+            <option value="Equipment & Furniture">Equipment & Furniture</option>
+            <option value="Electronics & Technology">Electronics & Technology</option>
+            <option value="Appliances">Appliances</option>
+            <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
+            <option value="Surfaces & Materials">Surfaces & Materials</option>
+            <option value="CREATE_NEW">+ Create New Category</option>
+          </select>
+          <button 
+            onClick={() => {
+              console.log('🚀 Walkthrough Transfer button clicked');
+              alert('Transfer functionality will be implemented next.');
+            }}
+            className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
+          >
+            → TRANSFER TO CHECKLIST
           </button>
-          <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium">
+          <button 
+            onClick={() => {
+              // Find first available subcategory to add item to
+              const firstRoom = project?.rooms?.[0];
+              const firstCategory = firstRoom?.categories?.[0];
+              const firstSubcategory = firstCategory?.subcategories?.[0];
+              
+              if (firstSubcategory) {
+                setSelectedSubCategoryId(firstSubcategory.id);
+                setShowAddItem(true);
+                console.log('🎯 Adding item to first available subcategory:', firstSubcategory.id);
+              } else {
+                alert('Please add a category first before adding items.');
+              }
+            }}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium"
+          >
             + ADD ITEM
           </button>
         </div>
+      </div>
+      
+      {/* ADD ITEM MODAL */}
+      {showAddItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-lg w-96">
+            <h3 className="text-white text-lg mb-4">Add Item</h3>
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Item Name"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600"
+              />
+              <input
+                type="text"
+                placeholder="Vendor"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600"
+              />
+              <input
+                type="text"
+                placeholder="SKU"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600"
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowAddItem(false)}
+                  className="flex-1 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // Simple add item logic
+                    console.log('Adding item...');
+                    setShowAddItem(false);
+                  }}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
+                >
+                  Add Item
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );
