@@ -3889,7 +3889,7 @@ async def scrape_canva_pdf(data: dict):
                 return {
                     "success": True, 
                     "data": canva_data,
-                    "message": f"Successfully scraped Canva board with {len(images)} images and {len(colors)} colors"
+                    "message": f"Successfully scraped Canva board with {len(all_links)} links, {len(images)} images and {len(colors)} colors"
                 }
                 
             except Exception as scrape_error:
