@@ -61,19 +61,19 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
       {/* FIXED SPREADSHEET - EXACTLY WHAT USER WANTS */}
       <div className="overflow-x-auto">
         
-        {/* LIVING ROOM HEADER (PURPLE) WITH DELETE */}
+        {/* LIVING ROOM HEADER (PURPLE) WITH MINIMIZE */}
         <div className="mt-8 mb-4 px-4 py-2 text-white font-bold flex justify-between items-center" style={{ backgroundColor: '#7C3AED' }}>
           <span>LIVING ROOM</span>
-          <button className="text-white hover:text-red-300 px-2 py-1 rounded">
-            🗑️ DELETE ROOM
+          <button className="text-white hover:text-gray-300 px-2 py-1 rounded">
+            ➖ MINIMIZE
           </button>
         </div>
         
-        {/* LIGHTING CATEGORY HEADER (GREEN) WITH DELETE */}
+        {/* LIGHTING CATEGORY HEADER (GREEN) WITH MINIMIZE */}
         <div className="mb-4 px-4 py-2 text-white font-bold flex justify-between items-center" style={{ backgroundColor: '#065F46' }}>
           <span>LIGHTING</span>
-          <button className="text-white hover:text-red-300 px-2 py-1 rounded">
-            🗑️ DELETE CATEGORY
+          <button className="text-white hover:text-gray-300 px-2 py-1 rounded">
+            ➖ MINIMIZE
           </button>
         </div>
         
