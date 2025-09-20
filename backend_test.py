@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Enhanced Rooms Backend API Testing Suite - CRITICAL TESTING
-Tests enhanced_rooms.py integration and backend endpoints to verify that categories, 
-subcategories, and items are being properly served. Focus on kitchen subcategories issue.
+FF&E and Checklist Backend API Testing Suite - REVIEW REQUEST TESTING
+Tests FF&E and Checklist backend functionality after recent button updates.
+Focus on project loading, Add Category API, Transfer Button Infrastructure, and Project Data Structure.
 """
 
 import requests
@@ -26,14 +26,14 @@ def get_backend_url():
     return "http://localhost:8001"
 
 BASE_URL = get_backend_url() + "/api"
-PROJECT_ID = "5cccfb11-0ac0-45ed-91ab-a56088d65b5a"  # Review request project ID
+PROJECT_ID = "5cccfb11-0ac0-45ed-91ab-a56088d65b5a"  # Greene Renovation project ID
 
 print("=" * 80)
-print("🧪 ENHANCED ROOMS INTEGRATION TESTING")
+print("🎯 FF&E AND CHECKLIST BACKEND TESTING - REVIEW REQUEST")
 print("=" * 80)
 print(f"Backend URL: {BASE_URL}")
-print(f"Project ID: {PROJECT_ID}")
-print("Focus: Kitchen subcategories missing issue")
+print(f"Project ID: {PROJECT_ID} (Greene Renovation)")
+print("Focus: FF&E Sheet Access, Checklist Sheet Access, Add Category API, Transfer Button Infrastructure")
 print("=" * 80)
 
 class EnhancedRoomsTester:
