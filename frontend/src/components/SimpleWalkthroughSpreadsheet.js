@@ -481,9 +481,19 @@ const SimpleWalkthroughSpreadsheet = ({
 
   if (!project.rooms || project.rooms.length === 0) {
     return (
-      <div className="text-center text-yellow-400 py-8 bg-yellow-900 m-4 p-4 rounded">
-        <p className="text-lg">🚨 SimpleWalkthroughSpreadsheet: NO ROOMS</p>
-        <p className="text-sm mt-2">Project has {project.rooms?.length || 0} rooms</p>
+      <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
+        <div className="text-center text-yellow-400 py-8 bg-yellow-900 m-4 p-4 rounded">
+          <p className="text-lg">🚶 No Rooms Available</p>
+          <p className="text-sm mt-2">This project has {project.rooms?.length || 0} rooms</p>
+          <div className="mt-4">
+            <button 
+              onClick={onAddRoom}
+              className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+            >
+              + ADD FIRST ROOM
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
