@@ -720,15 +720,13 @@ const SimpleWalkthroughSpreadsheet = ({
           </button>
           <button 
             onClick={() => {
-              // Find first available subcategory to add item to
+              // Find first available category to add blank row to
               const firstRoom = project?.rooms?.[0];
               const firstCategory = firstRoom?.categories?.[0];
-              const firstSubcategory = firstCategory?.subcategories?.[0];
               
-              if (firstSubcategory) {
-                setSelectedSubCategoryId(firstSubcategory.id);
-                setShowAddItem(true);
-                console.log('🎯 Adding item to first available subcategory:', firstSubcategory.id);
+              if (firstCategory) {
+                handleAddBlankRow(firstCategory.id);
+                console.log('🎯 Adding blank row to first available category:', firstCategory.id);
               } else {
                 alert('Please add a category first before adding items.');
               }
