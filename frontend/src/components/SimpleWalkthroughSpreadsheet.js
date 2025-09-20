@@ -33,20 +33,26 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
             </select>
           </div>
           
-          {/* Filter Buttons */}
+          {/* Filter Buttons - TONED DOWN */}
           <div className="flex gap-4">
-            <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded font-bold">
+            <button className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded font-medium opacity-80">
               🔍 FILTER
             </button>
-            <button className="bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded font-bold">
+            <button className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded font-medium opacity-80">
               CLEAR
             </button>
           </div>
           
-          {/* Add Room Button */}
-          <div className="flex justify-end">
-            <button className="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded font-bold">
+          {/* Action Buttons */}
+          <div className="flex gap-3">
+            <button className="text-white px-4 py-2 rounded font-medium" style={{ backgroundColor: '#8b7355' }}>
               + ADD ROOM
+            </button>
+            <button className="text-white px-4 py-2 rounded font-medium" style={{ backgroundColor: '#8b7355' }}>
+              + ADD CATEGORY
+            </button>
+            <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium">
+              + ADD ITEM
             </button>
           </div>
         </div>
