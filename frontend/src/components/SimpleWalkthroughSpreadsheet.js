@@ -883,6 +883,8 @@ const SimpleWalkthroughSpreadsheet = ({
                   })}
                 </div>
               )}
+                      </div>
+                    )}
                   </Draggable>
                 ))}
                 {provided.placeholder}
