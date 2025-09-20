@@ -273,14 +273,6 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
               </div>
             </div>
 
-            {/* PIE CHART AND STATUS BREAKDOWN */}
-            <StatusOverview
-              totalItems={getTotalItems()}
-              statusBreakdown={getStatusBreakdown()}
-              carrierBreakdown={getCarrierBreakdown()}
-              itemStatuses={itemStatuses}
-            />
-
             {/* SEARCH BAR AND ADD ROOM BUTTON */}
             <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
               <div className="flex items-center space-x-4 flex-1">
@@ -306,6 +298,14 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
             </div>
           </>
         )}
+
+        {/* PIE CHART AND STATUS BREAKDOWN - ALWAYS VISIBLE */}
+        <StatusOverview
+          totalItems={getTotalItems()}
+          statusBreakdown={getStatusBreakdown()}
+          carrierBreakdown={getCarrierBreakdown()}
+          itemStatuses={itemStatuses}
+        />
       </div>
 
       {/* FF&E Spreadsheet */}
