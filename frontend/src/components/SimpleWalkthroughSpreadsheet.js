@@ -48,11 +48,8 @@ const SimpleWalkthroughSpreadsheet = ({ project }) => {
             <button className="text-white px-4 py-2 rounded font-medium" style={{ backgroundColor: '#8b7355' }}>
               + ADD ROOM
             </button>
-            <button className="text-white px-4 py-2 rounded font-medium" style={{ backgroundColor: '#8b7355' }}>
-              + ADD CATEGORY
-            </button>
-            <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium">
-              + ADD ITEM
+            <button className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium">
+              → TRANSFER TO CHECKLIST
             </button>
           </div>
         </div>
