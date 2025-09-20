@@ -3860,7 +3860,7 @@ async def scrape_canva_pdf(data: dict):
                     "type": "canva_board"
                 }
                 
-                print(f"✅ Successfully scraped Canva board: {len(images)} images, {len(colors)} colors")
+                print(f"✅ Successfully scraped Canva board: {len(all_links)} links, {len(images)} images, {len(colors)} colors")
                 
                 # If item_id provided, update the item with scraped data
                 if item_id:
