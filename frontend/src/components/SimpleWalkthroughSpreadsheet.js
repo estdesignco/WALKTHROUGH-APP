@@ -653,15 +653,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                 <option value="CREATE_NEW">+ Create New Category</option>
                               </select>
                               <button 
-                                onClick={() => {
-                                  if (category.subcategories?.length > 0) {
-                                    setSelectedSubCategoryId(category.subcategories[0].id);
-                                    setShowAddItem(true);
-                                    console.log('🎯 Selected subcategory for walkthrough item:', category.subcategories[0].id);
-                                  } else {
-                                    alert('This category has no subcategories. Please contact support.');
-                                  }
-                                }}
+                                onClick={() => handleAddBlankRow(category.id)}
                                 className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
                               >
                                 + ADD ITEM
