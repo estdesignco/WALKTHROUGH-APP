@@ -419,18 +419,38 @@ const SimpleWalkthroughSpreadsheet = ({
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${categoryId}`, {
-        method: 'DELETE'
+      console.log('🗑️ DELETING CATEGORY:', categoryId);
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      
+      const response = await fetch(`${backendUrl}/api/categories/${categoryId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
+
+      console.log('📡 Delete category response:', response.status, response.statusText);
 
       if (response.ok) {
         console.log('✅ Walkthrough category deleted successfully');
+        
+        // Preserve expansion states during reload
+        const currentExpandedRooms = {...expandedRooms};
+        const currentExpandedCategories = {...expandedCategories};
+        
         if (onReload) {
-          onReload();
+          await onReload();
+          
+          // Restore expansion states
+          setTimeout(() => {
+            setExpandedRooms(currentExpandedRooms);
+            setExpandedCategories(currentExpandedCategories);
+          }, 100);
         }
       } else {
-        console.error('❌ Delete category failed with status:', response.status);
-        throw new Error(`HTTP ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ Delete category failed:', response.status, errorText);
+        alert(`Failed to delete category: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error('❌ Error deleting walkthrough category:', error);
