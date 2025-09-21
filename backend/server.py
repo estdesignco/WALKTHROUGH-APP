@@ -1921,7 +1921,7 @@ async def create_comprehensive_category(category: CategoryCreate):
                             finish_color = ""
                         else:
                             item_name = item_data.get('name', 'Unknown Item')
-                            finish_color = item_data.get('finish_color', '')
+                            finish_color = ""  # Always blank as requested
                         
                         item_obj = Item(
                             name=item_name,
