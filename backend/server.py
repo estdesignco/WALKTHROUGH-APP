@@ -1786,6 +1786,7 @@ async def create_room(room_data: RoomCreate):
             "name": room_dict["name"],
             "description": room_dict.get("description", ""),
             "order_index": room_dict.get("order_index", 0),
+            "sheet_type": room_dict.get("sheet_type", "walkthrough"),  # CRITICAL: Include sheet_type for transfer functionality
             "color": room_dict["color"],
             "created_at": room_dict["created_at"],
             "updated_at": room_dict["updated_at"]
