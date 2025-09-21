@@ -27,6 +27,9 @@ const SimpleWalkthroughSpreadsheet = ({
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [filteredProject, setFilteredProject] = useState(project);
+  
+  // ✅ CRITICAL: Checked items state for transfer functionality
+  const [checkedItems, setCheckedItems] = useState(new Set());
 
   // APPLY FILTERS - WORKING FILTER LOGIC
   useEffect(() => {
