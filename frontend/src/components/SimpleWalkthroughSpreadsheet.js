@@ -864,7 +864,31 @@ const SimpleWalkthroughSpreadsheet = ({
                             </table>
                             
                             {/* ADD ITEM BUTTON ONLY */}
-                            <div className="mb-4 flex gap-3">
+                            <div className="mb-4 flex justify-between items-center">
+                              <select
+                                value=""
+                                onChange={(e) => {
+                                  if (e.target.value === 'CREATE_NEW') {
+                                    const categoryName = window.prompt('Enter new category name:');
+                                    if (categoryName && categoryName.trim()) {
+                                      handleAddCategory(room.id, categoryName.trim());
+                                    }
+                                  } else if (e.target.value) {
+                                    handleAddCategory(room.id, e.target.value);
+                                  }
+                                }}
+                                className="text-white px-3 py-2 rounded font-medium border-none outline-none text-sm" 
+                                style={{ backgroundColor: '#8b7355' }}
+                              >
+                                <option value="">+ ADD CATEGORY ▼</option>
+                                <option value="Lighting">Lighting</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Decor & Accessories">Decor & Accessories</option>
+                                <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
+                                <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
+                                <option value="Appliances">Appliances</option>
+                                <option value="CREATE_NEW">+ Create New Category</option>
+                              </select>
                               <button 
                                 onClick={() => handleAddBlankRow(category.id)}
                                 className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
