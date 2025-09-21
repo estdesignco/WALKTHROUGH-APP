@@ -1759,7 +1759,7 @@ async def create_room(room_data: RoomCreate):
                         "name": item_obj["name"],
                         "quantity": 1,
                         "size": "",
-                        "finish_color": item_obj.get("finish_color", ""),
+                        "finish_color": "",  # ALWAYS BLANK - ignore template data
                         "status": "",  # BLANK status for all sheets
                         "vendor": "",
                         "sku": "",
