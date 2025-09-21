@@ -260,7 +260,7 @@ const SimpleWalkthroughSpreadsheet = ({
         sku: '',
         cost: '',
         size: '',
-        finish_color: 'Natural',  // DEFAULT VALUE AS REQUESTED
+        finish_color: '',  // BLANK AS REQUESTED
         quantity: '1',
         subcategory_id: subcategoryId,
         status: '',
