@@ -706,8 +706,11 @@ const SimpleWalkthroughSpreadsheet = ({
           
           return (
             <div key={room.id} className="mb-8">
-              {/* ROOM HEADER WITH DIFFERENT COLORS AND EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
-              <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: roomIndex % 2 === 0 ? '#7C3AED' : '#059669' }}>
+              {/* ROOM HEADER WITH DIFFERENT MUTED COLORS FOR EACH ROOM */}
+              <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ 
+                backgroundColor: roomColors?.[room.name.toLowerCase()] || 
+                  ['#7A5A8A', '#5A6A5A', '#6A5A7A', '#7A5A5A', '#5A6A6A', '#5A5A7A', '#6A4A4A', '#4A6A6A'][roomIndex % 8]
+              }}>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <button
