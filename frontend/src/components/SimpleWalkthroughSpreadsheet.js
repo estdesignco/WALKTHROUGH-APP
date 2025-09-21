@@ -392,23 +392,23 @@ const SimpleWalkthroughSpreadsheet = ({
         }
       });
 
-      console.log('📡 Delete response status:', response.status);
+      console.log('📡 Delete room response:', response.status, response.statusText);
 
       if (response.ok) {
         console.log('✅ Walkthrough room deleted successfully');
-        alert('✅ Room deleted successfully!');
+        
         if (onReload) {
           console.log('🔄 Calling onReload after successful delete');
-          onReload();
+          await onReload();
         }
       } else {
         const errorText = await response.text();
-        console.error('❌ Delete room failed with status:', response.status, 'Error:', errorText);
-        alert(`❌ Failed to delete room: ${response.status} - ${errorText}`);
+        console.error('❌ Delete room failed:', response.status, errorText);
+        alert(`Failed to delete room: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error('❌ Error deleting walkthrough room:', error);
-      alert('❌ Failed to delete room: ' + error.message);
+      alert('Failed to delete room: ' + error.message);
     }
   };
 
