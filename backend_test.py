@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
 """
-CREATE TEST PROJECT FOR PREVIEW - URGENT REVIEW REQUEST
+CRITICAL SYSTEM RECOVERY TESTING - MongoDB Fixed, Verify All Core Backend Functionality
 
-The user reports there is no preview available. Create a comprehensive test project immediately:
+CONTEXT: Just fixed critical MongoDB infrastructure issue - service was down causing all API endpoints 
+to return HTTP 500 errors. MongoDB is now running and /api/projects endpoint returns HTTP 200 with empty array. 
+Need to verify ALL core backend functionality is operational.
 
-1. **Create Test Project** via API:
-   - Project Name: "Modern Farmhouse Renovation" 
-   - Client Name: "Sarah & Mike Thompson"
-   - Address: "123 Main Street, Nashville, TN"
-   - Budget: "$75,000"
+PRIORITY TESTING SEQUENCE:
+1. **Project Management APIs** - Create, read, update, delete projects
+2. **Room Creation with Enhanced Structure** - Test room creation using enhanced_rooms.py comprehensive structure 
+   (kitchen should create 8 categories, 82+ items)
+3. **Category and Subcategory Management** - Test ADD CATEGORY functionality, verify GET /api/categories/available 
+   returns all 14 categories
+4. **Item CRUD Operations** - Create, read, update, delete items with proper subcategory relationships
+5. **Transfer Functionality APIs** - Test the critical Walkthrough → Checklist and Checklist → FFE transfer workflows
+6. **Web Scraping API** - Test POST /api/scrape-product with Four Hands URL
+7. **Status Management** - Verify status dropdowns and color coding for both FFE and Checklist
+8. **Data Structure Integrity** - Verify proper room/category/subcategory/item hierarchy with finish_color fields
 
-2. **Populate with Realistic Data**:
-   - Add 3-4 rooms (Living Room, Master Bedroom, Kitchen, Dining Room)
-   - Add categories and subcategories for each room
-   - Add sample items with realistic names, vendors, pricing
-   - Set various statuses (TO BE SELECTED, ORDERED, SHIPPED, etc.)
-
-3. **Test All Endpoints** and return project ID for immediate preview
+This is post-critical-fix testing to ensure the entire backend ecosystem is operational after MongoDB restart.
 """
 
 import requests
