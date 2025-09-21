@@ -175,8 +175,6 @@ const SimpleWalkthroughSpreadsheet = ({
         console.error('❌ Category creation failed:', response.status, errorText);
         alert(`❌ Failed to create ${categoryName} category: ${errorText}`);
       }
-
-      }
     } catch (error) {
       console.error('❌ Error adding comprehensive walkthrough category:', error);
     }
