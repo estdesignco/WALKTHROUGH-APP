@@ -1664,8 +1664,15 @@ async def create_room(room_data: RoomCreate):
         room_name_lower = room_data.name.lower().strip()
         print(f"🏠 CREATING ROOM: {room_name_lower}")
         
+        # Map room names to structure keys
+        room_name_mapping = {
+            "master bathroom": "primary bathroom",
+            "master bedroom": "primary bedroom"
+        }
+        structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
+        
         # Get FULL comprehensive structure for this room
-        room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(room_name_lower)
+        room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(structure_key)
         
         # If exact match not found, try to find similar room or use living room as template
         if not room_structure:
