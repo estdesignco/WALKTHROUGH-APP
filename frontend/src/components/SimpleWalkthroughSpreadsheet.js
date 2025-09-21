@@ -441,45 +441,148 @@ const SimpleWalkthroughSpreadsheet = ({
         return;
       }
 
-      // Create NEW copies of items for checklist sheet_type
+      // Create COMPLETE room structure for checklist first, then transfer items
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       let successCount = 0;
+      
+      // Track what structures we need to create
+      const roomsToCreate = new Map(); // roomId -> room data
+      const categoriesToCreate = new Map(); // categoryId -> category data  
+      const subcategoriesToCreate = new Map(); // subcategoryId -> subcategory data
 
+      // Analyze what structures we need for the checked items
       for (const item of checkedItemsToTransfer) {
-        try {
-          // Create a NEW item copy for checklist (different sheet_type)
-          const newItemForChecklist = {
-            name: item.name,
-            vendor: item.vendor || '',
-            sku: item.sku || '',
-            cost: item.cost || 0,
-            size: item.size || '',
-            finish_color: item.finish_color || '',
-            quantity: item.quantity || 1,
-            subcategory_id: item.subcategory_id,
-            status: 'PICKED',  // Set to PICKED for checklist
-            sheet_type: 'checklist'  // IMPORTANT: Set sheet_type for independence
-          };
-
-          console.log(`📦 Creating checklist copy of: ${item.name}`);
-
-          const response = await fetch(`${backendUrl}/api/items`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newItemForChecklist)
-          });
-
-          if (response.ok) {
-            successCount++;
-            console.log(`✅ Successfully transferred: ${item.name}`);
-          } else {
-            console.error(`❌ Failed to transfer: ${item.name}`);
+        // Find the room, category, and subcategory for this item
+        for (const room of filteredProject.rooms) {
+          for (const category of room.categories || []) {
+            for (const subcategory of category.subcategories || []) {
+              if (subcategory.items?.some(i => i.id === item.id)) {
+                roomsToCreate.set(room.id, {...room, sheet_type: 'checklist'});
+                categoriesToCreate.set(category.id, {...category, room_id: room.id});
+                subcategoriesToCreate.set(subcategory.id, {...subcategory, category_id: category.id});
+                break;
+              }
+            }
           }
-        } catch (error) {
-          console.error(`❌ Error transferring item ${item.name}:`, error);
         }
+      }
+
+      console.log(`🏗️ Need to create ${roomsToCreate.size} rooms, ${categoriesToCreate.size} categories, ${subcategoriesToCreate.size} subcategories`);
+
+      try {
+        // Step 1: Create rooms for checklist
+        const roomMapping = new Map(); // old room id -> new room id
+        for (const [oldRoomId, roomData] of roomsToCreate) {
+          const newRoomData = {
+            name: roomData.name,
+            description: roomData.description || '',
+            project_id: roomData.project_id,
+            sheet_type: 'checklist',
+            order_index: roomData.order_index || 0
+          };
+          
+          const roomResponse = await fetch(`${backendUrl}/api/rooms`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newRoomData)
+          });
+          
+          if (roomResponse.ok) {
+            const newRoom = await roomResponse.json();
+            roomMapping.set(oldRoomId, newRoom.id);
+            console.log(`✅ Created checklist room: ${newRoom.name}`);
+          }
+        }
+
+        // Step 2: Create categories for checklist
+        const categoryMapping = new Map(); // old category id -> new category id
+        for (const [oldCategoryId, categoryData] of categoriesToCreate) {
+          const newRoomId = roomMapping.get(categoryData.room_id);
+          if (newRoomId) {
+            const newCategoryData = {
+              name: categoryData.name,
+              description: categoryData.description || '',
+              room_id: newRoomId,
+              color: categoryData.color,
+              order_index: categoryData.order_index || 0
+            };
+            
+            const categoryResponse = await fetch(`${backendUrl}/api/categories`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newCategoryData)
+            });
+            
+            if (categoryResponse.ok) {
+              const newCategory = await categoryResponse.json();
+              categoryMapping.set(oldCategoryId, newCategory.id);
+              console.log(`✅ Created checklist category: ${newCategory.name}`);
+            }
+          }
+        }
+
+        // Step 3: Create subcategories for checklist
+        const subcategoryMapping = new Map(); // old subcategory id -> new subcategory id
+        for (const [oldSubcategoryId, subcategoryData] of subcategoriesToCreate) {
+          const newCategoryId = categoryMapping.get(subcategoryData.category_id);
+          if (newCategoryId) {
+            const newSubcategoryData = {
+              name: subcategoryData.name,
+              description: subcategoryData.description || '',
+              category_id: newCategoryId,
+              color: subcategoryData.color,
+              order_index: subcategoryData.order_index || 0
+            };
+            
+            const subcategoryResponse = await fetch(`${backendUrl}/api/subcategories`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newSubcategoryData)
+            });
+            
+            if (subcategoryResponse.ok) {
+              const newSubcategory = await subcategoryResponse.json();
+              subcategoryMapping.set(oldSubcategoryId, newSubcategory.id);
+              console.log(`✅ Created checklist subcategory: ${newSubcategory.name}`);
+            }
+          }
+        }
+
+        // Step 4: Finally create the items in the new structure
+        for (const item of checkedItemsToTransfer) {
+          const newSubcategoryId = subcategoryMapping.get(item.subcategory_id);
+          if (newSubcategoryId) {
+            const newItemForChecklist = {
+              name: item.name,
+              vendor: item.vendor || '',
+              sku: item.sku || '',
+              cost: item.cost || 0,
+              size: item.size || '',
+              finish_color: item.finish_color || '',
+              quantity: item.quantity || 1,
+              subcategory_id: newSubcategoryId,
+              status: 'PICKED',
+              order_index: item.order_index || 0
+            };
+
+            console.log(`📦 Creating checklist item: ${item.name}`);
+
+            const response = await fetch(`${backendUrl}/api/items`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newItemForChecklist)
+            });
+
+            if (response.ok) {
+              successCount++;
+              console.log(`✅ Successfully transferred: ${item.name}`);
+            }
+          }
+        }
+      } catch (structureError) {
+        console.error('❌ Error creating checklist structure:', structureError);
+        alert('❌ Failed to create checklist structure');
+        return;
       }
 
       alert(`✅ Successfully transferred ${successCount} CHECKED items from Walkthrough to Checklist!`);
