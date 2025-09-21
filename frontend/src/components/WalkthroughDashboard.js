@@ -106,7 +106,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
         ...roomData,
         project_id: projectId,
         order_index: project.rooms.length,
-        sheet_type: 'walkthrough'  // Make rooms independent per sheet
+        // sheet_type: 'walkthrough'  // Removed for now to fix room display
       };
       
       console.log('🏠 Creating room with data:', newRoom);
