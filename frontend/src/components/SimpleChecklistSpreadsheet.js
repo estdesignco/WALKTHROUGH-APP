@@ -912,7 +912,7 @@ const SimpleChecklistSpreadsheet = ({
                                       className="w-full bg-transparent text-white text-sm outline-none"
                                       onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
                                     >
-                                      {item.finish_color || ''}
+                                      {item.finish_color || 'Natural'}
                                     </div>
                                   </td>
                                   
