@@ -175,34 +175,7 @@ const SimpleWalkthroughSpreadsheet = ({
         console.error('❌ Category creation failed:', response.status, errorText);
         alert(`❌ Failed to create ${categoryName} category: ${errorText}`);
       }
-                    subcategory_id: newSubcategory.id,
-                    id: undefined,
-                    status: '' // BLANK status for walkthrough items
-                  };
-                  
-                  await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(itemData)
-                  });
-                }
-              }
-            }
-            
-            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
-              method: 'DELETE'
-            });
-            
-            // Reload to show all new items
-            if (onReload) {
-              onReload();
-            }
-          }
-        }
-        
-        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
-          method: 'DELETE'
-        });
+
       }
     } catch (error) {
       console.error('❌ Error adding comprehensive walkthrough category:', error);
