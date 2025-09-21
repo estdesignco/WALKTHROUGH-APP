@@ -1576,8 +1576,11 @@ async def get_project(project_id: str, sheet_type: str = None):
     if not project_data:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    # Fetch rooms filtered by sheet_type to make them independent
-    rooms = await db.rooms.find({"project_id": project_id, "sheet_type": sheet_type}).sort("order_index", 1).to_list(1000)
+    # Fetch rooms filtered by sheet_type to make them independent (if sheet_type specified)
+    if sheet_type:
+        rooms = await db.rooms.find({"project_id": project_id, "sheet_type": sheet_type}).sort("order_index", 1).to_list(1000)
+    else:
+        rooms = await db.rooms.find({"project_id": project_id}).sort("order_index", 1).to_list(1000)
     project_data["rooms"] = []
     
     for room_data in rooms:
