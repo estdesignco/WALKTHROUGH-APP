@@ -809,10 +809,38 @@ const SimpleWalkthroughSpreadsheet = ({
                                       <td className="border border-gray-400 px-1 py-1 text-center w-6">
                                         <input type="checkbox" className="w-6 h-6 cursor-pointer" />
                                       </td>
-                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.name}</td>
-                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">{item.quantity || 1}</td>
-                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.size || ''}</td>
-                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">{item.finish_color || ''}</td>
+                                      <td className="border border-gray-400 px-1 py-1">
+                                        <input 
+                                          type="text"
+                                          value={item.name || ''}
+                                          className="w-full bg-transparent text-white text-sm outline-none border-none"
+                                          onChange={(e) => console.log('Item name updated:', e.target.value)}
+                                        />
+                                      </td>
+                                      <td className="border border-gray-400 px-1 py-1 w-16">
+                                        <input 
+                                          type="number"
+                                          value={item.quantity || 1}
+                                          className="w-full bg-transparent text-white text-sm outline-none border-none text-center"
+                                          onChange={(e) => console.log('Quantity updated:', e.target.value)}
+                                        />
+                                      </td>
+                                      <td className="border border-gray-400 px-1 py-1">
+                                        <input 
+                                          type="text"
+                                          value={item.size || ''}
+                                          className="w-full bg-transparent text-white text-sm outline-none border-none"
+                                          onChange={(e) => console.log('Size updated:', e.target.value)}
+                                        />
+                                      </td>
+                                      <td className="border border-gray-400 px-1 py-1">
+                                        <input 
+                                          type="text"
+                                          value={item.finish_color || ''}
+                                          className="w-full bg-transparent text-white text-sm outline-none border-none"
+                                          onChange={(e) => console.log('Finish/Color updated:', e.target.value)}
+                                        />
+                                      </td>
                                       <td className="border border-gray-400 px-1 py-1 text-center w-12">
                                         <button 
                                           onClick={() => handleDeleteItem(item.id)}
