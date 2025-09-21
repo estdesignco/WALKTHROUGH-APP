@@ -130,7 +130,7 @@ const SimpleWalkthroughSpreadsheet = ({
     fetchCategories();
   }, []);
 
-  // Handle adding a new category WITH ALL SUBCATEGORIES AND ITEMS
+  // Handle adding a new category WITH ALL SUBCATEGORIES AND ITEMS - SIMPLIFIED
   const handleAddCategory = async (roomId, categoryName) => {
     if (!roomId || !categoryName) {
       console.error('❌ Missing roomId or categoryName');
@@ -139,65 +139,42 @@ const SimpleWalkthroughSpreadsheet = ({
 
     try {
       console.log('🔄 Creating comprehensive walkthrough category:', categoryName, 'for room:', roomId);
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
-      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
+      // Use the enhanced backend category creation that loads full structure
+      const categoryData = {
+        name: categoryName,
+        room_id: roomId,
+        description: `${categoryName} category with full subcategories and items`,
+        order_index: 0
+      };
+      
+      console.log('📤 Creating category with data:', categoryData);
+      
+      const response = await fetch(`${backendUrl}/api/categories`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: `temp_${categoryName}_${Date.now()}`,
-          description: `Temporary room to extract ${categoryName} structure`,
-          project_id: "temp",
-          order_index: 999
-        })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(categoryData)
       });
 
-      if (tempRoomResponse.ok) {
-        const tempRoom = await tempRoomResponse.json();
+      console.log('📡 Category creation response:', response.status);
+
+      if (response.ok) {
+        const newCategory = await response.json();
+        console.log('✅ Category created with full structure:', newCategory.name);
+        alert(`✅ Successfully added ${categoryName} category with all subcategories and items!`);
         
-        const matchingCategory = tempRoom.categories.find(cat => 
-          cat.name.toLowerCase() === categoryName.toLowerCase()
-        );
-        
-        if (matchingCategory) {
-          // First add the category
-          const categoryData = {
-            ...matchingCategory,
-            room_id: roomId,
-            id: undefined
-          };
-          
-          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(categoryData)
-          });
-          
-          if (addResponse.ok) {
-            const newCategory = await addResponse.json();
-            console.log('✅ Category added:', newCategory.name);
-            
-            // Now add ALL subcategories with their items
-            for (const subcategory of matchingCategory.subcategories) {
-              const subcategoryData = {
-                ...subcategory,
-                category_id: newCategory.id,
-                id: undefined
-              };
-              
-              const subResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/subcategories`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(subcategoryData)
-              });
-              
-              if (subResponse.ok) {
-                const newSubcategory = await subResponse.json();
-                console.log('✅ Subcategory added:', newSubcategory.name);
-                
-                // Add ALL items for this subcategory
-                for (const item of subcategory.items) {
-                  const itemData = {
-                    ...item,
+        // Reload to show the new category
+        if (onReload) {
+          await onReload();
+        }
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Category creation failed:', response.status, errorText);
+        alert(`❌ Failed to create ${categoryName} category: ${errorText}`);
+      }
                     subcategory_id: newSubcategory.id,
                     id: undefined,
                     status: '' // BLANK status for walkthrough items
