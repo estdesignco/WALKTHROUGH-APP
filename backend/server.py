@@ -886,6 +886,7 @@ class RoomBase(BaseModel):
     name: str
     description: Optional[str] = ""
     order_index: int = 0
+    sheet_type: str = "walkthrough"  # walkthrough, checklist, ffe
 
 class RoomCreate(RoomBase):
     project_id: str
