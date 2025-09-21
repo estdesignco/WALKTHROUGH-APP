@@ -151,7 +151,7 @@ const SimpleWalkthroughSpreadsheet = ({
       
       console.log('📤 Creating category with data:', categoryData);
       
-      const response = await fetch(`${backendUrl}/api/categories`, {
+      const response = await fetch(`${backendUrl}/api/categories/comprehensive`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
