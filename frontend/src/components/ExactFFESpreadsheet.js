@@ -392,7 +392,7 @@ const ExactFFESpreadsheet = ({
             id: undefined // Let backend generate new ID
           };
           
-          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/categories`, {
+          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(categoryData)
