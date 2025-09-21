@@ -1570,14 +1570,14 @@ async def get_projects():
     
     return result
 
-@api_router.get("/projects/{project_id}", response_model=Project)
-async def get_project(project_id: str):
+@api_router.get("/projects/{project_id}")
+async def get_project(project_id: str, sheet_type: str = "walkthrough"):
     project_data = await db.projects.find_one({"id": project_id})
     if not project_data:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    # Fetch rooms
-    rooms = await db.rooms.find({"project_id": project_id}).sort("order_index", 1).to_list(1000)
+    # Fetch rooms filtered by sheet_type to make them independent
+    rooms = await db.rooms.find({"project_id": project_id, "sheet_type": sheet_type}).sort("order_index", 1).to_list(1000)
     project_data["rooms"] = []
     
     for room_data in rooms:
