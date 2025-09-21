@@ -11,6 +11,9 @@ const SimpleWalkthroughSpreadsheet = ({
   onAddRoom,
   onReload 
 }) => {
+  
+  // State to track checked items for transfer
+  const [checkedItems, setCheckedItems] = useState(new Set());
   console.log('🎯 SimpleWalkthroughSpreadsheet rendering with project:', project);
 
   const [showAddItem, setShowAddItem] = useState(false);
