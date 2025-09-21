@@ -92,7 +92,8 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
       const newRoom = {
         ...roomData,
         project_id: projectId,
-        order_index: project.rooms.length
+        order_index: project.rooms.length,
+        sheet_type: 'ffe'  // Make rooms independent per sheet
       };
       
       console.log('🏠 Creating room with data:', newRoom);
