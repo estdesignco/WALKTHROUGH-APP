@@ -810,7 +810,20 @@ const SimpleWalkthroughSpreadsheet = ({
                                   (subcategory.items || []).map((item, itemIndex) => (
                                     <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
                                       <td className="border border-gray-400 px-1 py-1 text-center w-6">
-                                        <input type="checkbox" className="w-6 h-6 cursor-pointer" />
+                                        <input 
+                                          type="checkbox" 
+                                          className="w-6 h-6 cursor-pointer" 
+                                          checked={checkedItems.has(item.id)}
+                                          onChange={(e) => {
+                                            const newCheckedItems = new Set(checkedItems);
+                                            if (e.target.checked) {
+                                              newCheckedItems.add(item.id);
+                                            } else {
+                                              newCheckedItems.delete(item.id);
+                                            }
+                                            setCheckedItems(newCheckedItems);
+                                          }}
+                                        />
                                       </td>
                                       <td className="border border-gray-400 px-2 py-1 text-white text-sm">
                                         <div 
