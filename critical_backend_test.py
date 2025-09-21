@@ -332,15 +332,17 @@ class CriticalBackendTester:
         room_id = room_response.get('id')
         self.log_test("Comprehensive - Create Test Room", True, f"Room ID: {room_id}")
         
-        # Test comprehensive category creation
+        # Test comprehensive category creation using the correct CategoryCreate format
         print("\n📂 Step 3: Testing comprehensive category creation...")
         
-        # Try to create a comprehensive category (check if endpoint exists)
+        # Use the first available category for testing
+        test_category_name = categories_list[0] if categories_list else "Lighting"
+        
         comprehensive_data = {
-            "category_name": "Lighting",  # Use a category from available list
+            "name": test_category_name,
+            "description": f"Comprehensive {test_category_name} category",
             "room_id": room_id,
-            "include_subcategories": True,
-            "include_items": True
+            "order_index": 0
         }
         
         # First try the comprehensive endpoint
