@@ -596,6 +596,202 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
+  // CHECKLIST → FFE TRANSFER: Transfer ALL written items (using proven logic)
+  const handleTransferToFFE = async () => {
+    try {
+      console.log('🚀 TRANSFER TO FFE: ALL WRITTEN ITEMS (using proven walkthrough logic)');
+      
+      // Step 1: Collect ALL items that have real content (not just "New Item")
+      const allItemsToTransfer = [];
+      
+      if (filteredProject?.rooms) {
+        filteredProject.rooms.forEach(room => {
+          room.categories?.forEach(category => {
+            category.subcategories?.forEach(subcategory => {
+              subcategory.items?.forEach(item => {
+                // Transfer ALL items with real names (not empty or "New Item")
+                if (item.name && item.name.trim() !== '' && item.name !== 'New Item') {
+                  allItemsToTransfer.push({
+                    item,
+                    roomId: room.id,
+                    roomName: room.name,
+                    categoryId: category.id,
+                    categoryName: category.name,
+                    subcategoryId: subcategory.id,
+                    subcategoryName: subcategory.name
+                  });
+                }
+              });
+            });
+          });
+        });
+      }
+      
+      console.log(`📝 EXACT COUNT: ${allItemsToTransfer.length} ALL written items to transfer to FFE`);
+      console.log('📋 All items:', allItemsToTransfer.map(ci => ci.item.name));
+
+      if (allItemsToTransfer.length === 0) {
+        alert('No written items found for transfer to FFE.');
+        return;
+      }
+
+      // Step 2: Transfer ALL written items to FFE (create minimal structure as needed)
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const projectId = filteredProject.id;
+      
+      let successCount = 0;
+      const createdStructures = new Map(); // Track what we've already created
+      
+      console.log(`🏗️ Creating FFE structure for ALL ${allItemsToTransfer.length} written items`);
+
+      // Process each written item individually
+      for (const itemContext of allItemsToTransfer) {
+        try {
+          const roomKey = `${itemContext.roomName}_ffe`;
+          const categoryKey = `${roomKey}_${itemContext.categoryName}`;
+          const subcategoryKey = `${categoryKey}_${itemContext.subcategoryName}`;
+          
+          // Create room if not exists
+          let roomId = createdStructures.get(roomKey);
+          if (!roomId) {
+            const newRoomData = {
+              name: itemContext.roomName,
+              project_id: projectId,
+              sheet_type: 'ffe',
+              description: `Transferred from checklist - ${itemContext.roomName}`
+            };
+            
+            console.log(`🏠 Creating FFE room: ${itemContext.roomName}`);
+            
+            const roomResponse = await fetch(`${backendUrl}/api/rooms`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newRoomData)
+            });
+            
+            if (roomResponse.ok) {
+              const newRoom = await roomResponse.json();
+              roomId = newRoom.id;
+              createdStructures.set(roomKey, roomId);
+              console.log(`✅ Created FFE room: ${newRoom.name}`);
+            } else {
+              console.error(`❌ Failed to create FFE room: ${itemContext.roomName}`);
+              continue;
+            }
+          }
+          
+          // Create category if not exists
+          let categoryId = createdStructures.get(categoryKey);
+          if (!categoryId) {
+            const newCategoryData = {
+              name: itemContext.categoryName,
+              room_id: roomId,
+              description: `${itemContext.categoryName} category for FFE`,
+              color: '#4A90E2',
+              order_index: 0
+            };
+            
+            console.log(`📋 Creating FFE category: ${itemContext.categoryName}`);
+            
+            const categoryResponse = await fetch(`${backendUrl}/api/categories`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newCategoryData)
+            });
+            
+            if (categoryResponse.ok) {
+              const newCategory = await categoryResponse.json();
+              categoryId = newCategory.id;
+              createdStructures.set(categoryKey, categoryId);
+              console.log(`✅ Created FFE category: ${newCategory.name}`);
+            } else {
+              console.error(`❌ Failed to create FFE category: ${itemContext.categoryName}`);
+              continue;
+            }
+          }
+          
+          // Create subcategory if not exists
+          let subcategoryId = createdStructures.get(subcategoryKey);
+          if (!subcategoryId) {
+            const newSubcategoryData = {
+              name: itemContext.subcategoryName,
+              category_id: categoryId,
+              description: `${itemContext.subcategoryName} subcategory for FFE`,
+              color: '#6BA3E6',
+              order_index: 0
+            };
+            
+            console.log(`📝 Creating FFE subcategory: ${itemContext.subcategoryName}`);
+            
+            const subcategoryResponse = await fetch(`${backendUrl}/api/subcategories`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newSubcategoryData)
+            });
+            
+            if (subcategoryResponse.ok) {
+              const newSubcategory = await subcategoryResponse.json();
+              subcategoryId = newSubcategory.id;
+              createdStructures.set(subcategoryKey, subcategoryId);
+              console.log(`✅ Created FFE subcategory: ${newSubcategory.name}`);
+            } else {
+              console.error(`❌ Failed to create FFE subcategory: ${itemContext.subcategoryName}`);
+              continue;
+            }
+          }
+          
+          // Create the FFE item
+          const newItemData = {
+            name: itemContext.item.name,
+            vendor: itemContext.item.vendor || '',
+            sku: itemContext.item.sku || '',
+            cost: itemContext.item.cost || 0,
+            size: itemContext.item.size || '',
+            finish_color: itemContext.item.finish_color || '',
+            quantity: itemContext.item.quantity || 1,
+            subcategory_id: subcategoryId,
+            status: 'APPROVED', // Set to APPROVED for FFE
+            order_index: itemContext.item.order_index || 0,
+            link: itemContext.item.link || '',
+            image_url: itemContext.item.image_url || ''
+          };
+          
+          console.log(`📦 Creating FFE item: ${itemContext.item.name}`);
+          
+          const itemResponse = await fetch(`${backendUrl}/api/items`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newItemData)
+          });
+          
+          if (itemResponse.ok) {
+            successCount++;
+            console.log(`✅ Created FFE item: ${itemContext.item.name}`);
+          } else {
+            console.error(`❌ Failed to create FFE item: ${itemContext.item.name}`);
+          }
+          
+        } catch (itemError) {
+          console.error(`❌ Error processing item ${itemContext.item.name} for FFE:`, itemError);
+        }
+      }
+
+      if (successCount > 0) {
+        alert(`✅ Successfully transferred ${successCount} ALL written items to FFE!`);
+        
+        if (onReload) {
+          onReload();
+        }
+      } else {
+        alert('❌ Failed to transfer items to FFE. Please check the console for errors.');
+      }
+
+    } catch (error) {
+      console.error('❌ Error in FFE transfer process:', error);
+      alert('❌ Failed to transfer to FFE: ' + error.message);
+    }
+  };
+
   if (!project) {
     return (
       <div className="text-center text-red-400 py-8 bg-red-900 m-4 p-4 rounded">
