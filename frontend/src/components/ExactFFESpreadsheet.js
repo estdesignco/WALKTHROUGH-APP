@@ -287,7 +287,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "${process.env.REACT_APP_BACKEND_URL}";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
