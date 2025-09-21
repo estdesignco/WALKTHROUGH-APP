@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from playwright.async_api import async_playwright
 from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE  # Add comprehensive structure import
+from enhanced_rooms_intelligent import INTELLIGENT_ROOM_STRUCTURE  # Add intelligent structure import
 import aiosmtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
