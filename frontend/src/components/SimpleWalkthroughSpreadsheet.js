@@ -848,8 +848,9 @@ const SimpleWalkthroughSpreadsheet = ({
         })}
       </div>
 
-      {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS - MATCHING OTHER SHEETS */}
-      <div className="mt-6 flex gap-3">
+      {/* BOTTOM SECTION FOOTER - ADD CATEGORY IN FOOTER AS REQUESTED */}
+      <div className="mt-8 p-4 border-t-2 border-gray-600">
+        <div className="flex gap-3 justify-center">
           <select
             value=""
             onChange={(e) => {
@@ -869,7 +870,7 @@ const SimpleWalkthroughSpreadsheet = ({
                 alert('Please add a room first before adding categories.');
               }
             }}
-            className="text-white px-4 py-2 rounded font-medium border-none outline-none" 
+            className="text-white px-6 py-3 rounded font-bold border-none outline-none text-lg" 
             style={{ backgroundColor: '#8b7355' }}
           >
             <option value="">+ ADD CATEGORY ▼</option>
@@ -887,30 +888,8 @@ const SimpleWalkthroughSpreadsheet = ({
             <option value="Surfaces & Materials">Surfaces & Materials</option>
             <option value="CREATE_NEW">+ Create New Category</option>
           </select>
-          <button 
-            onClick={handleTransferToChecklist}
-            className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
-          >
-            → TRANSFER TO CHECKLIST
-          </button>
-          <button 
-            onClick={() => {
-              // Find first available category to add blank row to
-              const firstRoom = project?.rooms?.[0];
-              const firstCategory = firstRoom?.categories?.[0];
-              
-              if (firstCategory) {
-                handleAddBlankRow(firstCategory.id);
-                console.log('🎯 Adding blank row to first available category:', firstCategory.id);
-              } else {
-                alert('Please add a category first before adding items.');
-              }
-            }}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium"
-          >
-            + ADD ITEM
-          </button>
         </div>
+      </div>
       
       {/* ADD ITEM MODAL */}
       {showAddItem && (
