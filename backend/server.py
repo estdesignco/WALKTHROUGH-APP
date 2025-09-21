@@ -1872,9 +1872,9 @@ async def create_comprehensive_category(category: CategoryCreate):
         # Now populate with comprehensive structure
         category_name = category.name
         
-        # Find the category in the intelligent structure
-        intelligent_data = None
-        for room_name, room_structure in INTELLIGENT_ROOM_STRUCTURE.items():
+        # Find the category in the comprehensive structure
+        comprehensive_data = None
+        for room_name, room_structure in COMPREHENSIVE_ROOM_STRUCTURE.items():
             if category_name in room_structure:
                 intelligent_data = room_structure[category_name]
                 break
