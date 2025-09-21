@@ -52,7 +52,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     try {
       console.log('🚀 Loading project data for:', projectId);
       
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`);
       
       if (response.ok) {
         const projectData = await response.json();
