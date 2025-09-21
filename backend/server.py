@@ -1666,8 +1666,10 @@ async def create_room(room_data: RoomCreate):
         
         # Map room names to structure keys
         room_name_mapping = {
-            "master bathroom": "primary bathroom",
-            "master bedroom": "primary bedroom"
+            "primary bathroom": "primary bathroom",
+            "primary bedroom": "primary bedroom",
+            "master bathroom": "primary bathroom",  # Legacy support
+            "master bedroom": "primary bedroom"     # Legacy support
         }
         structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
         
