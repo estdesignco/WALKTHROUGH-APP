@@ -1923,13 +1923,13 @@ async def create_comprehensive_category(category: CategoryCreate):
 
 @api_router.get("/categories/available")
 async def get_available_categories():
-    """Get all available category names from the comprehensive room structure"""
+    """Get all available category names from the intelligent room structure"""
     try:
         from enhanced_rooms_intelligent import INTELLIGENT_ROOM_STRUCTURE
         
-        # Collect all unique category names from the comprehensive structure - NEW FORMAT
+        # Collect all unique category names from the intelligent structure - NEW FORMAT
         all_categories = set()
-        for room_name, room_structure in COMPREHENSIVE_ROOM_STRUCTURE.items():
+        for room_name, room_structure in INTELLIGENT_ROOM_STRUCTURE.items():
             categories_list = room_structure.get("categories", [])
             for category_obj in categories_list:
                 category_name = category_obj.get("name", "")
