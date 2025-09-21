@@ -105,7 +105,8 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
       const newRoom = {
         ...roomData,
         project_id: projectId,
-        order_index: project.rooms.length
+        order_index: project.rooms.length,
+        sheet_type: 'walkthrough'  // Make rooms independent per sheet
       };
       
       console.log('🏠 Creating room with data:', newRoom);
