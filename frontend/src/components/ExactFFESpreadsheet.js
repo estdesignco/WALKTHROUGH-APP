@@ -77,7 +77,7 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
