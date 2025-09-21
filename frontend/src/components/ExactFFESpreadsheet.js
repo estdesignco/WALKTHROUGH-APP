@@ -365,7 +365,7 @@ const ExactFFESpreadsheet = ({
       console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
       
       // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/rooms`, {
+      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
