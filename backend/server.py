@@ -1571,7 +1571,7 @@ async def get_projects():
     return result
 
 @api_router.get("/projects/{project_id}")
-async def get_project(project_id: str, sheet_type: str = "walkthrough"):
+async def get_project(project_id: str, sheet_type: str = None):
     project_data = await db.projects.find_one({"id": project_id})
     if not project_data:
         raise HTTPException(status_code=404, detail="Project not found")
