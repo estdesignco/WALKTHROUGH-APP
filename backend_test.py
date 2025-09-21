@@ -45,11 +45,11 @@ def get_backend_url():
 BASE_URL = get_backend_url() + "/api"
 
 print("=" * 80)
-print("🚨 CREATE TEST PROJECT FOR PREVIEW - URGENT")
+print("🚨 CRITICAL SYSTEM RECOVERY TESTING - MONGODB FIXED")
 print("=" * 80)
 print(f"Backend URL: {BASE_URL}")
-print("Creating: Modern Farmhouse Renovation - Sarah & Mike Thompson")
-print("Goal: Comprehensive test project with realistic data for immediate preview")
+print("Goal: Verify ALL core backend functionality after MongoDB infrastructure fix")
+print("Testing: Project APIs, Room Creation, Categories, Items, Transfer, Scraping, Status Management")
 print("=" * 80)
 
 class TestProjectCreator:
