@@ -413,49 +413,35 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const handleTransferToChecklist = async () => {
     try {
-      console.log('🚀 TRANSFER TO CHECKLIST: DEBUGGING CHECKED ITEMS');
-      console.log('📊 Raw checkedItems:', checkedItems);
-      console.log('📊 checkedItems type:', typeof checkedItems);
-      console.log('📊 checkedItems instanceof Set:', checkedItems instanceof Set);
-      console.log('📊 Array.from(checkedItems):', Array.from(checkedItems));
+      console.log('🚀 TRANSFER TO CHECKLIST: ONLY CHECKED ITEMS - FIXED VERSION');
+      console.log('📊 checkedItems:', checkedItems);
       console.log('📊 checkedItems.size:', checkedItems.size);
-      
-      // FORCE DEBUG - Show all items and their checkbox status
-      console.log('🔍 DEBUG: Checking all items in project...');
-      let totalItems = 0;
-      let checkedCount = 0;
-      
-      if (filteredProject?.rooms) {
-        filteredProject.rooms.forEach(room => {
-          room.categories?.forEach(category => {
-            category.subcategories?.forEach(subcategory => {
-              subcategory.items?.forEach(item => {
-                totalItems++;
-                const isChecked = checkedItems.has(item.id);
-                if (isChecked) checkedCount++;
-                console.log(`📦 Item: "${item.name}" (ID: ${item.id}) - CHECKED: ${isChecked}`);
-              });
-            });
-          });
-        });
-      }
-      
-      console.log(`📊 SUMMARY: ${checkedCount} checked out of ${totalItems} total items`);
+      console.log('📊 Array.from(checkedItems):', Array.from(checkedItems));
       
       if (checkedItems.size === 0) {
-        alert(`❌ No items are checked for transfer!\n\nFound ${totalItems} total items in project, but 0 are checked.\n\nPlease check the items you want to transfer first.`);
+        alert('No items are checked for transfer. Please check the items you want to transfer first.');
         return;
       }
       
-      // Show user exactly what will be transferred
-      const checkedItemsList = [];
+      // STEP 1: Find ONLY the checked items
+      const itemsToTransfer = [];
+      
       if (filteredProject?.rooms) {
         filteredProject.rooms.forEach(room => {
           room.categories?.forEach(category => {
             category.subcategories?.forEach(subcategory => {
               subcategory.items?.forEach(item => {
+                // CRITICAL FIX: Only process if item is actually checked
                 if (checkedItems.has(item.id)) {
-                  checkedItemsList.push(`${room.name} > ${category.name} > ${subcategory.name} > ${item.name}`);
+                  console.log(`✅ CHECKED ITEM: ${item.name} (ID: ${item.id})`);
+                  itemsToTransfer.push({
+                    item,
+                    roomName: room.name,
+                    categoryName: category.name,
+                    subcategoryName: subcategory.name
+                  });
+                } else {
+                  console.log(`❌ SKIPPED: ${item.name} (not checked)`);
                 }
               });
             });
@@ -463,217 +449,146 @@ const SimpleWalkthroughSpreadsheet = ({
         });
       }
       
-      console.log('🎯 ITEMS TO TRANSFER:', checkedItemsList);
+      console.log(`🎯 FINAL COUNT: ${itemsToTransfer.length} items to transfer`);
       
-      if (checkedItemsList.length === 0) {
-        alert('❌ No valid checked items found for transfer. The checkboxes might not be working correctly.');
+      if (itemsToTransfer.length === 0) {
+        alert('No checked items found. Please check some items first.');
         return;
       }
 
-      // Confirm with user before transfer
-      const confirmMessage = `You are about to transfer these ${checkedItemsList.length} CHECKED items to Checklist:\n\n${checkedItemsList.join('\n')}\n\nContinue?`;
-      
-      if (!confirm(confirmMessage)) {
-        console.log('❌ Transfer cancelled by user');
+      // Confirm transfer
+      if (!confirm(`Transfer ${itemsToTransfer.length} checked items to Checklist?`)) {
         return;
       }
 
-      // Step 2: Transfer ONLY the confirmed checked items
+      // STEP 2: Transfer ONLY the checked items
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const projectId = filteredProject.id;
       
       let successCount = 0;
       const createdStructures = new Map();
-      
-      console.log(`🏗️ Creating structure for EXACTLY ${checkedItemsList.length} checked items`);
 
-      // Process each checked item
-      for (const itemPath of checkedItemsList) {
-        // Extract item from path
-        const [roomName, categoryName, subcategoryName, itemName] = itemPath.split(' > ');
-        
-        // Find the actual item object
-        let itemToTransfer = null;
-        let roomId = null, categoryId = null, subcategoryId = null;
-        
-        if (filteredProject?.rooms) {
-          filteredProject.rooms.forEach(room => {
-            if (room.name === roomName) {
-              room.categories?.forEach(category => {
-                if (category.name === categoryName) {
-                  category.subcategories?.forEach(subcategory => {
-                    if (subcategory.name === subcategoryName) {
-                      subcategory.items?.forEach(item => {
-                        if (item.name === itemName && checkedItems.has(item.id)) {
-                          itemToTransfer = item;
-                          roomId = room.id;
-                          categoryId = category.id;
-                          subcategoryId = subcategory.id;
-                        }
-                      });
-                    }
-                  });
-                }
-              });
-            }
-          });
-        }
-        
-        if (!itemToTransfer) {
-          console.error(`❌ Could not find item: ${itemName}`);
-          continue;
-        }
-        
+      for (const itemData of itemsToTransfer) {
         try {
-          console.log(`🔄 Processing ONLY checked item: ${itemToTransfer.name}`);
+          const roomKey = `${itemData.roomName}_checklist`;
+          const categoryKey = `${roomKey}_${itemData.categoryName}`;
+          const subcategoryKey = `${categoryKey}_${itemData.subcategoryName}`;
           
-          const roomKey = `${roomName}_checklist`;
-          const categoryKey = `${roomKey}_${categoryName}`;
-          const subcategoryKey = `${categoryKey}_${subcategoryName}`;
-          
-          // Create room if not exists
-          let newRoomId = createdStructures.get(roomKey);
-          if (!newRoomId) {
-            const newRoomData = {
-              name: roomName,
-              project_id: projectId,
-              sheet_type: 'checklist',
-              description: `Transferred from walkthrough - ${roomName}`
-            };
-            
-            console.log(`🏠 Creating checklist room: ${roomName}`);
-            
+          // Create room if needed
+          let roomId = createdStructures.get(roomKey);
+          if (!roomId) {
             const roomResponse = await fetch(`${backendUrl}/api/rooms`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(newRoomData)
+              body: JSON.stringify({
+                name: itemData.roomName,
+                project_id: projectId,
+                sheet_type: 'checklist',
+                description: `Transferred from walkthrough`
+              })
             });
             
             if (roomResponse.ok) {
               const newRoom = await roomResponse.json();
-              newRoomId = newRoom.id;
-              createdStructures.set(roomKey, newRoomId);
-              console.log(`✅ Created room: ${newRoom.name}`);
+              roomId = newRoom.id;
+              createdStructures.set(roomKey, roomId);
             } else {
-              console.error(`❌ Failed to create room: ${roomName}`);
+              console.error(`Failed to create room: ${itemData.roomName}`);
               continue;
             }
           }
           
-          // Create category if not exists
-          let newCategoryId = createdStructures.get(categoryKey);
-          if (!newCategoryId) {
-            const newCategoryData = {
-              name: categoryName,
-              room_id: newRoomId,
-              description: `${categoryName} category`,
-              color: '#4A90E2',
-              order_index: 0
-            };
-            
-            console.log(`📋 Creating category: ${categoryName}`);
-            
+          // Create category if needed
+          let categoryId = createdStructures.get(categoryKey);
+          if (!categoryId) {
             const categoryResponse = await fetch(`${backendUrl}/api/categories`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(newCategoryData)
+              body: JSON.stringify({
+                name: itemData.categoryName,
+                room_id: roomId,
+                description: '',
+                color: '#4A90E2',
+                order_index: 0
+              })
             });
             
             if (categoryResponse.ok) {
               const newCategory = await categoryResponse.json();
-              newCategoryId = newCategory.id;
-              createdStructures.set(categoryKey, newCategoryId);
-              console.log(`✅ Created category: ${newCategory.name}`);
+              categoryId = newCategory.id;
+              createdStructures.set(categoryKey, categoryId);
             } else {
-              console.error(`❌ Failed to create category: ${categoryName}`);
+              console.error(`Failed to create category: ${itemData.categoryName}`);
               continue;
             }
           }
           
-          // Create subcategory if not exists
-          let newSubcategoryId = createdStructures.get(subcategoryKey);
-          if (!newSubcategoryId) {
-            const newSubcategoryData = {
-              name: subcategoryName,
-              category_id: newCategoryId,
-              description: `${subcategoryName} subcategory`,
-              color: '#6BA3E6',
-              order_index: 0
-            };
-            
-            console.log(`📝 Creating subcategory: ${subcategoryName}`);
-            
+          // Create subcategory if needed
+          let subcategoryId = createdStructures.get(subcategoryKey);
+          if (!subcategoryId) {
             const subcategoryResponse = await fetch(`${backendUrl}/api/subcategories`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(newSubcategoryData)
+              body: JSON.stringify({
+                name: itemData.subcategoryName,
+                category_id: categoryId,
+                description: '',
+                color: '#6BA3E6',
+                order_index: 0
+              })
             });
             
             if (subcategoryResponse.ok) {
               const newSubcategory = await subcategoryResponse.json();
-              newSubcategoryId = newSubcategory.id;
-              createdStructures.set(subcategoryKey, newSubcategoryId);
-              console.log(`✅ Created subcategory: ${newSubcategory.name}`);
+              subcategoryId = newSubcategory.id;
+              createdStructures.set(subcategoryKey, subcategoryId);
             } else {
-              console.error(`❌ Failed to create subcategory: ${subcategoryName}`);
+              console.error(`Failed to create subcategory: ${itemData.subcategoryName}`);
               continue;
             }
           }
           
-          // Create the SPECIFIC CHECKED item
-          const newItemData = {
-            name: itemToTransfer.name,
-            vendor: itemToTransfer.vendor || '',
-            sku: itemToTransfer.sku || '',
-            cost: itemToTransfer.cost || 0,
-            size: itemToTransfer.size || '',
-            finish_color: itemToTransfer.finish_color || '',
-            quantity: itemToTransfer.quantity || 1,
-            subcategory_id: newSubcategoryId,
-            status: 'PICKED',
-            order_index: itemToTransfer.order_index || 0
-          };
-          
-          console.log(`📦 Creating SPECIFIC CHECKED item: ${itemToTransfer.name}`);
-          
+          // Create the item
           const itemResponse = await fetch(`${backendUrl}/api/items`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newItemData)
+            body: JSON.stringify({
+              name: itemData.item.name,
+              vendor: itemData.item.vendor || '',
+              sku: itemData.item.sku || '',
+              cost: itemData.item.cost || 0,
+              size: itemData.item.size || '',
+              finish_color: '', // COMPLETELY BLANK as requested
+              quantity: itemData.item.quantity || 1,
+              subcategory_id: subcategoryId,
+              status: 'PICKED',
+              order_index: 0
+            })
           });
           
           if (itemResponse.ok) {
             successCount++;
-            console.log(`✅ SUCCESS: Created checked item: ${itemToTransfer.name}`);
+            console.log(`✅ Created: ${itemData.item.name}`);
           } else {
-            const errorText = await itemResponse.text();
-            console.error(`❌ Failed to create item: ${itemToTransfer.name} - ${errorText}`);
+            console.error(`❌ Failed to create: ${itemData.item.name}`);
           }
           
-        } catch (itemError) {
-          console.error(`❌ Error processing checked item ${itemName}:`, itemError);
+        } catch (error) {
+          console.error(`❌ Error processing ${itemData.item.name}:`, error);
         }
       }
 
-      console.log(`🎯 TRANSFER COMPLETE: ${successCount} out of ${checkedItemsList.length} checked items transferred`);
-
       if (successCount > 0) {
-        alert(`✅ Successfully transferred ${successCount} CHECKED items to Checklist!\n\nItems transferred:\n${checkedItemsList.slice(0, 10).join('\n')}${checkedItemsList.length > 10 ? '\n... and more' : ''}`);
-        
-        // Clear checked items after successful transfer
-        console.log('🧹 Clearing checked items after successful transfer');
-        setCheckedItems(new Set());
-        
-        if (onReload) {
-          onReload();
-        }
+        alert(`✅ Successfully transferred ${successCount} CHECKED items to Checklist!`);
+        setCheckedItems(new Set()); // Clear checkboxes
+        if (onReload) onReload();
       } else {
-        alert('❌ Failed to transfer checked items. Please check the console for errors.');
+        alert('❌ Failed to transfer items.');
       }
 
     } catch (error) {
-      console.error('❌ Error in transfer process:', error);
-      alert('❌ Failed to transfer to checklist: ' + error.message);
+      console.error('❌ Transfer error:', error);
+      alert('❌ Transfer failed: ' + error.message);
     }
   };
   const handleDeleteItem = async (itemId) => {
