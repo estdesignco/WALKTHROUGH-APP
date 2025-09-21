@@ -52,7 +52,7 @@ ROOM_COLORS = {
     "bathroom": "#6A8A5A",           # Muted sage
     "master bathroom": "#8A6A5A",    # Muted tan
     "primary bathroom": "#6A5A8A",   # Muted lavender
-    "powder room": "#5A8A6A",        # Muted teal
+    "powder room": "#5A8A6A",        # Muted teal - DIFFERENT FROM LIVING ROOM
     "dining room": "#8A7A5A",        # Muted bronze
     "office": "#5A5A8A",             # Muted indigo
     "family room": "#7A5A6A",        # Muted mauve
@@ -64,7 +64,7 @@ ROOM_COLORS = {
     "guest room": "#8A5A6A",         # Muted dusty rose
     "playroom": "#6A7A5A",           # Muted moss
     "library": "#5A8A7A",            # Muted jade
-    "wine cellar": "#7A5A8A",        # Muted amethyst
+    "wine cellar": "#9A6A8A",        # UNIQUE - Different from living room
     "garage": "#8A7A6A",             # Muted khaki
     "patio": "#6A8A7A"               # Muted seafoam
 }
