@@ -54,7 +54,7 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
       console.log('🚀 Loading project data for:', projectId);
       
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-      const response = await fetch(`${BACKEND_URL}/api/projects/${projectId}`);
+      const response = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=ffe`);
       
       if (response.ok) {
         const projectData = await response.json();
