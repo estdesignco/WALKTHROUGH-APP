@@ -729,21 +729,80 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
     "primary bathroom": {
         "categories": [
             {
-                "name": "Lighting",
-                "color": "#7B68AA",
+                "name": "Plumbing & Fixtures",
+                "color": "#20B2AA",
                 "subcategories": [
                     {
-                        "name": "INSTALLED",
-                        "color": "#9B89B3",
+                        "name": "VANITY FIXTURES",
+                        "color": "#48D1CC",
                         "items": [
-                            {"name": "Vanity Lights (Over Mirror)", "finish_color": "Chrome/Brushed Nickel/Black/Brass"},
-                            {"name": "Sconces (Side of Mirror)", "finish_color": "Various Finishes"},
-                            {"name": "Recessed Lighting (Dimmable)", "finish_color": "White/Nickel"},
-                            {"name": "Shower Light", "finish_color": "White/Nickel"},
-                            {"name": "Toilet Area Light", "finish_color": "White/Nickel"},
-                            {"name": "Chandelier/Pendant (Freestanding Tub)", "finish_color": "Crystal/Metal"},
-                            {"name": "Exhaust Fan w/ Light", "finish_color": "White/Nickel"},
-                            {"name": "Under Vanity Lighting", "finish_color": "White/Warm White"}
+                            {"name": "Vanity Sink", "finish_color": ""},
+                            {"name": "Vanity Faucet", "finish_color": ""},
+                            {"name": "Vanity Mirror", "finish_color": ""},
+                            {"name": "Vanity Cabinet", "finish_color": ""},
+                            {"name": "Vanity Countertop", "finish_color": ""}
+                        ]
+                    },
+                    {
+                        "name": "BATHING FIXTURES",
+                        "color": "#48D1CC",
+                        "items": [
+                            {"name": "Bathtub", "finish_color": ""},
+                            {"name": "Shower Base", "finish_color": ""},
+                            {"name": "Shower Valve", "finish_color": ""},
+                            {"name": "Shower Head", "finish_color": ""},
+                            {"name": "Shower Doors", "finish_color": ""},
+                            {"name": "Tub Faucet", "finish_color": ""}
+                        ]
+                    },
+                    {
+                        "name": "TOILET FIXTURES",
+                        "color": "#48D1CC",
+                        "items": [
+                            {"name": "Toilet", "finish_color": ""},
+                            {"name": "Toilet Seat", "finish_color": ""},
+                            {"name": "Bidet", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Cabinets & Storage",
+                "color": "#8B4513",
+                "subcategories": [
+                    {
+                        "name": "VANITY CABINETS",
+                        "color": "#A0522D",
+                        "items": [
+                            {"name": "Vanity Base Cabinet", "finish_color": ""},
+                            {"name": "Vanity Drawers", "finish_color": ""},
+                            {"name": "Medicine Cabinet", "finish_color": ""},
+                            {"name": "Linen Cabinet", "finish_color": ""},
+                            {"name": "Tower Cabinet", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Lighting",
+                "color": "#FFD700",
+                "subcategories": [
+                    {
+                        "name": "VANITY LIGHTING",
+                        "color": "#FFED4E",
+                        "items": [
+                            {"name": "Vanity Lights", "finish_color": ""},
+                            {"name": "Mirror Lights", "finish_color": ""},
+                            {"name": "Sconces", "finish_color": ""}
+                        ]
+                    },
+                    {
+                        "name": "AMBIENT LIGHTING", 
+                        "color": "#FFED4E",
+                        "items": [
+                            {"name": "Recessed Lights", "finish_color": ""},
+                            {"name": "Exhaust Fan Light", "finish_color": ""},
+                            {"name": "Shower Light", "finish_color": ""}
                         ]
                     }
                 ]
