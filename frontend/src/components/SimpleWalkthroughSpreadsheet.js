@@ -809,37 +809,45 @@ const SimpleWalkthroughSpreadsheet = ({
                                       <td className="border border-gray-400 px-1 py-1 text-center w-6">
                                         <input type="checkbox" className="w-6 h-6 cursor-pointer" />
                                       </td>
-                                      <td className="border border-gray-400 px-1 py-1">
-                                        <input 
-                                          type="text"
-                                          value={item.name || ''}
-                                          className="w-full bg-transparent text-white text-sm outline-none border-none"
-                                          onChange={(e) => console.log('Item name updated:', e.target.value)}
-                                        />
+                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                        <div 
+                                          contentEditable
+                                          suppressContentEditableWarning={true}
+                                          className="w-full bg-transparent text-white text-sm outline-none"
+                                          onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
+                                        >
+                                          {item.name}
+                                        </div>
                                       </td>
-                                      <td className="border border-gray-400 px-1 py-1 w-16">
-                                        <input 
-                                          type="number"
-                                          value={item.quantity || 1}
-                                          className="w-full bg-transparent text-white text-sm outline-none border-none text-center"
-                                          onChange={(e) => console.log('Quantity updated:', e.target.value)}
-                                        />
+                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">
+                                        <div 
+                                          contentEditable
+                                          suppressContentEditableWarning={true}
+                                          className="w-full bg-transparent text-white text-sm outline-none text-center"
+                                          onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
+                                        >
+                                          {item.quantity || 1}
+                                        </div>
                                       </td>
-                                      <td className="border border-gray-400 px-1 py-1">
-                                        <input 
-                                          type="text"
-                                          value={item.size || ''}
-                                          className="w-full bg-transparent text-white text-sm outline-none border-none"
-                                          onChange={(e) => console.log('Size updated:', e.target.value)}
-                                        />
+                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                        <div 
+                                          contentEditable
+                                          suppressContentEditableWarning={true}
+                                          className="w-full bg-transparent text-white text-sm outline-none"
+                                          onBlur={(e) => console.log('Size updated:', e.target.textContent)}
+                                        >
+                                          {item.size || ''}
+                                        </div>
                                       </td>
-                                      <td className="border border-gray-400 px-1 py-1">
-                                        <input 
-                                          type="text"
-                                          value={item.finish_color || ''}
-                                          className="w-full bg-transparent text-white text-sm outline-none border-none"
-                                          onChange={(e) => console.log('Finish/Color updated:', e.target.value)}
-                                        />
+                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                        <div 
+                                          contentEditable
+                                          suppressContentEditableWarning={true}
+                                          className="w-full bg-transparent text-white text-sm outline-none"
+                                          onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
+                                        >
+                                          {item.finish_color || ''}
+                                        </div>
                                       </td>
                                       <td className="border border-gray-400 px-1 py-1 text-center w-12">
                                         <button 
