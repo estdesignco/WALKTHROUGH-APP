@@ -465,22 +465,19 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const handleTransferToChecklist = async () => {
     try {
-      console.log('🚀 Starting transfer from Walkthrough to Checklist');
+      console.log('🚀 Starting transfer from Walkthrough to Checklist - CHECKED ITEMS ONLY');
       
-      // Get all items from current walkthrough project
-      const allItems = [];
+      // Get ONLY CHECKED items from current walkthrough project
+      const checkedItemsToTransfer = [];
       
       if (filteredProject?.rooms) {
         filteredProject.rooms.forEach(room => {
           room.categories?.forEach(category => {
             category.subcategories?.forEach(subcategory => {
               subcategory.items?.forEach(item => {
-                if (item.name && item.name !== 'New Item') {  // Only transfer real items
-                  allItems.push({
-                    ...item,
-                    status: 'PICKED',  // Set status to PICKED for checklist
-                    source_sheet: 'walkthrough'
-                  });
+                // ONLY transfer CHECKED items
+                if (checkedItems.has(item.id) && item.name && item.name !== 'New Item') {
+                  checkedItemsToTransfer.push(item);
                 }
               });
             });
@@ -488,49 +485,67 @@ const SimpleWalkthroughSpreadsheet = ({
         });
       }
 
-      console.log(`📝 Found ${allItems.length} items to transfer`);
+      console.log(`📝 Found ${checkedItemsToTransfer.length} CHECKED items to transfer`);
+      console.log(`✅ Checked items IDs:`, Array.from(checkedItems));
 
-      if (allItems.length === 0) {
-        alert('No items found to transfer. Please add some items first.');
+      if (checkedItemsToTransfer.length === 0) {
+        alert('No items are checked for transfer. Please check the items you want to transfer first.');
         return;
       }
 
-      // Transfer each item to checklist by updating status
+      // Create NEW copies of items for checklist sheet_type
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       let successCount = 0;
 
-      for (const item of allItems) {
+      for (const item of checkedItemsToTransfer) {
         try {
-          const response = await fetch(`${backendUrl}/api/items/${item.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              ...item,
-              status: 'PICKED',
-              transferred_from: 'walkthrough',
-              transferred_at: new Date().toISOString()
-            })
+          // Create a NEW item copy for checklist (different sheet_type)
+          const newItemForChecklist = {
+            name: item.name,
+            vendor: item.vendor || '',
+            sku: item.sku || '',
+            cost: item.cost || 0,
+            size: item.size || '',
+            finish_color: item.finish_color || '',
+            quantity: item.quantity || 1,
+            subcategory_id: item.subcategory_id,
+            status: 'PICKED',  // Set to PICKED for checklist
+            sheet_type: 'checklist'  // IMPORTANT: Set sheet_type for independence
+          };
+
+          console.log(`📦 Creating checklist copy of: ${item.name}`);
+
+          const response = await fetch(`${backendUrl}/api/items`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newItemForChecklist)
           });
 
           if (response.ok) {
             successCount++;
+            console.log(`✅ Successfully transferred: ${item.name}`);
           } else {
-            console.error(`❌ Failed to transfer item ${item.name}`);
+            console.error(`❌ Failed to transfer: ${item.name}`);
           }
         } catch (error) {
           console.error(`❌ Error transferring item ${item.name}:`, error);
         }
       }
 
-      alert(`✅ Successfully transferred ${successCount} items from Walkthrough to Checklist!`);
+      alert(`✅ Successfully transferred ${successCount} CHECKED items from Walkthrough to Checklist!`);
+      
+      // Clear checked items after successful transfer
+      setCheckedItems(new Set());
       
       if (onReload) {
         onReload();
       }
 
     } catch (error) {
-      console.error('❌ Transfer error:', error);
-      alert('Transfer failed: ' + error.message);
+      console.error('❌ Error in transfer process:', error);
+      alert('❌ Failed to transfer items to checklist');
     }
   };
   const handleDeleteItem = async (itemId) => {
