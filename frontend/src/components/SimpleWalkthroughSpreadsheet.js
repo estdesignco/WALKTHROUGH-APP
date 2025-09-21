@@ -413,32 +413,51 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const handleTransferToChecklist = async () => {
     try {
-      console.log('🚀 TRANSFER TO CHECKLIST: ONLY CHECKED ITEMS (Fixed)');
+      console.log('🚀 TRANSFER TO CHECKLIST: ONLY CHECKED ITEMS (Google Apps Script Logic)');
+      console.log('📊 Current checkedItems Set:', Array.from(checkedItems));
+      console.log('📊 checkedItems.size:', checkedItems.size);
       
       if (checkedItems.size === 0) {
         alert('No items are checked for transfer. Please check the items you want to transfer first.');
         return;
       }
       
-      // Step 1: Collect ONLY the checked items with their context
+      // Step 1: Following Google Apps Script logic - scan ONLY checked items
       const checkedItemsToTransfer = [];
+      
+      console.log('🔍 Scanning all items to find checked ones...');
       
       if (filteredProject?.rooms) {
         filteredProject.rooms.forEach(room => {
+          console.log(`🏠 Checking room: ${room.name}`);
           room.categories?.forEach(category => {
+            console.log(`  📋 Checking category: ${category.name}`);
             category.subcategories?.forEach(subcategory => {
+              console.log(`    📝 Checking subcategory: ${subcategory.name}`);
               subcategory.items?.forEach(item => {
-                // ONLY process if this specific item is checked
-                if (checkedItems.has(item.id) && item.name && item.name !== 'New Item') {
-                  checkedItemsToTransfer.push({
-                    item,
-                    roomId: room.id,
-                    roomName: room.name,
-                    categoryId: category.id,
-                    categoryName: category.name,
-                    subcategoryId: subcategory.id,
-                    subcategoryName: subcategory.name
-                  });
+                console.log(`      📦 Item: ${item.name}, ID: ${item.id}, Checked: ${checkedItems.has(item.id)}`);
+                
+                // EXACT Google Apps Script logic: if (checkboxValue === true)
+                if (checkedItems.has(item.id)) {
+                  console.log(`        ✅ CHECKED ITEM FOUND: ${item.name}`);
+                  
+                  // Additional validation like Google Apps Script
+                  if (item.name && item.name.trim() !== '' && item.name !== 'New Item') {
+                    checkedItemsToTransfer.push({
+                      item,
+                      roomId: room.id,
+                      roomName: room.name,
+                      categoryId: category.id,
+                      categoryName: category.name,
+                      subcategoryId: subcategory.id,
+                      subcategoryName: subcategory.name
+                    });
+                    console.log(`        ✅ ADDED TO TRANSFER LIST: ${item.name}`);
+                  } else {
+                    console.log(`        ⚠️ SKIPPED (invalid name): ${item.name}`);
+                  }
+                } else {
+                  console.log(`        ❌ NOT CHECKED: ${item.name}`);
                 }
               });
             });
@@ -446,26 +465,36 @@ const SimpleWalkthroughSpreadsheet = ({
         });
       }
       
-      console.log(`📝 EXACT COUNT: ${checkedItemsToTransfer.length} CHECKED items to transfer`);
-      console.log('📋 Checked items:', checkedItemsToTransfer.map(ci => ci.item.name));
+      console.log(`🎯 FINAL TRANSFER LIST: ${checkedItemsToTransfer.length} CHECKED items`);
+      console.log('📋 Items to transfer:', checkedItemsToTransfer.map(ci => ci.item.name));
 
       if (checkedItemsToTransfer.length === 0) {
-        alert('No valid checked items found for transfer.');
+        alert('No valid checked items found for transfer. Please check items first.');
         return;
       }
 
-      // Step 2: Transfer ONLY the checked items (create minimal structure as needed)
+      // Confirm with user before transfer
+      const confirmMessage = `You are about to transfer ${checkedItemsToTransfer.length} CHECKED items to Checklist:\n\n${checkedItemsToTransfer.map(ci => `• ${ci.item.name}`).join('\n')}\n\nContinue?`;
+      
+      if (!confirm(confirmMessage)) {
+        console.log('❌ Transfer cancelled by user');
+        return;
+      }
+
+      // Step 2: Transfer ONLY the confirmed checked items
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const projectId = filteredProject.id;
       
       let successCount = 0;
       const createdStructures = new Map(); // Track what we've already created
       
-      console.log(`🏗️ Creating minimal structure for ONLY ${checkedItemsToTransfer.length} checked items`);
+      console.log(`🏗️ Creating structure for EXACTLY ${checkedItemsToTransfer.length} checked items`);
 
-      // Process each checked item individually
+      // Process each checked item individually (like Google Apps Script)
       for (const itemContext of checkedItemsToTransfer) {
         try {
+          console.log(`🔄 Processing checked item: ${itemContext.item.name}`);
+          
           const roomKey = `${itemContext.roomName}_checklist`;
           const categoryKey = `${roomKey}_${itemContext.categoryName}`;
           const subcategoryKey = `${categoryKey}_${itemContext.subcategoryName}`;
@@ -559,7 +588,7 @@ const SimpleWalkthroughSpreadsheet = ({
             }
           }
           
-          // Create the CHECKED item
+          // Create the SPECIFIC CHECKED item
           const newItemData = {
             name: itemContext.item.name,
             vendor: itemContext.item.vendor || '',
@@ -573,7 +602,7 @@ const SimpleWalkthroughSpreadsheet = ({
             order_index: itemContext.item.order_index || 0
           };
           
-          console.log(`📦 Creating CHECKED item: ${itemContext.item.name}`);
+          console.log(`📦 Creating SPECIFIC CHECKED item: ${itemContext.item.name}`);
           
           const itemResponse = await fetch(`${backendUrl}/api/items`, {
             method: 'POST',
@@ -583,9 +612,10 @@ const SimpleWalkthroughSpreadsheet = ({
           
           if (itemResponse.ok) {
             successCount++;
-            console.log(`✅ Created CHECKED item: ${itemContext.item.name}`);
+            console.log(`✅ SUCCESS: Created checked item: ${itemContext.item.name}`);
           } else {
-            console.error(`❌ Failed to create item: ${itemContext.item.name}`);
+            const errorText = await itemResponse.text();
+            console.error(`❌ Failed to create item: ${itemContext.item.name} - ${errorText}`);
           }
           
         } catch (itemError) {
@@ -593,10 +623,13 @@ const SimpleWalkthroughSpreadsheet = ({
         }
       }
 
+      console.log(`🎯 TRANSFER COMPLETE: ${successCount} out of ${checkedItemsToTransfer.length} checked items transferred`);
+
       if (successCount > 0) {
-        alert(`✅ Successfully transferred ${successCount} CHECKED items to Checklist!`);
+        alert(`✅ Successfully transferred ${successCount} CHECKED items to Checklist!\n\nItems transferred:\n${checkedItemsToTransfer.slice(0, 10).map(ci => `• ${ci.item.name}`).join('\n')}${checkedItemsToTransfer.length > 10 ? '\n... and more' : ''}`);
         
-        // Clear checked items after successful transfer
+        // Clear checked items after successful transfer (like Google Apps Script)
+        console.log('🧹 Clearing checked items after successful transfer');
         setCheckedItems(new Set());
         
         if (onReload) {
