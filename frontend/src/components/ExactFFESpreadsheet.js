@@ -1017,31 +1017,28 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
-                                                          {/* QTY - PROPER INPUT FIELD */}
+                                                          {/* QTY */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
-                                                            <input 
-                                                              type="number" 
-                                                              value={item.quantity || 1}
-                                                              className="w-full bg-transparent text-white text-sm text-center outline-none border-none"
-                                                              onChange={(e) => {
-                                                                handleItemFieldChange(item.id, 'quantity', parseInt(e.target.value) || 1);
-                                                              }}
-                                                              onBlur={(e) => console.log('Quantity updated:', e.target.value)}
-                                                            />
+                                                            <div 
+                                                              contentEditable
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm text-center outline-none"
+                                                              onBlur={(e) => handleItemFieldChange(item.id, 'quantity', parseInt(e.target.textContent) || 1)}
+                                                            >
+                                                              {item.quantity || 1}
+                                                            </div>
                                                           </td>
                                                           
-                                                          {/* SIZE - PROPER INPUT FIELD */}
+                                                          {/* SIZE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <input 
-                                                              type="text" 
-                                                              value={item.size || ''}
-                                                              placeholder="Size"
-                                                              className="w-full bg-transparent text-white text-sm outline-none border-none"
-                                                              onChange={(e) => {
-                                                                handleItemFieldChange(item.id, 'size', e.target.value);
-                                                              }}
-                                                              onBlur={(e) => console.log('Size updated:', e.target.value)}
-                                                            />
+                                                            <div 
+                                                              contentEditable
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm outline-none"
+                                                              onBlur={(e) => handleItemFieldChange(item.id, 'size', e.target.textContent)}
+                                                            >
+                                                              {item.size || ''}
+                                                            </div>
                                                           </td>
                                                           
                                                           {/* FINISH/Color */}
