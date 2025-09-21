@@ -1048,7 +1048,7 @@ const ExactFFESpreadsheet = ({
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             <input 
                                                               type="text" 
-                                                              value={item.finish_color || ''}
+                                                              value={item.finish_color || 'Natural'}
                                                               placeholder="Finish/Color"
                                                               className="w-full bg-transparent text-white text-sm outline-none border-none"
                                                               onChange={(e) => {
