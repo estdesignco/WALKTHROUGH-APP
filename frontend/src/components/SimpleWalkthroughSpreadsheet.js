@@ -527,28 +527,33 @@ const SimpleWalkthroughSpreadsheet = ({
         }
       });
 
-      console.log('📡 Delete response status:', response.status);
+      console.log('📡 Delete response status:', response.status, response.statusText);
 
       if (response.ok) {
         console.log('✅ Walkthrough item deleted successfully');
-        alert('✅ Item deleted successfully!');
         
-        // Call onReload to refresh data WITHOUT RESETTING MINIMIZE STATE
-        const currentExpandedState = expandedRooms;
+        // Immediate reload - PRESERVE EXPANSION STATE
+        const currentExpandedRooms = {...expandedRooms};
+        const currentExpandedCategories = {...expandedCategories};
+        
         if (onReload) {
           console.log('🔄 Calling onReload after successful delete');
           await onReload();
-          // Restore expanded state after reload
-          setExpandedRooms(currentExpandedState);
+          
+          // Restore expansion state
+          setTimeout(() => {
+            setExpandedRooms(currentExpandedRooms);
+            setExpandedCategories(currentExpandedCategories);
+          }, 100);
         }
       } else {
         const errorText = await response.text();
-        console.error('❌ Delete item failed with status:', response.status, 'Error:', errorText);
-        alert(`❌ Failed to delete item: ${response.status} - ${errorText}`);
+        console.error('❌ Delete item failed:', response.status, errorText);
+        alert(`Failed to delete item: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error('❌ Error deleting walkthrough item:', error);
-      alert('❌ Failed to delete item: ' + error.message);
+      alert('Error deleting item: ' + error.message);
     }
   };
   
