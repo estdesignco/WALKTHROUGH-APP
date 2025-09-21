@@ -107,7 +107,8 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       const newRoom = {
         ...roomData,
         project_id: projectId,
-        order_index: project.rooms.length
+        order_index: project.rooms.length,
+        sheet_type: 'checklist'  // Make rooms independent per sheet
       };
       
       console.log('🏠 Creating room with data:', newRoom);
