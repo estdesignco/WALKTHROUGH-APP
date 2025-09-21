@@ -181,6 +181,10 @@ const App = () => {
               element={<WalkthroughDashboard isOffline={isOffline} />}
             />
             <Route 
+              path="/walkthrough/:projectId" 
+              element={<WalkthroughDashboard isOffline={isOffline} />}
+            />
+            <Route 
               path="/project/:projectId/checklist" 
               element={<ChecklistDashboard isOffline={isOffline} />}
             />
