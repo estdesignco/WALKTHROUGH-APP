@@ -1876,15 +1876,15 @@ async def create_comprehensive_category(category: CategoryCreate):
         comprehensive_data = None
         for room_name, room_structure in COMPREHENSIVE_ROOM_STRUCTURE.items():
             if category_name in room_structure:
-                intelligent_data = room_structure[category_name]
+                comprehensive_data = room_structure[category_name]
                 break
         
-        if intelligent_data:
-            logger.info(f"📋 Found intelligent data for category: {category_name}")
+        if comprehensive_data:
+            logger.info(f"📋 Found comprehensive data for category: {category_name}")
             
             # Create subcategories and their items
             created_subcategories = []
-            for subcategory_name, items_list in intelligent_data.items():
+            for subcategory_name, items_list in comprehensive_data.items():
                 # Create subcategory
                 subcategory_obj = SubCategory(
                     name=subcategory_name,
