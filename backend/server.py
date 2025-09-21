@@ -1663,15 +1663,15 @@ async def create_room(room_data: RoomCreate):
         room_name_lower = room_data.name.lower().strip()
         print(f"🏠 CREATING ROOM: {room_name_lower}")
         
-        # Get FULL comprehensive structure for this room
-        room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(room_name_lower)
+        # Get FULL intelligent structure for this room
+        room_structure = INTELLIGENT_ROOM_STRUCTURE.get(room_name_lower)
         
         # If exact match not found, try to find similar room or use living room as template
         if not room_structure:
-            print(f"⚠️ Room '{room_name_lower}' not found in comprehensive structure")
-            # Try to find any room with comprehensive structure or default to living room
-            if 'living room' in COMPREHENSIVE_ROOM_STRUCTURE:
-                room_structure = COMPREHENSIVE_ROOM_STRUCTURE['living room']
+            print(f"⚠️ Room '{room_name_lower}' not found in intelligent structure")
+            # Try to find any room with intelligent structure or default to living room
+            if 'living room' in INTELLIGENT_ROOM_STRUCTURE:
+                room_structure = INTELLIGENT_ROOM_STRUCTURE['living room']
                 print(f"✅ Using living room structure as template")
             else:
                 # Fallback basic structure - should never happen with comprehensive structure
