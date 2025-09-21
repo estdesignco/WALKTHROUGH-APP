@@ -176,7 +176,7 @@ const ExactFFESpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = "${process.env.REACT_APP_BACKEND_URL}";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
