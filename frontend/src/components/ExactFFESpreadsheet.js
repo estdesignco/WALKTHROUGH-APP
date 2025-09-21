@@ -313,27 +313,37 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = "${process.env.REACT_APP_BACKEND_URL}";
+      console.log('🗑️ FFE DELETING ITEM:', itemId);
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      console.log('🌐 Using backend URL:', backendUrl);
+
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
+      console.log('📡 Delete response status:', response.status, response.statusText);
+
       if (response.ok) {
-        console.log('✅ Item deleted successfully');
-        console.log('Item deleted successfully!');
+        console.log('✅ FFE item deleted successfully');
+        alert('✅ Item deleted successfully!');
+        
         // Force reload to show updated data
         if (onReload) {
-          onReload();
+          console.log('🔄 Calling onReload after successful FFE delete');
+          await onReload();
         }
       } else {
-        console.error('❌ Delete failed with status:', response.status);
-        console.error(`Delete failed: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ FFE Delete failed with status:', response.status, errorText);
+        alert(`❌ Delete failed: ${response.status} - ${errorText}`);
         throw new Error(`HTTP ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ Error deleting item:', error);
-      console.error(`Delete error: ${error.message}`);
-      console.error('Failed to delete item. Please try again.');
+      console.error('❌ Error deleting FFE item:', error);
+      alert('❌ Failed to delete item: ' + error.message);
     }
   };
 
