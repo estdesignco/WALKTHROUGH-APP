@@ -189,7 +189,15 @@ const App = () => {
               element={<ChecklistDashboard isOffline={isOffline} />}
             />
             <Route 
+              path="/checklist/:projectId" 
+              element={<ChecklistDashboard isOffline={isOffline} />}
+            />
+            <Route 
               path="/project/:projectId/ffe" 
+              element={<FFEDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/ffe/:projectId" 
               element={<FFEDashboard isOffline={isOffline} />}
             />
             <Route 
