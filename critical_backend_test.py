@@ -458,8 +458,8 @@ class CriticalBackendTester:
         # Test different room types
         room_types_to_test = [
             {"name": "kitchen", "expected_categories": ["Lighting", "Appliances", "Plumbing"]},
-            {"name": "living room", "expected_categories": ["Lighting", "Furniture", "Decor & Accessories"]},
-            {"name": "primary bedroom", "expected_categories": ["Lighting", "Furniture", "Decor & Accessories"]},
+            {"name": "living room", "expected_categories": ["Lighting", "Furniture", "Art & Accessories"]},
+            {"name": "primary bedroom", "expected_categories": ["Lighting", "Furniture", "Art & Accessories"]},
             {"name": "primary bathroom", "expected_categories": ["Lighting", "Plumbing & Fixtures", "Furniture & Storage"]}
         ]
         
