@@ -1086,6 +1086,44 @@ const SimpleChecklistSpreadsheet = ({
         />
       )}
 
+      {/* FOOTER SECTION - ADD CATEGORY */}
+      <div className="mt-8 p-4 border-t-2 border-gray-600">
+        <div className="flex gap-3 justify-center">
+          <select
+            value=""
+            onChange={(e) => {
+              // Find first room to add category to
+              const firstRoom = project?.rooms?.[0];
+              if (firstRoom) {
+                if (e.target.value === 'CREATE_NEW') {
+                  const categoryName = window.prompt('Enter new category name:');
+                  if (categoryName && categoryName.trim()) {
+                    // handleAddCategory(firstRoom.id, categoryName.trim());
+                    console.log('Add new category:', categoryName);
+                  }
+                } else if (e.target.value) {
+                  // handleAddCategory(firstRoom.id, e.target.value);
+                  console.log('Add existing category:', e.target.value);
+                }
+              } else {
+                alert('Please add a room first before adding categories.');
+              }
+            }}
+            className="text-white px-6 py-3 rounded font-bold border-none outline-none text-lg" 
+            style={{ backgroundColor: '#8b7355' }}
+          >
+            <option value="">+ ADD CATEGORY ▼</option>
+            <option value="Lighting">Lighting</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Decor & Accessories">Decor & Accessories</option>
+            <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
+            <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
+            <option value="Appliances">Appliances</option>
+            <option value="CREATE_NEW">+ Create New Category</option>
+          </select>
+        </div>
+      </div>
+
       {/* Canva Integration Modal */}
       {showCanvaModal && (
         <CanvaIntegrationModal
