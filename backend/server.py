@@ -44,28 +44,29 @@ api_router = APIRouter(prefix="/api")
 
 # Room color constants - MORE MUTED
 ROOM_COLORS = {
-    "living room": "#7A5A8A",     # Muted purple
-    "kitchen": "#5A6A5A", 
-    "master bedroom": "#6A5A7A",
-    "bedroom 2": "#7A5A5A",
-    "bedroom 3": "#5A6A6A",
-    "bathroom": "#5A5A7A",
-    "master bathroom": "#6A4A4A",
-    "powder room": "#4A6A6A",
-    "dining room": "#7A6A8A",
-    "office": "#4A5A5A",
-    "family room": "#5A6A8A",
-    "basement": "#8A7A5A",
-    "laundry room": "#4A4A6A",
-    "mudroom": "#5A6A4A",
-    "pantry": "#8A8A5A",
-    "closet": "#6A7A6A",
-    "guest room": "#8A5A7A",
-    "playroom": "#8A8A5A",
-    "library": "#4A6A8A",
-    "wine cellar": "#4A4A6A",
-    "garage": "#6A7A4A",
-    "patio": "#7A7A5A"
+    "living room": "#7A5A8A",        # Muted purple
+    "kitchen": "#5A7A5A",            # Muted green  
+    "master bedroom": "#8A5A7A",     # Muted rose
+    "bedroom 2": "#7A6A5A",          # Muted olive
+    "bedroom 3": "#5A6A8A",          # Muted blue
+    "bathroom": "#6A8A5A",           # Muted sage
+    "master bathroom": "#8A6A5A",    # Muted tan
+    "primary bathroom": "#6A5A8A",   # Muted lavender
+    "powder room": "#5A8A6A",        # Muted teal
+    "dining room": "#8A7A5A",        # Muted bronze
+    "office": "#5A5A8A",             # Muted indigo
+    "family room": "#7A5A6A",        # Muted mauve
+    "basement": "#6A6A5A",           # Muted gray-green
+    "laundry room": "#5A7A6A",       # Muted sea green
+    "mudroom": "#7A6A6A",            # Muted gray
+    "pantry": "#6A5A6A",             # Muted plum
+    "closet": "#5A6A7A",             # Muted steel
+    "guest room": "#8A5A6A",         # Muted dusty rose
+    "playroom": "#6A7A5A",           # Muted moss
+    "library": "#5A8A7A",            # Muted jade
+    "wine cellar": "#7A5A8A",        # Muted amethyst
+    "garage": "#8A7A6A",             # Muted khaki
+    "patio": "#6A8A7A"               # Muted seafoam
 }
 
 # Enhanced Item Status Options with Colors for Sophisticated Tracking
