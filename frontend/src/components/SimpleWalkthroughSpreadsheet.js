@@ -247,20 +247,21 @@ const SimpleWalkthroughSpreadsheet = ({
 
       if (!subcategoryId) {
         console.error('No subcategory found to add blank row to');
+        alert('Please expand a category first to add items to it.');
         return;
       }
 
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
-      // Create a blank row item - ONLY ITEM NAME, rest blank for designer to fill
+      // Create a blank row item - WITH DEFAULT FINISH COLOR
       const blankItem = {
         name: 'New Item',
         vendor: '',
         sku: '',
         cost: '',
         size: '',
-        finish_color: '',
-        quantity: '',
+        finish_color: 'Natural',  // DEFAULT VALUE AS REQUESTED
+        quantity: '1',
         subcategory_id: subcategoryId,
         status: '',
         order_index: 0
@@ -284,9 +285,11 @@ const SimpleWalkthroughSpreadsheet = ({
       } else {
         const errorData = await response.text();
         console.error('❌ Backend error:', errorData);
+        alert(`Failed to add item: ${errorData}`);
       }
     } catch (error) {
       console.error('❌ Error adding blank row:', error);
+      alert(`Error adding item: ${error.message}`);
     }
   };
   const handleAddItem = async (itemData) => {
