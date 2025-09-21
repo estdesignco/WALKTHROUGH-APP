@@ -299,11 +299,20 @@ class CriticalBackendTester:
             self.log_test("Comprehensive - Categories Available", False, f"Failed to get available categories: {categories_data} (Status: {status_code})")
             return False
         
-        if not isinstance(categories_data, list) or len(categories_data) == 0:
-            self.log_test("Comprehensive - Categories Available", False, f"Expected non-empty list, got: {type(categories_data)} with {len(categories_data) if isinstance(categories_data, list) else 'N/A'} items")
+        # Handle both dict and list responses
+        if isinstance(categories_data, dict) and 'categories' in categories_data:
+            categories_list = categories_data['categories']
+        elif isinstance(categories_data, list):
+            categories_list = categories_data
+        else:
+            self.log_test("Comprehensive - Categories Available", False, f"Expected list or dict with 'categories' key, got: {type(categories_data)}")
             return False
         
-        self.log_test("Comprehensive - Categories Available", True, f"Found {len(categories_data)} available categories: {', '.join(categories_data[:5])}...")
+        if len(categories_list) == 0:
+            self.log_test("Comprehensive - Categories Available", False, "No categories found")
+            return False
+        
+        self.log_test("Comprehensive - Categories Available", True, f"Found {len(categories_list)} available categories: {', '.join(categories_list[:5])}...")
         
         # Create a test room to add comprehensive category to
         print("\n🏠 Step 2: Creating test room for comprehensive category...")
