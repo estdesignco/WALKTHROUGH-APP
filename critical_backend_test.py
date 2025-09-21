@@ -33,19 +33,8 @@ from typing import Dict, Any, List
 import sys
 import os
 
-# Get backend URL from frontend .env file
-def get_backend_url():
-    try:
-        with open('/app/frontend/.env', 'r') as f:
-            for line in f:
-                if line.startswith('REACT_APP_BACKEND_URL='):
-                    return line.split('=', 1)[1].strip()
-    except Exception as e:
-        print(f"Error reading frontend .env: {e}")
-        return "http://localhost:8001"
-    return "http://localhost:8001"
-
-BASE_URL = get_backend_url() + "/api"
+# Use local backend URL for testing
+BASE_URL = "http://localhost:8001/api"
 TEST_PROJECT_ID = "4f261f4e-c5af-46c3-92c7-0d923593228f"
 
 print("=" * 80)
