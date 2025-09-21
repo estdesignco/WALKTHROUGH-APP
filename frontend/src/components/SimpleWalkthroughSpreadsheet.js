@@ -908,48 +908,7 @@ const SimpleWalkthroughSpreadsheet = ({
         })}
       </div>
 
-      {/* BOTTOM SECTION FOOTER - ADD CATEGORY IN FOOTER AS REQUESTED */}
-      <div className="mt-8 p-4 border-t-2 border-gray-600">
-        <div className="flex gap-3 justify-center">
-          <select
-            value=""
-            onChange={(e) => {
-              // Find first room to add category to
-              const firstRoom = project?.rooms?.[0];
-              if (firstRoom) {
-                if (e.target.value === 'CREATE_NEW') {
-                  const categoryName = window.prompt('Enter new category name:');
-                  if (categoryName && categoryName.trim()) {
-                    handleAddCategory(firstRoom.id, categoryName.trim());
-                  }
-                } else if (e.target.value) {
-                  handleAddCategory(firstRoom.id, e.target.value);
-                }
-              } else {
-                console.error('❌ No rooms available. Please add a room first.');
-                alert('Please add a room first before adding categories.');
-              }
-            }}
-            className="text-white px-6 py-3 rounded font-bold border-none outline-none text-lg" 
-            style={{ backgroundColor: '#8b7355' }}
-          >
-            <option value="">+ ADD CATEGORY ▼</option>
-            <option value="Lighting">Lighting</option>
-            <option value="Furniture">Furniture</option>
-            <option value="Decor & Accessories">Decor & Accessories</option>
-            <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
-            <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
-            <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
-            <option value="Furniture & Storage">Furniture & Storage</option>
-            <option value="Equipment & Furniture">Equipment & Furniture</option>
-            <option value="Electronics & Technology">Electronics & Technology</option>
-            <option value="Appliances">Appliances</option>
-            <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
-            <option value="Surfaces & Materials">Surfaces & Materials</option>
-            <option value="CREATE_NEW">+ Create New Category</option>
-          </select>
-        </div>
-      </div>
+      {/* FOOTER REMOVED - ADD CATEGORY NOW IN EACH SECTION */}
       
       {/* ADD ITEM MODAL */}
       {showAddItem && (
