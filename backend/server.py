@@ -1913,11 +1913,20 @@ async def create_comprehensive_category(category: CategoryCreate):
                     
                     # Create items for this subcategory
                     created_items = []
-                    for item_name in items_list:
+                    for item_data in items_list:
+                        # Handle both old string format and new object format
+                        if isinstance(item_data, str):
+                            item_name = item_data
+                            finish_color = ""
+                        else:
+                            item_name = item_data.get('name', 'Unknown Item')
+                            finish_color = item_data.get('finish_color', '')
+                        
                         item_obj = Item(
                             name=item_name,
                             subcategory_id=subcategory_id,
                             quantity=1,
+                            finish_color=finish_color,
                             status="TO BE SELECTED",
                             order_index=0
                         )
