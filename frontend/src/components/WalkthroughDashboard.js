@@ -31,7 +31,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
           const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
           console.log('🌐 Using backend URL:', backendUrl);
           
-          const response = await fetch(`${backendUrl}/api/projects/${projectId}`, {
+          const response = await fetch(`${backendUrl}/api/projects/${projectId}?sheet_type=walkthrough`, {
             headers: {
               'Content-Type': 'application/json'
             }
