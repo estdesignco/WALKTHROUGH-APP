@@ -1923,11 +1923,12 @@ async def create_comprehensive_category(category: CategoryCreate):
                             item_name = item_data.get('name', 'Unknown Item')
                             finish_color = ""  # Always blank as requested
                         
+                        # Create item with explicit blank finish_color - ignore template data
                         item_obj = Item(
                             name=item_name,
                             subcategory_id=subcategory_id,
                             quantity=1,
-                            finish_color=finish_color,
+                            finish_color="",  # FORCE BLANK - ignore any template data
                             status="TO BE SELECTED",
                             order_index=0
                         )
