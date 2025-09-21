@@ -115,7 +115,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "URGENT: WALKTHROUGH DELETE FUNCTIONALITY AND PAGE REDIRECT ISSUES - User reports: 1) WALKTHROUGH - Delete buttons don't work (rooms, categories, items), 2) ALL SHEETS - Page keeps resetting to landing page every 2 seconds, 3) ALL SHEETS - Finish and color default is blank. Critical system failure preventing walkthrough sheet usage."
+  "CRITICAL FUNCTIONALITY FAILURES - User reports: 1) TRANSFER TO CHECKLIST not working - fails to move items with full room/category structure, 2) ADD CATEGORY not working properly - only adds empty categories instead of comprehensive subcategories and items, 3) ADD ROOM not working on other pages - functionality is page-specific rather than universal. User provided Google Apps Script roadmap showing proper patterns for room/category structure management, context-aware transfers, and comprehensive data population."
 
 backend:
   - task: "FF&E and Checklist Backend Functionality Testing - Review Request"
