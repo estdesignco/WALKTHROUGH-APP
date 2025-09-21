@@ -402,7 +402,7 @@ const ExactFFESpreadsheet = ({
             console.log('✅ Comprehensive category added successfully');
             
             // Delete the temp room
-            await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/rooms/${tempRoom.id}`, {
+            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
