@@ -239,7 +239,7 @@ const ExactFFESpreadsheet = ({
         return;
       }
 
-      const backendUrl = "${process.env.REACT_APP_BACKEND_URL}";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
       const newItem = {
         ...itemData,
