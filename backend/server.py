@@ -1880,17 +1880,24 @@ async def create_comprehensive_category(category: CategoryCreate):
         
         # Find the category in the comprehensive structure
         comprehensive_data = None
-        for room_name, room_structure in COMPREHENSIVE_ROOM_STRUCTURE.items():
-            if category_name in room_structure:
-                comprehensive_data = room_structure[category_name]
+        for room_name, room_data in COMPREHENSIVE_ROOM_STRUCTURE.items():
+            if 'categories' in room_data:
+                for cat in room_data['categories']:
+                    if cat['name'].lower() == category_name.lower():
+                        comprehensive_data = cat
+                        break
+            if comprehensive_data:
                 break
         
         if comprehensive_data:
             logger.info(f"📋 Found comprehensive data for category: {category_name}")
             
-            # Create subcategories and their items
+            # Create subcategories and their items from the new structure
             created_subcategories = []
-            for subcategory_name, items_list in comprehensive_data.items():
+            for subcategory_data in comprehensive_data.get('subcategories', []):
+                subcategory_name = subcategory_data['name']
+                items_list = subcategory_data.get('items', [])
+                
                 # Create subcategory
                 subcategory_obj = SubCategory(
                     name=subcategory_name,
