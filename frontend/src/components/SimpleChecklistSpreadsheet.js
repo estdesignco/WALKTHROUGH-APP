@@ -727,10 +727,7 @@ const SimpleChecklistSpreadsheet = ({
               ✚ ADD ROOM
             </button>
             <button 
-              onClick={() => {
-                console.log('🚀 Checklist Transfer button clicked');
-                alert('Transfer functionality will be implemented next.');
-              }}
+              onClick={handleTransferToFFE}
               className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
             >
               → TRANSFER TO FF&E
