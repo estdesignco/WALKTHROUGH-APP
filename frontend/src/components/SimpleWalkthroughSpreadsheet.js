@@ -413,19 +413,24 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const handleTransferToChecklist = async () => {
     try {
-      console.log('🚀 TRANSFER TO CHECKLIST: Using Google Sheets proven logic');
+      console.log('🚀 TRANSFER TO CHECKLIST: ONLY CHECKED ITEMS (Fixed)');
       
-      // Step 1: Scan for checked items and build context map (like Google Sheets getRoomAndCategoryFromSheet)
-      const checkedItemsWithContext = [];
-      const roomStructureMap = new Map(); // room_id -> {room, categories: Map}
+      if (checkedItems.size === 0) {
+        alert('No items are checked for transfer. Please check the items you want to transfer first.');
+        return;
+      }
+      
+      // Step 1: Collect ONLY the checked items with their context
+      const checkedItemsToTransfer = [];
       
       if (filteredProject?.rooms) {
         filteredProject.rooms.forEach(room => {
           room.categories?.forEach(category => {
             category.subcategories?.forEach(subcategory => {
               subcategory.items?.forEach(item => {
+                // ONLY process if this specific item is checked
                 if (checkedItems.has(item.id) && item.name && item.name !== 'New Item') {
-                  checkedItemsWithContext.push({
+                  checkedItemsToTransfer.push({
                     item,
                     roomId: room.id,
                     roomName: room.name,
@@ -434,182 +439,171 @@ const SimpleWalkthroughSpreadsheet = ({
                     subcategoryId: subcategory.id,
                     subcategoryName: subcategory.name
                   });
-                  
-                  // Track structure we need to create
-                  if (!roomStructureMap.has(room.id)) {
-                    roomStructureMap.set(room.id, {
-                      room: room,
-                      categories: new Map()
-                    });
-                  }
-                  
-                  const roomStruct = roomStructureMap.get(room.id);
-                  if (!roomStruct.categories.has(category.id)) {
-                    roomStruct.categories.set(category.id, {
-                      category: category,
-                      subcategories: new Map()
-                    });
-                  }
-                  
-                  const catStruct = roomStruct.categories.get(category.id);
-                  if (!catStruct.subcategories.has(subcategory.id)) {
-                    catStruct.subcategories.set(subcategory.id, {
-                      subcategory: subcategory,
-                      items: []
-                    });
-                  }
-                  
-                  catStruct.subcategories.get(subcategory.id).items.push(item);
                 }
               });
             });
           });
         });
       }
+      
+      console.log(`📝 EXACT COUNT: ${checkedItemsToTransfer.length} CHECKED items to transfer`);
+      console.log('📋 Checked items:', checkedItemsToTransfer.map(ci => ci.item.name));
 
-      console.log(`📝 Found ${checkedItemsWithContext.length} CHECKED items across ${roomStructureMap.size} rooms`);
-
-      if (checkedItemsWithContext.length === 0) {
-        alert('No items are checked for transfer. Please check the items you want to transfer first.');
+      if (checkedItemsToTransfer.length === 0) {
+        alert('No valid checked items found for transfer.');
         return;
       }
 
-      // Step 2: Create complete structure in checklist (like Google Sheets populateChecklistFromWalkthroughApp)
+      // Step 2: Transfer ONLY the checked items (create minimal structure as needed)
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const projectId = filteredProject.id;
       
       let successCount = 0;
+      const createdStructures = new Map(); // Track what we've already created
       
-      console.log(`🏗️ Creating complete structure for ${roomStructureMap.size} rooms in checklist`);
+      console.log(`🏗️ Creating minimal structure for ONLY ${checkedItemsToTransfer.length} checked items`);
 
-      // Create rooms, categories, subcategories, and items in proper order
-      for (const [roomId, roomStruct] of roomStructureMap) {
+      // Process each checked item individually
+      for (const itemContext of checkedItemsToTransfer) {
         try {
-          // Create room for checklist
-          const newRoomData = {
-            name: roomStruct.room.name,
-            project_id: projectId,
-            sheet_type: 'checklist',
-            description: `Transferred from walkthrough - ${roomStruct.room.description || ''}`
-          };
+          const roomKey = `${itemContext.roomName}_checklist`;
+          const categoryKey = `${roomKey}_${itemContext.categoryName}`;
+          const subcategoryKey = `${categoryKey}_${itemContext.subcategoryName}`;
           
-          console.log(`🏠 Creating checklist room: ${roomStruct.room.name}`);
-          
-          const roomResponse = await fetch(`${backendUrl}/api/rooms`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newRoomData)
-          });
-          
-          if (roomResponse.ok) {
-            const newRoom = await roomResponse.json();
-            console.log(`✅ Created checklist room: ${newRoom.name}`);
+          // Create room if not exists
+          let roomId = createdStructures.get(roomKey);
+          if (!roomId) {
+            const newRoomData = {
+              name: itemContext.roomName,
+              project_id: projectId,
+              sheet_type: 'checklist',
+              description: `Transferred from walkthrough - ${itemContext.roomName}`
+            };
             
-            // Create categories for this room
-            for (const [categoryId, catStruct] of roomStruct.categories) {
-              try {
-                const newCategoryData = {
-                  name: catStruct.category.name,
-                  room_id: newRoom.id,
-                  description: catStruct.category.description || '',
-                  color: catStruct.category.color || '#4A90E2',
-                  order_index: catStruct.category.order_index || 0
-                };
-                
-                console.log(`📋 Creating category: ${catStruct.category.name}`);
-                
-                const categoryResponse = await fetch(`${backendUrl}/api/categories`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(newCategoryData)
-                });
-                
-                if (categoryResponse.ok) {
-                  const newCategory = await categoryResponse.json();
-                  console.log(`✅ Created category: ${newCategory.name}`);
-                  
-                  // Create subcategories for this category
-                  for (const [subcategoryId, subStruct] of catStruct.subcategories) {
-                    try {
-                      const newSubcategoryData = {
-                        name: subStruct.subcategory.name,
-                        category_id: newCategory.id,
-                        description: subStruct.subcategory.description || '',
-                        color: subStruct.subcategory.color || '#6BA3E6',
-                        order_index: subStruct.subcategory.order_index || 0
-                      };
-                      
-                      console.log(`📝 Creating subcategory: ${subStruct.subcategory.name}`);
-                      
-                      const subcategoryResponse = await fetch(`${backendUrl}/api/subcategories`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newSubcategoryData)
-                      });
-                      
-                      if (subcategoryResponse.ok) {
-                        const newSubcategory = await subcategoryResponse.json();
-                        console.log(`✅ Created subcategory: ${newSubcategory.name}`);
-                        
-                        // Create items for this subcategory
-                        for (const item of subStruct.items) {
-                          try {
-                            const newItemData = {
-                              name: item.name,
-                              vendor: item.vendor || '',
-                              sku: item.sku || '',
-                              cost: item.cost || 0,
-                              size: item.size || '',
-                              finish_color: item.finish_color || '',
-                              quantity: item.quantity || 1,
-                              subcategory_id: newSubcategory.id,
-                              status: 'PICKED', // Set to PICKED for checklist
-                              order_index: item.order_index || 0
-                            };
-                            
-                            console.log(`📦 Creating item: ${item.name}`);
-                            
-                            const itemResponse = await fetch(`${backendUrl}/api/items`, {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify(newItemData)
-                            });
-                            
-                            if (itemResponse.ok) {
-                              successCount++;
-                              console.log(`✅ Created item: ${item.name}`);
-                            }
-                          } catch (itemError) {
-                            console.error(`❌ Error creating item ${item.name}:`, itemError);
-                          }
-                        }
-                      }
-                    } catch (subcategoryError) {
-                      console.error(`❌ Error creating subcategory:`, subcategoryError);
-                    }
-                  }
-                }
-              } catch (categoryError) {
-                console.error(`❌ Error creating category:`, categoryError);
-              }
+            console.log(`🏠 Creating checklist room: ${itemContext.roomName}`);
+            
+            const roomResponse = await fetch(`${backendUrl}/api/rooms`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newRoomData)
+            });
+            
+            if (roomResponse.ok) {
+              const newRoom = await roomResponse.json();
+              roomId = newRoom.id;
+              createdStructures.set(roomKey, roomId);
+              console.log(`✅ Created room: ${newRoom.name}`);
+            } else {
+              console.error(`❌ Failed to create room: ${itemContext.roomName}`);
+              continue;
             }
           }
-        } catch (roomError) {
-          console.error(`❌ Error creating room:`, roomError);
+          
+          // Create category if not exists
+          let categoryId = createdStructures.get(categoryKey);
+          if (!categoryId) {
+            const newCategoryData = {
+              name: itemContext.categoryName,
+              room_id: roomId,
+              description: `${itemContext.categoryName} category`,
+              color: '#4A90E2',
+              order_index: 0
+            };
+            
+            console.log(`📋 Creating category: ${itemContext.categoryName}`);
+            
+            const categoryResponse = await fetch(`${backendUrl}/api/categories`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newCategoryData)
+            });
+            
+            if (categoryResponse.ok) {
+              const newCategory = await categoryResponse.json();
+              categoryId = newCategory.id;
+              createdStructures.set(categoryKey, categoryId);
+              console.log(`✅ Created category: ${newCategory.name}`);
+            } else {
+              console.error(`❌ Failed to create category: ${itemContext.categoryName}`);
+              continue;
+            }
+          }
+          
+          // Create subcategory if not exists
+          let subcategoryId = createdStructures.get(subcategoryKey);
+          if (!subcategoryId) {
+            const newSubcategoryData = {
+              name: itemContext.subcategoryName,
+              category_id: categoryId,
+              description: `${itemContext.subcategoryName} subcategory`,
+              color: '#6BA3E6',
+              order_index: 0
+            };
+            
+            console.log(`📝 Creating subcategory: ${itemContext.subcategoryName}`);
+            
+            const subcategoryResponse = await fetch(`${backendUrl}/api/subcategories`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newSubcategoryData)
+            });
+            
+            if (subcategoryResponse.ok) {
+              const newSubcategory = await subcategoryResponse.json();
+              subcategoryId = newSubcategory.id;
+              createdStructures.set(subcategoryKey, subcategoryId);
+              console.log(`✅ Created subcategory: ${newSubcategory.name}`);
+            } else {
+              console.error(`❌ Failed to create subcategory: ${itemContext.subcategoryName}`);
+              continue;
+            }
+          }
+          
+          // Create the CHECKED item
+          const newItemData = {
+            name: itemContext.item.name,
+            vendor: itemContext.item.vendor || '',
+            sku: itemContext.item.sku || '',
+            cost: itemContext.item.cost || 0,
+            size: itemContext.item.size || '',
+            finish_color: itemContext.item.finish_color || '',
+            quantity: itemContext.item.quantity || 1,
+            subcategory_id: subcategoryId,
+            status: 'PICKED', // Set to PICKED for checklist
+            order_index: itemContext.item.order_index || 0
+          };
+          
+          console.log(`📦 Creating CHECKED item: ${itemContext.item.name}`);
+          
+          const itemResponse = await fetch(`${backendUrl}/api/items`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newItemData)
+          });
+          
+          if (itemResponse.ok) {
+            successCount++;
+            console.log(`✅ Created CHECKED item: ${itemContext.item.name}`);
+          } else {
+            console.error(`❌ Failed to create item: ${itemContext.item.name}`);
+          }
+          
+        } catch (itemError) {
+          console.error(`❌ Error processing checked item ${itemContext.item.name}:`, itemError);
         }
       }
 
       if (successCount > 0) {
-        alert(`✅ Successfully transferred ${successCount} checked items to Checklist with complete room structure!`);
+        alert(`✅ Successfully transferred ${successCount} CHECKED items to Checklist!`);
         
-        // Clear checked items after successful transfer (like Google Sheets)
+        // Clear checked items after successful transfer
         setCheckedItems(new Set());
         
         if (onReload) {
           onReload();
         }
       } else {
-        alert('❌ Failed to transfer items. Please check the console for errors.');
+        alert('❌ Failed to transfer checked items. Please check the console for errors.');
       }
 
     } catch (error) {
