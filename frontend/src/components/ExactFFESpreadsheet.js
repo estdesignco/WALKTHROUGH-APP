@@ -465,7 +465,7 @@ const ExactFFESpreadsheet = ({
       // Update backend category order  
       try {
         const roomId = source.droppableId.replace('categories-', '');
-        const response = await fetch('${process.env.REACT_APP_BACKEND_URL}/api/categories/reorder', {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
