@@ -1854,7 +1854,7 @@ async def create_category(category: CategoryCreate):
 async def create_comprehensive_category(category: CategoryCreate):
     """Create a category with all its subcategories and items from comprehensive structure"""
     try:
-        from enhanced_rooms_intelligent import INTELLIGENT_ROOM_STRUCTURE
+
         
         # First create the basic category
         category_dict = category.dict()
