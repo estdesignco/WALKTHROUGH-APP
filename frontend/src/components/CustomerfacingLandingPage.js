@@ -320,13 +320,13 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
     const InputField = ({ label, id, value, onChange, type = "text", placeholder = "", className = "" }) => (
         <div className="space-y-1">
             <Label htmlFor={id} className="text-sm font-medium text-stone-300">{label}</Label>
-            <Input 
+            <input 
                 id={id} 
                 type={type} 
                 value={value || ''} 
                 onChange={onChange} 
                 placeholder={placeholder} 
-                className={`${inputStyles} ${className}`}
+                className={`${inputStyles} ${className} w-full px-3 py-2 rounded-md border-0 bg-gray-700 text-stone-200 focus:outline-none focus:ring-2 focus:ring-[#8B7355]`}
                 autoComplete="off"
             />
         </div>
