@@ -2258,7 +2258,7 @@ async def configure_teams_webhook(webhook_data: dict):
 async def test_teams_notification():
     """Send a test notification to Teams"""
     try:
-        from teams_integration import notify_status_change
+        from .teams_integration import notify_status_change
         
         result = await notify_status_change(
             project_name="Test Project",
