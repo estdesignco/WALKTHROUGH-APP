@@ -317,31 +317,19 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
         </div>
     );
 
-    const InputField = ({ label, id, value, onChange, type = "text", placeholder = "", className = "" }) => {
-        const inputRef = React.useRef(null);
-        
-        React.useEffect(() => {
-            if (inputRef.current && inputRef.current.value !== value) {
-                inputRef.current.value = value || '';
-            }
-        }, [value]);
-        
-        return (
-            <div className="space-y-1">
-                <Label htmlFor={id} className="text-sm font-medium text-stone-300">{label}</Label>
-                <input 
-                    ref={inputRef}
-                    id={id} 
-                    type={type} 
-                    defaultValue={value || ''} 
-                    onChange={onChange} 
-                    placeholder={placeholder} 
-                    className={`${inputStyles} ${className} w-full px-3 py-2 rounded-md border-0 bg-gray-700 text-stone-200 focus:outline-none focus:ring-2 focus:ring-[#8B7355]`}
-                    autoComplete="off"
-                />
-            </div>
-        );
-    };
+    const InputField = ({ label, id, name, type = "text", placeholder = "", className = "" }) => (
+        <div className="space-y-1">
+            <Label htmlFor={id} className="text-sm font-medium text-stone-300">{label}</Label>
+            <input 
+                id={id} 
+                name={name}
+                type={type} 
+                placeholder={placeholder} 
+                className={`${inputStyles} ${className} w-full px-3 py-2 rounded-md border-0 bg-gray-700 text-stone-200 focus:outline-none focus:ring-2 focus:ring-[#8B7355]`}
+                autoComplete="off"
+            />
+        </div>
+    );
 
     const FieldWrapper = ({ label, children }) => (
         <div className="space-y-1">
