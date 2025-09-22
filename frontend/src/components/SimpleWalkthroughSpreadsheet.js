@@ -467,34 +467,43 @@ const SimpleWalkthroughSpreadsheet = ({
         return;
       }
 
-      // STEP 2: Transfer ONLY the checked items - Google Apps Script approach
-      // DO NOT create room structures - only transfer individual items
+      // STEP 2: Transfer using Google Apps Script logic - Create minimal structure and add ONLY checked items
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const projectId = filteredProject.id;
       
       let successCount = 0;
       
-      // Create a batch transfer request with ONLY the checked items
-      console.log(`🚀 TRANSFERRING ${itemsToTransfer.length} SPECIFIC ITEMS (Google Apps Script Style)`);
+      console.log(`🚀 GOOGLE APPS SCRIPT TRANSFER: Creating ${itemsToTransfer.length} individual items`);
 
       for (const itemData of itemsToTransfer) {
         try {
-          console.log(`📝 Transferring item: "${itemData.item.name}" from ${itemData.roomName}/${itemData.categoryName}/${itemData.subcategoryName}`);
+          console.log(`📝 Creating individual item: "${itemData.item.name}"`);
           
-          // Transfer by changing the item's status to PICKED (like Google Apps Script)
-          const transferResponse = await fetch(`${backendUrl}/api/items/${itemData.item.id}`, {
-            method: 'PATCH',
+          // Create the item directly in checklist sheet_type - Google Apps Script insertRows() equivalent
+          const createItemResponse = await fetch(`${backendUrl}/api/items`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              status: 'PICKED'  // This marks it as transferred to checklist
+              name: itemData.item.name,
+              quantity: itemData.item.quantity || 1,
+              size: itemData.item.size || '',
+              finish_color: '', // Always blank as requested
+              remarks: itemData.item.remarks || '',
+              status: 'TO BE SELECTED',
+              project_id: projectId,
+              room_name: itemData.roomName,
+              category_name: itemData.categoryName,
+              subcategory_name: itemData.subcategoryName,
+              sheet_type: 'checklist'  // Mark as checklist item
             })
           });
           
-          if (transferResponse.ok) {
-            successCount++;
-            console.log(`✅ Item "${itemData.item.name}" marked as PICKED`);
+          if (createItemResponse.ok) {
+            successCount++; 
+            console.log(`✅ Created checklist item: "${itemData.item.name}"`);
           } else {
-            console.error(`❌ Failed to transfer item: ${itemData.item.name}`);
+            const errorText = await createItemResponse.text();
+            console.error(`❌ Failed to create item: ${itemData.item.name} - ${errorText}`);
           }
           
           // Create category if needed
