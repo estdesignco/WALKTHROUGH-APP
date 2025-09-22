@@ -400,33 +400,12 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                     {/* Client Information */}
                     <Section title="Client Information">
                         <div className="grid grid-cols-2 gap-3">
-                            <InputField label="Client Name" id="client_name" value={formData.client_name || ''} onChange={(e) => {
-                                const value = e.target.value;
-                                setFormData(prev => {
-                                    const newFormData = { ...prev };
-                                    newFormData.client_name = value;
-                                    return newFormData;
-                                });
-                            }} />
-                            <InputField label="Project Name" id="name" value={formData.name || ''} onChange={(e) => {
-                                const value = e.target.value;
-                                setFormData(prev => {
-                                    const newFormData = { ...prev };
-                                    newFormData.name = value;
-                                    return newFormData;
-                                });
-                            }} />
+                            <InputField label="Client Name" id="client_name" name="client_name" />
+                            <InputField label="Project Name" id="name" name="name" />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                            <InputField label="Email Address" id="email" type="email" value={formData.email || ''} onChange={(e) => {
-                                const value = e.target.value;
-                                setFormData(prev => {
-                                    const newFormData = { ...prev };
-                                    newFormData.email = value;
-                                    return newFormData;
-                                });
-                            }} />
-                            <InputField label="Phone Number" id="phone" type="tel" value={formData.phone || ''} onChange={(e) => handleFormChange('phone', e.target.value)} />
+                            <InputField label="Email Address" id="email" name="email" type="email" />
+                            <InputField label="Phone Number" id="phone" name="phone" type="tel" />
                         </div>
                         <FieldWrapper label="Project Address">
                             <Textarea className={inputStyles} value={formData.address || ''} onChange={(e) => handleFormChange('address', e.target.value)} />
