@@ -24,6 +24,7 @@ import aiosmtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from teams_integration import notify_status_change
+from dotenv import load_dotenv
 
 # Import Google Sheets functionality
 from google_sheets_routes import router as google_sheets_router
