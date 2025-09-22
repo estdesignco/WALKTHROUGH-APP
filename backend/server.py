@@ -23,7 +23,7 @@ from .enhanced_rooms_intelligent import INTELLIGENT_ROOM_STRUCTURE  # Add intell
 import aiosmtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from teams_integration import notify_status_change
+from .teams_integration import notify_status_change
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
