@@ -413,60 +413,39 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const handleTransferToChecklist = async () => {
     try {
-      console.log('🚀 TRANSFER TO CHECKLIST: GOOGLE APPS SCRIPT LOGIC - ONLY CHECKED ITEMS');
-      console.log('📊 checkedItems state:', checkedItems);
-      console.log('📊 checkedItems.size:', checkedItems.size);
-      console.log('📊 Array.from(checkedItems):', Array.from(checkedItems));
+      // 🚨 EXACT REPLICATION OF GOOGLE APPS SCRIPT populateChecklistFromWalkthroughApp() LOGIC
+      console.log('🚀 GOOGLE APPS SCRIPT TRANSFER: populateChecklistFromWalkthroughApp()');
       
-      // VALIDATION: Exactly like Google Apps Script - check if any items are selected
+      // STEP 1: Validation - Mirror Google Apps Script lines 462-467
       if (checkedItems.size === 0) {
         alert('Please select items in the Walkthrough App by checking their checkboxes (Column A) before attempting to transfer.');
         return;
       }
       
-      // STEP 1: ULTRA DETAILED DEBUGGING - Find the exact issue
+      console.log(`Attempting to transfer ${checkedItems.size} items to Checklist.`);
+      
+      // STEP 2: Collect ONLY checked items - Mirror Google Apps Script itemsToInsert array
       const itemsToTransfer = [];
-      let totalItemsScanned = 0;
-      let checkedItemsFound = 0;
-      let uncheckedItemsFound = 0;
       
-      // DEBUG: Log current checkedItems state in detail
-      console.log('🔍 DEBUGGING CHECKEDITEMS STATE:');
-      console.log('  - checkedItems type:', typeof checkedItems);
-      console.log('  - checkedItems instanceof Set:', checkedItems instanceof Set);
-      console.log('  - checkedItems.size:', checkedItems.size);
-      console.log('  - checkedItems values:', Array.from(checkedItems));
+      // Convert Set to Array for direct iteration - like Google Apps Script's approach
+      const checkedItemIds = Array.from(checkedItems);
+      console.log('🔍 Checked Item IDs:', checkedItemIds);
       
+      // Find actual item objects for the checked IDs
       if (filteredProject?.rooms) {
-        filteredProject.rooms.forEach((room, roomIndex) => {
-          console.log(`🏠 ROOM ${roomIndex + 1}: "${room.name}" (${room.categories?.length || 0} categories)`);
-          
-          room.categories?.forEach((category, catIndex) => {
-            console.log(`  📁 CATEGORY ${catIndex + 1}: "${category.name}" (${category.subcategories?.length || 0} subcategories)`);
-            
-            category.subcategories?.forEach((subcategory, subIndex) => {
-              console.log(`    📂 SUBCATEGORY ${subIndex + 1}: "${subcategory.name}" (${subcategory.items?.length || 0} items)`);
-              
-              subcategory.items?.forEach((item, itemIndex) => {
-                totalItemsScanned++;
-                
-                // CRITICAL DEBUGGING: Check each item individually
-                const isItemChecked = checkedItems.has(item.id);
-                console.log(`      📝 ITEM ${itemIndex + 1}: "${item.name}" (ID: ${item.id})`);
-                console.log(`          - checkedItems.has(${item.id}): ${isItemChecked}`);
-                
-                if (isItemChecked) {
-                  checkedItemsFound++;
-                  console.log(`          ✅ CHECKED - WILL TRANSFER`);
+        filteredProject.rooms.forEach(room => {
+          room.categories?.forEach(category => {
+            category.subcategories?.forEach(subcategory => {
+              subcategory.items?.forEach(item => {
+                // CRITICAL: Only include if this item's ID is in the checked list
+                if (checkedItemIds.includes(item.id)) {
+                  console.log(`✅ MATCHED CHECKED ITEM: "${item.name}" (ID: ${item.id})`);
                   itemsToTransfer.push({
                     item,
                     roomName: room.name,
                     categoryName: category.name,
                     subcategoryName: subcategory.name
                   });
-                } else {
-                  uncheckedItemsFound++;
-                  console.log(`          ❌ UNCHECKED - WILL SKIP`);
                 }
               });
             });
@@ -474,31 +453,17 @@ const SimpleWalkthroughSpreadsheet = ({
         });
       }
       
-      console.log('🔍 FINAL SCAN RESULTS:');
-      console.log(`  - Total items scanned: ${totalItemsScanned}`);
-      console.log(`  - Checked items found: ${checkedItemsFound}`);
-      console.log(`  - Unchecked items found: ${uncheckedItemsFound}`);
-      console.log(`  - Items queued for transfer: ${itemsToTransfer.length}`);
-      console.log(`  - checkedItems.size should equal checkedItemsFound: ${checkedItems.size} === ${checkedItemsFound} = ${checkedItems.size === checkedItemsFound}`);
-      
-      // VALIDATION: Verify that itemsToTransfer.length matches checkedItems.size
+      // VALIDATION: Ensure we found all checked items
       if (itemsToTransfer.length !== checkedItems.size) {
-        console.error(`🚨 CRITICAL MISMATCH: itemsToTransfer.length (${itemsToTransfer.length}) != checkedItems.size (${checkedItems.size})`);
-        alert(`DEBUG ERROR: Transfer list has ${itemsToTransfer.length} items but ${checkedItems.size} were checked. This indicates a logic error.`);
+        console.error(`🚨 MISMATCH: Found ${itemsToTransfer.length} items but expected ${checkedItems.size}`);
+        alert(`Error: Could not find all checked items. Expected ${checkedItems.size}, found ${itemsToTransfer.length}`);
         return;
       }
       
-      console.log(`📊 SCAN COMPLETE: ${totalItemsScanned} total items scanned`);
-      console.log(`🎯 TRANSFER QUEUE: ${itemsToTransfer.length} checked items ready for transfer`);
+      console.log(`Verified: ${itemsToTransfer.length} items ready for transfer`);
       
-      // VALIDATION: Must have checked items
-      if (itemsToTransfer.length === 0) {
-        alert('No items were selected or valid for transfer.');
-        return;
-      }
-
-      // Confirm transfer with specific count - like Google Apps Script
-      if (!confirm(`Transfer ${itemsToTransfer.length} selected items to Checklist? (Out of ${totalItemsScanned} total items)`)) {
+      // Confirm transfer - like Google Apps Script
+      if (!confirm(`Transfer ${itemsToTransfer.length} selected items to Checklist?`)) {
         return;
       }
 
