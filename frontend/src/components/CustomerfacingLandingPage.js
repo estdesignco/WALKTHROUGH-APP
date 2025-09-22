@@ -244,8 +244,9 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
             // Reset form
             e.target.reset();
         } catch (error) {
-            console.error('Failed to create project:', error);
-            alert('Failed to create project. Please try again.');
+            console.error('Error creating project:', error);
+            alert('Error creating project. Please try again.');
+        } finally {
             setIsLoading(false);
         }
     };
