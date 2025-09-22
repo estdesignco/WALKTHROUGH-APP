@@ -586,12 +586,17 @@ const SimpleWalkthroughSpreadsheet = ({
         }
       }
 
+      // Google Apps Script logic: Clear checkboxes after successful transfer
       if (successCount > 0) {
-        alert(`✅ Successfully transferred ${successCount} CHECKED items to Checklist!`);
-        setCheckedItems(new Set()); // Clear checkboxes
+        alert(`✅ Successfully transferred ${successCount} items to the Checklist.`);
+        
+        // Clear checkboxes exactly like Google Apps Script: checkboxRange.setValue(false)
+        console.log(`📝 Clearing ${checkedItems.size} checkboxes after successful transfer`);
+        setCheckedItems(new Set()); // Clear all checked items
+        
         if (onReload) onReload();
       } else {
-        alert('❌ Failed to transfer items.');
+        alert('Transfer Failed: An unexpected issue occurred or no items were selected. No items were transferred to the Checklist.');
       }
 
     } catch (error) {
