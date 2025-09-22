@@ -467,41 +467,34 @@ const SimpleWalkthroughSpreadsheet = ({
         return;
       }
 
-      // STEP 2: Transfer ONLY the checked items
+      // STEP 2: Transfer ONLY the checked items - Google Apps Script approach
+      // DO NOT create room structures - only transfer individual items
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const projectId = filteredProject.id;
       
       let successCount = 0;
-      const createdStructures = new Map();
+      
+      // Create a batch transfer request with ONLY the checked items
+      console.log(`🚀 TRANSFERRING ${itemsToTransfer.length} SPECIFIC ITEMS (Google Apps Script Style)`);
 
       for (const itemData of itemsToTransfer) {
         try {
-          const roomKey = `${itemData.roomName}_checklist`;
-          const categoryKey = `${roomKey}_${itemData.categoryName}`;
-          const subcategoryKey = `${categoryKey}_${itemData.subcategoryName}`;
+          console.log(`📝 Transferring item: "${itemData.item.name}" from ${itemData.roomName}/${itemData.categoryName}/${itemData.subcategoryName}`);
           
-          // Create room if needed
-          let roomId = createdStructures.get(roomKey);
-          if (!roomId) {
-            const roomResponse = await fetch(`${backendUrl}/api/rooms`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                name: itemData.roomName,
-                project_id: projectId,
-                sheet_type: 'checklist',
-                description: `Transferred from walkthrough`
-              })
-            });
-            
-            if (roomResponse.ok) {
-              const newRoom = await roomResponse.json();
-              roomId = newRoom.id;
-              createdStructures.set(roomKey, roomId);
-            } else {
-              console.error(`Failed to create room: ${itemData.roomName}`);
-              continue;
-            }
+          // Transfer by changing the item's status to PICKED (like Google Apps Script)
+          const transferResponse = await fetch(`${backendUrl}/api/items/${itemData.item.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              status: 'PICKED'  // This marks it as transferred to checklist
+            })
+          });
+          
+          if (transferResponse.ok) {
+            successCount++;
+            console.log(`✅ Item "${itemData.item.name}" marked as PICKED`);
+          } else {
+            console.error(`❌ Failed to transfer item: ${itemData.item.name}`);
           }
           
           // Create category if needed
