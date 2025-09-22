@@ -203,6 +203,8 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
         }
         setIsLoading(true);
         try {
+            console.log('🏠 Creating project with formData:', formData);
+            console.log('🏠 Rooms involved:', formData.rooms_involved);
             const newProject = await Project.create(formData);
 
             // Create rooms WITH THE CORRECT STARTER ITEMS
