@@ -27,7 +27,7 @@ from teams_integration import notify_status_change
 from dotenv import load_dotenv
 
 # Import Google Sheets functionality
-# from google_sheets_routes import router as google_sheets_router
+from google_sheets_routes import router as google_sheets_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
