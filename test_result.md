@@ -361,6 +361,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "CRITICAL: New Client Input Fields Cannot Accept Typing - URGENT FIX REQUIRED"
     - "CRITICAL SYSTEM RECOVERY TESTING: COMPLETED SUCCESSFULLY - 96.2% success rate, all core functionality verified"
     - "MongoDB Infrastructure Recovery: COMPLETED - Database connectivity restored, all endpoints operational"
     - "Enhanced Room Creation: VERIFIED - Kitchen creates 8 categories, 113 items from enhanced_rooms.py"
