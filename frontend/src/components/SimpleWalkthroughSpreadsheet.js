@@ -982,7 +982,13 @@ const SimpleWalkthroughSpreadsheet = ({
                                 <option value="CREATE_NEW">+ Create New Category</option>
                               </select>
                               <button 
-                                onClick={() => handleAddBlankRow(category.id)}
+                                onClick={() => {
+                                  // Use first subcategory ID from this category
+                                  const firstSubcategoryId = category.subcategories?.[0]?.id;
+                                  if (firstSubcategoryId) {
+                                    handleAddBlankRow(firstSubcategoryId);
+                                  }
+                                }}
                                 className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
                               >
                                 + ADD ITEM
