@@ -437,7 +437,11 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                         </FieldWrapper>
                         <InputField label="Best Time to Call" id="best_time_to_call" value={formData.best_time_to_call || ''} onChange={(e) => {
                             const value = e.target.value;
-                            setFormData(prev => ({ ...prev, best_time_to_call: value }));
+                            setFormData(prev => {
+                                const newFormData = { ...prev };
+                                newFormData.best_time_to_call = value;
+                                return newFormData;
+                            });
                         }} />
                     </Section>
 
