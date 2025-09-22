@@ -414,7 +414,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                         <FieldWrapper label="What type of project is this?">
                             <RadioGroup value={formData.project_type} onValueChange={(value) => handleFormChange('project_type', value)} className="text-stone-200">
                                 <div className="grid grid-cols-2 gap-2">
-                                    {["New Build", "Renovation", "Furniture/Styling Refresh", "Other"].map(option => (
+                                    {["Renovation", "New Construction", "Design Consultation", "Furniture Only"].map(option => (
                                         <div key={option} className="flex items-center space-x-2">
                                             <RadioGroupItem value={option} id={`type-${option}`} className="border-stone-400 text-[#8B7355]" />
                                             <Label htmlFor={`type-${option}`} className="text-sm text-stone-200">{option}</Label>
