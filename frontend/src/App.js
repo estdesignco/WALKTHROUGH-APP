@@ -209,6 +209,10 @@ const App = () => {
               path="/advanced-features" 
               element={<AdvancedFeaturesDashboard />}
             />
+            <Route 
+              path="/google-sheets-import" 
+              element={<GoogleSheetsImporter />}
+            />
             {/* Customer-facing routes */}
             <Route 
               path="/customer" 
