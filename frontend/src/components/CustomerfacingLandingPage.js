@@ -790,6 +790,11 @@ export default function Index() {
                       <Plus className="mr-2 h-5 w-5" /> Full Questionnaire
                   </Button>
               </Link>
+              <Link to="/google-sheets-import">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md transition-all duration-300 text-base">
+                      <FileSpreadsheet className="mr-2 h-5 w-5" /> Import Google Sheets
+                  </Button>
+              </Link>
           </div>
       </div>
 
