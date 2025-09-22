@@ -209,9 +209,11 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
 
             // Create rooms WITH THE CORRECT STARTER ITEMS
             if (formData.rooms_involved && formData.rooms_involved.length > 0) {
+                console.log('🏠 Creating rooms for:', formData.rooms_involved);
                 const uniqueRooms = [...new Set(formData.rooms_involved)];
                 
                 for (const roomName of uniqueRooms) {
+                    console.log('🏠 Creating room:', roomName);
                     const newRoom = await Room.create({ 
                         project_id: newProject.id, 
                         name: roomName, 
