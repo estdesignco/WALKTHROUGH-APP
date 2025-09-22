@@ -401,7 +401,10 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                     {/* Client Information */}
                     <Section title="Client Information">
                         <div className="grid grid-cols-2 gap-3">
-                            <InputField label="Client Name" id="client_name" value={formData.client_name || ''} onChange={(e) => handleFormChange('client_name', e.target.value)} />
+                            <InputField label="Client Name" id="client_name" value={formData.client_name || ''} onChange={(e) => {
+                                const value = e.target.value;
+                                setFormData(prev => ({ ...prev, client_name: value }));
+                            }} />
                             <InputField label="Project Name" id="name" value={formData.name || ''} onChange={(e) => handleFormChange('name', e.target.value)} />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
