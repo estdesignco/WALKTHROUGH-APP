@@ -185,6 +185,18 @@ backend:
         comment: "🎯 REVIEW REQUEST DIAGNOSTIC TESTING COMPLETED - SCRAPING ISSUES IDENTIFIED AND RESOLVED: Conducted comprehensive diagnostic testing of scraping functionality as requested. ✅ PLAYWRIGHT BROWSERS INSTALLED: Fixed critical issue - Playwright browsers were missing, now installed and functional (/pw-browsers/chromium-1091). ✅ SCRAPING ENDPOINT OPERATIONAL: POST /api/scrape-product responding correctly with 200 status and proper JSON format {success: true, data: {...}}. ✅ FOUR HANDS URL CORRECTED: User's URL 'fourhandshome.com' has typo - correct URL 'fourhands.com/product/248067-003' works perfectly, extracts name='Fenn Chair', vendor='Four Hands', sku='248067-003', price='$1,899', image_url. ✅ USER REPORTED ISSUES CONFIRMED: Size and finish_color fields are blank - this is due to website structure not matching selectors, not a system failure. ❌ WAYFAIR BLOCKED: Wayfair URL returns 'Access denied' - site blocks automated scraping. ✅ CORE FUNCTIONALITY WORKING: Basic scraping (name, price, vendor, sku, image) works correctly for supported sites. The scraping system is fully operational - user's main issue was the typo in the Four Hands URL."
 
 frontend:
+  - task: "CRITICAL: New Client Input Fields Cannot Accept Typing"
+    implemented: true
+    working: false
+    file: "CustomerfacingLandingPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL NEW CLIENT INPUT BUG CONFIRMED - REACT CONTROLLED COMPONENT ISSUE! Conducted comprehensive testing of the exact user-reported issue: 'Cannot type in cells on new client sheet'. ✅ NEW CLIENT MODAL ACCESS: Successfully opens from homepage 'New Client' button, displays complete form with Client Information, Project Details, and all sections. ✅ FIELD FOCUS WORKING: All input fields (client_name, name, email, phone, best_time_to_call, timeline) receive focus properly when clicked. ❌ CRITICAL TYPING ISSUE IDENTIFIED: Users can only type ONE CHARACTER at a time in all input fields. Testing shows: Client Name field - Expected: 'Sarah Johnson', Actual: 'S' | Project Name field - Expected: 'Modern Kitchen Renovation', Actual: 'M' | Email field - Expected: 'sarah.johnson@email.com', Actual: 's' | Phone field - Expected: '555-123-4567', Actual: '5'. ✅ ROOT CAUSE IDENTIFIED: fill() method works perfectly (shows 'Test Client Name' correctly), but type() method fails due to React controlled component state management issue. The onChange handler appears to be causing state conflicts where only the first character is retained. ❌ IMPACT: This completely blocks users from entering client information, making the New Client functionality unusable. ✅ WORKAROUND CONFIRMED: Programmatic fill() works, suggesting the issue is specifically with keyboard input handling in React components. URGENT: Fix React controlled component onChange handlers in CustomerfacingLandingPage.js InputField components."
+
   - task: "Filter Functionality Implementation"
     implemented: true
     working: true
