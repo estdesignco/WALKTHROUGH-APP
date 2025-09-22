@@ -462,7 +462,11 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                             <InputField label="Your Timeline" id="timeline" value={formData.timeline} onChange={(e) => {
                                 const value = e.target.value;
-                                setFormData(prev => ({ ...prev, timeline: value }));
+                                setFormData(prev => {
+                                    const newFormData = { ...prev };
+                                    newFormData.timeline = value;
+                                    return newFormData;
+                                });
                             }} />
                             <div>
                                 <Label htmlFor="budget_range" className="font-semibold text-stone-300">Budget Range</Label>
