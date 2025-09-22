@@ -424,22 +424,40 @@ const SimpleWalkthroughSpreadsheet = ({
         return;
       }
       
-      // STEP 1: Scan for ONLY checked items - EXACTLY like Google Apps Script populateChecklistFromWalkthroughApp()
+      // STEP 1: ULTRA DETAILED DEBUGGING - Find the exact issue
       const itemsToTransfer = [];
       let totalItemsScanned = 0;
+      let checkedItemsFound = 0;
+      let uncheckedItemsFound = 0;
+      
+      // DEBUG: Log current checkedItems state in detail
+      console.log('🔍 DEBUGGING CHECKEDITEMS STATE:');
+      console.log('  - checkedItems type:', typeof checkedItems);
+      console.log('  - checkedItems instanceof Set:', checkedItems instanceof Set);
+      console.log('  - checkedItems.size:', checkedItems.size);
+      console.log('  - checkedItems values:', Array.from(checkedItems));
       
       if (filteredProject?.rooms) {
-        filteredProject.rooms.forEach(room => {
-          room.categories?.forEach(category => {
-            category.subcategories?.forEach(subcategory => {
-              subcategory.items?.forEach(item => {
+        filteredProject.rooms.forEach((room, roomIndex) => {
+          console.log(`🏠 ROOM ${roomIndex + 1}: "${room.name}" (${room.categories?.length || 0} categories)`);
+          
+          room.categories?.forEach((category, catIndex) => {
+            console.log(`  📁 CATEGORY ${catIndex + 1}: "${category.name}" (${category.subcategories?.length || 0} subcategories)`);
+            
+            category.subcategories?.forEach((subcategory, subIndex) => {
+              console.log(`    📂 SUBCATEGORY ${subIndex + 1}: "${subcategory.name}" (${subcategory.items?.length || 0} items)`);
+              
+              subcategory.items?.forEach((item, itemIndex) => {
                 totalItemsScanned++;
                 
-                // CRITICAL LOGIC: Mirror Google Apps Script line "if (checkboxValue === true)"
+                // CRITICAL DEBUGGING: Check each item individually
                 const isItemChecked = checkedItems.has(item.id);
+                console.log(`      📝 ITEM ${itemIndex + 1}: "${item.name}" (ID: ${item.id})`);
+                console.log(`          - checkedItems.has(${item.id}): ${isItemChecked}`);
                 
                 if (isItemChecked) {
-                  console.log(`✅ FOUND CHECKED ITEM: "${item.name}" (ID: ${item.id}) - WILL TRANSFER`);
+                  checkedItemsFound++;
+                  console.log(`          ✅ CHECKED - WILL TRANSFER`);
                   itemsToTransfer.push({
                     item,
                     roomName: room.name,
@@ -447,12 +465,27 @@ const SimpleWalkthroughSpreadsheet = ({
                     subcategoryName: subcategory.name
                   });
                 } else {
-                  console.log(`❌ UNCHECKED ITEM: "${item.name}" (ID: ${item.id}) - WILL SKIP`);
+                  uncheckedItemsFound++;
+                  console.log(`          ❌ UNCHECKED - WILL SKIP`);
                 }
               });
             });
           });
         });
+      }
+      
+      console.log('🔍 FINAL SCAN RESULTS:');
+      console.log(`  - Total items scanned: ${totalItemsScanned}`);
+      console.log(`  - Checked items found: ${checkedItemsFound}`);
+      console.log(`  - Unchecked items found: ${uncheckedItemsFound}`);
+      console.log(`  - Items queued for transfer: ${itemsToTransfer.length}`);
+      console.log(`  - checkedItems.size should equal checkedItemsFound: ${checkedItems.size} === ${checkedItemsFound} = ${checkedItems.size === checkedItemsFound}`);
+      
+      // VALIDATION: Verify that itemsToTransfer.length matches checkedItems.size
+      if (itemsToTransfer.length !== checkedItems.size) {
+        console.error(`🚨 CRITICAL MISMATCH: itemsToTransfer.length (${itemsToTransfer.length}) != checkedItems.size (${checkedItems.size})`);
+        alert(`DEBUG ERROR: Transfer list has ${itemsToTransfer.length} items but ${checkedItems.size} were checked. This indicates a logic error.`);
+        return;
       }
       
       console.log(`📊 SCAN COMPLETE: ${totalItemsScanned} total items scanned`);
