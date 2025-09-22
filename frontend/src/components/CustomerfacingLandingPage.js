@@ -431,14 +431,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                             </RadioGroup>
                         </FieldWrapper>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                            <InputField label="Your Timeline" id="timeline" value={formData.timeline} onChange={(e) => {
-                                const value = e.target.value;
-                                setFormData(prev => {
-                                    const newFormData = { ...prev };
-                                    newFormData.timeline = value;
-                                    return newFormData;
-                                });
-                            }} />
+                            <InputField label="Your Timeline" id="timeline" name="timeline" />
                             <div>
                                 <Label htmlFor="budget_range" className="font-semibold text-stone-300">Budget Range</Label>
                                 <Select value={formData.budget_range} onValueChange={(value) => handleFormChange('budget_range', value)}>
