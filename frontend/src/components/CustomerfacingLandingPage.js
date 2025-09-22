@@ -165,7 +165,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [newRoomName, setNewRoomName] = useState("");
 
-    const handleFormChange = (field, value) => {
+    const handleFormChange = React.useCallback((field, value) => {
         if (field === 'phone') {
             const onlyNums = value.replace(/[^\d]/g, '');
             let formatted = onlyNums;
@@ -178,7 +178,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
         } else {
             setFormData(prev => ({ ...prev, [field]: value }));
         }
-    };
+    }, []);
 
     const handleRoomsChange = (newRooms) => {
         handleFormChange('rooms_involved', newRooms);
