@@ -44,7 +44,7 @@ app.add_middleware(
 )
 
 # Include Google Sheets import routes
-# app.include_router(google_sheets_router)
+app.include_router(google_sheets_router)
 
 # ... [rest of existing server.py code remains the same] ...
 
