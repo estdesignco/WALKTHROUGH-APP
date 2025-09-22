@@ -1,0 +1,650 @@
+
+import React, { useState, useEffect, useCallback } from "react";
+import { useLocation, Link } from "react-router-dom";
+import { Project } from "@/api/entities";
+import { Room } from "@/api/entities";
+import { Item } from "@/api/entities";
+import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, Plus } from "lucide-react";
+import { createPageUrl } from "@/utils";
+import WalkthroughSpreadsheet from "@/components/project/WalkthroughSpreadsheet";
+import ChecklistSpreadsheet from "@/components/project/ChecklistSpreadsheet";
+import FFESpreadsheet from "@/components/project/FFESpreadsheet";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion"
+
+const EditableQuestionnaireTab = ({ project, onUpdate }) => {
+    const [formData, setFormData] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (project) {
+            const initialData = { ...project };
+            
+            const contactFields = [
+                'new_build_architect_additional_contacts', 'new_build_builder_additional_contacts',
+                'renovation_architect_additional_contacts', 'renovation_builder_additional_contacts'
+            ];
+            contactFields.forEach(field => {
+                if (typeof initialData[field] === 'string') {
+                    initialData[field] = initialData[field].split(',').map(s => s.trim()).filter(Boolean);
+                } else if (!Array.isArray(initialData[field])) {
+                    initialData[field] = [];
+                }
+            });
+
+            const arrayStringFields = [
+                'contact_preferences', 'project_priority', 'rooms_involved', 'additional_rooms_involved',
+                'design_preferred_palette', 'design_artwork_preference', 'design_styles_preference', 
+                'finishes_patterns_preference'
+            ];
+            arrayStringFields.forEach(field => {
+                if (Array.isArray(initialData[field])) {
+                    initialData[field] = initialData[field].join(', ');
+                } else if (typeof initialData[field] !== 'string') {
+                    initialData[field] = '';
+                }
+            });
+            
+            setFormData(initialData);
+        }
+    }, [project]);
+
+    const handleFieldChange = (field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleAdditionalContactChange = (field, index, value) => {
+        setFormData(prev => {
+            const updatedContacts = [...(prev[field] || [])];
+            updatedContacts[index] = value;
+            return { ...prev, [field]: updatedContacts };
+        });
+    };
+
+    const addAdditionalContact = (field) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: [...(prev[field] || []), '']
+        }));
+    };
+
+    const removeAdditionalContact = (field, index) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: (prev[field] || []).filter((_, i) => i !== index)
+        }));
+    };
+
+    const handleSave = async () => {
+        setIsLoading(true);
+        try {
+            const dataToSave = { ...formData };
+            
+            const contactFields = [
+                'new_build_architect_additional_contacts', 'new_build_builder_additional_contacts',
+                'renovation_architect_additional_contacts', 'renovation_builder_additional_contacts'
+            ];
+            contactFields.forEach(field => {
+                if (Array.isArray(dataToSave[field])) {
+                    dataToSave[field] = dataToSave[field].filter(Boolean);
+                } else { 
+                    dataToSave[field] = [];
+                }
+            });
+
+            const arrayStringFields = [
+                'contact_preferences', 'project_priority', 'rooms_involved', 'additional_rooms_involved',
+                'design_preferred_palette', 'design_artwork_preference', 'design_styles_preference',
+                'finishes_patterns_preference'
+            ];
+
+            arrayStringFields.forEach(field => {
+                if (typeof dataToSave[field] === 'string') {
+                    dataToSave[field] = dataToSave[field].split(',').map(s => s.trim()).filter(Boolean);
+                } else if (!dataToSave[field]) { 
+                    dataToSave[field] = [];
+                }
+            });
+
+            // Room sync logic
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            const newRoomsInvolved = new Set([...(dataToSave.rooms_involved || []), ...(dataToSave.additional_rooms_involved || [])]);
+            const currentRooms = await Room.filter({ project_id: project.id });
+            const currentRoomNames = new Set(currentRooms.map(r => r.name));
+
+            const roomsToAdd = Array.from(newRoomsInvolved).filter(name => !currentRoomNames.has(name));
+            const roomsToDelete = currentRooms.filter(room => !newRoomsInvolved.has(room.name));
+
+            for (const roomToDelete of roomsToDelete) {
+                const roomItems = await Item.filter({ room_id: roomToDelete.id });
+                for (const item of roomItems) {
+                    await Item.delete(item.id);
+                    await sleep(100);
+                }
+                await Room.delete(roomToDelete.id);
+            }
+
+            // THIS IS THE CORRECTED, SIMPLIFIED ITEM POPULATION LOGIC
+            for (const roomNameToAdd of roomsToAdd) {
+                const newRoom = await Room.create({ project_id: project.id, name: roomNameToAdd });
+                
+                const basicItems = [
+                    { category: 'LIGHTING', sub_category: 'CEILING', name: 'Ceiling Light - Click to edit' },
+                    { category: 'FURNITURE', sub_category: 'SEATING', name: 'Seating - Click to edit' },
+                    { category: 'ACCESSORIES', sub_category: 'ART & DECOR', name: 'Art & Decor - Click to edit' },
+                    { category: 'PAINT, WALLPAPER, HARDWARE & FINISHES', sub_category: 'WALL', name: 'Wall Finish - Click to edit' },
+                    { category: 'PAINT, WALLPAPER, HARDWARE & FINISHES', sub_category: 'FLOORING', name: 'Flooring - Click to edit' }
+                ];
+
+                if (roomNameToAdd.toLowerCase().includes('kitchen')) {
+                    basicItems.push(
+                        { category: 'APPLIANCES', sub_category: 'KITCHEN APPLIANCES', name: 'Refrigerator - Click to edit' },
+                        { category: 'PLUMBING', sub_category: 'KITCHEN SINKS & FAUCETS', name: 'Kitchen Sink - Click to edit' },
+                        { category: 'CABINETS', sub_category: 'LOWER', name: 'Lower Cabinets - Click to edit' },
+                        { category: 'COUNTERTOPS & TILE', sub_category: 'COUNTERTOPS', name: 'Countertops - Click to edit' }
+                    );
+                } else if (roomNameToAdd.toLowerCase().includes('bath')) {
+                    basicItems.push(
+                        { category: 'PLUMBING', sub_category: 'SHOWER & TUB', name: 'Shower/Tub - Click to edit' },
+                        { category: 'CABINETS', sub_category: 'VANITY', name: 'Vanity - Click to edit' },
+                        { category: 'COUNTERTOPS & TILE', sub_category: 'TILE', name: 'Floor Tile - Click to edit' }
+                    );
+                } else if (roomNameToAdd.toLowerCase().includes('bedroom')) {
+                     basicItems.push(
+                        { category: 'FURNITURE', sub_category: 'BEDS', name: 'Bed - Click to edit' },
+                        { category: 'TEXTILES', sub_category: 'BEDDING', name: 'Bedding - Click to edit' }
+                    );
+                }
+
+                const itemsToCreate = basicItems.map(item => ({
+                    project_id: project.id,
+                    room_id: newRoom.id,
+                    category: item.category,
+                    sub_category: item.sub_category,
+                    name: item.name,
+                    status: 'Walkthrough',
+                    quantity: 1,
+                }));
+
+                await Item.bulkCreate(itemsToCreate);
+            }
+            
+            await Project.update(project.id, dataToSave);
+            onUpdate();
+            alert('Project updated successfully!');
+
+        } catch (error) {
+            console.error("Failed to update project and sync rooms:", error);
+            alert('An error occurred while updating the project. Please check the console for details.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const formatPhone = (value) => {
+        const onlyNums = value.replace(/[^\d]/g, '');
+        let formatted = onlyNums;
+        if (onlyNums.length > 3 && onlyNums.length <= 6) {
+            formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`;
+        } else if (onlyNums.length > 6) {
+            formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 6)}-${onlyNums.slice(6, 10)}`;
+        }
+        return formatted;
+    };
+
+    const handlePhoneChange = (value) => {
+        // Only update if value is valid for phone formatting or empty
+        if (/^[\d-]*$/.test(value) || value === '') {
+            handleFieldChange('phone', formatPhone(value));
+        }
+    };
+
+    // Helper for rendering input fields
+    const renderInput = (label, field, type = "text", placeholder = "") => (
+        <div>
+            <Label htmlFor={field} className="text-stone-300">{label}</Label>
+            <Input
+                id={field}
+                type={type}
+                value={formData[field] || ''}
+                onChange={(e) => handleFieldChange(field, e.target.value)}
+                className="bg-stone-700 border-stone-600 text-stone-200 mt-1"
+                placeholder={placeholder}
+            />
+        </div>
+    );
+
+    // Helper for rendering textarea fields - simplified to handle strings naturally
+    const renderTextarea = (label, field, placeholder = "") => (
+        <div>
+            <Label htmlFor={field} className="text-stone-300">{label}</Label>
+            <Textarea
+                id={field}
+                value={formData[field] || ''}
+                onChange={(e) => handleFieldChange(field, e.target.value)}
+                className="bg-stone-700 border-stone-600 text-stone-200 min-h-[80px] mt-1"
+                placeholder={placeholder}
+            />
+        </div>
+    );
+
+    // Helper for rendering select fields
+    const renderSelect = (label, field, options, placeholder = "Select...") => (
+        <div>
+            <Label htmlFor={field} className="text-stone-300">{label}</Label>
+            <Select value={formData[field] || ''} onValueChange={(value) => handleFieldChange(field, value)}>
+                <SelectTrigger id={field} className="bg-stone-700 border-stone-600 text-stone-200 mt-1">
+                    <SelectValue placeholder={placeholder} />
+                </SelectTrigger>
+                <SelectContent className="bg-stone-800 text-stone-200 border-stone-700">
+                    {options.map(opt => (
+                        <SelectItem key={opt.value} value={opt.value} className="hover:bg-stone-700">
+                            {opt.label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
+    );
+
+    // Helper for rendering dynamic contact list
+    const renderContactList = (label, field) => (
+        <div className="col-span-1 md:col-span-2 space-y-2">
+            <Label className="text-stone-300">{label}</Label>
+            {(formData[field] || []).map((contact, index) => (
+                <div key={index} className="flex items-center gap-2">
+                    <Input
+                        type="text"
+                        value={contact}
+                        onChange={(e) => handleAdditionalContactChange(field, index, e.target.value)}
+                        className="bg-stone-700 border-stone-600 text-stone-200"
+                        placeholder="Name - email@example.com - 555-1234"
+                    />
+                    <Button type="button" variant="destructive" size="sm" onClick={() => removeAdditionalContact(field, index)} className="bg-red-500 hover:bg-red-600 text-white">
+                        Remove
+                    </Button>
+                </div>
+            ))}
+            <Button type="button" variant="outline" size="sm" onClick={() => addAdditionalContact(field)} className="border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-stone-100">
+                <Plus className="w-4 h-4 mr-2" /> Add Contact
+            </Button>
+        </div>
+    );
+
+    return (
+        <div className="space-y-8 p-6 max-w-6xl mx-auto">
+            <div className="flex justify-between items-center bg-[#1E293B] p-4 rounded-md shadow-lg border border-stone-700">
+                <h2 className="text-2xl font-bold text-[#8B7355]">Edit Project Details</h2>
+                <Button onClick={handleSave} disabled={isLoading} className="bg-[#8B7355] hover:bg-[#7A6249] text-stone-100">
+                    {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                    Save Changes
+                </Button>
+            </div>
+
+            {/* Client & Project Information */}
+            <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-[#8B7355]">Client & Project Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderInput("Project Name", "name")}
+                        {renderInput("Client Name", "client_name")}
+                        {renderInput("Address", "address")}
+                        {renderInput("Email", "email", "email")}
+                        <div>
+                            <Label htmlFor="phone" className="text-stone-300">Phone</Label>
+                            <Input
+                                id="phone"
+                                value={formData.phone || ''}
+                                onChange={(e) => handlePhoneChange(e.target.value)}
+                                className="bg-stone-700 border-stone-600 text-stone-200 mt-1"
+                                placeholder="e.g. 123-456-7890"
+                            />
+                        </div>
+                        {renderTextarea("Contact Preferences (comma-separated)", "contact_preferences", "email, phone, text")}
+                        {renderInput("Best Time to Call", "best_time_to_call")}
+                        {renderSelect("Worked with Designer Before", "worked_with_designer_before", [
+                            { value: "yes", label: "Yes" },
+                            { value: "no", label: "No" },
+                        ])}
+                        {renderInput("Primary Decision Maker", "primary_decision_maker")}
+                        {renderSelect("Desired Involvement Level", "involvement_level", [
+                            { value: "high", label: "High - I want to be involved in every decision" },
+                            { value: "medium", label: "Medium - I want to approve major decisions" },
+                            { value: "low", label: "Low - I trust you to make most decisions" },
+                        ])}
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Scope & Budget */}
+            <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-[#8B7355]">Scope & Budget</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderSelect("Project Type", "project_type", [
+                            { value: "New Build", label: "New Build" },
+                            { value: "Renovation", label: "Renovation" },
+                            { value: "Furniture/Styling Refresh", label: "Furniture/Styling Refresh" },
+                            { value: "Other", label: "Other" },
+                        ])}
+                        {renderInput("Timeline", "timeline")}
+                        {renderSelect("Budget Range", "budget_range", [
+                            { value: "35k-65k", label: "$35k - $65k" },
+                            { value: "75k-100k", label: "$75k - $100k" },
+                            { value: "125k-500k", label: "$125k - $500k" },
+                            { value: "600k-1M", label: "$600k - $1M" },
+                            { value: "2M-5M", label: "$2M - $5M" },
+                            { value: "7M-10M", label: "$7M - $10M" },
+                            { value: "other", label: "Other" },
+                        ])}
+                        {renderInput("Ideal Sofa Price", "ideal_sofa_price")}
+                        {renderTextarea("Project Priorities (comma-separated)", "project_priority", "quality, timeline, budget")}
+                        {renderTextarea("Rooms Involved (comma-separated)", "rooms_involved", "Living Room, Kitchen, Primary Bedroom")}
+                        {renderTextarea("Additional Rooms Involved (comma-separated)", "additional_rooms_involved", "Guest Bedroom, Office")}
+                    </div>
+                    {formData.project_type === 'Other' && (
+                        <div className="col-span-2">
+                            {renderTextarea("Other Project Description", "other_project_description")}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* Conditional Sections based on Project Type */}
+            {formData.project_type === 'New Build' && (
+                <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                    <CardHeader>
+                        <CardTitle className="text-[#8B7355]">New Build Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <Accordion type="multiple" className="w-full" defaultValue={['architect', 'builder']}>
+                            <AccordionItem value="architect" className="border-b-stone-600">
+                                <AccordionTrigger className="text-lg text-stone-300 hover:no-underline">Architect Information</AccordionTrigger>
+                                <AccordionContent className="pt-4 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderInput("Architect", "new_build_architect")}
+                                        {renderInput("Architect Main Contact", "new_build_architect_main_contact")}
+                                        {renderInput("Architect Email", "new_build_architect_email", "email")}
+                                        {renderInput("Architect Phone", "new_build_architect_phone")}
+                                        {renderContactList("Architect Additional Contacts", "new_build_architect_additional_contacts")}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="builder" className="border-b-stone-600">
+                                <AccordionTrigger className="text-lg text-stone-300 hover:no-underline">Builder Information</AccordionTrigger>
+                                <AccordionContent className="pt-4 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderInput("Builder", "new_build_builder")}
+                                        {renderInput("Builder Main Contact", "new_build_builder_main_contact")}
+                                        {renderInput("Builder Email", "new_build_builder_email", "email")}
+                                        {renderInput("Builder Phone", "new_build_builder_phone")}
+                                        {renderContactList("Builder Additional Contacts", "new_build_builder_additional_contacts")}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-stone-600 pt-6">
+                            {renderInput("New Build Address", "new_build_address")}
+                             {renderSelect("Has Plans", "new_build_has_plans", [
+                                { value: "yes", label: "Yes" },
+                                { value: "no", label: "No" },
+                            ])}
+                            {renderInput("Process Stage", "new_build_process_stage")}
+                            {renderSelect("Needs Furniture", "new_build_need_furniture", [
+                                { value: "yes", label: "Yes" },
+                                { value: "no", label: "No" },
+                            ])}
+                        </div>
+                        {renderTextarea("New Build Scope Notes", "new_build_scope_notes")}
+                    </CardContent>
+                </Card>
+            )}
+
+            {formData.project_type === 'Renovation' && (
+                <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                    <CardHeader>
+                        <CardTitle className="text-[#8B7355]">Renovation Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                       <Accordion type="multiple" className="w-full" defaultValue={['architect', 'builder']}>
+                            <AccordionItem value="architect" className="border-b-stone-600">
+                                <AccordionTrigger className="text-lg text-stone-300 hover:no-underline">Architect Information</AccordionTrigger>
+                                <AccordionContent className="pt-4 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderInput("Architect", "renovation_architect")}
+                                        {renderInput("Architect Main Contact", "renovation_architect_main_contact")}
+                                        {renderInput("Architect Email", "renovation_architect_email", "email")}
+                                        {renderInput("Architect Phone", "renovation_architect_phone")}
+                                        {renderContactList("Architect Additional Contacts", "renovation_architect_additional_contacts")}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="builder" className="border-b-stone-600">
+                                <AccordionTrigger className="text-lg text-stone-300 hover:no-underline">Builder Information</AccordionTrigger>
+                                <AccordionContent className="pt-4 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderInput("Builder", "renovation_builder")}
+                                        {renderInput("Builder Main Contact", "renovation_builder_main_contact")}
+                                        {renderInput("Builder Email", "renovation_builder_email", "email")}
+                                        {renderInput("Builder Phone", "renovation_builder_phone")}
+                                        {renderContactList("Builder Additional Contacts", "renovation_builder_additional_contacts")}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-stone-600 pt-6">
+                            {renderInput("Renovation Address", "renovation_address")}
+                            {renderInput("Move-in Date", "renovation_move_in_date", "date")}
+                            {renderSelect("Has Updated Plans", "renovation_has_updated_plans", [
+                                { value: "yes", label: "Yes" },
+                                { value: "no", label: "No" },
+                            ])}
+                            {renderSelect("Needs Furniture", "renovation_need_furniture", [
+                                { value: "yes", label: "Yes" },
+                                { value: "no", label: "No" },
+                            ])}
+                        </div>
+                        {renderTextarea("Existing Condition", "renovation_existing_condition")}
+                        {renderTextarea("Renovation Memories", "renovation_memories")}
+                        {renderTextarea("Renovation Scope Notes", "renovation_scope_notes")}
+                    </CardContent>
+                </Card>
+            )}
+
+            {formData.project_type === 'Furniture/Styling Refresh' && (
+                <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                    <CardHeader>
+                        <CardTitle className="text-[#8B7355]">Furniture/Styling Refresh Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {renderSelect("Has Current Plans", "furniture_has_current_plans", [
+                                { value: "yes", label: "Yes" },
+                                { value: "no", label: "No" },
+                            ])}
+                            {renderInput("Move-in Date", "furniture_move_in_date", "date")}
+                        </div>
+                        {renderTextarea("Condition of Refresh", "furniture_refresh_condition")}
+                        {renderTextarea("Furniture Scope Notes", "furniture_scope_notes")}
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Design & Style Preferences */}
+            <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-[#8B7355]">Design & Style Preferences</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderTextarea("What They Love About Home", "design_love_home")}
+                        {renderTextarea("How Space Will Be Used", "design_space_use")}
+                        {renderTextarea("How Space Is Currently Used", "design_current_use")}
+                        {renderTextarea("First Impression for Guests", "design_first_impression")}
+                        {renderInput("Common Color Palette", "design_common_color_palette")}
+                        {renderTextarea("Preferred Color Palette (comma-separated)", "design_preferred_palette", "whites, blues, grays")}
+                        {renderInput("Disliked Colors", "design_disliked_colors")}
+                        {renderTextarea("Artwork Preference (comma-separated)", "design_artwork_preference", "modern, abstract, photography")}
+                        {renderTextarea("Style Preferences (comma-separated)", "design_styles_preference", "modern, transitional, farmhouse")}
+                        {renderTextarea("Styles They Love", "design_styles_love")}
+                        {renderTextarea("Existing Furniture to Keep", "design_existing_furniture")}
+                        {renderTextarea("Finishes/Patterns Preference (comma-separated)", "finishes_patterns_preference", "natural wood, marble, linen")}
+                        {renderTextarea("Materials to Avoid", "design_materials_to_avoid")}
+                        {renderTextarea("Meaningful Item", "design_meaningful_item")}
+                        {renderTextarea("Special Requirements", "design_special_requirements")}
+                        {renderInput("Pinterest/Houzz Links", "design_pinterest_houzz")}
+                        {renderTextarea("Additional Design Comments", "design_additional_comments")}
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Get To Know You */}
+            <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-[#8B7355]">Get To Know You</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderTextarea("Household Members", "know_you_household")}
+                        {renderTextarea("Pets", "know_you_pets")}
+                        {renderInput("Social Media", "know_you_social_media")}
+                        {renderInput("Hobbies", "know_you_hobbies")}
+                        {renderInput("What They Do For Fun", "know_you_fun")}
+                        {renderInput("What Makes Them Happy", "know_you_happy")}
+                        {renderInput("Family Birthdays", "know_you_family_birthdays")}
+                        {renderInput("Anniversary", "know_you_anniversary", "date")}
+                        {renderTextarea("What They Do As a Family", "know_you_family_together")}
+                        {renderTextarea("Weekday Routine", "know_you_weekday_routine")}
+                        {renderTextarea("Weekend Routine", "know_you_weekend_routine")}
+                        {renderInput("Lighting Preference (Early Birds/Night Owls)", "know_you_lighting_preference")}
+                        {renderTextarea("Entertaining Style", "know_you_entertaining_style")}
+                        {renderInput("Favorite Restaurant", "know_you_favorite_restaurant")}
+                        {renderInput("Favorite Vacation", "know_you_favorite_vacation")}
+                        {renderInput("Favorite Foods", "know_you_favorite_foods")}
+                        {renderTextarea("Where Family Relaxes", "know_you_relax_space")}
+                        {renderTextarea("How They Want Space to Feel", "know_you_evoke_space")}
+                        {renderTextarea("How Home Supports Social Life", "know_you_support_social_life")}
+                        {renderTextarea("Future Family Plans (5-10 years)", "know_you_future_plans")}
+                        {renderTextarea("Anything Else to Share", "know_you_share_more")}
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Referral */}
+            <Card className="bg-[#1E293B] border-stone-700 shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-[#8B7355]">Referral</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {renderInput("How They Heard About Us", "how_heard")}
+                        {renderTextarea("Other Referral Details", "how_heard_other")}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+};
+
+export default function ProjectPage() {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const projectId = searchParams.get("id");
+    
+    const [project, setProject] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState("Questionnaire");
+
+    const fetchProject = useCallback(async () => {
+        if (projectId) {
+            setIsLoading(true);
+            try {
+                const projectData = await Project.get(projectId);
+                setProject(projectData);
+            } catch (error) {
+                console.error("Failed to fetch project:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    }, [projectId]);
+
+    useEffect(() => {
+        fetchProject();
+    }, [fetchProject]);
+    
+    const tabs = [
+        { name: "Questionnaire", icon: FileQuestion, component: <EditableQuestionnaireTab project={project} onUpdate={fetchProject} /> },
+        { name: "Walkthrough", icon: Aperture, component: <WalkthroughSpreadsheet project={project} /> },
+        { name: "Checklist", icon: CheckSquare, component: <ChecklistSpreadsheet project={project} /> },
+        { name: "FF&E", icon: Trello, component: <FFESpreadsheet project={project} /> },
+    ];
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <Loader2 className="w-12 h-12 mr-2 animate-spin text-stone-400" /> <span className="text-stone-300">Loading project...</span>
+            </div>
+        );
+    }
+    
+    if (!project) {
+        return <div className="text-center text-stone-300">Project not found.</div>;
+    }
+
+    return (
+        <div className="space-y-6">
+            <div>
+                <Link to={createPageUrl("Index")} className="inline-flex items-center text-sm font-medium text-stone-400 hover:text-stone-100 mb-4">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to All Projects
+                </Link>
+                <h1 className="text-6xl font-bold" style={{color: '#8B7355'}}>{project.name}</h1>
+                <p className="text-stone-300 mt-1 text-lg">{project.client_name} - {project.address}</p>
+            </div>
+
+            <div className="border-b border-stone-700">
+                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.name}
+                            onClick={() => setActiveTab(tab.name)}
+                            className={`whitespace-nowrap py-4 px-4 border-b-2 font-semibold text-lg transition-colors ${
+                                activeTab === tab.name
+                                    ? 'border-[#8B7355] text-[#8B7355]'
+                                    : 'border-transparent text-stone-400 hover:text-stone-200 hover:border-stone-500'
+                            }`}
+                        >
+                            <tab.icon className="inline-block w-6 h-6 mr-3" />
+                            {tab.name}
+                        </button>
+                    ))}
+                </nav>
+            </div>
+            
+            <div className="mt-6">
+                {tabs.find(tab => tab.name === activeTab)?.component}
+            </div>
+        </div>
+    );
+}
