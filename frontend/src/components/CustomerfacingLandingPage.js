@@ -197,13 +197,33 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
 
     const handleCreateProject = async (e) => {
         e.preventDefault();
-        if (!formData.name && !formData.client_name) {
-            alert('Please provide at least a project name or client name.');
-            return;
-        }
         setIsLoading(true);
+
         try {
-            const newProject = await Project.create(formData);
+            const formData = new FormData(e.target);
+            const formValues = Object.fromEntries(formData.entries());
+            
+            const projectData = {
+                name: formValues.name || `${formValues.client_name}'s Project`,
+                client_info: {
+                    full_name: formValues.client_name,
+                    email: formValues.email,
+                    phone: formValues.phone,
+                    address: formValues.address || '',
+                    contact_preferences: [],
+                    best_time_to_call: formValues.best_time_to_call || ''
+                },
+                project_type: formValues.project_type || 'Renovation',
+                timeline: formValues.timeline || '',
+                budget: formValues.budget_range || '$35k-65k',
+                rooms_involved: [],
+                design_styles_preference: [],
+                design_preferred_palette: [],
+                design_artwork_preference: []
+            };
+
+            console.log('Creating project with data:', projectData);
+            const newProject = await Project.create(projectData);
 
             // Create rooms WITH THE CORRECT STARTER ITEMS
             if (formData.rooms_involved && formData.rooms_involved.length > 0) {
