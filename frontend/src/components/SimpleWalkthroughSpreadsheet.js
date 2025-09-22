@@ -413,27 +413,33 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const handleTransferToChecklist = async () => {
     try {
-      console.log('🚀 TRANSFER TO CHECKLIST: ONLY CHECKED ITEMS - FIXED VERSION');
-      console.log('📊 checkedItems:', checkedItems);
+      console.log('🚀 TRANSFER TO CHECKLIST: GOOGLE APPS SCRIPT LOGIC - ONLY CHECKED ITEMS');
+      console.log('📊 checkedItems state:', checkedItems);
       console.log('📊 checkedItems.size:', checkedItems.size);
       console.log('📊 Array.from(checkedItems):', Array.from(checkedItems));
       
+      // VALIDATION: Exactly like Google Apps Script - check if any items are selected
       if (checkedItems.size === 0) {
-        alert('No items are checked for transfer. Please check the items you want to transfer first.');
+        alert('Please select items in the Walkthrough App by checking their checkboxes (Column A) before attempting to transfer.');
         return;
       }
       
-      // STEP 1: Find ONLY the checked items
+      // STEP 1: Scan for ONLY checked items - EXACTLY like Google Apps Script populateChecklistFromWalkthroughApp()
       const itemsToTransfer = [];
+      let totalItemsScanned = 0;
       
       if (filteredProject?.rooms) {
         filteredProject.rooms.forEach(room => {
           room.categories?.forEach(category => {
             category.subcategories?.forEach(subcategory => {
               subcategory.items?.forEach(item => {
-                // CRITICAL FIX: Only process if item is actually checked
-                if (checkedItems.has(item.id)) {
-                  console.log(`✅ CHECKED ITEM: ${item.name} (ID: ${item.id})`);
+                totalItemsScanned++;
+                
+                // CRITICAL LOGIC: Mirror Google Apps Script line "if (checkboxValue === true)"
+                const isItemChecked = checkedItems.has(item.id);
+                
+                if (isItemChecked) {
+                  console.log(`✅ FOUND CHECKED ITEM: "${item.name}" (ID: ${item.id}) - WILL TRANSFER`);
                   itemsToTransfer.push({
                     item,
                     roomName: room.name,
@@ -441,7 +447,7 @@ const SimpleWalkthroughSpreadsheet = ({
                     subcategoryName: subcategory.name
                   });
                 } else {
-                  console.log(`❌ SKIPPED: ${item.name} (not checked)`);
+                  console.log(`❌ UNCHECKED ITEM: "${item.name}" (ID: ${item.id}) - WILL SKIP`);
                 }
               });
             });
@@ -449,15 +455,17 @@ const SimpleWalkthroughSpreadsheet = ({
         });
       }
       
-      console.log(`🎯 FINAL COUNT: ${itemsToTransfer.length} items to transfer`);
+      console.log(`📊 SCAN COMPLETE: ${totalItemsScanned} total items scanned`);
+      console.log(`🎯 TRANSFER QUEUE: ${itemsToTransfer.length} checked items ready for transfer`);
       
+      // VALIDATION: Must have checked items
       if (itemsToTransfer.length === 0) {
-        alert('No checked items found. Please check some items first.');
+        alert('No items were selected or valid for transfer.');
         return;
       }
 
-      // Confirm transfer
-      if (!confirm(`Transfer ${itemsToTransfer.length} checked items to Checklist?`)) {
+      // Confirm transfer with specific count - like Google Apps Script
+      if (!confirm(`Transfer ${itemsToTransfer.length} selected items to Checklist? (Out of ${totalItemsScanned} total items)`)) {
         return;
       }
 
