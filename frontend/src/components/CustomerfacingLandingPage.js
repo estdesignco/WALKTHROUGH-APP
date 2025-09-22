@@ -423,7 +423,10 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                         <FieldWrapper label="Contact Preferences">
                             <CheckboxGroup options={contactPrefOptions} value={formData.contact_preferences} onChange={(v) => handleFormChange('contact_preferences', v)} />
                         </FieldWrapper>
-                        <InputField label="Best Time to Call" id="best_time_to_call" value={formData.best_time_to_call || ''} onChange={(e) => handleFormChange('best_time_to_call', e.target.value)} />
+                        <InputField label="Best Time to Call" id="best_time_to_call" value={formData.best_time_to_call || ''} onChange={(e) => {
+                            const value = e.target.value;
+                            setFormData(prev => ({ ...prev, best_time_to_call: value }));
+                        }} />
                     </Section>
 
                     {/* Project Type & Budget */}
