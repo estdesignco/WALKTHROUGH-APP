@@ -413,27 +413,38 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const handleTransferToChecklist = async () => {
     try {
-      console.log('🚀 TRANSFER TO CHECKLIST: ONLY CHECKED ITEMS - FIXED VERSION');
-      console.log('📊 checkedItems:', checkedItems);
+      console.log('🚀 TRANSFER TO CHECKLIST: GOOGLE APPS SCRIPT LOGIC IMPLEMENTATION');
+      console.log('📊 checkedItems state:', checkedItems);
       console.log('📊 checkedItems.size:', checkedItems.size);
-      console.log('📊 Array.from(checkedItems):', Array.from(checkedItems));
+      console.log('📊 Checked item IDs:', Array.from(checkedItems));
       
       if (checkedItems.size === 0) {
         alert('No items are checked for transfer. Please check the items you want to transfer first.');
         return;
       }
       
-      // STEP 1: Find ONLY the checked items
+      // EXACT GOOGLE APPS SCRIPT LOGIC: Only process items where checkbox === true
       const itemsToTransfer = [];
       
+      console.log('🔍 SCANNING PROJECT DATA FOR CHECKED ITEMS...');
+      
       if (filteredProject?.rooms) {
-        filteredProject.rooms.forEach(room => {
-          room.categories?.forEach(category => {
-            category.subcategories?.forEach(subcategory => {
-              subcategory.items?.forEach(item => {
-                // CRITICAL FIX: Only process if item is actually checked
-                if (checkedItems.has(item.id)) {
-                  console.log(`✅ CHECKED ITEM: ${item.name} (ID: ${item.id})`);
+        filteredProject.rooms.forEach((room, roomIndex) => {
+          console.log(`🏠 Scanning room: ${room.name}`);
+          
+          room.categories?.forEach((category, categoryIndex) => {
+            console.log(`📂 Scanning category: ${category.name}`);
+            
+            category.subcategories?.forEach((subcategory, subcategoryIndex) => {
+              console.log(`📁 Scanning subcategory: ${subcategory.name}`);
+              
+              subcategory.items?.forEach((item, itemIndex) => {
+                const isChecked = checkedItems.has(item.id);
+                console.log(`📝 Item: ${item.name} (ID: ${item.id}) - Checked: ${isChecked}`);
+                
+                // EXACT SAME LOGIC AS GOOGLE APPS SCRIPT: if (checkboxValue === true)
+                if (isChecked) {
+                  console.log(`✅ ADDING TO TRANSFER: ${item.name}`);
                   itemsToTransfer.push({
                     item,
                     roomName: room.name,
@@ -441,7 +452,7 @@ const SimpleWalkthroughSpreadsheet = ({
                     subcategoryName: subcategory.name
                   });
                 } else {
-                  console.log(`❌ SKIPPED: ${item.name} (not checked)`);
+                  console.log(`❌ SKIPPING (not checked): ${item.name}`);
                 }
               });
             });
@@ -449,15 +460,22 @@ const SimpleWalkthroughSpreadsheet = ({
         });
       }
       
-      console.log(`🎯 FINAL COUNT: ${itemsToTransfer.length} items to transfer`);
+      console.log(`🎯 FINAL TRANSFER COUNT: ${itemsToTransfer.length} items`);
+      console.log('📋 Items to transfer:', itemsToTransfer.map(i => i.item.name));
+      
+      // Validation check - ensure we found the expected number of items
+      if (itemsToTransfer.length !== checkedItems.size) {
+        console.warn(`⚠️ MISMATCH: Found ${itemsToTransfer.length} items but expected ${checkedItems.size} checked items`);
+      }
       
       if (itemsToTransfer.length === 0) {
-        alert('No checked items found. Please check some items first.');
+        console.error('❌ NO ITEMS FOUND FOR TRANSFER despite having checked items');
+        alert('No checked items found for transfer. There may be an issue with the data structure.');
         return;
       }
 
-      // Confirm transfer
-      if (!confirm(`Transfer ${itemsToTransfer.length} checked items to Checklist?`)) {
+      // Confirm transfer with exact count
+      if (!confirm(`Transfer ${itemsToTransfer.length} checked items to Checklist?\n\nItems: ${itemsToTransfer.map(i => i.item.name).join(', ')}`)) {
         return;
       }
 
