@@ -223,63 +223,26 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
             };
 
             console.log('Creating project with data:', projectData);
-            const newProject = await Project.create(projectData);
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(projectData),
+            });
 
-            // Create rooms WITH THE CORRECT STARTER ITEMS
-            if (formData.rooms_involved && formData.rooms_involved.length > 0) {
-                const uniqueRooms = [...new Set(formData.rooms_involved)];
-                
-                for (const roomName of uniqueRooms) {
-                    const newRoom = await Room.create({ 
-                        project_id: newProject.id, 
-                        name: roomName, 
-                        notes: '' 
-                    });
-
-                    // THIS IS THE CORRECTED, SIMPLIFIED ITEM POPULATION LOGIC
-                    const basicItems = [
-                        { category: 'LIGHTING', sub_category: 'CEILING', name: 'Ceiling Light - Click to edit' },
-                        { category: 'FURNITURE', sub_category: 'SEATING', name: 'Seating - Click to edit' },
-                        { category: 'ACCESSORIES', sub_category: 'ART & DECOR', name: 'Art & Decor - Click to edit' },
-                        { category: 'PAINT, WALLPAPER, HARDWARE & FINISHES', sub_category: 'WALL', name: 'Wall Finish - Click to edit' },
-                        { category: 'PAINT, WALLPAPER, HARDWARE & FINISHES', sub_category: 'FLOORING', name: 'Flooring - Click to edit' }
-                    ];
-
-                    if (roomName.toLowerCase().includes('kitchen')) {
-                        basicItems.push(
-                            { category: 'APPLIANCES', sub_category: 'KITCHEN APPLIANCES', name: 'Refrigerator - Click to edit' },
-                            { category: 'PLUMBING', sub_category: 'KITCHEN SINKS & FAUCETS', name: 'Kitchen Sink - Click to edit' },
-                            { category: 'CABINETS', sub_category: 'LOWER', name: 'Lower Cabinets - Click to edit' },
-                            { category: 'COUNTERTOPS & TILE', sub_category: 'COUNTERTOPS', name: 'Countertops - Click to edit' }
-                        );
-                    } else if (roomName.toLowerCase().includes('bath')) {
-                        basicItems.push(
-                            { category: 'PLUMBING', sub_category: 'SHOWER & TUB', name: 'Shower/Tub - Click to edit' },
-                            { category: 'CABINETS', sub_category: 'VANITY', name: 'Vanity - Click to edit' },
-                            { category: 'COUNTERTOPS & TILE', sub_category: 'TILE', name: 'Floor Tile - Click to edit' }
-                        );
-                    } else if (roomName.toLowerCase().includes('bedroom')) {
-                        basicItems.push(
-                            { category: 'FURNITURE', sub_category: 'BEDS', name: 'Bed - Click to edit' },
-                            { category: 'TEXTILES', sub_category: 'BEDDING', name: 'Bedding - Click to edit' }
-                        );
-                    }
-
-                    const itemsToCreate = basicItems.map(item => ({
-                        project_id: newProject.id,
-                        room_id: newRoom.id,
-                        category: item.category,
-                        sub_category: item.sub_category,
-                        name: item.name,
-                        status: 'Walkthrough',
-                        quantity: 1,
-                    }));
-
-                    await Item.bulkCreate(itemsToCreate);
-                }
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            window.location.href = `/project/${newProject.id}/detail`;
+            const newProject = await response.json();
+            console.log('Project created successfully:', newProject);
+            
+            alert('Project created successfully!');
+            onOpenChange(false);
+            
+            // Reset form
+            e.target.reset();
         } catch (error) {
             console.error('Failed to create project:', error);
             alert('Failed to create project. Please try again.');
