@@ -353,6 +353,18 @@ frontend:
         agent: "testing"
         comment: "❌ CRITICAL FRONTEND INTEGRATION ISSUE: While subcategory headers and table structure are working correctly, Add Category dropdown only shows 5 hardcoded categories instead of using backend API with 14 categories. Backend GET /api/categories/available returns all 14 categories correctly, but SimpleChecklistSpreadsheet.js lines 686-692 use hardcoded options instead of fetching from API. Missing 10 categories: Appliances, Art & Accessories, Cabinets Built-ins and Trim, Fireplace & Built-ins, Paint Wallpaper and Finishes, Plumbing, Plumbing & Fixtures, Textiles & Soft Goods, Tile and Tops, Window Treatments. URGENT: Update Add Category dropdown to use dynamic API data instead of hardcoded values."
 
+  - task: "CRITICAL: Walkthrough to Checklist Transfer Bug - Only Checked Items Should Transfer"
+    implemented: true
+    working: false
+    file: "SimpleWalkthroughSpreadsheet.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL BUG CONFIRMED - USER'S COMPLAINT IS VALID! Conducted comprehensive testing of the exact transfer functionality issue reported by user. ✅ TEST SETUP: Successfully navigated to project c4ec5c57-870a-4977-8a44-095b771bc54a walkthrough page with 380 total checkboxes available. ✅ PRECISE TEST EXECUTION: Checked EXACTLY 3 specific items in walkthrough (Chandelier, Recessed Lighting, Sconces) and clicked 'TRANSFER TO CHECKLIST' button. ✅ TRANSFER BUTTON WORKING: Transfer button found and functional, confirmation dialog handled properly. ❌ CRITICAL BUG CONFIRMED: Expected 3 items in checklist but found 30 items transferred! This confirms user's complaint that 'ALL items transfer instead of just checked ones'. ❌ ROOT CAUSE: The transfer logic in SimpleWalkthroughSpreadsheet.js handleTransferToChecklist() function is NOT properly filtering by checked items only. The checkedItems state is being tracked but the actual transfer is including unchecked items. 🚨 URGENT FIX REQUIRED: The transfer functionality has a critical bug where it transfers ALL items instead of only checked items, making the checkbox selection meaningless. This is exactly the issue the user reported and is blocking their workflow. The bug exists in the frontend transfer logic and needs immediate attention."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
