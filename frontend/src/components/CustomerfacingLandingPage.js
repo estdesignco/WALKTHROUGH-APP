@@ -421,7 +421,11 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                         <div className="grid grid-cols-2 gap-3">
                             <InputField label="Email Address" id="email" type="email" value={formData.email || ''} onChange={(e) => {
                                 const value = e.target.value;
-                                setFormData(prev => ({ ...prev, email: value }));
+                                setFormData(prev => {
+                                    const newFormData = { ...prev };
+                                    newFormData.email = value;
+                                    return newFormData;
+                                });
                             }} />
                             <InputField label="Phone Number" id="phone" type="tel" value={formData.phone || ''} onChange={(e) => handleFormChange('phone', e.target.value)} />
                         </div>
