@@ -584,17 +584,17 @@ const SimpleWalkthroughSpreadsheet = ({
         }
       }
 
-      // Google Apps Script logic: Clear checkboxes after successful transfer
+      // STEP 4: Clear checkboxes and notify - Mirror Google Apps Script success handling
       if (successCount > 0) {
-        alert(`✅ Successfully transferred ${successCount} items to the Checklist.`);
+        // Clear checkboxes like Google Apps Script: "checkboxRange.setValue(false)"
+        setCheckedItems(new Set());
+        console.log(`Cleared ${checkedItems.size} checkboxes in Walkthrough App.`);
         
-        // Clear checkboxes exactly like Google Apps Script: checkboxRange.setValue(false)
-        console.log(`📝 Clearing ${checkedItems.size} checkboxes after successful transfer`);
-        setCheckedItems(new Set()); // Clear all checked items
+        alert(`Successfully transferred ${successCount} items to the Checklist.`);
         
         if (onReload) onReload();
       } else {
-        alert('Transfer Failed: An unexpected issue occurred or no items were selected. No items were transferred to the Checklist.');
+        alert('No items were transferred.');
       }
 
     } catch (error) {
