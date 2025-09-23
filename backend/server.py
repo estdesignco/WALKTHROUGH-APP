@@ -1888,8 +1888,8 @@ async def get_available_categories():
     
     return {"categories": sorted(list(categories))}
 
-@api_router.post("/categories/comprehensive", response_model=Category)
-async def create_comprehensive_category(room_id: str, category_name: str):
+@api_router.post("/categories/comprehensive")
+async def create_comprehensive_category(room_id: str = Query(...), category_name: str = Query(...)):
     """Create a category with full comprehensive structure from enhanced_rooms.py"""
     from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE
     
