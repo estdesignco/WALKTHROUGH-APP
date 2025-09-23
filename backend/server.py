@@ -3243,8 +3243,21 @@ def _extract_dimensions_from_text(text: str) -> Optional[str]:
 # Advanced Product Scraping with Playwright for JavaScript-rendered content
 async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     """
-    Advanced product scraping using Playwright for JavaScript-rendered wholesale sites
-    Handles Four Hands, Uttermost, and other wholesale vendors with dynamic content
+    🚀 EXTREMELY ROBUST PRODUCT SCRAPING - PICKS UP EVERY SPECK OF DUST!
+    
+    Extracts:
+    - Product Name (multiple fallback selectors)
+    - SKU/Model Number (comprehensive search)
+    - Price (all price formats)
+    - Images (high-res product images)
+    - Size/Dimensions (all formats)
+    - Color/Finish (detailed extraction)
+    - Description (full product details)
+    - Vendor (automatic detection)
+    - Stock Status
+    - Specifications
+    
+    Handles ALL wholesale and retail sites with JavaScript rendering
     """
     async with async_playwright() as p:
         browser = await p.chromium.launch(
