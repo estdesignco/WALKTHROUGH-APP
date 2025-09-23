@@ -100,24 +100,29 @@ const ChecklistSpreadsheet = ({
 
   const handleAddCategory = async (roomId, categoryName) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
+      console.log(`🚀 ADD CATEGORY: Creating comprehensive '${categoryName}' with ALL subcategories and items`);
+      
+      // Use the new comprehensive endpoint that auto-populates with ALL items and subcategories
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: categoryName,
-          room_id: roomId,
-          order_index: 0
-        })
+        headers: { 'Content-Type': 'application/json' }
       });
 
       if (response.ok) {
-        console.log('✅ Checklist category added successfully');
-        window.location.reload();
+        const newCategory = await response.json();
+        console.log(`✅ SUCCESS: Created comprehensive category '${categoryName}' with ${newCategory.subcategories?.length || 0} subcategories`);
+        
+        alert(`✅ Added comprehensive category '${categoryName}' with all subcategories and items!`);
+        
+        if (onReload) onReload();
       } else {
-        throw new Error(`HTTP ${response.status}`);
+        const errorText = await response.text();
+        console.error(`❌ Failed to create comprehensive category: ${errorText}`);
+        alert(`Failed to add category '${categoryName}'. Please try again.`);
       }
     } catch (error) {
-      console.error('❌ Error adding checklist category:', error);
+      console.error('Error adding comprehensive category:', error);
+      alert(`Error adding category '${categoryName}'. Please try again.`);
     }
   };
 
