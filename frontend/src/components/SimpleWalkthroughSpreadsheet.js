@@ -507,10 +507,9 @@ const SimpleWalkthroughSpreadsheet = ({
               const newCategory = await categoryResponse.json();
               categoryId = newCategory.id;
               createdStructures.set(categoryKey, categoryId);
-              console.log(`✅ Created category: ${itemData.categoryName} with ID: ${categoryId}`);
+              console.log(`✅ Created category: ${itemData.categoryName}`);
             } else {
-              const errorText = await categoryResponse.text();
-              console.error(`❌ Failed to create category: ${itemData.categoryName}, Status: ${categoryResponse.status}, Error: ${errorText}`);
+              console.error(`❌ Failed to create category: ${itemData.categoryName}`);
               continue;
             }
           }
