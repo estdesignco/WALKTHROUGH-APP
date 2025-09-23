@@ -3494,30 +3494,6 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             }
         finally:
             await browser.close()
-                # Standard product images
-                '.product-image img, .product-photo img, [class*="product-image"] img',
-                '.main-image img, .featured-image img, .hero-image img',
-                '[data-testid="product-image"] img, [data-test="product-image"] img',
-                # Gallery images  
-                '.product-gallery img:first-of-type, .image-gallery img:first-of-type',
-                '.product-media img:first-of-type, .media-gallery img:first-of-type',
-                # Generic selectors
-                'img[alt*="product"], img[alt*="item"], img[src*="product"]',
-                # Backup - any large image
-                'img[width], img[height]'
-            ]
-            
-            # ULTRA-ENHANCED size/dimension selectors
-            size_selectors = [
-                '[class*="dimension"], [class*="size"], [class*="measurement"]',
-                '.product-specs .size, .specifications .dimensions',
-                '.product-details .size, .item-details .dimensions',
-                '[data-size], [data-dimensions], [data-specs]',
-                'td:contains("Dimensions"), td:contains("Size"), td:contains("W x D x H")',
-                '.specs-table td, .specification-table td'
-            ]
-            
-            # ULTRA-ENHANCED description selectors
             description_selectors = [
                 '.product-description, .item-description, .product-details',
                 '.product-summary, .product-info, .product-content',
