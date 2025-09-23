@@ -150,42 +150,41 @@ class CategoryCreationTester:
             self.log_test("Comprehensive Category Test Setup", False, "No test rooms available")
             return False
         
-        # Test with living room (walkthrough sheet)
-        living_room = self.test_rooms.get("living room")
-        if not living_room:
-            self.log_test("Get Living Room for Test", False, "Living room not found")
+        # Test with kitchen room (should have fewer existing categories)
+        kitchen_room = self.test_rooms.get("kitchen")
+        if not kitchen_room:
+            self.log_test("Get Kitchen Room for Test", False, "Kitchen room not found")
             return False
             
-        room_id = living_room.get('id')
+        room_id = kitchen_room.get('id')
         
         # Test categories to create
-        test_categories = ["Lighting", "Furniture", "Appliances"]
+        test_categories = ["Lighting", "Furniture & Storage", "Appliances"]
         
         for category_name in test_categories:
             print(f"\n   Testing category creation: {category_name}")
             
-            # Test the comprehensive endpoint
+            # Test the comprehensive endpoint (it's a POST, not GET)
             params = {
                 "room_id": room_id,
                 "category_name": category_name
             }
             
-            success, response, status_code = self.make_request('GET', '/categories/comprehensive', params=params)
+            success, response, status_code = self.make_request('POST', '/categories/comprehensive', params=params)
             
             if not success:
                 self.log_test(f"Comprehensive Category - {category_name}", False, 
                              f"Failed: {response} (Status: {status_code})")
                 continue
             
-            # Check response structure
+            # Check response structure - should be a Category object
             if not isinstance(response, dict):
                 self.log_test(f"Comprehensive Category Response - {category_name}", False, 
                              f"Expected dict, got {type(response)}")
                 continue
             
             # Check if category was created with subcategories and items
-            category_data = response.get('category', {})
-            subcategories = category_data.get('subcategories', [])
+            subcategories = response.get('subcategories', [])
             
             total_items = sum(len(subcat.get('items', [])) for subcat in subcategories)
             
