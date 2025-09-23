@@ -560,11 +560,15 @@ const SimpleWalkthroughSpreadsheet = ({
             })
           });
           
+          console.log(`📡 Item creation response status: ${itemResponse.status}`);
+          
           if (itemResponse.ok) {
+            const createdItem = await itemResponse.json();
+            console.log(`✅ SUCCESSFULLY CREATED CHECKED ITEM: ${itemData.item.name} with ID: ${createdItem.id}`);
             successCount++;
-            console.log(`✅ SUCCESSFULLY CREATED CHECKED ITEM: ${itemData.item.name}`);
           } else {
-            console.error(`❌ Failed to create checked item: ${itemData.item.name}`);
+            const errorText = await itemResponse.text();
+            console.error(`❌ Failed to create checked item: ${itemData.item.name}, Status: ${itemResponse.status}, Error: ${errorText}`);
           }
           
         } catch (error) {
