@@ -1876,8 +1876,101 @@ async def create_category(category: CategoryCreate):
         logger.error(f"Error creating category: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to create category: {str(e)}")
 
+@api_router.get("/categories/available")
+async def get_available_categories():
+    """Get all available category names from comprehensive structure"""
+    from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE
+    
+    categories = set()
+    for room_type, room_data in COMPREHENSIVE_ROOM_STRUCTURE.items():
+        for category in room_data.get("categories", []):
+            categories.add(category["name"])
+    
+    return {"categories": sorted(list(categories))}
+
 @api_router.post("/categories/comprehensive", response_model=Category)
-async def create_comprehensive_category(category: CategoryCreate):
+async def create_comprehensive_category(room_id: str, category_name: str):
+    """Create a category with full comprehensive structure from enhanced_rooms.py"""
+    from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE
+    
+    print(f"🚀 Creating comprehensive category '{category_name}' for room {room_id}")
+    
+    # Find the category structure from ANY room type that has this category
+    category_structure = None
+    for room_type, room_data in COMPREHENSIVE_ROOM_STRUCTURE.items():
+        for category in room_data.get("categories", []):
+            if category["name"].lower() == category_name.lower():
+                category_structure = category
+                break
+        if category_structure:
+            break
+    
+    if not category_structure:
+        raise HTTPException(status_code=404, detail=f"Category '{category_name}' not found in comprehensive structure")
+    
+    # Create the category with full structure
+    category_id = str(uuid.uuid4())
+    category_dict = {
+        "id": category_id,
+        "name": category_structure["name"],
+        "room_id": room_id,
+        "description": f"Comprehensive {category_name} category",
+        "color": category_structure.get("color", "#4A90E2"),
+        "order_index": 0,
+        "subcategories": [],
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
+    }
+    
+    # Create all subcategories and items
+    for subcategory_data in category_structure.get("subcategories", []):
+        subcategory_id = str(uuid.uuid4())
+        subcategory_dict = {
+            "id": subcategory_id,
+            "name": subcategory_data["name"],
+            "category_id": category_id,
+            "description": "",
+            "color": subcategory_data.get("color", "#6BA3E6"),
+            "order_index": 0,
+            "items": [],
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Create all items in this subcategory
+        created_items = []
+        for item_data in subcategory_data.get("items", []):
+            item_name = item_data if isinstance(item_data, str) else item_data.get("name", "")
+            if item_name:
+                item_obj = Item(
+                    name=item_name,
+                    subcategory_id=subcategory_id,
+                    quantity=1,
+                    finish_color="",  # ALWAYS BLANK as requested
+                    status="TO BE SELECTED",
+                    order_index=0
+                )
+                created_items.append(item_obj.dict())
+        
+        # Insert all items for this subcategory
+        if created_items:
+            result = await db.items.insert_many(created_items)
+            print(f"✅ Created {len(created_items)} items for subcategory '{subcategory_data['name']}'")
+        
+        # Insert subcategory
+        subcategory_dict["items"] = created_items
+        await db.subcategories.insert_one(subcategory_dict)
+        category_dict["subcategories"].append(subcategory_dict)
+        print(f"✅ Created subcategory '{subcategory_data['name']}'")
+    
+    # Insert the category
+    await db.categories.insert_one(category_dict)
+    print(f"✅ Created comprehensive category '{category_name}' with {len(category_dict['subcategories'])} subcategories")
+    
+    return Category(**category_dict)
+
+@api_router.post("/categories", response_model=Category)
+async def create_category(category: CategoryCreate):
     """Create a category with all its subcategories and items from comprehensive structure"""
     try:
 
