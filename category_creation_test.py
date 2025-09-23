@@ -309,21 +309,21 @@ class CategoryCreationTester:
             category_count = len(room.get('categories', []))
             initial_room_categories[room_name] = category_count
         
-        # Add a category to one specific room (living room)
-        living_room = self.test_rooms.get("living room")
-        if living_room:
-            room_id = living_room.get('id')
+        # Add a category to one specific room (master bedroom - should have fewer categories)
+        bedroom_room = self.test_rooms.get("master bedroom")
+        if bedroom_room:
+            room_id = bedroom_room.get('id')
             
-            # Try to add a new category
+            # Try to add a new category using POST method
             params = {
                 "room_id": room_id,
                 "category_name": "Window Treatments"
             }
             
-            success, response, status_code = self.make_request('GET', '/categories/comprehensive', params=params)
+            success, response, status_code = self.make_request('POST', '/categories/comprehensive', params=params)
             
             if success:
-                self.log_test("Add Category to Living Room", True, "Category added successfully")
+                self.log_test("Add Category to Master Bedroom", True, "Category added successfully")
                 
                 # Check that other rooms were not affected
                 success, updated_project, status_code = self.make_request('GET', f'/projects/{self.test_project_id}')
@@ -336,13 +336,13 @@ class CategoryCreationTester:
                         current_category_count = len(room.get('categories', []))
                         initial_count = initial_room_categories.get(room_name, 0)
                         
-                        if room_name == "living room":
+                        if room_name == "master bedroom":
                             # This room should have more categories
                             if current_category_count > initial_count:
-                                self.log_test(f"Living Room Category Increase", True, 
+                                self.log_test(f"Master Bedroom Category Increase", True, 
                                              f"Categories increased from {initial_count} to {current_category_count}")
                             else:
-                                self.log_test(f"Living Room Category Increase", False, 
+                                self.log_test(f"Master Bedroom Category Increase", False, 
                                              f"Categories did not increase: {initial_count} -> {current_category_count}")
                                 independence_maintained = False
                         else:
@@ -360,10 +360,10 @@ class CategoryCreationTester:
                     self.log_test("Get Updated Project State", False, "Could not verify independence")
                     return False
             else:
-                self.log_test("Add Category to Living Room", False, f"Failed: {response}")
+                self.log_test("Add Category to Master Bedroom", False, f"Failed: {response}")
                 return False
         else:
-            self.log_test("Sheet Independence Test", False, "Living room not available for test")
+            self.log_test("Sheet Independence Test", False, "Master bedroom not available for test")
             return False
 
     def test_category_structure_completeness(self):
