@@ -526,8 +526,18 @@ const ChecklistSpreadsheet = ({
                                         <option value="">Add Category ▼</option>
                                         <option value="Lighting">Lighting</option>
                                         <option value="Furniture">Furniture</option>
-                                        <option value="Decor & Accessories">Decor & Accessories</option>
+                                        <option value="Window Treatments">Window Treatments</option>
+                                        <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
+                                        <option value="Art & Accessories">Art & Accessories</option>
+                                        <option value="Fireplace & Built-ins">Fireplace & Built-ins</option>
+                                        <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
                                         <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
+                                        <option value="Furniture & Storage">Furniture & Storage</option>
+                                        <option value="Cabinets & Storage">Cabinets & Storage</option>
+                                        <option value="Cabinets, Built-ins, and Trim">Cabinets, Built-ins, and Trim</option>
+                                        <option value="Tile and Tops">Tile and Tops</option>
+                                        <option value="Appliances">Appliances</option>
+                                        <option value="Decor & Accessories">Decor & Accessories</option>
                                       </select>
                                       
                                       <button
