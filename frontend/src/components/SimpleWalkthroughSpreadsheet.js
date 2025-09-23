@@ -558,7 +558,7 @@ const SimpleWalkthroughSpreadsheet = ({
               finish_color: '', // ALWAYS BLANK as requested
               quantity: itemData.item.quantity || 1,
               subcategory_id: subcategoryId,
-              status: 'TO BE SELECTED',
+              status: 'PICKED',
               order_index: 0
             })
           });
