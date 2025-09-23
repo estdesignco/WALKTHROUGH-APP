@@ -132,51 +132,30 @@ const SimpleWalkthroughSpreadsheet = ({
 
   // Handle adding a new category WITH ALL SUBCATEGORIES AND ITEMS - SIMPLIFIED
   const handleAddCategory = async (roomId, categoryName) => {
-    if (!roomId || !categoryName) {
-      console.error('❌ Missing roomId or categoryName');
-      return;
-    }
-
     try {
-      console.log('🔄 Creating comprehensive walkthrough category:', categoryName, 'for room:', roomId);
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      console.log(`🚀 WALKTHROUGH ADD CATEGORY: Creating comprehensive '${categoryName}' with ALL subcategories and items`);
       
-      // Use the enhanced backend category creation that loads full structure
-      const categoryData = {
-        name: categoryName,
-        room_id: roomId,
-        description: `${categoryName} category with full subcategories and items`,
-        order_index: 0
-      };
-      
-      console.log('📤 Creating category with data:', categoryData);
-      
-      const response = await fetch(`${backendUrl}/api/categories/comprehensive`, {
+      // Use the new comprehensive endpoint that auto-populates with ALL items and subcategories
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(categoryData)
+        headers: { 'Content-Type': 'application/json' }
       });
-
-      console.log('📡 Category creation response:', response.status);
 
       if (response.ok) {
         const newCategory = await response.json();
-        console.log('✅ Category created with full structure:', newCategory.name);
-        alert(`✅ Successfully added ${categoryName} category with all subcategories and items!`);
+        console.log(`✅ WALKTHROUGH SUCCESS: Created comprehensive category '${categoryName}' with ${newCategory.subcategories?.length || 0} subcategories`);
         
-        // Reload to show the new category
-        if (onReload) {
-          await onReload();
-        }
+        alert(`✅ Added comprehensive category '${categoryName}' with all subcategories and items!`);
+        
+        if (onReload) onReload();
       } else {
         const errorText = await response.text();
-        console.error('❌ Category creation failed:', response.status, errorText);
-        alert(`❌ Failed to create ${categoryName} category: ${errorText}`);
+        console.error(`❌ Failed to create comprehensive category: ${errorText}`);
+        alert(`Failed to add category '${categoryName}'. Please try again.`);
       }
     } catch (error) {
-      console.error('❌ Error adding comprehensive walkthrough category:', error);
+      console.error('Error adding comprehensive category:', error);
+      alert(`Error adding category '${categoryName}'. Please try again.`);
     }
   };
 
