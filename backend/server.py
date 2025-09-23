@@ -1677,7 +1677,25 @@ async def create_room(room_data: RoomCreate):
         }
         structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
         
-        # Get FULL comprehensive structure for this room
+        # CRITICAL FIX: Only auto-populate if walkthrough sheet_type
+        # For checklist/ffe sheet_types, create empty room (no items)
+        if room_data.sheet_type != "walkthrough":
+            print(f"🚫 CHECKLIST/FFE ROOM: Creating empty room (no auto-population)")
+            room_dict = {
+                "id": str(uuid.uuid4()),
+                "name": room_data.name,
+                "description": room_data.description,
+                "order_index": room_data.order_index,
+                "sheet_type": room_data.sheet_type,
+                "categories": [],  # Empty - no auto-population
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            
+            result = await db.rooms.insert_one(room_dict)
+            return Room(**room_dict)
+        
+        # WALKTHROUGH ROOMS: Get FULL comprehensive structure for this room
         room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(structure_key)
         
         # If exact match not found, try to find similar room or use living room as template
