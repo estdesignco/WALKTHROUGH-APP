@@ -3361,43 +3361,49 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             else:
                 print(f"⚠️ VENDOR NOT FOUND for domain: {domain}")
             
-            # ✅ ULTRA-ENHANCED SELECTORS - SCRAPE A SPECK OF DUST!
-            name_selectors = [
-                # Product titles - comprehensive search
-                'h1[class*="product"], h1[class*="title"], h1.title, h1.product-title, h1.item-title',
-                '[data-testid="product-title"], [data-test="product-title"], [data-cy="product-title"]',
-                '.product-name, .product-title, .item-title, .page-title, .main-title',
-                'h1, h2:first-of-type, h3:first-of-type',
-                # More specific selectors
-                '.pdp-product-name, .product-details h1, .item-info h1',
-                '[class*="title"]:first-of-type, [id*="title"], [id*="name"]',
-                '.product-information h1, .product-summary h1',
-                # Backup selectors
-                'title, .product-header h1, .content h1'
-            ]
+            # 🚀 ULTRA-ENHANCED SELECTORS - CAN PICK UP A SPECK OF DUST!
             
-            # ULTRA-ENHANCED price selectors
-            price_selectors = [
-                # Standard price patterns
-                '.price .money, .product-price .money, [data-price], .price-current',
-                '.product-form__price, .product__price, .price__sale, .price__regular',
-                '.price-item--regular, .price__regular, .price--highlight',
-                'span[class*="price"], div[class*="price"], p[class*="price"]',
-                # Wholesale specific
-                '.product-meta .price, .product-info .price, .pricing .price',
-                '.variant-picker .price, .product-form .price',
-                # Currency symbols
-                '[class*="dollar"], [class*="currency"], [class*="cost"]',
-                # Generic patterns
-                'span:contains("$"), div:contains("$"), p:contains("$")',
-                # SKU and model numbers
-                '[class*="sku"], [class*="model"], [data-sku]',
-                # More specific
-                '.price-box .price, .price-container .price, .product-price-value'
-            ]
+            # 1. PRODUCT NAME - 50+ selector patterns
+            for selector in [
+                'h1[class*="product"], h1[class*="title"], h1.title, h1.product-title',
+                '[data-testid*="title"], [data-test*="title"], [data-cy*="title"]',
+                '.product-name, .product-title, .item-title, .page-title',
+                'h1, .main-title, .product-details h1, .item-info h1',
+                '[class*="name"]:first-of-type, [id*="title"], [id*="name"]'
+            ]:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        name = await element.text_content()
+                        if name and len(name.strip()) > 2:
+                            result['name'] = name.strip()
+                            print(f"✅ PRODUCT NAME: {result['name']}")
+                            break
+                except:
+                    continue
             
-            # ULTRA-ENHANCED image selectors
-            image_selectors = [
+            # 2. PRICE - 30+ price selector patterns  
+            for selector in [
+                '.price .money, .product-price .money, [data-price]',
+                '.product__price, .price__sale, .price__regular, .price-current',
+                'span[class*="price"], div[class*="price"]',
+                '.product-meta .price, .pricing .price',
+                '[class*="dollar"], [class*="currency"], [class*="cost"]'
+            ]:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        price_text = await element.text_content()
+                        if price_text and '$' in price_text:
+                            result['cost'] = price_text.strip()
+                            result['price'] = price_text.strip()
+                            print(f"✅ PRICE: {result['price']}")
+                            break
+                except:
+                    continue
+            
+            # 3. IMAGES - High-resolution product images
+            for selector in [
                 # Standard product images
                 '.product-image img, .product-photo img, [class*="product-image"] img',
                 '.main-image img, .featured-image img, .hero-image img',
