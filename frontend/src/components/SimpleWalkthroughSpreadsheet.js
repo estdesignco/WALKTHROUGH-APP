@@ -534,10 +534,9 @@ const SimpleWalkthroughSpreadsheet = ({
               const newSubcategory = await subcategoryResponse.json();
               subcategoryId = newSubcategory.id;
               createdStructures.set(subcategoryKey, subcategoryId);
-              console.log(`✅ Created subcategory: ${itemData.subcategoryName} with ID: ${subcategoryId}`);
+              console.log(`✅ Created subcategory: ${itemData.subcategoryName}`);
             } else {
-              const errorText = await subcategoryResponse.text();
-              console.error(`❌ Failed to create subcategory: ${itemData.subcategoryName}, Status: ${subcategoryResponse.status}, Error: ${errorText}`);
+              console.error(`❌ Failed to create subcategory: ${itemData.subcategoryName}`);
               continue;
             }
           }
