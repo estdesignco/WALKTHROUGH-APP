@@ -1687,6 +1687,7 @@ async def create_room(room_data: RoomCreate):
                 "description": room_data.description,
                 "order_index": room_data.order_index,
                 "sheet_type": room_data.sheet_type,
+                "project_id": room_data.project_id,  # MISSING FIELD
                 "categories": [],  # Empty - no auto-population
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
