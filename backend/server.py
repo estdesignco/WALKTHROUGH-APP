@@ -3494,40 +3494,6 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             }
         finally:
             await browser.close()
-            description_selectors = [
-                '.product-description, .item-description, .product-details',
-                '.product-summary, .product-info, .product-content',
-                '[class*="description"], [class*="summary"], [class*="details"]',
-                '.product-text, .item-text, .content-text',
-                'p:contains("description"), div:contains("details")'
-            ]
-            
-            # ✅ ENHANCED FOUR HANDS SPECIFIC SELECTORS FOR IMAGE, COST, SIZE
-            # Enhanced price selectors for JavaScript-rendered content
-            price_selectors = [
-                # Four Hands specific selectors (JavaScript-rendered)
-                '.price .money, .product-price .money, [data-price], .price-current',
-                '.product-form__price, .product__price, .price__sale, .price__regular',
-                '.price-item--regular, .price__regular, .price--highlight',
-                'span[class*="price"], div[class*="price"]',
-                # Four Hands specific price patterns
-                '.product-meta .price, .product-info .price, .pricing .price',
-                '.variant-picker .price, .product-form .price',
-                '[data-product-price], [data-variant-price]',
-                # Shopify common selectors
-                '.product__price .money, .product-form__price .money',
-                '.price-list .price-item, .product-price-wrap .price',
-                # Generic selectors
-                '[class*="price"]:not([class*="original"]):not([class*="old"])',
-                '[data-testid*="price"], [data-test*="price"]',
-                '.cost, .pricing, .product-price, .price-current',
-                # Text-based approach for dynamic content
-                'span, div, p'  # Will filter for $ content in code
-            ]
-            
-            # Enhanced image selectors for the MAIN PRODUCT IMAGE (not thumbnails)
-            image_selectors = [
-                # Target the MAIN/HERO product images first
                 '.product__media img[src*="cdn"]:not([src*="thumb"]):not([src*="small"])',
                 '.product-media img[src*="images"]:not([src*="thumbnail"])',
                 '.hero-image img, .main-image img, .primary-image img',
