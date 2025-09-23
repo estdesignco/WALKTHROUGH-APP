@@ -2106,14 +2106,34 @@ async def create_subcategory(subcategory: SubCategoryCreate):
 # ITEM ENDPOINTS (updated to use subcategory_id)
 @api_router.post("/items", response_model=Item)
 async def create_item(item: ItemCreate):
-    item_dict = item.dict()
-    item_obj = Item(**item_dict)
-    
-    result = await db.items.insert_one(item_obj.dict())
-    
-    if result.inserted_id:
-        return item_obj
-    raise HTTPException(status_code=400, detail="Failed to create item")
+    try:
+        # Create item dictionary with proper defaults
+        item_dict = item.dict()
+        item_dict["id"] = str(uuid.uuid4())
+        item_dict["created_at"] = datetime.utcnow()
+        item_dict["updated_at"] = datetime.utcnow()
+        
+        # Ensure required fields have defaults
+        if "finish_color" not in item_dict or not item_dict["finish_color"]:
+            item_dict["finish_color"] = ""
+        if "order_index" not in item_dict:
+            item_dict["order_index"] = 0
+        
+        print(f"💾 Creating item: {item_dict['name']} in subcategory: {item_dict['subcategory_id']}")
+        
+        result = await db.items.insert_one(item_dict)
+        
+        if result.inserted_id:
+            print(f"✅ Item created successfully with ID: {item_dict['id']}")
+            return Item(**item_dict)
+        else:
+            print(f"❌ Failed to insert item into database")
+            raise HTTPException(status_code=400, detail="Failed to create item in database")
+            
+    except Exception as e:
+        print(f"❌ Error creating item: {str(e)}")
+        logger.error(f"Error creating item: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create item: {str(e)}")
 
 @api_router.get("/items/{item_id}", response_model=Item)  
 async def get_item(item_id: str):
