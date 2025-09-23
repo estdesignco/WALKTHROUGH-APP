@@ -953,8 +953,8 @@ const SimpleWalkthroughSpreadsheet = ({
                                         </button>
                                       </td>
                                     </tr>
-                                  ))
-                                )}
+                                  ))}
+                              </tbody>
                               </tbody>
                             </table>
                             
