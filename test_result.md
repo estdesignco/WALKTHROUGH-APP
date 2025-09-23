@@ -364,9 +364,9 @@ frontend:
 
   - task: "CRITICAL: Walkthrough to Checklist Transfer Bug - Only Checked Items Should Transfer"
     implemented: true
-    working: false
+    working: "NA"
     file: "SimpleWalkthroughSpreadsheet.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
