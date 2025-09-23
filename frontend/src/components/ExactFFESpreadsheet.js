@@ -354,75 +354,33 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Handle adding a new category WITH ALL SUBCATEGORIES AND INSTALLEDS
+  // Handle adding a new category WITH ALL SUBCATEGORIES AND ITEMS
   const handleAddCategory = async (roomId, categoryName) => {
-    if (!roomId || !categoryName) {
-      console.error('❌ Missing roomId or categoryName');
-      return;
-    }
-
     try {
-      console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
+      console.log(`🚀 FFE ADD CATEGORY: Creating comprehensive '${categoryName}' with ALL subcategories and items`);
       
-      // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
+      // Use the new comprehensive endpoint that auto-populates with ALL items and subcategories
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: `temp_${categoryName}_${Date.now()}`,
-          description: `Temporary room to extract ${categoryName} structure`,
-          project_id: "temp",
-          order_index: 999
-        })
+        headers: { 'Content-Type': 'application/json' }
       });
 
-      if (tempRoomResponse.ok) {
-        const tempRoom = await tempRoomResponse.json();
+      if (response.ok) {
+        const newCategory = await response.json();
+        console.log(`✅ FFE SUCCESS: Created comprehensive category '${categoryName}' with ${newCategory.subcategories?.length || 0} subcategories`);
         
-        // Find the matching category from the temp room
-        const matchingCategory = tempRoom.categories.find(cat => 
-          cat.name.toLowerCase() === categoryName.toLowerCase()
-        );
+        alert(`✅ Added comprehensive category '${categoryName}' with all subcategories and items!`);
         
-        if (matchingCategory) {
-          // Add the comprehensive category to the actual room
-          const categoryData = {
-            ...matchingCategory,
-            room_id: roomId,
-            id: undefined // Let backend generate new ID
-          };
-          
-          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(categoryData)
-          });
-          
-          if (addResponse.ok) {
-            console.log('✅ Comprehensive category added successfully');
-            
-            // Delete the temp room
-            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
-              method: 'DELETE'
-            });
-            
-            // Reload to show new category with all items
-            if (onReload) {
-              onReload();
-            }
-          }
-        }
-        
-        // Clean up temp room regardless
-        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
-          method: 'DELETE'
-        });
+        // Reload to show the new category
+        window.location.reload();
       } else {
-        throw new Error('Failed to create comprehensive category structure');
+        const errorText = await response.text();
+        console.error(`❌ Failed to create comprehensive category: ${errorText}`);
+        alert(`Failed to add category '${categoryName}'. Please try again.`);
       }
     } catch (error) {
-      console.error('❌ Error adding comprehensive category:', error);
-      console.error('Failed to add category with items. Please try again.');
+      console.error('Error adding comprehensive category:', error);
+      alert(`Error adding category '${categoryName}'. Please try again.`);
     }
   };
 
