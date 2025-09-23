@@ -480,9 +480,10 @@ const SimpleWalkthroughSpreadsheet = ({
               const newRoom = await roomResponse.json();
               roomId = newRoom.id;
               createdStructures.set(roomKey, roomId);
-              console.log(`✅ Created empty checklist room: ${itemData.roomName}`);
+              console.log(`✅ Created empty checklist room: ${itemData.roomName} with ID: ${roomId}`);
             } else {
-              console.error(`❌ Failed to create room: ${itemData.roomName}`);
+              const errorText = await roomResponse.text();
+              console.error(`❌ Failed to create room: ${itemData.roomName}, Status: ${roomResponse.status}, Error: ${errorText}`);
               continue;
             }
           }
