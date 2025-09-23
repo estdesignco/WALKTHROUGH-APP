@@ -3404,6 +3404,96 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             
             # 3. IMAGES - High-resolution product images
             for selector in [
+                'img[class*="product"], img[class*="hero"], img[class*="main"]',
+                '.product-image img, .product-gallery img:first-of-type',
+                '[data-testid*="image"] img, .product-media img',
+                'img[src*="product"], img[alt*="product"]'
+            ]:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        src = await element.get_attribute('src')
+                        if src and ('http' in src or src.startswith('//')):
+                            if not src.startswith('http'):
+                                src = 'https:' + src if src.startswith('//') else url.split('/')[0] + '//' + url.split('/')[2] + src
+                            result['image_url'] = src
+                            print(f"✅ IMAGE: {result['image_url']}")
+                            break
+                except:
+                    continue
+            
+            # 4. SKU/MODEL - Comprehensive extraction
+            for selector in [
+                '[class*="sku"], [class*="model"], [data-sku], [data-model]',
+                '.product-meta [class*="code"], .product-info [class*="number"]',
+                'span:contains("SKU"), span:contains("Model"), span:contains("#")'
+            ]:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        sku_text = await element.text_content()
+                        if sku_text and len(sku_text.strip()) > 1:
+                            result['sku'] = sku_text.strip()
+                            print(f"✅ SKU: {result['sku']}")
+                            break
+                except:
+                    continue
+            
+            # 5. SIZE/DIMENSIONS - All format patterns
+            for selector in [
+                '[class*="dimension"], [class*="size"], [class*="measurement"]',
+                '.product-details [class*="spec"], .specifications td, .specs td',
+                'span:contains("W"), span:contains("H"), span:contains("D")',
+                'div:contains("inches"), div:contains("cm"), div:contains("x")'
+            ]:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        size_text = await element.text_content()
+                        if size_text and any(x in size_text.lower() for x in ['w', 'h', 'd', 'inch', 'cm', 'x']):
+                            result['size'] = size_text.strip()
+                            print(f"✅ SIZE: {result['size']}")
+                            break
+                except:
+                    continue
+            
+            # 6. COLOR/FINISH - Detailed extraction
+            for selector in [
+                '[class*="color"], [class*="finish"], [class*="material"]',
+                '.product-options [class*="variant"], .variant-selector',
+                'span:contains("Color"), span:contains("Finish"), span:contains("Material")'
+            ]:
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        color_text = await element.text_content()
+                        if color_text and len(color_text.strip()) > 2:
+                            result['finish_color'] = color_text.strip()
+                            print(f"✅ FINISH/COLOR: {result['finish_color']}")
+                            break
+                except:
+                    continue
+            
+            print(f"🎯 SCRAPING COMPLETE - RESULTS: {result}")
+            return result
+            
+        except Exception as e:
+            print(f"❌ SCRAPING ERROR: {str(e)}")
+            return {
+                'name': None,
+                'vendor': None,
+                'cost': None,
+                'price': None,
+                'image_url': None,
+                'finish_color': None,
+                'size': None,
+                'description': None,
+                'sku': None,
+                'availability': None,
+                'error': str(e)
+            }
+        finally:
+            await browser.close()
                 # Standard product images
                 '.product-image img, .product-photo img, [class*="product-image"] img',
                 '.main-image img, .featured-image img, .hero-image img',
