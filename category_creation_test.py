@@ -244,14 +244,21 @@ class CategoryCreationTester:
         """Test the /api/categories/available endpoint"""
         print("\n📂 Testing /api/categories/available endpoint...")
         
-        success, categories, status_code = self.make_request('GET', '/categories/available')
+        success, response, status_code = self.make_request('GET', '/categories/available')
         
         if not success:
-            self.log_test("Available Categories Endpoint", False, f"Failed: {categories} (Status: {status_code})")
+            self.log_test("Available Categories Endpoint", False, f"Failed: {response} (Status: {status_code})")
             return False
         
+        # The endpoint returns {"categories": [...]} format
+        if not isinstance(response, dict) or 'categories' not in response:
+            self.log_test("Available Categories Format", False, f"Expected dict with 'categories' key, got {type(response)}")
+            return False
+        
+        categories = response.get('categories', [])
+        
         if not isinstance(categories, list):
-            self.log_test("Available Categories Format", False, f"Expected list, got {type(categories)}")
+            self.log_test("Available Categories List", False, f"Expected list in categories, got {type(categories)}")
             return False
         
         # Check for expected categories from enhanced_rooms.py
