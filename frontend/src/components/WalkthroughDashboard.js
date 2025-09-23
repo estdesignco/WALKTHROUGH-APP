@@ -67,7 +67,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
     try {
       console.log('🚀 Loading project data for:', projectId);
       
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=walkthrough`);
       
       if (response.ok) {
         const projectData = await response.json();
