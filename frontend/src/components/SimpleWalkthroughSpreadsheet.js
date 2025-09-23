@@ -991,7 +991,9 @@ const SimpleWalkthroughSpreadsheet = ({
                                 + ADD ITEM
                               </button>
                             </div>
-                          </div>
+                              </React.Fragment>
+                            ))}
+                          </>
                         )}
                       </div>
                     );
