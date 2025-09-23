@@ -867,25 +867,26 @@ const SimpleWalkthroughSpreadsheet = ({
                           </div>
                         </div>
                         
-                        {/* TABLE - ONLY SHOW WHEN CATEGORY EXPANDED */}
+                        {/* SUBCATEGORY TABLES - EXACTLY LIKE CHECKLIST AND FFE */}
                         {isCategoryExpanded && (
-                          <div>
-                            {/* TABLE WITH CORRECT HEADERS - MATCHING CHECKLIST EXACTLY */}
-                            <table className="w-full border-collapse border border-gray-400 mb-6">
-                              <thead>
-                                <tr>
-                                  <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-6" style={{ backgroundColor: '#8b7355' }}>✓</th>
-                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
-                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
-                                  <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {/* REAL DATA FROM SUBCATEGORIES */}
-                                {(category.subcategories || []).map((subcategory) => 
-                                  (subcategory.items || []).map((item, itemIndex) => (
+                          <>
+                            {category.subcategories?.map((subcategory) => (
+                              <React.Fragment key={subcategory.id || subcategory.name}>
+                                {/* TABLE WITH SUBCATEGORY NAME IN HEADER - MATCHING CHECKLIST */}
+                                <table className="w-full border-collapse border border-gray-400 mb-4">
+                                  <thead>
+                                    <tr>
+                                      <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-6" style={{ backgroundColor: '#8b7355' }}>✓</th>
+                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
+                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                                      <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {/* ITEMS FOR THIS SUBCATEGORY */}
+                                    {(subcategory.items || []).map((item, itemIndex) => (
                                     <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
                                       <td className="border border-gray-400 px-1 py-1 text-center w-6">
                                         <input 
