@@ -467,45 +467,126 @@ const SimpleWalkthroughSpreadsheet = ({
         return;
       }
 
-      // STEP 2: Transfer using Google Apps Script logic - Create minimal structure and add ONLY checked items
+      // STEP 2: Google Apps Script Transfer Logic - Create structure then add ONLY checked items
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const projectId = filteredProject.id;
       
       let successCount = 0;
+      const createdStructures = new Map();
       
-      console.log(`🚀 GOOGLE APPS SCRIPT TRANSFER: Creating ${itemsToTransfer.length} individual items`);
+      console.log(`🚀 GOOGLE APPS SCRIPT TRANSFER: Creating structure and adding ${itemsToTransfer.length} checked items`);
 
       for (const itemData of itemsToTransfer) {
         try {
-          console.log(`📝 Creating individual item: "${itemData.item.name}"`);
+          const roomKey = `${itemData.roomName}_checklist`;
+          const categoryKey = `${roomKey}_${itemData.categoryName}`;
+          const subcategoryKey = `${categoryKey}_${itemData.subcategoryName}`;
           
-          // Create the item directly in checklist sheet_type - Google Apps Script insertRows() equivalent
-          const createItemResponse = await fetch(`${backendUrl}/api/items`, {
+          // Create EMPTY checklist room if needed (backend now creates empty rooms for checklist)
+          let roomId = createdStructures.get(roomKey);
+          if (!roomId) {
+            console.log(`📁 Creating EMPTY checklist room: ${itemData.roomName}`);
+            const roomResponse = await fetch(`${backendUrl}/api/rooms`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: itemData.roomName,
+                project_id: projectId,
+                sheet_type: 'checklist',  // Backend will create EMPTY room
+                description: `Transferred from walkthrough`
+              })
+            });
+            
+            if (roomResponse.ok) {
+              const newRoom = await roomResponse.json();
+              roomId = newRoom.id;
+              createdStructures.set(roomKey, roomId);
+              console.log(`✅ Created empty checklist room: ${itemData.roomName}`);
+            } else {
+              console.error(`❌ Failed to create room: ${itemData.roomName}`);
+              continue;
+            }
+          }
+          
+          // Create category if needed
+          let categoryId = createdStructures.get(categoryKey);
+          if (!categoryId) {
+            console.log(`📂 Creating category: ${itemData.categoryName}`);
+            const categoryResponse = await fetch(`${backendUrl}/api/categories`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: itemData.categoryName,
+                room_id: roomId,
+                description: '',
+                color: '#4A90E2',
+                order_index: 0
+              })
+            });
+            
+            if (categoryResponse.ok) {
+              const newCategory = await categoryResponse.json();
+              categoryId = newCategory.id;
+              createdStructures.set(categoryKey, categoryId);
+              console.log(`✅ Created category: ${itemData.categoryName}`);
+            } else {
+              console.error(`❌ Failed to create category: ${itemData.categoryName}`);
+              continue;
+            }
+          }
+          
+          // Create subcategory if needed
+          let subcategoryId = createdStructures.get(subcategoryKey);
+          if (!subcategoryId) {
+            console.log(`📄 Creating subcategory: ${itemData.subcategoryName}`);
+            const subcategoryResponse = await fetch(`${backendUrl}/api/subcategories`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: itemData.subcategoryName,
+                category_id: categoryId,
+                description: '',
+                color: '#6BA3E6',
+                order_index: 0
+              })
+            });
+            
+            if (subcategoryResponse.ok) {
+              const newSubcategory = await subcategoryResponse.json();
+              subcategoryId = newSubcategory.id;
+              createdStructures.set(subcategoryKey, subcategoryId);
+              console.log(`✅ Created subcategory: ${itemData.subcategoryName}`);
+            } else {
+              console.error(`❌ Failed to create subcategory: ${itemData.subcategoryName}`);
+              continue;
+            }
+          }
+          
+          // Create ONLY the checked item - Google Apps Script insertRows() equivalent
+          console.log(`📝 Creating ONLY CHECKED ITEM: "${itemData.item.name}"`);
+          const itemResponse = await fetch(`${backendUrl}/api/items`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               name: itemData.item.name,
-              quantity: itemData.item.quantity || 1,
+              vendor: itemData.item.vendor || '',
+              sku: itemData.item.sku || '',
+              cost: itemData.item.cost || 0,
               size: itemData.item.size || '',
-              finish_color: '', // Always blank as requested
-              remarks: itemData.item.remarks || '',
+              finish_color: '', // ALWAYS BLANK as requested
+              quantity: itemData.item.quantity || 1,
+              subcategory_id: subcategoryId,
               status: 'TO BE SELECTED',
-              project_id: projectId,
-              room_name: itemData.roomName,
-              category_name: itemData.categoryName,
-              subcategory_name: itemData.subcategoryName,
-              sheet_type: 'checklist'  // Mark as checklist item
+              order_index: 0
             })
           });
           
-          if (createItemResponse.ok) {
-            successCount++; 
-            console.log(`✅ Created checklist item: "${itemData.item.name}"`);
+          if (itemResponse.ok) {
+            successCount++;
+            console.log(`✅ SUCCESSFULLY CREATED CHECKED ITEM: ${itemData.item.name}`);
           } else {
-            const errorText = await createItemResponse.text();
-            console.error(`❌ Failed to create item: ${itemData.item.name} - ${errorText}`);
+            console.error(`❌ Failed to create checked item: ${itemData.item.name}`);
           }
-          // END OF ITEM CREATION LOOP
           
         } catch (error) {
           console.error(`❌ Error processing ${itemData.item.name}:`, error);
