@@ -1,5 +1,21 @@
 #!/usr/bin/env python3
 """
+COMPREHENSIVE TRANSFER FUNCTIONALITY TEST - EXACT FRONTEND SIMULATION
+
+CONTEXT: User reports the walkthrough to checklist transfer functionality is broken.
+This test simulates the EXACT frontend transfer process by calling the same API endpoints
+in the same sequence as the SimpleWalkthroughSpreadsheet.js handleTransferToChecklist function.
+
+EXACT FRONTEND SIMULATION:
+1. Create walkthrough room with items
+2. Simulate checking specific items (like user clicking checkboxes)
+3. Execute the EXACT transfer logic from frontend:
+   - Create checklist room with sheet_type: 'checklist'
+   - Create categories and subcategories as needed
+   - Create ONLY the checked items in checklist with status 'TO BE SELECTED'
+4. Verify transfer results match expected behavior
+"""
+"""
 COMPREHENSIVE TRANSFER FUNCTIONALITY TEST
 
 This test verifies that the TRANSFER TO CHECKLIST functionality works correctly
