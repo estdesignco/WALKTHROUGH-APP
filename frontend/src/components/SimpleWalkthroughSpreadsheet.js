@@ -955,7 +955,6 @@ const SimpleWalkthroughSpreadsheet = ({
                                     </tr>
                                   ))}
                               </tbody>
-                              </tbody>
                             </table>
                             
                             {/* ADD ITEM BUTTON ONLY */}
