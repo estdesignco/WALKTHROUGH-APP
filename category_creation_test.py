@@ -73,7 +73,11 @@ class CategoryCreationTester:
             if method.upper() == 'GET':
                 response = self.session.get(url, params=params, timeout=15)
             elif method.upper() == 'POST':
-                response = self.session.post(url, json=data, timeout=15)
+                if params:
+                    # For POST requests with query parameters, add them to the URL
+                    response = self.session.post(url, json=data, params=params, timeout=15)
+                else:
+                    response = self.session.post(url, json=data, timeout=15)
             elif method.upper() == 'PUT':
                 response = self.session.put(url, json=data, timeout=15)
             elif method.upper() == 'DELETE':
