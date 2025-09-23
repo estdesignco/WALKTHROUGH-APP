@@ -1,106 +1,75 @@
 <analysis>
-The trajectory details an iterative development process focusing on expanding an existing React/FastAPI/MongoDB application with new customer-facing features and fixing persistent bugs. Key challenges involved replicating UI designs *exactly* from provided assets, maintaining core existing spreadsheet functionalities, and resolving numerous loading and data-mapping issues. The AI engineer struggled with user instructions, leading to several misinterpretations, particularly regarding navigation elements and the structure of spreadsheet components, which caused significant user frustration and multiple rollbacks. Critical fixes included resolving a hardcoded URL issue, addressing React StrictMode problems, and correcting data mapping for project details. The AI also implemented a comprehensive customer questionnaire and integrated existing spreadsheet components (Walkthrough, Checklist, FF&E) into a new project detail page, carefully hiding their internal navigation. The conversation concluded with the AI working to ensure consistency of UI elements (like Add Category and Transfer buttons) across all spreadsheet pages.
+The previous AI engineer successfully brought the Interior Design Project Management App from a non-functional state to a more stable one. Key achievements included resolving persistent Kubernetes ingress routing issues, rectifying a critical MongoDB connection problem that was causing 500 errors on the  endpoint, and fixing the default FINISH/COLOR column to be blank. A major breakthrough was the successful implementation of the Walkthrough → Checklist Transfer to only move *checked* items, which was a long-standing user frustration, achieved by aligning backend logic with a provided Google Apps Script. However, some frontend rendering issues, such as incorrect subcategory headers in the Walkthrough, and the robust implementation of web scraping, remained incomplete or problematic. The most recent efforts focused on improving category creation and robust web scraping.
 </analysis>
 
 <product_requirements>
-The primary objective is to enhance an existing React/FastAPI/MongoDB application for interior design FF&E data management. Critical requirements include:
-
-*   **Existing Spreadsheet Preservation:** The Walkthrough, Checklist, and FF&E sheets (colors, format, form, function) are paramount and **must remain untouched** in their original studio view.
-*   **New Customer-Facing Interface:** Develop a client-facing workflow with:
-    *   A **Landing Page** ( or root ) for project overview (New Client, Email New Client, Full Questionnaire buttons, project cards with actions).
-    *   A **Comprehensive Client Questionnaire** () with detailed sections (Client Info, Scope of Work, Project Type with conditional questions, Design Questions, etc.), file uploads, and room selection.
-    *   A **Project Detail Page** ( or ) displaying client/project info, featuring tabs for Questionnaire (showing *filled answers* and editable), Walkthrough, Checklist, and FF&E.
-*   **Exact UI Replication:** Recreate the new landing page, project detail page, and questionnaire **precisely** from user-provided ZIP files and screenshots, including logos, specific gold color (), and a dark theme.
-*   **Enhanced Scraping:** Improve product scraping to be extremely thorough and fix Canva PDF scraping to extract *all* links. (Note: These scraping tasks were mentioned but not actively worked on in detail in this trajectory).
-*   **Mobile-Ready Walkthrough:** The Walkthrough sheet needs to function as a mobile app portion, working offline and then syncing back to the desktop app. It will transfer data to the Checklist.
-*   **UI Consistency:** Features like Add Category and Transfer buttons should be consistently applied across Walkthrough, Checklist, and FF&E sheets once implemented.
+The application is an Interior Design Project Management App. Its core functionality is a spreadsheet-based system across Questionnaire, Walkthrough, Checklist, and FFE modules, integrated with external services like Houzz Pro, MS Teams, My Measures, and Canva for sequential data flow and project management.
+Key modules and their requirements include:
+1.  **Questionnaire**: Customer-facing, for project and personal details.
+2.  **Designer Landing Page**: Populated from the questionnaire.
+3.  **Contact Sheet**: Manages project contacts.
+4.  **Walkthrough**: Mobile-first, offline capable; allows pre-loaded rooms/items, adding/deleting/rearranging elements, media capture (Leica D5 integration), and transferring *selected* items to Checklist.
+5.  **Checklist (Curation)**: Similar features; Add Item via web scraping (product details, image, cost); status dropdowns for presentation charts and Teams integration; Canva board automation; transfers to FFE.
+6.  **FFE (Bible for Designers)**: Offline, onsite use; live shipping tracking; status dropdowns for FOR INSTALL charts; order date cells.
+7.  **Ultimate Dream**: Unified furniture search engine for scraping vendor data and direct Checklist integration.
+**Implementation done so far**: Core backend APIs, React frontend components, initial data transfer logic (Walkthrough to Checklist, Checklist to FFE), and basic web scraping. Recent work focused on critical bug fixes to make the application functional and reliable for project data management and transfer workflows.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack Development**: React (frontend), FastAPI (backend), MongoDB (database).
--   **Environment**: Kubernetes, backend                          RUNNING   pid 27, uptime 0:00:03
-code-server                      RUNNING   pid 29, uptime 0:00:03
-frontend                         STOPPED   Sep 20 04:27 AM
-mongodb                          RUNNING   pid 35, uptime 0:00:03
-supervisor>  for service management,  for configuration.
--   **Frontend**: React components (, , React Router), Shadcn/UI, Tailwind CSS for styling.
--   **Backend**: FastAPI routes, Pydantic models for data validation, MongoDB for data storage, Playwright for web scraping.
+-   **Backend**: FastAPI (Python), MongoDB (persistence), Playwright (web scraping).
+-   **Frontend**: React.js, React Router, Tailwind CSS, Craco.
+-   **Integrations**: SMTP (Gmail), Microsoft Teams API (webhooks), Canva API, Web Scraping.
+-   **Architecture**: Monorepo, RESTful APIs, PWA (offline capability), Kubernetes Ingress, Supervisor.
+-   **Google Apps Script**: Used as a reference for transfer logic.
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a standard full-stack setup with a React frontend, FastAPI backend, and MongoDB database.
+The application uses a monorepo structure with  (FastAPI, Python) and  (React.js, JavaScript) directories.
 
 
 
--   : Stores  for database and ,  for email.
--   :
-    -   **Summary**: Main FastAPI application handling API endpoints, database interactions, and scraping.
-    -   **Changes**: Contains  and  endpoints; Playwright was installed. The  endpoint was confirmed functional.
--   : Stores .
--   :
-    -   **Summary**: Root React component defining application routing.
-    -   **Changes**: Added routes , , . The root path  was changed to render  instead of .  was created for the original studio interface.
--   :
-    -   **Summary**: Dashboard for the FF&E view, fetches project data.
-    -   **Changes**: Fixed a hardcoded API URL to use . Modified to accept  as a prop and conditionally hide internal navigation elements based on  prop, also ensuring pie charts and status breakdowns are always visible. An Add Category button is being added.
--   :
-    -   **Summary**: Dashboard for the Checklist view.
-    -   **Changes**: Modified to accept  as a prop and conditionally hide internal navigation elements based on  prop, also ensuring pie charts and status breakdowns are always visible. An Add Category button has been added.
--   :
-    -   **Summary**: Dashboard for the Walkthrough view.
-    -   **Changes**: Modified to accept  as a prop and conditionally hide internal navigation elements based on  prop, also ensuring pie charts and status breakdowns are always visible.
--   :
-    -   **Summary**: New client-facing landing page component.
-    -   **Changes**: Created as an exact replication from ZIP. Links were verified to correctly navigate to project detail pages. Set as the default route for .
--   :
-    -   **Summary**: New client-facing questionnaire.
-    -   **Changes**: Exact replication from ZIP. Logo URL was fixed. A Back to Projects button was added. This component already contains all comprehensive sections.
--   :
-    -   **Summary**: New client-facing project detail page.
-    -   **Changes**: Created from ZIP, then iteratively refined. Fixed data mapping issues ( to ). Addressed React StrictMode issues. Integrated , ,  as tabs, passing  as a prop and . The questionnaire tab now displays *all* filled answers. The Project Rooms section was moved higher. The component was entirely rewritten at one point due to file corruption from previous edits.
--   :
-    -   **Summary**: A new component created to display comprehensive questionnaire answers, intended for .
-    -   **Changes**: Created, but its integration led to loading issues, requiring further debugging of its rendering logic.
--   :
-    -   **Summary**: The underlying spreadsheet component for the Walkthrough.
-    -   **Changes**: Changed ITEM column to SUB CATEGORY with a dropdown. Checkbox size reduced. Add Room button color changed to gold. Filter and Clear buttons toned down. Add Category and delete buttons for rooms, categories, and rows were added. Minimize functionality added to headers. Transfer button added.
--   :
-    -   **Summary**: The underlying spreadsheet component for the Checklist.
-    -   **Changes**: An Add Category button was added next to Add Item.
--   :
-    -   **Summary**: Global navigation.
-    -   **Changes**: Updated logo URL.
+-   ****:
+    -   **Importance**: Stores environment variables for backend, notably .
+    -   **Changes**: Verified MongoDB URL and corrected Backend URL configuration during initial setup.
+-   ****:
+    -   **Importance**: Central API hub, orchestrates backend services, defines Pydantic models.
+    -   **Changes**: 's  default was set to blank. The  endpoint was modified to *not* auto-populate rooms with full comprehensive structure when  is  and fixed its database insertion logic.  endpoint was fixed and  was imported. The  function is currently being enhanced for robustness.
+-   ****:
+    -   **Importance**: Defines comprehensive room/category structures and template data.
+    -   **Changes**: Reviewed for  and comprehensive structure details; no direct modifications in this trajectory.
+-   ****:
+    -   **Importance**: Stores frontend environment variables, particularly .
+    -   **Changes**: Verified  consistency.
+-   ****:
+    -   **Importance**: React app entry point.
+    -   **Changes**:  was temporarily disabled for debugging input issues, then re-enabled.
+-   ****:
+    -   **Importance**: Renders the walkthrough spreadsheet and handles item transfer logic.
+    -   **Changes**: The  logic was repeatedly refined to transfer *only checked items*. The rendering logic was modified to display proper subcategory names (e.g., PENDANT LIGHTS) instead of generic headers (UNIT). Its category dropdown and  function were updated to use the new comprehensive backend categories.
+-   ****:
+    -   **Importance**: Renders the checklist spreadsheet.
+    -   **Changes**: Its category dropdown and  function were updated to use the new comprehensive backend categories.
+-   ****:
+    -   **Importance**: Renders the FFE spreadsheet.
+    -   **Changes**: Its category dropdown and  function were updated to use the new comprehensive backend categories.
+-   ****:
+    -   **Importance**: Manages the New Client form.
+    -   **Changes**: Input field issues (single-character entry) were addressed by replacing controlled components with uncontrolled HTML inputs and  extraction, and resolving an orphaned Node.js process issue.
 </code_architecture>
 
 <pending_tasks>
--   **Consistent Add Category button:** Add Add Category button to the bottom of the FF&E sheet (already done for Walkthrough and Checklist).
--   **Transfer Button Consistency:** Add Transfer buttons to Checklist and FF&E sheets.
--   **Walkthrough Mobile Functionality**: Implement offline capability and mobile app specific features for Walkthrough.
--   **Walkthrough Auto-Populate Rooms:** Ensure rooms automatically populate the Walkthrough sheet from the filled-out questionnaire.
--   **Walkthrough Pie Chart Suggestion**: Propose a suitable mobile-friendly pie chart for the Walkthrough, as it's for on-site use.
--   **Email Functionality**: Fix Gmail SMTP authentication issue (requires user to provide an App Password).
--   **Scraping Enhancement**: Further refine scraping selectors and add fallback options for robust data extraction.
--   **Canva PDF Scraping**: Debug and fix Canva PDF link extraction and improve related logic to pick up *all* links.
--   **Search/Sort Functionality**: Fully implement and test search/sort across all three sheets.
--   **Muted Room Colors**: Ensure all three sheets have distinct muted room header colors.
--   **Data Synchronization**: Fix missing categories, items, subcategories, dropdowns, status breakdown, and pie chart population across all sheets (some already addressed for pie charts).
+-   **Walkthrough Subcategory Display**: The walkthrough spreadsheet still displays generic headers (INSTALLED, UNIT) instead of actual subcategory names.
+-   **SCRAPING**: The web scraping functionality in Add Item is not working robustly and needs significant improvement.
+-   **Mobile App & Leica D5 Integration**: Initial requirements not yet started.
+-   **Comprehensive Web Scraping Legal Compliance**: Needs verification.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was focused on implementing user-requested UI consistency across the Walkthrough, Checklist, and FF&E spreadsheet components, specifically after the user expressed frustration about the Walkthrough not matching the other sheets and reiterating that functionality should be consistent.
+Immediately prior to this summary, the AI engineer was addressing several critical issues. The  functionality across all sheets (Walkthrough, Checklist, FFE) was fixed to properly populate categories with all subcategories and items from the comprehensive structure, and its backend endpoint was corrected. The sheet independence, ensuring that rooms/categories added or deleted on one sheet only affect that sheet, was verified to be correctly implemented in the backend's  endpoint.
 
-The AI engineer addressed:
-1.  **Walkthrough Specific Changes**:
-    *   Moved the PROJECT ROOMS section to the top of the .
-    *   Modified  to change ITEM to SUB CATEGORY with a dropdown.
-    *   Made checkboxes smaller, changed Add Room button to gold, and toned down Filter and Clear buttons.
-    *   Added Add Category and delete buttons for rooms, categories, and rows.
-    *   Added minimize functionality to room and category headers.
-    *   Added a TRANSFER button to the top section of the Walkthrough.
-2.  **UI Consistency (Add Category Button)**: The user explicitly requested that anything made to work on one sheet (like the Add Category button at the bottom of Walkthrough) must work on all sheets.
-    *   The Add Category button has been added to the  component, next to the Add Item button.
+The primary focus at the very end of the trajectory was on enhancing the **scraping functionality**. The user reported that scraping was STILL NOT WORKING and emphasized the need for it to be EXTREMELY robust and capable of extracting detailed information like SKU, product name, price, image, and size for both Checklist and FFE modules. The AI engineer located the  function in  and began implementing significant enhancements to its logic to achieve this robustness, which involves a comprehensive approach to extracting product data from various web page structures. This work is actively in progress.
 </current_work>
 
 <optional_next_step>
-Add the Add Category button to the bottom of the  component, next to the Add Item button.
+Continue enhancing the scraping functionality to make it robust.
 </optional_next_step>
