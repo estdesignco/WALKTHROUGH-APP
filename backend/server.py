@@ -1663,7 +1663,7 @@ async def update_category(category_id: str, category_update: CategoryUpdate):
 # ROOM ENDPOINTS with 3-level auto-population
 @api_router.post("/rooms", response_model=Room)
 async def create_room(room_data: RoomCreate):
-    """Create a new room with FULL COMPREHENSIVE structure from enhanced_rooms.py"""
+    """Create a new room - auto-populate ONLY if walkthrough sheet_type"""
     try:
         room_name_lower = room_data.name.lower().strip()
         print(f"🏠 CREATING ROOM: {room_name_lower}")
