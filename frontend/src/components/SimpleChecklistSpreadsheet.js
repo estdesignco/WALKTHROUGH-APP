@@ -1265,8 +1265,27 @@ const SimpleChecklistSpreadsheet = ({
                           </React.Fragment>
                         ))}
 
-                        {/* ADD CATEGORY AND ADD ITEM BUTTONS - BOTTOM SECTION */}
+                        {/* ADD CATEGORY AND ADD ITEM BUTTONS - SECTION FOOTER */}
                         <div className="mb-4 flex gap-3">
+                          <select 
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                handleAddCategory(room.id, e.target.value);
+                                e.target.value = ''; // Reset dropdown
+                              }
+                            }}
+                            className="text-white px-3 py-2 rounded font-medium border-none outline-none text-sm" 
+                            style={{ backgroundColor: '#8b7355' }}
+                          >
+                            <option value="">+ ADD CATEGORY ▼</option>
+                            <option value="Lighting">Lighting</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Window Treatments">Window Treatments</option>
+                            <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
+                            <option value="Art & Accessories">Art & Accessories</option>
+                            <option value="Fireplace & Built-ins">Fireplace & Built-ins</option>
+                            <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
+                          </select>
                           <button 
                             onClick={() => {
                               if (category.subcategories?.length > 0) {
