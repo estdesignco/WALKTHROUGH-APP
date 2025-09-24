@@ -406,12 +406,14 @@ export default function Questionnaire() {
                     </Link>
                 </div>
 
-                {/* Header - Updated to match luxury theme */}
-                <div className="w-full bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center my-8 rounded-2xl" style={{ height: '130px' }}>
-                    <div className="text-center text-white">
-                        <h1 className="text-4xl font-light tracking-[0.3em]">ESTABLISHED</h1>
-                        <div className="text-base font-extralight tracking-[0.2em] mt-1">DESIGN CO.</div>
-                    </div>
+                {/* Header with your actual logo */}
+                <div className="w-full bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center my-8 rounded-2xl p-6" style={{ minHeight: '130px' }}>
+                    <img
+                        src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
+                        alt="Established Design Co."
+                        className="max-w-full h-auto max-h-24 object-contain"
+                        style={{ filter: 'brightness(0) invert(1)' }} // Makes the logo white against the gradient
+                    />
                 </div>
 
                 <div className="text-center mb-12">
