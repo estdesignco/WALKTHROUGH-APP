@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://sleek-showcase-46.preview.emergentagent.com/email-template.html
+https://studio-project-hub.preview.emergentagent.com/email-template.html
 
 ---
 
