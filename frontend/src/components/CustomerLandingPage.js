@@ -67,7 +67,7 @@ const CustomerLandingPage = () => {
                                     <div className="w-64 h-36 bg-black/50 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-[#B49B7E]/30 group-hover:border-[#B49B7E]/60 transition-all duration-300">
                                         <Play className="w-12 h-12 text-[#B49B7E] group-hover:scale-110 transition-transform duration-300" />
                                     </div>
-                                    <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-sm font-light text-white/70">
+                                    <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-sm font-light" style={{ color: '#F5F5DC' }}>
                                         Meet Our Team
                                     </div>
                                 </div>
