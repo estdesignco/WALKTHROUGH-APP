@@ -18,6 +18,9 @@ const SimpleChecklistSpreadsheet = ({
 
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
+  
+  // State to track checked items (for PICKED status)
+  const [checkedItems, setCheckedItems] = useState(new Set());
   const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
