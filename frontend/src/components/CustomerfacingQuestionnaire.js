@@ -68,9 +68,9 @@ const Section = ({ title, description, children }) => (
 );
 
 const FieldWrapper = ({ label, children, required }) => (
-    <div className="space-y-2">
-        <Label className="text-lg font-semibold text-[#8B7355]">
-            {label} {required && <span className="text-red-400">*</span>}
+    <div className="space-y-3">
+        <Label className="text-lg font-light text-[#B49B7E] tracking-wide">
+            {label} {required && <span className="text-[#B49B7E]/80">*</span>}
         </Label>
         {children}
     </div>
