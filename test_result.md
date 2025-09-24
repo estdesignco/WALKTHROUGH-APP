@@ -194,15 +194,15 @@ backend:
       
   - task: "Teams Integration for Status Change Notifications"
     implemented: true
-    working: true
+    working: false
     file: "teams_integration.py, server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
-      - working: true
+      - working: false
         agent: "main"
-        comment: "🔔 TEAMS INTEGRATION ACTIVE - ALREADY WORKING! Found teams_integration.py with notify_status_change() function that's already integrated into server.py item update endpoint (lines 2180-2191). When item status changes, Teams notification is automatically created with project/item/room context. User requested this for 'items added to to-do list' - this is implemented. Function includes vendor, cost, room name, and sends to assistants/interns. Needs testing to verify webhook URLs and message formatting work correctly."
+        comment: "🔔 TEAMS INTEGRATION IMPLEMENTED BUT NEEDS WEBHOOK URL. Found comprehensive Teams integration with notify_status_change() function integrated into server.py item update endpoint (lines 2168-2194). When item status changes, Teams notification is automatically created with project/item/room context including vendor, cost, room name. Integration creates proper Teams card payload with colors, priorities, and adaptive cards format. ISSUE: TEAMS_WEBHOOK_URL in .env is empty - user needs to provide Microsoft Teams webhook URL for channel notifications. Once configured, Teams integration will automatically notify assistants/interns when items are added to to-do list (status changes). Code is production-ready, just needs webhook URL configuration."
 
   - task: "Checklist and FFE Auto-Population Fix - URGENT REVIEW REQUEST"
     implemented: true
