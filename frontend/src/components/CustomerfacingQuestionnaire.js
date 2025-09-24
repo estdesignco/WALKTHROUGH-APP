@@ -80,9 +80,9 @@ const inputStyles = "bg-black/40 border-[#B49B7E]/30 text-[#F5F5DC] focus:border
 
 // New InputField component
 const InputField = ({ label, id, value, onChange, required = false, type = "text", placeholder = "" }) => (
-    <div className="space-y-2">
-        <Label htmlFor={id} className="text-lg font-semibold text-[#8B7355]">
-            {label} {required && <span className="text-red-400">*</span>}
+    <div className="space-y-3">
+        <Label htmlFor={id} className="text-lg font-light text-[#B49B7E] tracking-wide">
+            {label} {required && <span className="text-[#B49B7E]/80">*</span>}
         </Label>
         <Input
             id={id}
