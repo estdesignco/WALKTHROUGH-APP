@@ -895,6 +895,9 @@ const SimpleChecklistSpreadsheet = ({
               <option value="GET QUOTE">GET QUOTE</option>
               <option value="WAITING ON QT">WAITING ON QT</option>
               <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
+              <option value="GET QUOTE">GET QUOTE</option>
+              <option value="WAITING ON QT">WAITING ON QT</option>
+              <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
             </select>
             
             {/* Filter and Clear Buttons */}
