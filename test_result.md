@@ -195,9 +195,9 @@ backend:
 
   - task: "Walkthrough to Checklist Transfer Functionality - Emergency User Report Testing"
     implemented: true
-    working: true
+    working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -210,6 +210,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "🎉 CRITICAL STATUS DROPDOWN CHANGES + TRANSFER FUNCTIONALITY TESTING COMPLETED - ALL REQUIREMENTS VERIFIED! Conducted comprehensive testing of the exact status dropdown changes requested in review where 'PICKED' status shows as 'BLANK' in UI while preserving backend transfer logic. ✅ TRANSFER TEST PASSED: Successfully created walkthrough items, simulated checking them, and transferred to checklist - 2 items transferred correctly from walkthrough (73 total items) to checklist room. ✅ STATUS DISPLAY VERIFIED: Transferred items correctly show PICKED status in backend (2 items) while UI should display as BLANK - backend preserves transfer logic perfectly. ✅ STATUS DROPDOWN CONFIRMED: BLANK status option found in dropdown (total 31 statuses available) - UI can properly show BLANK instead of PICKED. ✅ STATUS CHANGES WORKING: Successfully tested changing status from PICKED to ORDER SAMPLES - status updates work correctly in checklist. ✅ BACKEND LOGIC PRESERVED: Backend correctly stores PICKED status internally to maintain transfer functionality while allowing UI to display as BLANK. ✅ CHECKLIST STATUSES VERIFIED: All 8 checklist-specific statuses available (ORDER SAMPLES, SAMPLES ARRIVED, ASK NEIL, ASK CHARLENE, ASK JALA, GET QUOTE, WAITING ON QT, READY FOR PRESENTATION) with proper color coding. ✅ 100% TEST SUCCESS: All 5/5 critical tests passed - transfer functionality is NOT broken and works perfectly. The status dropdown changes successfully preserve backend transfer logic while allowing PICKED items to display as BLANK in the UI. This is exactly what the user requested and the implementation is production-ready!"
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL TRANSFER FUNCTIONALITY BUG CONFIRMED - USER'S CONCERN IS VALID! Conducted emergency testing after user reported accidentally breaking transfer functionality. ✅ COMPREHENSIVE TEST EXECUTED: Created test project (ID: 293d8c7c-65bd-48f6-a895-c4afea597095) with walkthrough room containing 8 test items, simulated checking exactly 3 items (Chandelier, Recessed Lighting, Sconces), created checklist room for transfer destination. ❌ CRITICAL BUG CONFIRMED: When transferring 3 checked items, 76 items appeared in checklist instead of just the 3 checked items! This confirms user's exact complaint that 'ALL items transfer instead of just checked ones'. ❌ ROOT CAUSE IDENTIFIED: The recent change to auto-populate ALL sheet types with comprehensive structure is breaking transfer functionality. Backend logs show 'CHECKLIST ROOM: Creating with full comprehensive structure' and 'Will create 146 items for this room' - checklist rooms are being pre-populated with all items instead of being empty and waiting for selective transfer. ❌ TRANSFER LOGIC BROKEN: Line 1682-1684 in server.py shows 'AUTO-POPULATE ALL SHEET TYPES with comprehensive structure' which breaks the core transfer workflow. For transfer to work: Walkthrough rooms should be auto-populated, but Checklist/FFE rooms should be created EMPTY. ❌ VERIFICATION RESULTS: Walkthrough: 81 items, Checklist: 76 items, Expected: 3 items. Transfer bug definitively confirmed. 🚨 URGENT FIX REQUIRED: The auto-populate logic for checklist/FFE rooms must be reverted to allow proper selective transfer functionality. User's concern about broken transfer functionality is 100% VALID and confirmed."
 
   - task: "Status Dropdown Changes + Transfer Functionality - Critical Review Request"
     implemented: true
