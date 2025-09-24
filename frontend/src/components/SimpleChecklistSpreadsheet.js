@@ -194,6 +194,9 @@ const SimpleChecklistSpreadsheet = ({
       'GET QUOTE': '#06B6D4',               // Cyan
       'WAITING ON QT': '#F97316',           // Orange
       'READY FOR PRESENTATION': '#84CC16'   // Lime Green
+    };
+    return statusColors[status] || '#6B7280'; // Default gray
+  };
       'GET QUOTE': '#06B6D4',               // Cyan
       'WAITING ON QT': '#F97316',           // Orange
       'READY FOR PRESENTATION': '#84CC16'   // Lime
