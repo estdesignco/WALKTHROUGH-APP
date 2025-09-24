@@ -358,7 +358,7 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
-  // Handle adding a new category - COPIED FROM WORKING FFE
+  // Handle adding a new category - FIXED TO USE COMPREHENSIVE ENDPOINT
   const handleAddCategory = async (roomId, categoryName) => {
     if (!roomId || !categoryName) {
       console.error('❌ Missing roomId or categoryName');
@@ -368,95 +368,29 @@ const SimpleChecklistSpreadsheet = ({
     try {
       console.log('🔄 Creating comprehensive checklist category:', categoryName, 'for room:', roomId);
       
-      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
+      // Use comprehensive endpoint directly
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const response = await fetch(`${backendUrl}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: `temp_${categoryName}_${Date.now()}`,
-          description: `Temporary room to extract ${categoryName} structure`,
-          project_id: "temp",
-          order_index: 999
-        })
+        headers: { 'Content-Type': 'application/json' }
       });
 
-      if (tempRoomResponse.ok) {
-        const tempRoom = await tempRoomResponse.json();
+      if (response.ok) {
+        const newCategory = await response.json();
+        console.log('✅ Category added successfully:', newCategory.name);
         
-        const matchingCategory = tempRoom.categories.find(cat => 
-          cat.name.toLowerCase() === categoryName.toLowerCase()
-        );
-        
-        if (matchingCategory) {
-          // First add the category
-          const categoryData = {
-            ...matchingCategory,
-            room_id: roomId,
-            id: undefined
-          };
-          
-          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(categoryData)
-          });
-          
-          if (addResponse.ok) {
-            const newCategory = await addResponse.json();
-            console.log('✅ Category added:', newCategory.name);
-            
-            // Now add ALL subcategories with their items
-            for (const subcategory of matchingCategory.subcategories) {
-              const subcategoryData = {
-                ...subcategory,
-                category_id: newCategory.id,
-                id: undefined
-              };
-              
-              const subResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/subcategories`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(subcategoryData)
-              });
-              
-              if (subResponse.ok) {
-                const newSubcategory = await subResponse.json();
-                console.log('✅ Subcategory added:', newSubcategory.name);
-                
-                // Add ALL items for this subcategory
-                for (const item of subcategory.items) {
-                  const itemData = {
-                    ...item,
-                    subcategory_id: newSubcategory.id,
-                    id: undefined,
-                    status: '' // BLANK status for checklist items
-                  };
-                  
-                  await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(itemData)
-                  });
-                }
-              }
-            }
-            
-            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
-              method: 'DELETE'
-            });
-            
-            // Reload to show all new items
-            if (onReload) {
-              onReload();
-            }
-          }
+        // Reload data to show new category
+        if (onReload) {
+          onReload();
         }
-        
-        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
-          method: 'DELETE'
-        });
+      } else {
+        console.error('❌ Category creation failed with status:', response.status);
+        const errorData = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorData}`);
       }
     } catch (error) {
-      console.error('❌ Error adding comprehensive checklist category:', error);
+      console.error('❌ Error adding checklist category:', error);
+      alert('Failed to add category: ' + error.message);
     }
   };  
 
