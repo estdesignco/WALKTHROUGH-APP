@@ -236,57 +236,60 @@ const StudioLandingPage = () => {
         <UnifiedFurnitureSearch />
       </div>
 
-      {/* Email Modal */}
+      {/* Email Modal - Same style as Questionnaire */}
       {showEmailModal && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div className="bg-gradient-to-br from-black/90 to-gray-900/90 rounded-2xl p-8 w-full max-w-md mx-4 border border-[#B49B7E]/30 shadow-2xl">
-            <h3 className="text-2xl font-light text-[#B49B7E] mb-6">Email Client Questionnaire</h3>
+          <div className="bg-gradient-to-br from-black/60 to-gray-900/80 rounded-3xl p-8 w-full max-w-md mx-4 border border-[#B49B7E]/20 shadow-2xl backdrop-blur-sm">
+            <h3 className="text-2xl font-light text-[#B49B7E] mb-6 text-center">Email Client Questionnaire</h3>
+            <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mb-8"></div>
             
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-light mb-2" style={{ color: '#F5F5DC' }}>
+                <label className="block text-lg font-light text-[#B49B7E] tracking-wide mb-3">
                   Client Name
                 </label>
                 <input
                   type="text"
                   value={emailData.name}
                   onChange={(e) => setEmailData({ ...emailData, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/40 border border-[#B49B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] transition-all duration-300"
+                  className="w-full px-4 py-3 bg-black/40 border border-[#B49B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] focus:bg-black/60 transition-all duration-300"
                   style={{ color: '#F5F5DC' }}
                   placeholder="Enter client name"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-light mb-2" style={{ color: '#F5F5DC' }}>
+                <label className="block text-lg font-light text-[#B49B7E] tracking-wide mb-3">
                   Email Address
                 </label>
                 <input
                   type="email"
                   value={emailData.email}
                   onChange={(e) => setEmailData({ ...emailData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/40 border border-[#B49B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] transition-all duration-300"
+                  className="w-full px-4 py-3 bg-black/40 border border-[#B49B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] focus:bg-black/60 transition-all duration-300"
                   style={{ color: '#F5F5DC' }}
                   placeholder="Enter email address"
                 />
               </div>
             </div>
             
-            <div className="flex space-x-3 mt-8">
-              <button
-                onClick={() => setShowEmailModal(false)}
-                className="flex-1 px-6 py-3 bg-gradient-to-br from-black/60 to-gray-900/60 hover:from-gray-900/60 hover:to-black/60 rounded-lg transition-all duration-300 border border-[#B49B7E]/20"
-                style={{ color: '#F5F5DC' }}
-              >
-                Cancel
-              </button>
+            <div className="flex justify-center pt-8">
               <button
                 onClick={handleSendEmail}
                 disabled={!emailData.email || !emailData.name}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] disabled:from-gray-600 disabled:to-gray-700 rounded-lg transition-all duration-300 shadow-lg"
+                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] disabled:from-gray-600 disabled:to-gray-700 px-12 py-4 text-xl font-light rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide"
                 style={{ color: '#F5F5DC' }}
               >
                 Send Questionnaire
+              </button>
+            </div>
+            
+            <div className="text-center mt-6">
+              <button
+                onClick={() => setShowEmailModal(false)}
+                className="text-[#B49B7E] hover:opacity-80 transition-opacity"
+              >
+                Cancel
               </button>
             </div>
           </div>
