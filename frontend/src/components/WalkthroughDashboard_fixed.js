@@ -7,7 +7,7 @@ import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 
-const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
+const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.error("🚨 CHECKLIST DASHBOARD IS LOADING!");
   const { projectId: paramProjectId } = useParams();
   const projectId = propProjectId || paramProjectId;
