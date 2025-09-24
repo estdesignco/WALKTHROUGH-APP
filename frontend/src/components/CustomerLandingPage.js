@@ -40,14 +40,14 @@ const CustomerLandingPage = () => {
 
                 {/* Hero Content */}
                 <div className="relative z-10 text-center px-6 max-w-6xl mx-auto">
-                    {/* Logo */}
+                    {/* Your Logo */}
                     <div className="mb-8">
-                        <h1 className="text-6xl md:text-8xl font-light tracking-widest text-[#B49B7E] mb-4">
-                            ESTABLISHED
-                        </h1>
-                        <div className="text-3xl md:text-5xl font-extralight tracking-[0.3em] text-white/90">
-                            DESIGN CO.
-                        </div>
+                        <img
+                            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
+                            alt="Established Design Co."
+                            className="h-24 md:h-32 mx-auto object-contain"
+                            style={{ filter: 'brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(664%) hue-rotate(349deg) brightness(95%) contrast(88%)' }} // Converts to your brand gold color
+                        />
                         <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mt-6"></div>
                     </div>
 
