@@ -350,21 +350,21 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
           carrierBreakdown={getCarrierBreakdown()}
           itemStatuses={itemStatuses}
         />
-      </div>
 
-      {/* FF&E Spreadsheet */}
-      <div className="px-6 mt-4">
-        <ExactFFESpreadsheet
-          project={project}
-          roomColors={roomColors}
-          categoryColors={categoryColors}
-          itemStatuses={itemStatuses}
-          vendorTypes={vendorTypes}
-          carrierTypes={carrierTypes}
-          onDeleteRoom={handleDeleteRoom}
-          onAddRoom={() => setShowAddRoom(true)}
-          onReload={loadSimpleProject}
-        />
+        {/* Spreadsheet - Inside main container */}
+        <div className="mt-8">
+          <ExactFFESpreadsheet
+            project={project}
+            roomColors={roomColors}
+            categoryColors={categoryColors}
+            itemStatuses={itemStatuses}
+            vendorTypes={vendorTypes}
+            carrierTypes={carrierTypes}
+            onDeleteRoom={handleDeleteRoom}
+            onAddRoom={() => setShowAddRoom(true)}
+            onReload={loadSimpleProject}
+          />
+        </div>
       </div>
 
       {/* Add Room Modal */}
