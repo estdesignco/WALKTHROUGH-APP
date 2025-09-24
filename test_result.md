@@ -161,7 +161,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "URGENT TEST: Checklist and FFE Auto-Population Fix - I just made a critical change to the backend room creation logic to auto-populate checklist and FFE rooms with comprehensive structure like walkthrough does. SPECIFIC TESTS NEEDED: 1) Create a checklist room and verify it has all categories, subcategories, and items (like walkthrough), 2) Create an FFE room and verify it has all categories, subcategories, and items (like walkthrough), 3) Verify walkthrough rooms still work correctly (no regression), 4) Confirm transfer functionality is not affected. PREVIOUS ISSUE: Checklist and FFE were creating empty rooms with no categories while walkthrough auto-populated with full structure. CHANGE MADE: Removed the condition that prevented checklist/FFE from auto-populating and now ALL sheet types get comprehensive room structure."
+  "FEATURE STATUS CHECK: Test key features after reverting room auto-population. Need to verify that these features still work after fixing the transfer: 1) **ADD CATEGORY functionality** - Test if predefined categories can be added to rooms, 2) **ADD NEW CATEGORY functionality** - Test if custom categories work with the prompt, 3) **Walkthrough room auto-population** - Verify walkthrough rooms still get full structure, 4) **Scraping API** - Test if the product scraping endpoint still works, 5) **Transfer functionality** - Quick test to confirm it's working (only checked items). This is a status check to ensure we didn't break other features while fixing the transfer."
 
 backend:
   - task: "Checklist and FFE Auto-Population Fix - URGENT REVIEW REQUEST"
