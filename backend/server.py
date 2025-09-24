@@ -1757,7 +1757,12 @@ async def create_room(room_data: RoomCreate):
                 "updated_at": room_dict["updated_at"]
             }
             
-            await db.rooms.insert_one(room_basic)
+            try:
+                await db.rooms.insert_one(room_basic)
+                print(f"✅ Room inserted successfully: {room_id}")
+            except Exception as e:
+                print(f"❌ Failed to insert room: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Failed to insert room: {str(e)}")
             
             # Then insert categories and subcategories separately (NO ITEMS for checklist/FFE)
             for category_data in room_dict["categories"]:
@@ -1772,7 +1777,11 @@ async def create_room(room_data: RoomCreate):
                     "updated_at": category_data["updated_at"]
                 }
                 
-                await db.categories.insert_one(category_basic)
+                try:
+                    await db.categories.insert_one(category_basic)
+                    print(f"✅ Category inserted: {category_data['name']}")
+                except Exception as e:
+                    print(f"❌ Failed to insert category {category_data['name']}: {str(e)}")
                 
                 # Insert subcategories (but NO items - preserves transfer functionality)
                 for subcategory_data in category_data["subcategories"]:
@@ -1787,7 +1796,11 @@ async def create_room(room_data: RoomCreate):
                         "updated_at": subcategory_data["updated_at"]
                     }
                     
-                    await db.subcategories.insert_one(subcategory_basic)
+                    try:
+                        await db.subcategories.insert_one(subcategory_basic)
+                        print(f"✅ Subcategory inserted: {subcategory_data['name']}")
+                    except Exception as e:
+                        print(f"❌ Failed to insert subcategory {subcategory_data['name']}: {str(e)}")
                     # NOTE: NO items inserted - this preserves transfer functionality
             
             # Return the room with full structure (as expected by the frontend)
