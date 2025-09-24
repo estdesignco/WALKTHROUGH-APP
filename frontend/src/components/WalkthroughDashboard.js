@@ -363,10 +363,9 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
           carrierBreakdown={getCarrierBreakdown()}
           itemStatuses={itemStatuses}
         />
-      </div>
 
-      {/* FF&E Spreadsheet */}
-      <div className="px-6 mt-4">
+        {/* FF&E Spreadsheet - Inside main container */}
+        <div className="mt-8">
         <SimpleWalkthroughSpreadsheet
           project={project}
           roomColors={roomColors}
