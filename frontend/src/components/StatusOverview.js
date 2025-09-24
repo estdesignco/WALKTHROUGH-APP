@@ -245,9 +245,9 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* RIGHT COLUMN - SHIPPING SECTION */}
-      <div className="bg-gray-800 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Shipping Information</h3>
+      {/* RIGHT COLUMN - SHIPPING SECTION with Beautiful Rounded Treatment */}
+      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl p-6 border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
+        <h3 className="text-lg font-semibold text-[#B49B7E] mb-4 tracking-wide">Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
