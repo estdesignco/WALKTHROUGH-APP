@@ -215,6 +215,10 @@ const App = () => {
               path="/google-sheets-import" 
               element={<GoogleSheetsImporter />}
             />
+            <Route 
+              path="/email-preview" 
+              element={<EmailPreview />}
+            />
             {/* Customer-facing routes */}
             <Route 
               path="/customer" 
