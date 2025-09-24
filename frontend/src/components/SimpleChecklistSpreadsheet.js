@@ -1013,7 +1013,7 @@ const SimpleChecklistSpreadsheet = ({
                                             type="checkbox" 
                                             className="w-4 h-4 cursor-pointer" 
                                             checked={checkedItems.has(item.id) || item.status === 'PICKED'}
-                                            onChange={(e) => {
+                                            onChange={async (e) => {
                                               const newCheckedItems = new Set(checkedItems);
                                               const newStatus = e.target.checked ? 'PICKED' : '';
                                               
@@ -1024,12 +1024,23 @@ const SimpleChecklistSpreadsheet = ({
                                               }
                                               setCheckedItems(newCheckedItems);
                                               
-                                              // Update status and trigger reload to refresh dropdown
-                                              handleStatusChange(item.id, newStatus).then(() => {
-                                                if (onReload) {
-                                                  onReload();
-                                                }
-                                              });
+                                              // Update item status immediately in local data
+                                              item.status = newStatus;
+                                              
+                                              // Update backend
+                                              try {
+                                                const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                await fetch(`${backendUrl}/api/items/${item.id}`, {
+                                                  method: 'PUT',
+                                                  headers: { 'Content-Type': 'application/json' },
+                                                  body: JSON.stringify({ status: newStatus })
+                                                });
+                                                console.log(`✅ Status updated: ${newStatus}`);
+                                              } catch (error) {
+                                                console.error('❌ Failed to update status:', error);
+                                                // Revert local change on error
+                                                item.status = item.status;
+                                              }
                                             }}
                                           />
                                         </td>
