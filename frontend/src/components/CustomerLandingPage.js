@@ -194,8 +194,8 @@ const CustomerLandingPage = () => {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                     <div className="absolute bottom-4 left-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        <h4 className="text-lg font-medium">Luxury Residence</h4>
-                                        <p className="text-sm text-white/80">Complete Interior Design</p>
+                                        <h4 className="text-lg font-medium" style={{ color: '#F5F5DC' }}>Luxury Residence</h4>
+                                        <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>Complete Interior Design</p>
                                     </div>
                                 </div>
                             </div>
