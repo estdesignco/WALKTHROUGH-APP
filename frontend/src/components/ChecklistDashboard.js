@@ -349,8 +349,8 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
               </div>
               <button
                 onClick={() => setShowAddRoom(true)}
-                style={{ backgroundColor: '#8b7355' }}
-                className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors ml-4"
+                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-full shadow-xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide ml-4 font-medium"
+                style={{ color: '#F5F5DC' }}
               >
                 ➕ Add Room
               </button>
