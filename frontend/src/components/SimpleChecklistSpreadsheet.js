@@ -174,12 +174,12 @@ const SimpleChecklistSpreadsheet = ({
 
   const getCategoryColor = () => '#065F46';  // Dark green for categories
 
-  // Status colors mapping for checklist
+  // Status colors mapping for checklist  
   const getStatusColor = (status) => {
     const statusColors = {
       '': '#6B7280',                        // Gray for blank/default
       'BLANK': '#6B7280',                   // Gray for blank
-      'PICKED': '#3B82F6',                  // Blue
+      'PICKED': '#6B7280',                  // Gray - treat PICKED as BLANK for display
       'ORDER SAMPLES': '#10B981',           // Green
       'SAMPLES ARRIVED': '#8B5CF6',         // Purple
       'ASK NEIL': '#F59E0B',                // Yellow
