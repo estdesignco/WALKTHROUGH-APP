@@ -56,12 +56,12 @@ const createPageUrl = (page) => {
 
 // Section wrapper component
 const Section = ({ title, description, children }) => (
-    <Card className="bg-gray-800 border-stone-700 shadow-lg">
-        <CardHeader>
-            <CardTitle className="text-2xl font-bold text-stone-300">{title}</CardTitle>
-            {description && <CardDescription className="text-md text-stone-400">{description}</CardDescription>}
+    <Card className="bg-gradient-to-br from-black/80 to-gray-900/90 border-[#B49B7E]/20 shadow-2xl backdrop-blur-sm">
+        <CardHeader className="border-b border-[#B49B7E]/10 pb-6">
+            <CardTitle className="text-3xl font-light text-[#B49B7E] tracking-wide">{title}</CardTitle>
+            {description && <CardDescription className="text-lg text-[#F5F5DC]/70 mt-3 leading-relaxed">{description}</CardDescription>}
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8 pt-8">
             {children}
         </CardContent>
     </Card>
