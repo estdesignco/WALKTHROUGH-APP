@@ -161,7 +161,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "FEATURE STATUS CHECK: Test key features after reverting room auto-population. Need to verify that these features still work after fixing the transfer: 1) **ADD CATEGORY functionality** - Test if predefined categories can be added to rooms, 2) **ADD NEW CATEGORY functionality** - Test if custom categories work with the prompt, 3) **Walkthrough room auto-population** - Verify walkthrough rooms still get full structure, 4) **Scraping API** - Test if the product scraping endpoint still works, 5) **Transfer functionality** - Quick test to confirm it's working (only checked items). This is a status check to ensure we didn't break other features while fixing the transfer."
+  "SCRAPING PRIORITY: Fix web scraping to be ultra-robust and extract ALL product details (SKU, name, image, cost, size, finish/color) from vendor sites. Scraping 'still sucks real bad' and missing critical info. ALSO start Canva integration to scrape Canva boards for furniture links and Teams integration to send messages when STATUS changes (items added to to-do list). User will be away for long time, so work independently on all three priorities."
 
 backend:
   - task: "Feature Status Check - Post Transfer Fix Verification"
