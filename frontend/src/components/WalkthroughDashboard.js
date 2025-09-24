@@ -137,128 +137,38 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B49B7E] mx-auto"></div>
-          <p className="mt-4" style={{ color: '#F5F5DC', opacity: '0.8' }}>Loading FF&E data...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-6xl mb-4">❌</div>
-        <h2 className="text-2xl font-light mb-2" style={{ color: '#F5F5DC' }}>Error Loading Project</h2>
-        <p style={{ color: '#F5F5DC', opacity: '0.7' }}>{error}</p>
-        <button 
-          onClick={() => {
-            setError(null);
-            setLoading(true);
-            loadSimpleProject();
-          }}
-          className="mt-4 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-lg transition-all duration-300"
-          style={{ color: '#F5F5DC' }}
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  if (!project) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-6xl mb-4">❌</div>
-        <h2 className="text-2xl font-light mb-2" style={{ color: '#F5F5DC' }}>Project Not Found</h2>
-        <p style={{ color: '#F5F5DC', opacity: '0.7' }}>The project you're looking for doesn't exist or couldn't be loaded.</p>
-      </div>
-    );
-  }
-
-  const getTotalItems = () => {
-    if (!project || !project.rooms || !Array.isArray(project.rooms)) {
-      return 0;
-    }
-    
-    return project.rooms.reduce((total, room) => {
-      if (!room || !room.categories || !Array.isArray(room.categories)) {
-        return total;
-      }
-      return total + room.categories.reduce((catTotal, category) => {
-        if (!category) return catTotal;
-        return catTotal + (category.subcategories || []).reduce((subTotal, subcategory) =>
-          subTotal + (subcategory && subcategory.items && Array.isArray(subcategory.items) ? subcategory.items.length : 0), 0
-        );
-      }, 0);
-    }, 0);
-  };
-
-  const getStatusBreakdown = () => {
-    const breakdown = {};
-    
-    if (!project || !project.rooms || !Array.isArray(project.rooms)) {
-      return breakdown;
-    }
-    
-    project.rooms.forEach(room => {
-      if (!room || !room.categories || !Array.isArray(room.categories)) {
-        return;
-      }
-      room.categories.forEach(category => {
-        if (!category) return;
-        (category.subcategories || []).forEach(subcategory => {
-          if (!subcategory) return;
-          (subcategory.items || []).forEach(item => {
-            if (!item) return;
-            const status = item.status || 'TO BE SELECTED';
-            breakdown[status] = (breakdown[status] || 0) + 1;
-          });
-        });
-      });
-    });
-    
-    return breakdown;
-  };
-
-  const getCarrierBreakdown = () => {
-    const carriers = {};
-    
-    if (!project || !project.rooms || !Array.isArray(project.rooms)) {
-      return carriers;
-    }
-    
-    project.rooms.forEach(room => {
-      if (!room || !room.categories || !Array.isArray(room.categories)) {
-        return;
-      }
-      room.categories.forEach(category => {
-        if (!category) return;
-        (category.subcategories || []).forEach(subcategory => {
-          if (!subcategory) return;
-          (subcategory.items || []).forEach(item => {
-            if (!item) return;
-            if (item.carrier) {
-              carriers[item.carrier] = (carriers[item.carrier] || 0) + 1;
-            }
-          });
-        });
-      });
-    });
-    
-    return carriers;
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+      return (
+    <div className="max-w-full mx-auto bg-gradient-to-b from-black via-gray-900 to-black min-h-screen">
       {/* TOP HEADER */}
       <div className="mb-6">
         <div className="text-center mb-4">
           <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
           <p style={{ color: '#F5F5DC', opacity: '0.8' }}>Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
-        
+        </div>
+
+        {!hideNavigation && (
+          <>
+            {/* Navigation Tabs */}
+            <div className="flex justify-center space-x-8 mb-6">
+              <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 transition-colors" style={{ color: '#F5F5DC', opacity: '0.7' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
+                <span>📋</span>
+                <span>Questionnaire</span>
+              </a>
+              <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 transition-colors" style={{ color: '#F5F5DC', opacity: '0.7' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
+                <span>🚶</span>
+                <span>Walkthrough</span>
+              </a>
+              <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 transition-colors" style={{ color: '#F5F5DC', opacity: '0.7' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
+                <span>✅</span>
+                <span>Checklist</span>
+              </a>
+              <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
+                <span>📊</span>
+                <span className="font-semibold">FF&E</span>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* LOGO BANNER */}
         <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}>
@@ -273,42 +183,6 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
       {/* Main Content Container - MAXIMUM WIDTH with Darker Gradient */}
       <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
         
-        {!hideNavigation && (
-          <>
-            {/* Navigation Tabs */}
-            <div className="flex justify-center space-x-8 mb-6">
-              <a href={`/project/${projectId}/questionnaire`} 
-                 className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
-                 style={{ color: '#F5F5DC', opacity: '0.7' }} 
-                 onMouseEnter={(e) => e.target.style.opacity = '1'} 
-                 onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
-                <span>📋</span>
-                <span className="font-light tracking-wide">Questionnaire</span>
-              </a>
-              <div className="flex items-center space-x-2 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] px-6 py-3 rounded-full shadow-lg">
-                <span>🚶</span>
-                <span className="font-medium text-[#F5F5DC] tracking-wide">Walkthrough</span>
-              </div>
-              <a href={`/project/${projectId}/checklist`} 
-                 className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
-                 style={{ color: '#F5F5DC', opacity: '0.7' }} 
-                 onMouseEnter={(e) => e.target.style.opacity = '1'} 
-                 onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
-                <span>✅</span>
-                <span className="font-light tracking-wide">Checklist</span>
-              </a>
-              <a href={`/project/${projectId}/ffe`} 
-                 className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
-                 style={{ color: '#F5F5DC', opacity: '0.7' }} 
-                 onMouseEnter={(e) => e.target.style.opacity = '1'} 
-                 onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
-                <span>📊</span>
-                <span className="font-light tracking-wide">FF&E</span>
-              </a>
-            </div>
-          </>
-        )}
-
         {/* Page Title - Luxury Style */}
         <div className="text-center mb-12">
           <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide mb-6">WALKTHROUGH - GREENE</h2>
@@ -331,7 +205,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
               </button>
             </div>
 
-            {/* Search and Controls - Darker Gradient to Match Top */}
+            {/* Search and Controls - Darker Gradient to Match Content Areas */}
             <div className="flex items-center justify-between mt-6 p-6 bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
               <div className="flex items-center space-x-4 flex-1">
                 <input
