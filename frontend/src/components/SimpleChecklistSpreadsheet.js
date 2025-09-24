@@ -1121,7 +1121,7 @@ const SimpleChecklistSpreadsheet = ({
                                       style={{ backgroundColor: getStatusColor(item.status || ''), color: 'white' }}
                                       onChange={(e) => handleStatusChange(item.id, e.target.value)}
                                     >
-                                      <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>BLANK</option>
+                                      <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}></option>
                                       <option value="ORDER SAMPLES" style={{ backgroundColor: '#10B981', color: 'white' }}>ORDER SAMPLES</option>
                                       <option value="SAMPLES ARRIVED" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>SAMPLES ARRIVED</option>
                                       <option value="ASK NEIL" style={{ backgroundColor: '#F59E0B', color: 'white' }}>ASK NEIL</option>
