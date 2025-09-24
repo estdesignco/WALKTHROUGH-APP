@@ -356,6 +356,43 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
+  // Handle deleting a subcategory and all its items
+  const handleDeleteSubcategory = async (subcategoryId) => {
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      
+      // First delete all items in the subcategory
+      const subcategoryItems = project.rooms.flatMap(room => 
+        room.categories.flatMap(category => 
+          category.subcategories.filter(sub => sub.id === subcategoryId)
+            .flatMap(sub => sub.items || [])
+        )
+      );
+      
+      // Delete each item
+      for (const item of subcategoryItems) {
+        await fetch(`${backendUrl}/api/items/${item.id}`, {
+          method: 'DELETE'
+        });
+      }
+      
+      // Then delete the subcategory
+      const response = await fetch(`${backendUrl}/api/subcategories/${subcategoryId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        console.log('✅ Subcategory deleted successfully');
+        if (onReload) onReload();
+      } else {
+        throw new Error('Failed to delete subcategory');
+      }
+    } catch (error) {
+      console.error('❌ Error deleting subcategory:', error);
+      alert('Failed to delete subcategory: ' + error.message);
+    }
+  };
+
   // Handle adding a new category - FIXED TO USE COMPREHENSIVE ENDPOINT
   const handleAddCategory = async (roomId, categoryName) => {
     if (!roomId || !categoryName) {
