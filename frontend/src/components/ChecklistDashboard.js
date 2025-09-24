@@ -181,22 +181,40 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   }
 
   const getTotalItems = () => {
-    return project.rooms.reduce((total, room) => 
-      total + room.categories.reduce((catTotal, category) => 
-        catTotal + (category.subcategories || []).reduce((subTotal, subcategory) =>
-          subTotal + (subcategory.items || []).length, 0
-        ), 0
-      ), 0
-    );
+    if (!project || !project.rooms || !Array.isArray(project.rooms)) {
+      return 0;
+    }
+    
+    return project.rooms.reduce((total, room) => {
+      if (!room || !room.categories || !Array.isArray(room.categories)) {
+        return total;
+      }
+      return total + room.categories.reduce((catTotal, category) => {
+        if (!category) return catTotal;
+        return catTotal + (category.subcategories || []).reduce((subTotal, subcategory) =>
+          subTotal + (subcategory && subcategory.items && Array.isArray(subcategory.items) ? subcategory.items.length : 0), 0
+        );
+      }, 0);
+    }, 0);
   };
 
   const getStatusBreakdown = () => {
     const breakdown = {};
     
+    if (!project || !project.rooms || !Array.isArray(project.rooms)) {
+      return breakdown;
+    }
+    
     project.rooms.forEach(room => {
+      if (!room || !room.categories || !Array.isArray(room.categories)) {
+        return;
+      }
       room.categories.forEach(category => {
+        if (!category) return;
         (category.subcategories || []).forEach(subcategory => {
+          if (!subcategory) return;
           (subcategory.items || []).forEach(item => {
+            if (!item) return;
             const status = item.status || 'TO BE SELECTED';
             breakdown[status] = (breakdown[status] || 0) + 1;
           });
