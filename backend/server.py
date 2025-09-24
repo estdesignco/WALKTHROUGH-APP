@@ -1790,7 +1790,7 @@ async def create_room(room_data: RoomCreate):
                     await db.subcategories.insert_one(subcategory_basic)
                     # NOTE: NO items inserted - this preserves transfer functionality
             
-            result = await db.rooms.insert_one(room_dict)
+            # Return the room with full structure (as expected by the frontend)
             return Room(**room_dict)
         
         # WALKTHROUGH ROOMS: Get FULL comprehensive structure for this room
