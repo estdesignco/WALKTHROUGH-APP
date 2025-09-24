@@ -166,13 +166,21 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
   }
 
   const getTotalItems = () => {
-    return project.rooms.reduce((total, room) => 
-      total + room.categories.reduce((catTotal, category) => 
-        catTotal + (category.subcategories || []).reduce((subTotal, subcategory) =>
-          subTotal + (subcategory.items || []).length, 0
-        ), 0
-      ), 0
-    );
+    if (!project || !project.rooms || !Array.isArray(project.rooms)) {
+      return 0;
+    }
+    
+    return project.rooms.reduce((total, room) => {
+      if (!room || !room.categories || !Array.isArray(room.categories)) {
+        return total;
+      }
+      return total + room.categories.reduce((catTotal, category) => {
+        if (!category) return catTotal;
+        return catTotal + (category.subcategories || []).reduce((subTotal, subcategory) =>
+          subTotal + (subcategory && subcategory.items && Array.isArray(subcategory.items) ? subcategory.items.length : 0), 0
+        );
+      }, 0);
+    }, 0);
   };
 
   const getStatusBreakdown = () => {
