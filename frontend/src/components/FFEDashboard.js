@@ -353,17 +353,31 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
 
         {/* Spreadsheet - Inside main container */}
         <div className="mt-8">
-          <ExactFFESpreadsheet
-            project={project}
-            roomColors={roomColors}
-            categoryColors={categoryColors}
-            itemStatuses={itemStatuses}
-            vendorTypes={vendorTypes}
-            carrierTypes={carrierTypes}
-            onDeleteRoom={handleDeleteRoom}
-            onAddRoom={() => setShowAddRoom(true)}
-            onReload={loadSimpleProject}
-          />
+          {project && project.rooms && project.rooms.length > 0 ? (
+            <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-6">
+              <h3 className="text-2xl font-light text-[#B49B7E] mb-6 tracking-wide">Project Data</h3>
+              {project.rooms.map((room, index) => (
+                <div key={room.id || index} className="mb-6 p-4 bg-black/40 rounded-xl border border-[#B49B7E]/10">
+                  <h4 className="text-xl font-medium text-[#B49B7E] mb-3">{room.name}</h4>
+                  <p className="text-[#F5F5DC]/80">Room data will be displayed here once the spreadsheet component is fixed.</p>
+                  <div className="mt-3 text-sm text-[#B49B7E]/70">
+                    Room ID: {room.id}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-8 text-center">
+              <p className="text-xl text-[#F5F5DC]/80">No rooms available for this project.</p>
+              <button
+                onClick={() => setShowAddRoom(true)}
+                className="mt-4 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-full shadow-xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium"
+                style={{ color: '#F5F5DC' }}
+              >
+                ➕ Add Your First Room
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
