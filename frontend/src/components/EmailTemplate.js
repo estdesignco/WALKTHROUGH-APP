@@ -248,7 +248,7 @@ export const generateEmailHTML = (clientName, questionnaireLinkId) => {
                         <!-- Footer -->
                         <tr>
                             <td style="background-color: #0F0F0F; padding: 40px; text-align: center;">
-                                <p style="font-size: 16px; color: #B49B7E; margin: 0 0 15px 0; letter-spacing: 2px;">ESTABLISHED DESIGN CO.</p>
+                                <img src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" alt="Established Design Co." style="height: 30px; object-fit: contain; filter: brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(664%) hue-rotate(349deg) brightness(95%) contrast(88%);" />
                                 <p style="font-size: 14px; color: #808080; margin: 0 0 20px 0;">Creating extraordinary spaces since 2020</p>
                                 <p style="margin: 0 0 20px 0;">
                                     <a href="#" style="color: #B49B7E; text-decoration: none; font-size: 13px; margin: 0 15px;">Pinterest</a>
