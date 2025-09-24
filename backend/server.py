@@ -1679,10 +1679,12 @@ async def create_room(room_data: RoomCreate):
         }
         structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
         
-        # CRITICAL FIX: Only auto-populate if walkthrough sheet_type
-        # For checklist/ffe sheet_types, create empty room (no items) to preserve transfer functionality
+        # SMART AUTO-POPULATE: Structure for all sheets, items only for walkthrough
+        # Checklist/FFE get categories+subcategories but NO items (preserves transfer)
         if room_data.sheet_type != "walkthrough":
-            print(f"🚫 CHECKLIST/FFE ROOM: Creating empty room (no auto-population) to preserve transfer functionality")
+            print(f"📋 {room_data.sheet_type.upper()} ROOM: Creating with structure but NO ITEMS (preserves transfer)")
+            
+            # Create room with comprehensive STRUCTURE but empty items
             room_dict = {
                 "id": str(uuid.uuid4()),
                 "name": room_data.name,
@@ -1690,10 +1692,35 @@ async def create_room(room_data: RoomCreate):
                 "order_index": room_data.order_index,
                 "sheet_type": room_data.sheet_type,
                 "project_id": room_data.project_id,
-                "categories": [],  # Empty - no auto-population to preserve transfer
+                "categories": [],  # Will populate with structure below
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
+            
+            # Add comprehensive structure but NO items
+            structure_key = room_data.name.lower()
+            room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(structure_key)
+            
+            if room_structure:
+                print(f"📁 Adding comprehensive structure for {room_data.name}")
+                for category_name, subcategories in room_structure.items():
+                    category_dict = {
+                        "id": str(uuid.uuid4()),
+                        "name": category_name,
+                        "order_index": 0,
+                        "subcategories": []
+                    }
+                    
+                    for subcategory_name, items in subcategories.items():
+                        subcategory_dict = {
+                            "id": str(uuid.uuid4()),
+                            "name": subcategory_name,
+                            "order_index": 0,
+                            "items": []  # NO ITEMS - preserves transfer functionality
+                        }
+                        category_dict["subcategories"].append(subcategory_dict)
+                    
+                    room_dict["categories"].append(category_dict)
             
             result = await db.rooms.insert_one(room_dict)
             return Room(**room_dict)
