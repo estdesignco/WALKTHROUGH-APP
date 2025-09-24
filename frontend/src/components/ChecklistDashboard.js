@@ -254,30 +254,50 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   };
 
   return (
-    <div className="max-w-full mx-auto bg-gradient-to-b from-black via-gray-900 to-black min-h-screen">
-      {/* TOP HEADER */}
-      <div className="mb-6">
-        <div className="text-center mb-4">
-          <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
-          <p className="text-gray-300">Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+      {/* Header with Logo - Same as Studio Dashboard */}
+      <div className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center px-2 py-1" style={{ height: '180px' }}>
+        <img
+          src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
+          alt="Established Design Co."
+          className="w-full h-full object-contain"
+          style={{ transform: 'scale(2.2)', maxWidth: '98%', maxHeight: '95%' }}
+        />
+      </div>
 
+      {/* Project Header */}
+      <div className="text-center py-6">
+        <h1 className="text-4xl font-light text-[#B49B7E] mb-2 tracking-wide">GREENE</h1>
+        <p className="text-lg" style={{ color: '#F5F5DC', opacity: '0.8' }}>Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
+      </div>
+
+      {/* Main Content Container - Same style as Studio Dashboard */}
+      <div className="max-w-4xl mx-auto bg-gradient-to-br from-black/60 to-gray-900/80 p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
+        
         {!hideNavigation && (
           <>
-            {/* Navigation Tabs */}
-            <div className="flex justify-center space-x-8 mb-6">
-              <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+            {/* Navigation Tabs - Luxury Style */}
+            <div className="flex justify-center space-x-8 mb-8">
+              <a href={`/project/${projectId}/questionnaire`} 
+                 className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
+                 style={{ color: '#F5F5DC', opacity: '0.7' }} 
+                 onMouseEnter={(e) => e.target.style.opacity = '1'} 
+                 onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
                 <span>📋</span>
-                <span>Questionnaire</span>
+                <span className="font-light tracking-wide">Questionnaire</span>
               </a>
-              <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+              <a href={`/project/${projectId}/walkthrough`} 
+                 className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
+                 style={{ color: '#F5F5DC', opacity: '0.7' }} 
+                 onMouseEnter={(e) => e.target.style.opacity = '1'} 
+                 onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
                 <span>🚶</span>
-                <span>Walkthrough</span>
+                <span className="font-light tracking-wide">Walkthrough</span>
               </a>
-              <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+              <div className="flex items-center space-x-2 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] px-6 py-3 rounded-full shadow-lg">
                 <span>✅</span>
-                <span>Checklist</span>
-              </a>
+                <span className="font-medium text-[#F5F5DC] tracking-wide">Checklist</span>
+              </div>
               <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
                 <span>📊</span>
                 <span className="font-semibold">FF&E</span>
