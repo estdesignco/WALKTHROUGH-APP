@@ -151,7 +151,7 @@ const CustomerLandingPage = () => {
                     </div>
 
                     {/* Process Overview */}
-                    <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/50 backdrop-blur-sm rounded-3xl p-12 border border-[#B49B7E]/20">
+                    <div className="bg-gradient-to-br from-black/80 to-gray-900/90 backdrop-blur-sm rounded-3xl p-12 border border-[#B49B7E]/20 shadow-2xl">
                         <h3 className="text-4xl font-light text-[#B49B7E] text-center mb-12">Our Design Process</h3>
                         
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
