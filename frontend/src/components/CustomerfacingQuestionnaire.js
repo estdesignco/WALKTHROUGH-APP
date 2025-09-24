@@ -768,7 +768,81 @@ export default function Questionnaire() {
                         </FieldWrapper>
                     </Section>
 
-                    {/* Section 9: How Did You Hear About Us */}
+                    {/* Section 9: Lifestyle & Preferences */}
+                    <Section title="LIFESTYLE & SPECIAL CONSIDERATIONS" description="Help us understand your unique needs and preferences to create the perfect space for your lifestyle.">
+                        <FieldWrapper label="Are you interested in smart home technology integration?">
+                            <RadioGroup value={formData.smart_home_interest} onValueChange={(value) => handleFormChange('smart_home_interest', value)} className="text-[#F5F5DC]">
+                                <div className="flex flex-col space-y-3">
+                                    {["Very interested - I want a fully automated home", "Somewhat interested - Basic smart features", "Not interested - I prefer traditional controls", "Unsure - I'd like to learn more"].map(option => (
+                                        <div key={option} className="flex items-center space-x-3">
+                                            <RadioGroupItem value={option} id={`smart-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                            <Label htmlFor={`smart-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="text-[#F5F5DC]/90 font-light">{option}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </RadioGroup>
+                        </FieldWrapper>
+
+                        <FieldWrapper label="Do you prioritize eco-friendly or sustainable materials?">
+                            <RadioGroup value={formData.sustainability_priority} onValueChange={(value) => handleFormChange('sustainability_priority', value)} className="text-[#F5F5DC]">
+                                <div className="flex flex-col space-y-3">
+                                    {["Extremely important - Sustainability is a top priority", "Important - I prefer eco-friendly when possible", "Somewhat important - If it doesn't compromise design", "Not a priority - Design and function come first"].map(option => (
+                                        <div key={option} className="flex items-center space-x-3">
+                                            <RadioGroupItem value={option} id={`eco-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                            <Label htmlFor={`eco-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="text-[#F5F5DC]/90 font-light">{option}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </RadioGroup>
+                        </FieldWrapper>
+
+                        <FieldWrapper label="What are your biggest storage and organization challenges?">
+                            <Textarea className={inputStyles} value={formData.storage_challenges || ''} onChange={(e) => handleFormChange('storage_challenges', e.target.value)} placeholder="Tell us about your storage needs, clutter concerns, or organization goals..." />
+                        </FieldWrapper>
+
+                        <FieldWrapper label="Do you prefer hidden storage or decorative storage solutions?">
+                            <RadioGroup value={formData.storage_preference} onValueChange={(value) => handleFormChange('storage_preference', value)} className="text-[#F5F5DC]">
+                                <div className="flex flex-col space-y-3">
+                                    {["Hidden storage - Clean, minimal appearance", "Decorative storage - Beautiful and functional display", "Mix of both - Hidden for clutter, decorative for special items", "Depends on the room - Different solutions for different spaces"].map(option => (
+                                        <div key={option} className="flex items-center space-x-3">
+                                            <RadioGroupItem value={option} id={`storage-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                            <Label htmlFor={`storage-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="text-[#F5F5DC]/90 font-light">{option}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </RadioGroup>
+                        </FieldWrapper>
+
+                        <FieldWrapper label="Do you need spaces for specific activities or wellness features?">
+                            <CheckboxGroup 
+                                options={[
+                                    "Home gym/exercise space", "Yoga/meditation area", "Reading nook", "Music room", 
+                                    "Art studio/craft room", "Home office", "Study/library", "Game room", 
+                                    "Wine cellar/bar area", "Outdoor living space", "Air purification systems", 
+                                    "Natural lighting optimization", "Quiet zones/soundproofing"
+                                ]} 
+                                value={formData.special_activity_spaces || []} 
+                                onChange={(v) => handleFormChange('special_activity_spaces', v)} 
+                            />
+                        </FieldWrapper>
+
+                        <FieldWrapper label="How much maintenance are you comfortable with for finishes and materials?">
+                            <RadioGroup value={formData.maintenance_preference} onValueChange={(value) => handleFormChange('maintenance_preference', value)} className="text-[#F5F5DC]">
+                                <div className="flex flex-col space-y-3">
+                                    {["Low maintenance - I want beautiful but easy-care materials", "Moderate maintenance - I'm okay with some upkeep for beauty", "High maintenance - I love luxury materials regardless of care required", "It depends - Different standards for different areas"].map(option => (
+                                        <div key={option} className="flex items-center space-x-3">
+                                            <RadioGroupItem value={option} id={`maint-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                            <Label htmlFor={`maint-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="text-[#F5F5DC]/90 font-light">{option}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </RadioGroup>
+                        </FieldWrapper>
+
+                        <InputField label="What's your ideal dinner party or gathering size?" id="ideal_party_size" value={formData.ideal_party_size || ''} onChange={(e) => handleFormChange('ideal_party_size', e.target.value)} placeholder="e.g., Intimate dinners for 4-6, Large parties up to 20, etc." />
+                    </Section>
+
+                    {/* Section 10: How Did You Hear About Us */}
                     <Section title="HOW DID YOU HEAR ABOUT US AND HOW TO STAY IN TOUCH">
                         <FieldWrapper label="How did you hear about us?">
                             <RadioGroup value={formData.how_heard} onValueChange={(value) => handleFormChange('how_heard', value)} className="text-[#F5F5DC]">
