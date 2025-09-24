@@ -1276,12 +1276,10 @@ const SimpleChecklistSpreadsheet = ({
                 if (e.target.value === 'CREATE_NEW') {
                   const categoryName = window.prompt('Enter new category name:');
                   if (categoryName && categoryName.trim()) {
-                    // handleAddCategory(firstRoom.id, categoryName.trim());
-                    console.log('Add new category:', categoryName);
+                    handleAddCategory(firstRoom.id, categoryName.trim());
                   }
                 } else if (e.target.value) {
-                  // handleAddCategory(firstRoom.id, e.target.value);
-                  console.log('Add existing category:', e.target.value);
+                  handleAddCategory(firstRoom.id, e.target.value);
                 }
               } else {
                 alert('Please add a room first before adding categories.');
