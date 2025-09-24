@@ -238,49 +238,53 @@ const StudioLandingPage = () => {
 
       {/* Email Modal */}
       {showEmailModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-xl font-semibold text-white mb-4">Email Client Questionnaire</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-black/90 to-gray-900/90 rounded-2xl p-8 w-full max-w-md mx-4 border border-[#B49B7E]/30 shadow-2xl">
+            <h3 className="text-2xl font-light text-[#B49B7E] mb-6">Email Client Questionnaire</h3>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-light mb-2" style={{ color: '#F5F5DC' }}>
                   Client Name
                 </label>
                 <input
                   type="text"
                   value={emailData.name}
                   onChange={(e) => setEmailData({ ...emailData, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-black/40 border border-[#B49B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] transition-all duration-300"
+                  style={{ color: '#F5F5DC' }}
                   placeholder="Enter client name"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-light mb-2" style={{ color: '#F5F5DC' }}>
                   Email Address
                 </label>
                 <input
                   type="email"
                   value={emailData.email}
                   onChange={(e) => setEmailData({ ...emailData, email: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-black/40 border border-[#B49B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] transition-all duration-300"
+                  style={{ color: '#F5F5DC' }}
                   placeholder="Enter email address"
                 />
               </div>
             </div>
             
-            <div className="flex space-x-3 mt-6">
+            <div className="flex space-x-3 mt-8">
               <button
                 onClick={() => setShowEmailModal(false)}
-                className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
+                className="flex-1 px-6 py-3 bg-gradient-to-br from-black/60 to-gray-900/60 hover:from-gray-900/60 hover:to-black/60 rounded-lg transition-all duration-300 border border-[#B49B7E]/20"
+                style={{ color: '#F5F5DC' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSendEmail}
                 disabled={!emailData.email || !emailData.name}
-                className="flex-1 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white rounded-md transition-colors"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] disabled:from-gray-600 disabled:to-gray-700 rounded-lg transition-all duration-300 shadow-lg"
+                style={{ color: '#F5F5DC' }}
               >
                 Send Questionnaire
               </button>
