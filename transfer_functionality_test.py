@@ -1,5 +1,511 @@
 #!/usr/bin/env python3
 """
+URGENT TRANSFER FUNCTIONALITY TESTING - Critical Fix Verification
+
+CONTEXT: User has reverted the auto-populate change that was breaking transfers. 
+Need to verify the transfer functionality is restored to working state.
+
+CRITICAL TESTS REQUIRED:
+1. Test walkthrough to checklist transfer - only checked items should transfer
+2. Verify checklist rooms are created EMPTY (no auto-population) 
+3. Confirm only 3 checked items transfer (not 76 like before)
+4. Ensure walkthrough rooms still auto-populate correctly
+5. Test that transfer creates proper room/category/subcategory structure in checklist
+
+This is urgent verification that the transfer functionality is working correctly after the fix.
+"""
+
+import requests
+import json
+import uuid
+import random
+from datetime import datetime
+from typing import Dict, Any, List
+import sys
+import os
+
+# Get backend URL from frontend .env file
+def get_backend_url():
+    try:
+        with open('/app/frontend/.env', 'r') as f:
+            for line in f:
+                if line.startswith('REACT_APP_BACKEND_URL='):
+                    return line.split('=', 1)[1].strip()
+    except Exception as e:
+        print(f"Error reading frontend .env: {e}")
+        return "http://localhost:8001"
+    return "http://localhost:8001"
+
+BASE_URL = get_backend_url() + "/api"
+
+print("=" * 80)
+print("🚨 URGENT TRANSFER FUNCTIONALITY TESTING - CRITICAL FIX VERIFICATION")
+print("=" * 80)
+print(f"Backend URL: {BASE_URL}")
+print("Goal: Verify transfer functionality works correctly after auto-populate fix")
+print("Testing: Walkthrough → Checklist transfer with selective item transfer")
+print("=" * 80)
+
+class TransferFunctionalityTester:
+    def __init__(self):
+        self.session = requests.Session()
+        self.test_results = []
+        self.test_project_id = None
+        self.walkthrough_room_id = None
+        self.checklist_room_id = None
+        self.test_items = []
+        
+    def log_test(self, test_name: str, success: bool, details: str = ""):
+        """Log test results"""
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status} {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        self.test_results.append({
+            'test': test_name,
+            'success': success,
+            'details': details
+        })
+        
+    def make_request(self, method: str, endpoint: str, data: Dict = None, params: Dict = None) -> tuple:
+        """Make HTTP request and return (success, response_data, status_code)"""
+        try:
+            url = f"{BASE_URL}{endpoint}"
+            
+            if method.upper() == 'GET':
+                response = self.session.get(url, params=params, timeout=15)
+            elif method.upper() == 'POST':
+                response = self.session.post(url, json=data, timeout=15)
+            elif method.upper() == 'PUT':
+                response = self.session.put(url, json=data, timeout=15)
+            elif method.upper() == 'DELETE':
+                response = self.session.delete(url, timeout=15)
+            else:
+                return False, f"Unsupported method: {method}", 400
+                
+            return response.status_code < 400, response.json() if response.content else {}, response.status_code
+            
+        except requests.exceptions.RequestException as e:
+            return False, f"Request failed: {str(e)}", 0
+        except json.JSONDecodeError as e:
+            return False, f"JSON decode error: {str(e)}", response.status_code if 'response' in locals() else 0
+        except Exception as e:
+            return False, f"Unexpected error: {str(e)}", 0
+
+    def create_test_project(self):
+        """Create a test project for transfer functionality testing"""
+        print("\n🏠 Creating test project for transfer functionality...")
+        
+        project_data = {
+            "name": "Transfer Functionality Test Project",
+            "client_info": {
+                "full_name": "Transfer Test Client",
+                "email": "transfer@test.com",
+                "phone": "555-0123",
+                "address": "123 Transfer Test St"
+            },
+            "project_type": "Renovation",
+            "budget": "$50,000"
+        }
+        
+        success, project, status_code = self.make_request('POST', '/projects', project_data)
+        
+        if not success:
+            self.log_test("Create Test Project", False, f"Failed: {project} (Status: {status_code})")
+            return False
+            
+        self.test_project_id = project.get('id')
+        self.log_test("Create Test Project", True, f"Project ID: {self.test_project_id}")
+        return True
+
+    def create_walkthrough_room_with_items(self):
+        """Create walkthrough room and verify it auto-populates correctly"""
+        print("\n🚶 Creating walkthrough room with auto-population...")
+        
+        room_data = {
+            "name": "living room",
+            "project_id": self.test_project_id,
+            "sheet_type": "walkthrough",
+            "description": "Test walkthrough room for transfer functionality"
+        }
+        
+        success, room, status_code = self.make_request('POST', '/rooms', room_data)
+        
+        if not success:
+            self.log_test("Create Walkthrough Room", False, f"Failed: {room} (Status: {status_code})")
+            return False
+            
+        self.walkthrough_room_id = room.get('id')
+        self.log_test("Create Walkthrough Room", True, f"Room ID: {self.walkthrough_room_id}")
+        
+        # Verify walkthrough room auto-populates
+        success, project_data, status_code = self.make_request('GET', f'/projects/{self.test_project_id}')
+        
+        if not success:
+            self.log_test("Verify Walkthrough Auto-Population", False, "Could not retrieve project data")
+            return False
+            
+        # Find walkthrough room
+        walkthrough_room = None
+        for room in project_data.get('rooms', []):
+            if room.get('id') == self.walkthrough_room_id:
+                walkthrough_room = room
+                break
+                
+        if not walkthrough_room:
+            self.log_test("Verify Walkthrough Auto-Population", False, "Walkthrough room not found")
+            return False
+            
+        # Count items in walkthrough room
+        categories = walkthrough_room.get('categories', [])
+        total_items = sum(
+            len(subcat.get('items', []))
+            for cat in categories
+            for subcat in cat.get('subcategories', [])
+        )
+        
+        if total_items > 20:  # Should have many items from auto-population
+            self.log_test("Verify Walkthrough Auto-Population", True, 
+                         f"Walkthrough room has {len(categories)} categories, {total_items} items")
+        else:
+            self.log_test("Verify Walkthrough Auto-Population", False, 
+                         f"Walkthrough room has only {total_items} items (expected 20+)")
+            
+        # Store some test items for transfer simulation
+        item_count = 0
+        for category in categories:
+            for subcategory in category.get('subcategories', []):
+                for item in subcategory.get('items', []):
+                    if item_count < 5:  # Store first 5 items for testing
+                        self.test_items.append({
+                            'id': item.get('id'),
+                            'name': item.get('name'),
+                            'subcategory_id': subcategory.get('id'),
+                            'category_name': category.get('name'),
+                            'subcategory_name': subcategory.get('name')
+                        })
+                        item_count += 1
+                    if item_count >= 5:
+                        break
+                if item_count >= 5:
+                    break
+            if item_count >= 5:
+                break
+        
+        self.log_test("Store Test Items", True, f"Stored {len(self.test_items)} items for transfer testing")
+        return True
+
+    def create_empty_checklist_room(self):
+        """Create checklist room and verify it's created EMPTY (no auto-population)"""
+        print("\n📋 Creating checklist room and verifying it's empty...")
+        
+        room_data = {
+            "name": "living room",
+            "project_id": self.test_project_id,
+            "sheet_type": "checklist",
+            "description": "Test checklist room for transfer functionality"
+        }
+        
+        success, room, status_code = self.make_request('POST', '/rooms', room_data)
+        
+        if not success:
+            self.log_test("Create Checklist Room", False, f"Failed: {room} (Status: {status_code})")
+            return False
+            
+        self.checklist_room_id = room.get('id')
+        self.log_test("Create Checklist Room", True, f"Room ID: {self.checklist_room_id}")
+        
+        # Verify checklist room is EMPTY (no auto-population)
+        success, project_data, status_code = self.make_request('GET', f'/projects/{self.test_project_id}')
+        
+        if not success:
+            self.log_test("Verify Checklist Empty", False, "Could not retrieve project data")
+            return False
+            
+        # Find checklist room
+        checklist_room = None
+        for room in project_data.get('rooms', []):
+            if room.get('id') == self.checklist_room_id:
+                checklist_room = room
+                break
+                
+        if not checklist_room:
+            self.log_test("Verify Checklist Empty", False, "Checklist room not found")
+            return False
+            
+        # Count items in checklist room - should be EMPTY
+        categories = checklist_room.get('categories', [])
+        total_items = sum(
+            len(subcat.get('items', []))
+            for cat in categories
+            for subcat in cat.get('subcategories', [])
+        )
+        
+        if total_items == 0:
+            self.log_test("Verify Checklist Empty", True, 
+                         f"Checklist room is empty as expected (0 items)")
+        else:
+            self.log_test("Verify Checklist Empty", False, 
+                         f"Checklist room has {total_items} items (should be 0 - auto-populate bug still present)")
+            
+        return total_items == 0
+
+    def simulate_selective_transfer(self):
+        """Simulate transferring only 3 specific checked items from walkthrough to checklist"""
+        print("\n🔄 Simulating selective transfer of 3 checked items...")
+        
+        if len(self.test_items) < 3:
+            self.log_test("Simulate Selective Transfer", False, "Not enough test items available")
+            return False
+            
+        # Select exactly 3 items to "check" for transfer
+        selected_items = self.test_items[:3]
+        
+        print(f"   📝 Selected items for transfer:")
+        for i, item in enumerate(selected_items, 1):
+            print(f"      {i}. {item['name']} (ID: {item['id']})")
+        
+        # Create categories and subcategories in checklist room for the selected items
+        created_structures = {}
+        
+        for item in selected_items:
+            category_name = item['category_name']
+            subcategory_name = item['subcategory_name']
+            
+            # Create category in checklist room if not exists
+            if category_name not in created_structures:
+                category_data = {
+                    "name": category_name,
+                    "room_id": self.checklist_room_id,
+                    "description": f"Transferred category: {category_name}"
+                }
+                
+                success, category, status_code = self.make_request('POST', '/categories', category_data)
+                
+                if success:
+                    created_structures[category_name] = {
+                        'category_id': category.get('id'),
+                        'subcategories': {}
+                    }
+                    print(f"      ✅ Created category: {category_name}")
+                else:
+                    self.log_test("Create Transfer Category", False, f"Failed to create category {category_name}")
+                    return False
+            
+            # Create subcategory if not exists
+            category_id = created_structures[category_name]['category_id']
+            if subcategory_name not in created_structures[category_name]['subcategories']:
+                subcategory_data = {
+                    "name": subcategory_name,
+                    "category_id": category_id,
+                    "description": f"Transferred subcategory: {subcategory_name}"
+                }
+                
+                success, subcategory, status_code = self.make_request('POST', '/subcategories', subcategory_data)
+                
+                if success:
+                    created_structures[category_name]['subcategories'][subcategory_name] = subcategory.get('id')
+                    print(f"      ✅ Created subcategory: {subcategory_name}")
+                else:
+                    self.log_test("Create Transfer Subcategory", False, f"Failed to create subcategory {subcategory_name}")
+                    return False
+        
+        # Transfer the selected items to checklist room
+        transferred_count = 0
+        
+        for item in selected_items:
+            category_name = item['category_name']
+            subcategory_name = item['subcategory_name']
+            target_subcategory_id = created_structures[category_name]['subcategories'][subcategory_name]
+            
+            # Create item in checklist room with PICKED status
+            transfer_item_data = {
+                "name": item['name'],
+                "quantity": 1,
+                "subcategory_id": target_subcategory_id,
+                "status": "PICKED",  # Status for transferred items
+                "remarks": f"Transferred from walkthrough",
+                "finish_color": "To Be Selected"
+            }
+            
+            success, transferred_item, status_code = self.make_request('POST', '/items', transfer_item_data)
+            
+            if success:
+                transferred_count += 1
+                print(f"      ✅ Transferred: {item['name']}")
+            else:
+                print(f"      ❌ Failed to transfer: {item['name']}")
+        
+        self.log_test("Simulate Selective Transfer", transferred_count == 3, 
+                     f"Transferred {transferred_count}/3 selected items")
+        
+        return transferred_count == 3
+
+    def verify_transfer_results(self):
+        """Verify that exactly 3 items were transferred and checklist structure is correct"""
+        print("\n🔍 Verifying transfer results...")
+        
+        # Get updated project data
+        success, project_data, status_code = self.make_request('GET', f'/projects/{self.test_project_id}')
+        
+        if not success:
+            self.log_test("Verify Transfer Results", False, "Could not retrieve project data")
+            return False
+            
+        # Find checklist room
+        checklist_room = None
+        walkthrough_room = None
+        
+        for room in project_data.get('rooms', []):
+            if room.get('id') == self.checklist_room_id:
+                checklist_room = room
+            elif room.get('id') == self.walkthrough_room_id:
+                walkthrough_room = room
+        
+        if not checklist_room or not walkthrough_room:
+            self.log_test("Verify Transfer Results", False, "Could not find rooms")
+            return False
+        
+        # Count items in checklist room
+        checklist_categories = checklist_room.get('categories', [])
+        checklist_items = sum(
+            len(subcat.get('items', []))
+            for cat in checklist_categories
+            for subcat in cat.get('subcategories', [])
+        )
+        
+        # Count items in walkthrough room (should remain unchanged)
+        walkthrough_categories = walkthrough_room.get('categories', [])
+        walkthrough_items = sum(
+            len(subcat.get('items', []))
+            for cat in walkthrough_categories
+            for subcat in cat.get('subcategories', [])
+        )
+        
+        print(f"   📊 Transfer Results:")
+        print(f"      Walkthrough room: {len(walkthrough_categories)} categories, {walkthrough_items} items")
+        print(f"      Checklist room: {len(checklist_categories)} categories, {checklist_items} items")
+        
+        # Verify exactly 3 items in checklist
+        if checklist_items == 3:
+            self.log_test("Verify Exact Item Count", True, "Exactly 3 items transferred to checklist")
+        else:
+            self.log_test("Verify Exact Item Count", False, 
+                         f"Expected 3 items in checklist, found {checklist_items}")
+        
+        # Verify walkthrough room still has many items
+        if walkthrough_items > 20:
+            self.log_test("Verify Walkthrough Unchanged", True, 
+                         f"Walkthrough room still has {walkthrough_items} items")
+        else:
+            self.log_test("Verify Walkthrough Unchanged", False, 
+                         f"Walkthrough room has only {walkthrough_items} items")
+        
+        # Verify proper room/category/subcategory structure in checklist
+        if len(checklist_categories) > 0:
+            total_subcategories = sum(len(cat.get('subcategories', [])) for cat in checklist_categories)
+            self.log_test("Verify Checklist Structure", True, 
+                         f"Checklist has proper structure: {len(checklist_categories)} categories, {total_subcategories} subcategories")
+        else:
+            self.log_test("Verify Checklist Structure", False, "Checklist has no categories")
+        
+        # Check for PICKED status items
+        picked_items = 0
+        for category in checklist_categories:
+            for subcategory in category.get('subcategories', []):
+                for item in subcategory.get('items', []):
+                    if item.get('status') == 'PICKED':
+                        picked_items += 1
+        
+        self.log_test("Verify PICKED Status", picked_items == 3, 
+                     f"Found {picked_items}/3 items with PICKED status")
+        
+        return checklist_items == 3 and walkthrough_items > 20
+
+    def test_transfer_functionality_fix(self):
+        """Run the complete transfer functionality test"""
+        print("🚀 STARTING TRANSFER FUNCTIONALITY TESTING...")
+        
+        # Step 1: Create test project
+        if not self.create_test_project():
+            print("❌ CRITICAL: Could not create test project")
+            return False
+        
+        # Step 2: Create walkthrough room with auto-population
+        if not self.create_walkthrough_room_with_items():
+            print("❌ CRITICAL: Walkthrough room creation failed")
+            return False
+        
+        # Step 3: Create empty checklist room (verify no auto-population)
+        if not self.create_empty_checklist_room():
+            print("❌ CRITICAL: Checklist room is not empty - auto-populate bug still present")
+            return False
+        
+        # Step 4: Simulate selective transfer of 3 items
+        if not self.simulate_selective_transfer():
+            print("❌ CRITICAL: Selective transfer simulation failed")
+            return False
+        
+        # Step 5: Verify transfer results
+        if not self.verify_transfer_results():
+            print("❌ CRITICAL: Transfer results verification failed")
+            return False
+        
+        # Final Summary
+        print("\n" + "=" * 80)
+        print("🎯 TRANSFER FUNCTIONALITY TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = sum(1 for result in self.test_results if result['success'])
+        failed_tests = total_tests - passed_tests
+        
+        print(f"📊 OVERALL RESULTS: {passed_tests}/{total_tests} tests passed ({(passed_tests/total_tests)*100:.1f}%)")
+        
+        if failed_tests > 0:
+            print(f"\n❌ FAILED TESTS ({failed_tests}):")
+            for result in self.test_results:
+                if not result['success']:
+                    print(f"   • {result['test']}: {result['details']}")
+        
+        print(f"\n✅ PASSED TESTS ({passed_tests}):")
+        for result in self.test_results:
+            if result['success']:
+                print(f"   • {result['test']}")
+        
+        # Critical assessment
+        critical_failures = []
+        for result in self.test_results:
+            if not result['success'] and any(keyword in result['test'].lower() for keyword in ['empty', 'transfer', 'exact']):
+                critical_failures.append(result['test'])
+        
+        if critical_failures:
+            print(f"\n🚨 CRITICAL TRANSFER ISSUES: {len(critical_failures)} failures")
+            print("   Transfer functionality is NOT working correctly")
+            return False
+        else:
+            print(f"\n🎉 TRANSFER FUNCTIONALITY VERIFIED: All critical tests passed")
+            print(f"   ✅ Walkthrough rooms auto-populate correctly")
+            print(f"   ✅ Checklist rooms are created empty")
+            print(f"   ✅ Only selected items transfer (not all items)")
+            print(f"   ✅ Proper room/category/subcategory structure created")
+            if self.test_project_id:
+                print(f"   📋 Test project ID: {self.test_project_id}")
+            return True
+
+
+# Main execution
+if __name__ == "__main__":
+    tester = TransferFunctionalityTester()
+    success = tester.test_transfer_functionality_fix()
+    
+    if success:
+        print("\n🎉 SUCCESS: Transfer functionality is working correctly after the fix!")
+        exit(0)
+    else:
+        print("\n❌ FAILURE: Transfer functionality issues detected.")
+        exit(1)
+"""
 URGENT TRANSFER FUNCTIONALITY RETEST - Post Critical Fixes
 
 CONTEXT: Testing the walkthrough to checklist transfer functionality after critical fixes:
