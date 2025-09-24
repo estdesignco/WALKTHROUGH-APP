@@ -245,10 +245,10 @@ const CustomerLandingPage = () => {
                     <div className="text-2xl font-light tracking-widest text-[#B49B7E] mb-4">
                         ESTABLISHED DESIGN CO.
                     </div>
-                    <p className="text-white/60 text-sm mb-6">
+                    <p className="text-sm mb-6" style={{ color: '#F5F5DC', opacity: '0.7' }}>
                         Creating extraordinary spaces since 2020
                     </p>
-                    <div className="flex justify-center gap-8 text-white/40 text-sm">
+                    <div className="flex justify-center gap-8 text-sm" style={{ color: '#F5F5DC', opacity: '0.5' }}>
                         <span>Privacy Policy</span>
                         <span>Terms of Service</span>
                         <span>Contact</span>
