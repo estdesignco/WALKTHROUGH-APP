@@ -179,17 +179,21 @@ const SimpleChecklistSpreadsheet = ({
     return status === 'PICKED' ? '' : status;
   };
 
-  // Status colors mapping for checklist  
+  // Status colors mapping for checklist - MATCHES STATUS BREAKDOWN COLORS
   const getStatusColor = (status) => {
     const statusColors = {
-      '': '#6B7280',                        // Gray for blank/default
+      '': '#6B7280',                        // Gray for blank/default (TO BE PICKED)
       'BLANK': '#6B7280',                   // Gray for blank
-      'PICKED': '#6B7280',                  // Gray - treat PICKED as BLANK for display
+      'PICKED': '#6B7280',                  // Gray - treat PICKED as blank for display  
+      'TO BE PICKED': '#6B7280',            // Gray - same as blank
       'ORDER SAMPLES': '#10B981',           // Green
       'SAMPLES ARRIVED': '#8B5CF6',         // Purple
-      'ASK NEIL': '#F59E0B',                // Yellow
+      'ASK NEIL': '#F59E0B',                // Yellow/Amber
       'ASK CHARLENE': '#EF4444',            // Red
       'ASK JALA': '#EC4899',                // Pink
+      'GET QUOTE': '#06B6D4',               // Cyan
+      'WAITING ON QT': '#F97316',           // Orange
+      'READY FOR PRESENTATION': '#84CC16'   // Lime Green
       'GET QUOTE': '#06B6D4',               // Cyan
       'WAITING ON QT': '#F97316',           // Orange
       'READY FOR PRESENTATION': '#84CC16'   // Lime
