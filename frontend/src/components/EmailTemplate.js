@@ -86,15 +86,15 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                     <div style={{ margin: '20px 0' }}>
                         <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
                             <span style={{ color: '#B49B7E', marginRight: '10px' }}>•</span>
-                            <span style={{ color: '#D0D0D0', fontSize: '14px' }}>Completely confidential and secure</span>
+                            <span style={{ color: '#F5F5DC', fontSize: '14px' }}>Completely confidential and secure</span>
                         </div>
                         <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
                             <span style={{ color: '#B49B7E', marginRight: '10px' }}>•</span>
-                            <span style={{ color: '#D0D0D0', fontSize: '14px' }}>Save and continue at your convenience</span>
+                            <span style={{ color: '#F5F5DC', fontSize: '14px' }}>Save and continue at your convenience</span>
                         </div>
                         <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
                             <span style={{ color: '#B49B7E', marginRight: '10px' }}>•</span>
-                            <span style={{ color: '#D0D0D0', fontSize: '14px' }}>No obligation for our initial consultation</span>
+                            <span style={{ color: '#F5F5DC', fontSize: '14px' }}>No obligation for our initial consultation</span>
                         </div>
                     </div>
                 </div>
