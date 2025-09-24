@@ -224,7 +224,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
   };
 
   return (
-    <div className="max-w-full mx-auto bg-gray-950 min-h-screen">
+    <div className="max-w-full mx-auto bg-gradient-to-b from-black via-gray-900 to-black min-h-screen">
       {/* TOP HEADER */}
       <div className="mb-6">
         <div className="text-center mb-4">
