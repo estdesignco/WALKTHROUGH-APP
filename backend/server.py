@@ -3852,6 +3852,65 @@ async def send_questionnaire_to_client(request: EmailQuestionnaireRequest, backg
         logging.error(f"Unexpected error sending questionnaire: {str(e)}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred while sending the questionnaire")
 
+@api_router.post("/scrape-canva-board")
+async def scrape_canva_board(data: dict):
+    """
+    🎨 CANVA BOARD SCRAPING ENDPOINT
+    Extract furniture links and product information from Canva design boards
+    
+    Input: {"canva_url": "https://www.canva.com/design/..."}
+    Output: {"success": true, "data": {...}} with extracted links and products
+    """
+    canva_url = data.get('canva_url', '')
+    if not canva_url:
+        raise HTTPException(status_code=400, detail="canva_url is required")
+    
+    if 'canva.com' not in canva_url:
+        raise HTTPException(status_code=400, detail="Invalid Canva URL - must be from canva.com")
+    
+    try:
+        from canva_integration import extract_products_from_canva_board
+        result = await extract_products_from_canva_board(canva_url)
+        
+        if result['success']:
+            return {"success": True, "data": result}
+        else:
+            return {"success": False, "error": result['error']}
+            
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to scrape Canva board: {str(e)}")
+
+@api_router.post("/sync-canva-to-project")
+async def sync_canva_to_project(data: dict):
+    """
+    🔄 SYNC CANVA BOARD TO PROJECT CHECKLIST
+    Extract products from Canva board and add them to project checklist
+    
+    Input: {
+        "canva_url": "https://www.canva.com/design/...",
+        "project_id": "uuid",
+        "room_name": "Living Room"
+    }
+    """
+    canva_url = data.get('canva_url', '')
+    project_id = data.get('project_id', '')
+    room_name = data.get('room_name', '')
+    
+    if not all([canva_url, project_id, room_name]):
+        raise HTTPException(status_code=400, detail="canva_url, project_id, and room_name are required")
+    
+    try:
+        from canva_integration import sync_canva_with_project
+        result = await sync_canva_with_project(canva_url, project_id, room_name)
+        
+        if result['success']:
+            return {"success": True, "data": result}
+        else:
+            return {"success": False, "error": result['error']}
+            
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to sync Canva to project: {str(e)}")
+
 @api_router.post("/scrape-product")
 async def scrape_product_advanced(data: dict):
     """
