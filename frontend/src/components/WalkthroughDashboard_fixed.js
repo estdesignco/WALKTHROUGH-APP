@@ -320,8 +320,8 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
                 <span className="font-light tracking-wide">Walkthrough</span>
               </a>
               <div className="flex items-center space-x-2 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] px-6 py-3 rounded-full shadow-lg">
-                <span>✅</span>
-                <span className="font-medium text-[#F5F5DC] tracking-wide">Checklist</span>
+                <span>🚶</span>
+                <span className="font-medium text-[#F5F5DC] tracking-wide">Walkthrough</span>
               </div>
               <a href={`/project/${projectId}/ffe`} 
                  className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
