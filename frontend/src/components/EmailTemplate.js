@@ -104,7 +104,7 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                     <a href={questionnaireUrl} style={{
                         display: 'inline-block',
                         background: 'linear-gradient(135deg, #B49B7E 0%, #A08B6F 100%)',
-                        color: 'white',
+                        color: '#F5F5DC',
                         textDecoration: 'none',
                         padding: '15px 35px',
                         borderRadius: '25px',
