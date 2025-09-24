@@ -367,7 +367,7 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
               ))}
             </div>
           ) : (
-            <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-8 text-center">
+            <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl border border-[#B49B7E]/20 p-8 text-center">
               <p className="text-xl text-[#F5F5DC]/80">No rooms available for this project.</p>
               <button
                 onClick={() => setShowAddRoom(true)}
