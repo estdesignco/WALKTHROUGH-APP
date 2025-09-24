@@ -153,14 +153,15 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
 
                 {/* Footer */}
                 <div style={{ textAlign: 'center' }}>
-                    <p style={{
-                        fontSize: '14px',
-                        color: '#B49B7E',
-                        margin: '0 0 10px 0',
-                        letterSpacing: '1px'
-                    }}>
-                        ESTABLISHED DESIGN CO.
-                    </p>
+                    <img 
+                        src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
+                        alt="Established Design Co." 
+                        style={{
+                            height: '30px',
+                            objectFit: 'contain',
+                            filter: 'brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(664%) hue-rotate(349deg) brightness(95%) contrast(88%)'
+                        }} 
+                    />
                     <p style={{
                         fontSize: '12px',
                         color: '#808080',
