@@ -3321,18 +3321,20 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # Stage 3: Trigger lazy loading with smart scrolling
             print("📜 TRIGGERING LAZY LOADING...")
             await page.evaluate("""
-                (async () => {
-                    const scrollHeight = document.body.scrollHeight;
-                    let currentPosition = 0;
-                    const scrollStep = Math.max(200, scrollHeight / 10);
-                    
-                    while (currentPosition < scrollHeight) {
+                const scrollHeight = document.body.scrollHeight;
+                let currentPosition = 0;
+                const scrollStep = Math.max(200, scrollHeight / 10);
+                
+                function scroll() {
+                    if (currentPosition < scrollHeight) {
                         window.scrollTo(0, currentPosition);
                         currentPosition += scrollStep;
-                        await new Promise(resolve => setTimeout(resolve, 200));
+                        setTimeout(scroll, 200);
+                    } else {
+                        window.scrollTo(0, 0);
                     }
-                    window.scrollTo(0, 0);
-                })();
+                }
+                scroll();
             """)
             
             # Stage 4: Wait for potential AJAX/React updates
