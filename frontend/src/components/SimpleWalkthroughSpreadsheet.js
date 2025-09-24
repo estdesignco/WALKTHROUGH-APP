@@ -472,7 +472,8 @@ const SimpleWalkthroughSpreadsheet = ({
                 name: itemData.roomName,
                 project_id: projectId,
                 sheet_type: 'checklist',  // Backend will create EMPTY room
-                description: `Transferred from walkthrough`
+                description: `Transferred from walkthrough`,
+                auto_populate: false  // CRITICAL: Don't auto-populate for transfer
               })
             });
             
