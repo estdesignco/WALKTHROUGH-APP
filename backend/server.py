@@ -175,10 +175,27 @@ async def get_projects():
 @app.get("/api/projects/{project_id}")
 async def get_project(project_id: str):
     try:
+        # Get the project
         project = await projects_collection.find_one({"_id": ObjectId(project_id)})
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
-        return serialize_doc(project)
+        
+        # Get all rooms for this project
+        rooms_cursor = rooms_collection.find({"project_id": project_id})
+        rooms = await rooms_cursor.to_list(length=None)
+        
+        # For each room, get its items
+        for room in rooms:
+            room_id = room["id"]
+            items_cursor = items_collection.find({"room_id": room_id})
+            items = await items_cursor.to_list(length=None)
+            room["items"] = [serialize_doc(item) for item in items]
+        
+        # Add rooms to project
+        project_data = serialize_doc(project)
+        project_data["rooms"] = [serialize_doc(room) for room in rooms]
+        
+        return project_data
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Invalid project ID: {str(e)}")
 
