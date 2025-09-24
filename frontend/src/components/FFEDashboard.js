@@ -317,8 +317,8 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
               </button>
             </div>
 
-            {/* Search and Controls - Luxury Style */}
-            <div className="flex items-center justify-between mt-6 p-6 bg-gradient-to-br from-black/80 to-gray-900/90 rounded-2xl border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
+            {/* Search and Controls - Darker Gradient to Match Top */}
+            <div className="flex items-center justify-between mt-6 p-6 bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
               <div className="flex items-center space-x-4 flex-1">
                 <input
                   type="text"
