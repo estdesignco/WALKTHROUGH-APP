@@ -438,19 +438,19 @@ export default function Questionnaire() {
                         </FieldWrapper>
                         <InputField label="Who will be the primary decision maker(s) for this project?" id="primary_decision_maker" value={formData.primary_decision_maker || ''} onChange={(e) => handleFormChange('primary_decision_maker', e.target.value)} />
                         <FieldWrapper label="How involved would you like to be in the design process?">
-                            <RadioGroup value={formData.involvement_level} onValueChange={(value) => handleFormChange('involvement_level', value)} className="text-[#F5F5DC]">
-                                <div className="flex flex-col space-y-2">
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="Very involved - I want to approve every detail" id="very-involved" className="border-stone-400 text-[#8B7355]" />
-                                        <Label htmlFor="very-involved" className="text-[#F5F5DC]">Very involved - I want to approve every detail</Label>
+                            <RadioGroup value={formData.involvement_level} onValueChange={(value) => handleFormData('involvement_level', value)} className="text-[#F5F5DC]">
+                                <div className="flex flex-col space-y-3">
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="Very involved - I want to approve every detail" id="very-involved" className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                        <Label htmlFor="very-involved" className="text-[#F5F5DC]/90 font-light">Very involved - I want to approve every detail</Label>
                                     </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="Somewhat involved - I want to approve major decisions" id="somewhat-involved" className="border-stone-400 text-[#8B7355]" />
-                                        <Label htmlFor="somewhat-involved" className="text-[#F5F5DC]">Somewhat involved - I want to approve major decisions</Label>
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="Somewhat involved - I want to approve major decisions" id="somewhat-involved" className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                        <Label htmlFor="somewhat-involved" className="text-[#F5F5DC]/90 font-light">Somewhat involved - I want to approve major decisions</Label>
                                     </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="Minimally involved - I trust your expertise" id="minimally-involved" className="border-stone-400 text-[#8B7355]" />
-                                        <Label htmlFor="minimally-involved" className="text-[#F5F5DC]">Minimally involved - I trust your expertise</Label>
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="Minimally involved - I trust your expertise" id="minimally-involved" className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                        <Label htmlFor="minimally-involved" className="text-[#F5F5DC]/90 font-light">Minimally involved - I trust your expertise</Label>
                                     </div>
                                 </div>
                             </RadioGroup>
