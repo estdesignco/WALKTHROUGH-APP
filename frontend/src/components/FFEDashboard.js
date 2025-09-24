@@ -186,10 +186,20 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
   const getStatusBreakdown = () => {
     const breakdown = {};
     
+    if (!project || !project.rooms || !Array.isArray(project.rooms)) {
+      return breakdown;
+    }
+    
     project.rooms.forEach(room => {
+      if (!room || !room.categories || !Array.isArray(room.categories)) {
+        return;
+      }
       room.categories.forEach(category => {
+        if (!category) return;
         (category.subcategories || []).forEach(subcategory => {
+          if (!subcategory) return;
           (subcategory.items || []).forEach(item => {
+            if (!item) return;
             const status = item.status || 'TO BE SELECTED';
             breakdown[status] = (breakdown[status] || 0) + 1;
           });
