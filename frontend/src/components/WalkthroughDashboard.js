@@ -258,7 +258,17 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
         <div className="text-center mb-4">
           <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
           <p style={{ color: '#F5F5DC', opacity: '0.8' }}>Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
+        
+
+        {/* LOGO BANNER */}
+        <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}>
+          <img 
+            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
+            alt="Established Design Co. Logo" 
+            style={{ height: '200px', width: 'auto', objectFit: 'contain', display: 'block' }}
+          />
         </div>
+      </div>
 
       {/* Main Content Container - MAXIMUM WIDTH with Darker Gradient */}
       <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
