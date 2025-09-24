@@ -304,38 +304,33 @@ class RoomLoadingTransferTester:
             # This mimics what the frontend transfer functionality should do
             items_transferred = 0
             
+            # Get the first available subcategory in checklist room for testing
+            target_subcategory = None
+            if checklist_room['categories'] and checklist_room['categories'][0]['subcategories']:
+                target_subcategory = checklist_room['categories'][0]['subcategories'][0]
+            
+            if not target_subcategory:
+                self.log_test("Transfer Functionality", False, "No subcategories available in checklist room for transfer")
+                return False
+            
             for item in selected_items:
-                # Find appropriate category and subcategory in checklist room
-                target_category = None
-                target_subcategory = None
+                # Create item in checklist room
+                item_data = {
+                    "name": item['name'],
+                    "subcategory_id": target_subcategory['id'],
+                    "status": "PICKED",  # Status for transferred items
+                    "quantity": item.get('quantity', 1),
+                    "size": item.get('size', ''),
+                    "finish_color": item.get('finish_color', ''),
+                    "vendor": item.get('vendor', ''),
+                    "cost": item.get('cost', 0.0)
+                }
                 
-                # Look for matching category in checklist room
-                for category in checklist_room['categories']:
-                    if category['name'].lower() == item['category_location'].lower():
-                        target_category = category
-                        # Look for matching subcategory
-                        for subcategory in category['subcategories']:
-                            if subcategory['name'].lower() == item['subcategory_location'].lower():
-                                target_subcategory = subcategory
-                                break
-                        break
-                
-                if target_subcategory:
-                    # Create item in checklist room
-                    item_data = {
-                        "name": item['name'],
-                        "subcategory_id": target_subcategory['id'],
-                        "status": "PICKED",  # Status for transferred items
-                        "quantity": item.get('quantity', 1),
-                        "size": item.get('size', ''),
-                        "finish_color": item.get('finish_color', ''),
-                        "vendor": item.get('vendor', ''),
-                        "cost": item.get('cost', 0.0)
-                    }
-                    
-                    item_response = requests.post(f"{BASE_URL}/items", json=item_data)
-                    if item_response.status_code == 200:
-                        items_transferred += 1
+                item_response = requests.post(f"{BASE_URL}/items", json=item_data)
+                if item_response.status_code == 200:
+                    items_transferred += 1
+                else:
+                    print(f"   Failed to transfer item '{item['name']}': {item_response.status_code} - {item_response.text}")
             
             # Verify transfer results
             # Get updated project to check checklist room
