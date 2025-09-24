@@ -28,12 +28,12 @@ const CustomerLandingPage = () => {
         <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
             {/* Hero Section */}
             <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-                {/* Background Video/Image */}
+                {/* Background - Your Stunning Interior Photo */}
                 <div className="absolute inset-0 z-0">
                     <img 
-                        src={portfolioImages[currentImageIndex]}
-                        alt="Luxury Interior" 
-                        className="w-full h-full object-cover transition-all duration-1000 ease-in-out"
+                        src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/pbaudki8_10-web-or-mls-014%203.JPG"
+                        alt="Established Design Co. - Luxury Interior Design" 
+                        className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40"></div>
                 </div>
