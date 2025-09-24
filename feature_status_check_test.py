@@ -70,7 +70,7 @@ class FeatureStatusChecker:
             if method.upper() == 'GET':
                 response = self.session.get(url, params=params, timeout=15)
             elif method.upper() == 'POST':
-                response = self.session.post(url, json=data, timeout=15)
+                response = self.session.post(url, json=data, params=params, timeout=15)
             elif method.upper() == 'PUT':
                 response = self.session.put(url, json=data, timeout=15)
             elif method.upper() == 'DELETE':
