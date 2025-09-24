@@ -1117,7 +1117,7 @@ const SimpleChecklistSpreadsheet = ({
                                   <td className="border border-gray-400 px-2 py-1 text-white text-sm">
                                     <select 
                                       className="bg-gray-800 text-white text-xs border-none w-full"
-                                      value={item.status || ''}
+                                      value={getDisplayStatus(item.status || '')}
                                       style={{ backgroundColor: getStatusColor(item.status || ''), color: 'white' }}
                                       onChange={(e) => handleStatusChange(item.id, e.target.value)}
                                     >
