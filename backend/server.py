@@ -1705,20 +1705,29 @@ async def create_room(room_data: RoomCreate):
                 print(f"📁 Adding comprehensive structure for {room_data.name}")
                 categories_list = room_structure.get("categories", [])
                 for category_obj in categories_list:
+                    category_id = str(uuid.uuid4())
                     category_dict = {
-                        "id": str(uuid.uuid4()),
+                        "id": category_id,
+                        "room_id": room_dict["id"],
                         "name": category_obj["name"],
+                        "color": category_obj.get("color", get_category_color(category_obj["name"])),
                         "order_index": 0,
-                        "subcategories": []
+                        "subcategories": [],
+                        "created_at": datetime.utcnow(),
+                        "updated_at": datetime.utcnow()
                     }
                     
                     subcategories_list = category_obj.get("subcategories", [])
                     for subcategory_obj in subcategories_list:
                         subcategory_dict = {
                             "id": str(uuid.uuid4()),
+                            "category_id": category_id,
                             "name": subcategory_obj["name"],
+                            "color": subcategory_obj.get("color", get_subcategory_color(subcategory_obj["name"])),
                             "order_index": 0,
-                            "items": []  # NO ITEMS - preserves transfer functionality
+                            "items": [],  # NO ITEMS - preserves transfer functionality
+                            "created_at": datetime.utcnow(),
+                            "updated_at": datetime.utcnow()
                         }
                         category_dict["subcategories"].append(subcategory_dict)
                     
