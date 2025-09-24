@@ -104,7 +104,7 @@ const CustomerLandingPage = () => {
             </section>
 
             {/* Who We Are Section */}
-            <section className="py-20 px-6 bg-gradient-to-b from-gray-800 to-gray-900">
+            <section className="py-20 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-5xl font-light text-[#B49B7E] mb-6">Who We Are</h2>
