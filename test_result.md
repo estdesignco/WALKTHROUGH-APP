@@ -151,7 +151,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "CRITICAL FUNCTIONALITY FAILURES - User reports: 1) TRANSFER TO CHECKLIST not working - fails to move items with full room/category structure, 2) ADD CATEGORY not working properly - only adds empty categories instead of comprehensive subcategories and items, 3) ADD ROOM not working on other pages - functionality is page-specific rather than universal. User provided Google Apps Script roadmap showing proper patterns for room/category structure management, context-aware transfers, and comprehensive data population."
+  "URGENT TEST: Checklist and FFE Auto-Population Fix - I just made a critical change to the backend room creation logic to auto-populate checklist and FFE rooms with comprehensive structure like walkthrough does. SPECIFIC TESTS NEEDED: 1) Create a checklist room and verify it has all categories, subcategories, and items (like walkthrough), 2) Create an FFE room and verify it has all categories, subcategories, and items (like walkthrough), 3) Verify walkthrough rooms still work correctly (no regression), 4) Confirm transfer functionality is not affected. PREVIOUS ISSUE: Checklist and FFE were creating empty rooms with no categories while walkthrough auto-populated with full structure. CHANGE MADE: Removed the condition that prevented checklist/FFE from auto-populating and now ALL sheet types get comprehensive room structure."
 
 backend:
   - task: "FF&E and Checklist Backend Functionality Testing - Review Request"
