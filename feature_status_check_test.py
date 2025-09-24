@@ -233,12 +233,12 @@ class FeatureStatusChecker:
             return False
         
         # Test adding a custom category
-        custom_category_data = {
+        params = {
             "room_id": self.walkthrough_room_id,
             "category_name": "Custom Test Category"
         }
         
-        success, response, status_code = self.make_request('POST', '/categories/comprehensive', custom_category_data)
+        success, response, status_code = self.make_request('POST', '/categories/comprehensive', params=params)
         
         if not success:
             self.log_test("ADD NEW CATEGORY (Custom)", False, f"Failed: {response} (Status: {status_code})")
