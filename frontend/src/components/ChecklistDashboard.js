@@ -298,22 +298,17 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
                 <span>✅</span>
                 <span className="font-medium text-[#F5F5DC] tracking-wide">Checklist</span>
               </div>
-              <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
+              <a href={`/project/${projectId}/ffe`} 
+                 className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
+                 style={{ color: '#F5F5DC', opacity: '0.7' }} 
+                 onMouseEnter={(e) => e.target.style.opacity = '1'} 
+                 onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
                 <span>📊</span>
-                <span className="font-semibold">FF&E</span>
-              </div>
+                <span className="font-light tracking-wide">FF&E</span>
+              </a>
             </div>
           </>
         )}
-
-        {/* LOGO BANNER */}
-        <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}>
-          <img 
-            src="/established-logo.png" 
-            alt="Established Design Co. Logo" 
-            style={{ height: '200px', width: 'auto', objectFit: 'contain', display: 'block' }}
-          />
-        </div>
 
         {!hideNavigation && (
           <>
