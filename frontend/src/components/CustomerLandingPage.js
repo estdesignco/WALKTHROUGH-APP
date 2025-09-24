@@ -132,8 +132,8 @@ const CustomerLandingPage = () => {
                             <div className="w-20 h-20 bg-gradient-to-br from-[#B49B7E] to-[#A08B6F] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                                 <Award className="w-10 h-10 text-white" />
                             </div>
-                            <h3 className="text-2xl font-light text-white mb-4">Our Expertise</h3>
-                            <p className="text-white/70 leading-relaxed">
+                            <h3 className="text-2xl font-light mb-4" style={{ color: '#F5F5DC' }}>Our Expertise</h3>
+                            <p className="leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.8' }}>
                                 With years of experience in luxury design, we specialize in new builds, renovations, and complete styling transformations.
                             </p>
                         </div>
