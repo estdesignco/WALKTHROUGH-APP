@@ -163,8 +163,8 @@ const CustomerLandingPage = () => {
                             ].map((item, index) => (
                                 <div key={index} className="text-center">
                                     <div className="text-3xl font-light text-[#B49B7E] mb-4">{item.step}</div>
-                                    <h4 className="text-xl font-medium text-white mb-3">{item.title}</h4>
-                                    <p className="text-white/70 text-sm leading-relaxed">{item.desc}</p>
+                                    <h4 className="text-xl font-medium mb-3" style={{ color: '#F5F5DC' }}>{item.title}</h4>
+                                    <p className="text-sm leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.8' }}>{item.desc}</p>
                                 </div>
                             ))}
                         </div>
