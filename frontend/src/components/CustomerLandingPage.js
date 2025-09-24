@@ -172,34 +172,81 @@ const CustomerLandingPage = () => {
                 </div>
             </section>
 
-            {/* Portfolio Showcase */}
+            {/* All in the Details Showcase */}
             <section className="py-20 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-5xl font-light text-[#B49B7E] mb-6">Recent Projects</h2>
+                        <h2 className="text-5xl font-light text-[#B49B7E] mb-6">All in the Details</h2>
                         <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mb-8"></div>
                         <p className="text-xl max-w-3xl mx-auto" style={{ color: '#F5F5DC', opacity: '0.9' }}>
-                            Discover some of our recent transformations where luxury meets livability
+                            The thoughtful curation and styling that transforms houses into extraordinary homes
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {portfolioImages.map((image, index) => (
-                            <div key={index} className="group cursor-pointer">
-                                <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
-                                    <img 
-                                        src={image} 
-                                        alt={`Project ${index + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    <div className="absolute bottom-4 left-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        <h4 className="text-lg font-medium" style={{ color: '#F5F5DC' }}>Luxury Residence</h4>
-                                        <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>Complete Interior Design</p>
-                                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Vintage Clock Collection */}
+                        <div className="group cursor-pointer">
+                            <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
+                                <img 
+                                    src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/lhwi6kpk_0FB9969A-C111-4078-A3FC-6711D2015941_1_105_c.jpeg"
+                                    alt="Curated vintage clock collection"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <h4 className="text-lg font-medium" style={{ color: '#F5F5DC' }}>Curated Collections</h4>
+                                    <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>Thoughtful styling & vintage finds</p>
                                 </div>
                             </div>
-                        ))}
+                        </div>
+
+                        {/* Brass & Books Styling */}
+                        <div className="group cursor-pointer">
+                            <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
+                                <img 
+                                    src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/uw773jrc_17-IMG_2489.jpg"
+                                    alt="Brass accessories and book styling"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <h4 className="text-lg font-medium" style={{ color: '#F5F5DC' }}>Artful Arrangements</h4>
+                                    <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>Brass accents & curated objects</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Office Design with Dog */}
+                        <div className="group cursor-pointer">
+                            <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
+                                <img 
+                                    src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/gtmb5fh5_20-IMG_2441.jpg"
+                                    alt="Custom home office design"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <h4 className="text-lg font-medium" style={{ color: '#F5F5DC' }}>Custom Built-Ins</h4>
+                                    <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>Functional luxury & pattern play</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Luxury Bathroom */}
+                        <div className="group cursor-pointer">
+                            <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
+                                <img 
+                                    src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/unq2tzy0_5-IMG_2599.jpg"
+                                    alt="Luxury bathroom with pattern tiles"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <h4 className="text-lg font-medium" style={{ color: '#F5F5DC' }}>Luxury Finishes</h4>
+                                    <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>Statement tiles & elegant fixtures</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
