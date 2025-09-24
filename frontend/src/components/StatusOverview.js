@@ -284,7 +284,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                       className="w-3 h-3 rounded-full" 
                       style={{ backgroundColor: getCarrierColor(carrier) }}
                     ></div>
-                    <span className="text-sm text-gray-300">{carrier}</span>
+                    <span className="text-sm text-[#F5F5DC]/90">{carrier}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="bg-gray-700 rounded-full h-2 w-16">
