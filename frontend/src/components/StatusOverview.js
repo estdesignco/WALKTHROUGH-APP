@@ -251,7 +251,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
-          <h4 className="text-md font-medium text-gray-300 mb-3">Carrier Distribution</h4>
+          <h4 className="text-md font-medium text-[#F5F5DC]/80 mb-3">Carrier Distribution</h4>
           <div className="h-48">
             {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
               <Pie data={carrierPieData} options={pieOptions} />
