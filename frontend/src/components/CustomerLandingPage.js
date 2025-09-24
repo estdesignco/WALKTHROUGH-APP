@@ -208,7 +208,7 @@ const CustomerLandingPage = () => {
             <section className="py-20 px-6 bg-gradient-to-r from-[#B49B7E]/10 to-[#A08B6F]/10">
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-5xl font-light text-[#B49B7E] mb-8">Ready to Begin?</h2>
-                    <p className="text-xl text-white/80 mb-12 leading-relaxed">
+                    <p className="text-xl mb-12 leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.9' }}>
                         Take the first step towards your dream space. Our comprehensive questionnaire helps us understand your unique vision and creates the foundation for an extraordinary design journey.
                     </p>
                     
