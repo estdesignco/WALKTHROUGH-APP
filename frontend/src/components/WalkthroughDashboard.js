@@ -172,8 +172,8 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">❌</div>
-        <h2 className="text-2xl font-bold text-gray-200 mb-2">Project Not Found</h2>
-        <p className="text-gray-400">The project you're looking for doesn't exist or couldn't be loaded.</p>
+        <h2 className="text-2xl font-light mb-2" style={{ color: '#F5F5DC' }}>Project Not Found</h2>
+        <p style={{ color: '#F5F5DC', opacity: '0.7' }}>The project you're looking for doesn't exist or couldn't be loaded.</p>
       </div>
     );
   }
