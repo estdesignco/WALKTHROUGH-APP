@@ -1706,7 +1706,8 @@ async def create_room(room_data: RoomCreate):
                 categories_list = room_structure.get("categories", [])
                 print(f"🔍 DEBUG: categories_list length: {len(categories_list)}")
                 print(f"📁 Adding comprehensive structure for {room_data.name}")
-                for category_obj in categories_list:
+                for i, category_obj in enumerate(categories_list):
+                    print(f"🔍 DEBUG: Processing category {i}: {category_obj.get('name', 'UNKNOWN')}")
                     category_id = str(uuid.uuid4())
                     category_dict = {
                         "id": category_id,
@@ -1720,7 +1721,9 @@ async def create_room(room_data: RoomCreate):
                     }
                     
                     subcategories_list = category_obj.get("subcategories", [])
-                    for subcategory_obj in subcategories_list:
+                    print(f"🔍 DEBUG: Category '{category_obj['name']}' has {len(subcategories_list)} subcategories")
+                    for j, subcategory_obj in enumerate(subcategories_list):
+                        print(f"🔍 DEBUG: Processing subcategory {j}: {subcategory_obj.get('name', 'UNKNOWN')}")
                         subcategory_dict = {
                             "id": str(uuid.uuid4()),
                             "category_id": category_id,
@@ -1734,6 +1737,9 @@ async def create_room(room_data: RoomCreate):
                         category_dict["subcategories"].append(subcategory_dict)
                     
                     room_dict["categories"].append(category_dict)
+                    print(f"🔍 DEBUG: Added category '{category_obj['name']}' with {len(category_dict['subcategories'])} subcategories")
+                
+                print(f"🔍 DEBUG: Final room_dict has {len(room_dict['categories'])} categories")
             
             result = await db.rooms.insert_one(room_dict)
             return Room(**room_dict)
