@@ -178,7 +178,7 @@ const CustomerLandingPage = () => {
                     <div className="text-center mb-16">
                         <h2 className="text-5xl font-light text-[#B49B7E] mb-6">Recent Projects</h2>
                         <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mb-8"></div>
-                        <p className="text-xl text-white/80 max-w-3xl mx-auto">
+                        <p className="text-xl max-w-3xl mx-auto" style={{ color: '#F5F5DC', opacity: '0.9' }}>
                             Discover some of our recent transformations where luxury meets livability
                         </p>
                     </div>
