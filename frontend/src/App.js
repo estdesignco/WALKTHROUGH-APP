@@ -1,54 +1,244 @@
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
+import FFEDashboard from "./components/FFEDashboard";
+import ProjectList from "./components/ProjectList";
+import Navigation from "./components/Navigation";
+import ScrapingTestPage from "./components/ScrapingTestPage";
+import QuestionnaireSheet from "./components/QuestionnaireSheet";
+import WalkthroughDashboard from "./components/WalkthroughDashboard";
+import ChecklistDashboard from "./components/ChecklistDashboard";
+import StudioLandingPage from "./components/StudioLandingPage";
+import ComprehensiveQuestionnaire from "./components/ComprehensiveQuestionnaire";
+import ProjectDetailPage from "./components/ProjectDetailPage";
+import CustomerfacingLandingPage from './components/CustomerfacingLandingPage';
+import CustomerfacingQuestionnaire from './components/CustomerfacingQuestionnaire';
+import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectDetailPage';
+import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
+import GoogleSheetsImporter from './components/GoogleSheetsImporter';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: API,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
+// API functions
+export const projectAPI = {
+  getAll: () => api.get('/projects'),
+  getById: (id) => api.get(`/projects/${id}`),
+  create: (data) => api.post('/projects', data),
+  update: (id, data) => api.put(`/projects/${id}`, data),
+  delete: (id) => api.delete(`/projects/${id}`)
 };
 
-function App() {
+export const roomAPI = {
+  create: (data) => api.post('/rooms', data),
+  getById: (id) => api.get(`/rooms/${id}`),
+  update: (id, data) => api.put(`/rooms/${id}`, data),
+  delete: (id) => api.delete(`/rooms/${id}`)
+};
+
+export const categoryAPI = {
+  create: (data) => api.post('/categories', data),
+  getById: (id) => api.get(`/categories/${id}`),
+  update: (id, data) => api.put(`/categories/${id}`, data),
+  delete: (id) => api.delete(`/categories/${id}`)
+};
+
+export const itemAPI = {
+  create: (data) => api.post('/items', data),
+  getById: (id) => api.get(`/items/${id}`),
+  update: (id, data) => api.put(`/items/${id}`, data),
+  delete: (id) => api.delete(`/items/${id}`)
+};
+
+export const utilityAPI = {
+  getRoomColors: () => api.get('/room-colors'),
+  getCategoryColors: () => api.get('/category-colors'),
+  getItemStatuses: () => api.get('/item-statuses'),
+  getVendorTypes: () => api.get('/vendor-types'),
+  getCarrierTypes: () => api.get('/carrier-types')
+};
+
+const App = () => {
+  const [currentProject, setCurrentProject] = useState(null);
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    // Check online/offline status for jobsite work
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    setIsOffline(!navigator.onLine);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Component wrapper to handle project loading for direct FF&E navigation
+  const FFEDashboardWrapper = () => {
+    const location = useLocation();
+    const [projectLoaded, setProjectLoaded] = useState(false);
+
+    useEffect(() => {
+      // Extract projectId from current path
+      const pathMatch = location.pathname.match(/\/project\/([^\/]+)\/ffe/);
+      const projectId = pathMatch ? pathMatch[1] : null;
+
+      if (projectId && !currentProject) {
+        // Load project data for navigation context
+        const loadProject = async () => {
+          try {
+            const response = await projectAPI.getById(projectId);
+            if (response.data) {
+              setCurrentProject(response.data);
+              setProjectLoaded(true);
+            }
+          } catch (error) {
+            console.error('Failed to load project for navigation:', error);
+            setProjectLoaded(true); // Still proceed even if project load fails
+          }
+        };
+        loadProject();
+      } else {
+        setProjectLoaded(true);
+      }
+    }, [location.pathname]);
+
+    // Show loading state while project is being loaded
+    if (!projectLoaded) {
+      return (
+        <div className="text-center text-gray-400 py-8">
+          <p className="text-lg">Loading project...</p>
+        </div>
+      );
+    }
+
+    return <FFEDashboard isOffline={isOffline} />;
+  };
+
   return (
-    <div className="App">
+    <div className="App min-h-screen bg-gray-900">
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <Navigation 
+          currentProject={currentProject} 
+          isOffline={isOffline}
+        />
+        
+        <main className="container mx-auto px-4 py-6">
+          <Routes>
+            <Route 
+              path="/" 
+              element={<CustomerfacingLandingPage />}
+            />
+            <Route 
+              path="/studio" 
+              element={<StudioLandingPage />}
+            />
+            <Route 
+              path="/projects" 
+              element={
+                <ProjectList 
+                  onSelectProject={setCurrentProject}
+                  isOffline={isOffline}
+                />
+              }
+            />
+            <Route 
+              path="/questionnaire/new" 
+              element={<ComprehensiveQuestionnaire />}
+            />
+            <Route 
+              path="/questionnaire/demo" 
+              element={<ComprehensiveQuestionnaire />}
+            />
+            <Route 
+              path="/questionnaire/:clientEmail" 
+              element={<ComprehensiveQuestionnaire />}
+            />
+            <Route 
+              path="/project/:projectId" 
+              element={<ProjectDetailPage />}
+            />
+            <Route 
+              path="/project/:projectId/questionnaire" 
+              element={<QuestionnaireSheet />}
+            />
+            <Route 
+              path="/project/:projectId/walkthrough" 
+              element={<WalkthroughDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/walkthrough/:projectId" 
+              element={<WalkthroughDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/project/:projectId/checklist" 
+              element={<ChecklistDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/checklist/:projectId" 
+              element={<ChecklistDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/project/:projectId/ffe" 
+              element={<FFEDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/ffe/:projectId" 
+              element={<FFEDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/scraping-test" 
+              element={<ScrapingTestPage />}
+            />
+            <Route 
+              path="/advanced-features" 
+              element={<AdvancedFeaturesDashboard />}
+            />
+            <Route 
+              path="/google-sheets-import" 
+              element={<GoogleSheetsImporter />}
+            />
+            {/* Customer-facing routes */}
+            <Route 
+              path="/customer" 
+              element={<CustomerfacingLandingPage />}
+            />
+            <Route 
+              path="/customer/questionnaire" 
+              element={<CustomerfacingQuestionnaire />}
+            />
+            <Route 
+              path="/customer/project/:projectId" 
+              element={<CustomerfacingProjectDetailPage />}
+            />
+            <Route 
+              path="/questionnaire" 
+              element={<CustomerfacingQuestionnaire />}
+            />
+            <Route 
+              path="/project/:projectId/detail" 
+              element={<CustomerfacingProjectDetailPage />}
+            />
+          </Routes>
+        </main>
       </BrowserRouter>
     </div>
   );
-}
+};
 
 export default App;
