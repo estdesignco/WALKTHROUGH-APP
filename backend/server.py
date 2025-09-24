@@ -1679,10 +1679,15 @@ async def create_room(room_data: RoomCreate):
         }
         structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
         
-        # CRITICAL FIX: Only auto-populate if walkthrough sheet_type
-        # For checklist/ffe sheet_types, create COMPLETELY EMPTY room to preserve transfer functionality
+        # SMART FIX: Checklist/FFE get structure but NO ITEMS (preserves transfer)
+        # Transfer adds items to existing empty structure
         if room_data.sheet_type != "walkthrough":
-            print(f"🚫 CHECKLIST/FFE ROOM: Creating COMPLETELY EMPTY room to preserve transfer functionality")
+            print(f"📋 {room_data.sheet_type.upper()} ROOM: Creating with STRUCTURE but NO ITEMS (preserves transfer)")
+            
+            # Get comprehensive structure
+            structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
+            room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(structure_key)
+            
             room_dict = {
                 "id": str(uuid.uuid4()),
                 "name": room_data.name,
@@ -1690,10 +1695,35 @@ async def create_room(room_data: RoomCreate):
                 "order_index": room_data.order_index,
                 "sheet_type": room_data.sheet_type,
                 "project_id": room_data.project_id,
-                "categories": [],  # COMPLETELY EMPTY - transfer will create structure
+                "categories": [],
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
+            
+            if room_structure:
+                # Add categories and subcategories but NO ITEMS
+                categories_list = room_structure.get("categories", [])
+                for category_obj in categories_list:
+                    category_dict = {
+                        "id": str(uuid.uuid4()),
+                        "name": category_obj["name"],
+                        "color": category_obj.get("color", get_category_color(category_obj["name"])),
+                        "order_index": 0,
+                        "subcategories": []
+                    }
+                    
+                    # Add subcategories but NO ITEMS (transfer will add items here)
+                    for subcategory_obj in category_obj.get("subcategories", []):
+                        subcategory_dict = {
+                            "id": str(uuid.uuid4()),
+                            "name": subcategory_obj["name"],
+                            "color": subcategory_obj.get("color", get_subcategory_color(subcategory_obj["name"])),
+                            "order_index": 0,
+                            "items": []  # NO ITEMS - transfer adds here
+                        }
+                        category_dict["subcategories"].append(subcategory_dict)
+                    
+                    room_dict["categories"].append(category_dict)
             
             result = await db.rooms.insert_one(room_dict)
             return Room(**room_dict)
