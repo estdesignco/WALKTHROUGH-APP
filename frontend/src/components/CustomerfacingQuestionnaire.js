@@ -76,7 +76,7 @@ const FieldWrapper = ({ label, children, required }) => (
     </div>
 );
 
-const inputStyles = "bg-gray-700 border-gray-600 text-[#F5F5DC] focus:border-[#8B7355] placeholder:text-stone-400";
+const inputStyles = "bg-black/40 border-[#B49B7E]/30 text-[#F5F5DC] focus:border-[#B49B7E] focus:bg-black/60 placeholder:text-[#B49B7E]/50 transition-all duration-300";
 
 // New InputField component
 const InputField = ({ label, id, value, onChange, required = false, type = "text", placeholder = "" }) => (
