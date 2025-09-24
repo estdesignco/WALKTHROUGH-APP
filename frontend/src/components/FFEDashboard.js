@@ -354,7 +354,7 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
         {/* Spreadsheet - Inside main container */}
         <div className="mt-8">
           {project && project.rooms && project.rooms.length > 0 ? (
-            <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-6">
+            <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl border border-[#B49B7E]/20 p-6">
               <h3 className="text-2xl font-light text-[#B49B7E] mb-6 tracking-wide">Project Data</h3>
               {project.rooms.map((room, index) => (
                 <div key={room.id || index} className="mb-6 p-4 bg-black/40 rounded-xl border border-[#B49B7E]/10">
