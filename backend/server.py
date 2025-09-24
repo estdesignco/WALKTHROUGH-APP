@@ -1706,10 +1706,13 @@ async def create_room(room_data: RoomCreate):
                 for category_obj in categories_list:
                     category_dict = {
                         "id": str(uuid.uuid4()),
+                        "room_id": room_dict["id"],  # REQUIRED FIELD - was missing!
                         "name": category_obj["name"],
                         "color": category_obj.get("color", get_category_color(category_obj["name"])),
                         "order_index": 0,
-                        "subcategories": []
+                        "subcategories": [],
+                        "created_at": datetime.utcnow(),
+                        "updated_at": datetime.utcnow()
                     }
                     
                     # Add subcategories but NO ITEMS (transfer will add items here)
