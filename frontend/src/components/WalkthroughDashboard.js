@@ -140,8 +140,8 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto"></div>
-          <p className="text-gray-400 mt-4">Loading FF&E data...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B49B7E] mx-auto"></div>
+          <p className="mt-4" style={{ color: '#F5F5DC', opacity: '0.8' }}>Loading FF&E data...</p>
         </div>
       </div>
     );
