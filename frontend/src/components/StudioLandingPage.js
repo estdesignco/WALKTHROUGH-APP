@@ -178,47 +178,50 @@ const StudioLandingPage = () => {
               </button>
             </div>
           ) : (
-            projects.map((project) => (
-              <div
-                key={project.id}
-                className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-lg border border-[#B49B7E]/20 p-6 cursor-pointer hover:border-[#B49B7E]/40 transition-all duration-300 shadow-lg"
-                onClick={() => handleProjectClick(project)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-light uppercase tracking-wide text-[#B49B7E]">
-                        {project.name}
-                      </h3>
-                      <div className="flex items-center space-x-4">
-                        <span className="text-sm" style={{ color: '#F5F5DC', opacity: '0.7' }}>Last Updated</span>
-                        <button
-                          onClick={(e) => handleDeleteProject(project.id, e)}
-                          className="hover:text-red-400 transition-colors"
-                          style={{ color: '#F5F5DC', opacity: '0.7' }}
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <p className="mb-1" style={{ color: '#F5F5DC' }}>
-                      {project.client_info?.full_name}
-                    </p>
-                    
-                    <p className="mb-4" style={{ color: '#F5F5DC', opacity: '0.7' }}>
-                      {project.client_info?.address}
-                    </p>
-                    
-                    <div className="text-right">
-                      <span className="text-sm" style={{ color: '#F5F5DC', opacity: '0.7' }}>
-                        {formatDate(project.updated_at || project.created_at)}
-                      </span>
+            <div className="space-y-6">
+              {projects.map((project) => (
+                <div
+                  key={project.id}
+                  className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-2xl border border-[#B49B7E]/20 p-8 cursor-pointer hover:border-[#B49B7E]/40 transition-all duration-300 shadow-2xl backdrop-blur-sm"
+                  onClick={() => handleProjectClick(project)}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-2xl font-light text-[#B49B7E] tracking-wide">
+                      {project.name}
+                    </h3>
+                    <div className="flex items-center space-x-4">
+                      <span className="text-sm" style={{ color: '#F5F5DC', opacity: '0.7' }}>Last Updated</span>
+                      <button
+                        onClick={(e) => handleDeleteProject(project.id, e)}
+                        className="hover:text-red-400 transition-colors"
+                        style={{ color: '#F5F5DC', opacity: '0.7' }}
+                      >
+                        🗑️
+                      </button>
                     </div>
                   </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <p style={{ color: '#F5F5DC' }}>
+                      <span className="font-medium text-[#B49B7E]">Client:</span> {project.client_info?.full_name}
+                    </p>
+                    <p style={{ color: '#F5F5DC' }}>
+                      <span className="font-medium text-[#B49B7E]">Address:</span> {project.client_info?.address}
+                    </p>
+                  </div>
+                  
+                  <div className="flex justify-between items-center pt-4 border-t border-[#B49B7E]/20">
+                    <div className="flex space-x-2">
+                      <span className="w-2 h-2 bg-[#B49B7E] rounded-full"></span>
+                      <span className="text-xs text-[#B49B7E]">Active</span>
+                    </div>
+                    <span className="text-sm" style={{ color: '#F5F5DC', opacity: '0.7' }}>
+                      Created {formatDate(project.updated_at || project.created_at)}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </div>
