@@ -108,23 +108,19 @@ const StudioLandingPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
-      {/* Header with Logo */}
-      <div className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] border-b border-[#B49B7E]/20 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex justify-center">
-            <img
-              src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
-              alt="Established Design Co."
-              className="h-16 object-contain"
-              style={{ filter: 'brightness(0) invert(1)' }}
-            />
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+      {/* Header with Logo - Same as Questionnaire */}
+      <div className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center py-8">
+        <img
+          src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
+          alt="Established Design Co."
+          className="object-contain"
+          style={{ height: '120px', transform: 'scale(1.8)', maxWidth: '95%', maxHeight: '90%' }}
+        />
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Main Content Container - Same as Questionnaire */}
+      <div className="max-w-4xl mx-auto bg-gradient-to-br from-black/60 to-gray-900/80 p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
         {/* Studio Projects Header and Action Buttons */}
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide">Studio Projects</h2>
