@@ -1117,6 +1117,7 @@ const SimpleChecklistSpreadsheet = ({
                                       onChange={(e) => handleStatusChange(item.id, e.target.value)}
                                     >
                                       <option value=""></option>
+                                      <option value="PICKED">PICKED</option>
                                       <option value="ORDER SAMPLES">ORDER SAMPLES</option>
                                       <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
                                       <option value="ASK NEIL">ASK NEIL</option>
