@@ -407,12 +407,11 @@ export default function Questionnaire() {
                 </div>
 
                 {/* Header with your actual logo */}
-                <div className="w-full bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center my-8 rounded-2xl overflow-hidden" style={{ height: '150px' }}>
+                <div className="w-full bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center my-8 rounded-2xl p-3" style={{ height: '150px' }}>
                     <img
                         src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
                         alt="Established Design Co."
-                        className="w-full h-full object-cover"
-                        style={{ transform: 'scale(1.1)' }}
+                        className="w-full h-full object-contain"
                     />
                 </div>
 
