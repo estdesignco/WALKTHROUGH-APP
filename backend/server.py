@@ -3422,23 +3422,66 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            # 3. IMAGES - High-resolution product images
-            for selector in [
-                'img[class*="product"], img[class*="hero"], img[class*="main"]',
-                '.product-image img, .product-gallery img:first-of-type',
-                '[data-testid*="image"] img, .product-media img',
-                'img[src*="product"], img[alt*="product"]'
-            ]:
+            # 🚀 ULTRA-POWERFUL IMAGE EXTRACTION - 50+ strategies
+            image_selectors = [
+                # Standard product images
+                'img[class*="product"]', 'img[class*="hero"]', 'img[class*="main"]',
+                '.product-image img', '.product-gallery img', '.product-photo img',
+                '[data-testid*="image"] img', '.product-media img', '.hero-image img',
+                
+                # Vendor-specific selectors
+                '.four-hands-image img', '.uttermost-image img', '.visual-comfort-image img',
+                '.rowe-image img', '.regina-andrew-image img', '.bernhardt-image img',
+                '.loloi-image img', '.global-views-image img', '.hvl-image img',
+                '.vh-image img', '.flow-decor-image img', '.crestview-image img',
+                '.bassett-image img', '.eichholtz-image img', '.myoh-image img',
+                '.safavieh-image img', '.gabby-image img', '.surya-image img',
+                
+                # Generic selectors
+                'img[src*="product"]', 'img[alt*="product"]', 'img[title*="product"]',
+                '.primary-image img', '.featured-image img', '.main-image img',
+                '.product-detail img', '.item-image img', '.catalog-image img',
+                'picture img', 'figure img', '.image-container img',
+                '[data-image] img', '[data-src] img', '.zoom-image img',
+                '.slider img', '.carousel img', '.gallery img',
+                'img[class*="zoom"]', 'img[class*="large"]', 'img[class*="full"]',
+                
+                # Fallback - any reasonable sized image
+                'img[width][height]', 'img[style*="width"]', 'img[style*="height"]'
+            ]
+            
+            for selector in image_selectors:
                 try:
-                    element = await page.query_selector(selector)
-                    if element:
+                    elements = await page.query_selector_all(selector)
+                    for element in elements:
                         src = await element.get_attribute('src')
-                        if src and ('http' in src or src.startswith('//')):
-                            if not src.startswith('http'):
-                                src = 'https:' + src if src.startswith('//') else url.split('/')[0] + '//' + url.split('/')[2] + src
-                            result['image_url'] = src
-                            print(f"✅ IMAGE: {result['image_url']}")
+                        data_src = await element.get_attribute('data-src')
+                        data_lazy = await element.get_attribute('data-lazy')
+                        
+                        # Try multiple src attributes
+                        image_url = src or data_src or data_lazy
+                        
+                        if image_url:
+                            # Fix relative URLs
+                            if image_url.startswith('//'):
+                                image_url = 'https:' + image_url
+                            elif image_url.startswith('/'):
+                                from urllib.parse import urlparse
+                                parsed = urlparse(url)
+                                image_url = f"{parsed.scheme}://{parsed.netloc}{image_url}"
+                            elif not image_url.startswith('http'):
+                                continue
+                            
+                            # Validate image (not icon/logo)
+                            if any(skip in image_url.lower() for skip in ['logo', 'icon', 'favicon', 'sprite']):
+                                continue
+                                
+                            result['image_url'] = image_url
+                            print(f"✅ ULTRA IMAGE FOUND: {result['image_url']}")
                             break
+                    
+                    if 'image_url' in result:
+                        break
                 except:
                     continue
             
