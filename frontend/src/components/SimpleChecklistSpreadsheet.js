@@ -1120,20 +1120,25 @@ const SimpleChecklistSpreadsheet = ({
                                   {/* STATUS - DROPDOWN (KEEP AS IS) */}
                                   <td className="border border-gray-400 px-2 py-1 text-white text-sm">
                                     <select 
-                                      className="bg-gray-800 text-white text-xs border-none w-full"
+                                      className="text-white text-xs border-none w-full"
                                       value={getDisplayStatus(item.status || '')}
-                                      style={{ backgroundColor: getStatusColor(item.status || ''), color: 'white' }}
+                                      style={{ 
+                                        backgroundColor: getStatusColor(item.status || ''), 
+                                        color: 'white',
+                                        border: 'none',
+                                        outline: 'none'
+                                      }}
                                       onChange={(e) => handleStatusChange(item.id, e.target.value)}
                                     >
-                                      <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}></option>
-                                      <option value="ORDER SAMPLES" style={{ backgroundColor: '#10B981', color: 'white' }}>ORDER SAMPLES</option>
-                                      <option value="SAMPLES ARRIVED" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>SAMPLES ARRIVED</option>
-                                      <option value="ASK NEIL" style={{ backgroundColor: '#F59E0B', color: 'white' }}>ASK NEIL</option>
-                                      <option value="ASK CHARLENE" style={{ backgroundColor: '#EF4444', color: 'white' }}>ASK CHARLENE</option>
-                                      <option value="ASK JALA" style={{ backgroundColor: '#EC4899', color: 'white' }}>ASK JALA</option>
-                                      <option value="GET QUOTE" style={{ backgroundColor: '#06B6D4', color: 'white' }}>GET QUOTE</option>
-                                      <option value="WAITING ON QT" style={{ backgroundColor: '#F97316', color: 'white' }}>WAITING ON QT</option>
-                                      <option value="READY FOR PRESENTATION" style={{ backgroundColor: '#84CC16', color: 'white' }}>READY FOR PRESENTATION</option>
+                                      <option value=""></option>
+                                      <option value="ORDER SAMPLES">ORDER SAMPLES</option>
+                                      <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
+                                      <option value="ASK NEIL">ASK NEIL</option>
+                                      <option value="ASK CHARLENE">ASK CHARLENE</option>
+                                      <option value="ASK JALA">ASK JALA</option>
+                                      <option value="GET QUOTE">GET QUOTE</option>
+                                      <option value="WAITING ON QT">WAITING ON QT</option>
+                                      <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
                                       <option value="GET QUOTE" style={{ backgroundColor: '#06B6D4', color: 'white' }}>GET QUOTE</option>
                                       <option value="WAITING ON QT" style={{ backgroundColor: '#F97316', color: 'white' }}>WAITING ON QT</option>
                                       <option value="READY FOR PRESENTATION" style={{ backgroundColor: '#84CC16', color: 'white' }}>READY FOR PRESENTATION</option>
