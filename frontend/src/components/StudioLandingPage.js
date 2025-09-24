@@ -163,13 +163,15 @@ const StudioLandingPage = () => {
         {/* Projects List */}
         <div className="space-y-4">
           {projects.length === 0 ? (
-            <div className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-xl p-12 text-center border border-[#B49B7E]/20 shadow-2xl">
-              <div className="text-6xl mb-4">🏗️</div>
-              <h3 className="text-2xl font-light mb-2" style={{ color: '#F5F5DC' }}>No Projects Yet</h3>
-              <p className="mb-6" style={{ color: '#F5F5DC', opacity: '0.7' }}>Get started by creating your first client project</p>
+            <div className="text-center py-12">
+              <div className="text-6xl mb-6">🏗️</div>
+              <h3 className="text-3xl font-light text-[#B49B7E] mb-4">No Projects Yet</h3>
+              <p className="text-xl mb-12 leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+                Get started by creating your first client project
+              </p>
               <button
                 onClick={handleNewClient}
-                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-3 rounded-lg transition-all duration-300 shadow-lg"
+                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-12 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide"
                 style={{ color: '#F5F5DC' }}
               >
                 Create Your First Project
