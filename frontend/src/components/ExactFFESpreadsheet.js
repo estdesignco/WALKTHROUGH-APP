@@ -1059,13 +1059,28 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Order Status/Order Number (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
+                                                          <td 
+                                                            className="border border-gray-400 px-1 py-1 text-sm"
+                                                            style={{ 
+                                                              backgroundColor: getStatusColor(item.status || '') + ' !important',
+                                                              background: getStatusColor(item.status || ''),
+                                                              minWidth: '120px'
+                                                            }}
+                                                          >
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <select 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
+                                                                  className="w-full h-full text-white text-xs p-0"
                                                                   value={item.status || ''}
-                                                                  style={{ backgroundColor: getStatusColor(item.status || '') }}
+                                                                  style={{ 
+                                                                    backgroundColor: getStatusColor(item.status || ''),
+                                                                    background: getStatusColor(item.status || ''),
+                                                                    color: 'white !important',
+                                                                    border: '2px solid ' + getStatusColor(item.status || ''),
+                                                                    borderRadius: '4px',
+                                                                    outline: 'none',
+                                                                    fontWeight: 'bold'
+                                                                  }}
                                                                   onChange={(e) => {
                                                                     const newStatus = e.target.value;
                                                                     handleStatusChange(item.id, newStatus);
