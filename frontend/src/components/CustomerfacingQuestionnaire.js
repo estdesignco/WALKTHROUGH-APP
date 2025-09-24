@@ -396,27 +396,27 @@ export default function Questionnaire() {
 
 
     return (
-        <div className="bg-[#1E293B] min-h-screen p-4 sm:p-6 lg:p-8" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
-            <div className="max-w-4xl mx-auto bg-[#2D3748] p-8 rounded-lg shadow-2xl">
+        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black p-4 sm:p-6 lg:p-8" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+            <div className="max-w-4xl mx-auto bg-gradient-to-br from-black/60 to-gray-900/80 p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm">
                 {/* Back Button */}
-                <div className="mb-6">
-                    <Link to="/" className="flex items-center text-stone-400 hover:text-stone-200 transition-colors">
+                <div className="mb-8">
+                    <Link to="/customer" className="flex items-center text-[#B49B7E]/70 hover:text-[#B49B7E] transition-all duration-300">
                         <ArrowLeft className="w-5 h-5 mr-2" />
-                        Back to Projects
+                        Back to Home
                     </Link>
                 </div>
 
-                {/* Header that matches your drawing - bigger and more proportionate container */}
-                <div className="w-full bg-[#8B7355] shadow-lg flex items-center justify-center my-8" style={{ height: '130px' }}>
-                    <img
-                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf5_Establishedlogo.png"
-                        alt="Established Design Co."
-                        className="w-full h-full object-contain"
-                    />
+                {/* Header - Updated to match luxury theme */}
+                <div className="w-full bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center my-8 rounded-2xl" style={{ height: '130px' }}>
+                    <div className="text-center text-white">
+                        <h1 className="text-4xl font-light tracking-[0.3em]">ESTABLISHED</h1>
+                        <div className="text-base font-extralight tracking-[0.2em] mt-1">DESIGN CO.</div>
+                    </div>
                 </div>
 
                 <div className="text-center mb-12">
-                    <h1 className="text-xl font-bold text-[#8B7355]">COMPREHENSIVE CLIENT QUESTIONNAIRE</h1>
+                    <h2 className="text-2xl font-light text-[#B49B7E] tracking-wider">COMPREHENSIVE CLIENT QUESTIONNAIRE</h2>
+                    <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mt-4"></div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-12 mt-8">
