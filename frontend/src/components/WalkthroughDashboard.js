@@ -366,17 +366,18 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
 
         {/* FF&E Spreadsheet - Inside main container */}
         <div className="mt-8">
-        <SimpleWalkthroughSpreadsheet
-          project={project}
-          roomColors={roomColors}
-          categoryColors={categoryColors}
-          itemStatuses={itemStatuses}
-          vendorTypes={vendorTypes}
-          carrierTypes={carrierTypes}
-          onDeleteRoom={handleDeleteRoom}
-          onAddRoom={() => setShowAddRoom(true)}
-          onReload={loadSimpleProject}
-        />
+          <SimpleWalkthroughSpreadsheet
+            project={project}
+            roomColors={roomColors}
+            categoryColors={categoryColors}
+            itemStatuses={itemStatuses}
+            vendorTypes={vendorTypes}
+            carrierTypes={carrierTypes}
+            onDeleteRoom={handleDeleteRoom}
+            onAddRoom={() => setShowAddRoom(true)}
+            onReload={loadSimpleProject}
+          />
+        </div>
       </div>
 
       {/* Add Room Modal */}
