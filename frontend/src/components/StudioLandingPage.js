@@ -160,7 +160,7 @@ const StudioLandingPage = () => {
         </div>
 
         {error && (
-          <div className="bg-red-900 border border-red-700 text-red-100 p-4 rounded-lg mb-6">
+          <div className="bg-red-900/20 border border-red-500/30 p-4 rounded-lg mb-6" style={{ color: '#F5F5DC' }}>
             {error}
           </div>
         )}
