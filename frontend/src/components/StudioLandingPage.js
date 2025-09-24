@@ -98,10 +98,10 @@ const StudioLandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto"></div>
-          <p className="text-gray-400 mt-4">Loading studio projects...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B49B7E] mx-auto"></div>
+          <p style={{ color: '#F5F5DC' }} className="mt-4 opacity-80">Loading studio projects...</p>
         </div>
       </div>
     );
