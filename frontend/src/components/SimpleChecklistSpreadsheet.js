@@ -187,7 +187,7 @@ const SimpleChecklistSpreadsheet = ({
     const statusColors = {
       '': '#6B7280',                        // Gray for blank/default (TO BE PICKED)
       'BLANK': '#6B7280',                   // Gray for blank
-      'PICKED': '#6B7280',                  // Gray - treat PICKED as blank for display  
+      'PICKED': '#3B82F6',                  // Blue for picked items
       'TO BE PICKED': '#6B7280',            // Gray - same as blank
       'ORDER SAMPLES': '#10B981',           // Green
       'SAMPLES ARRIVED': '#8B5CF6',         // Purple
