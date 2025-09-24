@@ -393,7 +393,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
 
         {/* Spreadsheet - Inside main container */}
         <div className="mt-8">
-          <SimpleChecklistSpreadsheet
+          <SimpleWalkthroughSpreadsheet
             project={project}
             roomColors={roomColors}
             categoryColors={categoryColors}
