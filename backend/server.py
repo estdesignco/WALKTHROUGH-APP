@@ -833,6 +833,7 @@ class ItemUpdate(BaseModel):
     order_date: Optional[datetime] = None
     install_date: Optional[datetime] = None
     image_url: Optional[str] = None
+    carrier: Optional[str] = None
 
 class Item(ItemBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
