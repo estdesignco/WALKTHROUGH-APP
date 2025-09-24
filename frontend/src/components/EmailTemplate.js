@@ -180,8 +180,33 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                 </div>
             </div>
         </div>
-                            
-                            {/* Header with Elegant Background */}
+    );
+};
+
+// Export both the component and the HTML string version for email sending
+export const generateEmailHTML = (clientName, questionnaireLinkId) => {
+    const questionnaireUrl = `${process.env.REACT_APP_FRONTEND_URL || 'https://sleek-showcase-46.preview.emergentagent.com'}/customer/questionnaire/${questionnaireLinkId}`;
+    
+    return `
+    <!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Your Design Journey Begins - Established Design Co.</title>
+        <!--[if !mso]><!-->
+        <style type="text/css">
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500&family=Lato:wght@300;400&display=swap');
+        </style>
+        <!--<![endif]-->
+    </head>
+    <body style="margin:0; padding:0; font-family: 'Lato', Georgia, serif; background-color: #0F0F0F; color: #F5F5DC;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0F0F0F; min-height: 100vh;">
+            <tr>
+                <td align="center" style="padding: 40px 20px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #1A1A1A; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(180, 155, 126, 0.1);">
+                        
+                        <!-- Header -->
                             <tr>
                                 <td style={{
                                     background: 'linear-gradient(135deg, #B49B7E 0%, #A08B6F 50%, #8B7355 100%)',
