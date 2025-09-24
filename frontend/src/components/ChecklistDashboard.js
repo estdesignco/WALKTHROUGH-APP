@@ -196,7 +196,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       room.categories.forEach(category => {
         (category.subcategories || []).forEach(subcategory => {
           (subcategory.items || []).forEach(item => {
-            const status = item.status || 'TO BE SELECTED';
+            const status = item.status || 'TO BE PICKED';
             breakdown[status] = (breakdown[status] || 0) + 1;
           });
         });
