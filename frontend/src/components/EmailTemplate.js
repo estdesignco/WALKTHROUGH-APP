@@ -20,24 +20,15 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                 borderRadius: '15px 15px 0 0',
                 marginBottom: '0'
             }}>
-                <h1 style={{
-                    fontSize: '36px',
-                    fontWeight: '300',
-                    letterSpacing: '6px',
-                    color: 'white',
-                    margin: '0 0 10px 0'
-                }}>
-                    ESTABLISHED
-                </h1>
-                <div style={{
-                    fontSize: '16px',
-                    fontWeight: '200',
-                    letterSpacing: '3px',
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    margin: '0'
-                }}>
-                    DESIGN CO.
-                </div>
+                <img 
+                    src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
+                    alt="Established Design Co." 
+                    style={{
+                        height: '60px',
+                        objectFit: 'contain',
+                        filter: 'brightness(0) invert(1)'
+                    }} 
+                />
             </div>
 
             {/* Email Body */}
