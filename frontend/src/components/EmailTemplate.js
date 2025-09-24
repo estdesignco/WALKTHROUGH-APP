@@ -157,7 +157,8 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                         alt="Established Design Co." 
                         style={{
                             height: '50px',
-                            objectFit: 'contain'
+                            objectFit: 'contain',
+                            filter: 'brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(664%) hue-rotate(349deg) brightness(95%) contrast(88%)'
                         }} 
                     />
                     <p style={{
