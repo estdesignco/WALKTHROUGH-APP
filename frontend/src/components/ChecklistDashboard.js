@@ -26,7 +26,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       console.log('🚀 Loading project:', projectId);
       
       // IMMEDIATE TEST - Force load project data
-      fetch(`${process.env.REACT_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`)
+      fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`)
         .then(response => {
           console.log('📡 Response received:', response.status);
           if (response.ok) {
