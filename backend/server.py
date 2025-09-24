@@ -1680,10 +1680,12 @@ async def create_room(room_data: RoomCreate):
         }
         structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
         
-        # CRITICAL FIX: Only auto-populate walkthrough rooms
-        # Checklist/FFE rooms created by transfer should be empty
-        if room_data.sheet_type != "walkthrough":
-            print(f"🚫 CHECKLIST/FFE ROOM: Creating empty room to preserve transfer functionality")
+        # SMART LOGIC: Auto-populate based on sheet_type AND auto_populate flag
+        # ADD ROOM: auto_populate=True (default) - all sheets get full structure
+        # TRANSFER: auto_populate=False - checklist/FFE get empty rooms
+        
+        if room_data.sheet_type != "walkthrough" and not room_data.auto_populate:
+            print(f"🚫 TRANSFER ROOM: Creating empty {room_data.sheet_type.upper()} room for transfer")
             room_dict = {
                 "id": str(uuid.uuid4()),
                 "name": room_data.name,
@@ -1691,13 +1693,16 @@ async def create_room(room_data: RoomCreate):
                 "order_index": room_data.order_index,
                 "sheet_type": room_data.sheet_type,
                 "project_id": room_data.project_id,
-                "categories": [],  # Empty - transfer will add checked items only
+                "categories": [],  # Empty - transfer will add only checked items
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
             
             result = await db.rooms.insert_one(room_dict)
             return Room(**room_dict)
+        
+        # AUTO-POPULATE for walkthrough OR when explicitly requested (ADD ROOM)
+        print(f"📋 AUTO-POPULATE: Creating {room_data.sheet_type.upper()} room with full structure")
         
         # WALKTHROUGH ROOMS: Get FULL comprehensive structure for this room
         room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(structure_key)
