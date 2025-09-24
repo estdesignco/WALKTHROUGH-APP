@@ -108,13 +108,18 @@ const StudioLandingPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
       {/* Header with Logo */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-4xl font-bold text-white tracking-wider text-center">
-            ESTABLISHED DESIGN CO.
-          </h1>
+      <div className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] border-b border-[#B49B7E]/20 shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex justify-center">
+            <img
+              src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
+              alt="Established Design Co."
+              className="h-16 object-contain"
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
+          </div>
         </div>
       </div>
 
