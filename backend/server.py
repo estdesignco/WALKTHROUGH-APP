@@ -3744,9 +3744,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 '[class*="color"], [class*="finish"], [class*="material"]',
                 '.product-options [class*="selected"], .variant-selected',
                 
-                # Text-based
-                '*:has-text("Color:"), *:has-text("Finish:"), *:has-text("Material:")',
-                'span:has-text("Color"), span:has-text("Finish"), span:has-text("Material")'
+                # Generic areas that might contain finish/color info
+                '.product-info, .product-details, .specifications, .product-meta'
             ]
             
             for strategy in finish_strategies:
