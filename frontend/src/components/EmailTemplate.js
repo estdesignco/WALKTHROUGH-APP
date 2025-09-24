@@ -200,8 +200,7 @@ export const generateEmailHTML = (clientName, questionnaireLinkId) => {
                         <tr>
                             <td style="background: linear-gradient(135deg, #B49B7E 0%, #A08B6F 50%, #8B7355 100%); padding: 60px 40px; text-align: center;">
                                 <div style="width: 80px; height: 1px; background-color: rgba(255, 255, 255, 0.3); margin: 0 auto 30px auto;"></div>
-                                <h1 style="font-family: 'Playfair Display', Georgia, serif; font-size: 42px; font-weight: 300; letter-spacing: 8px; color: white; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">ESTABLISHED</h1>
-                                <div style="font-size: 18px; font-weight: 200; letter-spacing: 4px; color: rgba(255, 255, 255, 0.9); margin: 0 0 30px 0;">DESIGN CO.</div>
+                                <img src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" alt="Established Design Co." style="height: 60px; object-fit: contain; filter: brightness(0) invert(1);" />
                                 <div style="width: 120px; height: 1px; background-color: rgba(255, 255, 255, 0.4); margin: 0 auto;"></div>
                             </td>
                         </tr>
