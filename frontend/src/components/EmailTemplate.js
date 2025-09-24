@@ -9,13 +9,11 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
             backgroundColor: '#0F0F0F',
             color: '#F5F5DC',
             margin: 0,
-            padding: 0,
-            minHeight: '100vh'
+            padding: 0
         }}>
             {/* Main Container */}
             <table cellPadding="0" cellSpacing="0" border="0" width="100%" style={{
-                backgroundColor: '#0F0F0F',
-                minHeight: '100vh'
+                backgroundColor: '#0F0F0F'
             }}>
                 <tr>
                     <td align="center" style={{ padding: '40px 20px' }}>
