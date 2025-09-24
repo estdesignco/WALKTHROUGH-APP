@@ -139,7 +139,7 @@ class StatusDropdownTransferTester:
     def test_status_dropdown_options(self):
         """Test that status dropdown shows BLANK option instead of PICKED"""
         try:
-            response = requests.get(f"{API_BASE}/statuses/enhanced")
+            response = requests.get(f"{API_BASE}/item-statuses-enhanced")
             if response.status_code == 200:
                 statuses = response.json()
                 
