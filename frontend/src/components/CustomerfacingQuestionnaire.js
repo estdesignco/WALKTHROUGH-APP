@@ -803,9 +803,9 @@ export default function Questionnaire() {
                         </Section>
                     )}
 
-                    <div className="flex justify-end pt-8">
-                        <Button type="submit" disabled={isSubmitting} className="bg-[#B49B7E] hover:bg-[#A08B6F] text-white font-bold py-3 px-8 text-lg rounded-lg w-full sm:w-auto">
-                            {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+                    <div className="flex justify-center pt-12">
+                        <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-white font-light py-4 px-12 text-xl rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide">
+                            {isSubmitting ? <Loader2 className="mr-3 h-6 w-6 animate-spin" /> : null}
                             Submit Questionnaire
                         </Button>
                     </div>
