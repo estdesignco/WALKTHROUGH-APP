@@ -107,13 +107,14 @@ const ProjectList = ({ onSelectProject, isOffline }) => {
       )}
 
       {projects.length === 0 ? (
-        <div className="bg-gray-800 rounded-xl p-12 text-center">
+        <div className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-xl p-12 text-center border border-[#B49B7E]/20 shadow-2xl">
           <div className="text-6xl mb-4">🏗️</div>
-          <h3 className="text-xl font-semibold text-white mb-2">No Projects Yet</h3>
-          <p className="text-gray-400 mb-6">Get started by creating your first interior design project</p>
+          <h3 className="text-2xl font-light mb-2" style={{ color: '#F5F5DC' }}>No Projects Yet</h3>
+          <p className="mb-6" style={{ color: '#F5F5DC', opacity: '0.7' }}>Get started by creating your first interior design project</p>
           <button
             onClick={createSampleProject}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white px-8 py-3 rounded-lg transition-colors"
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-3 rounded-lg transition-all duration-300 shadow-lg"
+            style={{ color: '#F5F5DC' }}
           >
             Create Your First Project
           </button>
