@@ -1018,18 +1018,18 @@ const ExactFFESpreadsheet = ({
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* Cost/Price - PROPER INPUT FIELD */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <input 
-                                                              type="number" 
-                                                              value={item.cost || ''}
-                                                              placeholder="Cost"
-                                                              className="w-full bg-transparent text-white text-sm outline-none border-none"
-                                                              onChange={(e) => {
-                                                                handleItemFieldChange(item.id, 'cost', parseFloat(e.target.value) || 0);
-                                                              }}
-                                                              onBlur={(e) => console.log('Cost updated:', e.target.value)}
-                                                            />
+                                                          {/* Cost/Price - DIRECTLY EDITABLE */}
+                                                          <td 
+                                                            className="border border-gray-400 px-2 py-2 text-sm text-white"
+                                                            contentEditable
+                                                            suppressContentEditableWarning={true}
+                                                            onBlur={(e) => {
+                                                              const value = e.target.textContent;
+                                                              handleItemFieldChange(item.id, 'cost', parseFloat(value) || 0);
+                                                            }}
+                                                            style={{ minHeight: '20px' }}
+                                                          >
+                                                            {item.cost || ''}
                                                           </td>
                                                           
                                                           {/* Image - SCRAPED AUTOMATICALLY */}
