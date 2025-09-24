@@ -179,6 +179,7 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                     </p>
                 </div>
             </div>
+        </div>
                             
                             {/* Header with Elegant Background */}
                             <tr>
