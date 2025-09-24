@@ -1015,16 +1015,21 @@ const SimpleChecklistSpreadsheet = ({
                                             checked={checkedItems.has(item.id) || item.status === 'PICKED'}
                                             onChange={(e) => {
                                               const newCheckedItems = new Set(checkedItems);
+                                              const newStatus = e.target.checked ? 'PICKED' : '';
+                                              
                                               if (e.target.checked) {
                                                 newCheckedItems.add(item.id);
-                                                // Auto-set status to PICKED
-                                                handleStatusChange(item.id, 'PICKED');
                                               } else {
                                                 newCheckedItems.delete(item.id);
-                                                // Reset status to blank when unchecked
-                                                handleStatusChange(item.id, '');
                                               }
                                               setCheckedItems(newCheckedItems);
+                                              
+                                              // Update status and trigger reload to refresh dropdown
+                                              handleStatusChange(item.id, newStatus).then(() => {
+                                                if (onReload) {
+                                                  onReload();
+                                                }
+                                              });
                                             }}
                                           />
                                         </td>
