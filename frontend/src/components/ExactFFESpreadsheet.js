@@ -1172,21 +1172,44 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Tracking/Carrier (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
+                                                          <td 
+                                                            className="border border-gray-400 px-1 py-1 text-sm"
+                                                            style={{ 
+                                                              backgroundColor: getCarrierColor(item.carrier || '') + ' !important',
+                                                              background: getCarrierColor(item.carrier || ''),
+                                                              minWidth: '120px'
+                                                            }}
+                                                          >
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <input 
                                                                   type="text" 
                                                                   placeholder="Live Tracking #"
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Live tracking changed:', e.target.value)}
+                                                                  className="w-full h-full text-white text-xs p-0"
+                                                                  style={{ 
+                                                                    backgroundColor: getCarrierColor(item.carrier || ''),
+                                                                    background: getCarrierColor(item.carrier || ''),
+                                                                    border: '2px solid ' + getCarrierColor(item.carrier || ''),
+                                                                    borderRadius: '4px',
+                                                                    outline: 'none'
+                                                                  }}
+                                                                  value={item.tracking_number || ''}
+                                                                  onChange={(e) => handleItemFieldChange(item.id, 'tracking_number', e.target.value)}
                                                                 />
                                                               </div>
                                                               <div className="h-6">
                                                                 <select 
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
+                                                                  className="w-full h-full text-white text-xs p-0"
                                                                   value={item.carrier || ''}
-                                                                  style={{ backgroundColor: getCarrierColor(item.carrier || '') }}
+                                                                  style={{ 
+                                                                    backgroundColor: getCarrierColor(item.carrier || ''),
+                                                                    background: getCarrierColor(item.carrier || ''),
+                                                                    color: 'white !important',
+                                                                    border: '2px solid ' + getCarrierColor(item.carrier || ''),
+                                                                    borderRadius: '4px',
+                                                                    outline: 'none',
+                                                                    fontWeight: 'bold'
+                                                                  }}
                                                                   onChange={(e) => handleCarrierChange(item.id, e.target.value)}
                                                                 >
                                                                   <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>—</option>
