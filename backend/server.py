@@ -3323,6 +3323,13 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     pass  # Continue even if page doesn't fully load
             
             # Initialize result structure
+            print("🔍 STARTING ULTRA-ROBUST PRODUCT EXTRACTION...")
+            
+            # DUMP PAGE CONTENT FOR DEBUGGING
+            page_content = await page.content()
+            page_text = await page.inner_text('body')
+            print(f"📄 PAGE LENGTH: {len(page_content)} chars, BODY TEXT: {len(page_text)} chars")
+            
             result = {
                 'name': None,
                 'vendor': None,
