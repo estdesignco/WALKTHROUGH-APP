@@ -833,23 +833,6 @@ class ItemUpdate(BaseModel):
     order_date: Optional[datetime] = None
     install_date: Optional[datetime] = None
     image_url: Optional[str] = None
-    
-    # ENHANCED TRACKING FIELDS FOR UPDATES
-    sku: Optional[str] = None
-    finish_color: Optional[str] = None
-    price: Optional[float] = None
-    description: Optional[str] = None
-    availability: Optional[str] = None
-    carrier: Optional[str] = None
-    expected_delivery: Optional[datetime] = None
-    actual_delivery: Optional[datetime] = None
-    po_number: Optional[str] = None
-    invoice_number: Optional[str] = None
-    notes: Optional[str] = None
-    priority: Optional[str] = None
-    lead_time_weeks: Optional[int] = None
-    warranty_info: Optional[str] = None
-    installation_notes: Optional[str] = None
 
 class Item(ItemBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
