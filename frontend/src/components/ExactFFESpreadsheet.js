@@ -1417,10 +1417,10 @@ const ExactFFESpreadsheet = ({
                 if (e.target.value === 'CREATE_NEW') {
                   const categoryName = window.prompt('Enter new category name:');
                   if (categoryName && categoryName.trim()) {
-                    console.log('FFE Add new category:', categoryName);
+                    handleAddCategory(firstRoom.id, categoryName.trim());
                   }
                 } else if (e.target.value) {
-                  console.log('FFE Add existing category:', e.target.value);
+                  handleAddCategory(firstRoom.id, e.target.value);
                 }
               } else {
                 alert('Please add a room first before adding categories.');
