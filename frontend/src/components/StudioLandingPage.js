@@ -121,38 +121,37 @@ const StudioLandingPage = () => {
 
       {/* Main Content Container - Same as Questionnaire */}
       <div className="max-w-4xl mx-auto bg-gradient-to-br from-black/60 to-gray-900/80 p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
-        {/* Studio Projects Header and Action Buttons */}
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide">Studio Projects</h2>
+        {/* Header - Same style as Questionnaire */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide mb-6">Studio Projects</h2>
+          <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto"></div>
+        </div>
+
+        {/* Action Buttons - Same style as Questionnaire */}
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <button
+            onClick={handleNewClient}
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide"
+            style={{ color: '#F5F5DC' }}
+          >
+            + New Client
+          </button>
           
-          <div className="flex space-x-4">
-            <button
-              onClick={handleNewClient}
-              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 shadow-lg"
-              style={{ color: '#F5F5DC' }}
-            >
-              <span>+</span>
-              <span>New Client</span>
-            </button>
-            
-            <button
-              onClick={handleEmailNewClient}
-              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 shadow-lg"
-              style={{ color: '#F5F5DC' }}
-            >
-              <span>📧</span>
-              <span>Email New Client</span>
-            </button>
-            
-            <button
-              onClick={handleFullQuestionnaire}
-              className="bg-gradient-to-br from-black/80 to-gray-900/90 hover:from-gray-900/80 hover:to-black/90 px-6 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 border border-[#B49B7E]/30"
-              style={{ color: '#F5F5DC' }}
-            >
-              <span>+</span>
-              <span>Full Questionnaire</span>
-            </button>
-          </div>
+          <button
+            onClick={handleEmailNewClient}
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide"
+            style={{ color: '#F5F5DC' }}
+          >
+            📧 Email New Client
+          </button>
+          
+          <button
+            onClick={handleFullQuestionnaire}
+            className="bg-gradient-to-br from-black/80 to-gray-900/90 hover:from-gray-900/80 hover:to-black/90 px-8 py-4 text-xl font-medium rounded-full transition-all duration-300 border border-[#B49B7E]/30 tracking-wide"
+            style={{ color: '#F5F5DC' }}
+          >
+            + Full Questionnaire
+          </button>
         </div>
 
         {error && (
