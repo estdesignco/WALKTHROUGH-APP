@@ -221,7 +221,7 @@ const CustomerLandingPage = () => {
                             <ArrowRight className="ml-4 w-6 h-6" />
                         </Button>
                         
-                        <div className="flex items-center gap-6 text-white/60 text-sm">
+                        <div className="flex items-center gap-6 text-sm" style={{ color: '#F5F5DC', opacity: '0.7' }}>
                             <div className="flex items-center gap-2">
                                 <CheckCircle className="w-4 h-4 text-[#B49B7E]" />
                                 <span>Takes 10-15 minutes</span>
