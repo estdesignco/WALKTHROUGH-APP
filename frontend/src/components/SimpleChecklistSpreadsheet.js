@@ -1104,7 +1104,7 @@ const SimpleChecklistSpreadsheet = ({
                                   >
                                     <select 
                                       className="w-full text-white text-xs"
-                                      value={getDisplayStatus(item.status || '')}
+                                      value={item.status || ''}
                                       style={{ 
                                         backgroundColor: getStatusColor(item.status || ''),
                                         background: getStatusColor(item.status || ''),
