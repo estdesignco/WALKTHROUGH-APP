@@ -63,7 +63,7 @@ const Navigation = ({ currentProject, isOffline }) => {
                 <Link
                   to={`/project/${currentProject.id}/ffe`}
                   className={`px-4 py-2 rounded-lg transition-colors ${
-                    location.pathway.includes('/ffe') 
+                    location.pathname.includes('/ffe') 
                       ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-[#F5F5DC]' 
                       : 'text-[#F5F5DC]/70 hover:bg-[#B49B7E]/20'
                   }`}
