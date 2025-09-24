@@ -201,9 +201,9 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST */}
-      <div className="bg-gray-800 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Status Breakdown</h3>
+      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST with Beautiful Rounded Treatment */}
+      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl p-6 border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
+        <h3 className="text-lg font-semibold text-[#B49B7E] mb-4 tracking-wide">Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
