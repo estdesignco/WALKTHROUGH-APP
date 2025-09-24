@@ -438,7 +438,7 @@ export default function Questionnaire() {
                         </FieldWrapper>
                         <InputField label="Who will be the primary decision maker(s) for this project?" id="primary_decision_maker" value={formData.primary_decision_maker || ''} onChange={(e) => handleFormChange('primary_decision_maker', e.target.value)} />
                         <FieldWrapper label="How involved would you like to be in the design process?">
-                            <RadioGroup value={formData.involvement_level} onValueChange={(value) => handleFormData('involvement_level', value)} className="text-[#F5F5DC]">
+                            <RadioGroup value={formData.involvement_level} onValueChange={(value) => handleFormChange('involvement_level', value)} className="text-[#F5F5DC]">
                                 <div className="flex flex-col space-y-3">
                                     <div className="flex items-center space-x-3">
                                         <RadioGroupItem value="Very involved - I want to approve every detail" id="very-involved" className="border-[#B49B7E]/50 text-[#B49B7E]" />
