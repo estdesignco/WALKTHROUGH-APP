@@ -127,12 +127,13 @@ const StudioLandingPage = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Studio Projects Header and Action Buttons */}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-semibold text-yellow-400">Studio Projects</h2>
+          <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide">Studio Projects</h2>
           
           <div className="flex space-x-4">
             <button
               onClick={handleNewClient}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 shadow-lg"
+              style={{ color: '#F5F5DC' }}
             >
               <span>+</span>
               <span>New Client</span>
@@ -140,7 +141,8 @@ const StudioLandingPage = () => {
             
             <button
               onClick={handleEmailNewClient}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 shadow-lg"
+              style={{ color: '#F5F5DC' }}
             >
               <span>📧</span>
               <span>Email New Client</span>
@@ -148,7 +150,8 @@ const StudioLandingPage = () => {
             
             <button
               onClick={handleFullQuestionnaire}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+              className="bg-gradient-to-br from-black/80 to-gray-900/90 hover:from-gray-900/80 hover:to-black/90 px-6 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 border border-[#B49B7E]/30"
+              style={{ color: '#F5F5DC' }}
             >
               <span>+</span>
               <span>Full Questionnaire</span>
