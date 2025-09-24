@@ -1679,12 +1679,10 @@ async def create_room(room_data: RoomCreate):
         }
         structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
         
-        # SMART AUTO-POPULATE: Structure for all sheets, items only for walkthrough
-        # Checklist/FFE get categories+subcategories but NO items (preserves transfer)
+        # CRITICAL FIX: Only auto-populate if walkthrough sheet_type
+        # For checklist/ffe sheet_types, create COMPLETELY EMPTY room to preserve transfer functionality
         if room_data.sheet_type != "walkthrough":
-            print(f"📋 {room_data.sheet_type.upper()} ROOM: Creating with structure but NO ITEMS (preserves transfer)")
-            
-            # Create room with comprehensive STRUCTURE but empty items
+            print(f"🚫 CHECKLIST/FFE ROOM: Creating COMPLETELY EMPTY room to preserve transfer functionality")
             room_dict = {
                 "id": str(uuid.uuid4()),
                 "name": room_data.name,
@@ -1692,118 +1690,25 @@ async def create_room(room_data: RoomCreate):
                 "order_index": room_data.order_index,
                 "sheet_type": room_data.sheet_type,
                 "project_id": room_data.project_id,
-                "categories": [],  # Will populate with structure below
+                "categories": [],  # COMPLETELY EMPTY - no categories, no subcategories
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
             
-            # Add comprehensive structure but NO items
-            structure_key = room_data.name.lower()
-            room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(structure_key)
-            
-            print(f"🔍 DEBUG: structure_key='{structure_key}', room_structure found: {room_structure is not None}")
-            if room_structure:
-                categories_list = room_structure.get("categories", [])
-                print(f"🔍 DEBUG: categories_list length: {len(categories_list)}")
-                print(f"📁 Adding comprehensive structure for {room_data.name}")
-                for i, category_obj in enumerate(categories_list):
-                    print(f"🔍 DEBUG: Processing category {i}: {category_obj.get('name', 'UNKNOWN')}")
-                    category_id = str(uuid.uuid4())
-                    category_dict = {
-                        "id": category_id,
-                        "room_id": room_dict["id"],
-                        "name": category_obj["name"],
-                        "color": category_obj.get("color", get_category_color(category_obj["name"])),
-                        "order_index": 0,
-                        "subcategories": [],
-                        "created_at": datetime.utcnow(),
-                        "updated_at": datetime.utcnow()
-                    }
-                    
-                    subcategories_list = category_obj.get("subcategories", [])
-                    print(f"🔍 DEBUG: Category '{category_obj['name']}' has {len(subcategories_list)} subcategories")
-                    for j, subcategory_obj in enumerate(subcategories_list):
-                        print(f"🔍 DEBUG: Processing subcategory {j}: {subcategory_obj.get('name', 'UNKNOWN')}")
-                        subcategory_dict = {
-                            "id": str(uuid.uuid4()),
-                            "category_id": category_id,
-                            "name": subcategory_obj["name"],
-                            "color": subcategory_obj.get("color", get_subcategory_color(subcategory_obj["name"])),
-                            "order_index": 0,
-                            "items": [],  # NO ITEMS - preserves transfer functionality
-                            "created_at": datetime.utcnow(),
-                            "updated_at": datetime.utcnow()
-                        }
-                        category_dict["subcategories"].append(subcategory_dict)
-                    
-                    room_dict["categories"].append(category_dict)
-                    print(f"🔍 DEBUG: Added category '{category_obj['name']}' with {len(category_dict['subcategories'])} subcategories")
-                
-                print(f"🔍 DEBUG: Final room_dict has {len(room_dict['categories'])} categories")
-            
-            # Store room data in separate collections for consistency (same as walkthrough)
-            room_id = room_dict["id"]
-            
-            # First, insert the room (without nested categories)
+            # Insert ONLY the basic room - NO categories or subcategories to preserve transfer
             room_basic = {
-                "id": room_id,
+                "id": room_dict["id"],
                 "project_id": room_dict["project_id"],
                 "name": room_dict["name"],
                 "description": room_dict.get("description", ""),
                 "order_index": room_dict.get("order_index", 0),
-                "sheet_type": room_dict.get("sheet_type", "checklist"),
+                "sheet_type": room_dict.get("sheet_type"),
                 "color": get_room_color(room_dict["name"]),
                 "created_at": room_dict["created_at"],
                 "updated_at": room_dict["updated_at"]
             }
             
-            try:
-                await db.rooms.insert_one(room_basic)
-                print(f"✅ Room inserted successfully: {room_id}")
-            except Exception as e:
-                print(f"❌ Failed to insert room: {str(e)}")
-                raise HTTPException(status_code=500, detail=f"Failed to insert room: {str(e)}")
-            
-            # Then insert categories and subcategories separately (NO ITEMS for checklist/FFE)
-            for category_data in room_dict["categories"]:
-                category_basic = {
-                    "id": category_data["id"],
-                    "room_id": room_id,
-                    "name": category_data["name"],
-                    "description": "",
-                    "order_index": 0,
-                    "color": category_data["color"],
-                    "created_at": category_data["created_at"],
-                    "updated_at": category_data["updated_at"]
-                }
-                
-                try:
-                    await db.categories.insert_one(category_basic)
-                    print(f"✅ Category inserted: {category_data['name']}")
-                except Exception as e:
-                    print(f"❌ Failed to insert category {category_data['name']}: {str(e)}")
-                
-                # Insert subcategories (but NO items - preserves transfer functionality)
-                for subcategory_data in category_data["subcategories"]:
-                    subcategory_basic = {
-                        "id": subcategory_data["id"],
-                        "category_id": category_data["id"],
-                        "name": subcategory_data["name"],
-                        "description": "",
-                        "order_index": 0,
-                        "color": subcategory_data["color"],
-                        "created_at": subcategory_data["created_at"],
-                        "updated_at": subcategory_data["updated_at"]
-                    }
-                    
-                    try:
-                        await db.subcategories.insert_one(subcategory_basic)
-                        print(f"✅ Subcategory inserted: {subcategory_data['name']}")
-                    except Exception as e:
-                        print(f"❌ Failed to insert subcategory {subcategory_data['name']}: {str(e)}")
-                    # NOTE: NO items inserted - this preserves transfer functionality
-            
-            # Return the room with full structure (as expected by the frontend)
+            await db.rooms.insert_one(room_basic)
             return Room(**room_dict)
         
         # WALKTHROUGH ROOMS: Get FULL comprehensive structure for this room
