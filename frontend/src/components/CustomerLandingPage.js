@@ -291,9 +291,12 @@ const CustomerLandingPage = () => {
             {/* Footer */}
             <footer className="py-12 px-6 bg-black">
                 <div className="max-w-4xl mx-auto text-center">
-                    <div className="text-2xl font-light tracking-widest text-[#B49B7E] mb-4">
-                        ESTABLISHED DESIGN CO.
-                    </div>
+                    <img
+                        src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
+                        alt="Established Design Co."
+                        className="h-12 mx-auto object-contain mb-4"
+                        style={{ filter: 'brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(664%) hue-rotate(349deg) brightness(95%) contrast(88%)' }}
+                    />
                     <p className="text-sm mb-6" style={{ color: '#F5F5DC', opacity: '0.7' }}>
                         Creating extraordinary spaces since 2020
                     </p>
