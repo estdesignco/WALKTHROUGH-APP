@@ -54,8 +54,8 @@ const Navigation = ({ currentProject, isOffline }) => {
                   to={`/project/${currentProject.id}/checklist`}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     location.pathname.includes('/checklist') 
-                      ? 'bg-yellow-600 text-white' 
-                      : 'text-gray-300 hover:bg-gray-700'  
+                      ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-[#F5F5DC]' 
+                      : 'text-[#F5F5DC]/70 hover:bg-[#B49B7E]/20'  
                   }`}
                 >
                   ✅ Checklist
