@@ -82,18 +82,19 @@ const ProjectList = ({ onSelectProject, isOffline }) => {
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Interior Design Projects</h1>
-          <p className="text-gray-400">Select a project to manage FF&E or create a new one</p>
+          <h1 className="text-4xl font-light text-[#B49B7E] mb-2 tracking-wide">Interior Design Projects</h1>
+          <p style={{ color: '#F5F5DC', opacity: '0.8' }}>Select a project to manage FF&E or create a new one</p>
         </div>
         
         <div className="flex space-x-4">
           <button
             onClick={createSampleProject}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-lg transition-all duration-300 shadow-lg"
+            style={{ color: '#F5F5DC' }}
           >
             🏠 Create Sample Project
           </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors">
+          <button className="bg-gradient-to-br from-black/80 to-gray-900/90 hover:from-gray-900/80 hover:to-black/90 px-6 py-3 rounded-lg transition-all duration-300 border border-[#B49B7E]/30" style={{ color: '#F5F5DC' }}>
             📥 Import from Sheets
           </button>
         </div>
