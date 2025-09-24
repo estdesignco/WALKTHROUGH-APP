@@ -183,12 +183,12 @@ class FeatureStatusChecker:
             return False
         
         # Test comprehensive category creation endpoint
-        category_data = {
+        params = {
             "room_id": self.walkthrough_room_id,
             "category_name": "Lighting"
         }
         
-        success, response, status_code = self.make_request('POST', '/categories/comprehensive', category_data)
+        success, response, status_code = self.make_request('POST', '/categories/comprehensive', params=params)
         
         if not success:
             self.log_test("ADD CATEGORY (Comprehensive)", False, f"Failed: {response} (Status: {status_code})")
