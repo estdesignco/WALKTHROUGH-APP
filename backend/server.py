@@ -186,7 +186,7 @@ async def get_project(project_id: str):
         
         # For each room, get its items
         for room in rooms:
-            room_id = room["id"]
+            room_id = str(room["_id"])  # Use _id and convert to string
             items_cursor = items_collection.find({"room_id": room_id})
             items = await items_cursor.to_list(length=None)
             room["items"] = [serialize_doc(item) for item in items]
