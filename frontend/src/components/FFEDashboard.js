@@ -294,29 +294,27 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
             </div>
           </>
         )}
+
+        {/* Page Title - Luxury Style */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide mb-6">FF&E - GREENE</h2>
+          <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto"></div>
         </div>
 
         {!hideNavigation && (
           <>
-            {/* FF&E TITLE WITH EXPORT BUTTONS */}
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>FF&E - GREENE</h3>
-              <div className="flex space-x-4">
-                <button
-                  style={{ backgroundColor: '#8b7355' }}
-                  className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
-                >
-                  <span>📥</span>
-                  <span>Export FF&E</span>
-                </button>
-                <button
-                  style={{ backgroundColor: '#8b7355' }}
-                  className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
-                >
-                  <span>📋</span>
-                  <span>Spec Sheet</span>
-                </button>
-              </div>
+            {/* Action Buttons - Same style as Studio Dashboard */}
+            <div className="flex justify-center gap-4 mb-8">
+              <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2"
+                      style={{ color: '#F5F5DC' }}>
+                <span>📥</span>
+                <span>Export FF&E</span>
+              </button>
+              <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2"
+                      style={{ color: '#F5F5DC' }}>
+                <span>📋</span>
+                <span>Spec Sheet</span>
+              </button>
             </div>
 
             {/* SEARCH BAR AND ADD ROOM BUTTON */}
