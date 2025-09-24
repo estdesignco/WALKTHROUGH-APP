@@ -1679,60 +1679,9 @@ async def create_room(room_data: RoomCreate):
         }
         structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
         
-        # SMART FIX: Checklist/FFE get structure but NO ITEMS (preserves transfer)
-        # Transfer adds items to existing empty structure
-        if room_data.sheet_type != "walkthrough":
-            print(f"📋 {room_data.sheet_type.upper()} ROOM: Creating with STRUCTURE but NO ITEMS (preserves transfer)")
-            
-            # Get comprehensive structure
-            structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
-            room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(structure_key)
-            
-            room_dict = {
-                "id": str(uuid.uuid4()),
-                "name": room_data.name,
-                "description": room_data.description,
-                "order_index": room_data.order_index,
-                "sheet_type": room_data.sheet_type,
-                "project_id": room_data.project_id,
-                "categories": [],
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow()
-            }
-            
-            if room_structure:
-                # Add categories and subcategories but NO ITEMS
-                categories_list = room_structure.get("categories", [])
-                for category_obj in categories_list:
-                    category_dict = {
-                        "id": str(uuid.uuid4()),
-                        "room_id": room_dict["id"],  # REQUIRED FIELD - was missing!
-                        "name": category_obj["name"],
-                        "color": category_obj.get("color", get_category_color(category_obj["name"])),
-                        "order_index": 0,
-                        "subcategories": [],
-                        "created_at": datetime.utcnow(),
-                        "updated_at": datetime.utcnow()
-                    }
-                    
-                    # Add subcategories but NO ITEMS (transfer will add items here)
-                    for subcategory_obj in category_obj.get("subcategories", []):
-                        subcategory_dict = {
-                            "id": str(uuid.uuid4()),
-                            "category_id": category_dict["id"],  # REQUIRED FIELD - was missing!
-                            "name": subcategory_obj["name"],
-                            "color": subcategory_obj.get("color", get_subcategory_color(subcategory_obj["name"])),
-                            "order_index": 0,
-                            "items": [],  # NO ITEMS - transfer adds here
-                            "created_at": datetime.utcnow(),
-                            "updated_at": datetime.utcnow()
-                        }
-                        category_dict["subcategories"].append(subcategory_dict)
-                    
-                    room_dict["categories"].append(category_dict)
-            
-            result = await db.rooms.insert_one(room_dict)
-            return Room(**room_dict)
+        # AUTO-POPULATE ALL ROOM TYPES with full comprehensive structure INCLUDING ITEMS
+        # Transfer is separate - it adds checked items to existing structure
+        print(f"📋 {room_data.sheet_type.upper()} ROOM: Creating with FULL STRUCTURE INCLUDING ITEMS")
         
         # WALKTHROUGH ROOMS: Get FULL comprehensive structure for this room
         room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(structure_key)
