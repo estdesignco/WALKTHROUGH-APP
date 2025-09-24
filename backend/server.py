@@ -3402,23 +3402,108 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            # 2. PRICE - 30+ price selector patterns  
-            for selector in [
-                '.price .money, .product-price .money, [data-price]',
-                '.product__price, .price__sale, .price__regular, .price-current',
-                'span[class*="price"], div[class*="price"]',
-                '.product-meta .price, .pricing .price',
-                '[class*="dollar"], [class*="currency"], [class*="cost"]'
-            ]:
+            # 💰 ULTRA-POWERFUL PRICE EXTRACTION - 100+ strategies
+            price_selectors = [
+                # Standard price selectors
+                '.price', '.product-price', '.cost', '.price-current', '.price-now',
+                '.sale-price', '.regular-price', '.price-display', '.product-cost',
+                '[data-testid*="price"]', '[data-testid*="cost"]', '.item-price',
+                
+                # Vendor-specific price selectors
+                '.four-hands-price', '.uttermost-price', '.visual-comfort-price',
+                '.rowe-price', '.regina-andrew-price', '.bernhardt-price',
+                '.loloi-price', '.global-views-price', '.hvl-price',
+                '.vh-price', '.flow-decor-price', '.crestview-price',
+                '.bassett-price', '.eichholtz-price', '.myoh-price',
+                '.safavieh-price', '.gabby-price', '.surya-price',
+                
+                # Advanced selectors
+                '.pricing', '.price-amount', '[class*="price"]', '[id*="price"]',
+                '.price-box .price', '.product-price-value', '.price-current',
+                '.product-price-current', '.price-range', '.product-pricing',
+                '.price-display', '.product-cost-display', '.pricing-info',
+                '.item-pricing', '.price-info', '.product-price-info',
+                '.rug-price', '.product-rug-price', '.item-cost',
+                '.global-price', '.hvl-pricing', '.product-hvl-price',
+                '.vh-price', '.vandh-pricing', '.flow-price', '.decor-pricing',
+                '.crest-price', '.collection-price', '.mirror-price',
+                '.bassett-pricing', '.eich-price', '.luxury-pricing',
+                '.myoh-price', '.america-pricing', '.safa-price',
+                '.dealer-price', '.gabby-price', '.home-pricing',
+                '.surya-price', '.rug-cost', '.zeev-price', '.lighting-cost',
+                '.forge-price', '.handmade-cost', '.hinkley-price',
+                '.light-cost', '.elegant-price', '.crystal-cost',
+                
+                # Money/currency selectors
+                '[class*="dollar"]', '[class*="currency"]', '[class*="amount"]',
+                '[class*="money"]', '.product-meta .price', '.pricing .price',
+                'span[class*="price"]', 'div[class*="price"]', 'p[class*="price"]',
+                
+                # Text-based selectors
+                'span:contains("$")', 'div:contains("$")', 'p:contains("$")',
+                'span:contains("Price")', 'div:contains("Price")', 'p:contains("Price")',
+                'span:contains("Cost")', 'div:contains("Cost")', 'p:contains("Cost")',
+                
+                # Data attributes
+                '[data-price]', '[data-cost]', '[data-amount]', '[data-value]',
+                
+                # Generic patterns
+                '.product .price', '.item .price', '.details .price',
+                '.info .price', '.summary .price', '.content .price'
+            ]
+            
+            for selector in price_selectors:
                 try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        price_text = await element.text_content()
-                        if price_text and '$' in price_text:
-                            result['cost'] = price_text.strip()
-                            result['price'] = price_text.strip()
-                            print(f"✅ PRICE: {result['price']}")
+                    elements = await page.query_selector_all(selector)
+                    for element in elements:
+                        # Try multiple text extraction methods
+                        price_text = await element.text_content() or await element.inner_text()
+                        price_value = await element.get_attribute('data-price')
+                        price_content = await element.get_attribute('content')
+                        
+                        price_candidates = [price_text, price_value, price_content]
+                        
+                        for candidate in price_candidates:
+                            if not candidate:
+                                continue
+                                
+                            # Ultra-robust price pattern matching
+                            import re
+                            
+                            # Multiple price patterns
+                            patterns = [
+                                r'\$\s*([0-9,]+\.?[0-9]*)',  # $123.45, $123
+                                r'([0-9,]+\.?[0-9]*)\s*\$',  # 123.45$
+                                r'USD\s*([0-9,]+\.?[0-9]*)', # USD 123.45
+                                r'([0-9,]+\.?[0-9]*)\s*USD', # 123.45 USD
+                                r'Price:\s*\$?([0-9,]+\.?[0-9]*)', # Price: $123.45
+                                r'Cost:\s*\$?([0-9,]+\.?[0-9]*)',  # Cost: $123.45
+                                r'([0-9,]+\.?[0-9]*)', # Just numbers
+                            ]
+                            
+                            for pattern in patterns:
+                                match = re.search(pattern, candidate)
+                                if match:
+                                    price_num = match.group(1).replace(',', '')
+                                    try:
+                                        price_float = float(price_num)
+                                        # Validate reasonable price range
+                                        if 0.01 <= price_float <= 999999:
+                                            result['cost'] = price_float
+                                            result['price'] = f"${price_float:.2f}"
+                                            print(f"✅ ULTRA PRICE FOUND: ${price_float:.2f}")
+                                            break
+                                    except:
+                                        continue
+                            
+                            if 'cost' in result:
+                                break
+                        
+                        if 'cost' in result:
                             break
+                    
+                    if 'cost' in result:
+                        break
                 except:
                     continue
             
