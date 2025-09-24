@@ -49,7 +49,7 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                 
                 <p style={{
                     fontSize: '16px',
-                    color: '#E0E0E0',
+                    color: '#F5F5DC',
                     textAlign: 'center',
                     fontStyle: 'italic',
                     margin: '0 0 30px 0'
