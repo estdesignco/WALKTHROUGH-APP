@@ -52,7 +52,7 @@ const CustomerLandingPage = () => {
                     </div>
 
                     {/* Tagline */}
-                    <p className="text-xl md:text-2xl font-light text-white/80 mb-8 max-w-3xl mx-auto leading-relaxed">
+                    <p className="text-xl md:text-2xl font-light mb-8 max-w-3xl mx-auto leading-relaxed" style={{ color: '#F5F5DC' }}>
                         Creating extraordinary spaces that reflect your unique story and elevate your everyday life
                     </p>
 
