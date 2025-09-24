@@ -112,9 +112,9 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
                         id={option}
                         checked={value.includes(option)}
                         onCheckedChange={(checked) => handleCheckedChange(option, checked)}
-                        className="border-stone-400 data-[state=checked]:bg-[#F5F5DC] data-[state=checked]:border-[#F5F5DC] data-[state=checked]:text-[#8B7355]"
+                        className="border-[#B49B7E]/50 data-[state=checked]:bg-[#B49B7E] data-[state=checked]:border-[#B49B7E] data-[state=checked]:text-white"
                     />
-                    <label htmlFor={option} className="text-sm font-medium leading-none text-[#F5F5DC]">
+                    <label htmlFor={option} className="text-sm font-light leading-relaxed text-[#F5F5DC]/90">
                         {option}
                     </label>
                 </div>
