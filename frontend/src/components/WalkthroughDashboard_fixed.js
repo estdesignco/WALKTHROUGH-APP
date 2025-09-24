@@ -419,4 +419,4 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
   );
 };
 
-export default ChecklistDashboard;
+export default WalkthroughDashboard;
