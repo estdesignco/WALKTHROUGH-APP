@@ -384,7 +384,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
         )}
 
         {/* PIE CHART AND STATUS BREAKDOWN - ALWAYS VISIBLE */}
-        <ChecklistStatusOverview
+        <StatusOverview
           totalItems={getTotalItems()}
           statusBreakdown={getStatusBreakdown()}
           carrierBreakdown={getCarrierBreakdown()}
