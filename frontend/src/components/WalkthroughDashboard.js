@@ -252,13 +252,22 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
   };
 
   return (
-    <div className="max-w-full mx-auto bg-gradient-to-b from-black via-gray-900 to-black min-h-screen">
-      {/* TOP HEADER */}
-      <div className="mb-6">
-        <div className="text-center mb-4">
-          <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
-          <p style={{ color: '#F5F5DC', opacity: '0.8' }}>Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+      {/* Header with Logo - Same as Studio Dashboard */}
+      <div className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center px-2 py-1" style={{ height: '180px' }}>
+        <img
+          src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
+          alt="Established Design Co."
+          className="w-full h-full object-contain"
+          style={{ transform: 'scale(2.2)', maxWidth: '98%', maxHeight: '95%' }}
+        />
+      </div>
+
+      {/* Project Header */}
+      <div className="text-center py-6">
+        <h1 className="text-4xl font-light text-[#B49B7E] mb-2 tracking-wide">GREENE</h1>
+        <p className="text-lg" style={{ color: '#F5F5DC', opacity: '0.8' }}>Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
+      </div>
 
         {!hideNavigation && (
           <>
