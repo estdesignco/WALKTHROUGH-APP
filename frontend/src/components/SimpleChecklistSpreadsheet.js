@@ -1117,19 +1117,27 @@ const SimpleChecklistSpreadsheet = ({
                                     </div>
                                   </td>
                                   
-                                  {/* STATUS - DROPDOWN WITH COLORED CELL CONTAINER */}
+                                  {/* STATUS - DROPDOWN WITH FORCED COLORED CELL */}
                                   <td 
-                                    className="border border-gray-400 px-2 py-1 text-white text-sm"
-                                    style={{ backgroundColor: getStatusColor(item.status || '') }}
+                                    className="border border-gray-400 px-1 py-1 text-white text-sm"
+                                    style={{ 
+                                      backgroundColor: getStatusColor(item.status || '') + ' !important',
+                                      background: getStatusColor(item.status || ''),
+                                      minWidth: '120px'
+                                    }}
                                   >
                                     <select 
-                                      className="text-white text-xs border-none w-full bg-transparent"
+                                      className="w-full text-white text-xs"
                                       value={getDisplayStatus(item.status || '')}
                                       style={{ 
-                                        backgroundColor: 'transparent',
-                                        color: 'white',
-                                        border: 'none',
-                                        outline: 'none'
+                                        backgroundColor: getStatusColor(item.status || ''),
+                                        background: getStatusColor(item.status || ''),
+                                        color: 'white !important',
+                                        border: '2px solid ' + getStatusColor(item.status || ''),
+                                        borderRadius: '4px',
+                                        padding: '2px',
+                                        outline: 'none',
+                                        fontWeight: 'bold'
                                       }}
                                       onChange={(e) => handleStatusChange(item.id, e.target.value)}
                                     >
