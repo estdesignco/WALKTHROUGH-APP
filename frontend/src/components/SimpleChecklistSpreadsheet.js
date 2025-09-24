@@ -988,7 +988,20 @@ const SimpleChecklistSpreadsheet = ({
                               <thead>
                                 <tr>
                                   <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-8" style={{ backgroundColor: '#8B4444' }}>✓</th>
-                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
+                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>
+                                    {subcategory.name.toUpperCase()}
+                                    <button
+                                      onClick={() => {
+                                        if (window.confirm(`Delete subcategory "${subcategory.name}" and all its items?`)) {
+                                          handleDeleteSubcategory(subcategory.id);
+                                        }
+                                      }}
+                                      className="ml-2 text-white hover:text-red-200 text-xs"
+                                      title={`Delete ${subcategory.name} subcategory`}
+                                    >
+                                      🗑️
+                                    </button>
+                                  </th>
                                   <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
                                   <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
                                   <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
