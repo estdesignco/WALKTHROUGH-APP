@@ -177,11 +177,6 @@ const SimpleChecklistSpreadsheet = ({
 
   const getCategoryColor = () => '#065F46';  // Dark green for categories
 
-  // Convert PICKED status to blank for display (preserves transfer functionality)
-  const getDisplayStatus = (status) => {
-    return status === 'PICKED' ? '' : status;
-  };
-
   // Status colors mapping for checklist - MATCHES STATUS BREAKDOWN COLORS
   const getStatusColor = (status) => {
     const statusColors = {
