@@ -1117,13 +1117,16 @@ const SimpleChecklistSpreadsheet = ({
                                     </div>
                                   </td>
                                   
-                                  {/* STATUS - DROPDOWN (KEEP AS IS) */}
-                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                  {/* STATUS - DROPDOWN WITH COLORED CELL CONTAINER */}
+                                  <td 
+                                    className="border border-gray-400 px-2 py-1 text-white text-sm"
+                                    style={{ backgroundColor: getStatusColor(item.status || '') }}
+                                  >
                                     <select 
-                                      className="text-white text-xs border-none w-full"
+                                      className="text-white text-xs border-none w-full bg-transparent"
                                       value={getDisplayStatus(item.status || '')}
                                       style={{ 
-                                        backgroundColor: getStatusColor(item.status || ''), 
+                                        backgroundColor: 'transparent',
                                         color: 'white',
                                         border: 'none',
                                         outline: 'none'
