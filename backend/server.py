@@ -3688,9 +3688,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 '.product-specs td, .specifications td, .spec-table td',
                 '.product-details li, .specs li, .attributes li',
                 
-                # Text-based search
-                '*:has-text("Dimensions"), *:has-text("Size"), *:has-text("Measurements")',
-                'span:has-text("W"), span:has-text("H"), span:has-text("D")'
+                # Generic areas that might contain dimensions
+                '.product-info, .product-details, .specifications, .product-meta'
             ]
             
             for strategy in size_strategies:
