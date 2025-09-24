@@ -153,15 +153,16 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">❌</div>
-        <h2 className="text-2xl font-bold text-gray-200 mb-2">Error Loading Project</h2>
-        <p className="text-gray-400">{error}</p>
+        <h2 className="text-2xl font-light mb-2" style={{ color: '#F5F5DC' }}>Error Loading Project</h2>
+        <p style={{ color: '#F5F5DC', opacity: '0.7' }}>{error}</p>
         <button 
           onClick={() => {
             setError(null);
             setLoading(true);
             loadSimpleProject();
           }}
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          className="mt-4 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-lg transition-all duration-300"
+          style={{ color: '#F5F5DC' }}
         >
           Retry
         </button>
