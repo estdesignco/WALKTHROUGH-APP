@@ -156,9 +156,8 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                         src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
                         alt="Established Design Co." 
                         style={{
-                            height: '30px',
-                            objectFit: 'contain',
-                            filter: 'brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(664%) hue-rotate(349deg) brightness(95%) contrast(88%)'
+                            height: '50px',
+                            objectFit: 'contain'
                         }} 
                     />
                     <p style={{
