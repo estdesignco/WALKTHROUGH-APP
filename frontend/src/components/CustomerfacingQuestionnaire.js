@@ -407,12 +407,12 @@ export default function Questionnaire() {
                 </div>
 
                 {/* Header with your actual logo */}
-                <div className="w-full bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center my-8 rounded-2xl p-6" style={{ minHeight: '130px' }}>
+                <div className="w-full bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center my-8 rounded-2xl p-1" style={{ minHeight: '130px' }}>
                     <img
                         src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
                         alt="Established Design Co."
-                        className="max-w-full h-auto max-h-24 object-contain"
-                        style={{ filter: 'brightness(0) invert(1)' }} // Makes the logo white against the gradient
+                        className="w-full h-full object-contain"
+                        style={{ maxHeight: '128px' }}
                     />
                 </div>
 
