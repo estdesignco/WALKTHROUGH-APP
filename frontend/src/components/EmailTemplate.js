@@ -67,7 +67,7 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                     <p style={{
                         fontSize: '15px',
                         lineHeight: '1.6',
-                        color: '#D0D0D0',
+                        color: '#F5F5DC',
                         margin: '0 0 20px 0'
                     }}>
                         Creating your dream space begins with understanding your unique story, lifestyle, and vision. We've carefully crafted a comprehensive questionnaire that will help us design a space that truly reflects who you are.
@@ -76,7 +76,7 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                     <p style={{
                         fontSize: '15px',
                         lineHeight: '1.6',
-                        color: '#D0D0D0',
+                        color: '#F5F5DC',
                         margin: '0 0 20px 0'
                     }}>
                         This personalized assessment takes approximately <strong style={{ color: '#B49B7E' }}>10-15 minutes</strong> and covers everything from your design preferences to your family's daily routines.
