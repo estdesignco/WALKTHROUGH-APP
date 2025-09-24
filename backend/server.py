@@ -1679,37 +1679,9 @@ async def create_room(room_data: RoomCreate):
         }
         structure_key = room_name_mapping.get(room_name_lower, room_name_lower)
         
-        # CRITICAL FIX: Only auto-populate if walkthrough sheet_type
-        # For checklist/ffe sheet_types, create COMPLETELY EMPTY room to preserve transfer functionality
-        if room_data.sheet_type != "walkthrough":
-            print(f"🚫 CHECKLIST/FFE ROOM: Creating COMPLETELY EMPTY room to preserve transfer functionality")
-            room_dict = {
-                "id": str(uuid.uuid4()),
-                "name": room_data.name,
-                "description": room_data.description,
-                "order_index": room_data.order_index,
-                "sheet_type": room_data.sheet_type,
-                "project_id": room_data.project_id,
-                "categories": [],  # COMPLETELY EMPTY - no categories, no subcategories
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow()
-            }
-            
-            # Insert ONLY the basic room - NO categories or subcategories to preserve transfer
-            room_basic = {
-                "id": room_dict["id"],
-                "project_id": room_dict["project_id"],
-                "name": room_dict["name"],
-                "description": room_dict.get("description", ""),
-                "order_index": room_dict.get("order_index", 0),
-                "sheet_type": room_dict.get("sheet_type"),
-                "color": get_room_color(room_dict["name"]),
-                "created_at": room_dict["created_at"],
-                "updated_at": room_dict["updated_at"]
-            }
-            
-            await db.rooms.insert_one(room_basic)
-            return Room(**room_dict)
+        # AUTO-POPULATE ALL SHEET TYPES with full comprehensive structure
+        # All rooms (walkthrough, checklist, FFE) get the same comprehensive structure
+        print(f"📋 {room_data.sheet_type.upper()} ROOM: Creating with full comprehensive structure")
         
         # WALKTHROUGH ROOMS: Get FULL comprehensive structure for this room
         room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(structure_key)
