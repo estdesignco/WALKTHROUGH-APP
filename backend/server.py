@@ -1741,6 +1741,55 @@ async def create_room(room_data: RoomCreate):
                 
                 print(f"🔍 DEBUG: Final room_dict has {len(room_dict['categories'])} categories")
             
+            # Store room data in separate collections for consistency (same as walkthrough)
+            room_id = room_dict["id"]
+            
+            # First, insert the room (without nested categories)
+            room_basic = {
+                "id": room_id,
+                "project_id": room_dict["project_id"],
+                "name": room_dict["name"],
+                "description": room_dict.get("description", ""),
+                "order_index": room_dict.get("order_index", 0),
+                "sheet_type": room_dict.get("sheet_type", "checklist"),
+                "color": get_room_color(room_dict["name"]),
+                "created_at": room_dict["created_at"],
+                "updated_at": room_dict["updated_at"]
+            }
+            
+            await db.rooms.insert_one(room_basic)
+            
+            # Then insert categories and subcategories separately (NO ITEMS for checklist/FFE)
+            for category_data in room_dict["categories"]:
+                category_basic = {
+                    "id": category_data["id"],
+                    "room_id": room_id,
+                    "name": category_data["name"],
+                    "description": "",
+                    "order_index": 0,
+                    "color": category_data["color"],
+                    "created_at": category_data["created_at"],
+                    "updated_at": category_data["updated_at"]
+                }
+                
+                await db.categories.insert_one(category_basic)
+                
+                # Insert subcategories (but NO items - preserves transfer functionality)
+                for subcategory_data in category_data["subcategories"]:
+                    subcategory_basic = {
+                        "id": subcategory_data["id"],
+                        "category_id": category_data["id"],
+                        "name": subcategory_data["name"],
+                        "description": "",
+                        "order_index": 0,
+                        "color": subcategory_data["color"],
+                        "created_at": subcategory_data["created_at"],
+                        "updated_at": subcategory_data["updated_at"]
+                    }
+                    
+                    await db.subcategories.insert_one(subcategory_basic)
+                    # NOTE: NO items inserted - this preserves transfer functionality
+            
             result = await db.rooms.insert_one(room_dict)
             return Room(**room_dict)
         
