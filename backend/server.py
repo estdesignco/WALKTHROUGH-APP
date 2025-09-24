@@ -3330,6 +3330,23 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             page_text = await page.inner_text('body')
             print(f"📄 PAGE LENGTH: {len(page_content)} chars, BODY TEXT: {len(page_text)} chars")
             
+            # 🚀 ULTRA-AGGRESSIVE SCRAPING TECHNIQUE
+            print("🔍 STARTING ULTRA-AGGRESSIVE EXTRACTION...")
+            
+            # First, try to extract ALL text content and search for patterns
+            all_text = await page.inner_text('body')
+            
+            # Extract price using REGEX from ALL page text
+            import re
+            price_patterns = [
+                r'\$[\s]*([0-9,]+\.?[0-9]*)',  # $123.45, $ 123
+                r'([0-9,]+\.?[0-9]*)[\s]*\$',  # 123.45 $
+                r'USD[\s]*([0-9,]+\.?[0-9]*)', # USD 123.45
+                r'Price:[\s]*\$?([0-9,]+\.?[0-9]*)', # Price: $123
+                r'Cost:[\s]*\$?([0-9,]+\.?[0-9]*)',  # Cost: $123
+                r'MSRP:[\s]*\$?([0-9,]+\.?[0-9]*)',  # MSRP: $123
+            ]
+            
             result = {
                 'name': None,
                 'vendor': None,
@@ -3342,6 +3359,109 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'sku': None,
                 'availability': None
             }
+            
+            for pattern in price_patterns:
+                matches = re.findall(pattern, all_text)
+                for match in matches:
+                    try:
+                        price_val = float(match.replace(',', ''))
+                        if 1 <= price_val <= 999999:  # Reasonable price range
+                            result['cost'] = price_val
+                            result['price'] = f"${price_val:.2f}"
+                            print(f"✅ REGEX PRICE FOUND: ${price_val:.2f}")
+                            break
+                    except:
+                        continue
+                if result['cost']:
+                    break
+            
+            # Extract dimensions/size using REGEX
+            size_patterns = [
+                r'(\d+["\'\s]*[xX×]\s*\d+["\'\s]*[xX×]?\s*\d*["\']?)', # 24" x 36" x 12"
+                r'Dimensions?:[\s]*([^\n]+)',
+                r'Size:[\s]*([^\n]+)',
+                r'Measurements?:[\s]*([^\n]+)',
+                r'([0-9.]+\s*[WwHhDdLl][\s]*[xX×]\s*[0-9.]+)',  # 24W x 36H
+                r'([0-9.]+["\'][\s]*[wWxX×hHdD][\s]*[0-9.]+["\'])', # 24"w x 36"h
+            ]
+            
+            for pattern in size_patterns:
+                match = re.search(pattern, all_text, re.IGNORECASE)
+                if match:
+                    size_text = match.group(1).strip()
+                    if len(size_text) > 3:  # Reasonable size
+                        result['size'] = size_text
+                        print(f"✅ REGEX SIZE FOUND: {size_text}")
+                        break
+            
+            # AGGRESSIVE IMAGE EXTRACTION - Multiple strategies
+            image_found = False
+            
+            # Strategy 1: Look for high-res images in all img tags
+            all_images = await page.query_selector_all('img')
+            print(f"🖼️ FOUND {len(all_images)} TOTAL IMAGES")
+            
+            for img in all_images:
+                try:
+                    src = await img.get_attribute('src')
+                    data_src = await img.get_attribute('data-src')
+                    data_lazy = await img.get_attribute('data-lazy-src')
+                    alt = await img.get_attribute('alt') or ""
+                    
+                    # Try multiple src attributes
+                    image_candidates = [src, data_src, data_lazy]
+                    
+                    for image_url in image_candidates:
+                        if not image_url:
+                            continue
+                            
+                        # Fix relative URLs
+                        if image_url.startswith('//'):
+                            image_url = 'https:' + image_url
+                        elif image_url.startswith('/'):
+                            from urllib.parse import urlparse
+                            parsed = urlparse(url)
+                            image_url = f"{parsed.scheme}://{parsed.netloc}{image_url}"
+                        
+                        # Skip obvious non-product images
+                        skip_keywords = ['logo', 'icon', 'favicon', 'sprite', 'arrow', 'button', 'cart', 'search']
+                        if any(keyword in image_url.lower() for keyword in skip_keywords):
+                            continue
+                        
+                        # Prefer product-related images
+                        if any(keyword in alt.lower() for keyword in ['product', 'item', 'chair', 'table', 'lamp', 'rug']):
+                            result['image_url'] = image_url
+                            print(f"✅ PRODUCT IMAGE FOUND (ALT): {image_url}")
+                            image_found = True
+                            break
+                    
+                    if image_found:
+                        break
+                        
+                except:
+                    continue
+            
+            # Strategy 2: If no product image found, take the largest image
+            if not image_found:
+                for img in all_images:
+                    try:
+                        src = await img.get_attribute('src') or await img.get_attribute('data-src')
+                        if src and 'http' in src:
+                            # Fix URL if needed
+                            if src.startswith('//'):
+                                src = 'https:' + src
+                            elif src.startswith('/'):
+                                from urllib.parse import urlparse
+                                parsed = urlparse(url)
+                                src = f"{parsed.scheme}://{parsed.netloc}{src}"
+                            
+                            # Skip obvious non-product images
+                            if not any(skip in src.lower() for skip in ['logo', 'icon', 'favicon']):
+                                result['image_url'] = src
+                                print(f"✅ FALLBACK IMAGE FOUND: {src}")
+                                break
+                    except:
+                        continue
             
             # Extract vendor from URL with enhanced debugging
             domain = url.split('/')[2].lower()
