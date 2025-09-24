@@ -1893,7 +1893,19 @@ async def create_comprehensive_category(room_id: str = Query(...), category_name
             break
     
     if not category_structure:
-        raise HTTPException(status_code=404, detail=f"Category '{category_name}' not found in comprehensive structure")
+        # Handle custom category - create basic structure
+        print(f"🆕 Creating CUSTOM category: {category_name}")
+        category_structure = {
+            "name": category_name,
+            "color": "#8B7355",  # Default color for custom categories
+            "subcategories": [
+                {
+                    "name": "ITEMS", 
+                    "color": "#A0862F",
+                    "items": []
+                }
+            ]
+        }
     
     # Create the category with full structure
     category_id = str(uuid.uuid4())
