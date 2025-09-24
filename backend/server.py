@@ -3632,9 +3632,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 '[class*="sku"], [class*="model"], [class*="item-number"]',
                 '[data-sku], [data-model], [data-item-id]',
                 
-                # Text-based search
-                'span:has-text("SKU"), span:has-text("Model"), span:has-text("Item #")',
-                '*:has-text("SKU:"), *:has-text("Model:"), *:has-text("Item:")'
+                # Generic selectors for text content
+                '.product-info, .product-details, .specifications, .product-meta'
             ]
             
             # Also try regex on page text for SKU patterns
