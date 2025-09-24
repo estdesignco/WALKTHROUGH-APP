@@ -141,7 +141,8 @@ class StatusDropdownTransferTester:
         try:
             response = requests.get(f"{API_BASE}/item-statuses-enhanced")
             if response.status_code == 200:
-                statuses = response.json()
+                response_data = response.json()
+                statuses = response_data.get('data', [])
                 
                 # Check if blank status is available
                 blank_status_found = False
