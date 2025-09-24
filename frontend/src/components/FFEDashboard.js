@@ -213,10 +213,20 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
   const getCarrierBreakdown = () => {
     const carriers = {};
     
+    if (!project || !project.rooms || !Array.isArray(project.rooms)) {
+      return carriers;
+    }
+    
     project.rooms.forEach(room => {
+      if (!room || !room.categories || !Array.isArray(room.categories)) {
+        return;
+      }
       room.categories.forEach(category => {
+        if (!category) return;
         (category.subcategories || []).forEach(subcategory => {
+          if (!subcategory) return;
           (subcategory.items || []).forEach(item => {
+            if (!item) return;
             if (item.carrier) {
               carriers[item.carrier] = (carriers[item.carrier] || 0) + 1;
             }
