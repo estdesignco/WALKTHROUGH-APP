@@ -18,6 +18,7 @@ import CustomerfacingQuestionnaire from './components/CustomerfacingQuestionnair
 import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectDetailPage';
 import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
 import GoogleSheetsImporter from './components/GoogleSheetsImporter';
+import EmailPreview from './components/EmailPreview';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
