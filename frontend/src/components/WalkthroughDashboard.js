@@ -265,8 +265,8 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
         
         {!hideNavigation && (
           <>
-            {/* Navigation Tabs - Luxury Style */}
-            <div className="flex justify-center space-x-8 mb-8">
+            {/* Navigation Tabs */}
+            <div className="flex justify-center space-x-8 mb-6">
               <a href={`/project/${projectId}/questionnaire`} 
                  className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
                  style={{ color: '#F5F5DC', opacity: '0.7' }} 
