@@ -269,8 +269,8 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
         <p className="text-lg" style={{ color: '#F5F5DC', opacity: '0.8' }}>Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
       </div>
 
-      {/* Main Content Container - MUCH WIDER for spreadsheet data */}
-      <div className="max-w-7xl mx-auto bg-gradient-to-br from-black/60 to-gray-900/80 p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
+      {/* Main Content Container - MAXIMUM WIDTH for spreadsheet data */}
+      <div className="w-full max-w-[95%] mx-auto bg-gradient-to-br from-black/60 to-gray-900/80 p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
         
         {!hideNavigation && (
           <>
