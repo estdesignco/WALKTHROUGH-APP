@@ -892,6 +892,7 @@ class RoomBase(BaseModel):
 
 class RoomCreate(RoomBase):
     project_id: str
+    auto_populate: bool = True  # False for transfer operations
 
 class RoomUpdate(BaseModel):
     name: Optional[str] = None
