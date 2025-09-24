@@ -811,13 +811,15 @@ export default function Questionnaire() {
                     </div>
 
                     {submissionStatus === 'success' && (
-                        <div className="mt-4 p-4 bg-green-100 text-green-800 rounded-md">
-                            Questionnaire submitted successfully! Redirecting...
+                        <div className="mt-6 p-6 bg-gradient-to-r from-[#B49B7E]/20 to-[#A08B6F]/20 text-[#B49B7E] rounded-2xl border border-[#B49B7E]/30 text-center">
+                            <h3 className="text-xl font-light mb-2">Questionnaire submitted successfully!</h3>
+                            <p className="text-[#F5F5DC]/70">Thank you for sharing your vision with us. We'll be in touch soon.</p>
                         </div>
                     )}
                     {submissionStatus === 'error' && (
-                        <div className="mt-4 p-4 bg-red-100 text-red-800 rounded-md">
-                            Failed to submit questionnaire. Please try again.
+                        <div className="mt-6 p-6 bg-red-900/20 text-red-300 rounded-2xl border border-red-500/30 text-center">
+                            <h3 className="text-xl font-light mb-2">Something went wrong</h3>
+                            <p className="text-[#F5F5DC]/70">Please try submitting again or contact us directly.</p>
                         </div>
                     )}
                 </form>
