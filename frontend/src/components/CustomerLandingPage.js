@@ -109,7 +109,7 @@ const CustomerLandingPage = () => {
                     <div className="text-center mb-16">
                         <h2 className="text-5xl font-light text-[#B49B7E] mb-6">Who We Are</h2>
                         <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mb-8"></div>
-                        <p className="text-xl text-white/80 max-w-4xl mx-auto leading-relaxed">
+                        <p className="text-xl max-w-4xl mx-auto leading-relaxed" style={{ color: '#F5F5DC' }}>
                             We are passionate creators of extraordinary living spaces, dedicated to transforming your vision into reality with unparalleled attention to detail and timeless elegance.
                         </p>
                     </div>
