@@ -252,34 +252,36 @@ const CustomerLandingPage = () => {
             </section>
 
             {/* Final CTA Section */}
-            <section className="py-20 px-6 bg-gradient-to-r from-[#B49B7E]/10 to-[#A08B6F]/10 border-t border-[#B49B7E]/20">
-                <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-5xl font-light text-[#B49B7E] mb-8">Ready to Begin?</h2>
-                    <p className="text-xl mb-12 leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.9' }}>
-                        Take the first step towards your dream space. Our comprehensive questionnaire helps us understand your unique vision and creates the foundation for an extraordinary design journey.
-                    </p>
-                    
-                    <div className="flex flex-col items-center gap-6">
-                        <Button 
-                            onClick={() => navigate('/customer/questionnaire')}
-                            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-white px-16 py-6 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105"
-                        >
-                            Start Your Questionnaire
-                            <ArrowRight className="ml-4 w-6 h-6" />
-                        </Button>
+            <section className="py-20 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
+                <div className="max-w-4xl mx-auto">
+                    <div className="bg-gradient-to-br from-black/80 to-gray-900/90 backdrop-blur-sm rounded-3xl p-12 border border-[#B49B7E]/20 shadow-2xl text-center">
+                        <h2 className="text-5xl font-light text-[#B49B7E] mb-8">Ready to Begin?</h2>
+                        <p className="text-xl mb-12 leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.9' }}>
+                            Take the first step towards your dream space. Our comprehensive questionnaire helps us understand your unique vision and creates the foundation for an extraordinary design journey.
+                        </p>
                         
-                        <div className="flex items-center gap-6 text-sm" style={{ color: '#F5F5DC', opacity: '0.7' }}>
-                            <div className="flex items-center gap-2">
-                                <CheckCircle className="w-4 h-4 text-[#B49B7E]" />
-                                <span>Takes 10-15 minutes</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <CheckCircle className="w-4 h-4 text-[#B49B7E]" />
-                                <span>Completely confidential</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <CheckCircle className="w-4 h-4 text-[#B49B7E]" />
-                                <span>No obligation consultation</span>
+                        <div className="flex flex-col items-center gap-6">
+                            <Button 
+                                onClick={() => navigate('/customer/questionnaire')}
+                                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-16 py-6 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105"
+                            >
+                                Start Your Questionnaire
+                                <ArrowRight className="ml-4 w-6 h-6" />
+                            </Button>
+                            
+                            <div className="flex items-center gap-6 text-sm" style={{ color: '#F5F5DC', opacity: '0.7' }}>
+                                <div className="flex items-center gap-2">
+                                    <CheckCircle className="w-4 h-4 text-[#B49B7E]" />
+                                    <span>Takes 10-15 minutes</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <CheckCircle className="w-4 h-4 text-[#B49B7E]" />
+                                    <span>Completely confidential</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <CheckCircle className="w-4 h-4 text-[#B49B7E]" />
+                                    <span>No obligation consultation</span>
+                                </div>
                             </div>
                         </div>
                     </div>
