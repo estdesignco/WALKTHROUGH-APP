@@ -1701,9 +1701,11 @@ async def create_room(room_data: RoomCreate):
             structure_key = room_data.name.lower()
             room_structure = COMPREHENSIVE_ROOM_STRUCTURE.get(structure_key)
             
+            print(f"🔍 DEBUG: structure_key='{structure_key}', room_structure found: {room_structure is not None}")
             if room_structure:
-                print(f"📁 Adding comprehensive structure for {room_data.name}")
                 categories_list = room_structure.get("categories", [])
+                print(f"🔍 DEBUG: categories_list length: {len(categories_list)}")
+                print(f"📁 Adding comprehensive structure for {room_data.name}")
                 for category_obj in categories_list:
                     category_id = str(uuid.uuid4())
                     category_dict = {
