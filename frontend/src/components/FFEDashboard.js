@@ -317,25 +317,25 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
               </button>
             </div>
 
-            {/* SEARCH BAR AND ADD ROOM BUTTON */}
-            <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
+            {/* Search and Controls - Luxury Style */}
+            <div className="flex items-center justify-between mt-6 p-6 bg-gradient-to-br from-black/80 to-gray-900/90 rounded-2xl border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
               <div className="flex items-center space-x-4 flex-1">
                 <input
                   type="text"
                   placeholder="Search Items..."
-                  className="flex-1 bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500"
+                  className="flex-1 bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] focus:bg-black/60 transition-all duration-300 placeholder:text-[#B49B7E]/50"
                 />
-                <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+                <select className="bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] transition-all duration-300">
                   <option>All Rooms</option>
                 </select>
-                <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+                <select className="bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] transition-all duration-300">
                   <option>All Statuses</option>
                 </select>
               </div>
               <button
                 onClick={() => setShowAddRoom(true)}
-                style={{ backgroundColor: '#8b7355' }}
-                className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors ml-4"
+                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-full shadow-xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide ml-4 font-medium"
+                style={{ color: '#F5F5DC' }}
               >
                 ➕ Add Room
               </button>
