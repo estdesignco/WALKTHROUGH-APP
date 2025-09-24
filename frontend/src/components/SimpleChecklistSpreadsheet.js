@@ -1269,10 +1269,15 @@ const SimpleChecklistSpreadsheet = ({
                         <div className="mb-4 flex gap-3">
                           <select 
                             onChange={(e) => {
-                              if (e.target.value) {
+                              if (e.target.value === 'ADD_NEW') {
+                                const customCategory = prompt('Enter new category name:');
+                                if (customCategory && customCategory.trim()) {
+                                  handleAddCategory(room.id, customCategory.trim());
+                                }
+                              } else if (e.target.value) {
                                 handleAddCategory(room.id, e.target.value);
-                                e.target.value = ''; // Reset dropdown
                               }
+                              e.target.value = ''; // Reset dropdown
                             }}
                             className="text-white px-3 py-2 rounded font-medium border-none outline-none text-sm" 
                             style={{ backgroundColor: '#8b7355' }}
@@ -1285,6 +1290,7 @@ const SimpleChecklistSpreadsheet = ({
                             <option value="Art & Accessories">Art & Accessories</option>
                             <option value="Fireplace & Built-ins">Fireplace & Built-ins</option>
                             <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
+                            <option value="ADD_NEW">+ ADD NEW CATEGORY</option>
                           </select>
                           <button 
                             onClick={() => {
