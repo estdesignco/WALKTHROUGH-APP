@@ -971,18 +971,15 @@ const ExactFFESpreadsheet = ({
                                                             {item.name}
                                                           </td>
                                                           
-                                                          {/* VENDOR/SKU - PROPER INPUT FIELD */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <input 
-                                                              type="text" 
-                                                              value={item.vendor || ''}
-                                                              placeholder="Vendor/SKU"
-                                                              className="w-full bg-transparent text-white text-sm outline-none border-none"
-                                                              onChange={(e) => {
-                                                                handleItemFieldChange(item.id, 'vendor', e.target.value);
-                                                              }}
-                                                              onBlur={(e) => console.log('Vendor updated:', e.target.value)}
-                                                            />
+                                                          {/* VENDOR/SKU - DIRECTLY EDITABLE */}
+                                                          <td 
+                                                            className="border border-gray-400 px-2 py-2 text-sm text-white"
+                                                            contentEditable
+                                                            suppressContentEditableWarning={true}
+                                                            onBlur={(e) => handleItemFieldChange(item.id, 'vendor', e.target.textContent)}
+                                                            style={{ minHeight: '20px' }}
+                                                          >
+                                                            {item.vendor || ''}
                                                           </td>
                                                           
                                                           {/* QTY */}
