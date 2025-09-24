@@ -7,8 +7,8 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel, HttpUrl
 from typing import List, Dict, Any, Optional
 import logging
-from .google_sheets_importer import GoogleSheetsImporter
-from .database import get_database
+from google_sheets_importer import GoogleSheetsImporter
+from database import get_database
 
 router = APIRouter(prefix="/api/google-sheets", tags=["Google Sheets Import"])
 
