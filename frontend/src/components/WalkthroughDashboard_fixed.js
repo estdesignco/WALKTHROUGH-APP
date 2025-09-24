@@ -337,7 +337,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
 
         {/* Page Title - Luxury Style */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide mb-6">CHECKLIST - GREENE</h2>
+          <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide mb-6">WALKTHROUGH - GREENE</h2>
           <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto"></div>
         </div>
 
