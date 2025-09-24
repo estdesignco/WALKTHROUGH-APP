@@ -143,7 +143,7 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
-              element={<CustomerfacingLandingPage />}
+              element={<CustomerLandingPage />}
             />
             <Route 
               path="/studio" 
@@ -217,10 +217,14 @@ const App = () => {
             {/* Customer-facing routes */}
             <Route 
               path="/customer" 
-              element={<CustomerfacingLandingPage />}
+              element={<CustomerLandingPage />}
             />
             <Route 
               path="/customer/questionnaire" 
+              element={<CustomerfacingQuestionnaire />}
+            />
+            <Route 
+              path="/customer/questionnaire/:linkId" 
               element={<CustomerfacingQuestionnaire />}
             />
             <Route 
