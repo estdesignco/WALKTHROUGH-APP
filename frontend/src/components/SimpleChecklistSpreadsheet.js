@@ -824,6 +824,7 @@ const SimpleChecklistSpreadsheet = ({
               className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
             >
               <option value="">All Status</option>
+              <option value="PICKED">PICKED</option>
               <option value="ORDER SAMPLES">ORDER SAMPLES</option>
               <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
               <option value="ASK NEIL">ASK NEIL</option>
