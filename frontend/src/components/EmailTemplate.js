@@ -8,22 +8,177 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
             fontFamily: 'Georgia, serif',
             backgroundColor: '#0F0F0F',
             color: '#F5F5DC',
-            margin: 0,
-            padding: 0
+            padding: '20px',
+            maxWidth: '600px',
+            margin: '0 auto'
         }}>
-            {/* Main Container */}
-            <table cellPadding="0" cellSpacing="0" border="0" width="100%" style={{
-                backgroundColor: '#0F0F0F'
+            {/* Email Header */}
+            <div style={{
+                background: 'linear-gradient(135deg, #B49B7E 0%, #A08B6F 50%, #8B7355 100%)',
+                padding: '40px 30px',
+                textAlign: 'center',
+                borderRadius: '15px 15px 0 0',
+                marginBottom: '0'
             }}>
-                <tr>
-                    <td align="center" style={{ padding: '40px 20px' }}>
-                        {/* Email Content Container */}
-                        <table cellPadding="0" cellSpacing="0" border="0" width="600" style={{
-                            backgroundColor: '#1A1A1A',
-                            borderRadius: '20px',
-                            overflow: 'hidden',
-                            boxShadow: '0 20px 40px rgba(180, 155, 126, 0.1)'
-                        }}>
+                <h1 style={{
+                    fontSize: '36px',
+                    fontWeight: '300',
+                    letterSpacing: '6px',
+                    color: 'white',
+                    margin: '0 0 10px 0'
+                }}>
+                    ESTABLISHED
+                </h1>
+                <div style={{
+                    fontSize: '16px',
+                    fontWeight: '200',
+                    letterSpacing: '3px',
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    margin: '0'
+                }}>
+                    DESIGN CO.
+                </div>
+            </div>
+
+            {/* Email Body */}
+            <div style={{
+                backgroundColor: '#1A1A1A',
+                padding: '40px 30px',
+                borderRadius: '0 0 15px 15px'
+            }}>
+                {/* Personal Greeting */}
+                <h2 style={{
+                    fontSize: '28px',
+                    fontWeight: '300',
+                    color: '#B49B7E',
+                    margin: '0 0 15px 0',
+                    textAlign: 'center'
+                }}>
+                    Welcome, {clientName}
+                </h2>
+                
+                <p style={{
+                    fontSize: '16px',
+                    color: '#E0E0E0',
+                    textAlign: 'center',
+                    fontStyle: 'italic',
+                    margin: '0 0 30px 0'
+                }}>
+                    We are honored that you're considering us for your design journey
+                </p>
+
+                {/* Main Content */}
+                <div style={{
+                    backgroundColor: 'rgba(180, 155, 126, 0.1)',
+                    borderRadius: '10px',
+                    padding: '25px',
+                    marginBottom: '25px'
+                }}>
+                    <p style={{
+                        fontSize: '15px',
+                        lineHeight: '1.6',
+                        color: '#D0D0D0',
+                        margin: '0 0 20px 0'
+                    }}>
+                        Creating your dream space begins with understanding your unique story, lifestyle, and vision. We've carefully crafted a comprehensive questionnaire that will help us design a space that truly reflects who you are.
+                    </p>
+                    
+                    <p style={{
+                        fontSize: '15px',
+                        lineHeight: '1.6',
+                        color: '#D0D0D0',
+                        margin: '0 0 20px 0'
+                    }}>
+                        This personalized assessment takes approximately <strong style={{ color: '#B49B7E' }}>10-15 minutes</strong> and covers everything from your design preferences to your family's daily routines.
+                    </p>
+
+                    {/* Benefits */}
+                    <div style={{ margin: '20px 0' }}>
+                        <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+                            <span style={{ color: '#B49B7E', marginRight: '10px' }}>•</span>
+                            <span style={{ color: '#D0D0D0', fontSize: '14px' }}>Completely confidential and secure</span>
+                        </div>
+                        <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+                            <span style={{ color: '#B49B7E', marginRight: '10px' }}>•</span>
+                            <span style={{ color: '#D0D0D0', fontSize: '14px' }}>Save and continue at your convenience</span>
+                        </div>
+                        <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+                            <span style={{ color: '#B49B7E', marginRight: '10px' }}>•</span>
+                            <span style={{ color: '#D0D0D0', fontSize: '14px' }}>No obligation for our initial consultation</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* CTA Button */}
+                <div style={{ textAlign: 'center', marginBottom: '25px' }}>
+                    <a href={questionnaireUrl} style={{
+                        display: 'inline-block',
+                        background: 'linear-gradient(135deg, #B49B7E 0%, #A08B6F 100%)',
+                        color: 'white',
+                        textDecoration: 'none',
+                        padding: '15px 35px',
+                        borderRadius: '25px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        letterSpacing: '1px',
+                        textTransform: 'uppercase'
+                    }}>
+                        BEGIN YOUR DESIGN JOURNEY
+                    </a>
+                    <p style={{
+                        fontSize: '12px',
+                        color: '#A0A0A0',
+                        margin: '15px 0 0 0',
+                        fontStyle: 'italic'
+                    }}>
+                        This link is exclusively for you and expires in 30 days
+                    </p>
+                </div>
+
+                {/* Quote */}
+                <div style={{
+                    backgroundColor: 'rgba(180, 155, 126, 0.05)',
+                    padding: '20px',
+                    textAlign: 'center',
+                    borderRadius: '8px',
+                    marginBottom: '20px'
+                }}>
+                    <p style={{
+                        fontSize: '16px',
+                        fontStyle: 'italic',
+                        color: '#B49B7E',
+                        margin: '0 0 8px 0'
+                    }}>
+                        "The details are not the details. They make the design."
+                    </p>
+                    <p style={{
+                        fontSize: '12px',
+                        color: '#A0A0A0',
+                        margin: '0'
+                    }}>
+                        — Charles Eames
+                    </p>
+                </div>
+
+                {/* Footer */}
+                <div style={{ textAlign: 'center' }}>
+                    <p style={{
+                        fontSize: '14px',
+                        color: '#B49B7E',
+                        margin: '0 0 10px 0',
+                        letterSpacing: '1px'
+                    }}>
+                        ESTABLISHED DESIGN CO.
+                    </p>
+                    <p style={{
+                        fontSize: '12px',
+                        color: '#808080',
+                        margin: '0'
+                    }}>
+                        Creating extraordinary spaces since 2020
+                    </p>
+                </div>
+            </div>
                             
                             {/* Header with Elegant Background */}
                             <tr>
