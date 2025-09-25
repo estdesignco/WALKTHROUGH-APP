@@ -391,20 +391,20 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           itemStatuses={itemStatuses}
         />
 
-        {/* Spreadsheet - Inside main container */}
-        <div className="mt-8">
-          <SimpleChecklistSpreadsheet
-            project={project}
-            roomColors={roomColors}
-            categoryColors={categoryColors}
-            itemStatuses={itemStatuses}
-            vendorTypes={vendorTypes}
-            carrierTypes={carrierTypes}
-            onDeleteRoom={handleDeleteRoom}
-            onAddRoom={() => setShowAddRoom(true)}
-            onReload={loadSimpleProject}
-          />
-        </div>
+      {/* Spreadsheet Container */}
+      <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
+        <SimpleChecklistSpreadsheet
+          project={project}
+          roomColors={roomColors}
+          categoryColors={categoryColors}
+          itemStatuses={itemStatuses}
+          vendorTypes={vendorTypes}
+          carrierTypes={carrierTypes}
+          onDeleteRoom={handleDeleteRoom}
+          onAddRoom={() => setShowAddRoom(true)}
+          onReload={loadSimpleProject}
+        />
+      </div>
       </div>
 
       {/* Add Room Modal */}
