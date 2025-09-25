@@ -296,7 +296,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
         </div>
       </div>
 
-      {/* Main Content Container - MAXIMUM WIDTH with Darker Gradient */}
+      {/* Action Buttons Container */}
       <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
         
         {!hideNavigation && (
