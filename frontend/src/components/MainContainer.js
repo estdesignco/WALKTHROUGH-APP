@@ -36,38 +36,27 @@ const MainContainer = ({
             </button>
           </div>
 
-          {/* Search and Controls - MINIMAL SHIMMER */}
+          {/* Search and Controls - NO SHIMMER */}
           <div className="flex items-center justify-between mt-6 p-6 rounded-2xl shadow-xl backdrop-blur-sm border border-[#B49B7E]" style={{
-            background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)',
-            boxShadow: '0 0 12px rgba(180, 155, 126, 0.2)'
+            background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
           }}>
             <div className="flex items-center space-x-4 flex-1">
               <input
                 type="text"
                 placeholder="Search Items..."
                 className="flex-1 bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] focus:bg-black/80 transition-all duration-300 placeholder:text-[#B49B7E]/60"
-                style={{
-                  boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6), 0 0 6px rgba(180, 155, 126, 0.1)'
-                }}
               />
-              <select className="bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] transition-all duration-300" style={{
-                boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6), 0 0 6px rgba(180, 155, 126, 0.1)'
-              }}>
+              <select className="bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] transition-all duration-300">
                 <option>All Rooms</option>
               </select>
-              <select className="bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] transition-all duration-300" style={{
-                boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6), 0 0 6px rgba(180, 155, 126, 0.1)'
-              }}>
+              <select className="bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] transition-all duration-300">
                 <option>All Statuses</option>
               </select>
             </div>
             <button
               onClick={onAddRoom}
               className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide ml-4 font-medium border border-[#D4C5A9]"
-              style={{ 
-                color: '#F5F5DC',
-                boxShadow: '0 0 8px rgba(180, 155, 126, 0.2)'
-              }}
+              style={{ color: '#F5F5DC' }}
             >
               ➕ Add Room
             </button>
