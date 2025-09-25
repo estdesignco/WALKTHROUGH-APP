@@ -3591,11 +3591,19 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         if image_url.endswith(('.jpg', '.jpeg', '.png', '.webp')):
                             score += 3
                         
-                        # Negative scoring
-                        if any(keyword in image_url.lower() for keyword in ['logo', 'icon', 'favicon', 'sprite', 'thumb', 'small']):
+                        # Negative scoring - Enhanced tracking exclusions
+                        if any(keyword in image_url.lower() for keyword in ['logo', 'icon', 'favicon', 'sprite', 'thumb', 'small', 'bat.bing.com', 'tracking', 'analytics', 'pixel', 'beacon']):
                             score -= 20
                         if any(keyword in alt.lower() for keyword in ['logo', 'brand', 'icon']):
                             score -= 10
+                            
+                        # FOUR HANDS SPECIFIC: Boost actual product images
+                        if 'fourhands.com' in url.lower():
+                            if any(pattern in image_url.lower() for pattern in ['/products/', '/product/', 'fourhands', '.jpg', '.jpeg', '.png']):
+                                # Skip tracking pixels specifically
+                                if not any(skip in image_url.lower() for skip in ['bat.bing.com', 'tracking', 'analytics', 'googletagmanager', 'facebook.com/tr']):
+                                    score += 15  # High boost for Four Hands product images
+                                    print(f"🎯 FOUR HANDS PRODUCT IMAGE BOOST: {image_url}")
                         
                         if score > best_score:
                             best_image = image_url
