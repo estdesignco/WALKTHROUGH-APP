@@ -88,7 +88,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         name: data.name || "Fenn Chair",
         vendor: data.vendor || "Four Hands", 
         sku: data.sku || "248067-003",
-        cost: data.cost ? parseFloat(data.cost.replace('$', '').replace(',', '')) : data.price ? parseFloat(data.price.replace('$', '').replace(',', '')) : formData.cost,
+        cost: data.cost ? (typeof data.cost === 'number' ? data.cost : parseFloat(data.cost.replace('$', '').replace(',', ''))) : data.price ? (typeof data.price === 'number' ? data.price : parseFloat(data.price.replace('$', '').replace(',', ''))) : formData.cost,
         size: data.size || data.dimensions || formData.size,
         image_url: data.image_url || data.image || data.main_image || formData.image_url,
         finish_color: data.color || data.finish || data.finish_color || formData.finish_color
