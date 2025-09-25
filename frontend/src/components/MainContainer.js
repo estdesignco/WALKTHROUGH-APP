@@ -36,8 +36,8 @@ const MainContainer = ({
             </button>
           </div>
 
-          {/* Search and Controls - NO SHIMMER */}
-          <div className="flex items-center justify-between mt-2 p-4 rounded-2xl shadow-xl backdrop-blur-sm border border-[#B49B7E]/20" style={{
+          {/* Search and Controls - ZERO SPACING */}
+          <div className="flex items-center justify-between mt-1 p-4 rounded-2xl shadow-xl backdrop-blur-sm border border-[#B49B7E]/20" style={{
             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
           }}>
             <div className="flex items-center space-x-4 flex-1">
