@@ -303,6 +303,89 @@ backend:
     needs_retesting: false
     status_history:
       - working: true
+  - task: "Transfer Functionality Fixes - BOTH TRANSFERS NOT WORKING"
+    implemented: false
+    working: false
+    file: "SimpleWalkthroughSpreadsheet.js, SimpleChecklistSpreadsheet.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "🚨 USER REPORT: Both walkthrough-to-checklist AND checklist-to-FFE transfers reported as NOT WORKING. User reports with emphasis 'BOTH transfers not working!!!!' - this is critical blocking functionality. Need to investigate and fix transfer logic in both sheets immediately."
+
+  - task: "Apply New Look to ALL PAGES - Gold Lines and Buttons"
+    implemented: false
+    working: false
+    file: "All page components"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "🎨 USER REQUEST: Apply new look to ALL PAGES with specific requirements: 1) Make all lines on sheet gold, 2) All buttons match, 3) Keep shimmer effects (user changed mind), 4) DO NOT TOUCH ROOM AND CATEGORY HEADERS. Need systematic update across all components."
+
+  - task: "Teams Integration Setup - Webhook Configuration"
+    implemented: true
+    working: false
+    file: "backend/.env, teams_integration.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "📞 USER PROVIDED: Teams integration ready, user mentioned they have Teams webhook URL but need to provide it. Code exists in teams_integration.py, just needs TEAMS_WEBHOOK_URL configuration in .env file."
+
+  - task: "Canva Integration Enhancement"
+    implemented: false
+    working: false
+    file: "canva_integration.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "🎨 INTEGRATION NEEDED: User requested Canva integration enhancements. Existing canva_integration.py needs enhancement for better board scraping and furniture link attachment."
+
+  - task: "Houzz Pro Integration"
+    implemented: false
+    working: false
+    file: "New integration file needed"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "🏠 NEW INTEGRATION: User requested Houzz Pro integration. Need to research and implement integration playbook for Houzz Pro API connectivity."
+
+  - task: "Leica D5 Integration for Measurements and Picture Arrows"
+    implemented: false
+    working: false
+    file: "New integration file needed"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "📐 ADVANCED INTEGRATION: User requested Leica D5 integration for taking measurements and drawing arrows on pictures with bluetooth connectivity for each room. This is complex hardware integration requiring research."
+
+  - task: "Customer Facing Implementation"
+    implemented: false
+    working: false
+    file: "Customer facing components"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "👥 USER MENTIONED: Customer facing implementation needed. User mentioned they sent codes but no attachment visible. Need clarification on requirements and implementation details."
         agent: "testing"
         comment: "🎯 FOCUSED CATEGORY CREATION TESTING COMPLETED - FUNCTIONALITY CONFIRMED WORKING! Conducted comprehensive testing of the exact 'create a category' functionality that user reported as failing. ✅ COMPREHENSIVE ENDPOINT WORKING: POST /api/categories/comprehensive with room_id and category_name parameters successfully creates categories with full structure from enhanced_rooms.py. Tested with 'Lighting' (2 subcategories, 16 items), 'Furniture & Storage' (1 subcategory, 11 items), and 'Appliances' (1 subcategory, 19 items). ✅ AVAILABLE CATEGORIES ENDPOINT: GET /api/categories/available returns 15 total categories in correct format {'categories': [...]} including all expected categories (Lighting, Furniture & Storage, Appliances, Plumbing & Fixtures, Decor & Accessories, Paint/Wallpaper/Finishes). ✅ PROJECT STRUCTURE INTEGRATION: Created categories properly appear in project structure with complete subcategory and item hierarchy. Living room shows 7 categories with 10 subcategories and 73 items, kitchen shows 3 categories with 4 subcategories and 46 items. ✅ SHEET INDEPENDENCE VERIFIED: Categories created in one room (master bedroom) do not affect other rooms (living room and kitchen category counts unchanged). Successfully added 'Window Treatments' category to master bedroom without affecting other sheets. ✅ COMPREHENSIVE STRUCTURE: All created categories include proper subcategories and items from enhanced_rooms.py structure. Items have blank finish_color as intentionally designed (line 1949 in server.py). ✅ TEST PROJECT CREATED: Project ID 84997948-0772-4084-9047-3a11882d1f02 with multiple rooms demonstrating working category creation across different sheet types (walkthrough, checklist, ffe). CONCLUSION: The 'create a category' functionality is working correctly - user's reported issue may be frontend-related or specific to certain UI interactions, but the core backend functionality is fully operational."
 
