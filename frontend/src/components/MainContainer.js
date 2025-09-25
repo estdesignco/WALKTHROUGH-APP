@@ -16,12 +16,9 @@ const MainContainer = ({
       {/* Page Title - Luxury Style with SHIMMER */}
       <div className="text-center mb-4">
         <h2 className="text-3xl font-light tracking-wide mb-2" style={{
-          color: '#B49B7E',
-          textShadow: '0 0 8px rgba(180, 155, 126, 0.2)'
+          color: '#B49B7E'
         }}>{title}</h2>
-        <div className="w-48 h-1 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto" style={{
-          boxShadow: '0 0 6px rgba(180, 155, 126, 0.3)'
-        }}></div>
+        <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto"></div>
       </div>
 
       {!hideNavigation && (
