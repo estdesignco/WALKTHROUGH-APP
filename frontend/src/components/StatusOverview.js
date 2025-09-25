@@ -133,7 +133,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
       legend: {
         position: 'right',
         labels: {
-          color: '#ffffff',
+          color: '#F5F5DC',
           font: {
             size: 12
           },
