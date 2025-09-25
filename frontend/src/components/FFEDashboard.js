@@ -286,48 +286,6 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
         
         {!hideNavigation && (
           <>
-            {/* Navigation Tabs - Luxury Style */}
-            <div className="flex justify-center space-x-8 mb-8">
-              <a href={`/project/${projectId}/questionnaire`} 
-                 className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
-                 style={{ color: '#F5F5DC', opacity: '0.7' }} 
-                 onMouseEnter={(e) => e.target.style.opacity = '1'} 
-                 onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
-                <span>📋</span>
-                <span className="font-light tracking-wide">Questionnaire</span>
-              </a>
-              <a href={`/project/${projectId}/walkthrough`} 
-                 className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
-                 style={{ color: '#F5F5DC', opacity: '0.7' }} 
-                 onMouseEnter={(e) => e.target.style.opacity = '1'} 
-                 onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
-                <span>🚶</span>
-                <span className="font-light tracking-wide">Walkthrough</span>
-              </a>
-              <a href={`/project/${projectId}/checklist`} 
-                 className="flex items-center space-x-2 transition-all duration-300 hover:scale-105" 
-                 style={{ color: '#F5F5DC', opacity: '0.7' }} 
-                 onMouseEnter={(e) => e.target.style.opacity = '1'} 
-                 onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
-                <span>✅</span>
-                <span className="font-light tracking-wide">Checklist</span>
-              </a>
-              <div className="flex items-center space-x-2 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] px-6 py-3 rounded-full shadow-lg">
-                <span>📊</span>
-                <span className="font-medium text-[#F5F5DC] tracking-wide">FF&E</span>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Page Title - Luxury Style */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide mb-6">FF&E - GREENE</h2>
-          <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto"></div>
-        </div>
-
-        {!hideNavigation && (
-          <>
             {/* Action Buttons - Same style as Studio Dashboard */}
             <div className="flex justify-center gap-4 mb-8">
               <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2"
