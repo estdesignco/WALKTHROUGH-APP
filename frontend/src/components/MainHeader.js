@@ -67,7 +67,7 @@ const MainHeader = ({
           <img 
             src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
             alt="Established Design Co. Logo" 
-            style={{ height: '35px', width: 'auto', objectFit: 'contain', display: 'block' }}
+            style={{ height: '200px', width: 'auto', objectFit: 'contain', display: 'block' }}
           />
         </div>
       </div>
