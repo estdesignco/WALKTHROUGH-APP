@@ -37,26 +37,26 @@ const MainContainer = ({
           </div>
 
           {/* Search and Controls - NO SHIMMER */}
-          <div className="flex items-center justify-between mt-6 p-6 rounded-2xl shadow-xl backdrop-blur-sm border border-[#B49B7E]" style={{
+          <div className="flex items-center justify-between mt-2 p-4 rounded-2xl shadow-xl backdrop-blur-sm border border-[#B49B7E]/20" style={{
             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-          }}>
+          }}> {/* DIMMED BORDER TO 20% + TIGHTER SPACING */}
             <div className="flex items-center space-x-4 flex-1">
               <input
                 type="text"
                 placeholder="Search Items..."
-                className="flex-1 bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] focus:bg-black/80 transition-all duration-300 placeholder:text-[#B49B7E]/60"
+                className="flex-1 bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 focus:bg-black/80 transition-all duration-300 placeholder:text-[#B49B7E]/60" {/* DIMMED BORDERS TO 20% */}
               />
-              <select className="bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] transition-all duration-300">
+              <select className="bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 transition-all duration-300"> {/* DIMMED BORDERS TO 20% */}
                 <option>All Rooms</option>
               </select>
-              <select className="bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] transition-all duration-300">
+              <select className="bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 transition-all duration-300"> {/* DIMMED BORDERS TO 20% */}
                 <option>All Statuses</option>
               </select>
             </div>
             <button
               onClick={onAddRoom}
-              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide ml-4 font-medium border border-[#D4C5A9]"
-              style={{ color: '#F5F5DC' }}
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide ml-4 font-medium border border-[#D4C5A9]/20"
+              style={{ color: '#F5F5DC' }} {/* DIMMED BORDER TO 20% */}
             >
               ➕ Add Room
             </button>
