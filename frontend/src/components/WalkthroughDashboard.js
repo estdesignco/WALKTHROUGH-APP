@@ -247,8 +247,8 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
           itemStatuses={itemStatuses}
         />
 
-        {/* FF&E Spreadsheet - WITH DIMMED BORDER */}
-        <div className="px-6 mt-2 border border-[#B49B7E]/20 rounded-2xl bg-gradient-to-b from-black via-gray-900 to-black">
+        {/* FF&E Spreadsheet - ZERO SPACING */}
+        <div className="px-6 mt-1 border border-[#B49B7E]/20 rounded-2xl bg-gradient-to-b from-black via-gray-900 to-black">
           <SimpleWalkthroughSpreadsheet
             project={project}
             roomColors={roomColors}
