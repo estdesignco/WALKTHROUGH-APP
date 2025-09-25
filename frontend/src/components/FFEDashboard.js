@@ -239,8 +239,47 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
-      {/* Keep the original FFE header styling to match the colorful spreadsheet */}
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
+      {/* TOP HEADER - Original colorful style to match spreadsheet */}
+      <div className="mb-6">
+        <div className="text-center mb-4">
+          <h1 className="text-4xl font-bold mb-2" style={{ color: '#8b7355' }}>FF&E - GREENE</h1>
+          <p className="text-gray-300">Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
+        </div>
+
+        {!hideNavigation && (
+          <>
+            {/* Navigation Tabs - Original style */}
+            <div className="flex justify-center space-x-8 mb-6">
+              <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>📋</span>
+                <span>Questionnaire</span>
+              </a>
+              <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>🚶</span>
+                <span>Walkthrough</span>
+              </a>
+              <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>✅</span>
+                <span>Checklist</span>
+              </a>
+              <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
+                <span>📊</span>
+                <span className="font-semibold">FF&E</span>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* LOGO BANNER - Original colorful style */}
+        <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}>
+          <img 
+            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
+            alt="Established Design Co. Logo" 
+            style={{ height: '200px', width: 'auto', objectFit: 'contain', display: 'block' }}
+          />
+        </div>
+      </div>
 
       {/* Main Content Container - MAXIMUM WIDTH with Darker Gradient */}
       <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
