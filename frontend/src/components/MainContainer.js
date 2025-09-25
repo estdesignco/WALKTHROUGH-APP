@@ -16,25 +16,11 @@ const MainContainer = ({
       <div className="text-center mb-4">
         <h2 className="text-3xl font-light tracking-wide mb-2" style={{
           color: '#B49B7E',
-          textShadow: '0 0 20px rgba(180, 155, 126, 0.6), 0 0 40px rgba(180, 155, 126, 0.3)',
-          background: 'linear-gradient(45deg, #B49B7E, #D4C5A9, #B49B7E, #8B7355)',
-          backgroundSize: '300% 300%',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          animation: 'shimmer 3s ease-in-out infinite'
+          textShadow: '0 0 20px rgba(180, 155, 126, 0.6), 0 0 40px rgba(180, 155, 126, 0.3)'
         }}>{title}</h2>
         <div className="w-48 h-1 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto" style={{
           boxShadow: '0 0 15px rgba(180, 155, 126, 0.8)'
         }}></div>
-        
-        {/* Add shimmer animation styles */}
-        <style jsx>{`
-          @keyframes shimmer {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-          }
-        `}</style>
       </div>
 
       {!hideNavigation && (
