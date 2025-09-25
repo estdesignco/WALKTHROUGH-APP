@@ -726,7 +726,7 @@ const SimpleChecklistSpreadsheet = ({
             finish_color: itemContext.item.finish_color || '',
             quantity: itemContext.item.quantity || 1,
             subcategory_id: subcategoryId,
-            status: 'APPROVED', // Set to APPROVED for FFE
+            status: '', // Set to BLANK for FFE (not APPROVED)
             order_index: itemContext.item.order_index || 0,
             link: itemContext.item.link || '',
             image_url: itemContext.item.image_url || ''
