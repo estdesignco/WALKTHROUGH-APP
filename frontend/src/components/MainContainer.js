@@ -12,12 +12,12 @@ const MainContainer = ({
       marginTop: '-120px'
     }}> {/* MASSIVE NEGATIVE MARGIN + DIMMED BORDER TO 20% */}
       
-      {/* Page Title - Luxury Style with SHIMMER */}
-      <div className="text-center mb-4">
-        <h2 className="text-3xl font-light tracking-wide mb-2" style={{
+      {/* Page Title - Luxury Style */}
+      <div className="text-center mb-2"> {/* Much tighter */}
+        <h2 className="text-3xl font-light tracking-wide mb-1" style={{
           color: '#B49B7E'
-        }}>{title}</h2>
-        <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto"></div>
+        }}>{title}</h2> {/* Much tighter */}
+        <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E]/20 to-transparent mx-auto"></div> {/* DIMMED TO 20% */}
       </div>
 
       {!hideNavigation && (
