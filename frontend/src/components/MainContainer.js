@@ -39,17 +39,17 @@ const MainContainer = ({
           {/* Search and Controls - NO SHIMMER */}
           <div className="flex items-center justify-between mt-2 p-4 rounded-2xl shadow-xl backdrop-blur-sm border border-[#B49B7E]/20" style={{
             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-          }}> {/* DIMMED BORDER TO 20% + TIGHTER SPACING */}
+          }}>
             <div className="flex items-center space-x-4 flex-1">
               <input
                 type="text"
                 placeholder="Search Items..."
-                className="flex-1 bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 focus:bg-black/80 transition-all duration-300 placeholder:text-[#B49B7E]/60" {/* DIMMED BORDERS TO 20% */}
+                className="flex-1 bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 focus:bg-black/80 transition-all duration-300 placeholder:text-[#B49B7E]/60"
               />
-              <select className="bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 transition-all duration-300"> {/* DIMMED BORDERS TO 20% */}
+              <select className="bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 transition-all duration-300">
                 <option>All Rooms</option>
               </select>
-              <select className="bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 transition-all duration-300"> {/* DIMMED BORDERS TO 20% */}
+              <select className="bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 transition-all duration-300">
                 <option>All Statuses</option>
               </select>
             </div>
