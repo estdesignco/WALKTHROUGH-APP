@@ -336,6 +336,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           </div>
         </div>
       </div>
+      </div>
     </div>
   );
 };
