@@ -226,7 +226,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                   <span className="text-sm text-[#F5F5DC]">{status}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="bg-gray-700 rounded-full h-2 w-16">
+                  <div className="bg-black/40 rounded-full h-2 w-16">
                     <div
                       className="h-2 rounded-full transition-all duration-300"
                       style={{
@@ -235,7 +235,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                       }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-white w-8 text-right">
+                  <span className="text-sm font-medium w-8 text-right" style={{ color: '#F5F5DC' }}>
                     {count}
                   </span>
                 </div>
