@@ -207,7 +207,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold mb-4" style={{ color: '#B49B7E' }}>Status Breakdown</h3>
+        <h3 className="text-lg font-semibold mb-4 border-b border-[#B49B7E]/20 pb-2" style={{ color: '#B49B7E' }}>Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
