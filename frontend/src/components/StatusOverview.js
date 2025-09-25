@@ -185,9 +185,15 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       
-      {/* LEFT COLUMN - STATUS PIE CHART */}
-      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl border border-[#B49B7E]/30 shadow-xl backdrop-blur-sm p-6">
-        <h3 className="text-lg font-semibold mb-4" style={{ color: '#B49B7E' }}>Status Overview</h3>
+      {/* LEFT COLUMN - STATUS PIE CHART with LUXURY SHIMMER */}
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border-2 border-[#B49B7E]" style={{
+        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)',
+        boxShadow: '0 0 30px rgba(180, 155, 126, 0.4), inset 0 1px 0 rgba(180, 155, 126, 0.2)'
+      }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ 
+          color: '#B49B7E',
+          textShadow: '0 0 15px rgba(180, 155, 126, 0.6)'
+        }}>Status Overview</h3>
         
         {/* REAL PIE CHART WITH LABELS AND LINES */}
         <div className="h-64 mb-4">
