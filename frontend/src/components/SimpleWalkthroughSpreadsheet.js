@@ -888,9 +888,9 @@ const SimpleWalkthroughSpreadsheet = ({
                                           }}
                                         />
                                       </td>
-                                      <td className="border-2 border-[#B49B7E]/50 px-2 py-1 text-sm" style={{ 
+                                      <td className="border border-[#B49B7E]/40 px-2 py-1 text-sm" style={{ 
                                         color: '#F5F5DC',
-                                        boxShadow: 'inset 0 0 10px rgba(180, 155, 126, 0.1)'
+                                        boxShadow: 'inset 0 0 8px rgba(180, 155, 126, 0.08)'
                                       }}>
                                         <div 
                                           contentEditable
@@ -902,9 +902,9 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.name}
                                         </div>
                                       </td>
-                                      <td className="border-2 border-[#B49B7E]/50 px-2 py-1 text-sm text-center w-16" style={{ 
+                                      <td className="border border-[#B49B7E]/40 px-2 py-1 text-sm text-center w-16" style={{ 
                                         color: '#F5F5DC',
-                                        boxShadow: 'inset 0 0 10px rgba(180, 155, 126, 0.1)'
+                                        boxShadow: 'inset 0 0 8px rgba(180, 155, 126, 0.08)'
                                       }}>
                                         <div 
                                           contentEditable
@@ -916,9 +916,9 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.quantity || 1}
                                         </div>
                                       </td>
-                                      <td className="border-2 border-[#B49B7E]/50 px-2 py-1 text-sm" style={{ 
+                                      <td className="border border-[#B49B7E]/40 px-2 py-1 text-sm" style={{ 
                                         color: '#F5F5DC',
-                                        boxShadow: 'inset 0 0 10px rgba(180, 155, 126, 0.1)'
+                                        boxShadow: 'inset 0 0 8px rgba(180, 155, 126, 0.08)'
                                       }}>
                                         <div 
                                           contentEditable
@@ -930,9 +930,9 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.size || ''}
                                         </div>
                                       </td>
-                                      <td className="border-2 border-[#B49B7E]/50 px-2 py-1 text-sm" style={{ 
+                                      <td className="border border-[#B49B7E]/40 px-2 py-1 text-sm" style={{ 
                                         color: '#F5F5DC',
-                                        boxShadow: 'inset 0 0 10px rgba(180, 155, 126, 0.1)'
+                                        boxShadow: 'inset 0 0 8px rgba(180, 155, 126, 0.08)'
                                       }}>
                                         <div 
                                           contentEditable
@@ -944,8 +944,8 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.finish_color || ''}
                                         </div>
                                       </td>
-                                      <td className="border-2 border-[#B49B7E]/50 px-1 py-1 text-center w-12" style={{
-                                        boxShadow: 'inset 0 0 10px rgba(180, 155, 126, 0.1)'
+                                      <td className="border border-[#B49B7E]/40 px-1 py-1 text-center w-12" style={{
+                                        boxShadow: 'inset 0 0 8px rgba(180, 155, 126, 0.08)'
                                       }}>
                                         <button 
                                           onClick={() => handleDeleteItem(item.id)}
