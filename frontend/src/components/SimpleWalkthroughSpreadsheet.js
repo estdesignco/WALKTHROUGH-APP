@@ -852,15 +852,15 @@ const SimpleWalkthroughSpreadsheet = ({
                             {category.subcategories?.map((subcategory) => (
                               <React.Fragment key={subcategory.id || subcategory.name}>
                                 {/* TABLE WITH SUBCATEGORY NAME IN HEADER - MATCHING CHECKLIST */}
-                                <table className="w-full border-collapse border border-gray-400 mb-4">
+                                <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10">
                                   <thead>
                                     <tr>
-                                      <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-6" style={{ backgroundColor: '#8b7355' }}>✓</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                                      <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
-                                      <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-6 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8b7355' }}>✓</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-12 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
                                     </tr>
                                   </thead>
                                   <tbody>
