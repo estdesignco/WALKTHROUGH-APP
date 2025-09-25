@@ -867,8 +867,8 @@ const SimpleWalkthroughSpreadsheet = ({
                                   <tbody>
                                     {/* ITEMS FOR THIS SUBCATEGORY */}
                                     {(subcategory.items || []).map((item, itemIndex) => (
-                                    <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                      <td className="border border-gray-400 px-1 py-1 text-center w-6">
+                                    <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-gradient-to-r from-black/80 to-gray-900/80' : 'bg-gradient-to-r from-gray-900/60 to-black/60'}>
+                                      <td className="border border-[#B49B7E]/30 px-1 py-1 text-center w-6">
                                         <input 
                                           type="checkbox" 
                                           className="w-6 h-6 cursor-pointer" 
