@@ -822,7 +822,7 @@ const ExactFFESpreadsheet = ({
           <div className="flex gap-3">
             <button 
               onClick={handleAddRoom}
-              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-white"
             >
               ✚ ADD ROOM
             </button>
@@ -831,7 +831,7 @@ const ExactFFESpreadsheet = ({
                 console.log('🚀 FF&E Filter Transfer button clicked');
                 alert('Transfer functionality will be implemented next.');
               }}
-              className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-6 py-2 rounded-full shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-green-500/20 text-white"
             >
               → TRANSFER FROM CHECKLIST
             </button>
