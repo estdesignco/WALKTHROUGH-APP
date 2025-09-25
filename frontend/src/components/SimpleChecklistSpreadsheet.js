@@ -1272,7 +1272,7 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* DELETE BUTTON */}
-                                  <td className="border border-gray-400 px-2 py-1 text-center w-12">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-center w-12">
                                     <button
                                       onClick={() => handleDeleteItem(item.id)}
                                       className="text-red-400 hover:text-red-300 text-sm"
