@@ -196,7 +196,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         }}>Status Overview</h3>
         
         {/* REAL PIE CHART WITH LABELS AND LINES */}
-        <div className="h-64 mb-4">
+        <div className="h-35 mb-4">
           {totalItems > 0 ? (
             <Pie data={statusPieData} options={pieOptions} />
           ) : (
