@@ -45,37 +45,37 @@ const MainContainer = ({
             </button>
           </div>
 
-          {/* Search and Controls - SHIMMERY DARK GRADIENT with GOLD GLOW */}
-          <div className="flex items-center justify-between mt-6 p-6 rounded-2xl shadow-xl backdrop-blur-sm border-2 border-[#B49B7E]" style={{
+          {/* Search and Controls - REFINED DARK GRADIENT with SUBTLE GOLD GLOW */}
+          <div className="flex items-center justify-between mt-6 p-6 rounded-2xl shadow-xl backdrop-blur-sm border border-[#B49B7E]" style={{
             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)',
-            boxShadow: '0 0 30px rgba(180, 155, 126, 0.4), inset 0 1px 0 rgba(180, 155, 126, 0.2)'
+            boxShadow: '0 0 20px rgba(180, 155, 126, 0.3), inset 0 1px 0 rgba(180, 155, 126, 0.15)'
           }}>
             <div className="flex items-center space-x-4 flex-1">
               <input
                 type="text"
                 placeholder="Search Items..."
-                className="flex-1 bg-black/60 border-2 border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] focus:bg-black/80 transition-all duration-300 placeholder:text-[#B49B7E]/60"
+                className="flex-1 bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] focus:bg-black/80 transition-all duration-300 placeholder:text-[#B49B7E]/60"
                 style={{
-                  boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6), 0 0 15px rgba(180, 155, 126, 0.2)'
+                  boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6), 0 0 10px rgba(180, 155, 126, 0.15)'
                 }}
               />
-              <select className="bg-black/60 border-2 border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] transition-all duration-300" style={{
-                boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6), 0 0 15px rgba(180, 155, 126, 0.2)'
+              <select className="bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] transition-all duration-300" style={{
+                boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6), 0 0 10px rgba(180, 155, 126, 0.15)'
               }}>
                 <option>All Rooms</option>
               </select>
-              <select className="bg-black/60 border-2 border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] transition-all duration-300" style={{
-                boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6), 0 0 15px rgba(180, 155, 126, 0.2)'
+              <select className="bg-black/60 border border-[#B49B7E] text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9] focus:border-[#D4C5A9] transition-all duration-300" style={{
+                boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6), 0 0 10px rgba(180, 155, 126, 0.15)'
               }}>
                 <option>All Statuses</option>
               </select>
             </div>
             <button
               onClick={onAddRoom}
-              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-full shadow-xl hover:shadow-[#B49B7E]/50 transition-all duration-300 transform hover:scale-105 tracking-wide ml-4 font-medium border-2 border-[#D4C5A9]"
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-full shadow-xl hover:shadow-[#B49B7E]/40 transition-all duration-300 transform hover:scale-105 tracking-wide ml-4 font-medium border border-[#D4C5A9]"
               style={{ 
                 color: '#F5F5DC',
-                boxShadow: '0 0 25px rgba(180, 155, 126, 0.6), inset 0 1px 0 rgba(212, 197, 169, 0.3)'
+                boxShadow: '0 0 15px rgba(180, 155, 126, 0.4), inset 0 1px 0 rgba(212, 197, 169, 0.2)'
               }}
             >
               ➕ Add Room
