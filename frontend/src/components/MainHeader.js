@@ -63,7 +63,7 @@ const MainHeader = ({
         )}
 
         {/* LOGO BANNER */}
-        <div className="rounded-lg mb-3" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}> {/* Reduced from mb-6 to mb-3 */}
+        <div className="rounded-lg mb-1" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}> {/* Much smaller margin */}
           <img 
             src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
             alt="Established Design Co. Logo" 
