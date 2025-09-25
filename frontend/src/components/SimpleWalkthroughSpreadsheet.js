@@ -870,8 +870,8 @@ const SimpleWalkthroughSpreadsheet = ({
                                     <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-gradient-to-r from-black/80 to-gray-900/80' : 'bg-gradient-to-r from-gray-900/60 to-black/60'} style={{
                                       boxShadow: 'inset 0 1px 0 rgba(180, 155, 126, 0.1)'
                                     }}>
-                                      <td className="border-2 border-[#B49B7E]/50 px-1 py-1 text-center w-6" style={{
-                                        boxShadow: 'inset 0 0 10px rgba(180, 155, 126, 0.1)'
+                                      <td className="border border-[#B49B7E]/40 px-1 py-1 text-center w-6" style={{
+                                        boxShadow: 'inset 0 0 8px rgba(180, 155, 126, 0.08)'
                                       }}>
                                         <input 
                                           type="checkbox" 
