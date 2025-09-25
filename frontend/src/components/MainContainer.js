@@ -64,8 +64,8 @@ const MainContainer = ({
         </>
       )}
 
-      {/* Content Area */}
-      <div className="mt-8">
+      {/* Content Area - ZERO SPACING */}
+      <div className="mt-1">
         {children}
       </div>
     </div>
