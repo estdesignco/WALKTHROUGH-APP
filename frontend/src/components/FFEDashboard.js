@@ -6,6 +6,7 @@ import ExactFFESpreadsheet from './ExactFFESpreadsheet';
 import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
+import CompletePageLayout from './CompletePageLayout';
 
 const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.error("🚨 FFE DASHBOARD IS LOADING!");
