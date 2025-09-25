@@ -11,21 +11,23 @@ const CompletePageLayout = ({
   children 
 }) => {
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
       <MainHeader 
         projectId={projectId}
         activeTab={activeTab}
         hideNavigation={hideNavigation}
       />
       
-      <MainContainer
-        title={title}
-        hideNavigation={hideNavigation}
-        onAddRoom={onAddRoom}
-      >
-        {children}
-      </MainContainer>
-    </>
+      <div style={{ marginTop: '-50px' }}> {/* OVERLAP THE CONTAINER OVER HEADER */}
+        <MainContainer
+          title={title}
+          hideNavigation={hideNavigation}
+          onAddRoom={onAddRoom}
+        >
+          {children}
+        </MainContainer>
+      </div>
+    </div>
   );
 };
 
