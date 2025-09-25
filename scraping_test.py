@@ -1,15 +1,25 @@
 #!/usr/bin/env python3
 """
-Scraping Endpoint Testing Suite
-Tests the /api/scrape-product endpoint with specific URLs as requested in the review.
-Also tests /api/categories/comprehensive endpoint.
+WEB SCRAPING FUNCTIONALITY TEST - PLAYWRIGHT BROWSERS VERIFICATION
+
+CONTEXT: User reported that Playwright browsers were just reinstalled to fix critical infrastructure.
+Need to test the POST /api/scrape-product endpoint with a Four Hands URL to ensure it can extract:
+- name
+- vendor  
+- cost
+- size
+- SKU
+- image fields
+
+TEST URL: https://www.fourhands.com/products/fenn-chair
+EXPECTED RESULTS: Should extract all major product fields successfully
 """
 
 import requests
 import json
 import sys
 import os
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 # Get backend URL from frontend .env file
 def get_backend_url():
@@ -25,7 +35,13 @@ def get_backend_url():
 
 BASE_URL = get_backend_url() + "/api"
 
-print(f"Testing Scraping Endpoints at: {BASE_URL}")
+print("=" * 80)
+print("🕷️ WEB SCRAPING FUNCTIONALITY TEST - PLAYWRIGHT BROWSERS VERIFICATION")
+print("=" * 80)
+print(f"Backend URL: {BASE_URL}")
+print("Goal: Test POST /api/scrape-product with Four Hands URL")
+print("Expected: Extract name, vendor, cost, size, SKU, and image fields")
+print("=" * 80)
 
 class ScrapingTester:
     def __init__(self):
@@ -44,26 +60,22 @@ class ScrapingTester:
             'details': details
         })
         
-    def make_request(self, method: str, endpoint: str, data: Dict = None, params: Dict = None) -> tuple:
+    def make_request(self, method: str, endpoint: str, data: Dict = None, timeout: int = 30) -> tuple:
         """Make HTTP request and return (success, response_data, status_code)"""
         try:
             url = f"{BASE_URL}{endpoint}"
             
-            if method.upper() == 'GET':
-                response = self.session.get(url, params=params, timeout=30)
-            elif method.upper() == 'POST':
-                response = self.session.post(url, json=data, timeout=30)
-            elif method.upper() == 'PUT':
-                response = self.session.put(url, json=data, timeout=30)
-            elif method.upper() == 'DELETE':
-                response = self.session.delete(url, timeout=30)
+            if method.upper() == 'POST':
+                response = self.session.post(url, json=data, timeout=timeout)
+            elif method.upper() == 'GET':
+                response = self.session.get(url, timeout=timeout)
             else:
                 return False, f"Unsupported method: {method}", 400
                 
             return response.status_code < 400, response.json() if response.content else {}, response.status_code
             
-        except requests.exceptions.Timeout as e:
-            return False, f"Request timeout: {str(e)}", 408
+        except requests.exceptions.Timeout:
+            return False, "Request timed out", 408
         except requests.exceptions.RequestException as e:
             return False, f"Request failed: {str(e)}", 0
         except json.JSONDecodeError as e:
@@ -71,261 +83,286 @@ class ScrapingTester:
         except Exception as e:
             return False, f"Unexpected error: {str(e)}", 0
 
-    def test_scrape_product_endpoint(self):
-        """Test the /api/scrape-product endpoint with specific URLs from review request"""
-        print("\n=== Testing /api/scrape-product Endpoint ===")
+    def test_scraping_endpoint_basic(self):
+        """Test basic scraping endpoint availability"""
+        print("\n🔍 Testing scraping endpoint availability...")
         
-        # Test URLs from the review request
-        test_urls = [
-            {
-                "url": "https://www.westelm.com/products/andes-sectional-sofa/",
-                "name": "West Elm - Andes Sectional Sofa",
-                "expected_vendor": "West Elm"
-            },
-            {
-                "url": "https://www.cb2.com/hide-n-seek-storage-coffee-table/s459848",
-                "name": "CB2 - Hide N Seek Storage Coffee Table",
-                "expected_vendor": "CB2"
-            },
-            {
-                "url": "https://www.restorationhardware.com/catalog/product/product.jsp?productId=prod17650394",
-                "name": "Restoration Hardware - Product",
-                "expected_vendor": "Restoration Hardware"
-            }
-        ]
-        
-        # First test endpoint availability
-        success, data, status_code = self.make_request('POST', '/scrape-product', {"url": "https://example.com"})
-        
-        if status_code == 404:
-            self.log_test("Scrape Product Endpoint - Availability", False, "Endpoint /api/scrape-product not found (404)")
-            return False
-        elif status_code >= 500:
-            self.log_test("Scrape Product Endpoint - Availability", False, f"Server error: {status_code}")
-            return False
-        else:
-            self.log_test("Scrape Product Endpoint - Availability", True, f"Endpoint accessible (Status: {status_code})")
-        
-        # Test each URL from the review request
-        for test_case in test_urls:
-            print(f"\n--- Testing: {test_case['name']} ---")
-            
-            scrape_data = {"url": test_case["url"]}
-            success, data, status_code = self.make_request('POST', '/scrape-product', scrape_data)
-            
-            print(f"URL: {test_case['url']}")
-            print(f"Status Code: {status_code}")
-            print(f"Success: {success}")
-            
-            if success:
-                # Check response format
-                if isinstance(data, dict) and 'success' in data and 'data' in data:
-                    self.log_test(f"Scrape {test_case['name']} - Response Format", True, "Correct {success: true, data: {...}} format")
-                    
-                    # Analyze the data fields
-                    product_data = data.get('data', {})
-                    expected_fields = ['name', 'price', 'vendor', 'image_url', 'description', 'sku', 'size', 'color']
-                    
-                    populated_fields = []
-                    empty_fields = []
-                    
-                    for field in expected_fields:
-                        value = product_data.get(field, '')
-                        if value and str(value).strip():
-                            populated_fields.append(f"{field}: '{value}'")
-                        else:
-                            empty_fields.append(field)
-                    
-                    # Log detailed field analysis
-                    print(f"   Populated fields: {populated_fields}")
-                    print(f"   Empty fields: {empty_fields}")
-                    
-                    # Check vendor detection
-                    detected_vendor = product_data.get('vendor', '')
-                    if test_case['expected_vendor']:
-                        if detected_vendor == test_case['expected_vendor']:
-                            self.log_test(f"Scrape {test_case['name']} - Vendor Detection", True, f"Correctly detected: {detected_vendor}")
-                        else:
-                            self.log_test(f"Scrape {test_case['name']} - Vendor Detection", False, f"Expected: {test_case['expected_vendor']}, Got: {detected_vendor}")
-                    
-                    # Check if product name was extracted
-                    product_name = product_data.get('name', '')
-                    if product_name and product_name.strip():
-                        self.log_test(f"Scrape {test_case['name']} - Product Name", True, f"Extracted name: '{product_name}'")
-                    else:
-                        self.log_test(f"Scrape {test_case['name']} - Product Name", False, "No product name extracted")
-                    
-                    # Check if price was extracted
-                    product_price = product_data.get('price', '')
-                    if product_price and product_price.strip():
-                        self.log_test(f"Scrape {test_case['name']} - Price", True, f"Extracted price: '{product_price}'")
-                    else:
-                        self.log_test(f"Scrape {test_case['name']} - Price", False, "No price extracted")
-                    
-                    # Check if image was extracted
-                    image_url = product_data.get('image_url', '')
-                    if image_url and image_url.strip():
-                        self.log_test(f"Scrape {test_case['name']} - Image", True, f"Extracted image URL")
-                    else:
-                        self.log_test(f"Scrape {test_case['name']} - Image", False, "No image URL extracted")
-                    
-                    # Overall data extraction assessment
-                    if len(populated_fields) >= 3:  # At least 3 fields should be populated for a good scrape
-                        self.log_test(f"Scrape {test_case['name']} - Overall Quality", True, f"Good extraction: {len(populated_fields)}/{len(expected_fields)} fields populated")
-                    elif len(populated_fields) > 0:
-                        self.log_test(f"Scrape {test_case['name']} - Overall Quality", True, f"Partial extraction: {len(populated_fields)}/{len(expected_fields)} fields populated")
-                    else:
-                        self.log_test(f"Scrape {test_case['name']} - Overall Quality", False, "No product data extracted")
-                        
-                else:
-                    self.log_test(f"Scrape {test_case['name']} - Response Format", False, f"Incorrect response format: {data}")
-                    
-            else:
-                # Check if it's a validation error vs server error
-                if status_code == 400:
-                    self.log_test(f"Scrape {test_case['name']} - Error Handling", True, f"Graceful error handling (400): {data}")
-                elif status_code == 408:
-                    self.log_test(f"Scrape {test_case['name']} - Timeout Handling", True, f"Timeout handled gracefully: {data}")
-                elif status_code == 429:
-                    self.log_test(f"Scrape {test_case['name']} - Rate Limiting", True, f"Rate limiting detected (expected for some sites): {data}")
-                else:
-                    self.log_test(f"Scrape {test_case['name']} - Error", False, f"Scraping failed: {data} (Status: {status_code})")
-            
-            print(f"Raw response: {json.dumps(data, indent=2)}")
-            print("-" * 50)
-
-    def test_error_handling(self):
-        """Test error handling for scraping endpoint"""
-        print("\n=== Testing Error Handling ===")
-        
-        # Test with empty URL
-        success, data, status_code = self.make_request('POST', '/scrape-product', {"url": ""})
-        if status_code == 400:
-            self.log_test("Empty URL Error Handling", True, "Correctly rejects empty URL with 400")
-        else:
-            self.log_test("Empty URL Error Handling", False, f"Should reject empty URL with 400, got {status_code}")
-        
-        # Test with invalid URL
-        success, data, status_code = self.make_request('POST', '/scrape-product', {"url": "not-a-url"})
-        if status_code == 400:
-            self.log_test("Invalid URL Error Handling", True, "Correctly rejects invalid URL with 400")
-        else:
-            self.log_test("Invalid URL Error Handling", False, f"Should reject invalid URL with 400, got {status_code}")
-        
-        # Test with missing URL field
-        success, data, status_code = self.make_request('POST', '/scrape-product', {})
-        if status_code == 400:
-            self.log_test("Missing URL Error Handling", True, "Correctly rejects missing URL with 400")
-        else:
-            self.log_test("Missing URL Error Handling", False, f"Should reject missing URL with 400, got {status_code}")
-
-    def test_categories_comprehensive_endpoint(self):
-        """Test the /api/categories/comprehensive endpoint"""
-        print("\n=== Testing /api/categories/comprehensive Endpoint ===")
-        
-        # Test endpoint availability with POST method (correct method)
+        # Test with a simple URL first to check if endpoint exists
         test_data = {
-            "name": "Test Comprehensive Category",
-            "description": "Test category for comprehensive testing",
-            "room_id": "bb060596-85c2-455f-860a-cf9fa23dfacf",
-            "order_index": 0
+            "url": "https://www.example.com"
         }
         
-        success, data, status_code = self.make_request('POST', '/categories/comprehensive', test_data)
+        success, response, status_code = self.make_request('POST', '/scrape-product', test_data, timeout=15)
         
         if status_code == 404:
-            self.log_test("Categories Comprehensive Endpoint - Availability", False, "Endpoint /api/categories/comprehensive not found (404)")
+            self.log_test("Scraping Endpoint Availability", False, "Endpoint not found (404)")
+            return False
+        elif status_code == 405:
+            self.log_test("Scraping Endpoint Availability", False, "Method not allowed (405)")
             return False
         elif status_code >= 500:
-            self.log_test("Categories Comprehensive Endpoint - Availability", False, f"Server error: {status_code}")
+            self.log_test("Scraping Endpoint Availability", False, f"Server error ({status_code}): {response}")
             return False
-        elif success:
-            self.log_test("Categories Comprehensive Endpoint - Availability", True, f"Endpoint accessible (Status: {status_code})")
+        else:
+            self.log_test("Scraping Endpoint Availability", True, f"Endpoint accessible (Status: {status_code})")
+            return True
+
+    def test_four_hands_scraping(self):
+        """Test scraping Four Hands Fenn Chair URL as specified in review request"""
+        print("\n🪑 Testing Four Hands Fenn Chair scraping...")
+        
+        # The exact URL mentioned in the review request
+        scrape_data = {
+            "url": "https://www.fourhands.com/products/fenn-chair"
+        }
+        
+        print(f"   🔗 Testing URL: {scrape_data['url']}")
+        
+        success, response, status_code = self.make_request('POST', '/scrape-product', scrape_data, timeout=45)
+        
+        if not success:
+            self.log_test("Four Hands Scraping Request", False, f"Request failed: {response} (Status: {status_code})")
+            return False
             
-            # Check response format
-            if isinstance(data, dict):
-                required_fields = ['id', 'name', 'room_id', 'color', 'subcategories']
-                missing_fields = [field for field in required_fields if field not in data]
-                
-                if not missing_fields:
-                    self.log_test("Categories Comprehensive - Response Format", True, f"Valid category response with all required fields")
-                    
-                    # Check if category was created with proper structure
-                    if data.get('name') == test_data['name']:
-                        self.log_test("Categories Comprehensive - Category Creation", True, f"Category created successfully: {data['name']}")
-                    else:
-                        self.log_test("Categories Comprehensive - Category Creation", False, "Category name mismatch")
-                    
-                    # Check color assignment
-                    if data.get('color'):
-                        self.log_test("Categories Comprehensive - Color Assignment", True, f"Category assigned color: {data['color']}")
-                    else:
-                        self.log_test("Categories Comprehensive - Color Assignment", False, "No color assigned to category")
-                        
-                    # Check subcategories structure (should be empty initially but structure should exist)
-                    if 'subcategories' in data and isinstance(data['subcategories'], list):
-                        self.log_test("Categories Comprehensive - Subcategories Structure", True, "Subcategories structure present")
-                    else:
-                        self.log_test("Categories Comprehensive - Subcategories Structure", False, "Subcategories structure missing")
-                else:
-                    self.log_test("Categories Comprehensive - Response Format", False, f"Missing required fields: {missing_fields}")
+        self.log_test("Four Hands Scraping Request", True, f"Request completed (Status: {status_code})")
+        
+        # Check response structure
+        if not isinstance(response, dict):
+            self.log_test("Scraping Response Format", False, f"Expected dict, got {type(response)}")
+            return False
+            
+        # Check for basic response structure
+        if 'success' not in response:
+            self.log_test("Scraping Response Structure", False, "Missing 'success' field in response")
+            return False
+            
+        if not response.get('success'):
+            error_msg = response.get('error', 'Unknown error')
+            self.log_test("Scraping Success Status", False, f"Scraping failed: {error_msg}")
+            
+            # Check if it's a Playwright browser issue
+            if 'executable' in error_msg.lower() or 'browser' in error_msg.lower() or 'playwright' in error_msg.lower():
+                self.log_test("Playwright Browser Issue", True, "Detected Playwright browser infrastructure issue")
+                return False
             else:
-                self.log_test("Categories Comprehensive - Response Format", False, "Response is not a dictionary")
-        else:
-            self.log_test("Categories Comprehensive Endpoint - Availability", False, f"Endpoint failed: {data} (Status: {status_code})")
-
-    def test_playwright_installation(self):
-        """Test if Playwright is properly installed"""
-        print("\n=== Testing Playwright Installation ===")
+                return False
         
-        # Check if Playwright browsers are installed by testing a simple scrape
-        success, data, status_code = self.make_request('POST', '/scrape-product', {"url": "https://example.com"})
+        self.log_test("Scraping Success Status", True, "Scraping completed successfully")
         
-        if success:
-            self.log_test("Playwright Installation", True, "Playwright appears to be working (successful response)")
-        elif "Executable doesn't exist" in str(data):
-            self.log_test("Playwright Installation", False, "Playwright browsers not installed - need to run playwright install")
-        elif "playwright" in str(data).lower():
-            self.log_test("Playwright Installation", False, f"Playwright issue detected: {data}")
-        else:
-            self.log_test("Playwright Installation", True, "Playwright installation appears OK (no browser errors)")
-
-    def run_all_tests(self):
-        """Run all scraping tests"""
-        print("🚀 Starting Scraping Endpoint Tests")
-        print("=" * 50)
-        
-        # Run tests
-        self.test_playwright_installation()
-        self.test_scrape_product_endpoint()
-        self.test_error_handling()
-        self.test_categories_comprehensive_endpoint()
-        
-        # Summary
-        print("\n" + "=" * 50)
-        print("📊 SCRAPING TEST SUMMARY")
-        print("=" * 50)
-        
-        passed = sum(1 for result in self.test_results if result['success'])
-        total = len(self.test_results)
-        
-        print(f"Total Tests: {total}")
-        print(f"Passed: {passed}")
-        print(f"Failed: {total - passed}")
-        print(f"Success Rate: {(passed/total)*100:.1f}%")
-        
-        # List failed tests
-        failed_tests = [result for result in self.test_results if not result['success']]
-        if failed_tests:
-            print("\n❌ FAILED TESTS:")
-            for test in failed_tests:
-                print(f"   • {test['test']}: {test['details']}")
-        else:
-            print("\n🎉 ALL SCRAPING TESTS PASSED!")
+        # Extract and verify data fields
+        data = response.get('data', {})
+        if not data:
+            self.log_test("Scraping Data Extraction", False, "No data extracted from URL")
+            return False
             
-        return passed == total
+        return self.verify_extracted_fields(data)
 
+    def verify_extracted_fields(self, data: Dict[str, Any]) -> bool:
+        """Verify that the required fields were extracted"""
+        print("\n📋 Verifying extracted fields...")
+        
+        # Required fields as specified in review request
+        required_fields = {
+            'name': 'Product name',
+            'vendor': 'Vendor name', 
+            'cost': 'Cost/Price',
+            'size': 'Size/Dimensions',
+            'sku': 'SKU/Product code',
+            'image_url': 'Product image'
+        }
+        
+        extracted_fields = []
+        missing_fields = []
+        field_details = []
+        
+        for field, description in required_fields.items():
+            value = data.get(field)
+            
+            # Check for alternative field names
+            if not value and field == 'cost':
+                value = data.get('price')
+            elif not value and field == 'image_url':
+                value = data.get('image')
+                
+            if value and str(value).strip():
+                extracted_fields.append(field)
+                # Truncate long values for display
+                display_value = str(value)[:50] + "..." if len(str(value)) > 50 else str(value)
+                field_details.append(f"{field}='{display_value}'")
+            else:
+                missing_fields.append(field)
+        
+        # Log results for each field
+        for field in extracted_fields:
+            value = data.get(field) or data.get('price' if field == 'cost' else field)
+            display_value = str(value)[:30] + "..." if len(str(value)) > 30 else str(value)
+            self.log_test(f"Extract {field.upper()}", True, f"Found: {display_value}")
+            
+        for field in missing_fields:
+            self.log_test(f"Extract {field.upper()}", False, f"Field not extracted or empty")
+        
+        # Overall assessment
+        extraction_rate = len(extracted_fields) / len(required_fields) * 100
+        
+        if len(extracted_fields) >= 4:  # At least 4 out of 6 fields
+            self.log_test("Field Extraction Success", True, 
+                         f"Extracted {len(extracted_fields)}/{len(required_fields)} fields ({extraction_rate:.1f}%)")
+            
+            # Print extracted data summary
+            print(f"\n📊 EXTRACTED DATA SUMMARY:")
+            for detail in field_details:
+                print(f"   ✅ {detail}")
+                
+            return True
+        else:
+            self.log_test("Field Extraction Success", False, 
+                         f"Only extracted {len(extracted_fields)}/{len(required_fields)} fields ({extraction_rate:.1f}%)")
+            return False
+
+    def test_alternative_four_hands_urls(self):
+        """Test alternative Four Hands URLs to verify scraping robustness"""
+        print("\n🔄 Testing alternative Four Hands URLs...")
+        
+        alternative_urls = [
+            "https://fourhands.com/product/248067-003",  # Alternative format
+            "https://www.fourhands.com/product/248067-003"  # With www
+        ]
+        
+        successful_scrapes = 0
+        
+        for url in alternative_urls:
+            print(f"   🔗 Testing: {url}")
+            
+            scrape_data = {"url": url}
+            success, response, status_code = self.make_request('POST', '/scrape-product', scrape_data, timeout=30)
+            
+            if success and response.get('success'):
+                data = response.get('data', {})
+                extracted_count = sum(1 for field in ['name', 'vendor', 'cost', 'price', 'sku'] 
+                                    if data.get(field) and str(data.get(field)).strip())
+                
+                if extracted_count >= 2:  # At least 2 fields extracted
+                    successful_scrapes += 1
+                    self.log_test(f"Alternative URL Scraping", True, f"Extracted {extracted_count} fields from {url}")
+                else:
+                    self.log_test(f"Alternative URL Scraping", False, f"Insufficient data from {url}")
+            else:
+                error_msg = response.get('error', 'Unknown error') if isinstance(response, dict) else str(response)
+                self.log_test(f"Alternative URL Scraping", False, f"Failed: {error_msg}")
+        
+        return successful_scrapes > 0
+
+    def test_scraping_infrastructure(self):
+        """Test scraping infrastructure and Playwright browser availability"""
+        print("\n🏗️ Testing scraping infrastructure...")
+        
+        # Test with a simple, reliable URL to check infrastructure
+        test_data = {
+            "url": "https://httpbin.org/html"  # Simple HTML page for testing
+        }
+        
+        success, response, status_code = self.make_request('POST', '/scrape-product', test_data, timeout=20)
+        
+        if not success:
+            if "executable" in str(response).lower() or "browser" in str(response).lower():
+                self.log_test("Playwright Browser Infrastructure", False, 
+                             "Playwright browsers not properly installed or accessible")
+                return False
+            else:
+                self.log_test("Scraping Infrastructure", False, f"Infrastructure issue: {response}")
+                return False
+        
+        if response.get('success'):
+            self.log_test("Scraping Infrastructure", True, "Basic scraping infrastructure working")
+            return True
+        else:
+            error_msg = response.get('error', 'Unknown error')
+            if "executable" in error_msg.lower() or "browser" in error_msg.lower():
+                self.log_test("Playwright Browser Infrastructure", False, 
+                             f"Browser infrastructure issue: {error_msg}")
+            else:
+                self.log_test("Scraping Infrastructure", False, f"Infrastructure issue: {error_msg}")
+            return False
+
+    def run_comprehensive_scraping_test(self):
+        """Run the complete web scraping test"""
+        print("🚀 STARTING WEB SCRAPING FUNCTIONALITY TEST...")
+        
+        # Step 1: Test basic endpoint availability
+        endpoint_available = self.test_scraping_endpoint_basic()
+        if not endpoint_available:
+            print("❌ CRITICAL: Scraping endpoint not available - cannot proceed")
+            return False
+        
+        # Step 2: Test scraping infrastructure
+        infrastructure_ok = self.test_scraping_infrastructure()
+        if not infrastructure_ok:
+            print("❌ CRITICAL: Scraping infrastructure issues detected")
+            # Continue testing to get more details
+        
+        # Step 3: Test Four Hands scraping (main requirement)
+        four_hands_success = self.test_four_hands_scraping()
+        if not four_hands_success:
+            print("❌ CRITICAL: Four Hands scraping failed")
+        
+        # Step 4: Test alternative URLs for robustness
+        alternatives_success = self.test_alternative_four_hands_urls()
+        if not alternatives_success:
+            print("⚠️ WARNING: Alternative URL scraping issues")
+        
+        # Final Summary
+        print("\n" + "=" * 80)
+        print("🎯 WEB SCRAPING TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = sum(1 for result in self.test_results if result['success'])
+        failed_tests = total_tests - passed_tests
+        
+        print(f"📊 OVERALL RESULTS: {passed_tests}/{total_tests} tests passed ({(passed_tests/total_tests)*100:.1f}%)")
+        
+        if failed_tests > 0:
+            print(f"\n❌ FAILED TESTS ({failed_tests}):")
+            for result in self.test_results:
+                if not result['success']:
+                    print(f"   • {result['test']}: {result['details']}")
+        
+        print(f"\n✅ PASSED TESTS ({passed_tests}):")
+        for result in self.test_results:
+            if result['success']:
+                print(f"   • {result['test']}")
+        
+        # Critical assessment
+        critical_success = endpoint_available and four_hands_success
+        
+        if critical_success:
+            print(f"\n🎉 SCRAPING FUNCTIONALITY OPERATIONAL")
+            print(f"   ✅ Endpoint accessible")
+            print(f"   ✅ Four Hands URL scraping working")
+            print(f"   ✅ Required fields being extracted")
+            print(f"   🕷️ Playwright browsers functioning correctly")
+            return True
+        else:
+            print(f"\n🚨 SCRAPING FUNCTIONALITY ISSUES DETECTED")
+            if not endpoint_available:
+                print(f"   ❌ Scraping endpoint not accessible")
+            if not four_hands_success:
+                print(f"   ❌ Four Hands URL scraping failed")
+            print(f"   🔧 May require Playwright browser reinstallation")
+            return False
+
+
+# Main execution
 if __name__ == "__main__":
     tester = ScrapingTester()
-    success = tester.run_all_tests()
-    sys.exit(0 if success else 1)
+    success = tester.run_comprehensive_scraping_test()
+    
+    if success:
+        print("\n🎉 SUCCESS: Web scraping functionality verified!")
+        print("🕷️ Playwright browsers are working correctly")
+        print("📦 Four Hands product data extraction operational")
+        exit(0)
+    else:
+        print("\n❌ FAILURE: Web scraping functionality issues detected")
+        print("🔧 May need to reinstall Playwright browsers or check infrastructure")
+        exit(1)
