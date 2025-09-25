@@ -1180,7 +1180,7 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* IMAGE */}
-                                  <td className="border border-gray-400 px-2 py-1 text-white text-sm w-20">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-white text-sm w-20">
                                     {item.image_url ? (
                                       <img 
                                         src={item.image_url} 
