@@ -162,7 +162,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "SCRAPING PRIORITY: Fix web scraping to be ultra-robust and extract ALL product details (SKU, name, image, cost, size, finish/color) from vendor sites. Scraping 'still sucks real bad' and missing critical info. ALSO start Canva integration to scrape Canva boards for furniture links and Teams integration to send messages when STATUS changes (items added to to-do list). User will be away for long time, so work independently on all three priorities."
+  "URGENT BUG FIX VALIDATION - CHECKLIST TO FFE TRANSFER: User reported critical regression: 'geeze... we have NEVER had an issue with the transfer from the checklist to the ffe. now that does not work! it is transfering ALL of the living room!!!' The checklist to FFE transfer is transferring ALL items instead of only selected/written items. This was working before but broke due to recent auto-population changes. FIX APPLIED: Added auto_populate: false flag to FFE room creation during transfer in SimpleChecklistSpreadsheet.js line 637, so FFE rooms are created empty instead of auto-populated with all items. TESTING REQUIREMENTS: 1) Create checklist with 20+ items, 2) Fill out only 5-8 items with status/content, 3) Transfer to FFE, 4) Verify FFE room has only 5-8 items (the written ones), NOT all items from the room."
 
 backend:
   - task: "Ultra-Robust Web Scraping Engine - Priority 1"
