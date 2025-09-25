@@ -16,10 +16,10 @@ const MainContainer = ({
       <div className="text-center mb-4">
         <h2 className="text-3xl font-light tracking-wide mb-2" style={{
           color: '#B49B7E',
-          textShadow: '0 0 20px rgba(180, 155, 126, 0.6), 0 0 40px rgba(180, 155, 126, 0.3)'
+          textShadow: '0 0 15px rgba(180, 155, 126, 0.4), 0 0 25px rgba(180, 155, 126, 0.2)'
         }}>{title}</h2>
         <div className="w-48 h-1 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto" style={{
-          boxShadow: '0 0 15px rgba(180, 155, 126, 0.8)'
+          boxShadow: '0 0 10px rgba(180, 155, 126, 0.6)'
         }}></div>
       </div>
 
