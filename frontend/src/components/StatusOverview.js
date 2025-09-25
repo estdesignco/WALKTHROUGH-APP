@@ -274,7 +274,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
             opacity: '0.9',
             textShadow: '0 0 8px rgba(180, 155, 126, 0.3)'
           }}>Carrier Distribution</h4>
-          <div style={{ height: '35px' }}>
+          <div className="h-48">
             {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
               <Pie data={carrierPieData} options={pieOptions} />
             ) : (
