@@ -7,6 +7,7 @@ import SimpleWalkthroughSpreadsheet from './SimpleWalkthroughSpreadsheet';
 import StatusOverview from './StatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
+import CompletePageLayout from './CompletePageLayout';
 
 const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.log("🚀 WALKTHROUGH DASHBOARD IS LOADING");
