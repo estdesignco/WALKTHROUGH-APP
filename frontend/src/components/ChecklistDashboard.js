@@ -6,6 +6,7 @@ import SimpleChecklistSpreadsheet from './SimpleChecklistSpreadsheet';
 import ChecklistStatusOverview from './ChecklistStatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
+import CompletePageLayout from './CompletePageLayout';
 
 const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.error("🚨 CHECKLIST DASHBOARD IS LOADING!");
