@@ -14,7 +14,7 @@ const MainContainer = ({
       
       {/* Page Title - NO SPACING */}
       <div className="text-center mb-1">
-        <h2 className="text-3xl font-light tracking-wide mb-0" style={{
+        <h2 className="text-3xl font-light tracking-wide mb-0 border border-[#B49B7E]/20 px-4 py-2 rounded-lg" style={{
           color: '#B49B7E'
         }}>{title}</h2>
         <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E]/20 to-transparent mx-auto"></div>
