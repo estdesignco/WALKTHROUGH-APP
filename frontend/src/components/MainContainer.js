@@ -12,10 +12,29 @@ const MainContainer = ({
       background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,20,0.9) 30%, rgba(0,0,0,0.95) 100%)'
     }}> {/* THICK GOLD BORDER + GLOW */}
       
-      {/* Page Title - Luxury Style */}
-      <div className="text-center mb-4"> {/* Much smaller margin */}
-        <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide mb-2">{title}</h2> {/* Smaller margin */}
-        <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto"></div>
+      {/* Page Title - Luxury Style with SHIMMER */}
+      <div className="text-center mb-4">
+        <h2 className="text-3xl font-light tracking-wide mb-2" style={{
+          color: '#B49B7E',
+          textShadow: '0 0 20px rgba(180, 155, 126, 0.6), 0 0 40px rgba(180, 155, 126, 0.3)',
+          background: 'linear-gradient(45deg, #B49B7E, #D4C5A9, #B49B7E, #8B7355)',
+          backgroundSize: '300% 300%',
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          animation: 'shimmer 3s ease-in-out infinite'
+        }}>{title}</h2>
+        <div className="w-48 h-1 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto" style={{
+          boxShadow: '0 0 15px rgba(180, 155, 126, 0.8)'
+        }}></div>
+        
+        {/* Add shimmer animation styles */}
+        <style jsx>{`
+          @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+          }
+        `}</style>
       </div>
 
       {!hideNavigation && (
