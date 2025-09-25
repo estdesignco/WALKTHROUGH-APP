@@ -183,11 +183,12 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-      
-      {/* LEFT COLUMN - STATUS PIE CHART with Beautiful Rounded Treatment */}
-      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl p-6 border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
-        <h3 className="text-lg font-semibold text-[#B49B7E] mb-4 tracking-wide">Status Overview</h3>
+    <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* LEFT COLUMN - STATUS PIE CHART */}
+        <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl p-6 border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
+          <h3 className="text-lg font-semibold text-[#B49B7E] mb-4 tracking-wide">Status Overview</h3>
         
         {/* REAL PIE CHART WITH LABELS AND LINES */}
         <div className="h-64 mb-4">
