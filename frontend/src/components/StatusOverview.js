@@ -274,7 +274,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
 
         {/* 2. SHIPPING BREAKDOWN - EXACTLY LIKE STATUS BREAKDOWN! */}
         <div className="mb-6">
-          <h4 className="text-md font-medium mb-3" style={{ 
+          <h4 className="text-md font-medium mb-3 border-b border-[#B49B7E]/20 pb-1" style={{ 
             color: '#B49B7E', 
             opacity: '0.9'
           }}>Shipping Breakdown</h4>
