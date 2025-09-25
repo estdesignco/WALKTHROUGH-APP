@@ -257,14 +257,14 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* RIGHT COLUMN - SHIPPING SECTION with REFINED LUXURY */}
+      {/* RIGHT COLUMN - SHIPPING SECTION with MINIMAL GLOW */}
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)',
-        boxShadow: '0 0 20px rgba(180, 155, 126, 0.3), inset 0 1px 0 rgba(180, 155, 126, 0.15)'
+        boxShadow: '0 0 12px rgba(180, 155, 126, 0.2)'
       }}>
         <h3 className="text-lg font-semibold mb-4" style={{ 
           color: '#B49B7E',
-          textShadow: '0 0 10px rgba(180, 155, 126, 0.4)'
+          textShadow: '0 0 6px rgba(180, 155, 126, 0.3)'
         }}>Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
