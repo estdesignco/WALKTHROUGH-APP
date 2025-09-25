@@ -27,18 +27,18 @@ const MainContainer = ({
         <>
           {/* Action Buttons - Same style as Studio Dashboard */}
           <div className="flex justify-center gap-4 mb-4"> {/* Smaller margin */}
-            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/50 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2 border-2 border-[#D4C5A9]"
+            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/40 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2 border border-[#D4C5A9]"
                     style={{ 
                       color: '#F5F5DC',
-                      boxShadow: '0 0 25px rgba(180, 155, 126, 0.6), inset 0 1px 0 rgba(212, 197, 169, 0.3)'
+                      boxShadow: '0 0 15px rgba(180, 155, 126, 0.4), inset 0 1px 0 rgba(212, 197, 169, 0.2)'
                     }}>
               <span>📥</span>
               <span>Export FF&E</span>
             </button>
-            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/50 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2 border-2 border-[#D4C5A9]"
+            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/40 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2 border border-[#D4C5A9]"
                     style={{ 
                       color: '#F5F5DC',
-                      boxShadow: '0 0 25px rgba(180, 155, 126, 0.6), inset 0 1px 0 rgba(212, 197, 169, 0.3)'
+                      boxShadow: '0 0 15px rgba(180, 155, 126, 0.4), inset 0 1px 0 rgba(212, 197, 169, 0.2)'
                     }}>
               <span>📋</span>
               <span>Spec Sheet</span>
