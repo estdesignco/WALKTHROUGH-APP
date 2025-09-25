@@ -203,15 +203,11 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST with MINIMAL GLOW */}
+      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST with BORDER */}
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)',
-        boxShadow: '0 0 12px rgba(180, 155, 126, 0.2)'
+        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold mb-4" style={{ 
-          color: '#B49B7E',
-          textShadow: '0 0 6px rgba(180, 155, 126, 0.3)'
-        }}>Status Breakdown</h3>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: '#B49B7E' }}>Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
