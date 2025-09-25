@@ -1141,7 +1141,7 @@ const SimpleChecklistSpreadsheet = ({
                                   
                                   {/* STATUS - DROPDOWN WITH FORCED COLORED CELL */}
                                   <td 
-                                    className="border border-gray-400 px-1 py-1 text-white text-sm"
+                                    className="border border-[#B49B7E] px-1 py-1 text-white text-sm"
                                     style={{ 
                                       backgroundColor: getStatusColor(item.status || '') + ' !important',
                                       background: getStatusColor(item.status || ''),
