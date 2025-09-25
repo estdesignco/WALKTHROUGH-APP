@@ -884,7 +884,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                           }}
                                         />
                                       </td>
-                                      <td className="border border-[#B49B7E]/40 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
+                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
@@ -895,7 +895,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.name}
                                         </div>
                                       </td>
-                                      <td className="border border-[#B49B7E]/40 px-2 py-1 text-sm text-center w-16" style={{ color: '#F5F5DC' }}>
+                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm text-center w-16" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
@@ -906,7 +906,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.quantity || 1}
                                         </div>
                                       </td>
-                                      <td className="border border-[#B49B7E]/40 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
+                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
@@ -917,7 +917,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.size || ''}
                                         </div>
                                       </td>
-                                      <td className="border border-[#B49B7E]/40 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
+                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
@@ -928,7 +928,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.finish_color || ''}
                                         </div>
                                       </td>
-                                      <td className="border border-[#B49B7E]/40 px-1 py-1 text-center w-12">
+                                      <td className="border border-[#B49B7E]/20 px-1 py-1 text-center w-12">
                                         <button 
                                           onClick={() => handleDeleteItem(item.id)}
                                           className="text-red-400 hover:text-red-300 text-xs"
