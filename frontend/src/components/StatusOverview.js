@@ -290,7 +290,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           <h4 className="text-md font-medium mb-3" style={{ 
             color: '#B49B7E', 
             opacity: '0.9',
-            textShadow: '0 0 10px rgba(180, 155, 126, 0.4)'
+            textShadow: '0 0 8px rgba(180, 155, 126, 0.3)'
           }}>Shipping Breakdown</h4>
           <div className="space-y-3 max-h-60 overflow-y-auto">{/*INCREASED HEIGHT*/}
             {[
