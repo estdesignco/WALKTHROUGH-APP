@@ -207,14 +207,14 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST with SHIMMER */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border-2 border-[#B49B7E]" style={{
+      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST with SUBTLE ELEGANCE */}
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)',
-        boxShadow: '0 0 30px rgba(180, 155, 126, 0.4), inset 0 1px 0 rgba(180, 155, 126, 0.2)'
+        boxShadow: '0 0 20px rgba(180, 155, 126, 0.3), inset 0 1px 0 rgba(180, 155, 126, 0.15)'
       }}>
         <h3 className="text-lg font-semibold mb-4" style={{ 
           color: '#B49B7E',
-          textShadow: '0 0 15px rgba(180, 155, 126, 0.6)'
+          textShadow: '0 0 10px rgba(180, 155, 126, 0.4)'
         }}>Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
