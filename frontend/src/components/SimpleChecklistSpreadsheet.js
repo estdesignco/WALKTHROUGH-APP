@@ -633,7 +633,8 @@ const SimpleChecklistSpreadsheet = ({
               name: itemContext.roomName,
               project_id: projectId,
               sheet_type: 'ffe',
-              description: `Transferred from checklist - ${itemContext.roomName}`
+              description: `Transferred from checklist - ${itemContext.roomName}`,
+              auto_populate: false  // CRITICAL: Create empty FFE room for transfer
             };
             
             console.log(`🏠 Creating FFE room: ${itemContext.roomName}`);
