@@ -186,15 +186,15 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       
       {/* LEFT COLUMN - STATUS PIE CHART */}
-      <div className="bg-gray-800 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Status Overview</h3>
+      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl border border-[#B49B7E]/30 shadow-xl backdrop-blur-sm p-6">
+        <h3 className="text-lg font-semibold mb-4" style={{ color: '#B49B7E' }}>Status Overview</h3>
         
         {/* REAL PIE CHART WITH LABELS AND LINES */}
         <div className="h-64 mb-4">
           {totalItems > 0 ? (
             <Pie data={statusPieData} options={pieOptions} />
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="flex items-center justify-center h-full text-[#B49B7E]/60">
               No items to display
             </div>
           )}
@@ -202,8 +202,8 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
       </div>
 
       {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST */}
-      <div className="bg-gray-800 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Status Breakdown</h3>
+      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl border border-[#B49B7E]/30 shadow-xl backdrop-blur-sm p-6">
+        <h3 className="text-lg font-semibold mb-4" style={{ color: '#B49B7E' }}>Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
