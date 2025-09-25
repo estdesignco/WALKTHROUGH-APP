@@ -183,7 +183,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 border-t border-[#B49B7E]/20 pt-4">
       
       {/* LEFT COLUMN - STATUS PIE CHART with DIMMED BORDER */}
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20" style={{
