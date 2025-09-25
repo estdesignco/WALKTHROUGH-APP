@@ -246,17 +246,17 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
       </div>
 
       {/* RIGHT COLUMN - SHIPPING SECTION */}
-      <div className="bg-gray-800 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Shipping Information</h3>
+      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl border border-[#B49B7E]/30 shadow-xl backdrop-blur-sm p-6">
+        <h3 className="text-lg font-semibold mb-4" style={{ color: '#B49B7E' }}>Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
-          <h4 className="text-md font-medium text-gray-300 mb-3">Carrier Distribution</h4>
+          <h4 className="text-md font-medium mb-3" style={{ color: '#B49B7E', opacity: '0.8' }}>Carrier Distribution</h4>
           <div className="h-48">
             {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
               <Pie data={carrierPieData} options={pieOptions} />
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-400">
+              <div className="flex items-center justify-center h-full text-[#B49B7E]/60">
                 No carrier data
               </div>
             )}
@@ -265,7 +265,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
 
         {/* 2. SHIPPING BREAKDOWN - EXACTLY LIKE STATUS BREAKDOWN! */}
         <div className="mb-6">
-          <h4 className="text-md font-medium text-gray-300 mb-3">Shipping Breakdown</h4>
+          <h4 className="text-md font-medium mb-3" style={{ color: '#B49B7E', opacity: '0.8' }}>Shipping Breakdown</h4>
           <div className="space-y-3 max-h-60 overflow-y-auto">{/*INCREASED HEIGHT*/}
             {[
               'FedEx', 'UPS', 'USPS', 'DHL', 'Brooks', 'Zenith', 'Sunbelt',
