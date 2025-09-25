@@ -266,11 +266,11 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           <>
             {/* Navigation Tabs */}
             <div className="flex justify-center space-x-8 mb-6">
-              <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+              <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 transition-colors" style={{ color: '#F5F5DC', opacity: '0.7' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
                 <span>📋</span>
                 <span>Questionnaire</span>
               </a>
-              <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+              <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 transition-colors" style={{ color: '#F5F5DC', opacity: '0.7' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
                 <span>🚶</span>
                 <span>Walkthrough</span>
               </a>
@@ -278,7 +278,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
                 <span>✅</span>
                 <span className="font-semibold">Checklist</span>
               </div>
-              <a href={`/project/${projectId}/ffe`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+              <a href={`/project/${projectId}/ffe`} className="flex items-center space-x-2 transition-colors" style={{ color: '#F5F5DC', opacity: '0.7' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
                 <span>📊</span>
                 <span>FF&E</span>
               </a>
