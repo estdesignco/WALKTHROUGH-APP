@@ -185,8 +185,8 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       
-      {/* LEFT COLUMN - STATUS PIE CHART with BORDER */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]" style={{
+      {/* LEFT COLUMN - STATUS PIE CHART with DIMMED BORDER */}
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
         <h3 className="text-lg font-semibold mb-4" style={{ color: '#B49B7E' }}>Status Overview</h3>
