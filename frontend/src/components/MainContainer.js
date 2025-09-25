@@ -22,8 +22,8 @@ const MainContainer = ({
 
       {!hideNavigation && (
         <>
-          {/* Action Buttons - Same style as Studio Dashboard */}
-          <div className="flex justify-center gap-4 mb-2"> {/* Much tighter spacing */}
+          {/* Action Buttons - ZERO SPACING */}
+          <div className="flex justify-center gap-4 mb-1">
             <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2 border border-[#D4C5A9]/20"
                     style={{ color: '#F5F5DC' }}> {/* DIMMED BORDER TO 20% */}
               <span>📥</span>
