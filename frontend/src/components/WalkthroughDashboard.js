@@ -239,6 +239,9 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
           </>
         )}
 
+        {/* DIVIDER LINE */}
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#B49B7E]/20 to-transparent my-1"></div>
+        
         {/* PIE CHART AND STATUS BREAKDOWN - ALWAYS VISIBLE */}
         <StatusOverview
           totalItems={getTotalItems()}
