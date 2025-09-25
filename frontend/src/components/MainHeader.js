@@ -8,16 +8,16 @@ const MainHeader = ({
   return (
     <div className="max-w-full mx-auto bg-gradient-to-b from-black via-gray-900 to-black min-h-screen">
       {/* TOP HEADER */}
-      <div className="mb-4"> {/* Reduced from mb-6 to mb-4 */}
-        <div className="text-center mb-3"> {/* Reduced from mb-4 to mb-3 */}
-          <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
+      <div className="mb-2 pt-4"> {/* Much smaller margin and padding */}
+        <div className="text-center mb-2"> {/* Much smaller margin */}
+          <h1 className="text-4xl font-bold text-white mb-1" style={{ color: '#8b7355' }}>GREENE</h1> {/* Smaller margin */}
           <p style={{ color: '#F5F5DC', opacity: '0.8' }}>Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
         </div>
 
         {!hideNavigation && (
           <>
             {/* Navigation Tabs */}
-            <div className="flex justify-center space-x-8 mb-4"> {/* Reduced from mb-6 to mb-4 */}
+            <div className="flex justify-center space-x-8 mb-3"> {/* Much smaller margin */}
               <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 transition-colors" style={{ color: '#F5F5DC', opacity: '0.7' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
                 <span>📋</span>
                 <span>Questionnaire</span>
