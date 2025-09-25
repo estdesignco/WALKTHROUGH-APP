@@ -259,8 +259,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         <div className="mb-6">
           <h4 className="text-md font-medium mb-3" style={{ 
             color: '#B49B7E', 
-            opacity: '0.9',
-            textShadow: '0 0 4px rgba(180, 155, 126, 0.2)'
+            opacity: '0.9'
           }}>Carrier Distribution</h4>
           <div className="h-48">
             {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
