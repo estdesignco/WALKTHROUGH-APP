@@ -56,7 +56,7 @@ const MainContainer = ({
             <button
               onClick={onAddRoom}
               className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide ml-4 font-medium border border-[#D4C5A9]/20"
-              style={{ color: '#F5F5DC' }} {/* DIMMED BORDER TO 20% */}
+              style={{ color: '#F5F5DC' }}
             >
               ➕ Add Room
             </button>
