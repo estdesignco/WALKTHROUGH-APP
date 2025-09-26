@@ -2004,7 +2004,14 @@ class RealVendorScraper:
                     logger.info(f"✅ REAL DIMENSIONS: {scraped_data['dimensions']}")
                     break
             
-            logger.info(f"🎉 Successfully scraped REAL data from {product_url}")
+            # Log what we found
+            logger.info(f"🎉 SCRAPED RESULTS:")
+            logger.info(f"   Title: {scraped_data.get('title', 'NOT FOUND')}")
+            logger.info(f"   SKU: {scraped_data.get('sku', 'NOT FOUND')}")
+            logger.info(f"   Price: {scraped_data.get('price', 'NOT FOUND')}")
+            logger.info(f"   Description: {scraped_data.get('description', 'NOT FOUND')[:50]}...")
+            logger.info(f"   Images: {len(scraped_data.get('multiple_images', []))}")
+            
             return scraped_data
             
         except Exception as e:
