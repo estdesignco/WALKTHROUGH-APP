@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import HouzzIntegrationModal from './HouzzIntegrationModal';
+import MobileWalkthroughApp from './MobileWalkthroughApp';
 
 // Canva Project Assignment Modal
 const CanvaProjectModal = ({ product, onClose, onAssign }) => {
