@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HouzzIntegrationModal from './HouzzIntegrationModal';
 import MobileWalkthroughApp from './MobileWalkthroughApp';
 import WorkflowDashboard from './WorkflowDashboard';
