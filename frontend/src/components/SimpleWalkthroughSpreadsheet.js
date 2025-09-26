@@ -692,7 +692,7 @@ const SimpleWalkthroughSpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#F5F5DC] border border-[#B49B7E]/30 focus:border-[#B49B7E] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
             >
               <option value="">All Rooms</option>
               {(project?.rooms || []).map(room => (
