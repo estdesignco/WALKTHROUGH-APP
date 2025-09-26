@@ -1112,7 +1112,7 @@ const SimpleChecklistSpreadsheet = ({
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-white text-sm text-center outline-none"
+                                      className="w-full bg-transparent text-[#F5F5DC] text-sm text-center outline-none"
                                       onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
                                     >
                                       {item.quantity || ''}
