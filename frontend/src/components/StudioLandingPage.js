@@ -905,7 +905,18 @@ const StudioLandingPage = () => {
             </p>
           </div>
 
-          {/* This was moved to the top of the page */}
+          {/* UNIFIED FURNITURE SEARCH - AT THE TOP! NO MORE SCROLLING! */}
+          <div className="bg-black/50 border-b-4 border-[#B49B7E] py-6">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="text-center mb-6">
+                <h2 className="text-4xl font-bold text-[#B49B7E] mb-2">🔍 UNIFIED FURNITURE SEARCH ENGINE</h2>
+                <p className="text-[#F5F5DC]/80 text-lg">
+                  Search ALL Four Hands console tables • Real-Time Houzz Pro Clipper • No More Scrolling!
+                </p>
+              </div>
+              <UnifiedFurnitureSearch />
+            </div>
+          </div>
         </>
       )}
 
