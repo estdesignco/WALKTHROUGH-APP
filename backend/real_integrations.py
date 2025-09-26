@@ -1030,15 +1030,19 @@ class RealIntegrationManager:
         try:
             logger.info(f"Starting real search for: {search_query}")
             
-            # Scrape products from multiple vendors
+            # Scrape products from Four Hands and Hudson Valley ONLY
             all_products = []
             
-            # Four Hands
-            fourhands_products = await self.scraper.scrape_fourhands(search_query)
+            # Four Hands - use dedicated console table scraper if searching for console tables
+            if 'console' in search_query.lower():
+                logger.info("Using dedicated Four Hands console table scraper")
+                fourhands_products = await self.scraper.scrape_fourhands_console_tables(max_results=60)
+            else:
+                fourhands_products = await self.scraper.scrape_fourhands(search_query)
             all_products.extend(fourhands_products)
             
-            # Hudson Valley Lighting  
-            if 'lighting' in search_query.lower() or 'lamp' in search_query.lower():
+            # Hudson Valley Lighting for lighting products
+            if 'lighting' in search_query.lower() or 'lamp' in search_query.lower() or 'pendant' in search_query.lower() or 'chandelier' in search_query.lower():
                 hudson_products = await self.scraper.scrape_hudson_valley(search_query)
                 all_products.extend(hudson_products)
             
