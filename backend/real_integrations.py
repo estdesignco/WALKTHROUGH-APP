@@ -1748,6 +1748,92 @@ class RealVendorScraper:
             product_data['multiple_images_base64'] = []
             product_data['image_url'] = None
             product_data['image_base64'] = None
+    
+    async def get_real_fourhands_console_urls(self) -> List[str]:
+        """Get REAL Four Hands console table product URLs"""
+        try:
+            logger.info("Finding REAL Four Hands console table URLs...")
+            self.setup_session()
+            
+            console_urls = []
+            
+            # Try different approaches to find console table URLs
+            search_urls = [
+                "https://fourhands.com",
+                "https://fourhands.com/sitemap.xml",
+                "https://fourhands.com/products.json"
+            ]
+            
+            for search_url in search_urls:
+                try:
+                    logger.info(f"Checking {search_url} for product URLs...")
+                    response = self.session.get(search_url, timeout=15)
+                    response.raise_for_status()
+                    
+                    if search_url.endswith('.json'):
+                        # Try JSON API
+                        try:
+                            data = response.json()
+                            if isinstance(data, dict) and 'products' in data:
+                                for product in data['products']:
+                                    if isinstance(product, dict) and 'handle' in product:
+                                        if any(term in product['handle'].lower() for term in ['console', 'table']):
+                                            console_urls.append(f"https://fourhands.com/products/{product['handle']}")
+                        except:
+                            pass
+                    
+                    elif search_url.endswith('.xml'):
+                        # Try sitemap
+                        try:
+                            if 'sitemap' in response.text.lower():
+                                # Parse sitemap for product URLs
+                                import xml.etree.ElementTree as ET
+                                root = ET.fromstring(response.content)
+                                for url_elem in root.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}url'):
+                                    loc_elem = url_elem.find('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')
+                                    if loc_elem is not None:
+                                        url = loc_elem.text
+                                        if '/products/' in url and any(term in url.lower() for term in ['console', 'table']):
+                                            console_urls.append(url)
+                        except:
+                            pass
+                    
+                    else:
+                        # Parse HTML for product links
+                        soup = BeautifulSoup(response.content, 'lxml')
+                        
+                        # Look for product links
+                        for link in soup.find_all('a', href=True):
+                            href = link['href']
+                            if '/products/' in href:
+                                # Make absolute URL
+                                if not href.startswith('http'):
+                                    href = f"https://fourhands.com{href}"
+                                
+                                # Check if it's console related
+                                if any(term in href.lower() for term in ['console', 'table']):
+                                    console_urls.append(href)
+                                # Also check link text
+                                elif any(term in link.get_text().lower() for term in ['console', 'table']):
+                                    console_urls.append(href)
+                    
+                    # If we found some URLs, break
+                    if console_urls:
+                        break
+                        
+                except Exception as e:
+                    logger.error(f"Error checking {search_url}: {e}")
+                    continue
+            
+            # Remove duplicates and limit results
+            unique_urls = list(set(console_urls))[:60]  # Limit to 60 as requested
+            
+            logger.info(f"Found {len(unique_urls)} unique console table URLs")
+            return unique_urls
+            
+        except Exception as e:
+            logger.error(f"Error finding real Four Hands URLs: {e}")
+            return []
 
     async def scrape_hudson_valley(self, search_query: str = "lighting", max_results: int = 20) -> List[Dict]:
         """Scrape Hudson Valley Lighting using requests/BeautifulSoup"""
