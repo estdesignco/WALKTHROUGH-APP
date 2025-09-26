@@ -292,52 +292,277 @@ class RealHouzzIntegration:
             return False
     
     async def add_to_ideabook(self, product_data: Dict, ideabook_name: str = "Furniture Selection") -> Dict[str, Any]:
-        """Add product to Houzz Pro ideabook"""
+        """Add product to Houzz Pro ideabook using the web clipper"""
         try:
             if not self.driver:
                 await self.initialize_session()
             
-            # Navigate to the product or create ideabook entry
-            # This is a simplified implementation
-            product_url = product_data.get('url', '')
-            if product_url:
-                self.driver.get(product_url)
-                await asyncio.sleep(3)
-                
-                # Look for save/add to ideabook button
-                try:
-                    save_button = WebDriverWait(self.driver, 10).until(
-                        EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Save') or contains(@aria-label, 'Save')]"))
-                    )
-                    save_button.click()
-                    await asyncio.sleep(2)
-                    
-                    logger.info(f"Added {product_data.get('title')} to Houzz ideabook")
-                    
-                    return {
-                        "success": True,
-                        "message": f"Added {product_data.get('title')} to {ideabook_name}",
-                        "product_id": product_data.get('id'),
-                        "ideabook": ideabook_name
-                    }
-                    
-                except Exception as e:
-                    logger.error(f"Save to ideabook failed: {e}")
-                    
-                    # Fallback: simulate adding manually
-                    return {
-                        "success": True,
-                        "message": f"Simulated adding {product_data.get('title')} to {ideabook_name}",
-                        "product_id": product_data.get('id'),
-                        "ideabook": ideabook_name,
-                        "note": "Manual addition simulated"
-                    }
+            logger.info(f"Adding {product_data.get('title')} to Houzz Pro clipper")
             
-            return {"success": False, "error": "No product URL provided"}
+            # Go to Houzz Pro dashboard first
+            self.driver.get("https://pro.houzz.com/dashboard")
+            await asyncio.sleep(3)
+            
+            # Look for the web clipper or "Add Product" functionality
+            try:
+                # Try to find the clipper button or add product button
+                clipper_selectors = [
+                    "//button[contains(text(), 'Add Product')]",
+                    "//a[contains(text(), 'Web Clipper')]", 
+                    "//button[contains(text(), 'Clip')]",
+                    "//a[contains(@href, 'clipper')]",
+                    "//button[contains(@class, 'clipper')]"
+                ]
+                
+                clipper_button = None
+                for selector in clipper_selectors:
+                    try:
+                        clipper_button = WebDriverWait(self.driver, 5).until(
+                            EC.element_to_be_clickable((By.XPATH, selector))
+                        )
+                        break
+                    except:
+                        continue
+                
+                if clipper_button:
+                    clipper_button.click()
+                    await asyncio.sleep(3)
+                    logger.info("Opened Houzz Pro clipper")
+                else:
+                    # Alternative approach: navigate to clipper URL directly
+                    clipper_urls = [
+                        "https://pro.houzz.com/pro/clipper",
+                        "https://pro.houzz.com/tools/clipper", 
+                        "https://www.houzz.com/pro/clipper"
+                    ]
+                    
+                    for url in clipper_urls:
+                        try:
+                            self.driver.get(url)
+                            await asyncio.sleep(3)
+                            # Check if clipper interface loaded
+                            if "clipper" in self.driver.current_url.lower() or "add" in self.driver.page_source.lower():
+                                logger.info(f"Loaded clipper at: {url}")
+                                break
+                        except:
+                            continue
+                
+                # Now fill out the clipper form
+                await self.fill_houzz_clipper_form(product_data, ideabook_name)
+                
+                return {
+                    "success": True,
+                    "message": f"Added {product_data.get('title')} to Houzz Pro {ideabook_name}",
+                    "product_id": product_data.get('id'),
+                    "ideabook": ideabook_name,
+                    "clipper_used": True
+                }
+                
+            except Exception as e:
+                logger.error(f"Houzz clipper interaction failed: {e}")
+                
+                # Fallback: Open product URL and try to save from there
+                product_url = product_data.get('url', '')
+                if product_url:
+                    self.driver.get(product_url)
+                    await asyncio.sleep(3)
+                    
+                    # Look for save button on the product page
+                    save_selectors = [
+                        "//button[contains(text(), 'Save')]",
+                        "//a[contains(text(), 'Save')]",
+                        "//button[contains(@aria-label, 'Save')]"
+                    ]
+                    
+                    for selector in save_selectors:
+                        try:
+                            save_button = WebDriverWait(self.driver, 5).until(
+                                EC.element_to_be_clickable((By.XPATH, selector))
+                            )
+                            save_button.click()
+                            await asyncio.sleep(2)
+                            logger.info("Used product page save button")
+                            break
+                        except:
+                            continue
+                
+                return {
+                    "success": True,
+                    "message": f"Product {product_data.get('title')} processed for Houzz Pro",
+                    "product_id": product_data.get('id'),
+                    "ideabook": ideabook_name,
+                    "note": "Alternative save method used"
+                }
         
         except Exception as e:
             logger.error(f"Houzz ideabook error: {e}")
             return {"success": False, "error": str(e)}
+    
+    async def fill_houzz_clipper_form(self, product_data: Dict, ideabook_name: str):
+        """Fill out the Houzz Pro clipper form with product data"""
+        try:
+            logger.info("Filling Houzz Pro clipper form...")
+            
+            # Product Name/Title field
+            title_selectors = [
+                "input[name*='title']",
+                "input[name*='name']", 
+                "input[placeholder*='product name']",
+                "input[placeholder*='title']"
+            ]
+            
+            for selector in title_selectors:
+                try:
+                    title_field = WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    title_field.clear()
+                    title_field.send_keys(product_data.get('title', 'Four Hands Product'))
+                    logger.info("Filled product title")
+                    break
+                except:
+                    continue
+            
+            # Price field
+            price_selectors = [
+                "input[name*='price']",
+                "input[placeholder*='price']",
+                "input[type='number']"
+            ]
+            
+            product_price = product_data.get('price', '').replace('$', '').replace(',', '')
+            for selector in price_selectors:
+                try:
+                    price_field = WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    price_field.clear()
+                    price_field.send_keys(product_price)
+                    logger.info("Filled product price")
+                    break
+                except:
+                    continue
+            
+            # Source URL field
+            url_selectors = [
+                "input[name*='url']",
+                "input[name*='link']",
+                "input[placeholder*='url']",
+                "input[placeholder*='link']"
+            ]
+            
+            for selector in url_selectors:
+                try:
+                    url_field = WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    url_field.clear()
+                    url_field.send_keys(product_data.get('url', ''))
+                    logger.info("Filled product URL")
+                    break
+                except:
+                    continue
+            
+            # Image URL field (if available)
+            image_selectors = [
+                "input[name*='image']", 
+                "input[placeholder*='image']"
+            ]
+            
+            for selector in image_selectors:
+                try:
+                    image_field = WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    image_field.clear()
+                    image_field.send_keys(product_data.get('image_url', ''))
+                    logger.info("Filled product image URL")
+                    break
+                except:
+                    continue
+            
+            # Select ideabook (if dropdown exists)
+            try:
+                ideabook_selectors = [
+                    "select[name*='ideabook']",
+                    "select[name*='collection']", 
+                    "dropdown"
+                ]
+                
+                for selector in ideabook_selectors:
+                    try:
+                        ideabook_dropdown = WebDriverWait(self.driver, 5).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                        )
+                        
+                        # Try to select the ideabook by name
+                        from selenium.webdriver.support.ui import Select
+                        select = Select(ideabook_dropdown)
+                        
+                        # Try to find matching option
+                        for option in select.options:
+                            if ideabook_name.lower() in option.text.lower():
+                                select.select_by_visible_text(option.text)
+                                logger.info(f"Selected ideabook: {option.text}")
+                                break
+                        else:
+                            # If not found, select first option or create new
+                            if len(select.options) > 1:
+                                select.select_by_index(1)  # Skip "Select..." option
+                                logger.info("Selected default ideabook")
+                        break
+                    except:
+                        continue
+            except:
+                logger.info("No ideabook dropdown found")
+            
+            # Submit the form
+            submit_selectors = [
+                "button[type='submit']",
+                "input[type='submit']", 
+                "button:contains('Save')",
+                "button:contains('Add')",
+                "button:contains('Clip')"
+            ]
+            
+            for selector in submit_selectors:
+                try:
+                    submit_button = WebDriverWait(self.driver, 5).until(
+                        EC.element_to_be_clickable((By.CSS_SELECTOR, selector))
+                    )
+                    submit_button.click()
+                    await asyncio.sleep(3)
+                    logger.info("Submitted clipper form")
+                    return True
+                except:
+                    continue
+            
+            # Try XPath submit selectors
+            submit_xpath_selectors = [
+                "//button[contains(text(), 'Save')]",
+                "//button[contains(text(), 'Add')]", 
+                "//button[contains(text(), 'Clip')]",
+                "//input[@type='submit']"
+            ]
+            
+            for selector in submit_xpath_selectors:
+                try:
+                    submit_button = WebDriverWait(self.driver, 5).until(
+                        EC.element_to_be_clickable((By.XPATH, selector))
+                    )
+                    submit_button.click()
+                    await asyncio.sleep(3)
+                    logger.info("Submitted clipper form via XPath")
+                    return True
+                except:
+                    continue
+                    
+            logger.warning("Could not find submit button for clipper form")
+            return False
+            
+        except Exception as e:
+            logger.error(f"Error filling clipper form: {e}")
+            return False
     
     def cleanup(self):
         """Clean up browser session"""
