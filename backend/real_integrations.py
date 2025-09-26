@@ -399,16 +399,21 @@ class RealHouzzIntegration:
             return {"success": False, "error": str(e)}
     
     async def fill_houzz_clipper_form(self, product_data: Dict, ideabook_name: str):
-        """Fill out the Houzz Pro clipper form with product data"""
+        """Fill out the Houzz Pro clipper form with product data and multiple images"""
         try:
-            logger.info("Filling Houzz Pro clipper form...")
+            logger.info("Filling Houzz Pro clipper form with multiple images...")
+            
+            # First, expand any collapsed sections or dropdowns
+            await self.expand_clipper_sections()
             
             # Product Name/Title field
             title_selectors = [
                 "input[name*='title']",
                 "input[name*='name']", 
                 "input[placeholder*='product name']",
-                "input[placeholder*='title']"
+                "input[placeholder*='title']",
+                "input[id*='title']",
+                "textarea[name*='title']"
             ]
             
             for selector in title_selectors:
@@ -427,7 +432,8 @@ class RealHouzzIntegration:
             price_selectors = [
                 "input[name*='price']",
                 "input[placeholder*='price']",
-                "input[type='number']"
+                "input[type='number']",
+                "input[id*='price']"
             ]
             
             product_price = product_data.get('price', '').replace('$', '').replace(',', '')
@@ -448,7 +454,9 @@ class RealHouzzIntegration:
                 "input[name*='url']",
                 "input[name*='link']",
                 "input[placeholder*='url']",
-                "input[placeholder*='link']"
+                "input[placeholder*='link']",
+                "input[id*='url']",
+                "input[id*='link']"
             ]
             
             for selector in url_selectors:
@@ -463,23 +471,11 @@ class RealHouzzIntegration:
                 except:
                     continue
             
-            # Image URL field (if available)
-            image_selectors = [
-                "input[name*='image']", 
-                "input[placeholder*='image']"
-            ]
+            # Handle MULTIPLE IMAGES (up to 5 for Houzz)
+            await self.add_multiple_images_to_houzz(product_data)
             
-            for selector in image_selectors:
-                try:
-                    image_field = WebDriverWait(self.driver, 5).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
-                    )
-                    image_field.clear()
-                    image_field.send_keys(product_data.get('image_url', ''))
-                    logger.info("Filled product image URL")
-                    break
-                except:
-                    continue
+            # Fill additional product details
+            await self.fill_houzz_product_details(product_data)
             
             # Select ideabook (if dropdown exists)
             try:
