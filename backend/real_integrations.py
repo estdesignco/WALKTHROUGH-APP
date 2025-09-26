@@ -1135,14 +1135,26 @@ class RealVendorScraper:
                     price = random.randint(499, 2999)
                     product_id = name.lower().replace(' ', '-').replace(',', '')
                     
+                    # Generate multiple images for Houzz (up to 5 images)
+                    multiple_images = []
+                    multiple_images_base64 = []
+                    
+                    for img_num in range(5):
+                        img_url = f"https://via.placeholder.com/400x300/8B4513/FFFFFF?text=Four+Hands+Console+{i+1}+View+{img_num+1}"
+                        multiple_images.append(img_url)
+                        img_base64 = await self.download_and_process_image(img_url)
+                        multiple_images_base64.append(img_base64)
+
                     products.append({
                         'id': f"fourhands_console_{i}_{int(time.time())}",
                         'title': f"Four Hands {name}",
                         'price': f"${price}.00",
                         'price_numeric': price,
                         'url': f"https://fourhands.com/products/{product_id}",
-                        'image_url': f"https://via.placeholder.com/400x300/8B4513/FFFFFF?text=Four+Hands+Console+{i+1}",
-                        'image_base64': await self.download_and_process_image(f"https://via.placeholder.com/400x300/8B4513/FFFFFF?text=Four+Hands+Console+{i+1}"),
+                        'image_url': multiple_images[0],  # Primary image
+                        'image_base64': multiple_images_base64[0],  # Primary image base64
+                        'multiple_images': multiple_images,  # All 5 images for Houzz
+                        'multiple_images_base64': multiple_images_base64,  # All 5 base64 images
                         'seller': 'Four Hands',
                         'vendor': 'Four Hands',
                         'category': 'console table',
