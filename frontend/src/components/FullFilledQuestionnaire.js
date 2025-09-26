@@ -10,9 +10,12 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
     };
 
     const Section = ({ title, description, children }) => (
-        <div className="mb-8 p-6 bg-stone-800 rounded-lg border border-stone-700">
-            <h3 className="text-xl font-bold text-[#8B7355] mb-2">{title}</h3>
-            {description && <p className="text-stone-400 mb-4 text-sm">{description}</p>}
+        <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+             style={{
+               background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+             }}>
+            <h3 className="text-xl font-bold text-[#F5F5DC] mb-2">{title}</h3>
+            {description && <p className="text-[#F5F5DC]/80 mb-4 text-sm">{description}</p>}
             <div className="space-y-4">
                 {children}
             </div>
