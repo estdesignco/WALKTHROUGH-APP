@@ -695,7 +695,7 @@ const ExactFFESpreadsheet = ({
       {/* SEARCH AND FILTER SECTION - SAME TREATMENT AS GRAPH CONTAINERS */}
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
            style={{
-             background: 'linear-gradient(135deg, rgba(180,155,126,0.15) 0%, rgba(160,139,111,0.1) 30%, rgba(180,155,126,0.15) 100%)'
+             background: 'linear-gradient(135deg, rgba(30,41,59,0.95) 0%, rgba(51,65,85,0.9) 30%, rgba(30,41,59,0.95) 100%)'
            }}>
         <div className="flex flex-col lg:flex-row gap-4 items-center">
           {/* Search Input */}
