@@ -822,19 +822,8 @@ IMAGES (5):
 
 Copy this data to Houzz Pro clipper!`;
                             
-                            // Show in alert for now (can be enhanced to modal later)
+                            // Show ONLY the complete clipper data popup
                             alert(clipperInfo);
-                            
-                            alert(`🎉 SUCCESS! Complete Houzz Pro clipper data generated for "${product.name}"!
-
-All required fields have been populated:
-✅ Product title, unit cost, markup (125%), client price, MSRP
-✅ Description for vendor and client description 
-✅ SKU, manufacturer, dimensions, finish/color, materials
-✅ Category, vendor, project, room dropdowns
-✅ All 5 images with URLs
-
-The complete data is ready to copy to your Houzz Pro clipper form!`);
                           } else {
                             alert(`🔥 ${product.name} processed for Houzz Pro clipper!`);
                           }
