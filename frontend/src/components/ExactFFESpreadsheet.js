@@ -839,12 +839,18 @@ const ExactFFESpreadsheet = ({
         </div>
       </div>
 
-      {/* ORIGINAL TABLE STRUCTURE - DO NOT CHANGE */}
-      <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
-        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
-          
-          <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
-            <table className="w-full border-collapse border border-[#B49B7E]">
+      {/* SPREADSHEET CONTAINER - SAME TREATMENT AS GRAPHS BUT BLUE */}
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+           style={{
+             background: 'linear-gradient(135deg, rgba(30,58,138,0.95) 0%, rgba(59,130,246,0.9) 30%, rgba(30,58,138,0.95) 100%)'
+           }}>
+        
+        {/* ORIGINAL TABLE STRUCTURE - DO NOT CHANGE */}
+        <div className="w-full overflow-x-auto" style={{ backgroundColor: 'rgba(15,23,42,0.8)', touchAction: 'pan-x' }}>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
+            
+            <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
+              <table className="w-full border-collapse border border-[#B49B7E]">
                   
                   <thead>
                     {/* EMPTY HEADER FOR STRUCTURE */}
