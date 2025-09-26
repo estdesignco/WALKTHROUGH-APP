@@ -353,21 +353,28 @@ class RealTeamsIntegration:
             if not self.webhook_url:
                 return {"success": False, "error": "Teams webhook URL not configured"}
             
-            # Create Teams message card
-            message_card = {
-                "@type": "MessageCard",
-                "@context": "http://schema.org/extensions",
-                "themeColor": "0078D4",
-                "summary": title,
-                "sections": [{
-                    "activityTitle": title,
-                    "activitySubtitle": "Automated Notification",
-                    "text": message,
-                    "markdown": True
-                }]
-            }
+            # Check if this is a Microsoft Teams webhook or other service
+            if "teams.microsoft.com" in self.webhook_url or "office.com" in self.webhook_url:
+                # Standard Microsoft Teams webhook format
+                message_card = {
+                    "@type": "MessageCard",
+                    "@context": "http://schema.org/extensions",
+                    "themeColor": "0078D4",
+                    "summary": title,
+                    "sections": [{
+                        "activityTitle": title,
+                        "activitySubtitle": "Automated Notification",
+                        "text": message,
+                        "markdown": True
+                    }]
+                }
+            else:
+                # Simple text format for other webhook services
+                message_card = {
+                    "text": f"{title}: {message}"
+                }
             
-            # Send to Teams
+            # Send to webhook
             async with aiohttp.ClientSession() as session:
                 async with session.post(
                     self.webhook_url,
@@ -376,22 +383,23 @@ class RealTeamsIntegration:
                 ) as response:
                     response_text = await response.text()
                     
-                    if response.status == 200 and "error" not in response_text.lower():
-                        logger.info(f"Teams notification sent: {title}")
+                    if response.status == 200:
+                        logger.info(f"Webhook notification sent: {title}")
                         return {
                             "success": True,
-                            "message": "Notification sent to Teams",
-                            "title": title
+                            "message": "Notification sent successfully",
+                            "title": title,
+                            "response": response_text
                         }
                     else:
-                        logger.error(f"Teams notification failed: {response_text}")
+                        logger.error(f"Webhook notification failed: {response.status} - {response_text}")
                         return {
                             "success": False,
-                            "error": response_text
+                            "error": f"HTTP {response.status}: {response_text}"
                         }
         
         except Exception as e:
-            logger.error(f"Teams integration error: {e}")
+            logger.error(f"Webhook integration error: {e}")
             return {"success": False, "error": str(e)}
     
     async def send_product_notification(self, products: List[Dict], action: str = "found") -> Dict[str, Any]:
