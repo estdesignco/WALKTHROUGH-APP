@@ -378,7 +378,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
             </button>
             <button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors font-medium disabled:opacity-50"
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-6 py-2 rounded-lg transition-colors font-medium disabled:opacity-50 border border-[#D4C5A9]/20"
               disabled={loading || !formData.name.trim()}
             >
               {loading ? 'Creating...' : 'Create Item'}
