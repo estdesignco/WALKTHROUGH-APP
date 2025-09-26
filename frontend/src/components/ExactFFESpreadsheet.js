@@ -794,7 +794,8 @@ const ExactFFESpreadsheet = ({
               <option value="Sunbelt" style={{ backgroundColor: '#FF4500', color: 'white' }}>Sunbelt</option>
               <option value="R+L Carriers" style={{ backgroundColor: '#32CD32', color: 'white' }}>R+L Carriers</option>
             </select>
-            
+          </div>
+          
           {/* Action Buttons - ADD ROOM AND TRANSFER */}
           <div className="flex gap-3">
             <button 
