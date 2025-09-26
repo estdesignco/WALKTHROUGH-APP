@@ -905,8 +905,7 @@ const StudioLandingPage = () => {
             </p>
           </div>
 
-          {/* Unified Furniture Search Engine */}
-          <UnifiedFurnitureSearch />
+          {/* MOVED TO TOP - NO MORE SCROLLING! */}
         </>
       )}
 
