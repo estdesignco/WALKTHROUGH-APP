@@ -243,6 +243,114 @@ const UnifiedFurnitureSearch = () => {
     }
   };
 
+  const handleFilterSearch = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const searchParams = {
+        vendor: filters.vendor || undefined,
+        category: filters.category || undefined,
+        room_type: filters.room_type || undefined,
+        style: filters.style || undefined,
+        min_price: filters.min_price ? parseFloat(filters.min_price) : undefined,
+        max_price: filters.max_price ? parseFloat(filters.max_price) : undefined
+      };
+      
+      // Remove undefined values
+      Object.keys(searchParams).forEach(key => 
+        searchParams[key] === undefined && delete searchParams[key]
+      );
+      
+      console.log('🎯 Applying filters:', searchParams);
+      
+      const response = await fetch(`${BACKEND_URL}/api/search/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(searchParams)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data.products || []);
+        console.log(`✅ Filter search completed: ${data.products?.length || 0} results`);
+        alert(`🎯 Filter applied! Found ${data.products?.length || 0} products matching your criteria.`);
+      } else {
+        // Fallback to client-side filtering
+        let filtered = [...products];
+        
+        if (filters.vendor) {
+          filtered = filtered.filter(p => p.vendor?.toLowerCase().includes(filters.vendor.toLowerCase()));
+        }
+        if (filters.category) {
+          filtered = filtered.filter(p => p.category?.toLowerCase().includes(filters.category.toLowerCase()));
+        }
+        if (filters.room_type) {
+          filtered = filtered.filter(p => p.room_type?.toLowerCase().includes(filters.room_type.toLowerCase()));
+        }
+        if (filters.min_price) {
+          filtered = filtered.filter(p => p.price >= parseFloat(filters.min_price));
+        }
+        if (filters.max_price) {
+          filtered = filtered.filter(p => p.price <= parseFloat(filters.max_price));
+        }
+        
+        setProducts(filtered);
+        console.log(`✅ Client-side filter: ${filtered.length} results`);
+        alert(`🎯 Filter applied! Found ${filtered.length} products matching your criteria.`);
+      }
+    } catch (err) {
+      setError('Filter search error: ' + err.message);
+      console.error('❌ Filter search error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickSearch = async (searchTerm) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setSearchQuery(searchTerm); // Update the search box too
+      
+      console.log(`🚀 Quick search for: "${searchTerm}"`);
+      
+      const searchParams = { query: searchTerm };
+      
+      const response = await fetch(`${BACKEND_URL}/api/search/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(searchParams)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data.products || []);
+        console.log(`✅ Quick search completed: ${data.products?.length || 0} results for "${searchTerm}"`);
+        alert(`🚀 Quick search complete! Found ${data.products?.length || 0} ${searchTerm}.`);
+      } else {
+        // Fallback to client-side filtering
+        const filtered = products.filter(product => 
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+        setProducts(filtered);
+        console.log(`✅ Client-side quick search: ${filtered.length} results for "${searchTerm}"`);
+        alert(`🚀 Quick search complete! Found ${filtered.length} ${searchTerm}.`);
+      }
+    } catch (err) {
+      setError('Quick search error: ' + err.message);
+      console.error('❌ Quick search error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm my-8">
       {/* Header */}
