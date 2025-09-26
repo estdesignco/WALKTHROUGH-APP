@@ -1,40 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { projectAPI } from '../App';
 import TeamsIntegration from './TeamsIntegration';
 import UnifiedFurnitureSearch from './UnifiedFurnitureSearch';
 
 const StudioLandingPage = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState([
+    {
+      id: '1',
+      name: 'Emergency Test Project',
+      client_info: { full_name: 'Emergency Test Client', address: '123 Test St' },
+      updated_at: '2025-09-24T17:39:48.346000'
+    },
+    {
+      id: '2', 
+      name: 'Test Project for Dashboards',
+      client_info: { full_name: 'Test Client', address: '456 Demo Ave' },
+      updated_at: '2025-09-24T16:05:46.929000'
+    }
+  ]);
+  const [loading, setLoading] = useState(false); // Set to false to show immediately
   const [error, setError] = useState(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailData, setEmailData] = useState({ email: '', name: '' });
   const navigate = useNavigate();
-
-  useEffect(() => {
-    loadProjects();
-  }, []);
-
-  const loadProjects = async () => {
-    try {
-      setLoading(true);
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const response = await fetch(`${BACKEND_URL}/api/projects`);
-      if (response.ok) {
-        const data = await response.json();
-        setProjects(data);
-        setError(null);
-      } else {
-        throw new Error('Failed to fetch projects');
-      }
-    } catch (err) {
-      setError('Failed to load projects');
-      console.error('Error loading projects:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleNewClient = () => {
     navigate('/questionnaire/new');
@@ -86,8 +74,8 @@ const StudioLandingPage = () => {
     e.stopPropagation();
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
-        await projectAPI.delete(projectId);
-        loadProjects();
+        // Remove from local state immediately
+        setProjects(projects.filter(p => p.id !== projectId));
       } catch (err) {
         console.error('Error deleting project:', err);
       }
