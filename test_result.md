@@ -338,7 +338,7 @@ backend:
 
   - task: "Teams Integration Setup - Webhook Configuration"
     implemented: true
-    working: false
+    working: true
     file: "backend/.env, teams_integration.py"
     stuck_count: 0
     priority: "high"
@@ -347,6 +347,9 @@ backend:
       - working: false
         agent: "main"
         comment: "📞 USER PROVIDED: Teams integration ready, user mentioned they have Teams webhook URL but need to provide it. Code exists in teams_integration.py, just needs TEAMS_WEBHOOK_URL configuration in .env file."
+      - working: true
+        agent: "main"
+        comment: "✅ COMPLETED: Successfully configured Teams webhook URL (https://webhookbot.c-toss.com/api/bot/webhooks/72216fd7-7af4-4344-9a8e-3bfac17f26b1) in backend/.env. Tested webhook endpoint successfully with curl. Teams integration is now active and ready for notifications."
 
   - task: "Canva Integration Enhancement"
     implemented: false
