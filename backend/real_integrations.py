@@ -1395,6 +1395,259 @@ class RealVendorScraper:
         except Exception as e:
             logger.error(f"Four Hands scraping error: {e}")
             return []
+    
+    async def scrape_complete_fourhands_product(self, product_url: str, initial_title: str) -> Optional[Dict]:
+        """Scrape complete product details from individual Four Hands product page"""
+        try:
+            logger.info(f"Scraping complete product details from: {product_url}")
+            
+            response = self.session.get(product_url, timeout=15)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.content, 'lxml')
+            
+            # Extract complete product data
+            product_data = {
+                'id': f"fourhands_real_{int(time.time())}_{random.randint(1000,9999)}",
+                'url': product_url,
+                'seller': 'Four Hands',
+                'vendor': 'Four Hands',
+                'category': 'console table',
+                'scraped_at': datetime.now().isoformat(),
+                'search_query': 'console table'
+            }
+            
+            # 1. REAL PRODUCT TITLE
+            title_selectors = [
+                'h1.product-title',
+                'h1[class*="title"]',
+                '.product-name h1',
+                'h1',
+                '[data-testid="product-title"]'
+            ]
+            
+            title = initial_title
+            for selector in title_selectors:
+                try:
+                    title_elem = soup.select_one(selector)
+                    if title_elem:
+                        title = title_elem.get_text().strip()
+                        break
+                except:
+                    continue
+            
+            product_data['title'] = title
+            
+            # 2. REAL SKU/MODEL NUMBER
+            sku_selectors = [
+                '[class*="sku"]',
+                '[id*="sku"]',
+                '[data-testid*="sku"]',
+                '.product-code',
+                '.model-number',
+                '.item-number'
+            ]
+            
+            sku = "N/A"
+            for selector in sku_selectors:
+                try:
+                    sku_elem = soup.select_one(selector)
+                    if sku_elem:
+                        sku_text = sku_elem.get_text().strip()
+                        # Extract SKU from text like "SKU: FH123456"
+                        sku_match = re.search(r'(?:SKU|Model|Item):\s*([A-Za-z0-9-]+)', sku_text, re.IGNORECASE)
+                        if sku_match:
+                            sku = sku_match.group(1)
+                        else:
+                            sku = sku_text
+                        break
+                except:
+                    continue
+            
+            # Also check page source for hidden SKU
+            if sku == "N/A":
+                sku_patterns = [
+                    r'"sku"\s*:\s*"([^"]+)"',
+                    r'"model"\s*:\s*"([^"]+)"',
+                    r'"product_id"\s*:\s*"([^"]+)"'
+                ]
+                
+                page_source = str(soup)
+                for pattern in sku_patterns:
+                    match = re.search(pattern, page_source, re.IGNORECASE)
+                    if match:
+                        sku = match.group(1)
+                        break
+            
+            product_data['sku'] = sku
+            
+            # 3. REAL PRICE
+            price_selectors = [
+                '.price',
+                '[class*="price"]',
+                '.cost',
+                '[data-testid*="price"]',
+                '.product-price',
+                '.current-price'
+            ]
+            
+            price = "Contact for pricing"
+            price_numeric = None
+            for selector in price_selectors:
+                try:
+                    price_elem = soup.select_one(selector)
+                    if price_elem:
+                        price_text = price_elem.get_text().strip()
+                        if '$' in price_text:
+                            price = price_text
+                            price_numeric = self.extract_price_number(price_text)
+                            break
+                except:
+                    continue
+            
+            product_data['price'] = price
+            product_data['price_numeric'] = price_numeric
+            
+            # 4. REAL PRODUCT DESCRIPTION
+            description_selectors = [
+                '.product-description',
+                '[class*="description"]',
+                '.product-details',
+                '[data-testid*="description"]',
+                '.product-info p',
+                '.description p'
+            ]
+            
+            description = title  # Fallback to title
+            for selector in description_selectors:
+                try:
+                    desc_elem = soup.select_one(selector)
+                    if desc_elem:
+                        desc_text = desc_elem.get_text().strip()
+                        if len(desc_text) > len(title):  # Only use if longer than title
+                            description = desc_text
+                            break
+                except:
+                    continue
+            
+            product_data['description'] = description
+            
+            # 5. ALL REAL PRODUCT IMAGES
+            await self.scrape_all_product_images(soup, product_url, product_data)
+            
+            # 6. ADDITIONAL SPECIFICATIONS
+            specifications = {}
+            spec_selectors = [
+                '.specifications',
+                '.product-specs',
+                '[class*="spec"]',
+                '.dimensions',
+                '.materials'
+            ]
+            
+            for selector in spec_selectors:
+                try:
+                    spec_section = soup.select_one(selector)
+                    if spec_section:
+                        # Extract key-value pairs
+                        spec_items = spec_section.find_all(['dt', 'dd', 'li'])
+                        current_key = None
+                        
+                        for item in spec_items:
+                            text = item.get_text().strip()
+                            if ':' in text:
+                                parts = text.split(':', 1)
+                                specifications[parts[0].strip()] = parts[1].strip()
+                            elif item.name == 'dt':
+                                current_key = text
+                            elif item.name == 'dd' and current_key:
+                                specifications[current_key] = text
+                                current_key = None
+                except:
+                    continue
+            
+            product_data['specifications'] = specifications
+            
+            logger.info(f"Successfully scraped complete details for: {title}")
+            return product_data
+            
+        except Exception as e:
+            logger.error(f"Error scraping complete product from {product_url}: {e}")
+            return None
+    
+    async def scrape_all_product_images(self, soup: BeautifulSoup, product_url: str, product_data: Dict):
+        """Scrape ALL product images from the product page"""
+        try:
+            logger.info("Scraping all product images...")
+            
+            all_images = []
+            all_images_base64 = []
+            
+            # Image selectors for Four Hands product pages
+            image_selectors = [
+                '.product-images img',
+                '.gallery img',
+                '[class*="image"] img',
+                '.swiper-slide img',
+                '.carousel img',
+                '[data-testid*="image"] img',
+                'img[src*="product"]',
+                'img[alt*="product"]'
+            ]
+            
+            found_images = set()  # Use set to avoid duplicates
+            
+            for selector in image_selectors:
+                try:
+                    img_elements = soup.select(selector)
+                    for img in img_elements:
+                        src = img.get('src') or img.get('data-src') or img.get('data-original')
+                        if src:
+                            # Make URL absolute
+                            if src.startswith('//'):
+                                src = 'https:' + src
+                            elif src.startswith('/'):
+                                src = 'https://fourhands.com' + src
+                            elif not src.startswith('http'):
+                                src = f"https://fourhands.com/{src}"
+                            
+                            # Filter out tiny images, logos, icons
+                            if any(skip in src.lower() for skip in ['logo', 'icon', 'badge', 'small']):
+                                continue
+                            
+                            # Only add if not already found
+                            if src not in found_images:
+                                found_images.add(src)
+                                all_images.append(src)
+                except:
+                    continue
+            
+            # Limit to reasonable number (5-10 images)
+            all_images = all_images[:8]
+            
+            # Process all images to base64
+            for img_url in all_images:
+                try:
+                    img_base64 = await self.download_and_process_image(img_url)
+                    all_images_base64.append(img_base64)
+                except:
+                    all_images_base64.append(None)
+            
+            # Update product data
+            product_data['multiple_images'] = all_images
+            product_data['multiple_images_base64'] = all_images_base64
+            product_data['image_url'] = all_images[0] if all_images else None
+            product_data['image_base64'] = all_images_base64[0] if all_images_base64 else None
+            
+            logger.info(f"Found {len(all_images)} product images")
+            
+        except Exception as e:
+            logger.error(f"Error scraping product images: {e}")
+            # Provide fallback images if scraping fails
+            product_data['multiple_images'] = []
+            product_data['multiple_images_base64'] = []
+            product_data['image_url'] = None
+            product_data['image_base64'] = None
 
     async def scrape_hudson_valley(self, search_query: str = "lighting", max_results: int = 20) -> List[Dict]:
         """Scrape Hudson Valley Lighting using requests/BeautifulSoup"""
