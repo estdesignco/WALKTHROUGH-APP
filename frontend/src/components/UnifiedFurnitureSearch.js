@@ -47,20 +47,65 @@ const UnifiedFurnitureSearch = () => {
     checkIntegrationStatus();
   }, []);
 
+  const checkIntegrationStatus = async () => {
+    try {
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${BACKEND_URL}/api/real-integrations/integration-status`);
+      if (response.ok) {
+        const status = await response.json();
+        setIntegrationStatus(status.integrations || {});
+      }
+    } catch (err) {
+      console.error('Failed to check integration status:', err);
+    }
+  };
+
   const loadInitialData = async () => {
     try {
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
-      // Load real products if available
-      const productsResponse = await fetch(`${BACKEND_URL}/api/search/products`);
-      if (productsResponse.ok) {
-        const productsData = await productsResponse.json();
-        if (productsData.products && productsData.products.length > 0) {
-          setProducts(productsData.products);
+      // Set vendors for real scraping
+      setVendors([
+        { name: 'Four Hands', id: 'fourhands' },
+        { name: 'Hudson Valley Lighting', id: 'hudson-valley' },
+        { name: 'Wayfair', id: 'wayfair' }
+      ]);
+
+      // Load sample products initially
+      setProducts([
+        {
+          id: '1',
+          title: 'Modern Dining Chair Set',
+          seller: 'Four Hands',
+          price: '$299.99',
+          category: 'Seating',
+          url: 'https://example.com/product1',
+          image_url: 'https://via.placeholder.com/300x200',
+          scraped_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          title: 'Hudson Valley Pendant Light',
+          seller: 'Hudson Valley Lighting', 
+          price: '$459.99',
+          category: 'Lighting',
+          url: 'https://example.com/product2',
+          image_url: 'https://via.placeholder.com/300x200',
+          scraped_at: new Date().toISOString()
         }
-      }
+      ]);
+
+      setFilterOptions({
+        categories: ['Seating', 'Lighting', 'Tables', 'Storage'],
+        room_types: ['Living Room', 'Dining Room', 'Bedroom', 'Kitchen'],
+        vendors: ['Four Hands', 'Hudson Valley Lighting', 'Wayfair'],
+        styles: ['Modern', 'Traditional', 'Contemporary', 'Rustic'],
+        colors: ['Black', 'White', 'Brown', 'Gray', 'Natural'],
+        materials: ['Wood', 'Metal', 'Fabric', 'Glass', 'Leather']
+      });
+      
     } catch (err) {
-      console.error('Failed to load real data, using sample data:', err);
+      console.error('Failed to load initial data:', err);
     }
   };
 
