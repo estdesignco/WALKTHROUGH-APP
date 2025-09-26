@@ -714,7 +714,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
             >
               <option value="">All Rooms</option>
               {project.rooms.map(room => (
@@ -725,7 +725,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
             >
               <option value="">All Categories</option>
               {availableCategories.map(category => (
@@ -736,7 +736,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
             >
               <option value="">All Vendors</option>
               <option value="Visual Comfort">Visual Comfort</option>
@@ -752,7 +752,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
             >
               <option value="">All Status</option>
               <option value="TO BE SELECTED">TO BE SELECTED</option>
@@ -782,7 +782,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedCarrier}
               onChange={(e) => setSelectedCarrier(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
             >
               <option value="">All Carriers</option>
               <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
