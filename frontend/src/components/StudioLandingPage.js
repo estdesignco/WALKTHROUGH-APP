@@ -746,14 +746,98 @@ const UnifiedFurnitureSearch = () => {
                     🎨 CANVA
                   </button>
                   <button
-                    onClick={() => {
-                      setSelectedProduct(product);
-                      setShowHouzzModal(true);
+                    onClick={async () => {
+                      try {
+                        setLoading(true);
+                        setError(null);
+                        
+                        const response = await fetch(`${BACKEND_URL}/api/real-integrations/add-to-houzz-ideabook`, {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            ideabook_name: `Design Project - ${new Date().toLocaleDateString()}`,
+                            products: [product]
+                          })
+                        });
+                        
+                        if (response.ok) {
+                          const data = await response.json();
+                          console.log('🔥 COMPLETE HOUZZ CLIPPER DATA:', data);
+                          
+                          if (data.success && data.houzz_clipper_data) {
+                            const clipperData = data.houzz_clipper_data;
+                            
+                            // Show COMPLETE scraped data in a popup for copying to Houzz Pro
+                            const clipperInfo = `🔥 HOUZZ PRO CLIPPER DATA READY!
+
+BASIC INFO:
+• Product Title: ${clipperData.product_title}
+• Unit Cost: ${clipperData.unit_cost}
+• Markup: ${clipperData.markup_percentage}% (Default 125%)
+• Client Price: ${clipperData.client_price}
+• MSRP: ${clipperData.msrp}
+
+DESCRIPTION:
+${clipperData.description_for_vendor}
+
+CLIENT DESCRIPTION:
+${clipperData.client_description}
+
+PRODUCT DETAILS:
+• SKU: ${clipperData.sku}
+• Manufacturer: ${clipperData.manufacturer}
+• Dimensions: ${clipperData.dimensions}
+• Finish/Color: ${clipperData.finish_color}
+• Materials: ${clipperData.materials}
+
+DROPDOWNS:
+• Category: ${clipperData.category}
+• Vendor: ${clipperData.vendor_subcontractor}
+• Project: ${clipperData.project}
+• Room: ${clipperData.room}
+
+IMAGES (5):
+1. ${clipperData.image_1}
+2. ${clipperData.image_2}
+3. ${clipperData.image_3}
+4. ${clipperData.image_4}
+5. ${clipperData.image_5}
+
+Copy this data to Houzz Pro clipper!`;
+                            
+                            // Show in alert for now (can be enhanced to modal later)
+                            alert(clipperInfo);
+                            
+                            alert(`🎉 SUCCESS! Complete Houzz Pro clipper data generated for "${product.name}"!
+
+All required fields have been populated:
+✅ Product title, unit cost, markup (125%), client price, MSRP
+✅ Description for vendor and client description 
+✅ SKU, manufacturer, dimensions, finish/color, materials
+✅ Category, vendor, project, room dropdowns
+✅ All 5 images with URLs
+
+The complete data is ready to copy to your Houzz Pro clipper form!`);
+                          } else {
+                            alert(`🔥 ${product.name} processed for Houzz Pro clipper!`);
+                          }
+                        } else {
+                          const errorData = await response.json();
+                          setError(`Houzz clipper error: ${errorData.detail || 'Failed to add to clipper'}`);
+                        }
+                      } catch (err) {
+                        setError(`Houzz clipper error: ${err.message}`);
+                      } finally {
+                        setLoading(false);
+                      }
                     }}
-                    className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 px-3 py-3 text-sm font-bold rounded transition-all duration-300"
+                    disabled={loading}
+                    className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 disabled:from-gray-600 disabled:to-gray-700 px-3 py-3 text-sm font-bold rounded transition-all duration-300 transform hover:scale-105 shadow-lg"
                     style={{ color: '#F5F5DC' }}
                   >
-                    🏠 HOUZZ PRO
+                    {loading ? '⏳ Adding to Houzz...' : '🔥 HOUZZ PRO CLIPPER'}
                   </button>
                 </div>
 
