@@ -600,53 +600,89 @@ const StudioLandingPage = () => {
         </div>
       </div>
 
-      {/* Welcome Message */}
-      <div className="max-w-4xl mx-auto p-8 text-center my-8">
-        <h2 className="text-4xl font-bold text-[#B49B7E] mb-4">
-          🚀 COMPLETE WORKFLOW SYSTEM IS LIVE!
-        </h2>
-        <p className="text-2xl mb-6" style={{ color: '#F5F5DC' }}>
-          Unified Search • Real-Time Sync • Mobile Walkthrough • Auto-Integration
-        </p>
-        
-        {/* Feature Highlights */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
-          <div className="bg-gradient-to-br from-green-900/20 to-green-800/30 border border-green-500/30 rounded-xl p-4">
-            <div className="text-3xl mb-2">🔍</div>
-            <h3 className="text-lg font-bold text-green-400 mb-2">Unified Search</h3>
-            <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
-              All vendors in one interface
+      {/* Content Based on Active View */}
+      {activeView === 'search' && (
+        <>
+          {/* Welcome Message */}
+          <div className="max-w-4xl mx-auto p-8 text-center my-8">
+            <h2 className="text-4xl font-bold text-[#B49B7E] mb-4">
+              🚀 UNIFIED SEARCH ENGINE
+            </h2>
+            <p className="text-2xl mb-6" style={{ color: '#F5F5DC' }}>
+              Search ALL vendor products • Real-Time Sync • Auto-Integration
             </p>
           </div>
-          
-          <div className="bg-gradient-to-br from-blue-900/20 to-blue-800/30 border border-blue-500/30 rounded-xl p-4">
-            <div className="text-3xl mb-2">🎨</div>
-            <h3 className="text-lg font-bold text-blue-400 mb-2">Canva Auto-Sync</h3>
-            <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
-              One-click project boards
-            </p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-orange-900/20 to-orange-800/30 border border-orange-500/30 rounded-xl p-4">
-            <div className="text-3xl mb-2">🏠</div>
-            <h3 className="text-lg font-bold text-orange-400 mb-2">Houzz Pro Integration</h3>
-            <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
-              Auto-fill selection boards
-            </p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-purple-900/20 to-purple-800/30 border border-purple-500/30 rounded-xl p-4">
-            <div className="text-3xl mb-2">📱</div>
-            <h3 className="text-lg font-bold text-purple-400 mb-2">Mobile Walkthrough</h3>
-            <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
-              On-site with offline sync
-            </p>
-          </div>
-        </div>
-      </div>
 
-      {/* Unified Furniture Search Engine */}
-      <UnifiedFurnitureSearch />
+          {/* Unified Furniture Search Engine */}
+          <UnifiedFurnitureSearch />
+        </>
+      )}
+
+      {activeView === 'dashboard' && (
+        <>
+          {/* Dashboard Welcome */}
+          <div className="max-w-4xl mx-auto p-8 text-center my-8">
+            <h2 className="text-4xl font-bold text-[#B49B7E] mb-4">
+              📊 ANALYTICS & WORKFLOW DASHBOARD
+            </h2>
+            <p className="text-2xl mb-6" style={{ color: '#F5F5DC' }}>
+              Real-time insights • Performance metrics • Integration status
+            </p>
+          </div>
+
+          {/* Workflow Dashboard */}
+          <WorkflowDashboard />
+        </>
+      )}
+
+      {(activeView === 'dashboard' && activeView !== 'search') && (
+        <>
+          {/* Welcome Message */}
+          <div className="max-w-4xl mx-auto p-8 text-center my-8">
+            <h2 className="text-4xl font-bold text-[#B49B7E] mb-4">
+              🚀 COMPLETE WORKFLOW SYSTEM IS LIVE!
+            </h2>
+            <p className="text-2xl mb-6" style={{ color: '#F5F5DC' }}>
+              Unified Search • Real-Time Sync • Mobile Walkthrough • Analytics
+            </p>
+            
+            {/* Feature Highlights */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+              <div className="bg-gradient-to-br from-green-900/20 to-green-800/30 border border-green-500/30 rounded-xl p-4">
+                <div className="text-3xl mb-2">🔍</div>
+                <h3 className="text-lg font-bold text-green-400 mb-2">Unified Search</h3>
+                <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+                  All vendors in one interface
+                </p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-blue-900/20 to-blue-800/30 border border-blue-500/30 rounded-xl p-4">
+                <div className="text-3xl mb-2">🎨</div>
+                <h3 className="text-lg font-bold text-blue-400 mb-2">Canva Auto-Sync</h3>
+                <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+                  One-click project boards
+                </p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-orange-900/20 to-orange-800/30 border border-orange-500/30 rounded-xl p-4">
+                <div className="text-3xl mb-2">🏠</div>
+                <h3 className="text-lg font-bold text-orange-400 mb-2">Houzz Pro Integration</h3>
+                <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+                  Auto-fill selection boards
+                </p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-purple-900/20 to-purple-800/30 border border-purple-500/30 rounded-xl p-4">
+                <div className="text-3xl mb-2">📱</div>
+                <h3 className="text-lg font-bold text-purple-400 mb-2">Mobile Walkthrough</h3>
+                <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+                  On-site with offline sync
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
       
       {/* Bottom Spacer */}
       <div className="h-16"></div>
