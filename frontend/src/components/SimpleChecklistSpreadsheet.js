@@ -874,7 +874,7 @@ const SimpleChecklistSpreadsheet = ({
             {/* Filter and Clear Buttons */}
             <button 
               onClick={() => console.log('🔍 CHECKLIST FILTER APPLIED')}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-[#F5F5DC] rounded font-medium"
             >
               🔍 FILTER
             </button>
