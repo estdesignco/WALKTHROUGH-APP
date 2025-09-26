@@ -19,9 +19,15 @@ const StudioLandingPage = () => {
   const loadProjects = async () => {
     try {
       setLoading(true);
-      const response = await projectAPI.getAll();
-      setProjects(response.data);
-      setError(null);
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${BACKEND_URL}/api/projects`);
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data);
+        setError(null);
+      } else {
+        throw new Error('Failed to fetch projects');
+      }
     } catch (err) {
       setError('Failed to load projects');
       console.error('Error loading projects:', err);
