@@ -815,7 +815,7 @@ const ExactFFESpreadsheet = ({
                 setSelectedCarrier('');
                 console.log('🧹 FILTER CLEARED');
               }}
-              className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-full shadow-lg hover:shadow-red-500/30 transition-all duration-300 font-medium border border-red-500/20"
+              className="px-4 py-2 bg-[#8B4444]/80 hover:bg-[#8B4444] text-[#B49B7E] rounded font-medium shadow-md transition-all duration-200 border border-[#B49B7E]"
             >
               CLEAR
             </button>
