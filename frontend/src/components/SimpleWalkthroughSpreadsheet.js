@@ -761,7 +761,7 @@ const SimpleWalkthroughSpreadsheet = ({
                 setFilteredProject(project); // Reset to original project
                 console.log('🧹 WALKTHROUGH FILTER CLEARED');
               }}
-              className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded font-medium"
+              className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-full shadow-lg hover:shadow-red-500/30 transition-all duration-300 font-medium border border-red-500/20"
             >
               CLEAR
             </button>
