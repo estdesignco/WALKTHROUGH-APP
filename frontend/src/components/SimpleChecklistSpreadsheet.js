@@ -1044,7 +1044,7 @@ const SimpleChecklistSpreadsheet = ({
                                       🗑️
                                     </button>
                                   </th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-16 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>QTY</th>
                                   <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
                                   <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
                                   <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
