@@ -747,7 +747,7 @@ const SimpleWalkthroughSpreadsheet = ({
                 // Filters are already applied via useEffect, just trigger a manual update
                 setFilteredProject({...filteredProject});
               }}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium"
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white rounded-full shadow-lg hover:shadow-blue-500/30 transition-all duration-300 font-medium border border-blue-500/20"
             >
               🔍 FILTER
             </button>
