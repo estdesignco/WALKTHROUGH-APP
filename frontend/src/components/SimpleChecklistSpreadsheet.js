@@ -843,7 +843,7 @@ const SimpleChecklistSpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-[#F5F5DC] border border-gray-600"
+              className="px-3 py-2 rounded bg-gray-700 text-[#F5F5DC] border border-[#B49B7E]/50"
             >
               <option value="">All Vendors</option>
               {(vendorTypes || []).map(vendor => (
