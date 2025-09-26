@@ -5,6 +5,8 @@ const UnifiedFurnitureSearch = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [integrationStatus, setIntegrationStatus] = useState({});
   const [filters, setFilters] = useState({
     vendor: '',
     category: '',
@@ -31,6 +33,12 @@ const UnifiedFurnitureSearch = () => {
   });
   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
   const [savedCredentials, setSavedCredentials] = useState([]);
+  const [workflowSettings, setWorkflowSettings] = useState({
+    create_canva: false,
+    add_to_houzz: false,
+    notify_teams: true
+  });
+  const [selectedProducts, setSelectedProducts] = useState([]);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
