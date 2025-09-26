@@ -1891,11 +1891,13 @@ class RealVendorScraper:
     async def scrape_live_product_data(self, product_url: str) -> Optional[Dict]:
         """Scrape complete product data from REAL Four Hands URL when clipper is clicked"""
         try:
-            logger.info(f"🔥 LIVE SCRAPING: {product_url}")
+            logger.info(f"🔥 LIVE SCRAPING FOUR HANDS: {product_url}")
+            self.setup_session()
             
             response = self.session.get(product_url, timeout=15)
             response.raise_for_status()
             
+            logger.info(f"✅ Successfully loaded page from {product_url}")
             soup = BeautifulSoup(response.content, 'lxml')
             
             scraped_data = {}
