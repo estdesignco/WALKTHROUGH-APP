@@ -773,17 +773,29 @@ const UnifiedFurnitureSearch = () => {
                 {product.image_base64 ? (
                   <img
                     src={`data:image/jpeg;base64,${product.image_base64}`}
-                    alt={product.name}
+                    alt={product.title || product.name}
                     className="w-full h-48 object-cover rounded-lg mb-4"
                   />
                 ) : product.image_url ? (
                   <img
                     src={product.image_url}
-                    alt={product.name}
+                    alt={product.title || product.name}
                     className="w-full h-48 object-cover rounded-lg mb-4"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
                   />
-                ) : (
+                ) : null}
+                
+                {(!product.image_base64 && !product.image_url) && (
                   <div className="w-full h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center">
+                    <span className="text-4xl">🖼️</span>
+                  </div>
+                )}
+                
+                {product.image_url && !product.image_base64 && (
+                  <div className="w-full h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center" style={{display: 'none'}}>
                     <span className="text-4xl">🖼️</span>
                   </div>
                 )}
