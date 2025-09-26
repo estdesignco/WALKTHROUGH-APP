@@ -871,9 +871,9 @@ class RealIntegrationManager:
                 hudson_products = await self.scraper.scrape_hudson_valley(search_query)
                 all_products.extend(hudson_products)
             
-            # Wayfair for broader search
-            wayfair_products = await self.scraper.scrape_wayfair(search_query)
-            all_products.extend(wayfair_products)
+            # Skip Wayfair - user doesn't want these results
+            # wayfair_products = await self.scraper.scrape_wayfair(search_query)
+            # all_products.extend(wayfair_products)
             
             # Apply filters if provided
             if filters:
