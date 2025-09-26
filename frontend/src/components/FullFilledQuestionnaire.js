@@ -57,15 +57,26 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
     );
 
     return (
-        <div className="space-y-6 p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-[#8B7355]">COMPREHENSIVE CLIENT QUESTIONNAIRE</h2>
-                <button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="px-4 py-2 bg-[#8B7355] text-white rounded hover:bg-[#9c8563] transition-colors"
-                >
-                    {isEditing ? 'Save Changes' : 'Edit Answers'}
-                </button>
+        <CompletePageLayout 
+            projectId={projectId || project?.id}
+            activeTab="questionnaire"
+            title="COMPREHENSIVE CLIENT QUESTIONNAIRE"
+            hideNavigation={false}
+        >
+            {/* Header Container */}
+            <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+                 style={{
+                   background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+                 }}>
+                <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-bold text-[#F5F5DC]">COMPREHENSIVE CLIENT QUESTIONNAIRE</h2>
+                    <button
+                        onClick={() => setIsEditing(!isEditing)}
+                        className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-4 py-2 rounded text-black font-medium transition-all duration-200 border border-[#B49B7E]/20"
+                    >
+                        {isEditing ? 'Save Changes' : 'Edit Answers'}
+                    </button>
+                </div>
             </div>
 
             {/* Section 1: Client Information */}
