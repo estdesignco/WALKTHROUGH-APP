@@ -199,8 +199,48 @@ const UnifiedFurnitureSearch = () => {
     { id: '2', vendor_name: 'Hudson Valley Lighting', username: 'demo_user' }
   ]);
 
-  const handleSearch = () => {
-    alert(`Searching for: ${searchQuery}`);
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      loadProducts(); // Reload all products if no query
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const searchParams = {
+        query: searchQuery,
+      };
+      
+      const response = await fetch(`${BACKEND_URL}/api/search/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(searchParams)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data.products || []);
+        console.log(`✅ Search completed: ${data.products?.length || 0} results for "${searchQuery}"`);
+      } else {
+        // Fallback to client-side filtering
+        const filtered = products.filter(product => 
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.vendor.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setProducts(filtered);
+        console.log(`✅ Client-side search: ${filtered.length} results for "${searchQuery}"`);
+      }
+    } catch (err) {
+      setError('Search error: ' + err.message);
+      console.error('❌ Search error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
