@@ -865,6 +865,49 @@ const UnifiedFurnitureSearch = () => {
                     🔗 View
                   </button>
                 </div>
+
+                {/* Houzz Pro Clipper Button - Make it prominent */}
+                <div className="mt-3 pt-3 border-t border-orange-500/20">
+                  <button
+                    onClick={async () => {
+                      try {
+                        setLoading(true);
+                        setSuccess(null);
+                        setError(null);
+                        
+                        const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+                        
+                        const response = await fetch(`${BACKEND_URL}/api/real-integrations/add-to-houzz-ideabook`, {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            ideabook_name: `Design Project - ${new Date().toLocaleDateString()}`,
+                            products: [product]
+                          })
+                        });
+                        
+                        if (response.ok) {
+                          const data = await response.json();
+                          setSuccess(`🔥 ${product.title} added to Houzz Pro clipper!`);
+                        } else {
+                          const errorData = await response.json();
+                          setError(`Houzz clipper error: ${errorData.detail || 'Failed to add to clipper'}`);
+                        }
+                      } catch (err) {
+                        setError(`Houzz clipper error: ${err.message}`);
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 disabled:from-gray-600 disabled:to-gray-700 px-4 py-3 text-sm rounded-lg transition-all duration-300 transform hover:scale-105 font-bold shadow-lg"
+                    style={{ color: '#F5F5DC' }}
+                  >
+                    {loading ? '⏳ Adding to Houzz...' : '🔥 HOUZZ PRO CLIPPER'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
