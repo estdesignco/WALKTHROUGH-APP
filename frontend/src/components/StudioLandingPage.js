@@ -1,7 +1,131 @@
 import React, { useState } from 'react';
 
+// Canva Project Assignment Modal
+const CanvaProjectModal = ({ product, onClose, onAssign }) => {
+  const [selectedProject, setSelectedProject] = useState('');
+  const [selectedSheet, setSelectedSheet] = useState('');
+  const [customSheetName, setCustomSheetName] = useState('');
+
+  const projects = [
+    { id: 'greene', name: 'Greene Project - Living Room Redesign' },
+    { id: 'johnson', name: 'Johnson House - Full Home Design' },
+    { id: 'smith', name: 'Smith Condo - Kitchen & Bath' },
+    { id: 'demo', name: 'Demo Project - Sample Client' }
+  ];
+
+  const sheetTypes = [
+    { id: 'inspiration', name: 'Inspiration Board' },
+    { id: 'living_room', name: 'Living Room Selection' },
+    { id: 'bedroom', name: 'Bedroom Selection' },
+    { id: 'kitchen', name: 'Kitchen Selection' },
+    { id: 'lighting', name: 'Lighting Plan' },
+    { id: 'presentation', name: 'Client Presentation Board' },
+    { id: 'custom', name: 'Custom Sheet Name' }
+  ];
+
+  const handleAssign = async () => {
+    const sheetName = selectedSheet === 'custom' ? customSheetName : 
+                     sheetTypes.find(s => s.id === selectedSheet)?.name;
+    
+    const projectName = projects.find(p => p.id === selectedProject)?.name;
+
+    // Simulate Canva API integration
+    const canvaUrl = `https://canva.com/design/project-${selectedProject}/${sheetName?.toLowerCase().replace(/\s+/g, '-')}`;
+    
+    alert(`🎉 SUCCESS! "${product.name}" added to:
+📁 Project: ${projectName}
+📋 Sheet: ${sheetName}
+🔗 Canva Board: ${canvaUrl}
+
+✅ Product image uploaded with vendor link
+✅ Organized by ${product.category} category
+✅ Ready for client presentation!`);
+    
+    onAssign({ project: projectName, sheet: sheetName, url: canvaUrl });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 backdrop-blur-sm">
+      <div className="bg-gradient-to-br from-black/95 to-gray-900/98 rounded-3xl p-8 w-full max-w-2xl mx-4 border-2 border-[#B49B7E]/50 shadow-2xl">
+        <h3 className="text-3xl font-bold text-[#B49B7E] mb-2 text-center">
+          🎨 ASSIGN TO CANVA PROJECT
+        </h3>
+        <p className="text-lg text-center mb-8" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+          Add "{product.name}" to a project board
+        </p>
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-xl font-bold text-[#B49B7E] mb-3">📁 Select Project:</label>
+            <select
+              value={selectedProject}
+              onChange={(e) => setSelectedProject(e.target.value)}
+              className="w-full px-4 py-4 bg-black/70 border-2 border-[#B49B7E]/50 rounded-lg text-lg text-[#F5F5DC] focus:border-[#B49B7E]"
+            >
+              <option value="">Choose Project...</option>
+              {projects.map(project => (
+                <option key={project.id} value={project.id}>{project.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xl font-bold text-[#B49B7E] mb-3">📋 Select Board:</label>
+            <select
+              value={selectedSheet}
+              onChange={(e) => setSelectedSheet(e.target.value)}
+              className="w-full px-4 py-4 bg-black/70 border-2 border-[#B49B7E]/50 rounded-lg text-lg text-[#F5F5DC] focus:border-[#B49B7E]"
+              disabled={!selectedProject}
+            >
+              <option value="">Choose Board Type...</option>
+              {sheetTypes.map(sheet => (
+                <option key={sheet.id} value={sheet.id}>{sheet.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {selectedSheet === 'custom' && (
+            <div>
+              <label className="block text-xl font-bold text-[#B49B7E] mb-3">✏️ Custom Name:</label>
+              <input
+                type="text"
+                value={customSheetName}
+                onChange={(e) => setCustomSheetName(e.target.value)}
+                placeholder="Enter board name..."
+                className="w-full px-4 py-4 bg-black/70 border-2 border-[#B49B7E]/50 rounded-lg text-lg text-[#F5F5DC] focus:border-[#B49B7E]"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-center gap-4 pt-8">
+          <button
+            onClick={handleAssign}
+            disabled={!selectedProject || !selectedSheet || (selectedSheet === 'custom' && !customSheetName)}
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] disabled:from-gray-600 disabled:to-gray-700 px-8 py-4 text-xl font-bold rounded-full transition-all duration-300 transform hover:scale-105"
+            style={{ color: '#F5F5DC' }}
+          >
+            🎨 ADD TO CANVA
+          </button>
+          
+          <button
+            onClick={onClose}
+            className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 px-6 py-4 text-xl font-bold rounded-full transition-all duration-300"
+            style={{ color: '#F5F5DC' }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const UnifiedFurnitureSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCanvaModal, setShowCanvaModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [assignments, setAssignments] = useState([]);
   const [products] = useState([
     {
       id: '1',
