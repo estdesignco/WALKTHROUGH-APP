@@ -742,7 +742,33 @@ const UnifiedFurnitureSearch = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => (
-              <div key={product.id} className="bg-black/60 border border-[#B49B7E]/20 rounded-lg p-4 hover:border-[#B49B7E]/40 transition-all duration-300">
+              <div key={product.id} className={`bg-black/60 border rounded-lg p-4 hover:border-[#B49B7E]/40 transition-all duration-300 ${
+                selectedProducts.some(p => p.id === product.id) 
+                  ? 'border-orange-500/60 bg-orange-900/10' 
+                  : 'border-[#B49B7E]/20'
+              }`}>
+                {/* Selection Checkbox */}
+                <div className="flex items-center justify-between mb-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedProducts.some(p => p.id === product.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedProducts([...selectedProducts, product]);
+                        } else {
+                          setSelectedProducts(selectedProducts.filter(p => p.id !== product.id));
+                        }
+                      }}
+                      className="w-4 h-4 text-orange-500 bg-black/40 border-orange-500/30 rounded focus:ring-orange-500 focus:ring-2"
+                    />
+                    <span className="text-orange-400 text-sm font-medium">Select</span>
+                  </label>
+                  {selectedProducts.some(p => p.id === product.id) && (
+                    <span className="text-orange-400 text-xs">✓ Selected</span>
+                  )}
+                </div>
+
                 {/* Product Image */}
                 {product.image_base64 ? (
                   <img
