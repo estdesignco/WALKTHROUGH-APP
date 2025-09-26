@@ -434,36 +434,52 @@ const UnifiedFurnitureSearch = () => {
         <div className="space-y-6">
           {/* Primary Filters Row */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
-              <option>All Vendors</option>
-              <option>Four Hands</option>
-              <option>Hudson Valley Lighting</option>
+            <select 
+              value={filters.vendor}
+              onChange={(e) => setFilters({...filters, vendor: e.target.value})}
+              className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold"
+            >
+              <option value="">All Vendors</option>
+              <option value="Four Hands">Four Hands</option>
+              <option value="Hudson Valley Lighting">Hudson Valley Lighting</option>
             </select>
-            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
-              <option>All Categories</option>
-              <option>Seating</option>
-              <option>Lighting</option>
-              <option>Tables</option>
-              <option>Storage</option>
-              <option>Decor</option>
+            <select 
+              value={filters.category}
+              onChange={(e) => setFilters({...filters, category: e.target.value})}
+              className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold"
+            >
+              <option value="">All Categories</option>
+              <option value="Seating">Seating</option>
+              <option value="Lighting">Lighting</option>
+              <option value="Tables">Tables</option>
+              <option value="Storage">Storage</option>
+              <option value="Decor">Decor</option>
             </select>
-            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
-              <option>All Room Types</option>
-              <option>Living Room</option>
-              <option>Dining Room</option>
-              <option>Bedroom</option>
-              <option>Kitchen</option>
-              <option>Office</option>
-              <option>Bathroom</option>
+            <select 
+              value={filters.room_type}
+              onChange={(e) => setFilters({...filters, room_type: e.target.value})}
+              className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold"
+            >
+              <option value="">All Room Types</option>
+              <option value="Living Room">Living Room</option>
+              <option value="Dining Room">Dining Room</option>
+              <option value="Bedroom">Bedroom</option>
+              <option value="Kitchen">Kitchen</option>
+              <option value="Office">Office</option>
+              <option value="Bathroom">Bathroom</option>
             </select>
-            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
-              <option>All Styles</option>
-              <option>Modern</option>
-              <option>Traditional</option>
-              <option>Contemporary</option>
-              <option>Transitional</option>
-              <option>Industrial</option>
-              <option>Rustic</option>
+            <select 
+              value={filters.style}
+              onChange={(e) => setFilters({...filters, style: e.target.value})}
+              className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold"
+            >
+              <option value="">All Styles</option>
+              <option value="Modern">Modern</option>
+              <option value="Traditional">Traditional</option>
+              <option value="Contemporary">Contemporary</option>
+              <option value="Transitional">Transitional</option>
+              <option value="Industrial">Industrial</option>
+              <option value="Rustic">Rustic</option>
             </select>
           </div>
 
