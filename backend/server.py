@@ -29,6 +29,9 @@ from dotenv import load_dotenv
 # Import Google Sheets functionality
 from google_sheets_routes import router as google_sheets_router
 
+# Import Unified Search functionality  
+from unified_search_routes import router as unified_search_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
@@ -45,6 +48,9 @@ app.add_middleware(
 
 # Include Google Sheets import routes
 app.include_router(google_sheets_router)
+
+# Include Unified Search routes
+app.include_router(unified_search_router)
 
 # ... [rest of existing server.py code remains the same] ...
 

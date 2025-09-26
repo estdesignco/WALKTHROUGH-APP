@@ -1,315 +1,514 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const UnifiedFurnitureSearch = ({ onSelectProduct }) => {
+const UnifiedFurnitureSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     vendor: '',
     category: '',
+    room_type: '',
+    style: '',
+    color: '',
+    material: '',
     min_price: '',
     max_price: ''
   });
-  const [searchResults, setSearchResults] = useState([]);
+  const [filterOptions, setFilterOptions] = useState({
+    categories: [],
+    room_types: [],
+    styles: [],
+    colors: [],
+    materials: [],
+    vendors: []
+  });
   const [vendors, setVendors] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
+  const [credentials, setCredentials] = useState({
+    vendor_name: '',
+    username: '',
+    password: ''
+  });
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false);
+  const [savedCredentials, setSavedCredentials] = useState([]);
+
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
-    loadVendorsAndCategories();
-    loadDatabaseStats();
+    loadInitialData();
   }, []);
 
-  const loadVendorsAndCategories = async () => {
+  const loadInitialData = async () => {
     try {
-      const [vendorsResponse, categoriesResponse] = await Promise.all([
-        axios.get(`${API}/furniture/vendors`),
-        axios.get(`${API}/furniture/categories`)
-      ]);
-      
-      setVendors(vendorsResponse.data.vendors || []);
-      setCategories(categoriesResponse.data.categories || []);
-    } catch (error) {
-      console.error('Failed to load vendors and categories:', error);
-    }
-  };
-
-  const loadDatabaseStats = async () => {
-    try {
-      const response = await axios.get(`${API}/furniture/stats`);
-      setStats(response.data);
-    } catch (error) {
-      console.error('Failed to load database stats:', error);
-    }
-  };
-
-  const searchFurniture = async () => {
-    if (!searchQuery.trim() && !filters.vendor && !filters.category) {
-      return;
-    }
-
-    setIsSearching(true);
-    try {
-      const params = new URLSearchParams();
-      
-      if (searchQuery.trim()) params.append('query', searchQuery.trim());
-      if (filters.vendor) params.append('vendor', filters.vendor);
-      if (filters.category) params.append('category', filters.category);
-      if (filters.min_price) params.append('min_price', filters.min_price);
-      if (filters.max_price) params.append('max_price', filters.max_price);
-
-      const response = await axios.get(`${API}/furniture/search?${params}`);
-      setSearchResults(response.data.products || []);
-    } catch (error) {
-      console.error('Search failed:', error);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const clearFilters = () => {
-    setSearchQuery('');
-    setFilters({
-      vendor: '',
-      category: '',
-      min_price: '',
-      max_price: ''
-    });
-    setSearchResults([]);
-  };
-
-  const scrapeAllVendors = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.post(`${API}/furniture/scrape-vendors`);
-      
-      if (response.data.status === 'success') {
-        alert(`✅ Database updated! ${response.data.results.total_products} products scraped from ${response.data.results.vendors_scraped} vendors`);
-        loadDatabaseStats();
-        loadVendorsAndCategories();
+      // Load vendors
+      const vendorsResponse = await fetch(`${BACKEND_URL}/api/search/vendors`);
+      if (vendorsResponse.ok) {
+        const vendorsData = await vendorsResponse.json();
+        setVendors(vendorsData.supported_vendors || []);
       }
-    } catch (error) {
-      console.error('Scraping failed:', error);
-      alert('❌ Failed to scrape vendors. Check console for details.');
+
+      // Load saved credentials
+      const credentialsResponse = await fetch(`${BACKEND_URL}/api/search/vendor-credentials`);
+      if (credentialsResponse.ok) {
+        const credentialsData = await credentialsResponse.json();
+        setSavedCredentials(credentialsData || []);
+      }
+
+      // Load filter options
+      const filtersResponse = await fetch(`${BACKEND_URL}/api/search/filters`);
+      if (filtersResponse.ok) {
+        const filtersData = await filtersResponse.json();
+        setFilterOptions(filtersData);
+      }
+
+      // Load initial products
+      loadProducts();
+    } catch (err) {
+      console.error('Failed to load initial data:', err);
+    }
+  };
+
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${BACKEND_URL}/api/search/products`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data.products || []);
+      } else {
+        setError('Failed to load products');
+      }
+    } catch (err) {
+      setError('Error loading products: ' + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const formatPrice = (priceStr) => {
-    if (!priceStr) return 'Price on request';
-    return priceStr.startsWith('$') ? priceStr : `$${priceStr}`;
+  const handleSearch = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const searchParams = {
+        query: searchQuery || undefined,
+        ...Object.fromEntries(
+          Object.entries(filters).map(([key, value]) => [key, value || undefined])
+        )
+      };
+      
+      // Remove undefined values
+      Object.keys(searchParams).forEach(key => 
+        searchParams[key] === undefined && delete searchParams[key]
+      );
+      
+      const response = await fetch(`${BACKEND_URL}/api/search/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(searchParams)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data.products || []);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || 'Search failed');
+      }
+    } catch (err) {
+      setError('Search error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveCredentials = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/search/vendor-credentials`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials)
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        alert('Credentials saved successfully!');
+        setShowCredentialsModal(false);
+        setCredentials({ vendor_name: '', username: '', password: '' });
+        
+        // Refresh saved credentials
+        const credentialsResponse = await fetch(`${BACKEND_URL}/api/search/vendor-credentials`);
+        if (credentialsResponse.ok) {
+          const credentialsData = await credentialsResponse.json();
+          setSavedCredentials(credentialsData || []);
+        }
+      } else {
+        const errorData = await response.json();
+        alert('Failed to save credentials: ' + errorData.detail);
+      }
+    } catch (err) {
+      alert('Error saving credentials: ' + err.message);
+    }
+  };
+
+  const handleScrapeProducts = async () => {
+    try {
+      if (savedCredentials.length === 0) {
+        alert('Please add vendor credentials first');
+        return;
+      }
+      
+      setLoading(true);
+      const response = await fetch(`${BACKEND_URL}/api/search/scrape-products`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        alert(`Product scraping started for ${result.vendors} vendors. This will take a few minutes.`);
+        
+        // Reload products after a delay
+        setTimeout(() => {
+          loadProducts();
+        }, 30000); // 30 seconds
+      } else {
+        const errorData = await response.json();
+        alert('Failed to start scraping: ' + errorData.detail);
+      }
+    } catch (err) {
+      alert('Scraping error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addToChecklist = async (product) => {
+    // Placeholder for adding to checklist
+    alert(`Adding "${product.name}" to checklist (feature coming soon)`);
+  };
+
+  const addToCanva = async (product) => {
+    // Placeholder for Canva integration
+    alert(`Adding "${product.name}" to Canva board (feature coming soon)`);
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg border border-gray-700">
+    <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4 my-8">
       {/* Header */}
-      <div className="p-6 border-b border-gray-700">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-white">
-            🔍 Unified Furniture Search Engine
-          </h2>
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-light text-[#B49B7E] tracking-wide mb-6">
+          🔍 UNIFIED FURNITURE SEARCH ENGINE
+        </h2>
+        <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mb-6"></div>
+        <p className="text-lg" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+          Search ALL your vendor products in one place - The DREAM!
+        </p>
+      </div>
+
+      {/* Vendor Management Section */}
+      <div className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-2xl border border-[#B49B7E]/20 p-6 mb-8">
+        <h3 className="text-xl font-light text-[#B49B7E] mb-6">Vendor Management</h3>
+        
+        <div className="flex flex-wrap gap-4 mb-6">
           <button
-            onClick={scrapeAllVendors}
-            disabled={loading}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 text-white rounded-md font-medium transition-colors"
+            onClick={() => setShowCredentialsModal(true)}
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium"
+            style={{ color: '#F5F5DC' }}
           >
-            {loading ? '⏳ Updating...' : '🔄 Update Database'}
+            🔐 Add Vendor Credentials
+          </button>
+          
+          <button
+            onClick={handleScrapeProducts}
+            disabled={loading || savedCredentials.length === 0}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-600 disabled:to-gray-700 px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium"
+            style={{ color: '#F5F5DC' }}
+          >
+            {loading ? '⏳ Scraping...' : '🔄 Scrape Products'}
           </button>
         </div>
-        
-        <p className="text-gray-300 mb-4">
-          <strong>THE DREAM IS REAL!</strong> Search ALL furniture from ALL vendors in one place. No more 1000 tabs!
-        </p>
 
-        {/* Database Stats */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div className="bg-gray-900 p-3 rounded border border-gray-600">
-              <div className="text-amber-400 font-semibold">Total Products</div>
-              <div className="text-2xl font-bold text-white">{stats.total_products.toLocaleString()}</div>
-            </div>
-            <div className="bg-gray-900 p-3 rounded border border-gray-600">
-              <div className="text-amber-400 font-semibold">Vendors</div>
-              <div className="text-2xl font-bold text-white">{stats.vendors.length}</div>
-            </div>
-            <div className="bg-gray-900 p-3 rounded border border-gray-600">
-              <div className="text-amber-400 font-semibold">Categories</div>
-              <div className="text-2xl font-bold text-white">{stats.categories.length}</div>
-            </div>
+        {/* Saved Credentials Display */}
+        {savedCredentials.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {savedCredentials.map((cred) => (
+              <div key={cred.id} className="bg-black/40 border border-[#B49B7E]/30 p-4 rounded-lg">
+                <h4 className="text-[#B49B7E] font-medium mb-2">{cred.vendor_name}</h4>
+                <p style={{ color: '#F5F5DC', opacity: '0.7' }} className="text-sm">
+                  Username: {cred.username}
+                </p>
+                <p style={{ color: '#F5F5DC', opacity: '0.7' }} className="text-sm">
+                  Added: {new Date(cred.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
-      {/* Search Interface */}
-      <div className="p-6">
-        {/* Search Bar */}
-        <div className="mb-4">
+      {/* Search Section */}
+      <div className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-2xl border border-[#B49B7E]/20 p-6 mb-8">
+        <h3 className="text-xl font-light text-[#B49B7E] mb-6">Search Products</h3>
+        
+        {/* Main Search Bar */}
+        <div className="flex items-center gap-4 mb-6">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && searchFurniture()}
-            placeholder="Search furniture... (e.g., 'dining chair', 'table lamp', 'sofa')"
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 text-lg"
+            placeholder="Search for lamps, chairs, tables..."
+            className="flex-1 bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] focus:bg-black/60 transition-all duration-300 placeholder:text-[#B49B7E]/50"
           />
+          <button
+            onClick={handleSearch}
+            disabled={loading}
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] disabled:from-gray-600 disabled:to-gray-700 px-8 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium"
+            style={{ color: '#F5F5DC' }}
+          >
+            {loading ? '🔍...' : '🔍 Search'}
+          </button>
         </div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        {/* Advanced Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <select
             value={filters.vendor}
-            onChange={(e) => setFilters({ ...filters, vendor: e.target.value })}
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+            onChange={(e) => setFilters({...filters, vendor: e.target.value})}
+            className="bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] transition-all duration-300"
           >
             <option value="">All Vendors</option>
-            {vendors.map(vendor => (
+            {filterOptions.vendors.map(vendor => (
               <option key={vendor} value={vendor}>{vendor}</option>
             ))}
           </select>
 
           <select
             value={filters.category}
-            onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+            onChange={(e) => setFilters({...filters, category: e.target.value})}
+            className="bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] transition-all duration-300"
           >
             <option value="">All Categories</option>
-            {categories.map(category => (
+            {filterOptions.categories.map(category => (
               <option key={category} value={category}>{category}</option>
             ))}
           </select>
 
-          <input
-            type="text"
-            value={filters.min_price}
-            onChange={(e) => setFilters({ ...filters, min_price: e.target.value })}
-            placeholder="Min Price ($)"
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
-
-          <input
-            type="text"
-            value={filters.max_price}
-            onChange={(e) => setFilters({ ...filters, max_price: e.target.value })}
-            placeholder="Max Price ($)"
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex space-x-4 mb-6">
-          <button
-            onClick={searchFurniture}
-            disabled={isSearching}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-md font-medium transition-colors"
+          <select
+            value={filters.room_type}
+            onChange={(e) => setFilters({...filters, room_type: e.target.value})}
+            className="bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] transition-all duration-300"
           >
-            {isSearching ? '🔍 Searching...' : '🔍 Search'}
-          </button>
+            <option value="">All Room Types</option>
+            {filterOptions.room_types.map(room => (
+              <option key={room} value={room}>{room}</option>
+            ))}
+          </select>
 
-          <button
-            onClick={clearFilters}
-            className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md font-medium transition-colors"
-          >
-            🧹 Clear All
-          </button>
-        </div>
-
-        {/* Search Results */}
-        {searchResults.length > 0 && (
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">
-              Search Results ({searchResults.length} products found)
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {searchResults.map((product, index) => (
-                <div key={index} className="bg-gray-900 rounded-lg border border-gray-600 overflow-hidden">
-                  {/* Product Image */}
-                  {product.image_url && (
-                    <div className="aspect-square bg-gray-800">
-                      <img
-                        src={product.image_url}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Product Details */}
-                  <div className="p-4">
-                    <h4 className="font-semibold text-white mb-2 line-clamp-2">
-                      {product.name}
-                    </h4>
-                    
-                    <div className="text-sm text-gray-300 mb-2">
-                      <div className="flex justify-between">
-                        <span className="text-amber-400">{product.vendor}</span>
-                        <span className="font-semibold text-white">{formatPrice(product.price)}</span>
-                      </div>
-                    </div>
-                    
-                    {product.category && (
-                      <div className="text-xs text-gray-400 mb-2">
-                        Category: {product.category}
-                      </div>
-                    )}
-                    
-                    {product.sku && (
-                      <div className="text-xs text-gray-400 mb-2">
-                        SKU: {product.sku}
-                      </div>
-                    )}
-                    
-                    {product.dimensions && (
-                      <div className="text-xs text-gray-400 mb-3">
-                        Dimensions: {product.dimensions}
-                      </div>
-                    )}
-                    
-                    <div className="flex space-x-2">
-                      {product.url && (
-                        <a
-                          href={product.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-center rounded text-sm font-medium transition-colors"
-                        >
-                          View Original
-                        </a>
-                      )}
-                      
-                      {onSelectProduct && (
-                        <button
-                          onClick={() => onSelectProduct(product)}
-                          className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
-                        >
-                          Add to Project
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              value={filters.min_price}
+              onChange={(e) => setFilters({...filters, min_price: e.target.value})}
+              placeholder="Min $"
+              className="flex-1 bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] focus:bg-black/60 transition-all duration-300 placeholder:text-[#B49B7E]/50"
+            />
+            <input
+              type="number"
+              value={filters.max_price}
+              onChange={(e) => setFilters({...filters, max_price: e.target.value})}
+              placeholder="Max $"
+              className="flex-1 bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] focus:bg-black/60 transition-all duration-300 placeholder:text-[#B49B7E]/50"
+            />
           </div>
-        )}
+        </div>
+      </div>
 
-        {/* No Results */}
-        {searchResults.length === 0 && isSearching === false && searchQuery && (
-          <div className="text-center py-8">
-            <div className="text-gray-400 mb-2">No products found matching your search.</div>
-            <div className="text-gray-500 text-sm">Try adjusting your search terms or filters.</div>
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-900/20 border border-red-500/30 p-6 rounded-2xl mb-8 text-center" style={{ color: '#F5F5DC' }}>
+          {error}
+        </div>
+      )}
+
+      {/* Products Grid */}
+      <div className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-2xl border border-[#B49B7E]/20 p-6">
+        <h3 className="text-xl font-light text-[#B49B7E] mb-6">
+          Search Results ({products.length} items)
+        </h3>
+        
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B49B7E] mx-auto"></div>
+            <p className="mt-4" style={{ color: '#F5F5DC', opacity: '0.8' }}>Loading products...</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-6">🔍</div>
+            <h3 className="text-2xl font-light text-[#B49B7E] mb-4">No Products Found</h3>
+            <p className="text-lg mb-8" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+              {savedCredentials.length === 0 
+                ? 'Add vendor credentials and scrape products to get started'
+                : 'Try adjusting your search filters or scraping more products'
+              }
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <div key={product.id} className="bg-black/60 border border-[#B49B7E]/20 rounded-lg p-4 hover:border-[#B49B7E]/40 transition-all duration-300">
+                {/* Product Image */}
+                {product.image_base64 ? (
+                  <img
+                    src={`data:image/jpeg;base64,${product.image_base64}`}
+                    alt={product.name}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                ) : product.image_url ? (
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                ) : (
+                  <div className="w-full h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center">
+                    <span className="text-4xl">🖼️</span>
+                  </div>
+                )}
+
+                {/* Product Info */}
+                <h4 className="text-[#B49B7E] font-medium mb-2 line-clamp-2">
+                  {product.name}
+                </h4>
+                
+                <p className="text-sm mb-2" style={{ color: '#F5F5DC', opacity: '0.7' }}>
+                  {product.vendor} • {product.vendor_sku}
+                </p>
+                
+                {product.price && (
+                  <p className="text-lg font-medium text-green-400 mb-2">
+                    ${product.price.toFixed(2)}
+                  </p>
+                )}
+                
+                <div className="flex flex-wrap gap-1 mb-4">
+                  {product.category && (
+                    <span className="bg-[#B49B7E]/20 text-[#B49B7E] px-2 py-1 rounded text-xs">
+                      {product.category}
+                    </span>
+                  )}
+                  {product.room_type && (
+                    <span className="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs">
+                      {product.room_type}
+                    </span>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => addToChecklist(product)}
+                    className="flex-1 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-3 py-2 text-sm rounded transition-all duration-300"
+                    style={{ color: '#F5F5DC' }}
+                  >
+                    ✅ Checklist
+                  </button>
+                  <button
+                    onClick={() => addToCanva(product)}
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-3 py-2 text-sm rounded transition-all duration-300"
+                    style={{ color: '#F5F5DC' }}
+                  >
+                    🎨 Canva
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
+
+      {/* Credentials Modal */}
+      {showCredentialsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-black/60 to-gray-900/80 rounded-3xl p-8 w-full max-w-md mx-4 border border-[#B49B7E]/20 shadow-2xl backdrop-blur-sm">
+            <h3 className="text-2xl font-light text-[#B49B7E] mb-6 text-center">Add Vendor Credentials</h3>
+            <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mb-8"></div>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block text-lg font-light text-[#B49B7E] tracking-wide mb-3">
+                  Vendor
+                </label>
+                <select
+                  value={credentials.vendor_name}
+                  onChange={(e) => setCredentials({...credentials, vendor_name: e.target.value})}
+                  className="w-full px-4 py-3 bg-black/40 border border-[#B49B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] focus:bg-black/60 transition-all duration-300"
+                  style={{ color: '#F5F5DC' }}
+                >
+                  <option value="">Select Vendor</option>
+                  {vendors.map(vendor => (
+                    <option key={vendor.id} value={vendor.name}>{vendor.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-lg font-light text-[#B49B7E] tracking-wide mb-3">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  value={credentials.username}
+                  onChange={(e) => setCredentials({...credentials, username: e.target.value})}
+                  className="w-full px-4 py-3 bg-black/40 border border-[#B49B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] focus:bg-black/60 transition-all duration-300"
+                  style={{ color: '#F5F5DC' }}
+                  placeholder="Enter username"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-lg font-light text-[#B49B7E] tracking-wide mb-3">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={credentials.password}
+                  onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                  className="w-full px-4 py-3 bg-black/40 border border-[#B49B7E]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B49B7E] focus:border-[#B49B7E] focus:bg-black/60 transition-all duration-300"
+                  style={{ color: '#F5F5DC' }}
+                  placeholder="Enter password"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-center gap-4 pt-8">
+              <button
+                onClick={handleSaveCredentials}
+                disabled={!credentials.vendor_name || !credentials.username || !credentials.password}
+                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] disabled:from-gray-600 disabled:to-gray-700 px-8 py-3 text-lg font-light rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide"
+                style={{ color: '#F5F5DC' }}
+              >
+                Save Credentials
+              </button>
+              
+              <button
+                onClick={() => {
+                  setShowCredentialsModal(false);
+                  setCredentials({ vendor_name: '', username: '', password: '' });
+                }}
+                className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 px-8 py-3 text-lg font-light rounded-full transition-all duration-300 tracking-wide"
+                style={{ color: '#F5F5DC' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
