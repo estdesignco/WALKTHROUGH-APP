@@ -1393,7 +1393,7 @@ const ExactFFESpreadsheet = ({
 
       {/* ADD INSTALLED MODAL */}
       {/* FOOTER SECTION - ADD CATEGORY */}
-      <div className="mt-8 p-4 border-t-2 border-[#B49B7E]/20">
+      <div className="mt-8 p-4 border-t-2 border-[#D4A574]/20">
         <div className="flex gap-3 justify-center">
           <select
             value=""
