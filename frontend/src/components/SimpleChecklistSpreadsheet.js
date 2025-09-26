@@ -1120,11 +1120,11 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* SIZE - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-white text-sm">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm">
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-white text-sm outline-none"
+                                      className="w-full bg-transparent text-[#F5F5DC] text-sm outline-none"
                                       onBlur={(e) => console.log('Size updated:', e.target.textContent)}
                                     >
                                       {item.size || ''}
