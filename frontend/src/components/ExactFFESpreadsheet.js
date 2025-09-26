@@ -842,10 +842,10 @@ const ExactFFESpreadsheet = ({
         </div>
       </div>
 
-      {/* SPREADSHEET CONTAINER - SAME TREATMENT AS GRAPHS BUT EXISTING DARK NAVY */}
+      {/* SPREADSHEET CONTAINER - EXACT SAME TREATMENT AS GRAPHS */}
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
            style={{
-             background: 'linear-gradient(135deg, rgba(30,41,59,0.95) 0%, rgba(51,65,85,0.9) 30%, rgba(30,41,59,0.95) 100%)'
+             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
            }}>
         
         {/* ORIGINAL TABLE STRUCTURE - DO NOT CHANGE */}
