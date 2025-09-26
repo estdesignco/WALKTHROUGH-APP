@@ -1209,20 +1209,19 @@ class RealVendorScraper:
             return []
     
     async def scrape_fourhands_console_tables(self, max_results: int = 60) -> List[Dict]:
-        """Dedicated scraper for Four Hands console tables using requests/BeautifulSoup"""
+        """Dedicated scraper for Four Hands console tables with REAL deep product scraping"""
         try:
-            logger.info("Scraping Four Hands console tables with requests...")
+            logger.info("REAL Four Hands console table scraping with complete product details...")
             self.setup_session()
             
             products = []
             
-            # Console table URLs to try (use fourhands.com not www.fourhands.com)
+            # First get product URLs, then scrape each individual product page for complete details
             console_urls = [
                 "https://fourhands.com/collections/console-tables",
                 "https://fourhands.com/collections/tables", 
                 "https://fourhands.com/collections/all",
                 "https://fourhands.com/search?q=console+table",
-                "https://fourhands.com/products.json",  # JSON API endpoint
                 "https://fourhands.com"  # Homepage fallback
             ]
             
