@@ -826,7 +826,7 @@ class RealVendorScraper:
                             if img:
                                 src = img.get('src') or img.get('data-src') or img.get('data-original')
                                 if src:
-                                    image_url = src if src.startswith('http') else f"https://www.fourhands.com{src}"
+                                    image_url = src if src.startswith('http') else f"https://fourhands.com{src}"
                             
                             # Try to find price
                             price_text = "Contact for pricing"
