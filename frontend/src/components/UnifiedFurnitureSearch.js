@@ -129,12 +129,13 @@ const UnifiedFurnitureSearch = () => {
 
   const handleRealSearch = async () => {
     try {
+      console.log('🚀 REAL SEARCH FUNCTION CALLED!');
       setLoading(true);
       setError(null);
       setSuccess(null);
       
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      console.log('Starting real search with backend URL:', BACKEND_URL);
+      console.log('🔗 Starting real search with backend URL:', BACKEND_URL, 'Query:', searchQuery);
       
       const searchRequest = {
         query: searchQuery || 'furniture',
