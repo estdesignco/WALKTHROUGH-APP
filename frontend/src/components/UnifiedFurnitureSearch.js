@@ -790,16 +790,16 @@ const UnifiedFurnitureSearch = () => {
 
                 {/* Product Info */}
                 <h4 className="text-[#B49B7E] font-medium mb-2 line-clamp-2">
-                  {product.name}
+                  {product.title || product.name || 'Unknown Product'}
                 </h4>
                 
                 <p className="text-sm mb-2" style={{ color: '#F5F5DC', opacity: '0.7' }}>
-                  {product.vendor} • {product.vendor_sku}
+                  {product.seller || product.vendor} • {product.id}
                 </p>
                 
                 {product.price && (
                   <p className="text-lg font-medium text-green-400 mb-2">
-                    ${product.price.toFixed(2)}
+                    {product.price}
                   </p>
                 )}
                 
