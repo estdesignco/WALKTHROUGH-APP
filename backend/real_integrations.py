@@ -799,7 +799,7 @@ class RealVendorScraper:
                                 
                             # Make URL absolute
                             if not href.startswith('http'):
-                                href = f"https://www.fourhands.com{href}"
+                                href = f"https://fourhands.com{href}"
                             
                             # Extract product name
                             product_name = link.get('title') or link.text.strip()
