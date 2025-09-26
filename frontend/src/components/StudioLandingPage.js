@@ -194,7 +194,7 @@ const UnifiedFurnitureSearch = () => {
     }
   };
 
-  const [savedCredentials] = useState([
+  const [savedCredentials, setSavedCredentials] = useState([
     { id: '1', vendor_name: 'Four Hands', username: 'demo_user' },
     { id: '2', vendor_name: 'Hudson Valley Lighting', username: 'demo_user' }
   ]);
