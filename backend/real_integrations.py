@@ -369,7 +369,7 @@ class RealHouzzIntegration:
                         # Dropdowns
                         "category": "Furniture > Console Tables",
                         "vendor_subcontractor": "Four Hands Furniture",
-                        "project": "🔥 LOAD REAL HOUZZ PROJECTS",
+                        "project": await self.get_real_houzz_projects(),
                         "room": "Living Room",
                         
                         # Additional Details
