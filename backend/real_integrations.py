@@ -500,6 +500,21 @@ class RealVendorScraper:
         except:
             return None
     
+    async def create_placeholder_image(self, size: tuple = (400, 300)) -> str:
+        """Create a simple placeholder image as base64"""
+        try:
+            # Create a simple colored image
+            image = Image.new('RGB', size, color=(139, 155, 126))  # Similar to our gold theme
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            image.save(buffer, format='JPEG', quality=85)
+            image_base64 = base64.b64encode(buffer.getvalue()).decode()
+            
+            return image_base64
+        except:
+            return None
+    
     async def scrape_fourhands(self, search_query: str = "furniture", max_results: int = 20) -> List[Dict]:
         """Scrape Four Hands furniture website with enhanced selectors and image processing"""
         try:
