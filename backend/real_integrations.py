@@ -454,8 +454,11 @@ class RealVendorScraper:
         """Download image and convert to base64 for frontend display"""
         try:
             if not image_url or not image_url.startswith('http'):
+                logger.error(f"Invalid image URL: {image_url}")
                 return None
                 
+            logger.info(f"Processing image: {image_url}")
+            
             # Download image
             response = self.session.get(image_url, timeout=10)
             response.raise_for_status()
@@ -480,7 +483,8 @@ class RealVendorScraper:
             
         except Exception as e:
             logger.error(f"Failed to process image {image_url}: {e}")
-            return None
+            # Return a simple placeholder base64 image
+            return await self.create_placeholder_image(max_size)
     
     def extract_price_number(self, price_text: str) -> Optional[float]:
         """Extract numeric price from text"""
