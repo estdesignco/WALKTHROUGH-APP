@@ -269,21 +269,41 @@ const UnifiedFurnitureSearch = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => alert(`Adding "${product.name}" to checklist!`)}
-                  className="flex-1 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-4 py-3 text-lg font-bold rounded transition-all duration-300"
-                  style={{ color: '#F5F5DC' }}
-                >
-                  ✅ ADD TO CHECKLIST
-                </button>
-                <button
-                  onClick={() => alert(`Adding "${product.name}" to Canva board!`)}
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-4 py-3 text-lg font-bold rounded transition-all duration-300"
-                  style={{ color: '#F5F5DC' }}
-                >
-                  🎨 ADD TO CANVA
-                </button>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => alert(`Adding "${product.name}" to checklist!`)}
+                    className="flex-1 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-4 py-3 text-lg font-bold rounded transition-all duration-300"
+                    style={{ color: '#F5F5DC' }}
+                  >
+                    ✅ ADD TO CHECKLIST
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedProduct(product);
+                      setShowCanvaModal(true);
+                    }}
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-4 py-3 text-lg font-bold rounded transition-all duration-300"
+                    style={{ color: '#F5F5DC' }}
+                  >
+                    🎨 ASSIGN TO PROJECT
+                  </button>
+                </div>
+
+                {/* Show Assignment Status */}
+                {assignments.filter(a => a.productId === product.id).length > 0 && (
+                  <div className="bg-green-900/20 border border-green-500/30 rounded p-3">
+                    <p className="text-sm font-bold text-green-400 mb-1">✅ Assigned to Canva:</p>
+                    {assignments
+                      .filter(a => a.productId === product.id)
+                      .map((assignment, idx) => (
+                        <div key={idx} className="text-xs" style={{ color: '#F5F5DC' }}>
+                          📁 {assignment.project} → 📋 {assignment.sheet}
+                        </div>
+                      ))
+                    }
+                  </div>
+                )}
               </div>
             </div>
           ))}
