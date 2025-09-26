@@ -107,26 +107,30 @@ async def create_canva_project(
 
 @router.post("/add-to-houzz-ideabook")
 async def add_to_houzz_ideabook(
-    ideabook_request: HouzzIdeabookRequest,
-    background_tasks: BackgroundTasks
+    ideabook_request: HouzzIdeabookRequest
 ):
-    """Add products to Houzz Pro ideabook"""
+    """Add products to Houzz Pro ideabook and return COMPLETE scraped data"""
     try:
-        logger.info(f"Adding products to Houzz ideabook: {ideabook_request.ideabook_name}")
+        logger.info(f"🔥 PROCESSING HOUZZ CLIPPER: {ideabook_request.ideabook_name}")
         
-        # Process in background
-        background_tasks.add_task(
-            integration_manager.add_to_houzz_ideabook,
-            ideabook_request.products,
-            ideabook_request.ideabook_name
-        )
-        
-        return {
-            "status": "initiated",
-            "message": f"Adding {len(ideabook_request.products)} products to Houzz ideabook '{ideabook_request.ideabook_name}'",
-            "ideabook_name": ideabook_request.ideabook_name,
-            "products_count": len(ideabook_request.products)
-        }
+        # Process the FIRST product and return complete data
+        if ideabook_request.products:
+            product = ideabook_request.products[0]  # Get first product
+            
+            # Get the complete scraped data RIGHT NOW
+            result = await integration_manager.houzz.add_to_ideabook(
+                product,
+                ideabook_request.ideabook_name
+            )
+            
+            logger.info(f"✅ HOUZZ CLIPPER RESULT: {result}")
+            
+            return result
+        else:
+            return {
+                "success": False,
+                "error": "No products provided"
+            }
     
     except Exception as e:
         logger.error(f"Houzz ideabook error: {e}")
