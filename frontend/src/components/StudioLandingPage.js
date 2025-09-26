@@ -134,6 +134,14 @@ const UnifiedFurnitureSearch = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    vendor: '',
+    category: '',
+    room_type: '',
+    style: '',
+    min_price: '',
+    max_price: ''
+  });
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
