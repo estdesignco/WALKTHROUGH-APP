@@ -776,12 +776,13 @@ class RealHouzzIntegration:
                 except:
                     continue
             
-            # Description field (use title as description if no separate description)
+            # REAL Description field 
             description = product_data.get('description', product_data.get('title', ''))
             description_selectors = [
                 "textarea[name*='description']",
                 "textarea[name*='notes']",
-                "textarea[placeholder*='description']"
+                "textarea[placeholder*='description']",
+                "textarea[id*='description']"
             ]
             
             for selector in description_selectors:
@@ -789,11 +790,55 @@ class RealHouzzIntegration:
                     desc_field = WebDriverWait(self.driver, 3).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, selector))
                     )
+                    desc_field.clear()
                     desc_field.send_keys(description)
-                    logger.info("Filled description field")
+                    logger.info("Filled REAL product description")
                     break
                 except:
                     continue
+            
+            # REAL SKU field
+            sku = product_data.get('sku', 'N/A')
+            sku_selectors = [
+                "input[name*='sku']",
+                "input[name*='model']",
+                "input[placeholder*='sku']",
+                "input[placeholder*='model']",
+                "input[id*='sku']"
+            ]
+            
+            for selector in sku_selectors:
+                try:
+                    sku_field = WebDriverWait(self.driver, 3).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    sku_field.clear()
+                    sku_field.send_keys(sku)
+                    logger.info(f"Filled REAL SKU: {sku}")
+                    break
+                except:
+                    continue
+            
+            # REAL Specifications (if any fields available)
+            specifications = product_data.get('specifications', {})
+            for spec_name, spec_value in specifications.items():
+                spec_selectors = [
+                    f"input[name*='{spec_name.lower()}']",
+                    f"input[placeholder*='{spec_name.lower()}']",
+                    f"textarea[name*='{spec_name.lower()}']"
+                ]
+                
+                for selector in spec_selectors:
+                    try:
+                        spec_field = WebDriverWait(self.driver, 2).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                        )
+                        spec_field.clear()
+                        spec_field.send_keys(spec_value)
+                        logger.info(f"Filled specification {spec_name}: {spec_value}")
+                        break
+                    except:
+                        continue
             
             logger.info("Completed filling additional product details")
             
