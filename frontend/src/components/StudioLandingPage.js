@@ -304,14 +304,24 @@ const UnifiedFurnitureSearch = () => {
                 </div>
 
                 {/* Show Assignment Status */}
-                {assignments.filter(a => a.productId === product.id).length > 0 && (
+                {(assignments.filter(a => a.productId === product.id).length > 0 || 
+                  houzzAssignments.filter(h => h.productId === product.id).length > 0) && (
                   <div className="bg-green-900/20 border border-green-500/30 rounded p-3">
-                    <p className="text-sm font-bold text-green-400 mb-1">✅ Assigned to Canva:</p>
+                    <p className="text-sm font-bold text-green-400 mb-1">✅ Assignments:</p>
                     {assignments
                       .filter(a => a.productId === product.id)
                       .map((assignment, idx) => (
                         <div key={idx} className="text-xs" style={{ color: '#F5F5DC' }}>
-                          📁 {assignment.project} → 📋 {assignment.sheet}
+                          🎨 Canva: {assignment.project} → {assignment.sheet}
+                        </div>
+                      ))
+                    }
+                    {houzzAssignments
+                      .filter(h => h.productId === product.id)
+                      .map((assignment, idx) => (
+                        <div key={idx} className="text-xs" style={{ color: '#F5F5DC' }}>
+                          🏠 Houzz: {assignment.projectName} → {assignment.room}
+                          {assignment.addToSelectionBoard && ' (Selection Board)'}
                         </div>
                       ))
                     }
