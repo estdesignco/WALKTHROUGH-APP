@@ -1342,7 +1342,8 @@ const SimpleChecklistSpreadsheet = ({
             </div>
           );
         })}
-      </div>
+        </div>
+      </div> {/* END DARK NAVY SPREADSHEET CONTAINER */}
 
       {/* Add Item Modal - FIXED */}
       {showAddItem && selectedSubCategoryId && (
