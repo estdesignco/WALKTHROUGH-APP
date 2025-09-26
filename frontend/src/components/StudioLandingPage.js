@@ -463,25 +463,31 @@ const UnifiedFurnitureSearch = () => {
                   </button>
                 </div>
 
-                {/* Show Assignment Status */}
+                {/* Enhanced Assignment Status */}
                 {(assignments.filter(a => a.productId === product.id).length > 0 || 
                   houzzAssignments.filter(h => h.productId === product.id).length > 0) && (
-                  <div className="bg-green-900/20 border border-green-500/30 rounded p-3">
-                    <p className="text-sm font-bold text-green-400 mb-1">✅ Assignments:</p>
+                  <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded p-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <p className="text-sm font-bold text-green-400">✅ ASSIGNED & SYNCED:</p>
+                    </div>
                     {assignments
                       .filter(a => a.productId === product.id)
                       .map((assignment, idx) => (
-                        <div key={idx} className="text-xs" style={{ color: '#F5F5DC' }}>
-                          🎨 Canva: {assignment.project} → {assignment.sheet}
+                        <div key={idx} className="flex items-center justify-between text-xs mb-1" style={{ color: '#F5F5DC' }}>
+                          <span>🎨 Canva: {assignment.project} → {assignment.sheet}</span>
+                          <span className="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs">LIVE</span>
                         </div>
                       ))
                     }
                     {houzzAssignments
                       .filter(h => h.productId === product.id)
                       .map((assignment, idx) => (
-                        <div key={idx} className="text-xs" style={{ color: '#F5F5DC' }}>
-                          🏠 Houzz: {assignment.projectName} → {assignment.room}
-                          {assignment.addToSelectionBoard && ' (Selection Board)'}
+                        <div key={idx} className="flex items-center justify-between text-xs mb-1" style={{ color: '#F5F5DC' }}>
+                          <span>🏠 Houzz: {assignment.projectName} → {assignment.room}</span>
+                          <span className="bg-orange-500/20 text-orange-400 px-2 py-1 rounded text-xs">
+                            {assignment.addToSelectionBoard ? 'BOARD' : 'PROJECT'}
+                          </span>
                         </div>
                       ))
                     }
