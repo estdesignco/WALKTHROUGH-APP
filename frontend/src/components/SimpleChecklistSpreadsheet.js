@@ -810,7 +810,7 @@ const SimpleChecklistSpreadsheet = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-700 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
+              className="w-full px-4 py-2 rounded bg-gray-700 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none placeholder-[#B49B7E]/60"
             />
           </div>
           
