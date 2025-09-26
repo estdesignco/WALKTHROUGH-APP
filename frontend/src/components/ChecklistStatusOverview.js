@@ -127,7 +127,9 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
       {/* LEFT COLUMN - STATUS OVERVIEW */}
-      <div className="bg-gray-800 rounded-xl p-6">
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
+        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+      }}>
         <h3 className="text-lg font-semibold text-white mb-4">Status Overview</h3>
         
         {/* STATUS PIE CHART */}
@@ -155,7 +157,9 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       </div>
 
       {/* MIDDLE COLUMN - STATUS BREAKDOWN */}
-      <div className="bg-gray-800 rounded-xl p-6">
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
+        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+      }}>
         <h3 className="text-lg font-semibold text-white mb-4">Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
@@ -197,7 +201,9 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       </div>
 
       {/* RIGHT COLUMN - SHIPPING SECTION */}
-      <div className="bg-gray-800 rounded-xl p-6">
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
+        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+      }}>
         <h3 className="text-lg font-semibold text-white mb-4">Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
