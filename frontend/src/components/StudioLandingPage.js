@@ -568,6 +568,16 @@ const StudioLandingPage = () => {
       <div className="max-w-6xl mx-auto p-4">
         <div className="flex flex-wrap justify-center gap-3 mb-8">
           <button
+            onClick={() => setActiveView('search')}
+            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 ${
+              activeView === 'search'
+                ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-black'
+                : 'bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] hover:border-[#B49B7E]/60'
+            }`}
+          >
+            🔍 Unified Search
+          </button>
+          <button
             onClick={() => setActiveView('dashboard')}
             className={`px-6 py-3 rounded-full font-bold transition-all duration-300 ${
               activeView === 'dashboard'
@@ -575,7 +585,7 @@ const StudioLandingPage = () => {
                 : 'bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] hover:border-[#B49B7E]/60'
             }`}
           >
-            🏠 Dashboard & Search
+            📊 Analytics Dashboard
           </button>
           <button
             onClick={() => setActiveView('mobile-walkthrough')}
