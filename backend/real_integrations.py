@@ -753,12 +753,14 @@ class RealVendorScraper:
             
             products = []
             
-            # Console table URLs to try
+            # Console table URLs to try (use fourhands.com not www.fourhands.com)
             console_urls = [
-                "https://www.fourhands.com/collections/console-tables",
-                "https://www.fourhands.com/collections/tables", 
-                "https://www.fourhands.com/search?q=console+table",
-                "https://www.fourhands.com/collections/all-furniture"
+                "https://fourhands.com/collections/console-tables",
+                "https://fourhands.com/collections/tables", 
+                "https://fourhands.com/collections/all",
+                "https://fourhands.com/search?q=console+table",
+                "https://fourhands.com/products.json",  # JSON API endpoint
+                "https://fourhands.com"  # Homepage fallback
             ]
             
             for url in console_urls:
