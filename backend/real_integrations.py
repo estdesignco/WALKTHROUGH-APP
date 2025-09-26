@@ -297,9 +297,18 @@ class RealHouzzIntegration:
             if not self.driver:
                 await self.initialize_session()
             
-            logger.info(f"Adding {product_data.get('title')} to Houzz Pro clipper")
+            logger.info(f"Processing {product_data.get('title')} for Houzz Pro clipper")
             
-            # Go to Houzz Pro dashboard first
+            # FIRST: If this product needs full scraping, scrape it from the real URL NOW
+            if product_data.get('needs_full_scrape') or not product_data.get('sku'):
+                logger.info("🔥 SCRAPING REAL PRODUCT DATA from Four Hands URL...")
+                real_product_data = await self.scrape_live_product_data(product_data.get('url'))
+                if real_product_data:
+                    # Merge the real scraped data with existing data
+                    product_data.update(real_product_data)
+                    logger.info(f"✅ Got REAL data: SKU={product_data.get('sku')}, Price={product_data.get('price')}")
+            
+            # Go to Houzz Pro dashboard
             self.driver.get("https://pro.houzz.com/dashboard")
             await asyncio.sleep(3)
             
