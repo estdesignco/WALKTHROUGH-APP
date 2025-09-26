@@ -747,51 +747,48 @@ const ComprehensiveQuestionnaire = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-white tracking-wider text-center">
-            ESTABLISHED DESIGN CO.
-          </h1>
-          <h2 className="text-xl text-yellow-400 text-center mt-2">
-            COMPREHENSIVE CLIENT QUESTIONNAIRE
-          </h2>
-        </div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="max-w-4xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-between mb-2">
+    <CompletePageLayout 
+      projectId={clientId}
+      activeTab="questionnaire"
+      title="COMPREHENSIVE CLIENT QUESTIONNAIRE"
+      hideNavigation={true}
+    >
+      {/* Progress Bar Container */}
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+           style={{
+             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+           }}>
+        <div className="flex items-center justify-between mb-4">
           {sections.map((section, index) => (
             <div
               key={section}
               className={`flex-1 text-center text-sm ${
                 index === currentSection
-                  ? 'text-yellow-400 font-semibold'
+                  ? 'text-[#B49B7E] font-semibold'
                   : index < currentSection
                   ? 'text-green-400'
-                  : 'text-gray-500'
+                  : 'text-[#F5F5DC]/60'
               }`}
             >
               {section}
             </div>
           ))}
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-2">
+        <div className="w-full bg-gray-700/50 rounded-full h-2 border border-[#B49B7E]/20">
           <div
-            className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] h-2 rounded-full transition-all duration-300"
             style={{ width: `${((currentSection + 1) / sections.length) * 100}%` }}
           ></div>
         </div>
       </div>
 
-      {/* Form Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Form Content Container */}
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-8 border border-[#B49B7E]/20 mb-6" 
+           style={{
+             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+           }}>
         <form onSubmit={handleSubmit}>
-          <div className="bg-gray-800 rounded-lg p-8">
-            {renderCurrentSection()}
-          </div>
+          {renderCurrentSection()}
 
           {/* Navigation Buttons */}
           <div className="flex justify-between mt-8">
@@ -799,7 +796,7 @@ const ComprehensiveQuestionnaire = () => {
               type="button"
               onClick={prevSection}
               disabled={currentSection === 0}
-              className="px-6 py-3 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 text-white rounded-lg transition-colors"
+              className="px-6 py-3 bg-[#8B4444]/80 hover:bg-[#8B4444] disabled:bg-gray-800/50 text-[#F5F5DC] rounded-lg transition-colors border border-[#B49B7E]/20"
             >
               Previous
             </button>
@@ -809,7 +806,7 @@ const ComprehensiveQuestionnaire = () => {
                 <button
                   type="button"
                   onClick={nextSection}
-                  className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
+                  className="px-6 py-3 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-black rounded-lg transition-colors border border-[#B49B7E]/20"
                 >
                   Next
                 </button>
@@ -817,7 +814,7 @@ const ComprehensiveQuestionnaire = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting || !formData.full_name || !formData.project_name}
-                  className="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors"
+                  className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 disabled:bg-gray-600/50 text-[#F5F5DC] rounded-lg transition-colors border border-[#B49B7E]/20"
                 >
                   {isSubmitting ? 'Creating Project...' : 'Submit Questionnaire'}
                 </button>
@@ -826,7 +823,7 @@ const ComprehensiveQuestionnaire = () => {
           </div>
         </form>
       </div>
-    </div>
+    </CompletePageLayout>
   );
 };
 
