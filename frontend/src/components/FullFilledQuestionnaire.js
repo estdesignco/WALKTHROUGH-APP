@@ -232,20 +232,25 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
             </Section>
 
             {isEditing && (
-                <div className="flex justify-end mt-6">
-                    <button
-                        onClick={() => {
-                            setIsEditing(false);
-                            // Here you would save the data to the backend
-                            console.log('Saving questionnaire data:', formData);
-                        }}
-                        className="px-6 py-3 bg-[#8B7355] text-white rounded hover:bg-[#9c8563] transition-colors"
-                    >
-                        Save All Changes
-                    </button>
+                <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20" 
+                     style={{
+                       background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+                     }}>
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => {
+                                setIsEditing(false);
+                                // Here you would save the data to the backend
+                                console.log('Saving questionnaire data:', formData);
+                            }}
+                            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-6 py-3 rounded text-white font-medium transition-all duration-200 border border-[#B49B7E]/20"
+                        >
+                            Save All Changes
+                        </button>
+                    </div>
                 </div>
             )}
-        </div>
+        </CompletePageLayout>
     );
 };
 
