@@ -1410,6 +1410,8 @@ const ExactFFESpreadsheet = ({
             + ADD ITEM
           </button>
         </div>
+      
+      </div> {/* END BLUE SPREADSHEET CONTAINER */}
 
       {/* ADD INSTALLED MODAL */}
       {/* FOOTER SECTION - ADD CATEGORY */}
