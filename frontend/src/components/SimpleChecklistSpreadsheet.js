@@ -924,7 +924,7 @@ const SimpleChecklistSpreadsheet = ({
             <div key={room.id} className="mb-8">
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS AND EXPAND/COLLAPSE */}
               <div 
-                className="px-4 py-2 text-[#B49B7E] font-bold mb-4"
+                className="px-4 py-2 text-[#F5F5DC] font-bold mb-4"
                 style={{ backgroundColor: getRoomColor(room.name, roomIndex) }}
               >
                 <div className="flex justify-between items-center">
