@@ -785,7 +785,7 @@ const SimpleChecklistSpreadsheet = ({
           <div className="mt-4">
             <button 
               onClick={onAddRoom}
-              className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-[#F5F5DC] rounded font-medium"
+              className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-[#B49B7E] rounded font-medium"
             >
               + ADD FIRST ROOM
             </button>
@@ -819,7 +819,7 @@ const SimpleChecklistSpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-[#F5F5DC] border border-[#B49B7E]/50"
+              className="px-3 py-2 rounded bg-gray-700 text-[#B49B7E] border border-[#B49B7E]/50"
             >
               <option value="">All Rooms</option>
               {(project?.rooms || []).map(room => (
@@ -830,7 +830,7 @@ const SimpleChecklistSpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-[#F5F5DC] border border-[#B49B7E]/50"
+              className="px-3 py-2 rounded bg-gray-700 text-[#B49B7E] border border-[#B49B7E]/50"
             >
               <option value="">All Categories</option>
               <option value="Lighting">Lighting</option>
@@ -843,7 +843,7 @@ const SimpleChecklistSpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-[#F5F5DC] border border-[#B49B7E]/50"
+              className="px-3 py-2 rounded bg-gray-700 text-[#B49B7E] border border-[#B49B7E]/50"
             >
               <option value="">All Vendors</option>
               {(vendorTypes || []).map(vendor => (
@@ -854,7 +854,7 @@ const SimpleChecklistSpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-[#F5F5DC] border border-[#B49B7E]/50"
+              className="px-3 py-2 rounded bg-gray-700 text-[#B49B7E] border border-[#B49B7E]/50"
             >
               <option value="">All Status</option>
               <option value="PICKED">PICKED</option>
@@ -874,7 +874,7 @@ const SimpleChecklistSpreadsheet = ({
             {/* Filter and Clear Buttons */}
             <button 
               onClick={() => console.log('🔍 CHECKLIST FILTER APPLIED')}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-[#F5F5DC] rounded font-medium"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-[#B49B7E] rounded font-medium"
             >
               🔍 FILTER
             </button>
@@ -887,7 +887,7 @@ const SimpleChecklistSpreadsheet = ({
                 setSelectedStatus('');
                 console.log('🧹 CHECKLIST FILTER CLEARED');
               }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-[#F5F5DC] rounded font-medium"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-[#B49B7E] rounded font-medium"
             >
               CLEAR
             </button>
@@ -897,13 +897,13 @@ const SimpleChecklistSpreadsheet = ({
           <div className="flex gap-3">
             <button 
               onClick={onAddRoom}
-              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-[#F5F5DC]"
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-[#B49B7E]"
             >
               ✚ ADD ROOM
             </button>
             <button 
               onClick={handleTransferToFFE}
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-6 py-2 rounded-full shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-green-500/20 text-[#F5F5DC]"
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-6 py-2 rounded-full shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-green-500/20 text-[#B49B7E]"
             >
               → TRANSFER TO FF&E
             </button>
@@ -924,14 +924,14 @@ const SimpleChecklistSpreadsheet = ({
             <div key={room.id} className="mb-8">
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS AND EXPAND/COLLAPSE */}
               <div 
-                className="px-4 py-2 text-[#F5F5DC] font-bold mb-4"
+                className="px-4 py-2 text-[#B49B7E] font-bold mb-4"
                 style={{ backgroundColor: getRoomColor(room.name, roomIndex) }}
               >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => toggleRoomExpansion(room.id)}
-                      className="text-[#F5F5DC] hover:text-gray-200"
+                      className="text-[#B49B7E] hover:text-gray-200"
                     >
                       {isRoomExpanded ? '▼' : '▶'}
                     </button>
@@ -953,7 +953,7 @@ const SimpleChecklistSpreadsheet = ({
                     />
                     <label
                       htmlFor={`canva-upload-${room.id}`}
-                      className="bg-purple-600 text-[#F5F5DC] text-xs px-2 py-1 rounded hover:bg-purple-700 cursor-pointer"
+                      className="bg-purple-600 text-[#B49B7E] text-xs px-2 py-1 rounded hover:bg-purple-700 cursor-pointer"
                       title="Upload Canva PDF/Image"
                     >
                       🎨 Upload Canva
@@ -977,14 +977,14 @@ const SimpleChecklistSpreadsheet = ({
                   <div key={category.id} className="mb-6">
                     {/* CATEGORY HEADER WITH EXPAND/COLLAPSE */}
                     <div 
-                      className="px-4 py-2 text-[#F5F5DC] font-bold mb-2"
+                      className="px-4 py-2 text-[#B49B7E] font-bold mb-2"
                       style={{ backgroundColor: getCategoryColor() }}
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => toggleCategoryExpansion(category.id)}
-                            className="text-[#F5F5DC] hover:text-gray-200"
+                            className="text-[#B49B7E] hover:text-gray-200"
                           >
                             {isCategoryExpanded ? '▼' : '▶'}
                           </button>
@@ -1000,7 +1000,7 @@ const SimpleChecklistSpreadsheet = ({
                                 e.target.value = '';
                               }
                             }}
-                            className="bg-green-600 text-[#F5F5DC] text-xs px-2 py-1 rounded border-none"
+                            className="bg-green-600 text-[#B49B7E] text-xs px-2 py-1 rounded border-none"
                           >
                             <option value="">+ Add Category</option>
                             {availableCategories.map(categoryName => (
@@ -1029,8 +1029,8 @@ const SimpleChecklistSpreadsheet = ({
                             <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10">
                               <thead>
                                 <tr>
-                                  <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-8 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>✓</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>
+                                  <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#B49B7E] w-8 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>✓</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>
                                     {subcategory.name.toUpperCase()}
                                     <button
                                       onClick={() => {
@@ -1038,20 +1038,20 @@ const SimpleChecklistSpreadsheet = ({
                                           handleDeleteSubcategory(subcategory.id);
                                         }
                                       }}
-                                      className="ml-2 text-[#F5F5DC] hover:text-red-200 text-xs"
+                                      className="ml-2 text-[#B49B7E] hover:text-red-200 text-xs"
                                       title={`Delete ${subcategory.name} subcategory`}
                                     >
                                       🗑️
                                     </button>
                                   </th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-16 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-20 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-20 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>LINK</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>REMARKS</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-12 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] w-16 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] w-20 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] w-20 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>LINK</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>REMARKS</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] w-12 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -1096,11 +1096,11 @@ const SimpleChecklistSpreadsheet = ({
                                           />
                                         </td>
                                         {/* ITEM - EDITABLE */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm">
+                                        <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
                                           <div 
                                             contentEditable={true}
                                             suppressContentEditableWarning={true}
-                                            className="w-full bg-transparent text-[#F5F5DC] text-sm outline-none"
+                                            className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
                                             onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
                                           >
                                             {item.name}
@@ -1108,11 +1108,11 @@ const SimpleChecklistSpreadsheet = ({
                                         </td>
                                   
                                   {/* QTY - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm text-center">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm text-center">
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#F5F5DC] text-sm text-center outline-none"
+                                      className="w-full bg-transparent text-[#B49B7E] text-sm text-center outline-none"
                                       onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
                                     >
                                       {item.quantity || ''}
@@ -1120,11 +1120,11 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* SIZE - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#F5F5DC] text-sm outline-none"
+                                      className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
                                       onBlur={(e) => console.log('Size updated:', e.target.textContent)}
                                     >
                                       {item.size || ''}
