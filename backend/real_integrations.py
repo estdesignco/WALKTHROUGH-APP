@@ -1843,6 +1843,156 @@ class RealVendorScraper:
         except Exception as e:
             logger.error(f"Error finding real Four Hands URLs: {e}")
             return []
+    
+    async def scrape_live_product_data(self, product_url: str) -> Optional[Dict]:
+        """Scrape complete product data from REAL Four Hands URL when clipper is clicked"""
+        try:
+            logger.info(f"🔥 LIVE SCRAPING: {product_url}")
+            
+            response = self.session.get(product_url, timeout=15)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.content, 'lxml')
+            
+            scraped_data = {}
+            
+            # 1. REAL TITLE
+            title_selectors = [
+                'h1',
+                '.product-title',
+                '[class*="title"]',
+                '.product-name',
+                '[data-testid*="title"]'
+            ]
+            
+            for selector in title_selectors:
+                try:
+                    title_elem = soup.select_one(selector)
+                    if title_elem and len(title_elem.get_text().strip()) > 5:
+                        scraped_data['title'] = title_elem.get_text().strip()
+                        logger.info(f"✅ REAL TITLE: {scraped_data['title']}")
+                        break
+                except:
+                    continue
+            
+            # 2. REAL SKU
+            sku_patterns = [
+                r'(?:SKU|Model|Item)\s*:?\s*([A-Za-z0-9-]+)',
+                r'"sku"\s*:\s*"([^"]+)"',
+                r'"model"\s*:\s*"([^"]+)"'
+            ]
+            
+            page_text = soup.get_text()
+            for pattern in sku_patterns:
+                match = re.search(pattern, page_text, re.IGNORECASE)
+                if match:
+                    scraped_data['sku'] = match.group(1)
+                    logger.info(f"✅ REAL SKU: {scraped_data['sku']}")
+                    break
+            
+            # 3. REAL PRICE
+            price_selectors = [
+                '.price',
+                '[class*="price"]',
+                '.cost',
+                '[data-price]'
+            ]
+            
+            for selector in price_selectors:
+                try:
+                    price_elem = soup.select_one(selector)
+                    if price_elem:
+                        price_text = price_elem.get_text().strip()
+                        if '$' in price_text and any(char.isdigit() for char in price_text):
+                            scraped_data['price'] = price_text
+                            scraped_data['price_numeric'] = self.extract_price_number(price_text)
+                            logger.info(f"✅ REAL PRICE: {scraped_data['price']}")
+                            break
+                except:
+                    continue
+            
+            # 4. REAL DESCRIPTION
+            description_selectors = [
+                '.product-description',
+                '[class*="description"]',
+                '.product-details',
+                '.details p',
+                '.content p'
+            ]
+            
+            for selector in description_selectors:
+                try:
+                    desc_elem = soup.select_one(selector)
+                    if desc_elem:
+                        desc_text = desc_elem.get_text().strip()
+                        if len(desc_text) > 20:  # Only use substantial descriptions
+                            scraped_data['description'] = desc_text
+                            logger.info(f"✅ REAL DESCRIPTION: {desc_text[:100]}...")
+                            break
+                except:
+                    continue
+            
+            # 5. ALL REAL IMAGES
+            real_images = []
+            image_selectors = [
+                'img[src*="product"]',
+                '.product-images img',
+                '.gallery img',
+                'img[alt*="product"]'
+            ]
+            
+            found_images = set()
+            for selector in image_selectors:
+                try:
+                    img_elements = soup.select(selector)
+                    for img in img_elements:
+                        src = img.get('src') or img.get('data-src') or img.get('data-original')
+                        if src and src not in found_images:
+                            # Make absolute URL
+                            if src.startswith('//'):
+                                src = 'https:' + src
+                            elif src.startswith('/'):
+                                src = 'https://fourhands.com' + src
+                            
+                            # Skip small/icon images
+                            if not any(skip in src.lower() for skip in ['logo', 'icon', 'small', 'thumb']):
+                                found_images.add(src)
+                                real_images.append(src)
+                except:
+                    continue
+            
+            if real_images:
+                scraped_data['multiple_images'] = real_images[:5]  # Limit to 5 for Houzz
+                logger.info(f"✅ REAL IMAGES: Found {len(real_images)} images")
+                
+                # Process first image to base64
+                try:
+                    first_img_base64 = await self.download_and_process_image(real_images[0])
+                    scraped_data['image_base64'] = first_img_base64
+                    scraped_data['image_url'] = real_images[0]
+                except:
+                    pass
+            
+            # 6. DIMENSIONS/SPECS
+            dimensions_patterns = [
+                r'(\d+)"?\s*[Ww]\s*x\s*(\d+)"?\s*[Dd]\s*x\s*(\d+)"?\s*[Hh]',
+                r'Dimensions?:?\s*([^\n]+)',
+                r'Size:?\s*([^\n]+)'
+            ]
+            
+            for pattern in dimensions_patterns:
+                match = re.search(pattern, page_text, re.IGNORECASE)
+                if match:
+                    scraped_data['dimensions'] = match.group(1) if len(match.groups()) == 1 else match.group(0)
+                    logger.info(f"✅ REAL DIMENSIONS: {scraped_data['dimensions']}")
+                    break
+            
+            logger.info(f"🎉 Successfully scraped REAL data from {product_url}")
+            return scraped_data
+            
+        except Exception as e:
+            logger.error(f"Error scraping live product data from {product_url}: {e}")
+            return None
 
     async def scrape_hudson_valley(self, search_query: str = "lighting", max_results: int = 20) -> List[Dict]:
         """Scrape Hudson Valley Lighting using requests/BeautifulSoup"""
