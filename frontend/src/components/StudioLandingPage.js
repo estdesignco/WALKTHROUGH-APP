@@ -536,11 +536,15 @@ const UnifiedFurnitureSearch = () => {
             <input
               type="number"
               placeholder="💰 Min Price $"
+              value={filters.min_price}
+              onChange={(e) => setFilters({...filters, min_price: e.target.value})}
               className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold placeholder:text-[#B49B7E]/70"
             />
             <input
               type="number"
               placeholder="💰 Max Price $"
+              value={filters.max_price}
+              onChange={(e) => setFilters({...filters, max_price: e.target.value})}
               className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold placeholder:text-[#B49B7E]/70"
             />
             
