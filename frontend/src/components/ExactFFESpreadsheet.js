@@ -752,7 +752,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-[#B49B7E]/30 focus:border-[#B49B7E] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#F5F5DC] border border-[#B49B7E]/30 focus:border-[#B49B7E] focus:outline-none"
             >
               <option value="">All Status</option>
               <option value="TO BE SELECTED">TO BE SELECTED</option>
