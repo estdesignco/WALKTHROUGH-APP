@@ -544,7 +544,7 @@ const UnifiedFurnitureSearch = () => {
 };
 
 const StudioLandingPage = () => {
-  const [activeView, setActiveView] = useState('dashboard');
+  const [activeView, setActiveView] = useState('search');
 
   if (activeView === 'mobile-walkthrough') {
     return <MobileWalkthroughApp />;
