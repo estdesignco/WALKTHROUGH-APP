@@ -670,8 +670,11 @@ const SimpleWalkthroughSpreadsheet = ({
   return (
     <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       
-      {/* ENHANCED FILTER SECTION - MATCHING OTHER SHEETS FUNCTIONALITY */}
-      <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
+      {/* ENHANCED FILTER SECTION - SAME TREATMENT AS GRAPHS BUT BLUE */}
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+           style={{
+             background: 'linear-gradient(135deg, rgba(30,58,138,0.95) 0%, rgba(59,130,246,0.9) 30%, rgba(30,58,138,0.95) 100%)'
+           }}>
         <div className="flex flex-col gap-4">
           {/* Search Bar */}
           <div className="w-full">
