@@ -1029,8 +1029,8 @@ const SimpleChecklistSpreadsheet = ({
                             <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10">
                               <thead>
                                 <tr>
-                                  <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#B49B7E] w-8 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>✓</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>
+                                  <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-8 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>✓</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>
                                     {subcategory.name.toUpperCase()}
                                     <button
                                       onClick={() => {
