@@ -665,8 +665,9 @@ const UnifiedFurnitureSearch = () => {
 
       {/* Success/Error Messages */}
       {success && (
-        <div className="bg-green-900/20 border border-green-500/30 p-4 rounded-lg mb-6">
-          <p className="text-green-300">✅ {success}</p>
+        <div className="bg-green-900/20 border border-green-500/30 p-4 rounded-lg mb-6 animate-pulse">
+          <p className="text-green-300 font-medium">✅ {success}</p>
+          <p className="text-green-200 text-sm mt-1">Product automatically added to your Houzz Pro ideabook!</p>
         </div>
       )}
       
