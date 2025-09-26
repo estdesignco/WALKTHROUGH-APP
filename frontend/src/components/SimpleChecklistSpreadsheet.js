@@ -1100,7 +1100,7 @@ const SimpleChecklistSpreadsheet = ({
                                           <div 
                                             contentEditable={true}
                                             suppressContentEditableWarning={true}
-                                            className="w-full bg-transparent text-white text-sm outline-none"
+                                            className="w-full bg-transparent text-[#F5F5DC] text-sm outline-none"
                                             onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
                                           >
                                             {item.name}
