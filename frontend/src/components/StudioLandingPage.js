@@ -688,6 +688,20 @@ const UnifiedFurnitureSearch = () => {
         </div>
       </div>
 
+      {/* Success/Error Messages */}
+      {success && (
+        <div className="bg-green-900/20 border border-green-500/30 p-4 rounded-lg mb-6 animate-pulse">
+          <p className="text-green-300 font-medium">✅ {success}</p>
+          <p className="text-green-200 text-sm mt-1">Product automatically processed for Houzz Pro clipper!</p>
+        </div>
+      )}
+      
+      {error && (
+        <div className="bg-red-900/20 border border-red-500/30 p-4 rounded-lg mb-6">
+          <p className="text-red-300">❌ {error}</p>
+        </div>
+      )}
+
       {/* Products Display */}
       <div className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-2xl border border-[#B49B7E]/20 p-6">
         <h3 className="text-2xl font-bold text-[#B49B7E] mb-6">
