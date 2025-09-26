@@ -543,6 +543,12 @@ const UnifiedFurnitureSearch = () => {
 };
 
 const StudioLandingPage = () => {
+  const [activeView, setActiveView] = useState('dashboard');
+
+  if (activeView === 'mobile-walkthrough') {
+    return <MobileWalkthroughApp />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
       {/* Logo Header */}
@@ -552,19 +558,80 @@ const StudioLandingPage = () => {
             ESTABLISHED DESIGN CO.
           </h1>
           <p className="text-2xl font-medium text-black/80 mt-2">
-            Interior Design Studio
+            Complete Interior Design Workflow System
           </p>
+        </div>
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="max-w-6xl mx-auto p-4">
+        <div className="flex flex-wrap justify-center gap-3 mb-8">
+          <button
+            onClick={() => setActiveView('dashboard')}
+            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 ${
+              activeView === 'dashboard'
+                ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-black'
+                : 'bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] hover:border-[#B49B7E]/60'
+            }`}
+          >
+            🏠 Dashboard & Search
+          </button>
+          <button
+            onClick={() => setActiveView('mobile-walkthrough')}
+            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 ${
+              activeView === 'mobile-walkthrough'
+                ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-black'
+                : 'bg-black/40 border border-[#B49B7E]/30 text-[#F5F5DC] hover:border-[#B49B7E]/60'
+            }`}
+          >
+            📱 Mobile Walkthrough
+          </button>
         </div>
       </div>
 
       {/* Welcome Message */}
       <div className="max-w-4xl mx-auto p-8 text-center my-8">
         <h2 className="text-4xl font-bold text-[#B49B7E] mb-4">
-          🎉 UNIFIED SEARCH ENGINE IS LIVE!
+          🚀 COMPLETE WORKFLOW SYSTEM IS LIVE!
         </h2>
-        <p className="text-2xl" style={{ color: '#F5F5DC' }}>
-          No more 1,000,000 tabs open! Search ALL vendor products below!
+        <p className="text-2xl mb-6" style={{ color: '#F5F5DC' }}>
+          Unified Search • Real-Time Sync • Mobile Walkthrough • Auto-Integration
         </p>
+        
+        {/* Feature Highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+          <div className="bg-gradient-to-br from-green-900/20 to-green-800/30 border border-green-500/30 rounded-xl p-4">
+            <div className="text-3xl mb-2">🔍</div>
+            <h3 className="text-lg font-bold text-green-400 mb-2">Unified Search</h3>
+            <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+              All vendors in one interface
+            </p>
+          </div>
+          
+          <div className="bg-gradient-to-br from-blue-900/20 to-blue-800/30 border border-blue-500/30 rounded-xl p-4">
+            <div className="text-3xl mb-2">🎨</div>
+            <h3 className="text-lg font-bold text-blue-400 mb-2">Canva Auto-Sync</h3>
+            <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+              One-click project boards
+            </p>
+          </div>
+          
+          <div className="bg-gradient-to-br from-orange-900/20 to-orange-800/30 border border-orange-500/30 rounded-xl p-4">
+            <div className="text-3xl mb-2">🏠</div>
+            <h3 className="text-lg font-bold text-orange-400 mb-2">Houzz Pro Integration</h3>
+            <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+              Auto-fill selection boards
+            </p>
+          </div>
+          
+          <div className="bg-gradient-to-br from-purple-900/20 to-purple-800/30 border border-purple-500/30 rounded-xl p-4">
+            <div className="text-3xl mb-2">📱</div>
+            <h3 className="text-lg font-bold text-purple-400 mb-2">Mobile Walkthrough</h3>
+            <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>
+              On-site with offline sync
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Unified Furniture Search Engine */}
