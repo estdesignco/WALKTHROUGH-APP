@@ -830,7 +830,7 @@ const SimpleChecklistSpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+              className="px-3 py-2 rounded bg-gray-700 text-[#F5F5DC] border border-gray-600"
             >
               <option value="">All Categories</option>
               <option value="Lighting">Lighting</option>
