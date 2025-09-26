@@ -434,7 +434,7 @@ class RealTeamsIntegration:
             return {"success": False, "error": str(e)}
 
 class RealVendorScraper:
-    """Real vendor website scraping with authentication"""
+    """Real vendor website scraping with authentication and image processing"""
     
     def __init__(self):
         self.session = requests.Session()
@@ -449,6 +449,52 @@ class RealVendorScraper:
             'Accept-Encoding': 'gzip, deflate',
             'Connection': 'keep-alive'
         })
+    
+    async def download_and_process_image(self, image_url: str, max_size: tuple = (400, 300)) -> Optional[str]:
+        """Download image and convert to base64 for frontend display"""
+        try:
+            if not image_url or not image_url.startswith('http'):
+                return None
+                
+            # Download image
+            response = self.session.get(image_url, timeout=10)
+            response.raise_for_status()
+            
+            # Open image with PIL
+            image = Image.open(io.BytesIO(response.content))
+            
+            # Convert to RGB if necessary
+            if image.mode in ('RGBA', 'LA', 'P'):
+                image = image.convert('RGB')
+            
+            # Resize image while maintaining aspect ratio
+            image.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            image.save(buffer, format='JPEG', quality=85)
+            image_base64 = base64.b64encode(buffer.getvalue()).decode()
+            
+            logger.info(f"Successfully processed image: {len(image_base64)} bytes")
+            return image_base64
+            
+        except Exception as e:
+            logger.error(f"Failed to process image {image_url}: {e}")
+            return None
+    
+    def extract_price_number(self, price_text: str) -> Optional[float]:
+        """Extract numeric price from text"""
+        if not price_text:
+            return None
+        
+        # Remove common currency symbols and text
+        price_clean = re.sub(r'[^\d.,]', '', price_text)
+        price_clean = price_clean.replace(',', '')
+        
+        try:
+            return float(price_clean)
+        except:
+            return None
     
     async def scrape_fourhands(self, search_query: str = "furniture", max_results: int = 20) -> List[Dict]:
         """Scrape Four Hands furniture website"""
