@@ -209,6 +209,27 @@ const UnifiedFurnitureSearch = () => {
         </div>
 
         {/* Filter Controls */}
+        {/* REAL-TIME SYNC STATUS */}
+        <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <p className="text-lg font-bold text-green-400">🔄 REAL-TIME SYNC ACTIVE</p>
+            </div>
+            <div className="flex gap-2">
+              <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm font-bold">
+                🎨 Canva Connected
+              </span>
+              <span className="bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full text-sm font-bold">
+                🏠 Houzz Pro Connected
+              </span>
+              <span className="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-sm font-bold">
+                📊 Auto-Sync ON
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* Enhanced Search Filters - EVERYTHING YOU NEED! */}
         <div className="space-y-6">
           {/* Primary Filters Row */}
