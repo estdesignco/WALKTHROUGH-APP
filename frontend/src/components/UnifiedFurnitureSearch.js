@@ -127,44 +127,52 @@ const UnifiedFurnitureSearch = () => {
     }
   };
 
-  const handleSearch = async () => {
+  const handleRealSearch = async () => {
     try {
       setLoading(true);
       setError(null);
+      setSuccess(null);
       
-      const searchParams = {
-        query: searchQuery || undefined,
-        ...Object.fromEntries(
-          Object.entries(filters).map(([key, value]) => [key, value || undefined])
-        )
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const searchRequest = {
+        query: searchQuery || 'furniture',
+        filters: {
+          ...filters,
+          price_min: filters.min_price ? parseFloat(filters.min_price) : undefined,
+          price_max: filters.max_price ? parseFloat(filters.max_price) : undefined
+        },
+        max_results: 50
       };
       
-      // Remove undefined values
-      Object.keys(searchParams).forEach(key => 
-        searchParams[key] === undefined && delete searchParams[key]
-      );
-      
-      const response = await fetch(`${BACKEND_URL}/api/search/search`, {
+      const response = await fetch(`${BACKEND_URL}/api/real-integrations/search-products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(searchParams)
+        body: JSON.stringify(searchRequest)
       });
       
       if (response.ok) {
         const data = await response.json();
         setProducts(data.products || []);
+        setSuccess(`Found ${data.products_found || 0} real products from vendor websites!`);
+        
+        if (data.teams_notified) {
+          setSuccess(prev => prev + ' Teams notification sent.');
+        }
       } else {
         const errorData = await response.json();
-        setError(errorData.detail || 'Search failed');
+        setError(errorData.detail || 'Real search failed');
       }
     } catch (err) {
-      setError('Search error: ' + err.message);
+      setError('Real search error: ' + err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleSearch = handleRealSearch;
 
   const handleSaveCredentials = async () => {
     try {
