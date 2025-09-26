@@ -74,18 +74,7 @@ const Navigation = ({ currentProject, isOffline }) => {
             </div>
           )}
 
-          {/* Actions */}
-          <div className="flex items-center space-x-4">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-              📤 Export FF&E
-            </button>
-            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
-              📊 Spec Sheet  
-            </button>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-              ➕ Add Room
-            </button>
-          </div>
+          {/* Actions removed per user request */}
         </div>
       </div>
     </nav>
