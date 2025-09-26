@@ -1301,20 +1301,10 @@ class RealVendorScraper:
                             if price_elem:
                                 price_text = price_elem.get_text().strip()
                             
-                            products.append({
-                                'id': f"fourhands_real_{len(products)}_{int(time.time())}",
-                                'title': product_name,
-                                'price': price_text,
-                                'price_numeric': self.extract_price_number(price_text),
-                                'url': href,
-                                'image_url': image_url,
-                                'image_base64': await self.download_and_process_image(image_url) if image_url else None,
-                                'seller': 'Four Hands',
-                                'vendor': 'Four Hands',
-                                'category': 'furniture',
-                                'scraped_at': datetime.now().isoformat(),
-                                'search_query': 'console table'
-                            })
+                            # Now scrape the COMPLETE product details from the individual product page
+                            complete_product = await self.scrape_complete_fourhands_product(href, product_name)
+                            if complete_product:
+                                products.append(complete_product)
                             
                         except Exception as e:
                             logger.error(f"Error processing product: {e}")
