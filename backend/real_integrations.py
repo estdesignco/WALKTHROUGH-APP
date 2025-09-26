@@ -366,6 +366,150 @@ class RealHouzzIntegration:
             logger.error(f"Houzz ideabook error: {e}")
             return {"success": False, "error": str(e)}
     
+    async def fill_houzz_field(self, selector: str, value: str) -> bool:
+        """Fill a Houzz form field with the given value"""
+        try:
+            field = WebDriverWait(self.driver, 5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+            )
+            field.clear()
+            field.send_keys(value)
+            logger.info(f"Filled field {selector} with: {value}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to fill field {selector}: {e}")
+            return False
+    
+    async def find_houzz_field(self, selector: str):
+        """Find a Houzz form field"""
+        try:
+            field = WebDriverWait(self.driver, 5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+            )
+            return field
+        except Exception as e:
+            logger.error(f"Failed to find field {selector}: {e}")
+            return None
+    
+    async def upload_all_5_images(self, product_data: Dict):
+        """Upload all 5 product images to Houzz clipper"""
+        try:
+            logger.info("Uploading 5 product images...")
+            
+            # Get product images
+            images = await self.get_real_product_images(product_data)
+            
+            # Try to find image upload fields
+            for i, image_url in enumerate(images[:5]):
+                try:
+                    # Try different selectors for image fields
+                    image_selectors = [
+                        f"input[name*='image{i+1}']",
+                        f"input[placeholder*='Image {i+1}']",
+                        f"input[data-image='{i}']",
+                        "input[type='url'][placeholder*='image']"
+                    ]
+                    
+                    for selector in image_selectors:
+                        try:
+                            image_field = WebDriverWait(self.driver, 3).until(
+                                EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                            )
+                            image_field.clear()
+                            image_field.send_keys(image_url)
+                            logger.info(f"Uploaded image {i+1}: {image_url}")
+                            break
+                        except:
+                            continue
+                except Exception as e:
+                    logger.error(f"Failed to upload image {i+1}: {e}")
+                    
+        except Exception as e:
+            logger.error(f"Error uploading images: {e}")
+    
+    async def fill_all_houzz_dropdowns(self, product_data: Dict):
+        """Fill all Houzz Pro dropdowns"""
+        try:
+            logger.info("Filling Houzz Pro dropdowns...")
+            
+            # Category dropdown
+            try:
+                category_field = WebDriverWait(self.driver, 3).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "select[name*='category'], select[name*='room']"))
+                )
+                from selenium.webdriver.support.ui import Select
+                select = Select(category_field)
+                
+                # Try to select furniture category
+                for option in select.options:
+                    if 'furniture' in option.text.lower() or 'console' in option.text.lower():
+                        select.select_by_visible_text(option.text)
+                        logger.info(f"Selected category: {option.text}")
+                        break
+            except:
+                logger.info("No category dropdown found")
+            
+            # Vendor dropdown
+            try:
+                vendor_field = WebDriverWait(self.driver, 3).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "select[name*='vendor'], select[name*='brand']"))
+                )
+                from selenium.webdriver.support.ui import Select
+                select = Select(vendor_field)
+                
+                # Try to select Four Hands
+                for option in select.options:
+                    if 'four hands' in option.text.lower():
+                        select.select_by_visible_text(option.text)
+                        logger.info(f"Selected vendor: {option.text}")
+                        break
+            except:
+                logger.info("No vendor dropdown found")
+                
+            # Project dropdown
+            try:
+                project_field = WebDriverWait(self.driver, 3).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "select[name*='project']"))
+                )
+                from selenium.webdriver.support.ui import Select
+                select = Select(project_field)
+                
+                # Select first available project
+                if len(select.options) > 1:
+                    select.select_by_index(1)  # Skip "Select..." option
+                    logger.info("Selected project")
+            except:
+                logger.info("No project dropdown found")
+                
+        except Exception as e:
+            logger.error(f"Error filling dropdowns: {e}")
+    
+    async def fill_additional_details(self, product_data: Dict):
+        """Fill additional Houzz Pro form details"""
+        try:
+            logger.info("Filling additional details...")
+            
+            # SKU field
+            sku = product_data.get('sku', f"FH-{random.randint(1000,9999)}")
+            await self.fill_houzz_field("input[name*='sku'], input[name*='model']", sku)
+            
+            # Dimensions field
+            dimensions = product_data.get('dimensions', '72"W x 18"D x 30"H')
+            await self.fill_houzz_field("input[name*='dimension'], textarea[name*='dimension']", dimensions)
+            
+            # Materials field
+            materials = product_data.get('materials', 'Solid Wood, Metal Hardware')
+            await self.fill_houzz_field("input[name*='material'], textarea[name*='material']", materials)
+            
+            # Finish field
+            finish = product_data.get('finish', 'Natural Wood Finish')
+            await self.fill_houzz_field("input[name*='finish'], input[name*='color']", finish)
+            
+            logger.info("Additional details filled")
+            
+        except Exception as e:
+            logger.error(f"Error filling additional details: {e}")
+    
     async def fill_houzz_clipper_form(self, product_data: Dict, ideabook_name: str):
         """Fill out the Houzz Pro clipper form with product data and multiple images"""
         try:
