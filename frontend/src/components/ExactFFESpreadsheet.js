@@ -705,7 +705,7 @@ const ExactFFESpreadsheet = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-[#B49B7E]/30 focus:border-[#B49B7E] focus:outline-none"
             />
           </div>
           
