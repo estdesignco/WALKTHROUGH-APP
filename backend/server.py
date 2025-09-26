@@ -55,6 +55,7 @@ app.include_router(google_sheets_router)
 
 # Include Unified Search routes
 app.include_router(unified_search_router)
+app.include_router(real_integration_router)
 
 # Include Real-Time Integration routes
 app.include_router(realtime_router)
