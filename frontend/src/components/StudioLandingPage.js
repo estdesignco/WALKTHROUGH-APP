@@ -125,8 +125,10 @@ const CanvaProjectModal = ({ product, onClose, onAssign }) => {
 const UnifiedFurnitureSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCanvaModal, setShowCanvaModal] = useState(false);
+  const [showHouzzModal, setShowHouzzModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [assignments, setAssignments] = useState([]);
+  const [houzzAssignments, setHouzzAssignments] = useState([]);
   const [products] = useState([
     {
       id: '1',
