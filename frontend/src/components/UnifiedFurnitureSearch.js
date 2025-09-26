@@ -155,14 +155,16 @@ const UnifiedFurnitureSearch = () => {
       
       if (response.ok) {
         const data = await response.json();
+        console.log('Search response:', data);
         setProducts(data.products || []);
-        setSuccess(`Found ${data.products_found || 0} real products from vendor websites!`);
+        setSuccess(`Found ${data.products_found || data.products?.length || 0} real products from vendor websites!`);
         
         if (data.teams_notified) {
           setSuccess(prev => prev + ' Teams notification sent.');
         }
       } else {
         const errorData = await response.json();
+        console.error('Search error:', errorData);
         setError(errorData.detail || 'Real search failed');
       }
     } catch (err) {
