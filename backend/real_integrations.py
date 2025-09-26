@@ -560,6 +560,248 @@ class RealHouzzIntegration:
             logger.error(f"Error filling clipper form: {e}")
             return False
     
+    async def expand_clipper_sections(self):
+        """Expand all dropdown sections in Houzz clipper form"""
+        try:
+            logger.info("Expanding Houzz clipper dropdown sections...")
+            
+            # Common selectors for expandable sections
+            expand_selectors = [
+                "button[aria-expanded='false']",
+                ".collapsed",
+                "[data-testid*='expand']",
+                "[class*='expand']",
+                "[class*='dropdown']",
+                "[class*='accordion']",
+                "summary", # HTML5 details/summary elements
+                ".details-section",
+                "[class*='toggle']"
+            ]
+            
+            for selector in expand_selectors:
+                try:
+                    expandable_elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    for element in expandable_elements:
+                        try:
+                            if element.is_displayed() and element.is_enabled():
+                                self.driver.execute_script("arguments[0].click();", element)
+                                await asyncio.sleep(1)
+                                logger.info(f"Expanded section with selector: {selector}")
+                        except:
+                            continue
+                except:
+                    continue
+            
+            # Also try clicking on section headers that might expand forms
+            section_headers = [
+                "//h3[contains(text(), 'Details')]",
+                "//h3[contains(text(), 'Images')]", 
+                "//h3[contains(text(), 'Additional')]",
+                "//div[contains(text(), 'More options')]",
+                "//span[contains(text(), 'Show more')]"
+            ]
+            
+            for xpath in section_headers:
+                try:
+                    header = WebDriverWait(self.driver, 3).until(
+                        EC.element_to_be_clickable((By.XPATH, xpath))
+                    )
+                    header.click()
+                    await asyncio.sleep(1)
+                    logger.info(f"Clicked section header: {xpath}")
+                except:
+                    continue
+                    
+        except Exception as e:
+            logger.error(f"Error expanding clipper sections: {e}")
+    
+    async def add_multiple_images_to_houzz(self, product_data: Dict):
+        """Add up to 5 images to Houzz clipper"""
+        try:
+            logger.info("Adding multiple images to Houzz clipper...")
+            
+            # Get the multiple images from product data
+            multiple_images = product_data.get('multiple_images', [])
+            if not multiple_images:
+                # Fallback to single image
+                single_image = product_data.get('image_url')
+                if single_image:
+                    multiple_images = [single_image]
+            
+            # Limit to 5 images as per Houzz limit
+            images_to_add = multiple_images[:5]
+            
+            # Try different methods to add images
+            for i, image_url in enumerate(images_to_add):
+                try:
+                    # Method 1: Multiple image URL fields
+                    image_field_selectors = [
+                        f"input[name*='image{i+1}']",
+                        f"input[name*='image'][data-index='{i}']",
+                        f"input[placeholder*='Image {i+1}']",
+                        f"input[id*='image{i+1}']"
+                    ]
+                    
+                    image_added = False
+                    for selector in image_field_selectors:
+                        try:
+                            image_field = WebDriverWait(self.driver, 3).until(
+                                EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                            )
+                            image_field.clear()
+                            image_field.send_keys(image_url)
+                            logger.info(f"Added image {i+1} via field: {selector}")
+                            image_added = True
+                            break
+                        except:
+                            continue
+                    
+                    if image_added:
+                        continue
+                    
+                    # Method 2: File upload buttons (if available)
+                    upload_selectors = [
+                        "input[type='file']",
+                        "button[class*='upload']",
+                        "[data-testid*='upload']"
+                    ]
+                    
+                    for selector in upload_selectors:
+                        try:
+                            upload_element = WebDriverWait(self.driver, 3).until(
+                                EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                            )
+                            
+                            # If it's a file input, we'd need to download and upload
+                            # For now, skip file uploads and focus on URL inputs
+                            if upload_element.tag_name == 'input' and upload_element.get_attribute('type') == 'file':
+                                logger.info(f"Skipping file upload for image {i+1}")
+                                continue
+                                
+                        except:
+                            continue
+                    
+                    # Method 3: Add image button + URL input
+                    if i == 0:  # Only try this for the first image to avoid duplicates
+                        try:
+                            add_image_buttons = [
+                                "//button[contains(text(), 'Add Image')]",
+                                "//button[contains(text(), 'Upload Image')]",
+                                "//a[contains(text(), 'Add Image')]"
+                            ]
+                            
+                            for xpath in add_image_buttons:
+                                try:
+                                    add_button = WebDriverWait(self.driver, 3).until(
+                                        EC.element_to_be_clickable((By.XPATH, xpath))
+                                    )
+                                    add_button.click()
+                                    await asyncio.sleep(2)
+                                    
+                                    # Now look for the image URL field that appeared
+                                    new_url_field = WebDriverWait(self.driver, 3).until(
+                                        EC.presence_of_element_located((By.CSS_SELECTOR, "input[name*='image'], input[placeholder*='image']"))
+                                    )
+                                    new_url_field.send_keys(image_url)
+                                    logger.info(f"Added image {i+1} via add button")
+                                    break
+                                except:
+                                    continue
+                        except:
+                            pass
+                    
+                except Exception as e:
+                    logger.error(f"Error adding image {i+1}: {e}")
+                    continue
+            
+            logger.info(f"Completed adding {len(images_to_add)} images to Houzz clipper")
+            
+        except Exception as e:
+            logger.error(f"Error adding multiple images: {e}")
+    
+    async def fill_houzz_product_details(self, product_data: Dict):
+        """Fill additional product details in Houzz clipper"""
+        try:
+            logger.info("Filling additional Houzz product details...")
+            
+            # Category/Room field
+            category = product_data.get('category', 'Furniture')
+            category_selectors = [
+                "select[name*='category']",
+                "select[name*='room']",
+                "input[name*='category']",
+                "input[placeholder*='category']"
+            ]
+            
+            for selector in category_selectors:
+                try:
+                    category_field = WebDriverWait(self.driver, 3).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    
+                    if category_field.tag_name == 'select':
+                        from selenium.webdriver.support.ui import Select
+                        select = Select(category_field)
+                        
+                        # Try to find matching option
+                        for option in select.options:
+                            if category.lower() in option.text.lower() or 'furniture' in option.text.lower():
+                                select.select_by_visible_text(option.text)
+                                logger.info(f"Selected category: {option.text}")
+                                break
+                    else:
+                        category_field.send_keys(category)
+                        logger.info("Filled category field")
+                    break
+                except:
+                    continue
+            
+            # Vendor/Brand field
+            vendor = product_data.get('vendor', 'Four Hands')
+            vendor_selectors = [
+                "input[name*='brand']",
+                "input[name*='vendor']", 
+                "input[placeholder*='brand']",
+                "input[placeholder*='manufacturer']"
+            ]
+            
+            for selector in vendor_selectors:
+                try:
+                    vendor_field = WebDriverWait(self.driver, 3).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    vendor_field.send_keys(vendor)
+                    logger.info("Filled vendor/brand field")
+                    break
+                except:
+                    continue
+            
+            # Description field (use title as description if no separate description)
+            description = product_data.get('description', product_data.get('title', ''))
+            description_selectors = [
+                "textarea[name*='description']",
+                "textarea[name*='notes']",
+                "textarea[placeholder*='description']"
+            ]
+            
+            for selector in description_selectors:
+                try:
+                    desc_field = WebDriverWait(self.driver, 3).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    desc_field.send_keys(description)
+                    logger.info("Filled description field")
+                    break
+                except:
+                    continue
+            
+            logger.info("Completed filling additional product details")
+            
+        except Exception as e:
+            logger.error(f"Error filling additional details: {e}")
+            
+            return False
+    
     def cleanup(self):
         """Clean up browser session"""
         if self.driver:
