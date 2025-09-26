@@ -189,7 +189,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#B49B7E' }}>Status Overview</h3>
+        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#D4A574' }}>Status Overview</h3>
         
         {/* REAL PIE CHART WITH LABELS AND LINES */}
         <div className="h-64 mb-4">
@@ -207,7 +207,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#B49B7E' }}>Status Breakdown</h3>
+        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#D4A574' }}>Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
@@ -253,12 +253,12 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#B49B7E' }}>Shipping Information</h3>
+        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#D4A574' }}>Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
           <h4 className="text-md font-medium mb-3 border-b border-[#D4A574]/60 pb-1" style={{ 
-            color: '#B49B7E', 
+            color: '#D4A574', 
             opacity: '0.9'
           }}>Carrier Distribution</h4>
           <div className="h-48">
@@ -275,7 +275,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         {/* 2. SHIPPING BREAKDOWN - EXACTLY LIKE STATUS BREAKDOWN! */}
         <div className="mb-6">
           <h4 className="text-md font-medium mb-3 border-b border-[#D4A574]/60 pb-1" style={{ 
-            color: '#B49B7E', 
+            color: '#D4A574', 
             opacity: '0.9'
           }}>Shipping Breakdown</h4>
           <div className="space-y-3 max-h-60 overflow-y-auto">{/*INCREASED HEIGHT*/}
