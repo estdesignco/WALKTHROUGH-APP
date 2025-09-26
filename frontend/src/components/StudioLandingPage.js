@@ -635,7 +635,7 @@ const StudioLandingPage = () => {
         </>
       )}
 
-      {(activeView === 'dashboard' && activeView !== 'search') && (
+      {(!activeView || (activeView !== 'search' && activeView !== 'dashboard' && activeView !== 'mobile-walkthrough')) && (
         <>
           {/* Welcome Message */}
           <div className="max-w-4xl mx-auto p-8 text-center my-8">
