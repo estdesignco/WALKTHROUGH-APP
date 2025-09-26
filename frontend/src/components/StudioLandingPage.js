@@ -352,6 +352,25 @@ const UnifiedFurnitureSearch = () => {
           }}
         />
       )}
+
+      {/* Houzz Pro Integration Modal */}
+      {showHouzzModal && selectedProduct && (
+        <HouzzIntegrationModal
+          product={selectedProduct}
+          onClose={() => {
+            setShowHouzzModal(false);
+            setSelectedProduct(null);
+          }}
+          onAssign={(assignment) => {
+            setHouzzAssignments([...houzzAssignments, {
+              ...assignment,
+              productId: selectedProduct.id
+            }]);
+            setShowHouzzModal(false);
+            setSelectedProduct(null);
+          }}
+        />
+      )}
     </div>
   );
 };
