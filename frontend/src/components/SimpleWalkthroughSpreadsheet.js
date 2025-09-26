@@ -807,7 +807,7 @@ const SimpleWalkthroughSpreadsheet = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => toggleRoomExpansion(room.id)}
-                      className="text-[#B49B7E] hover:text-[#B49B7E]/80"
+                      className="text-[#F5F5DC] hover:text-[#F5F5DC]/80"
                     >
                       {isRoomExpanded ? '▼' : '▶'}
                     </button>
