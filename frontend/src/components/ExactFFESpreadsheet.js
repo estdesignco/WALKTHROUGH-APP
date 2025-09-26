@@ -1405,7 +1405,7 @@ const ExactFFESpreadsheet = ({
                 alert('Please add a category first before adding items.');
               }
             }}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 px-6 py-2 rounded-full shadow-xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-blue-500/20 text-white"
           >
             + ADD ITEM
           </button>
