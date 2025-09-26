@@ -745,64 +745,213 @@ class RealVendorScraper:
             logger.error(f"Four Hands scraping error: {e}")
             return []
     
+    async def scrape_fourhands_console_tables(self, max_results: int = 60) -> List[Dict]:
+        """Dedicated scraper for Four Hands console tables"""
+        try:
+            logger.info("Scraping Four Hands console tables specifically...")
+            
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("--disable-dev-shm-usage")
+            
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+            
+            products = []
+            
+            try:
+                # Go directly to console tables collection
+                console_urls = [
+                    "https://www.fourhands.com/collections/console-tables",
+                    "https://www.fourhands.com/collections/tables",
+                    "https://www.fourhands.com/search?q=console+table",
+                    "https://www.fourhands.com/search?type=product&q=console"
+                ]
+                
+                for url in console_urls:
+                    try:
+                        logger.info(f"Scraping URL: {url}")
+                        driver.get(url)
+                        await asyncio.sleep(4)
+                        
+                        # Scroll to load all products
+                        last_height = driver.execute_script("return document.body.scrollHeight")
+                        while True:
+                            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                            await asyncio.sleep(3)
+                            new_height = driver.execute_script("return document.body.scrollHeight")
+                            if new_height == last_height:
+                                break
+                            last_height = new_height
+                        
+                        # Look for product links
+                        product_links = driver.find_elements(By.CSS_SELECTOR, 'a[href*="/products/"]')
+                        logger.info(f"Found {len(product_links)} product links")
+                        
+                        for link in product_links:
+                            if len(products) >= max_results:
+                                break
+                                
+                            try:
+                                href = link.get_attribute('href')
+                                if not href or '/products/' not in href:
+                                    continue
+                                
+                                # Extract product name from URL or link text
+                                product_name = link.get_attribute('title') or link.text.strip()
+                                if not product_name:
+                                    # Extract from URL
+                                    product_name = href.split('/products/')[-1].replace('-', ' ').title()
+                                
+                                # Skip if not console table related
+                                if 'console' not in product_name.lower() and 'table' not in product_name.lower():
+                                    continue
+                                
+                                # Try to find associated image
+                                image_url = None
+                                try:
+                                    # Look for image in same parent element
+                                    parent = link.find_element(By.XPATH, '..')
+                                    img = parent.find_element(By.CSS_SELECTOR, 'img')
+                                    src = img.get_attribute('src') or img.get_attribute('data-src') or img.get_attribute('data-original')
+                                    if src:
+                                        image_url = src if src.startswith('http') else f"https://www.fourhands.com{src}"
+                                except:
+                                    # Try to find image within the link
+                                    try:
+                                        img = link.find_element(By.CSS_SELECTOR, 'img')
+                                        src = img.get_attribute('src') or img.get_attribute('data-src')
+                                        if src:
+                                            image_url = src if src.startswith('http') else f"https://www.fourhands.com{src}"
+                                    except:
+                                        pass
+                                
+                                # Try to extract price if visible
+                                price_text = "Contact for pricing"
+                                try:
+                                    parent = link.find_element(By.XPATH, '../..')
+                                    price_elem = parent.find_element(By.CSS_SELECTOR, '*[class*="price"], .money, .cost')
+                                    price_text = price_elem.text.strip()
+                                except:
+                                    pass
+                                
+                                products.append({
+                                    'id': f"fourhands_console_{len(products)}_{int(time.time())}",
+                                    'title': product_name,
+                                    'price': price_text,
+                                    'price_numeric': self.extract_price_number(price_text),
+                                    'url': href,
+                                    'image_url': image_url,
+                                    'image_base64': await self.download_and_process_image(image_url) if image_url else None,
+                                    'seller': 'Four Hands',
+                                    'vendor': 'Four Hands',
+                                    'category': 'console table',
+                                    'scraped_at': datetime.now().isoformat(),
+                                    'search_query': 'console table'
+                                })
+                                
+                            except Exception as e:
+                                logger.error(f"Error processing product link: {e}")
+                                continue
+                        
+                        if products:
+                            break  # Found products, no need to try other URLs
+                            
+                    except Exception as e:
+                        logger.error(f"Error scraping URL {url}: {e}")
+                        continue
+                
+                logger.info(f"Scraped {len(products)} console tables from Four Hands")
+                return products
+                
+            finally:
+                driver.quit()
+                
+        except Exception as e:
+            logger.error(f"Four Hands console table scraping error: {e}")
+            return []
+
     async def scrape_hudson_valley(self, search_query: str = "lighting", max_results: int = 20) -> List[Dict]:
-        """Scrape Hudson Valley Lighting website with enhanced image processing"""
+        """Scrape Hudson Valley Lighting website with real scraping"""
         try:
             logger.info(f"Scraping Hudson Valley Lighting for: {search_query}")
             
-            # For now, return sample data with real images since the actual scraping needs site-specific adjustments
-            logger.info("Generating Hudson Valley sample products with real placeholder images")
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("--disable-dev-shm-usage")
             
-            products = [
-                {
-                    'id': f"hudson_sample_1_{int(time.time())}",
-                    'title': 'Hudson Valley Pendant Light - Modern Collection',
-                    'price': '$459.99',
-                    'price_numeric': 459.99,
-                    'url': 'https://www.hudsonvalleylighting.com/products/sample-pendant',
-                    'image_url': 'https://via.placeholder.com/400x300/FFD700/000000?text=Hudson+Valley+Pendant',
-                    'image_base64': await self.download_and_process_image('https://via.placeholder.com/400x300/FFD700/000000?text=Hudson+Valley+Pendant'),
-                    'seller': 'Hudson Valley Lighting',
-                    'vendor': 'Hudson Valley Lighting',
-                    'category': 'lighting',
-                    'subcategory': 'pendant',
-                    'scraped_at': datetime.now().isoformat(),
-                    'search_query': search_query
-                },
-                {
-                    'id': f"hudson_sample_2_{int(time.time())}",
-                    'title': 'Hudson Valley Chandelier - Crystal Series',
-                    'price': '$899.99',
-                    'price_numeric': 899.99,
-                    'url': 'https://www.hudsonvalleylighting.com/products/sample-chandelier',
-                    'image_url': 'https://via.placeholder.com/400x300/C0C0C0/000000?text=Hudson+Valley+Chandelier',
-                    'image_base64': await self.download_and_process_image('https://via.placeholder.com/400x300/C0C0C0/000000?text=Hudson+Valley+Chandelier'),
-                    'seller': 'Hudson Valley Lighting',
-                    'vendor': 'Hudson Valley Lighting',
-                    'category': 'lighting',
-                    'subcategory': 'chandelier',
-                    'scraped_at': datetime.now().isoformat(),
-                    'search_query': search_query
-                },
-                {
-                    'id': f"hudson_sample_3_{int(time.time())}",
-                    'title': 'Hudson Valley Table Lamp - Contemporary',
-                    'price': '$299.99',
-                    'price_numeric': 299.99,
-                    'url': 'https://www.hudsonvalleylighting.com/products/sample-table-lamp',
-                    'image_url': 'https://via.placeholder.com/400x300/4682B4/FFFFFF?text=Hudson+Valley+Table+Lamp',
-                    'image_base64': await self.download_and_process_image('https://via.placeholder.com/400x300/4682B4/FFFFFF?text=Hudson+Valley+Table+Lamp'),
-                    'seller': 'Hudson Valley Lighting',
-                    'vendor': 'Hudson Valley Lighting',
-                    'category': 'lighting',
-                    'subcategory': 'table lamp',
-                    'scraped_at': datetime.now().isoformat(),
-                    'search_query': search_query
-                }
-            ]
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=chrome_options)
             
-            logger.info(f"Generated {len(products)} Hudson Valley products with images")
-            return products
+            products = []
+            
+            try:
+                # Try Hudson Valley URLs
+                urls = [
+                    "https://www.hudsonvalleylighting.com/collections/all",
+                    f"https://www.hudsonvalleylighting.com/search?q={search_query}",
+                    "https://www.hudsonvalleylighting.com/collections/pendant-lighting",
+                    "https://www.hudsonvalleylighting.com/collections/chandeliers"
+                ]
+                
+                for url in urls:
+                    try:
+                        driver.get(url)
+                        await asyncio.sleep(4)
+                        
+                        # Look for product elements
+                        product_links = driver.find_elements(By.CSS_SELECTOR, 'a[href*="/products/"]')
+                        
+                        for link in product_links[:max_results]:
+                            try:
+                                href = link.get_attribute('href')
+                                title = link.get_attribute('title') or link.text.strip()
+                                
+                                if not title:
+                                    title = href.split('/products/')[-1].replace('-', ' ').title()
+                                
+                                if title and len(title) > 3:
+                                    # Try to find image
+                                    image_url = None
+                                    try:
+                                        img = link.find_element(By.CSS_SELECTOR, 'img')
+                                        src = img.get_attribute('src') or img.get_attribute('data-src')
+                                        if src:
+                                            image_url = src if src.startswith('http') else f"https://www.hudsonvalleylighting.com{src}"
+                                    except:
+                                        pass
+                                    
+                                    products.append({
+                                        'id': f"hudson_real_{len(products)}_{int(time.time())}",
+                                        'title': title,
+                                        'price': 'Contact for pricing',
+                                        'price_numeric': None,
+                                        'url': href,
+                                        'image_url': image_url,
+                                        'image_base64': await self.download_and_process_image(image_url) if image_url else None,
+                                        'seller': 'Hudson Valley Lighting',
+                                        'vendor': 'Hudson Valley Lighting',
+                                        'category': 'lighting',
+                                        'scraped_at': datetime.now().isoformat(),
+                                        'search_query': search_query
+                                    })
+                            except:
+                                continue
+                        
+                        if products:
+                            break
+                            
+                    except Exception as e:
+                        logger.error(f"Error with Hudson Valley URL {url}: {e}")
+                        continue
+                
+                logger.info(f"Scraped {len(products)} products from Hudson Valley Lighting")
+                return products
+                
+            finally:
+                driver.quit()
             
         except Exception as e:
             logger.error(f"Hudson Valley scraping error: {e}")
