@@ -758,13 +758,7 @@ const ExactWalkthroughSpreadsheet = ({
             </button>
           </div>
           
-          {/* Add Room Button - GOLD/AMBER COLOR */}
-          <button 
-            onClick={handleAddRoom}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
-          >
-            ✚ ADD ROOM
-          </button>
+          {/* Add Room button removed per user request */}
         </div>
       </div>
 
