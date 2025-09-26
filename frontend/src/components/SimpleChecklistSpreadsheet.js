@@ -1359,7 +1359,7 @@ const SimpleChecklistSpreadsheet = ({
       )}
 
       {/* FOOTER SECTION - ADD CATEGORY */}
-      <div className="mt-8 p-4 border-t-2 border-gray-600">
+      <div className="mt-8 p-4 border-t-2 border-[#B49B7E]/50">
         <div className="flex gap-3 justify-center">
           <select
             value=""
