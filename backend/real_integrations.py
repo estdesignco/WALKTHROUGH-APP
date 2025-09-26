@@ -532,13 +532,35 @@ class RealVendorScraper:
             driver = webdriver.Chrome(service=service, options=chrome_options)
             
             try:
-                # Try multiple search approaches
-                search_urls = [
-                    f"https://www.fourhands.com/search?q={search_query}",
-                    f"https://www.fourhands.com/products?search={search_query}",
-                    "https://www.fourhands.com/collections/seating",  # Fallback to category
-                    "https://www.fourhands.com/collections/all"  # Last resort
-                ]
+                # Comprehensive Four Hands scraping - try multiple approaches
+                search_urls = []
+                
+                # Build URLs based on search query
+                if 'console' in search_query.lower() or 'table' in search_query.lower():
+                    search_urls.extend([
+                        "https://www.fourhands.com/collections/console-tables",
+                        "https://www.fourhands.com/collections/tables",
+                        "https://www.fourhands.com/collections/dining-tables",
+                        f"https://www.fourhands.com/search?q={search_query}",
+                    ])
+                elif 'chair' in search_query.lower() or 'seating' in search_query.lower():
+                    search_urls.extend([
+                        "https://www.fourhands.com/collections/seating",
+                        "https://www.fourhands.com/collections/dining-chairs",
+                        "https://www.fourhands.com/collections/accent-chairs",
+                        f"https://www.fourhands.com/search?q={search_query}",
+                    ])
+                elif 'lighting' in search_query.lower() or 'lamp' in search_query.lower():
+                    search_urls.extend([
+                        "https://www.fourhands.com/collections/lighting",
+                        f"https://www.fourhands.com/search?q={search_query}",
+                    ])
+                else:
+                    search_urls.extend([
+                        f"https://www.fourhands.com/search?q={search_query}",
+                        "https://www.fourhands.com/collections/all-furniture",
+                        "https://www.fourhands.com/collections/new-arrivals"
+                    ])
                 
                 products = []
                 
