@@ -506,7 +506,7 @@ class RealHouzzIntegration:
             logger.error(f"Error filling form fields: {e}")
             return False
     
-    async def fill_houzz_field(self, selector: str, value: str):
+    async def fill_houzz_field(self, selector: str, value: str) -> bool:
         """Fill a field in the Houzz Pro form"""
         try:
             field = WebDriverWait(self.driver, 10).until(
@@ -514,7 +514,7 @@ class RealHouzzIntegration:
             )
             field.clear()
             field.send_keys(value)
-            logger.info(f"✅ Filled field with: {value}")
+            logger.info(f"✅ Filled field {selector} with: {value}")
             return True
         except Exception as e:
             logger.error(f"Failed to fill field {selector}: {e}")
@@ -526,7 +526,8 @@ class RealHouzzIntegration:
             return WebDriverWait(self.driver, 5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, selector))
             )
-        except:
+        except Exception as e:
+            logger.error(f"Failed to find field {selector}: {e}")
             return None
     
     async def upload_all_5_images(self, product_data: Dict):
