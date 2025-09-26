@@ -205,12 +205,184 @@ const UnifiedFurnitureSearch = () => {
     }
   };
 
-  const handleScrapeProducts = async () => {
+  const handleQuickWorkflow = async () => {
     try {
-      if (savedCredentials.length === 0) {
-        alert('Please add vendor credentials first');
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/real-integrations/quick-workflow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          search_query: searchQuery || 'furniture',
+          create_canva: workflowSettings.create_canva,
+          add_to_houzz: workflowSettings.add_to_houzz,
+          notify_teams: workflowSettings.notify_teams
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const results = data.workflow_results;
+        
+        setProducts(results.products || []);
+        
+        let successMessage = `Workflow completed! Found ${results.products.length} products.`;
+        if (results.steps_completed.includes('canva')) {
+          successMessage += ' Canva project created.';
+        }
+        if (results.steps_completed.includes('houzz')) {
+          successMessage += ' Houzz ideabook updated.';
+        }
+        if (results.steps_completed.includes('teams_summary')) {
+          successMessage += ' Teams notifications sent.';
+        }
+        
+        setSuccess(successMessage);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || 'Workflow failed');
+      }
+    } catch (err) {
+      setError('Workflow error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddToCanva = async () => {
+    try {
+      if (selectedProducts.length === 0) {
+        alert('Please select products first');
         return;
       }
+      
+      setLoading(true);
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/real-integrations/create-canva-project`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          project_name: `Design Project - ${new Date().toLocaleDateString()}`,
+          products: selectedProducts
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSuccess(`Canva project created! ${data.products_added || 0} products added.`);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || 'Failed to create Canva project');
+      }
+    } catch (err) {
+      setError('Canva integration error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddToHouzz = async () => {
+    try {
+      if (selectedProducts.length === 0) {
+        alert('Please select products first');
+        return;
+      }
+      
+      setLoading(true);
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/real-integrations/add-to-houzz-ideabook`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ideabook_name: `Furniture Selection - ${new Date().toLocaleDateString()}`,
+          products: selectedProducts
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSuccess(`Products added to Houzz ideabook! Processing ${data.products_count} items.`);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || 'Failed to add to Houzz ideabook');
+      }
+    } catch (err) {
+      setError('Houzz integration error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendTeamsNotification = async () => {
+    try {
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const message = selectedProducts.length > 0 
+        ? `Selected ${selectedProducts.length} products for review:\n${selectedProducts.slice(0, 3).map(p => `• ${p.title}`).join('\n')}`
+        : `Search completed for "${searchQuery}" - ${products.length} products found`;
+      
+      const response = await fetch(`${BACKEND_URL}/api/real-integrations/send-teams-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: message,
+          title: 'Interior Design Update'
+        })
+      });
+      
+      if (response.ok) {
+        setSuccess('Teams notification sent successfully!');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || 'Failed to send Teams notification');
+      }
+    } catch (err) {
+      setError('Teams notification error: ' + err.message);
+    }
+  };
+
+  const handleScrapeVendor = async (vendor) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/real-integrations/scrape-vendor/${vendor}?search_query=${searchQuery || 'furniture'}&max_results=20`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data.products || []);
+        setSuccess(`Scraped ${data.products_found} products from ${data.vendor}`);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || `Failed to scrape ${vendor}`);
+      }
+    } catch (err) {
+      setError(`Vendor scraping error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleScrapeProducts = async () => {
+    try {
+      // Scrape all vendors
+      await handleScrapeVendor('fourhands');
       
       setLoading(true);
       const response = await fetch(`${BACKEND_URL}/api/search/scrape-products`, {
