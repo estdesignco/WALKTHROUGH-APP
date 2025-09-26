@@ -1434,7 +1434,7 @@ const ExactFFESpreadsheet = ({
                 alert('Please add a room first before adding categories.');
               }
             }}
-            className="text-white px-6 py-3 rounded font-bold border-none outline-none text-lg" 
+            className="text-white px-6 py-3 rounded font-bold border border-[#B49B7E]/20 text-lg" 
             style={{ backgroundColor: '#8b7355' }}
           >
             <option value="">+ ADD CATEGORY ▼</option>
