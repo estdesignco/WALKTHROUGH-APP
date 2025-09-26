@@ -9,7 +9,7 @@ const MainContainer = ({
   return (
     <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-2 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4" style={{
       background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,20,0.9) 30%, rgba(0,0,0,0.95) 100%)',
-      marginTop: '-450px'
+      marginTop: '-500px'
     }}> {/* EXTREME NEGATIVE MARGIN - BRING LOGO SUPER CLOSE */}
       
       {/* Page Title - NO SPACING */}
