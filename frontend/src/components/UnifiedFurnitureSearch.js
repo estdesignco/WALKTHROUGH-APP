@@ -854,16 +854,40 @@ const UnifiedFurnitureSearch = () => {
                   </button>
                   <button
                     onClick={() => {
-                      if (product.url) {
+                      // Show all product images in a modal or new window
+                      if (product.multiple_images && product.multiple_images.length > 0) {
+                        // Create image gallery popup
+                        const imageGallery = product.multiple_images.map((img, idx) => 
+                          `<img src="${img}" alt="Product Image ${idx + 1}" style="width: 300px; height: 200px; object-fit: cover; margin: 10px; border: 2px solid #B49B7E; border-radius: 8px;">`
+                        ).join('');
+                        
+                        const popup = window.open('', '_blank', 'width=1200,height=800');
+                        popup.document.write(`
+                          <html>
+                            <head><title>All Images - ${product.title}</title></head>
+                            <body style="background: #1a1a1a; color: #F5F5DC; font-family: Arial; padding: 20px; text-align: center;">
+                              <h2 style="color: #B49B7E;">${product.title || 'Product Images'}</h2>
+                              <p><strong>Price:</strong> ${product.price} | <strong>Vendor:</strong> ${product.seller}</p>
+                              <div style="display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px;">
+                                ${imageGallery}
+                              </div>
+                              <br><br>
+                              <a href="${product.url}" target="_blank" style="color: #B49B7E; text-decoration: underline;">
+                                🔗 View Original Product Page
+                              </a>
+                            </body>
+                          </html>
+                        `);
+                      } else if (product.url) {
                         window.open(product.url, '_blank');
                       } else {
-                        alert('Product URL not available');
+                        alert('No images or URL available');
                       }
                     }}
                     className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-3 py-2 text-sm rounded transition-all duration-300"
                     style={{ color: '#F5F5DC' }}
                   >
-                    🔗 View
+                    🖼️ View All Images
                   </button>
                 </div>
 
