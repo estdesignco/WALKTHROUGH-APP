@@ -670,7 +670,7 @@ const SimpleWalkthroughSpreadsheet = ({
   return (
     <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       
-      {/* ENHANCED FILTER SECTION - SAME TREATMENT AS GRAPHS BUT EXISTING DARK NAVY */}
+      {/* ENHANCED FILTER SECTION - EXACT SAME TREATMENT AS GRAPHS BUT EXISTING DARK NAVY */}
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
            style={{
              background: 'linear-gradient(135deg, rgba(30,41,59,0.95) 0%, rgba(51,65,85,0.9) 30%, rgba(30,41,59,0.95) 100%)'
