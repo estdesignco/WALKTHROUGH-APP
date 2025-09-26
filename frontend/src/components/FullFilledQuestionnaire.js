@@ -24,20 +24,20 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
 
     const Field = ({ label, value, type = "text", isTextArea = false, options = [] }) => (
         <div>
-            <label className="block text-sm font-medium text-stone-300 mb-2">{label}</label>
+            <label className="block text-sm font-medium text-[#B49B7E] mb-2">{label}</label>
             {isTextArea ? (
                 <textarea
                     value={value || ''}
                     onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
                     readOnly={!isEditing}
-                    className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]"
+                    className="w-full p-3 bg-gray-700 border border-[#B49B7E]/30 rounded text-[#F5F5DC] min-h-[80px] focus:border-[#B49B7E] focus:outline-none"
                 />
             ) : type === "select" ? (
                 <select
                     value={value || ''}
                     onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
                     disabled={!isEditing}
-                    className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
+                    className="w-full p-3 bg-gray-700 border border-[#B49B7E]/30 rounded text-[#F5F5DC] focus:border-[#B49B7E] focus:outline-none"
                 >
                     <option value="">Select...</option>
                     {options.map(option => (
@@ -50,7 +50,7 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
                     value={value || ''}
                     onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
                     readOnly={!isEditing}
-                    className="w-full p-3 bg-stone-700 border border-stone-600 rounded text-stone-200"
+                    className="w-full p-3 bg-gray-700 border border-[#B49B7E]/30 rounded text-[#F5F5DC] focus:border-[#B49B7E] focus:outline-none"
                 />
             )}
         </div>
