@@ -31,6 +31,7 @@ from google_sheets_routes import router as google_sheets_router
 
 # Import Unified Search functionality  
 from unified_search_routes import router as unified_search_router
+from real_integration_routes import router as real_integration_router
 
 # Import Real-Time Integration functionality
 from real_time_integration import router as realtime_router
