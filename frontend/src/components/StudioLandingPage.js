@@ -452,25 +452,87 @@ const UnifiedFurnitureSearch = () => {
             </select>
           </div>
 
+          {/* ADVANCED FILTERS GO BUTTON */}
+          <div className="flex justify-center">
+            <button 
+              onClick={handleFilterSearch}
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-12 py-4 text-xl font-bold rounded-full transition-all duration-300 transform hover:scale-105"
+              style={{ color: '#F5F5DC' }}
+            >
+              🎯 GO - APPLY FILTERS
+            </button>
+          </div>
+
           {/* QUICK FILTER BUTTONS */}
-          <div className="flex flex-wrap gap-3">
-            <p className="text-lg font-bold text-[#B49B7E] self-center">🚀 Quick Filters:</p>
-            <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <p className="text-lg font-bold text-[#B49B7E] self-center w-full text-center mb-2">🚀 QUICK SEARCHES:</p>
+            
+            {/* Row 1: Seating */}
+            <button 
+              onClick={() => handleQuickSearch('dining chairs')}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-3 text-sm font-bold rounded-full transition-all duration-300 transform hover:scale-105" 
+              style={{ color: '#F5F5DC' }}
+            >
               💺 Dining Chairs
             </button>
-            <button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
-              🛋️ Sofas & Sectionals
-            </button>
-            <button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
-              💡 Pendant Lights
-            </button>
-            <button className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
+            <button 
+              onClick={() => handleQuickSearch('accent chairs')}
+              className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 px-6 py-3 text-sm font-bold rounded-full transition-all duration-300 transform hover:scale-105" 
+              style={{ color: '#F5F5DC' }}
+            >
               🪑 Accent Chairs
             </button>
-            <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
+            <button 
+              onClick={() => handleQuickSearch('sofas sectionals')}
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 px-6 py-3 text-sm font-bold rounded-full transition-all duration-300 transform hover:scale-105" 
+              style={{ color: '#F5F5DC' }}
+            >
+              🛋️ Sofas & Sectionals
+            </button>
+            
+            {/* Row 2: Tables */}
+            <button 
+              onClick={() => handleQuickSearch('dining tables')}
+              className="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 px-6 py-3 text-sm font-bold rounded-full transition-all duration-300 transform hover:scale-105" 
+              style={{ color: '#F5F5DC' }}
+            >
+              🍽️ Dining Tables
+            </button>
+            <button 
+              onClick={() => handleQuickSearch('end tables side tables')}
+              className="bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 px-6 py-3 text-sm font-bold rounded-full transition-all duration-300 transform hover:scale-105" 
+              style={{ color: '#F5F5DC' }}
+            >
+              🪑 End Tables
+            </button>
+            <button 
+              onClick={() => handleQuickSearch('console tables')}
+              className="bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 px-6 py-3 text-sm font-bold rounded-full transition-all duration-300 transform hover:scale-105" 
+              style={{ color: '#F5F5DC' }}
+            >
+              📺 Console Tables
+            </button>
+            
+            {/* Row 3: Lighting & Storage */}
+            <button 
+              onClick={() => handleQuickSearch('pendant lights')}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-6 py-3 text-sm font-bold rounded-full transition-all duration-300 transform hover:scale-105" 
+              style={{ color: '#F5F5DC' }}
+            >
+              💡 Pendant Lights
+            </button>
+            <button 
+              onClick={() => handleQuickSearch('table lamps')}
+              className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 px-6 py-3 text-sm font-bold rounded-full transition-all duration-300 transform hover:scale-105" 
+              style={{ color: '#F5F5DC' }}
+            >
               🕯️ Table Lamps
             </button>
-            <button className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
+            <button 
+              onClick={() => handleQuickSearch('storage solutions cabinets')}
+              className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 px-6 py-3 text-sm font-bold rounded-full transition-all duration-300 transform hover:scale-105" 
+              style={{ color: '#F5F5DC' }}
+            >
               🗄️ Storage Solutions
             </button>
           </div>
