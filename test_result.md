@@ -1201,10 +1201,8 @@ metadata:
 test_plan:
   current_focus:
     - "Checklist to FFE Transfer Functionality - URGENT BUG FIX VALIDATION"
-    - "Ultra-Robust Web Scraping Engine - Priority 1"
     - "Canva Integration for Board Scraping"
-  stuck_tasks:
-    - "Ultra-Robust Web Scraping Engine - Priority 1"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
