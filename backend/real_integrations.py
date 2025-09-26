@@ -11,6 +11,7 @@ import json
 import base64
 import time
 import random
+import io
 from typing import Dict, List, Optional, Any
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -24,6 +25,9 @@ from datetime import datetime, timedelta
 import logging
 from cryptography.fernet import Fernet
 from pydantic import BaseModel
+from PIL import Image
+import urllib.parse
+import re
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
