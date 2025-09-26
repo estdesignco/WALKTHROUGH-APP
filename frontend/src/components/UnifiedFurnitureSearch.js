@@ -134,6 +134,7 @@ const UnifiedFurnitureSearch = () => {
       setSuccess(null);
       
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      console.log('Starting real search with backend URL:', BACKEND_URL);
       
       const searchRequest = {
         query: searchQuery || 'furniture',
