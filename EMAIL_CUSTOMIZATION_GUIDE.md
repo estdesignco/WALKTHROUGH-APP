@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://studio-project-hub.preview.emergentagent.com/email-template.html
+https://interio-hub.preview.emergentagent.com/email-template.html
 
 ---
 

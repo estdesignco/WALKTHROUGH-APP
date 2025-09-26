@@ -13,7 +13,7 @@ class EmergentPreviewTester:
     def __init__(self):
         self.backend_url = "http://localhost:8000"
         self.frontend_url = "http://localhost:80"
-        self.preview_url = "https://studio-project-hub.preview.emergentagent.com"
+        self.preview_url = "https://interio-hub.preview.emergentagent.com"
         self.tests_run = 0
         self.tests_passed = 0
 
