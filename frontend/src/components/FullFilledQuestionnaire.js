@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import CompletePageLayout from './CompletePageLayout';
 
 const FullFilledQuestionnaire = ({ project }) => {
     const [isEditing, setIsEditing] = useState(false);
