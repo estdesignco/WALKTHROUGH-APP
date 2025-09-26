@@ -872,85 +872,99 @@ class RealVendorScraper:
             return []
 
     async def scrape_hudson_valley(self, search_query: str = "lighting", max_results: int = 20) -> List[Dict]:
-        """Scrape Hudson Valley Lighting website with real scraping"""
+        """Scrape Hudson Valley Lighting using requests/BeautifulSoup"""
         try:
             logger.info(f"Scraping Hudson Valley Lighting for: {search_query}")
-            
-            chrome_options = Options()
-            chrome_options.add_argument("--headless")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            
-            service = Service(ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=chrome_options)
+            self.setup_session()
             
             products = []
             
-            try:
-                # Try Hudson Valley URLs
-                urls = [
-                    "https://www.hudsonvalleylighting.com/collections/all",
-                    f"https://www.hudsonvalleylighting.com/search?q={search_query}",
-                    "https://www.hudsonvalleylighting.com/collections/pendant-lighting",
-                    "https://www.hudsonvalleylighting.com/collections/chandeliers"
-                ]
-                
-                for url in urls:
-                    try:
-                        driver.get(url)
-                        await asyncio.sleep(4)
-                        
-                        # Look for product elements
-                        product_links = driver.find_elements(By.CSS_SELECTOR, 'a[href*="/products/"]')
-                        
-                        for link in product_links[:max_results]:
-                            try:
-                                href = link.get_attribute('href')
-                                title = link.get_attribute('title') or link.text.strip()
-                                
-                                if not title:
-                                    title = href.split('/products/')[-1].replace('-', ' ').title()
-                                
-                                if title and len(title) > 3:
-                                    # Try to find image
-                                    image_url = None
-                                    try:
-                                        img = link.find_element(By.CSS_SELECTOR, 'img')
-                                        src = img.get_attribute('src') or img.get_attribute('data-src')
-                                        if src:
-                                            image_url = src if src.startswith('http') else f"https://www.hudsonvalleylighting.com{src}"
-                                    except:
-                                        pass
-                                    
-                                    products.append({
-                                        'id': f"hudson_real_{len(products)}_{int(time.time())}",
-                                        'title': title,
-                                        'price': 'Contact for pricing',
-                                        'price_numeric': None,
-                                        'url': href,
-                                        'image_url': image_url,
-                                        'image_base64': await self.download_and_process_image(image_url) if image_url else None,
-                                        'seller': 'Hudson Valley Lighting',
-                                        'vendor': 'Hudson Valley Lighting',
-                                        'category': 'lighting',
-                                        'scraped_at': datetime.now().isoformat(),
-                                        'search_query': search_query
-                                    })
-                            except:
+            # Hudson Valley URLs to try
+            urls = [
+                "https://www.hudsonvalleylighting.com/collections/all",
+                f"https://www.hudsonvalleylighting.com/search?q={search_query}",
+                "https://www.hudsonvalleylighting.com/collections/pendant-lighting",
+                "https://www.hudsonvalleylighting.com/collections/chandeliers"
+            ]
+            
+            for url in urls:
+                try:
+                    logger.info(f"Fetching Hudson Valley URL: {url}")
+                    response = self.session.get(url, timeout=15)
+                    response.raise_for_status()
+                    
+                    soup = BeautifulSoup(response.content, 'lxml')
+                    
+                    # Look for product links
+                    product_links = soup.select('a[href*="/products/"]')
+                    logger.info(f"Found {len(product_links)} Hudson Valley product links")
+                    
+                    for link in product_links[:max_results]:
+                        try:
+                            href = link.get('href')
+                            if not href or '/products/' not in href:
                                 continue
-                        
-                        if products:
-                            break
+                                
+                            # Make URL absolute
+                            if not href.startswith('http'):
+                                href = f"https://www.hudsonvalleylighting.com{href}"
                             
-                    except Exception as e:
-                        logger.error(f"Error with Hudson Valley URL {url}: {e}")
-                        continue
-                
-                logger.info(f"Scraped {len(products)} products from Hudson Valley Lighting")
-                return products
-                
-            finally:
-                driver.quit()
+                            # Extract title
+                            title = link.get('title') or link.text.strip()
+                            if not title:
+                                title = href.split('/products/')[-1].replace('-', ' ').title()
+                            
+                            title = title.strip()[:100]
+                            
+                            if not title or len(title) < 3:
+                                continue
+                            
+                            # Find image
+                            image_url = None
+                            img = link.find('img')
+                            if not img and link.parent:
+                                img = link.parent.find('img')
+                            
+                            if img:
+                                src = img.get('src') or img.get('data-src')
+                                if src:
+                                    image_url = src if src.startswith('http') else f"https://www.hudsonvalleylighting.com{src}"
+                            
+                            # Try to find price
+                            price_text = "Contact for pricing"
+                            if link.parent:
+                                price_elem = link.parent.find(class_=lambda x: x and 'price' in x.lower() if x else False)
+                                if price_elem:
+                                    price_text = price_elem.get_text().strip()
+                            
+                            products.append({
+                                'id': f"hudson_real_{len(products)}_{int(time.time())}",
+                                'title': title,
+                                'price': price_text,
+                                'price_numeric': self.extract_price_number(price_text),
+                                'url': href,
+                                'image_url': image_url,
+                                'image_base64': await self.download_and_process_image(image_url) if image_url else None,
+                                'seller': 'Hudson Valley Lighting',
+                                'vendor': 'Hudson Valley Lighting',
+                                'category': 'lighting',
+                                'scraped_at': datetime.now().isoformat(),
+                                'search_query': search_query
+                            })
+                            
+                        except Exception as e:
+                            logger.error(f"Error processing Hudson Valley product: {e}")
+                            continue
+                    
+                    if products:
+                        break
+                        
+                except Exception as e:
+                    logger.error(f"Error scraping Hudson Valley URL {url}: {e}")
+                    continue
+            
+            logger.info(f"Scraped {len(products)} products from Hudson Valley")
+            return products
             
         except Exception as e:
             logger.error(f"Hudson Valley scraping error: {e}")
