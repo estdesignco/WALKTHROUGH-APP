@@ -785,7 +785,7 @@ const SimpleChecklistSpreadsheet = ({
           <div className="mt-4">
             <button 
               onClick={onAddRoom}
-              className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+              className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-[#F5F5DC] rounded font-medium"
             >
               + ADD FIRST ROOM
             </button>
