@@ -276,12 +276,16 @@ const UnifiedFurnitureSearch = () => {
       
       console.log('🎯 Applying filters:', searchParams);
       
-      const response = await fetch(`${BACKEND_URL}/api/search/search`, {
+      const response = await fetch(`${BACKEND_URL}/api/real-integrations/search-products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(searchParams)
+        body: JSON.stringify({
+          query: searchParams.query || '',
+          filters: searchParams,
+          max_results: 50
+        })
       });
       
       if (response.ok) {
