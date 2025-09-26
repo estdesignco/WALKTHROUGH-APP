@@ -801,7 +801,7 @@ const ExactFFESpreadsheet = ({
                 console.log('🔍 FILTER APPLIED - Search:', searchTerm, 'Room:', selectedRoom, 'Category:', selectedCategory, 'Vendor:', selectedVendor, 'Status:', selectedStatus, 'Carrier:', selectedCarrier);
                 // Filters are applied automatically via useEffect
               }}
-              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white rounded-full shadow-lg hover:shadow-blue-500/30 transition-all duration-300 font-medium border border-blue-500/20"
+              className="px-4 py-2 bg-[#B49B7E]/80 hover:bg-[#B49B7E] text-black rounded font-medium shadow-md transition-all duration-200 border border-[#B49B7E]"
             >
               🔍 FILTER
             </button>
