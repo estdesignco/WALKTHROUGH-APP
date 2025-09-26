@@ -832,7 +832,7 @@ const SimpleWalkthroughSpreadsheet = ({
                     return (
                       <div key={category.id} className="mb-4">
                         {/* CATEGORY HEADER (GREEN) WITH EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
-                        <div className="mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: '#065F46' }}>
+                        <div className="mb-4 px-4 py-2 text-[#B49B7E] font-bold" style={{ backgroundColor: '#065F46' }}>
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
                               <button
