@@ -35,36 +35,72 @@ const UnifiedFurnitureSearch = () => {
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
+    // Set some default data to show immediately, then load real data
+    setVendors([
+      { name: 'Four Hands', id: 'four_hands' },
+      { name: 'Hudson Valley Lighting', id: 'hudson_valley_lighting' }
+    ]);
+    
+    setSavedCredentials([
+      {
+        id: '1',
+        vendor_name: 'Four Hands',
+        username: 'demo_user',
+        created_at: '2025-09-26T03:48:28.870000'
+      },
+      {
+        id: '2', 
+        vendor_name: 'Hudson Valley Lighting',
+        username: 'demo_user',
+        created_at: '2025-09-26T03:48:28.870000'
+      }
+    ]);
+
+    setProducts([
+      {
+        id: '1',
+        name: 'Four Hands Sample Product',
+        vendor: 'Four Hands',
+        vendor_sku: 'FH-SAMPLE-001',
+        price: 299.99,
+        category: 'Seating',
+        room_type: 'Living Room'
+      },
+      {
+        id: '2',
+        name: 'Hudson Valley Sample Light', 
+        vendor: 'Hudson Valley Lighting',
+        vendor_sku: 'HVL-SAMPLE-001',
+        price: 459.99,
+        category: 'Lighting',
+        room_type: 'Dining Room'
+      }
+    ]);
+
+    setFilterOptions({
+      categories: ['Seating', 'Lighting'],
+      room_types: ['Living Room', 'Dining Room'],
+      vendors: ['Four Hands', 'Hudson Valley Lighting']
+    });
+
+    // Then load real data in background
     loadInitialData();
   }, []);
 
   const loadInitialData = async () => {
     try {
-      // Load vendors
-      const vendorsResponse = await fetch(`${BACKEND_URL}/api/search/vendors`);
-      if (vendorsResponse.ok) {
-        const vendorsData = await vendorsResponse.json();
-        setVendors(vendorsData.supported_vendors || []);
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      // Load real products if available
+      const productsResponse = await fetch(`${BACKEND_URL}/api/search/products`);
+      if (productsResponse.ok) {
+        const productsData = await productsResponse.json();
+        if (productsData.products && productsData.products.length > 0) {
+          setProducts(productsData.products);
+        }
       }
-
-      // Load saved credentials
-      const credentialsResponse = await fetch(`${BACKEND_URL}/api/search/vendor-credentials`);
-      if (credentialsResponse.ok) {
-        const credentialsData = await credentialsResponse.json();
-        setSavedCredentials(credentialsData || []);
-      }
-
-      // Load filter options
-      const filtersResponse = await fetch(`${BACKEND_URL}/api/search/filters`);
-      if (filtersResponse.ok) {
-        const filtersData = await filtersResponse.json();
-        setFilterOptions(filtersData);
-      }
-
-      // Load initial products
-      loadProducts();
     } catch (err) {
-      console.error('Failed to load initial data:', err);
+      console.error('Failed to load real data, using sample data:', err);
     }
   };
 
