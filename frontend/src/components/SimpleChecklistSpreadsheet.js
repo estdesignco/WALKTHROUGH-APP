@@ -953,7 +953,7 @@ const SimpleChecklistSpreadsheet = ({
                     />
                     <label
                       htmlFor={`canva-upload-${room.id}`}
-                      className="bg-purple-600 text-white text-xs px-2 py-1 rounded hover:bg-purple-700 cursor-pointer"
+                      className="bg-purple-600 text-[#F5F5DC] text-xs px-2 py-1 rounded hover:bg-purple-700 cursor-pointer"
                       title="Upload Canva PDF/Image"
                     >
                       🎨 Upload Canva
