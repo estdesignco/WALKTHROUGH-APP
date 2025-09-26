@@ -472,6 +472,116 @@ const UnifiedFurnitureSearch = () => {
         )}
       </div>
 
+      {/* Integration Status */}
+      {Object.keys(integrationStatus).length > 0 && (
+        <div className="bg-gradient-to-br from-green-900/20 to-black/80 rounded-2xl border border-green-500/20 p-6 mb-8">
+          <h3 className="text-xl font-light text-green-400 mb-4">🔗 Real Integration Status</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-black/40 border border-green-500/30 p-4 rounded-lg">
+              <h4 className="text-green-400 font-medium mb-2">Canva</h4>
+              <p className={`text-sm ${integrationStatus.canva?.configured ? 'text-green-300' : 'text-red-300'}`}>
+                {integrationStatus.canva?.configured ? '✅ Connected' : '❌ Not Configured'}
+              </p>
+            </div>
+            <div className="bg-black/40 border border-green-500/30 p-4 rounded-lg">
+              <h4 className="text-green-400 font-medium mb-2">Houzz Pro</h4>
+              <p className={`text-sm ${integrationStatus.houzz?.configured ? 'text-green-300' : 'text-red-300'}`}>
+                {integrationStatus.houzz?.configured ? '✅ Connected' : '❌ Not Configured'}
+              </p>
+            </div>
+            <div className="bg-black/40 border border-green-500/30 p-4 rounded-lg">
+              <h4 className="text-green-400 font-medium mb-2">Teams</h4>
+              <p className={`text-sm ${integrationStatus.teams?.configured ? 'text-green-300' : 'text-red-300'}`}>
+                {integrationStatus.teams?.configured ? '✅ Connected' : '❌ Not Configured'}
+              </p>
+              {integrationStatus.teams?.test_result && (
+                <p className="text-xs text-green-300 mt-1">Last test: Success</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Workflow Section */}
+      <div className="bg-gradient-to-br from-purple-900/20 to-black/80 rounded-2xl border border-purple-500/20 p-6 mb-8">
+        <h3 className="text-xl font-light text-purple-400 mb-6">⚡ Quick Workflow</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <label className="flex items-center gap-3 bg-black/40 border border-purple-500/30 p-4 rounded-lg cursor-pointer">
+            <input
+              type="checkbox"
+              checked={workflowSettings.create_canva}
+              onChange={(e) => setWorkflowSettings({...workflowSettings, create_canva: e.target.checked})}
+              className="text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-purple-300">🎨 Create Canva Project</span>
+          </label>
+          
+          <label className="flex items-center gap-3 bg-black/40 border border-purple-500/30 p-4 rounded-lg cursor-pointer">
+            <input
+              type="checkbox"
+              checked={workflowSettings.add_to_houzz}
+              onChange={(e) => setWorkflowSettings({...workflowSettings, add_to_houzz: e.target.checked})}
+              className="text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-purple-300">📋 Add to Houzz</span>
+          </label>
+          
+          <label className="flex items-center gap-3 bg-black/40 border border-purple-500/30 p-4 rounded-lg cursor-pointer">
+            <input
+              type="checkbox"
+              checked={workflowSettings.notify_teams}
+              onChange={(e) => setWorkflowSettings({...workflowSettings, notify_teams: e.target.checked})}
+              className="text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-purple-300">📢 Teams Notification</span>
+          </label>
+        </div>
+        
+        <button
+          onClick={handleQuickWorkflow}
+          disabled={loading}
+          className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:from-gray-600 disabled:to-gray-700 px-8 py-4 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium text-lg"
+          style={{ color: '#F5F5DC' }}
+        >
+          {loading ? '⚡ Running Workflow...' : '⚡ Run Complete Workflow'}
+        </button>
+      </div>
+
+      {/* Individual Vendor Scraping */}
+      <div className="bg-gradient-to-br from-blue-900/20 to-black/80 rounded-2xl border border-blue-500/20 p-6 mb-8">
+        <h3 className="text-xl font-light text-blue-400 mb-6">🏪 Individual Vendor Scraping</h3>
+        
+        <div className="flex flex-wrap gap-4">
+          <button
+            onClick={() => handleScrapeVendor('fourhands')}
+            disabled={loading}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-600 disabled:to-gray-700 px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium"
+            style={{ color: '#F5F5DC' }}
+          >
+            {loading ? '⏳ Scraping...' : '🪑 Four Hands'}
+          </button>
+          
+          <button
+            onClick={() => handleScrapeVendor('hudson-valley')}
+            disabled={loading}
+            className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 disabled:from-gray-600 disabled:to-gray-700 px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium"
+            style={{ color: '#F5F5DC' }}
+          >
+            {loading ? '⏳ Scraping...' : '💡 Hudson Valley'}
+          </button>
+          
+          <button
+            onClick={() => handleScrapeVendor('wayfair')}
+            disabled={loading}
+            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium"
+            style={{ color: '#F5F5DC' }}
+          >
+            {loading ? '⏳ Scraping...' : '🏠 Wayfair'}
+          </button>
+        </div>
+      </div>
+
       {/* Search Section */}
       <div className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-2xl border border-[#B49B7E]/20 p-6 mb-8">
         <h3 className="text-xl font-light text-[#B49B7E] mb-6">Search Products</h3>
