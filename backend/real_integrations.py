@@ -746,130 +746,129 @@ class RealVendorScraper:
             return []
     
     async def scrape_fourhands_console_tables(self, max_results: int = 60) -> List[Dict]:
-        """Dedicated scraper for Four Hands console tables"""
+        """Dedicated scraper for Four Hands console tables using requests/BeautifulSoup"""
         try:
-            logger.info("Scraping Four Hands console tables specifically...")
-            
-            chrome_options = Options()
-            chrome_options.add_argument("--headless")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            
-            service = Service(ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=chrome_options)
+            logger.info("Scraping Four Hands console tables with requests...")
+            self.setup_session()
             
             products = []
             
-            try:
-                # Go directly to console tables collection
-                console_urls = [
-                    "https://www.fourhands.com/collections/console-tables",
-                    "https://www.fourhands.com/collections/tables",
-                    "https://www.fourhands.com/search?q=console+table",
-                    "https://www.fourhands.com/search?type=product&q=console"
-                ]
-                
-                for url in console_urls:
-                    try:
-                        logger.info(f"Scraping URL: {url}")
-                        driver.get(url)
-                        await asyncio.sleep(4)
-                        
-                        # Scroll to load all products
-                        last_height = driver.execute_script("return document.body.scrollHeight")
-                        while True:
-                            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                            await asyncio.sleep(3)
-                            new_height = driver.execute_script("return document.body.scrollHeight")
-                            if new_height == last_height:
-                                break
-                            last_height = new_height
-                        
-                        # Look for product links
-                        product_links = driver.find_elements(By.CSS_SELECTOR, 'a[href*="/products/"]')
-                        logger.info(f"Found {len(product_links)} product links")
-                        
-                        for link in product_links:
-                            if len(products) >= max_results:
-                                break
-                                
-                            try:
-                                href = link.get_attribute('href')
-                                if not href or '/products/' not in href:
-                                    continue
-                                
-                                # Extract product name from URL or link text
-                                product_name = link.get_attribute('title') or link.text.strip()
-                                if not product_name:
-                                    # Extract from URL
-                                    product_name = href.split('/products/')[-1].replace('-', ' ').title()
-                                
-                                # Skip if not console table related
-                                if 'console' not in product_name.lower() and 'table' not in product_name.lower():
-                                    continue
-                                
-                                # Try to find associated image
-                                image_url = None
-                                try:
-                                    # Look for image in same parent element
-                                    parent = link.find_element(By.XPATH, '..')
-                                    img = parent.find_element(By.CSS_SELECTOR, 'img')
-                                    src = img.get_attribute('src') or img.get_attribute('data-src') or img.get_attribute('data-original')
-                                    if src:
-                                        image_url = src if src.startswith('http') else f"https://www.fourhands.com{src}"
-                                except:
-                                    # Try to find image within the link
-                                    try:
-                                        img = link.find_element(By.CSS_SELECTOR, 'img')
-                                        src = img.get_attribute('src') or img.get_attribute('data-src')
-                                        if src:
-                                            image_url = src if src.startswith('http') else f"https://www.fourhands.com{src}"
-                                    except:
-                                        pass
-                                
-                                # Try to extract price if visible
-                                price_text = "Contact for pricing"
-                                try:
-                                    parent = link.find_element(By.XPATH, '../..')
-                                    price_elem = parent.find_element(By.CSS_SELECTOR, '*[class*="price"], .money, .cost')
-                                    price_text = price_elem.text.strip()
-                                except:
-                                    pass
-                                
-                                products.append({
-                                    'id': f"fourhands_console_{len(products)}_{int(time.time())}",
-                                    'title': product_name,
-                                    'price': price_text,
-                                    'price_numeric': self.extract_price_number(price_text),
-                                    'url': href,
-                                    'image_url': image_url,
-                                    'image_base64': await self.download_and_process_image(image_url) if image_url else None,
-                                    'seller': 'Four Hands',
-                                    'vendor': 'Four Hands',
-                                    'category': 'console table',
-                                    'scraped_at': datetime.now().isoformat(),
-                                    'search_query': 'console table'
-                                })
-                                
-                            except Exception as e:
-                                logger.error(f"Error processing product link: {e}")
-                                continue
-                        
-                        if products:
-                            break  # Found products, no need to try other URLs
+            # Console table URLs to try
+            console_urls = [
+                "https://www.fourhands.com/collections/console-tables",
+                "https://www.fourhands.com/collections/tables", 
+                "https://www.fourhands.com/search?q=console+table",
+                "https://www.fourhands.com/collections/all-furniture"
+            ]
+            
+            for url in console_urls:
+                try:
+                    logger.info(f"Fetching URL: {url}")
+                    response = self.session.get(url, timeout=15)
+                    response.raise_for_status()
+                    
+                    soup = BeautifulSoup(response.content, 'lxml')
+                    
+                    # Try multiple selectors for product links
+                    product_selectors = [
+                        'a[href*="/products/"]',
+                        '.product-item a',
+                        '.grid-item a',
+                        '.product-card a',
+                        '.product a'
+                    ]
+                    
+                    product_links = []
+                    for selector in product_selectors:
+                        links = soup.select(selector)
+                        if links:
+                            product_links = links
+                            logger.info(f"Found {len(links)} product links with selector: {selector}")
+                            break
+                    
+                    for link in product_links:
+                        if len(products) >= max_results:
+                            break
                             
-                    except Exception as e:
-                        logger.error(f"Error scraping URL {url}: {e}")
-                        continue
-                
-                logger.info(f"Scraped {len(products)} console tables from Four Hands")
-                return products
-                
-            finally:
-                driver.quit()
-                
+                        try:
+                            href = link.get('href')
+                            if not href or '/products/' not in href:
+                                continue
+                                
+                            # Make URL absolute
+                            if not href.startswith('http'):
+                                href = f"https://www.fourhands.com{href}"
+                            
+                            # Extract product name
+                            product_name = link.get('title') or link.text.strip()
+                            if not product_name:
+                                # Extract from URL
+                                product_name = href.split('/products/')[-1].replace('-', ' ').title()
+                            
+                            # Clean up product name
+                            product_name = product_name.strip()[:100]  # Limit length
+                            
+                            if not product_name or len(product_name) < 3:
+                                continue
+                            
+                            # Find associated image
+                            image_url = None
+                            
+                            # Look for img tag in link or parent
+                            img = link.find('img')
+                            if not img and link.parent:
+                                img = link.parent.find('img')
+                            if not img and link.parent and link.parent.parent:
+                                img = link.parent.parent.find('img')
+                            
+                            if img:
+                                src = img.get('src') or img.get('data-src') or img.get('data-original')
+                                if src:
+                                    image_url = src if src.startswith('http') else f"https://www.fourhands.com{src}"
+                            
+                            # Try to find price
+                            price_text = "Contact for pricing"
+                            price_elem = None
+                            if link.parent:
+                                price_elem = link.parent.find(class_=lambda x: x and 'price' in x.lower() if x else False)
+                            if not price_elem and link.parent and link.parent.parent:
+                                price_elem = link.parent.parent.find(class_=lambda x: x and 'price' in x.lower() if x else False)
+                            
+                            if price_elem:
+                                price_text = price_elem.get_text().strip()
+                            
+                            products.append({
+                                'id': f"fourhands_real_{len(products)}_{int(time.time())}",
+                                'title': product_name,
+                                'price': price_text,
+                                'price_numeric': self.extract_price_number(price_text),
+                                'url': href,
+                                'image_url': image_url,
+                                'image_base64': await self.download_and_process_image(image_url) if image_url else None,
+                                'seller': 'Four Hands',
+                                'vendor': 'Four Hands',
+                                'category': 'furniture',
+                                'scraped_at': datetime.now().isoformat(),
+                                'search_query': 'console table'
+                            })
+                            
+                        except Exception as e:
+                            logger.error(f"Error processing product: {e}")
+                            continue
+                    
+                    if products:
+                        logger.info(f"Found {len(products)} products from {url}")
+                        break  # Found products, no need to try other URLs
+                        
+                except Exception as e:
+                    logger.error(f"Error scraping URL {url}: {e}")
+                    continue
+            
+            logger.info(f"Total scraped {len(products)} products from Four Hands")
+            return products
+            
         except Exception as e:
-            logger.error(f"Four Hands console table scraping error: {e}")
+            logger.error(f"Four Hands scraping error: {e}")
             return []
 
     async def scrape_hudson_valley(self, search_query: str = "lighting", max_results: int = 20) -> List[Dict]:
