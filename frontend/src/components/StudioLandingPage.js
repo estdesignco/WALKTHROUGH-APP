@@ -309,6 +309,26 @@ const UnifiedFurnitureSearch = () => {
           ))}
         </div>
       </div>
+
+      {/* Canva Project Assignment Modal */}
+      {showCanvaModal && selectedProduct && (
+        <CanvaProjectModal
+          product={selectedProduct}
+          onClose={() => {
+            setShowCanvaModal(false);
+            setSelectedProduct(null);
+          }}
+          onAssign={(assignment) => {
+            setAssignments([...assignments, {
+              ...assignment,
+              productId: selectedProduct.id,
+              timestamp: new Date().toISOString()
+            }]);
+            setShowCanvaModal(false);
+            setSelectedProduct(null);
+          }}
+        />
+      )}
     </div>
   );
 };
