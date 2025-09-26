@@ -977,7 +977,7 @@ const SimpleChecklistSpreadsheet = ({
                   <div key={category.id} className="mb-6">
                     {/* CATEGORY HEADER WITH EXPAND/COLLAPSE */}
                     <div 
-                      className="px-4 py-2 text-[#B49B7E] font-bold mb-2"
+                      className="px-4 py-2 text-[#F5F5DC] font-bold mb-2"
                       style={{ backgroundColor: getCategoryColor() }}
                     >
                       <div className="flex justify-between items-center">
