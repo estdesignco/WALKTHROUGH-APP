@@ -273,23 +273,33 @@ const UnifiedFurnitureSearch = () => {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                <div className="flex gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   <button
                     onClick={() => alert(`Adding "${product.name}" to checklist!`)}
-                    className="flex-1 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-4 py-3 text-lg font-bold rounded transition-all duration-300"
+                    className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-3 py-3 text-sm font-bold rounded transition-all duration-300"
                     style={{ color: '#F5F5DC' }}
                   >
-                    ✅ ADD TO CHECKLIST
+                    ✅ CHECKLIST
                   </button>
                   <button
                     onClick={() => {
                       setSelectedProduct(product);
                       setShowCanvaModal(true);
                     }}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-4 py-3 text-lg font-bold rounded transition-all duration-300"
+                    className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-3 py-3 text-sm font-bold rounded transition-all duration-300"
                     style={{ color: '#F5F5DC' }}
                   >
-                    🎨 ASSIGN TO PROJECT
+                    🎨 CANVA
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedProduct(product);
+                      setShowHouzzModal(true);
+                    }}
+                    className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 px-3 py-3 text-sm font-bold rounded transition-all duration-300"
+                    style={{ color: '#F5F5DC' }}
+                  >
+                    🏠 HOUZZ PRO
                   </button>
                 </div>
 
