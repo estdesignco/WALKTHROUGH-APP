@@ -23,41 +23,7 @@ const MainHeader = ({
                 <span>Questionnaire</span>
               </a>
               
-              {activeTab === 'walkthrough' ? (
-                <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
-                  <span>🚶</span>
-                  <span className="font-semibold">Walkthrough</span>
-                </div>
-              ) : (
-                <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 transition-colors" style={{ color: '#F5F5DC', opacity: '0.7' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
-                  <span>🚶</span>
-                  <span>Walkthrough</span>
-                </a>
-              )}
-
-              {activeTab === 'checklist' ? (
-                <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
-                  <span>✅</span>
-                  <span className="font-semibold">Checklist</span>
-                </div>
-              ) : (
-                <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 transition-colors" style={{ color: '#F5F5DC', opacity: '0.7' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
-                  <span>✅</span>
-                  <span>Checklist</span>
-                </a>
-              )}
-
-              {activeTab === 'ffe' ? (
-                <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
-                  <span>📊</span>
-                  <span className="font-semibold">FF&E</span>
-                </div>
-              ) : (
-                <a href={`/project/${projectId}/ffe`} className="flex items-center space-x-2 transition-colors" style={{ color: '#F5F5DC', opacity: '0.7' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
-                  <span>📊</span>
-                  <span>FF&E</span>
-                </a>
-              )}
+              {/* Walkthrough, Checklist, and FF&E tabs removed per user request */}
             </div>
           </>
         )}
