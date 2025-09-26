@@ -655,39 +655,63 @@ class RealVendorScraper:
                         logger.error(f"Error with URL {search_url}: {e}")
                         continue
                 
-                # If no products found with real scraping, add some sample data for testing
+                # If no products found, try alternative scraping approach
                 if not products:
-                    logger.info("No products found with real scraping, adding sample Four Hands products")
-                    products = [
-                        {
-                            'id': f"fourhands_sample_1_{int(time.time())}",
-                            'title': 'Four Hands Modern Dining Chair',
-                            'price': '$299.99',
-                            'price_numeric': 299.99,
-                            'url': 'https://www.fourhands.com/products/sample-chair',
-                            'image_url': 'https://via.placeholder.com/400x300/8B4513/FFFFFF?text=Four+Hands+Chair',
-                            'image_base64': await self.download_and_process_image('https://via.placeholder.com/400x300/8B4513/FFFFFF?text=Four+Hands+Chair'),
-                            'seller': 'Four Hands',
-                            'vendor': 'Four Hands',
-                            'category': 'seating',
-                            'scraped_at': datetime.now().isoformat(),
-                            'search_query': search_query
-                        },
-                        {
-                            'id': f"fourhands_sample_2_{int(time.time())}",
-                            'title': 'Four Hands Rustic Coffee Table',
-                            'price': '$599.99',
-                            'price_numeric': 599.99,
-                            'url': 'https://www.fourhands.com/products/sample-table',
-                            'image_url': 'https://via.placeholder.com/400x300/654321/FFFFFF?text=Four+Hands+Table',
-                            'image_base64': await self.download_and_process_image('https://via.placeholder.com/400x300/654321/FFFFFF?text=Four+Hands+Table'),
-                            'seller': 'Four Hands',
-                            'vendor': 'Four Hands',
-                            'category': 'tables',
-                            'scraped_at': datetime.now().isoformat(),
-                            'search_query': search_query
-                        }
-                    ]
+                    logger.info("No products found with initial scraping, trying alternative approach...")
+                    # Try scraping the main Four Hands collections page
+                    try:
+                        driver.get("https://www.fourhands.com/collections/all-furniture")
+                        await asyncio.sleep(5)
+                        
+                        # Scroll down to load more products
+                        for i in range(3):
+                            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                            await asyncio.sleep(2)
+                        
+                        # Try finding products with different selectors
+                        all_elements = driver.find_elements(By.CSS_SELECTOR, '*[class*="product"], *[data-*="product"], a[href*="/products/"]')
+                        
+                        for element in all_elements[:max_results]:
+                            try:
+                                # Get text content and href
+                                text_content = element.text.strip()
+                                href = element.get_attribute('href')
+                                
+                                if href and '/products/' in href and text_content:
+                                    # Extract title from text or href
+                                    title = text_content[:100] if text_content else href.split('/products/')[-1].replace('-', ' ').title()
+                                    
+                                    if title and len(title) > 3:
+                                        # Try to find associated image
+                                        try:
+                                            img_elem = element.find_element(By.CSS_SELECTOR, 'img')
+                                            img_src = img_elem.get_attribute('src') or img_elem.get_attribute('data-src')
+                                            if img_src and not img_src.startswith('http'):
+                                                img_src = f"https://www.fourhands.com{img_src}"
+                                        except:
+                                            img_src = None
+                                        
+                                        products.append({
+                                            'id': f"fourhands_real_{len(products)}_{int(time.time())}",
+                                            'title': title,
+                                            'price': 'Contact for pricing',
+                                            'price_numeric': None,
+                                            'url': href,
+                                            'image_url': img_src,
+                                            'image_base64': await self.download_and_process_image(img_src) if img_src else None,
+                                            'seller': 'Four Hands',
+                                            'vendor': 'Four Hands', 
+                                            'category': search_query,
+                                            'scraped_at': datetime.now().isoformat(),
+                                            'search_query': search_query
+                                        })
+                                        
+                                        if len(products) >= max_results:
+                                            break
+                            except:
+                                continue
+                    except Exception as e:
+                        logger.error(f"Alternative scraping failed: {e}")
                 
                 logger.info(f"Scraped {len(products)} products from Four Hands")
                 return products
