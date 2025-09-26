@@ -749,7 +749,7 @@ const SimpleWalkthroughSpreadsheet = ({
             </button>
             <button 
               onClick={handleTransferToChecklist}
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-6 py-2 rounded-full shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-green-500/20 text-black"
+              className="bg-gradient-to-r from-[#8B7355] to-[#6B5B4B] hover:from-[#7A6749] hover:to-[#5A4F40] px-6 py-2 rounded-full shadow-xl hover:shadow-[#8B7355]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#A08B6F]/20 text-[#F5F5DC]"
             >
               → TRANSFER TO CHECKLIST
             </button>
