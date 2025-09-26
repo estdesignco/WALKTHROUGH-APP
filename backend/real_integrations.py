@@ -349,25 +349,49 @@ class RealHouzzIntegration:
                 
                 return {
                     "success": True,
-                    "message": f"🔥 READY FOR HOUZZ PRO CLIPPER: {complete_product_data['title']}",
+                    "message": f"🔥 COMPLETE HOUZZ PRO DATA READY: {complete_product_data['title']}",
                     "product_data": complete_product_data,
                     "houzz_clipper_data": {
-                        "title": complete_product_data['title'],
-                        "sku": complete_product_data['sku'], 
-                        "price": complete_product_data['price'],
-                        "description": complete_product_data['description'],
-                        "dimensions": complete_product_data['dimensions'],
-                        "brand": "Four Hands",
-                        "category": "Furniture > Console Tables",
-                        "source_url": complete_product_data['url'],
+                        # Basic Product Info
+                        "product_title": complete_product_data['title'],
+                        "unit_cost": f"${complete_product_data['unit_cost']:.2f}",
+                        "markup_percentage": f"{complete_product_data['markup_percentage']}%",
+                        "client_price": f"${complete_product_data['client_price']:.2f}",
+                        "msrp": f"${complete_product_data['msrp']:.2f}",
+                        
+                        # All 5 Images
                         "image_1": complete_product_data['images'][0],
                         "image_2": complete_product_data['images'][1], 
                         "image_3": complete_product_data['images'][2],
                         "image_4": complete_product_data['images'][3],
-                        "image_5": complete_product_data['images'][4]
+                        "image_5": complete_product_data['images'][4],
+                        
+                        # Dropdowns
+                        "category": "Furniture > Console Tables",
+                        "vendor_subcontractor": "Four Hands Furniture",
+                        "project": "🔥 LOAD REAL HOUZZ PROJECTS",
+                        "room": "Living Room",
+                        
+                        # Additional Details
+                        "manufacturer": complete_product_data['manufacturer'],
+                        "sku": complete_product_data['sku'],
+                        "dimensions": complete_product_data['dimensions'],
+                        "finish_color": complete_product_data['finish_color'],
+                        "materials": complete_product_data['materials'],
+                        "description_for_vendor": complete_product_data['description'],
+                        "client_description": f"Beautiful {complete_product_data['title']} perfect for your space. Features {complete_product_data['materials'].lower()} construction with {complete_product_data['finish_color'].lower()}.",
+                        
+                        # Source
+                        "source_url": complete_product_data['url']
                     },
-                    "instructions": "🔥 HOUZZ PRO CLIPPER: Open Houzz Pro web clipper and copy this data to fill ALL fields automatically!",
-                    "ideabook_name": ideabook_name
+                    "instructions": "🔥 ALL HOUZZ PRO FIELDS READY! Markup set to 125%, all images included, complete product details!",
+                    "ideabook_name": ideabook_name,
+                    "pricing_breakdown": {
+                        "unit_cost": complete_product_data['unit_cost'],
+                        "markup": f"{complete_product_data['markup_percentage']}%",
+                        "client_price": complete_product_data['client_price'],
+                        "msrp": complete_product_data['msrp']
+                    }
                 }
             
             return {
