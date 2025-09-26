@@ -713,7 +713,7 @@ const UnifiedFurnitureSearch = () => {
               </p>
               
               <p className="text-2xl font-bold text-green-400 mb-4">
-                ${product.price.toFixed(2)}
+                {product.price}
               </p>
               
               <div className="flex gap-2 mb-4">
