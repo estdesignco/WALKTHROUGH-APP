@@ -1000,7 +1000,8 @@ const SimpleWalkthroughSpreadsheet = ({
             </div>
           );
         })}
-      </div>
+        </div>
+      </div> {/* END DARK NAVY SPREADSHEET CONTAINER */}
 
       {/* FOOTER REMOVED - ADD CATEGORY NOW IN EACH SECTION */}
       
