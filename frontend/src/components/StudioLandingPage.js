@@ -209,27 +209,166 @@ const UnifiedFurnitureSearch = () => {
         </div>
 
         {/* Filter Controls */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg">
-            <option>All Vendors</option>
-            <option>Four Hands</option>
-            <option>Hudson Valley</option>
-          </select>
-          <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg">
-            <option>All Categories</option>
-            <option>Seating</option>
-            <option>Lighting</option>
-          </select>
-          <input
-            type="number"
-            placeholder="Min Price $"
-            className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg"
-          />
-          <input
-            type="number"
-            placeholder="Max Price $"
-            className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg"
-          />
+        {/* Enhanced Search Filters - EVERYTHING YOU NEED! */}
+        <div className="space-y-6">
+          {/* Primary Filters Row */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>All Vendors</option>
+              <option>Four Hands</option>
+              <option>Hudson Valley Lighting</option>
+            </select>
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>All Categories</option>
+              <option>Seating</option>
+              <option>Lighting</option>
+              <option>Tables</option>
+              <option>Storage</option>
+              <option>Decor</option>
+            </select>
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>All Room Types</option>
+              <option>Living Room</option>
+              <option>Dining Room</option>
+              <option>Bedroom</option>
+              <option>Kitchen</option>
+              <option>Office</option>
+              <option>Bathroom</option>
+            </select>
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>All Styles</option>
+              <option>Modern</option>
+              <option>Traditional</option>
+              <option>Contemporary</option>
+              <option>Transitional</option>
+              <option>Industrial</option>
+              <option>Rustic</option>
+            </select>
+          </div>
+
+          {/* SIZE, COLOR & MATERIAL Filters Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>🎨 All Colors</option>
+              <option>Black</option>
+              <option>White</option>
+              <option>Gray</option>
+              <option>Brown</option>
+              <option>Natural/Beige</option>
+              <option>Blue</option>
+              <option>Green</option>
+              <option>Gold/Brass</option>
+              <option>Silver/Chrome</option>
+              <option>Bronze</option>
+              <option>Navy</option>
+              <option>Cream</option>
+            </select>
+            
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>🧱 All Materials</option>
+              <option>Wood</option>
+              <option>Metal</option>
+              <option>Fabric</option>
+              <option>Leather</option>
+              <option>Glass</option>
+              <option>Stone</option>
+              <option>Ceramic</option>
+              <option>Rattan/Wicker</option>
+              <option>Marble</option>
+              <option>Velvet</option>
+              <option>Linen</option>
+            </select>
+
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>📏 All Sizes</option>
+              <option>Small (Under 30")</option>
+              <option>Medium (30-60")</option>
+              <option>Large (60-90")</option>
+              <option>Extra Large (90"+)</option>
+              <option>Counter Height (24-26")</option>
+              <option>Bar Height (28-30")</option>
+              <option>Standard Height (18-20")</option>
+              <option>Console/Sofa Table</option>
+              <option>Coffee Table Size</option>
+              <option>Accent/Side Table</option>
+            </select>
+          </div>
+
+          {/* PRICE & ADVANCED Filters Row */}
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <input
+              type="number"
+              placeholder="💰 Min Price $"
+              className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold placeholder:text-[#B49B7E]/70"
+            />
+            <input
+              type="number"
+              placeholder="💰 Max Price $"
+              className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold placeholder:text-[#B49B7E]/70"
+            />
+            
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>🔲 All Shapes</option>
+              <option>Round</option>
+              <option>Square</option>
+              <option>Rectangle</option>
+              <option>Oval</option>
+              <option>L-Shape</option>
+              <option>U-Shape</option>
+            </select>
+
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>🪑 All Seat Counts</option>
+              <option>1 Seat</option>
+              <option>2 Seats</option>
+              <option>3 Seats</option>
+              <option>4+ Seats</option>
+              <option>Sectional</option>
+              <option>Modular</option>
+            </select>
+
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>💡 All Light Types</option>
+              <option>Pendant</option>
+              <option>Chandelier</option>
+              <option>Table Lamp</option>
+              <option>Floor Lamp</option>
+              <option>Sconce</option>
+              <option>Ceiling Mount</option>
+            </select>
+
+            <select className="bg-black/40 border-2 border-[#B49B7E]/50 text-[#F5F5DC] px-4 py-3 rounded-lg text-lg font-bold">
+              <option>🏠 All Availability</option>
+              <option>In Stock</option>
+              <option>Quick Ship</option>
+              <option>Made to Order</option>
+              <option>Custom</option>
+              <option>Clearance</option>
+            </select>
+          </div>
+
+          {/* QUICK FILTER BUTTONS */}
+          <div className="flex flex-wrap gap-3">
+            <p className="text-lg font-bold text-[#B49B7E] self-center">🚀 Quick Filters:</p>
+            <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
+              💺 Dining Chairs
+            </button>
+            <button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
+              🛋️ Sofas & Sectionals
+            </button>
+            <button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
+              💡 Pendant Lights
+            </button>
+            <button className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
+              🪑 Accent Chairs
+            </button>
+            <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
+              🕯️ Table Lamps
+            </button>
+            <button className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 px-4 py-2 text-sm font-bold rounded-full transition-all duration-300" style={{ color: '#F5F5DC' }}>
+              🗄️ Storage Solutions
+            </button>
+          </div>
         </div>
       </div>
 
