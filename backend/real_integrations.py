@@ -530,6 +530,31 @@ class RealHouzzIntegration:
             logger.error(f"Failed to find field {selector}: {e}")
             return None
     
+    async def fill_houzz_dropdown(self, selector: str, value: str) -> bool:
+        """Fill a dropdown in Houzz Pro"""
+        try:
+            dropdown = await self.find_houzz_field(selector)
+            if dropdown:
+                from selenium.webdriver.support.ui import Select
+                select = Select(dropdown)
+                
+                # Try to find matching option
+                for option in select.options:
+                    if value.lower() in option.text.lower():
+                        select.select_by_visible_text(option.text)
+                        logger.info(f"✅ Selected dropdown option: {option.text}")
+                        return True
+                
+                # If no match, select by index
+                if len(select.options) > 1:
+                    select.select_by_index(1)
+                    logger.info(f"✅ Selected default dropdown option")
+                    return True
+                    
+        except Exception as e:
+            logger.error(f"Error filling dropdown {selector}: {e}")
+        return False
+    
 
     
     async def fill_houzz_field(self, selector: str, value: str) -> bool:
