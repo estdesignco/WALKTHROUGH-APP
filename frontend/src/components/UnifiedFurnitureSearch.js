@@ -659,10 +659,61 @@ const UnifiedFurnitureSearch = () => {
         </div>
       </div>
 
-      {/* Error Display */}
+      {/* Success/Error Messages */}
+      {success && (
+        <div className="bg-green-900/20 border border-green-500/30 p-4 rounded-lg mb-6">
+          <p className="text-green-300">✅ {success}</p>
+        </div>
+      )}
+      
       {error && (
-        <div className="bg-red-900/20 border border-red-500/30 p-6 rounded-2xl mb-8 text-center" style={{ color: '#F5F5DC' }}>
-          {error}
+        <div className="bg-red-900/20 border border-red-500/30 p-4 rounded-lg mb-6">
+          <p className="text-red-300">❌ {error}</p>
+        </div>
+      )}
+
+      {/* Selected Products Actions */}
+      {selectedProducts.length > 0 && (
+        <div className="bg-gradient-to-br from-orange-900/20 to-black/80 rounded-2xl border border-orange-500/20 p-6 mb-8">
+          <h3 className="text-xl font-light text-orange-400 mb-4">
+            📝 Selected Products ({selectedProducts.length})
+          </h3>
+          
+          <div className="flex flex-wrap gap-4">
+            <button
+              onClick={handleAddToCanva}
+              disabled={loading}
+              className="bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 disabled:from-gray-600 disabled:to-gray-700 px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium"
+              style={{ color: '#F5F5DC' }}
+            >
+              {loading ? '⏳ Adding...' : '🎨 Add to Canva'}
+            </button>
+            
+            <button
+              onClick={handleAddToHouzz}
+              disabled={loading}
+              className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 disabled:from-gray-600 disabled:to-gray-700 px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium"
+              style={{ color: '#F5F5DC' }}
+            >
+              {loading ? '⏳ Adding...' : '📋 Add to Houzz'}
+            </button>
+            
+            <button
+              onClick={handleSendTeamsNotification}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium"
+              style={{ color: '#F5F5DC' }}
+            >
+              📢 Notify Teams
+            </button>
+            
+            <button
+              onClick={() => setSelectedProducts([])}
+              className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium"
+              style={{ color: '#F5F5DC' }}
+            >
+              🗑️ Clear Selection
+            </button>
+          </div>
         </div>
       )}
 
