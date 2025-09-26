@@ -299,7 +299,9 @@ class RealHouzzIntegration:
             # SCRAPE THE REAL PRODUCT DATA FROM FOUR HANDS URL
             if product_data.get('needs_full_scrape') or not product_data.get('sku'):
                 logger.info(f"🔥 SCRAPING REAL DATA from: {product_data.get('url')}")
-                real_product_data = await self.scrape_live_product_data(product_data.get('url'))
+                # Use the scraper from integration manager
+                scraper = RealVendorScraper()
+                real_product_data = await scraper.scrape_live_product_data(product_data.get('url'))
                 if real_product_data:
                     # Merge the real scraped data
                     product_data.update(real_product_data)
