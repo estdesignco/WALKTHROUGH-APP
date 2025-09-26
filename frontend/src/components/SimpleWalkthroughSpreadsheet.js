@@ -739,34 +739,6 @@ const SimpleWalkthroughSpreadsheet = ({
             </select>
           </div>
           
-          {/* Filter Buttons - WORKING FILTER */}
-          <div className="flex gap-4">
-            <button 
-              onClick={() => {
-                console.log('🔍 WALKTHROUGH FILTER APPLIED');
-                // Filters are already applied via useEffect, just trigger a manual update
-                setFilteredProject({...filteredProject});
-              }}
-              className="px-4 py-2 bg-[#B49B7E]/80 hover:bg-[#B49B7E] text-black rounded font-medium shadow-md transition-all duration-200 border border-[#B49B7E]"
-            >
-              🔍 FILTER
-            </button>
-            <button 
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedRoom('');
-                setSelectedCategory('');
-                setSelectedVendor('');
-                setSelectedStatus('');
-                setFilteredProject(project); // Reset to original project
-                console.log('🧹 WALKTHROUGH FILTER CLEARED');
-              }}
-              className="px-4 py-2 bg-[#8B4444]/80 hover:bg-[#8B4444] text-[#B49B7E] rounded font-medium shadow-md transition-all duration-200 border border-[#B49B7E]"
-            >
-              CLEAR
-            </button>
-          </div>
-          
           {/* Action Buttons */}
           <div className="flex gap-3">
             <button 
