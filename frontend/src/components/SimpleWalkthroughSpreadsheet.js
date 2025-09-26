@@ -724,7 +724,7 @@ const SimpleWalkthroughSpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-[#B49B7E]/30 focus:border-[#B49B7E] focus:outline-none"
             >
               <option value="">All Status</option>
               <option value="PICKED">PICKED</option>
