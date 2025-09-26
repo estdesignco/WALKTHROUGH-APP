@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import CompletePageLayout from './CompletePageLayout';
 
 const ComprehensiveQuestionnaire = () => {
   const navigate = useNavigate();
