@@ -984,7 +984,7 @@ const SimpleChecklistSpreadsheet = ({
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => toggleCategoryExpansion(category.id)}
-                            className="text-white hover:text-gray-200"
+                            className="text-[#F5F5DC] hover:text-gray-200"
                           >
                             {isCategoryExpanded ? '▼' : '▶'}
                           </button>
