@@ -32,6 +32,9 @@ from google_sheets_routes import router as google_sheets_router
 # Import Unified Search functionality  
 from unified_search_routes import router as unified_search_router
 
+# Import Real-Time Integration functionality
+from real_time_integration import router as realtime_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
