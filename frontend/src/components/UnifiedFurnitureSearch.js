@@ -819,18 +819,34 @@ const UnifiedFurnitureSearch = () => {
                 {/* Action Buttons */}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => addToChecklist(product)}
-                    className="flex-1 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-3 py-2 text-sm rounded transition-all duration-300"
+                    onClick={() => {
+                      if (selectedProducts.some(p => p.id === product.id)) {
+                        setSelectedProducts(selectedProducts.filter(p => p.id !== product.id));
+                      } else {
+                        setSelectedProducts([...selectedProducts, product]);
+                      }
+                    }}
+                    className={`flex-1 px-3 py-2 text-sm rounded transition-all duration-300 ${
+                      selectedProducts.some(p => p.id === product.id)
+                        ? 'bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800'
+                        : 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355]'
+                    }`}
                     style={{ color: '#F5F5DC' }}
                   >
-                    ✅ Checklist
+                    {selectedProducts.some(p => p.id === product.id) ? '✓ Selected' : '+ Select'}
                   </button>
                   <button
-                    onClick={() => addToCanva(product)}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-3 py-2 text-sm rounded transition-all duration-300"
+                    onClick={() => {
+                      if (product.url) {
+                        window.open(product.url, '_blank');
+                      } else {
+                        alert('Product URL not available');
+                      }
+                    }}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-3 py-2 text-sm rounded transition-all duration-300"
                     style={{ color: '#F5F5DC' }}
                   >
-                    🎨 Canva
+                    🔗 View
                   </button>
                 </div>
               </div>
