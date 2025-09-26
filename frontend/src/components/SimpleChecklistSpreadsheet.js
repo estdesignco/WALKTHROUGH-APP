@@ -870,27 +870,6 @@ const SimpleChecklistSpreadsheet = ({
               <option value="WAITING ON QT">WAITING ON QT</option>
               <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
             </select>
-            
-            {/* Filter and Clear Buttons */}
-            <button 
-              onClick={() => console.log('🔍 CHECKLIST FILTER APPLIED')}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-[#B49B7E] rounded font-medium"
-            >
-              🔍 FILTER
-            </button>
-            <button 
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedRoom('');
-                setSelectedCategory('');
-                setSelectedVendor('');
-                setSelectedStatus('');
-                console.log('🧹 CHECKLIST FILTER CLEARED');
-              }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-[#B49B7E] rounded font-medium"
-            >
-              CLEAR
-            </button>
           </div>
           
           {/* Action Buttons - ADD ROOM AND TRANSFER */}
