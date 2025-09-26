@@ -1108,7 +1108,7 @@ const SimpleChecklistSpreadsheet = ({
                                         </td>
                                   
                                   {/* QTY - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-white text-sm text-center">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm text-center">
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
