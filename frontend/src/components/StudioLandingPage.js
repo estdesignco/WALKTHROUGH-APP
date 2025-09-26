@@ -131,26 +131,68 @@ const UnifiedFurnitureSearch = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [assignments, setAssignments] = useState([]);
   const [houzzAssignments, setHouzzAssignments] = useState([]);
-  const [products] = useState([
-    {
-      id: '1',
-      name: 'Four Hands Modern Chair',
-      vendor: 'Four Hands',
-      vendor_sku: 'FH-CHAIR-001',
-      price: 299.99,
-      category: 'Seating',
-      room_type: 'Living Room'
-    },
-    {
-      id: '2',
-      name: 'Hudson Valley Pendant Light',
-      vendor: 'Hudson Valley Lighting',
-      vendor_sku: 'HVL-LIGHT-001', 
-      price: 459.99,
-      category: 'Lighting',
-      room_type: 'Dining Room'
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+
+  useEffect(() => {
+    loadProducts();
+    loadCredentials();
+  }, []);
+
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${BACKEND_URL}/api/search/products`);
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data.products || []);
+        console.log('✅ Loaded products:', data.products?.length || 0);
+      } else {
+        throw new Error('Failed to load products');
+      }
+    } catch (err) {
+      setError('Failed to load products: ' + err.message);
+      console.error('❌ Product loading error:', err);
+      // Fallback to sample data if API fails
+      setProducts([
+        {
+          id: '1',
+          name: 'Four Hands Modern Chair (Sample)',
+          vendor: 'Four Hands',
+          vendor_sku: 'FH-CHAIR-001',
+          price: 299.99,
+          category: 'Seating',
+          room_type: 'Living Room'
+        },
+        {
+          id: '2',
+          name: 'Hudson Valley Pendant Light (Sample)',
+          vendor: 'Hudson Valley Lighting',
+          vendor_sku: 'HVL-LIGHT-001', 
+          price: 459.99,
+          category: 'Lighting',
+          room_type: 'Dining Room'
+        }
+      ]);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  const loadCredentials = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/search/vendor-credentials`);
+      if (response.ok) {
+        const data = await response.json();
+        setSavedCredentials(data || []);
+      }
+    } catch (err) {
+      console.error('Failed to load credentials:', err);
+    }
+  };
 
   const [savedCredentials] = useState([
     { id: '1', vendor_name: 'Four Hands', username: 'demo_user' },
