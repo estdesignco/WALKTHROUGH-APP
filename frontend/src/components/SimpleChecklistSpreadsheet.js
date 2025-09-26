@@ -911,9 +911,13 @@ const SimpleChecklistSpreadsheet = ({
         </div>
       </div>
 
-      {/* ENHANCED CHECKLIST TABLE WITH MINIMIZE/EXPAND AND FILTERING */}
-      <div className="w-full">
-        {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
+      {/* ENHANCED CHECKLIST TABLE WITH MINIMIZE/EXPAND AND FILTERING - SAME TREATMENT AS GRAPHS */}
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+           style={{
+             background: 'linear-gradient(135deg, rgba(30,41,59,0.95) 0%, rgba(51,65,85,0.9) 30%, rgba(30,41,59,0.95) 100%)'
+           }}>
+        <div className="w-full">
+          {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
           const isRoomExpanded = expandedRooms[room.id];
           
           return (
