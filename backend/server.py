@@ -55,6 +55,9 @@ app.include_router(google_sheets_router)
 # Include Unified Search routes
 app.include_router(unified_search_router)
 
+# Include Real-Time Integration routes
+app.include_router(realtime_router)
+
 # ... [rest of existing server.py code remains the same] ...
 
 # Database connection
