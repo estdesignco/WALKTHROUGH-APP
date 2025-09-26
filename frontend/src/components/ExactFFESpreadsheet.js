@@ -782,7 +782,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedCarrier}
               onChange={(e) => setSelectedCarrier(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#F5F5DC] border border-[#B49B7E]/30 focus:border-[#B49B7E] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
             >
               <option value="">All Carriers</option>
               <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
