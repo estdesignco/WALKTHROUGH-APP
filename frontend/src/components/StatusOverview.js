@@ -239,7 +239,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                       }}
                     />
                   </div>
-                  <span className="text-sm font-medium w-8 text-right" style={{ color: '#F5F5DC' }}>
+                  <span className="text-sm font-medium w-8 text-right text-[#D4A574]">
                     {count}
                   </span>
                 </div>
@@ -308,7 +308,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                         }}
                       />
                     </div>
-                    <span className="text-sm font-medium w-8 text-right" style={{ color: '#F5F5DC' }}>
+                    <span className="text-sm font-medium w-8 text-right text-[#D4A574]">
                       {count}
                     </span>
                   </div>
