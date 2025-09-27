@@ -861,8 +861,8 @@ const ExactWalkthroughSpreadsheet = ({
                                                         subcategory.items?.map((item, itemIndex) => (
                                                         <tr key={item.id} style={{ 
                                                           background: itemIndex % 2 === 0 
-                                                            ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 50%, rgba(15, 23, 42, 0.95) 100%)'
-                                                            : 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.9) 50%, rgba(30, 41, 59, 0.95) 100%)'
+                                                            ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                                            : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
                                                         }}>
                                                           {/* INSTALLED */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm">
