@@ -114,33 +114,43 @@ export default function ProjectPage() {
                                         background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                                     }}>
                                         <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">Preferred Communication</td>
+                                            {Array.isArray(project.contact_preferences) ? project.contact_preferences.join(', ') : project.contact_preferences || 'Not specified'}
+                                        </td>
+                                    </tr>
+                                    <tr style={{ 
+                                        background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                                    }}>
+                                        <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">Previous Designer Experience</td>
                                         <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
-                                {Array.isArray(project.contact_preferences) ? project.contact_preferences.join(', ') : project.contact_preferences || 'Not specified'}
-                            </div>
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Previous Designer Experience</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {project.worked_with_designer_before || 'Not provided'}
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Primary Decision Maker(s)</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {project.primary_decision_maker || 'Not specified'}
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Involvement Level</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {project.involvement_level || 'Not specified'}
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Ideal Sofa Price Point</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {project.ideal_sofa_price || 'Not specified'}
-                            </div>
+                                            {project.worked_with_designer_before || 'Not provided'}
+                                        </td>
+                                    </tr>
+                                    <tr style={{ 
+                                        background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                    }}>
+                                        <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">Primary Decision Maker(s)</td>
+                                        <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
+                                            {project.primary_decision_maker || 'Not specified'}
+                                        </td>
+                                    </tr>
+                                    <tr style={{ 
+                                        background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                                    }}>
+                                        <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">Involvement Level</td>
+                                        <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
+                                            {project.involvement_level || 'Not specified'}
+                                        </td>
+                                    </tr>
+                                    <tr style={{ 
+                                        background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                    }}>
+                                        <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">Ideal Sofa Price Point</td>
+                                        <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
+                                            {project.ideal_sofa_price || 'Not specified'}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
