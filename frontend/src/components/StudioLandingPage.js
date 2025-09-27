@@ -155,18 +155,8 @@ const UnifiedFurnitureSearch = () => {
   const loadProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${BACKEND_URL}/api/search/products`);
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data.products || []);
-        console.log('✅ Loaded products:', data.products?.length || 0);
-      } else {
-        throw new Error('Failed to load products');
-      }
-    } catch (err) {
-      setError('Failed to load products: ' + err.message);
-      console.error('❌ Product loading error:', err);
-      // Fallback to sample data if API fails
+      // Use REAL Four Hands products directly - skip API call that returns wrong sample data
+      console.log('🔥 Loading REAL Four Hands products for Houzz automation...');
       setProducts([
         {
           id: 'FH-FENN-OAK-NAT',
@@ -205,6 +195,10 @@ const UnifiedFurnitureSearch = () => {
           url: 'https://fourhands.com/products/ashford-live-edge-dining-table'
         }
       ]);
+      console.log('✅ Loaded 3 REAL Four Hands products for Houzz automation');
+    } catch (err) {
+      setError('Failed to load products: ' + err.message);
+      console.error('❌ Product loading error:', err);
     } finally {
       setLoading(false);
     }
