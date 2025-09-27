@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Interior Design Project Management System" />
+    <title>ESTABLISHED DESIGN CO. | Interior Design Manager</title>
+    <style>
+        body { 
+            margin: 0; 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .emergency-fallback {
+            display: none;
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        h1 { font-size: 3em; margin-bottom: 20px; }
+        .status { background: rgba(76, 175, 80, 0.2); padding: 15px; border-radius: 10px; margin: 20px; }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="loading">
+            <h1>🏠 ESTABLISHED DESIGN CO.</h1>
+            <p>Loading Interior Design Management System...</p>
+            <div style="margin: 20px 0;">⏳ Please wait...</div>
+        </div>
+    </div>
+    
+    <!-- Fallback content if React fails -->
+    <div id="fallback" class="emergency-fallback">
+        <h1>🏠 ESTABLISHED DESIGN CO.</h1>
+        <div class="status">
+            <h2>✅ Interior Design System Ready!</h2>
+            <p>React app failed to load - using fallback interface</p>
+        </div>
+        
+        <h3>📊 Test Projects Available:</h3>
+        <div style="margin: 20px;">
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; margin: 10px; border-radius: 10px;">
+                <strong>Wilson Kitchen Renovation</strong><br>
+                Client: Sarah Wilson | Type: Renovation
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; margin: 10px; border-radius: 10px;">
+                <strong>Martinez Luxury Loft Design</strong><br>
+                Client: Jennifer Martinez | Type: Design Consultation  
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; margin: 10px; border-radius: 10px;">
+                <strong>Thompson Whole Home Project</strong><br>
+                Client: Michael Thompson | Type: New Construction
+            </div>
+        </div>
+        
+        <button class="btn" onclick="testNewClient()">➕ Test New Client Creation</button>
+        <button class="btn" onclick="testAPI()">🔧 Test Backend API</button>
+        
+        <div id="test-results" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // Show fallback after 10 seconds if React doesn't load
+        setTimeout(() => {
+            const root = document.getElementById('root');
+            const fallback = document.getElementById('fallback');
+            
+            // If React didn't mount properly, show fallback
+            if (root && root.innerHTML.includes('Loading')) {
+                root.style.display = 'none';
+                fallback.style.display = 'block';
+            }
+        }, 10000);
+        
+        function testNewClient() {
+            const clientData = {
+                client_info: {
+                    full_name: 'Emergency Test Client',
+                    email: 'emergency@test.com',
+                    phone: '555-EMERGENCY'
+                },
+                name: 'Emergency Test Project',
+                project_type: 'Renovation'
+            };
+            
+            fetch('/api/projects', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(clientData)
+            })
+            .then(response => response.ok ? response.json() : Promise.reject(response))
+            .then(data => {
+                document.getElementById('test-results').innerHTML = 
+                    '<div style="color: #4CAF50;">✅ NEW CLIENT CREATED SUCCESSFULLY!<br>Project: ' + data.name + '</div>';
+            })
+            .catch(error => {
+                document.getElementById('test-results').innerHTML = 
+                    '<div style="color: #f44336;">❌ New client creation failed: ' + error.message + '</div>';
+            });
+        }
+        
+        function testAPI() {
+            fetch('/api/projects')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('test-results').innerHTML = 
+                    '<div style="color: #4CAF50;">✅ API CONNECTED! Found ' + data.length + ' projects</div>';
+            })
+            .catch(error => {
+                document.getElementById('test-results').innerHTML = 
+                    '<div style="color: #f44336;">❌ API connection failed: ' + error.message + '</div>';
+            });
+        }
+    </script>
+</body>
+</html>

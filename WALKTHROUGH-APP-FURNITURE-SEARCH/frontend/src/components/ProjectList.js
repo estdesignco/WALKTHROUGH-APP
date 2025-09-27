@@ -1,0 +1,171 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { projectAPI } from '../App';
+
+const ProjectList = ({ onSelectProject, isOffline }) => {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  const loadProjects = async () => {
+    try {
+      setLoading(true);
+      const response = await projectAPI.getAll();
+      setProjects(response.data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load projects');
+      console.error('Error loading projects:', err);
+      
+      // Try to load from localStorage for offline mode
+      const cachedProjects = localStorage.getItem('cached_projects');
+      if (cachedProjects) {
+        setProjects(JSON.parse(cachedProjects));
+        setError('Using cached data - some changes may not be saved');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectProject = (project) => {
+    onSelectProject(project);
+    // Cache project for offline use
+    localStorage.setItem('current_project', JSON.stringify(project));
+    // Don't auto-navigate - let user choose sheet type
+  };
+
+  const createSampleProject = async () => {
+    const sampleProject = {
+      name: "Greene Renovation",
+      client_info: {
+        full_name: "Emileigh Greene",
+        email: "emileigh.greene@goldcreekfoods.com",
+        phone: "6782305388",
+        address: "4567 Crooked Creek Road, Gainesville, Georgia, 30506"
+      },
+      project_type: "Renovation",
+      timeline: "NOW",
+      budget: "600k-1M", 
+      style_preferences: ["Transitional", "Traditional"],
+      color_palette: "Neutral with pops of color",
+      special_requirements: "Pet-friendly materials"
+    };
+
+    try {
+      const response = await projectAPI.create(sampleProject);
+      await loadProjects();
+      handleSelectProject(response.data);
+    } catch (err) {
+      setError('Failed to create sample project');
+      console.error('Error creating project:', err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto"></div>
+          <p className="text-gray-400 mt-4">Loading projects...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-4xl font-light text-[#B49B7E] mb-2 tracking-wide">Interior Design Projects</h1>
+          <p style={{ color: '#F5F5DC', opacity: '0.8' }}>Select a project to manage FF&E or create a new one</p>
+        </div>
+        
+        <div className="flex space-x-4">
+          <button
+            onClick={createSampleProject}
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-lg transition-all duration-300 shadow-lg"
+            style={{ color: '#F5F5DC' }}
+          >
+            🏠 Create Sample Project
+          </button>
+          <button className="bg-gradient-to-br from-black/80 to-gray-900/90 hover:from-gray-900/80 hover:to-black/90 px-6 py-3 rounded-lg transition-all duration-300 border border-[#B49B7E]/30" style={{ color: '#F5F5DC' }}>
+            📥 Import from Sheets
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-red-900/20 border border-red-500/30 p-4 rounded-lg mb-6" style={{ color: '#F5F5DC' }}>
+          {error}
+        </div>
+      )}
+
+      {projects.length === 0 ? (
+        <div className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-xl p-12 text-center border border-[#B49B7E]/20 shadow-2xl">
+          <div className="text-6xl mb-4">🏗️</div>
+          <h3 className="text-2xl font-light mb-2" style={{ color: '#F5F5DC' }}>No Projects Yet</h3>
+          <p className="mb-6" style={{ color: '#F5F5DC', opacity: '0.7' }}>Get started by creating your first interior design project</p>
+          <button
+            onClick={createSampleProject}
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-3 rounded-lg transition-all duration-300 shadow-lg"
+            style={{ color: '#F5F5DC' }}
+          >
+            Create Your First Project
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => (
+            <div
+              key={project.id}
+              className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-xl p-6 cursor-pointer hover:border-[#B49B7E]/40 transition-all duration-300 border border-[#B49B7E]/20 shadow-lg"
+              onClick={() => handleSelectProject(project)}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-light text-[#B49B7E]">{project.name}</h3>
+                <span className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] px-3 py-1 rounded-full text-sm" style={{ color: '#F5F5DC' }}>
+                  {project.project_type}
+                </span>
+              </div>
+              
+              <div className="space-y-2">
+                <p style={{ color: '#F5F5DC' }}>
+                  <span className="font-medium text-[#B49B7E]">Client:</span> {project.client_info.full_name}
+                </p>
+                <p style={{ color: '#F5F5DC' }}>
+                  <span className="font-medium text-[#B49B7E]">Timeline:</span> {project.timeline || 'Not specified'}
+                </p>
+                <p style={{ color: '#F5F5DC' }}>
+                  <span className="font-medium text-[#B49B7E]">Budget:</span> {project.budget || 'Not specified'}
+                </p>
+                <p style={{ color: '#F5F5DC' }}>
+                  <span className="font-medium text-[#B49B7E]">Rooms:</span> {project.rooms?.length || 0}
+                </p>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-[#B49B7E]/20">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm" style={{ color: '#F5F5DC', opacity: '0.7' }}>
+                    Created {new Date(project.created_at).toLocaleDateString()}
+                  </span>
+                  <div className="flex space-x-2">
+                    <span className="w-2 h-2 bg-[#B49B7E] rounded-full"></span>
+                    <span className="text-xs text-[#B49B7E]">Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProjectList;

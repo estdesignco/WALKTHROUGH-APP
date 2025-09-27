@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interior Design Manager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { 
+            background: rgba(255,255,255,0.1); 
+            backdrop-filter: blur(10px);
+            border-radius: 15px; 
+            padding: 20px; 
+            margin: 15px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        .btn:hover { background: #45a049; transform: translateY(-2px); }
+        .btn.secondary { background: #2196F3; }
+        .btn.secondary:hover { background: #1976D2; }
+        .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .project-card { 
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .project-card:hover { transform: scale(1.05); }
+        .status { color: #4CAF50; font-weight: bold; }
+        .error { color: #f44336; }
+        #api-status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 ESTABLISHED DESIGN CO.</h1>
+            <p>Interior Design Project Management System</p>
+            <div id="api-status">🔄 Testing API connection...</div>
+        </div>
+
+        <div class="card">
+            <h2>Studio Actions</h2>
+            <button class="btn" onclick="createNewClient()">➕ New Client</button>
+            <button class="btn secondary" onclick="emailClient()">✉️ Email New Client</button>
+            <button class="btn secondary" onclick="fullQuestionnaire()">📋 Full Questionnaire</button>
+        </div>
+
+        <div class="card">
+            <h2>Studio Projects</h2>
+            <div id="projects-container">
+                <div class="projects" id="projects-list">Loading projects...</div>
+            </div>
+        </div>
+
+        <!-- New Client Modal -->
+        <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000;">
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; color:black; padding:30px; border-radius:15px; max-width:500px; width:90%;">
+                <h2>New Client Project</h2>
+                <form id="clientForm" style="margin-top:20px;">
+                    <div style="margin-bottom:15px;">
+                        <label>Client Name:</label><br>
+                        <input type="text" id="clientName" style="width:100%; padding:8px; margin-top:5px; border-radius:5px; border:1px solid #ccc;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label>Project Name:</label><br>
+                        <input type="text" id="projectName" style="width:100%; padding:8px; margin-top:5px; border-radius:5px; border:1px solid #ccc;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label>Email:</label><br>
+                        <input type="email" id="email" style="width:100%; padding:8px; margin-top:5px; border-radius:5px; border:1px solid #ccc;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label>Phone:</label><br>
+                        <input type="tel" id="phone" style="width:100%; padding:8px; margin-top:5px; border-radius:5px; border:1px solid #ccc;">
+                    </div>
+                    <div style="text-align:right; margin-top:20px;">
+                        <button type="button" onclick="closeModal()" style="padding:8px 15px; margin-right:10px; background:#ccc; border:none; border-radius:5px;">Cancel</button>
+                        <button type="submit" style="padding:8px 15px; background:#4CAF50; color:white; border:none; border-radius:5px;">Create Project</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let projects = [];
+
+        // Test API connection and load projects
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/projects');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                projects = await response.json();
+                document.getElementById('api-status').innerHTML = 
+                    '<span class="status">✅ API Connected - ' + projects.length + ' projects loaded</span>';
+                
+                displayProjects();
+            } catch (error) {
+                document.getElementById('api-status').innerHTML = 
+                    '<span class="error">❌ API Connection Failed: ' + error.message + '</span>';
+                
+                // Show demo data if API fails
+                projects = [
+                    { name: 'Demo Project 1', client_info: { full_name: 'John Doe' }},
+                    { name: 'Demo Project 2', client_info: { full_name: 'Jane Smith' }}
+                ];
+                displayProjects();
+            }
+        }
+
+        function displayProjects() {
+            const container = document.getElementById('projects-list');
+            if (projects.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#ccc;">No projects yet. Create your first project!</p>';
+                return;
+            }
+
+            container.innerHTML = projects.map(project => `
+                <div class="project-card" onclick="openProject('${project.id || 'demo'}')">
+                    <h3>${project.name}</h3>
+                    <p>Client: ${project.client_info?.full_name || 'No client info'}</p>
+                    <p style="font-size:12px; color:#ccc;">Click to view project details</p>
+                </div>
+            `).join('');
+        }
+
+        function createNewClient() {
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function emailClient() {
+            alert('Email client functionality - would open email form');
+        }
+
+        function fullQuestionnaire() {
+            window.location.href = '/questionnaire/demo';
+        }
+
+        function openProject(id) {
+            if (id === 'demo') {
+                alert('This is a demo project. In the full app, this would open the project dashboard.');
+            } else {
+                window.location.href = `/project/${id}`;
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('clientForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('projectName').value,
+                client_info: {
+                    full_name: document.getElementById('clientName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                },
+                project_type: 'Renovation',
+                timeline: '3 months',
+                budget: '$50,000'
+            };
+
+            try {
+                const response = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Project created successfully!');
+                    closeModal();
+                    document.getElementById('clientForm').reset();
+                    loadProjects(); // Reload projects
+                } else {
+                    alert('Error creating project. Please try again.');
+                }
+            } catch (error) {
+                alert('Connection error: ' + error.message);
+            }
+        });
+
+        // Load projects on page load
+        loadProjects();
+    </script>
+</body>
+</html>
