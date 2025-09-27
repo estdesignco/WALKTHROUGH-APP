@@ -114,6 +114,7 @@ export default function ProjectPage() {
                                         background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                                     }}>
                                         <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">Preferred Communication</td>
+                                        <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
                                             {Array.isArray(project.contact_preferences) ? project.contact_preferences.join(', ') : project.contact_preferences || 'Not specified'}
                                         </td>
                                     </tr>
