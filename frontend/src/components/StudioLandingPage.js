@@ -781,51 +781,15 @@ const UnifiedFurnitureSearch = () => {
                           const data = await response.json();
                           console.log('🔥 COMPLETE HOUZZ CLIPPER DATA:', data);
                           
-                          if (data.success && data.houzz_clipper_data) {
-                            const clipperData = data.houzz_clipper_data;
-                            
-                            // Show COMPLETE scraped data in a popup for copying to Houzz Pro
-                            const clipperInfo = `🔥 HOUZZ PRO CLIPPER DATA READY!
-
-BASIC INFO:
-• Product Title: ${clipperData.product_title}
-• Unit Cost: ${clipperData.unit_cost}
-• Markup: ${clipperData.markup_percentage}% (Default 125%)
-• Client Price: ${clipperData.client_price}
-• MSRP: ${clipperData.msrp}
-
-DESCRIPTION:
-${clipperData.description_for_vendor}
-
-CLIENT DESCRIPTION:
-${clipperData.client_description}
-
-PRODUCT DETAILS:
-• SKU: ${clipperData.sku}
-• Manufacturer: ${clipperData.manufacturer}
-• Dimensions: ${clipperData.dimensions}
-• Finish/Color: ${clipperData.finish_color}
-• Materials: ${clipperData.materials}
-
-DROPDOWNS:
-• Category: ${clipperData.category}
-• Vendor: ${clipperData.vendor_subcontractor}
-• Project: ${clipperData.project}
-• Room: ${clipperData.room}
-
-IMAGES (5):
-1. ${clipperData.image_1}
-2. ${clipperData.image_2}
-3. ${clipperData.image_3}
-4. ${clipperData.image_4}
-5. ${clipperData.image_5}
-
-Copy this data to Houzz Pro clipper!`;
-                            
-                            // Show ONLY the complete clipper data popup
-                            alert(clipperInfo);
+                          // Check if automation completed successfully
+                          if (data.success) {
+                            if (data.automation_completed) {
+                              setSuccess(`🎉 FULL AUTOMATION SUCCESS! Product "${product.name}" has been automatically added to your Houzz Pro account!`);
+                            } else {
+                              setSuccess(`🔥 Houzz Pro clipper data generated for "${product.name}" - automation attempted!`);
+                            }
                           } else {
-                            alert(`🔥 ${product.name} processed for Houzz Pro clipper!`);
+                            setError(`Failed to process "${product.name}" for Houzz Pro clipper`);
                           }
                         } else {
                           const errorData = await response.json();
