@@ -158,6 +158,10 @@ const App = () => {
               element={<IntegrationHub />}
             />
             <Route 
+              path="/studio-search" 
+              element={<UnifiedFurnitureSearchPage />}
+            />
+            <Route 
               path="/customer-landing" 
               element={<CustomerfacingLandingPage />}
             />
