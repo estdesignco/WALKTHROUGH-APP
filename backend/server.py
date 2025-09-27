@@ -1569,6 +1569,15 @@ async def get_projects():
             room_data["categories"] = [Category(**cat) for cat in categories]
             
         project_data["rooms"] = [Room(**room) for room in rooms]
+        
+        # Clean up project_data for Pydantic validation
+        if project_data.get("project_type") is None:
+            project_data["project_type"] = "Design Consultation"
+        if project_data.get("timeline") is None:
+            project_data["timeline"] = "Not specified"
+        if project_data.get("budget_range") is None:
+            project_data["budget_range"] = "Not specified"
+        
         result.append(Project(**project_data))
     
     return result
