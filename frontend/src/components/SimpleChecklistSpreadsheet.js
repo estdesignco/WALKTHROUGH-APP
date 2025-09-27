@@ -819,7 +819,7 @@ const SimpleChecklistSpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-[#B49B7E] border border-[#B49B7E]/50"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
             >
               <option value="">All Rooms</option>
               {(project?.rooms || []).map(room => (
@@ -830,7 +830,7 @@ const SimpleChecklistSpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-[#B49B7E] border border-[#B49B7E]/50"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
             >
               <option value="">All Categories</option>
               <option value="Lighting">Lighting</option>
@@ -843,7 +843,7 @@ const SimpleChecklistSpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-[#B49B7E] border border-[#B49B7E]/50"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
             >
               <option value="">All Vendors</option>
               {(vendorTypes || []).map(vendor => (
@@ -854,7 +854,7 @@ const SimpleChecklistSpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-[#B49B7E] border border-[#B49B7E]/50"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
             >
               <option value="">All Status</option>
               <option value="PICKED">PICKED</option>
