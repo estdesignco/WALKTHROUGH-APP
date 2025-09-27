@@ -281,7 +281,7 @@ class RealFourHandsProductTester:
             print(f"\n🔍 Testing collection: {url}")
             
             scrape_data = {"url": url}
-            success, response, status_code = self.make_request('POST', '/scrape-product', scrape_data)
+            success, response, status_code = self.make_request('POST', '/search/scrape-products', scrape_data)
             
             if success and response.get('success'):
                 data = response.get('data', {})
