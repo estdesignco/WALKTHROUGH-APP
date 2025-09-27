@@ -128,3 +128,7 @@ frontend/node_modules/.cache/default-development/11.pack_
 *.env
 *.env.*
 google-chrome-stable_current_amd64.deb
+-e 
+# Environment files
+*.env
+*.env.*
