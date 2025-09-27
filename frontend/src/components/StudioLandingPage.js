@@ -781,15 +781,19 @@ const UnifiedFurnitureSearch = () => {
                           const data = await response.json();
                           console.log('🔥 COMPLETE HOUZZ CLIPPER DATA:', data);
                           
-                          // Check if automation completed successfully
+                          // Show what happened based on response
                           if (data.success) {
-                            if (data.automation_completed) {
-                              setSuccess(`🎉 FULL AUTOMATION SUCCESS! Product "${product.name}" has been automatically added to your Houzz Pro account!`);
+                            console.log('✅ Backend response:', data);
+                            
+                            if (data.browser_opened) {
+                              setSuccess(`🚀 BROWSER OPENED! Check for a Chrome window that should have appeared. Automation ${data.automation_completed ? 'SUCCEEDED' : 'ATTEMPTED'} for "${product.name}"`);
+                            } else if (data.automation_completed) {
+                              setSuccess(`🎉 AUTOMATION SUCCESS! Product "${product.name}" added to Houzz Pro!`);
                             } else {
-                              setSuccess(`🔥 Houzz Pro clipper data generated for "${product.name}" - automation attempted!`);
+                              setSuccess(`✅ Backend processed "${product.name}" - ${data.message}`);
                             }
                           } else {
-                            setError(`Failed to process "${product.name}" for Houzz Pro clipper`);
+                            setError(`❌ Failed: ${data.error || 'Unknown error'}`);
                           }
                         } else {
                           const errorData = await response.json();
