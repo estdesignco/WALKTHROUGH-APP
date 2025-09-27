@@ -112,12 +112,12 @@ const StudioLandingPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      {/* Header with Large Logo */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-2 py-2">
-          <h1 className="text-8xl font-bold text-white tracking-wider text-center">
-            ESTABLISHED DESIGN CO.
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
+      {/* Header with ESTABLISHED DESIGN CO. Logo */}
+      <div className="bg-gradient-to-r from-[#B49B7E] to-[#8B6914] border-b border-[#B49B7E]/20">
+        <div className="max-w-7xl mx-auto px-2 py-4">
+          <h1 className="text-6xl font-bold text-black tracking-wider text-center">
+            ESTABLISHEDDESIGN CO.
           </h1>
         </div>
       </div>
@@ -126,7 +126,7 @@ const StudioLandingPage = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Studio Projects Header and Action Buttons */}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-semibold text-yellow-400">Studio Projects</h2>
+          <h2 className="text-2xl font-semibold text-[#B49B7E]">Studio Projects</h2>
           
           <div className="flex space-x-4">
             <button
