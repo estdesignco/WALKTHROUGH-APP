@@ -566,9 +566,9 @@ export default function Questionnaire() {
                         )}
                     </Section>
 
-                    {/* Section 4: New Build (Conditional) */}
-                    {formData.project_type === 'New Build' && (
-                        <Section title="NEW BUILD" description="If you are not currently building a new home, please feel free to skip these questions!">
+                    {/* Section 4: New Construction (Conditional) */}
+                    {formData.project_type === 'New Construction' && (
+                        <Section title="NEW CONSTRUCTION" description="If you are not currently building a new home, please feel free to skip these questions!">
                             <FieldWrapper label="Please list NEW BUILD address">
                                 <Textarea className={inputStyles} value={formData.new_build_address || ''} onChange={(e) => handleFormChange('new_build_address', e.target.value)} />
                             </FieldWrapper>
