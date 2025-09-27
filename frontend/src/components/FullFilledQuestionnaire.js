@@ -242,9 +242,9 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
             </Section>
 
             {isEditing && (
-                <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20" 
+                <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" 
                      style={{
-                       background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+                       background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
                      }}>
                     <div className="flex justify-end">
                         <button
@@ -253,7 +253,7 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
                                 // Here you would save the data to the backend
                                 console.log('Saving questionnaire data:', formData);
                             }}
-                            className="bg-gradient-to-r from-[#8B7355] to-[#6B5B4B] hover:from-[#7A6749] hover:to-[#5A4F40] px-6 py-3 rounded text-[#F5F5DC] font-medium transition-all duration-200 border border-[#A08B6F]/20"
+                            className="bg-gradient-to-r from-[#D4A574] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded text-[#0F172A] font-medium transition-all duration-200 border border-[#D4A574]/30 shadow-lg"
                         >
                             Save All Changes
                         </button>
