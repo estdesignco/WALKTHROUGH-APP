@@ -56,29 +56,71 @@ export const itemAPI = {
 };
 
 const App = () => {
+  const [currentProject, setCurrentProject] = useState(null);
+  const [isOffline, setIsOffline] = useState(false);
+
   return (
     <div className="App min-h-screen bg-gray-900">
       <BrowserRouter>
-        <main className="container mx-auto px-4 py-6">
-          <Routes>
-            <Route 
-              path="/" 
-              element={<StudioLandingPage />}
-            />
-            <Route 
-              path="/studio" 
-              element={<StudioLandingPage />}
-            />
-            <Route 
-              path="/customer" 
-              element={<CustomerLandingPage />}
-            />
-            <Route 
-              path="/customer/questionnaire" 
-              element={<CustomerfacingQuestionnaire />}
-            />
-          </Routes>
-        </main>
+        <Routes>
+          {/* Studio Routes */}
+          <Route 
+            path="/" 
+            element={<ProjectList onSelectProject={setCurrentProject} isOffline={isOffline} />}
+          />
+          <Route 
+            path="/studio" 
+            element={<ProjectList onSelectProject={setCurrentProject} isOffline={isOffline} />}
+          />
+          <Route 
+            path="/projects" 
+            element={<ProjectList onSelectProject={setCurrentProject} isOffline={isOffline} />}
+          />
+          
+          {/* Project Detail Routes */}
+          <Route 
+            path="/project/:projectId" 
+            element={<ProjectDetailPage />}
+          />
+          <Route 
+            path="/project/:projectId/detail" 
+            element={<ProjectDetailPage />}
+          />
+          
+          {/* Workflow Routes */}
+          <Route 
+            path="/project/:projectId/walkthrough" 
+            element={<WalkthroughDashboard isOffline={isOffline} />}
+          />
+          <Route 
+            path="/project/:projectId/checklist" 
+            element={<ChecklistDashboard isOffline={isOffline} />}
+          />
+          <Route 
+            path="/project/:projectId/ffe" 
+            element={<FFEDashboard isOffline={isOffline} />}
+          />
+          
+          {/* Customer Routes */}
+          <Route 
+            path="/customer" 
+            element={<CustomerLandingPage />}
+          />
+          <Route 
+            path="/customer/questionnaire" 
+            element={<CustomerfacingQuestionnaire />}
+          />
+          <Route 
+            path="/questionnaire" 
+            element={<CustomerfacingQuestionnaire />}
+          />
+          
+          {/* Legacy Studio Search (for Houzz integration) */}
+          <Route 
+            path="/studio-search" 
+            element={<StudioLandingPage />}
+          />
+        </Routes>
       </BrowserRouter>
     </div>
   );
