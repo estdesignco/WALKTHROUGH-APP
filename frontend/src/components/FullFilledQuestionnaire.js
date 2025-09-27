@@ -89,26 +89,24 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
 
             {/* Section 1: Client Information */}
             <Section title="CLIENT INFORMATION">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Field label="Full Name" value={project?.client_info?.full_name} />
-                    <Field label="Project Name" value={project?.name} />
-                    <Field label="Email Address" value={project?.client_info?.email} type="email" />
-                    <Field label="Phone Number" value={project?.client_info?.phone} type="tel" />
-                </div>
-                <Field label="Project Address" value={project?.client_info?.address} isTextArea />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Field 
-                        label="Preferred Method of Communication" 
-                        value={project?.contact_preferences} 
-                    />
-                    <Field label="Best Time to Call" value={project?.best_time_to_call} />
-                </div>
+                <Field label="Full Name" value={project?.client_info?.full_name} index={0} />
+                <Field label="Project Name" value={project?.name} index={1} />
+                <Field label="Email Address" value={project?.client_info?.email} type="email" index={2} />
+                <Field label="Phone Number" value={project?.client_info?.phone} type="tel" index={3} />
+                <Field label="Project Address" value={project?.client_info?.address} isTextArea index={4} />
+                <Field 
+                    label="Preferred Method of Communication" 
+                    value={project?.contact_preferences} 
+                    index={5}
+                />
+                <Field label="Best Time to Call" value={project?.best_time_to_call} index={6} />
                 <Field 
                     label="Have you worked with a designer before? If not, what are your hesitations?" 
                     value={project?.worked_with_designer_before} 
                     isTextArea 
+                    index={7}
                 />
-                <Field label="Who will be the primary decision maker(s) for this project?" value={project?.primary_decision_maker} />
+                <Field label="Who will be the primary decision maker(s) for this project?" value={project?.primary_decision_maker} index={8} />
                 <Field 
                     label="How involved would you like to be in the design process?" 
                     value={project?.involvement_level} 
@@ -118,6 +116,7 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
                         "Somewhat involved - I want to approve major decisions", 
                         "Minimally involved - I trust your expertise"
                     ]}
+                    index={9}
                 />
                 <Field 
                     label="What is your ideal sofa price point?" 
