@@ -38,14 +38,20 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
                     value={value || ''}
                     onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
                     readOnly={!isEditing}
-                    className="w-full p-3 bg-gray-900/50 border border-[#D4A574]/50 rounded text-[#D4A574] min-h-[80px] focus:border-[#D4A574] focus:outline-none"
+                    className="w-full p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] min-h-[80px] focus:border-[#D4A574] focus:outline-none"
+                    style={{
+                        background: 'transparent'
+                    }}
                 />
             ) : type === "select" ? (
                 <select
                     value={value || ''}
                     onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
                     disabled={!isEditing}
-                    className="w-full p-3 bg-gray-900/50 border border-[#D4A574]/50 rounded text-[#D4A574] focus:border-[#D4A574] focus:outline-none"
+                    className="w-full p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] focus:border-[#D4A574] focus:outline-none"
+                    style={{
+                        background: 'transparent'
+                    }}
                 >
                     <option value="">Select...</option>
                     {options.map(option => (
@@ -58,7 +64,10 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
                     value={value || ''}
                     onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
                     readOnly={!isEditing}
-                    className="w-full p-3 bg-gray-900/50 border border-[#D4A574]/50 rounded text-[#D4A574] focus:border-[#D4A574] focus:outline-none"
+                    className="w-full p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] focus:border-[#D4A574] focus:outline-none"
+                    style={{
+                        background: 'transparent'
+                    }}
                 />
             )}
         </div>
