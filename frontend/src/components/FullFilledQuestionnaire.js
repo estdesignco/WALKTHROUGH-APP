@@ -16,9 +16,11 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
              }}>
             <h3 className="text-xl font-bold text-[#D4A574] mb-4">{title}</h3>
             {description && <p className="text-[#D4C5A9]/80 mb-4 text-sm">{description}</p>}
-            <div className="space-y-1">
-                {children}
-            </div>
+            <table className="w-full border-collapse border border-[#D4A574]">
+                <tbody>
+                    {children}
+                </tbody>
+            </table>
         </div>
     );
 
