@@ -237,8 +237,8 @@ class RealHouzzIntegration:
     async def initialize_session(self):
         """Initialize browser session for Houzz Pro"""
         chrome_options = Options()
-        # Use headless mode for server environment but still attempt automation
-        chrome_options.add_argument("--headless")
+        # REMOVE HEADLESS - WE WANT VISIBLE BROWSER FOR FULL AUTOMATION!
+        # chrome_options.add_argument("--headless")  # DISABLED FOR FULL AUTOMATION
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-gpu")
