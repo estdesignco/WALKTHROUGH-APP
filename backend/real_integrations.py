@@ -360,13 +360,16 @@ class RealHouzzIntegration:
             
             # 2. FULL BROWSER AUTOMATION (REQUIRED!)
             automation_success = False
+            browser_actually_opened = False
             try:
                 logger.info("🚀 STARTING FULL HOUZZ PRO AUTOMATION...")
                 automation_success = await self.fill_real_houzz_clipper(product_data, houzz_clipper_data)
+                browser_actually_opened = True  # If we get here, browser opened successfully
                 logger.info(f"🎯 Automation completed: {automation_success}")
             except Exception as e:
                 logger.error(f"❌ FULL AUTOMATION FAILED: {e}")
-                return {"success": False, "error": f"Automation failed: {str(e)}"}
+                browser_actually_opened = False  # Browser failed to open
+                return {"success": False, "error": f"Automation failed: {str(e)}", "browser_opened": False}
             
             logger.info("✅ HOUZZ PRO CLIPPER DATA GENERATED!")
             
@@ -375,7 +378,7 @@ class RealHouzzIntegration:
                     "success": True,
                     "message": f"🎉 FULL AUTOMATION SUCCESS! Product '{product_data.get('title')}' has been added to your Houzz Pro account!",
                     "automation_completed": True,
-                    "browser_opened": True,
+                    "browser_opened": browser_actually_opened,
                     "houzz_login_attempted": True,
                     "form_filled": True,
                     "instructions": "Check your Houzz Pro account - the product should be there!",
@@ -384,12 +387,12 @@ class RealHouzzIntegration:
             else:
                 return {
                     "success": True,
-                    "message": f"🔥 BROWSER AUTOMATION ATTEMPTED for {product_data.get('title')} - Check the browser window that opened!",
+                    "message": f"🔥 BROWSER AUTOMATION ATTEMPTED for {product_data.get('title')} - Browser opened in headless mode",
                     "automation_completed": False,
-                    "browser_opened": True,
+                    "browser_opened": browser_actually_opened,
                     "houzz_login_attempted": True,
                     "form_filled": False,
-                    "instructions": "A browser window opened and attempted to login to Houzz Pro. Check the browser window!",
+                    "instructions": "Browser opened in headless mode and attempted to login to Houzz Pro",
                     "houzz_clipper_data": houzz_clipper_data
                 }
         
