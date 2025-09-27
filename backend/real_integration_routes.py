@@ -30,6 +30,9 @@ class TeamsNotificationRequest(BaseModel):
     message: str
     title: Optional[str] = "Interior Design Notification"
 
+class ScrapeProductRequest(BaseModel):
+    url: str
+
 @router.post("/search-products")
 async def search_real_products(
     search_request: SearchRequest,
