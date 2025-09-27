@@ -21,7 +21,7 @@ const App = () => {
             />
             <Route 
               path="/customer" 
-              element={<div style={{minHeight: '100vh', backgroundColor: '#000', color: '#B49B7E', padding: '50px', textAlign: 'center'}}><h1 style={{fontSize: '48px'}}>CUSTOMER LANDING PAGE TEST</h1><p style={{fontSize: '24px', color: '#F5F5DC'}}>This route is working! Customer system can load.</p></div>}
+              element={<CustomerLandingPage />}
             />
             <Route 
               path="/customer/questionnaire" 
