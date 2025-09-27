@@ -227,14 +227,19 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
 
             {/* Section 7: Rooms */}
             <Section title="PROJECT ROOMS" description="Rooms that will be included in your project spreadsheets">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="space-y-1">
                     {project?.rooms?.map((room, index) => (
-                        <div key={room.id || index} className="p-3 bg-stone-700 rounded border border-stone-600">
-                            <h4 className="font-semibold text-[#8B7355]">{room.name}</h4>
-                            {room.description && <p className="text-sm text-stone-400 mt-1">{room.description}</p>}
+                        <div key={room.id || index} className="p-4 rounded border" style={{ 
+                            background: index % 2 === 0 
+                              ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                              : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)',
+                            borderColor: 'rgba(212, 165, 116, 0.3)'
+                        }}>
+                            <h4 className="font-semibold text-[#D4A574]">{room.name}</h4>
+                            {room.description && <p className="text-sm text-[#D4C5A9]/80 mt-1">{room.description}</p>}
                         </div>
                     )) || (
-                        <p className="text-stone-400 col-span-full">No rooms specified</p>
+                        <p className="text-[#D4C5A9]/60 text-center py-4">No rooms specified</p>
                     )}
                 </div>
             </Section>
