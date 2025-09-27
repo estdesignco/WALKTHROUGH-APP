@@ -449,7 +449,7 @@ const ComprehensiveQuestionnaire = () => {
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">What type of project is this?</label>
         <div className="space-y-2">
-          {['New Build', 'Renovation', 'Furniture/Styling Refresh', 'Other'].map(type => (
+          {['Renovation', 'New Construction', 'Design Consultation', 'Furniture Only'].map(type => (
             <label key={type} className="flex items-center">
               <input
                 type="radio"
