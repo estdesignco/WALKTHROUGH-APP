@@ -3623,34 +3623,67 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             parsed = urlparse(url)
                             image_url = f"{parsed.scheme}://{parsed.netloc}{image_url}"
                         
-                        # Score the image quality
+                        # Enhanced image quality scoring
                         score = 0
                         
-                        # Positive scoring
-                        if any(keyword in alt.lower() for keyword in ['product', 'main', 'hero', 'primary']):
-                            score += 10
-                        if any(keyword in image_url.lower() for keyword in ['product', 'main', 'hero', '1920', '1080', 'large']):
-                            score += 5
+                        # Get image dimensions if available
+                        try:
+                            width = await img.get_attribute('width')
+                            height = await img.get_attribute('height')
+                            if width and height:
+                                w, h = int(width), int(height)
+                                if w >= 400 and h >= 400:  # Good resolution
+                                    score += 8
+                                elif w >= 200 and h >= 200:  # Decent resolution
+                                    score += 4
+                        except:
+                            pass
+                        
+                        # Positive scoring - Enhanced
+                        if any(keyword in alt.lower() for keyword in ['product', 'main', 'hero', 'primary', 'detail']):
+                            score += 12
+                        if any(keyword in image_url.lower() for keyword in ['product', 'main', 'hero', 'large', 'detail', '1920', '1080', 'full']):
+                            score += 8
                         if image_url.endswith(('.jpg', '.jpeg', '.png', '.webp')):
-                            score += 3
+                            score += 5
                         
-                        # Negative scoring - Enhanced tracking exclusions
-                        if any(keyword in image_url.lower() for keyword in ['logo', 'icon', 'favicon', 'sprite', 'thumb', 'small', 'bat.bing.com', 'tracking', 'analytics', 'pixel', 'beacon']):
-                            score -= 20
-                        if any(keyword in alt.lower() for keyword in ['logo', 'brand', 'icon']):
-                            score -= 10
+                        # Negative scoring - Enhanced exclusions
+                        exclusion_keywords = [
+                            'logo', 'icon', 'favicon', 'sprite', 'thumb', 'small', 'mini',
+                            'bat.bing.com', 'tracking', 'analytics', 'pixel', 'beacon',
+                            'googletagmanager', 'facebook.com/tr', 'doubleclick',
+                            'amazon-adsystem', 'googlesyndication', 'googleadservices',
+                            '1x1', 'transparent.gif', 'blank.gif'
+                        ]
+                        
+                        if any(keyword in image_url.lower() for keyword in exclusion_keywords):
+                            score -= 25
+                        if any(keyword in alt.lower() for keyword in ['logo', 'brand', 'icon', 'advertisement']):
+                            score -= 15
+                        
+                        # Site-specific optimizations
+                        if 'fourhands.com' in domain:
+                            if any(pattern in image_url.lower() for pattern in ['/products/', '/product/', 'fourhands']):
+                                if not any(skip in image_url.lower() for skip in exclusion_keywords):
+                                    score += 20
+                                    print(f"🎯 FOUR HANDS BOOST: {image_url[:60]}...")
+                        
+                        elif 'wayfair.com' in domain:
+                            if any(pattern in image_url.lower() for pattern in ['piid', 'product', 'media']):
+                                score += 15
+                                
+                        elif 'cb2.com' in domain or 'westelm.com' in domain:
+                            if any(pattern in image_url.lower() for pattern in ['product', 'hero', 'main']):
+                                score += 15
+                        
+                        # Skip obviously bad images
+                        if score < -10:
+                            continue
                             
-                        # FOUR HANDS SPECIFIC: Boost actual product images
-                        if 'fourhands.com' in url.lower():
-                            if any(pattern in image_url.lower() for pattern in ['/products/', '/product/', 'fourhands', '.jpg', '.jpeg', '.png']):
-                                # Skip tracking pixels specifically
-                                if not any(skip in image_url.lower() for skip in ['bat.bing.com', 'tracking', 'analytics', 'googletagmanager', 'facebook.com/tr']):
-                                    score += 15  # High boost for Four Hands product images
-                                    print(f"🎯 FOUR HANDS PRODUCT IMAGE BOOST: {image_url}")
-                        
                         if score > best_score:
                             best_image = image_url
                             best_score = score
+                            print(f"🏆 NEW BEST IMAGE (score: {score}): {image_url[:60]}...")
                             
                 except:
                     continue
