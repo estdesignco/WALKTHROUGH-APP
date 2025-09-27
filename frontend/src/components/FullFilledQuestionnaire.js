@@ -73,16 +73,16 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
             title="COMPREHENSIVE CLIENT QUESTIONNAIRE"
             hideNavigation={false}
         >
-            {/* Header Container */}
-            <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+            {/* Header Container with Luxurious Gradient */}
+            <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60 mb-6" 
                  style={{
-                   background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+                   background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
                  }}>
                 <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-[#F5F5DC]">COMPREHENSIVE CLIENT QUESTIONNAIRE</h2>
+                    <h2 className="text-2xl font-bold text-[#D4A574]">COMPREHENSIVE CLIENT QUESTIONNAIRE</h2>
                     <button
                         onClick={() => setIsEditing(!isEditing)}
-                        className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-4 py-2 rounded text-black font-medium transition-all duration-200 border border-[#B49B7E]/20"
+                        className="bg-gradient-to-r from-[#D4A574] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-4 py-2 rounded text-[#0F172A] font-medium transition-all duration-200 border border-[#D4A574]/30 shadow-lg"
                     >
                         {isEditing ? 'Save Changes' : 'Edit Answers'}
                     </button>
