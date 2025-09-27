@@ -245,6 +245,9 @@ class RealHouzzIntegration:
         chrome_options.add_argument("--window-size=1920x1080")
         chrome_options.add_argument("--disable-web-security")
         chrome_options.add_argument("--disable-features=VizDisplayCompositor")
+        # Add unique user data directory to avoid conflicts
+        chrome_options.add_argument(f"--user-data-dir=/tmp/chrome_user_data_{int(time.time())}")
+        chrome_options.add_argument("--remote-debugging-port=9222")
         
         # Use system chromium-driver instead of downloading
         service = Service('/usr/bin/chromedriver')
