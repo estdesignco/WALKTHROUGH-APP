@@ -141,11 +141,23 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
-              element={<CustomerfacingLandingPage />}
+              element={<MasterDashboard />}
             />
             <Route 
               path="/studio" 
               element={<StudioLandingPage />}
+            />
+            <Route 
+              path="/dashboard" 
+              element={<MasterDashboard />}
+            />
+            <Route 
+              path="/integrations" 
+              element={<IntegrationHub />}
+            />
+            <Route 
+              path="/customer-landing" 
+              element={<CustomerfacingLandingPage />}
             />
             <Route 
               path="/projects" 
