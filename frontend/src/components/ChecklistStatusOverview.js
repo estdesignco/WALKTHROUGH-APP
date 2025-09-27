@@ -138,7 +138,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             {totalItems > 0 ? (
               <Pie data={statusPieData} options={pieOptions} />
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-400">
+              <div className="flex items-center justify-center h-full text-[#D4A574]">
                 No items to display
               </div>
             )}
@@ -150,7 +150,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
           <div className="text-2xl font-bold text-white">
             {totalPicked} Total Items
           </div>
-          <div className="text-sm text-gray-400 mt-1">
+          <div className="text-sm text-[#D4A574] mt-1">
             ({totalItems > 0 ? Math.round((totalPicked / totalItems) * 100) : 0}% Complete)
           </div>
         </div>
@@ -213,7 +213,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
               <Pie data={carrierPieData} options={pieOptions} />
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-400">
+              <div className="flex items-center justify-center h-full text-[#D4A574]">
                 No carrier data
               </div>
             )}
