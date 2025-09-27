@@ -44,7 +44,7 @@ const MainContainer = ({
               <input
                 type="text"
                 placeholder="Search Items..."
-                className="flex-1 bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 focus:bg-black/80 transition-all duration-300 placeholder:text-[#B49B7E]/60"
+                className="flex-1 bg-gray-900/50 border border-[#D4A574]/50 text-[#D4A574] px-4 py-3 rounded-lg focus:outline-none focus:border-[#D4A574] transition-all duration-300 placeholder:text-[#D4A574]/70"
               />
               <select className="bg-black/60 border border-[#B49B7E]/20 text-[#F5F5DC] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4C5A9]/20 focus:border-[#D4C5A9]/20 transition-all duration-300">
                 <option>All Rooms</option>
