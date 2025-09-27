@@ -763,8 +763,10 @@ const UnifiedFurnitureSearch = () => {
                   </button>
                   <button
                     onClick={async () => {
+                      const productId = product.id;
                       try {
-                        setLoading(true);
+                        // Set loading for THIS specific product only
+                        setHouzzLoading(prev => ({ ...prev, [productId]: true }));
                         setError(null);
                         
                         const response = await fetch(`${BACKEND_URL}/api/real-integrations/add-to-houzz-ideabook`, {
@@ -786,15 +788,17 @@ const UnifiedFurnitureSearch = () => {
                           if (data.success) {
                             console.log('✅ Backend response:', data);
                             
+                            const productTitle = product.title || product.name || 'Unknown Product';
+                            
                             if (data.browser_opened) {
-                              setSuccess(`🚀 BROWSER OPENED! Check for a Chrome window that should have appeared. Automation ${data.automation_completed ? 'SUCCEEDED' : 'ATTEMPTED'} for "${product.name}"`);
+                              setSuccess(`🚀 AUTOMATION ATTEMPTED for "${productTitle}"! Browser opened in headless mode and attempted to add to Houzz Pro. Check your Houzz Pro account!`);
                             } else if (data.automation_completed) {
-                              setSuccess(`🎉 AUTOMATION SUCCESS! Product "${product.name}" added to Houzz Pro!`);
+                              setSuccess(`🎉 AUTOMATION SUCCESS! Product "${productTitle}" added to Houzz Pro!`);
                             } else {
-                              setSuccess(`✅ Backend processed "${product.name}" - ${data.message}`);
+                              setSuccess(`✅ Product "${productTitle}" processed - ${data.message}`);
                             }
                           } else {
-                            setError(`❌ Failed: ${data.error || 'Unknown error'}`);
+                            setError(`❌ Failed to process "${product.title || product.name}": ${data.error || 'Unknown error'}`);
                           }
                         } else {
                           const errorData = await response.json();
@@ -803,14 +807,15 @@ const UnifiedFurnitureSearch = () => {
                       } catch (err) {
                         setError(`Houzz clipper error: ${err.message}`);
                       } finally {
-                        setLoading(false);
+                        // Clear loading for THIS specific product only
+                        setHouzzLoading(prev => ({ ...prev, [productId]: false }));
                       }
                     }}
-                    disabled={loading}
+                    disabled={houzzLoading[product.id]}
                     className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 disabled:from-gray-600 disabled:to-gray-700 px-3 py-3 text-sm font-bold rounded transition-all duration-300 transform hover:scale-105 shadow-lg"
                     style={{ color: '#F5F5DC' }}
                   >
-                    {loading ? '⏳ Adding to Houzz...' : '🔥 HOUZZ PRO CLIPPER'}
+                    {houzzLoading[product.id] ? '⏳ Adding to Houzz...' : `🔥 ADD "${product.title || product.name}" TO HOUZZ PRO`}
                   </button>
                 </div>
 
