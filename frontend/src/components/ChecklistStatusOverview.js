@@ -178,7 +178,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: statusData.color }}
                   ></div>
-                  <span className="text-sm text-gray-300">{status}</span>
+                  <span className="text-sm text-[#D4A574]">{status}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="bg-gray-700 rounded-full h-2 w-16">
@@ -208,7 +208,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
-          <h4 className="text-md font-medium text-gray-300 mb-3">Carrier Distribution</h4>
+          <h4 className="text-md font-medium text-[#D4A574] mb-3">Carrier Distribution</h4>
           <div className="h-48">
             {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
               <Pie data={carrierPieData} options={pieOptions} />
@@ -231,7 +231,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: getCarrierColor(carrier) }}
                   ></div>
-                  <span className="text-sm text-gray-300">{carrier}</span>
+                  <span className="text-sm text-[#D4A574]">{carrier}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="bg-gray-700 rounded-full h-2 w-16">
