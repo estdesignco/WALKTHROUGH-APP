@@ -133,6 +133,7 @@ const UnifiedFurnitureSearch = () => {
   const [houzzAssignments, setHouzzAssignments] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [houzzLoading, setHouzzLoading] = useState({});
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [filters, setFilters] = useState({
