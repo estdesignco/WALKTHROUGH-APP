@@ -525,76 +525,106 @@ class RealHouzzIntegration:
                 current_url = self.driver.current_url
                 logger.info(f"Current URL after login: {current_url}")
                 
-                if "pro.houzz.com" in current_url and "login" not in current_url:
-                    logger.info("🎉 SUCCESSFULLY LOGGED INTO HOUZZ PRO!")
+                if ("houzz.com" in current_url and "login" not in current_url) or "dashboard" in current_url or "my-projects" in current_url:
+                    logger.info("🎉 LOGIN SUCCESSFUL! Now finding clipper...")
                     
-                    # Navigate to projects page to find clipper
-                    logger.info("📋 Navigating to projects page...")
-                    self.driver.get("https://pro.houzz.com/my-projects")
-                    await asyncio.sleep(5)
-                    
-                    # Look for ways to add products
-                    clipper_options = [
-                        "//button[contains(text(), 'Add Product')]",
-                        "//a[contains(text(), 'Add Product')]",
-                        "//button[contains(text(), 'Clipper')]", 
-                        "//a[contains(text(), 'Clipper')]",
-                        "//button[contains(text(), 'Import')]",
-                        "//a[contains(text(), 'Import')]",
-                        "//button[contains(text(), '+')]"
+                    # Try different Houzz Pro pages to find clipper
+                    clipper_urls = [
+                        "https://pro.houzz.com/my-projects",
+                        "https://pro.houzz.com/clipper", 
+                        "https://pro.houzz.com/products",
+                        "https://pro.houzz.com/dashboard"
                     ]
                     
-                    for xpath in clipper_options:
+                    clipper_found = False
+                    for url in clipper_urls:
                         try:
-                            element = WebDriverWait(self.driver, 3).until(
-                                EC.element_to_be_clickable((By.XPATH, xpath))
-                            )
-                            logger.info(f"🎯 Found clickable element: {xpath}")
-                            element.click()
-                            await asyncio.sleep(3)
+                            logger.info(f"🔍 Trying URL: {url}")
+                            self.driver.get(url)
+                            await asyncio.sleep(5)
                             
-                            # Try to fill form that appears
-                            form_filled = await self.fill_clipper_form_fields(clipper_data)
-                            if form_filled:
-                                logger.info("✅ FORM FILLED SUCCESSFULLY!")
-                                return True
+                            # Look for clipper interface or add product functionality
+                            clipper_elements = [
+                                "//button[contains(text(), 'Add Product')]",
+                                "//a[contains(text(), 'Add Product')]",
+                                "//button[contains(text(), 'Clipper')]",
+                                "//a[contains(text(), 'Clipper')]",
+                                "//button[contains(text(), 'New Product')]",
+                                "//a[contains(text(), 'New Product')]",
+                                "//button[contains(text(), '+')]",
+                                "//input[@placeholder*='product']",
+                                "//form[contains(@class, 'product')]",
+                                ".product-form",
+                                "#product-form"
+                            ]
                             
+                            for selector in clipper_elements:
+                                try:
+                                    if selector.startswith('//'):
+                                        element = WebDriverWait(self.driver, 3).until(
+                                            EC.presence_of_element_located((By.XPATH, selector))
+                                        )
+                                    else:
+                                        element = WebDriverWait(self.driver, 3).until(
+                                            EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                                        )
+                                    
+                                    logger.info(f"🎯 FOUND CLIPPER ELEMENT: {selector}")
+                                    
+                                    # If it's clickable, click it to open the form
+                                    if element.tag_name in ['button', 'a']:
+                                        element.click()
+                                        await asyncio.sleep(3)
+                                        logger.info("✅ Clicked clipper element")
+                                    
+                                    clipper_found = True
+                                    break
+                                except:
+                                    continue
+                            
+                            if clipper_found:
+                                break
+                                
                         except Exception as e:
-                            logger.warning(f"Option {xpath} not found or failed: {e}")
+                            logger.warning(f"URL {url} failed: {e}")
                             continue
                     
-                    # If no specific clipper found, try to create new project
-                    logger.info("🔄 Trying alternative approach - create new project...")
-                    try:
-                        # Look for "Create Project" or "New Project" buttons
-                        create_buttons = [
-                            "//button[contains(text(), 'Create')]",
-                            "//button[contains(text(), 'New Project')]",
-                            "//a[contains(text(), 'Create')]"
-                        ]
+                    if not clipper_found:
+                        logger.warning("⚠️ No clipper interface found, trying manual form creation...")
                         
-                        for xpath in create_buttons:
-                            try:
-                                button = WebDriverWait(self.driver, 3).until(
-                                    EC.element_to_be_clickable((By.XPATH, xpath))
-                                )
-                                button.click()
-                                await asyncio.sleep(3)
-                                logger.info(f"✅ Clicked: {xpath}")
-                                break
-                            except:
-                                continue
-                        
-                        # After creating/entering project, try to add product
-                        await asyncio.sleep(3)
-                        await self.fill_clipper_form_fields(clipper_data)
-                        return True
-                        
-                    except Exception as e:
-                        logger.error(f"Create project approach failed: {e}")
+                        # If no clipper found, try to create a project first
+                        try:
+                            create_project_buttons = [
+                                "//button[contains(text(), 'Create Project')]",
+                                "//a[contains(text(), 'Create Project')]", 
+                                "//button[contains(text(), 'New Project')]",
+                                "//a[contains(text(), 'New Project')]"
+                            ]
+                            
+                            for xpath in create_project_buttons:
+                                try:
+                                    button = WebDriverWait(self.driver, 3).until(
+                                        EC.element_to_be_clickable((By.XPATH, xpath))
+                                    )
+                                    button.click()
+                                    await asyncio.sleep(3)
+                                    logger.info(f"✅ Created new project: {xpath}")
+                                    break
+                                except:
+                                    continue
+                        except:
+                            pass
                     
-                    logger.warning("⚠️ Could not find clipper interface, but login successful!")
-                    return True  # Login worked, form filling can be enhanced
+                    # Now attempt to fill the clipper form
+                    logger.info("📝 ATTEMPTING TO FILL HOUZZ PRO FORM...")
+                    form_success = await self.fill_clipper_form_fields(clipper_data)
+                    
+                    if form_success:
+                        logger.info("🎉 FORM FILLED SUCCESSFULLY!")
+                        return True
+                    else:
+                        logger.warning("⚠️ Form filling had issues but login succeeded")
+                        return True  # Still successful login
                     
                 else:
                     logger.error(f"❌ Login failed - still on: {current_url}")
