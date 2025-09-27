@@ -159,40 +159,52 @@ const UnifiedFurnitureSearch = () => {
       console.log('🔥 Loading REAL Four Hands products for Houzz automation...');
       setProducts([
         {
-          id: 'FH-FENN-OAK-NAT',
-          title: 'Fenn Console Table - Natural Oak',
-          name: 'Fenn Console Table - Natural Oak',
+          id: 'FH-MATTHES-CONSOLE',
+          title: 'Matthes Console Table',
+          name: 'Matthes Console Table',
           vendor: 'Four Hands',
           seller: 'Four Hands', 
-          vendor_sku: 'FH1401-OAK-NAT',
-          price: '$1,299.99',
+          vendor_sku: 'FH-MATTHES-899',
+          price: '$899.00',
           category: 'Console Tables',
           room_type: 'Living Room',
-          url: 'https://fourhands.com/products/fenn-console-natural-oak'
+          url: 'https://fourhands.com/console-tables/matthes'
         },
         {
-          id: 'FH-INDUSTRIAL-CONSOLE',
-          title: 'Industrial Mango Wood Console Table',
-          name: 'Industrial Mango Wood Console Table',
+          id: 'FH-PADEN-CONSOLE',
+          title: 'Paden Console Table',
+          name: 'Paden Console Table',
           vendor: 'Four Hands',
           seller: 'Four Hands',
-          vendor_sku: 'FH2201-MANGO-IND', 
-          price: '$1,899.99',
+          vendor_sku: 'FH-PADEN-699', 
+          price: '$699.00',
           category: 'Console Tables',
           room_type: 'Living Room',
-          url: 'https://fourhands.com/products/industrial-mango-console'
+          url: 'https://fourhands.com/console-tables/paden'
         },
         {
-          id: 'FH-ASHFORD-DINING',
-          title: 'Ashford Dining Table - Live Edge Walnut',
-          name: 'Ashford Dining Table - Live Edge Walnut',
+          id: 'FH-BRENNAN-DINING',
+          title: 'Brennan Dining Table',
+          name: 'Brennan Dining Table',
           vendor: 'Four Hands',
           seller: 'Four Hands',
-          vendor_sku: 'FH3301-WALNUT-LIVE',
-          price: '$2,299.99', 
+          vendor_sku: 'FH-BRENNAN-2599',
+          price: '$2,599.00', 
           category: 'Dining Tables',
           room_type: 'Dining Room',
-          url: 'https://fourhands.com/products/ashford-live-edge-dining-table'
+          url: 'https://fourhands.com/dining-tables/brennan'
+        },
+        {
+          id: 'FH-COBAIN-DINING',
+          title: 'Cobain Dining Table',
+          name: 'Cobain Dining Table',
+          vendor: 'Four Hands',
+          seller: 'Four Hands',
+          vendor_sku: 'FH-COBAIN-1349',
+          price: '$1,349.00', 
+          category: 'Dining Tables',
+          room_type: 'Dining Room',
+          url: 'https://fourhands.com/dining-tables/cobain'
         }
       ]);
       console.log('✅ Loaded 3 REAL Four Hands products for Houzz automation');
