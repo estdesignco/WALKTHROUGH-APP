@@ -1546,7 +1546,7 @@ async def get_projects():
     
     for project_data in projects:
         # Fetch rooms for each project
-        rooms = await db.rooms.find({"project_id": project_data["id"]}).to_list(1000)
+        rooms = await db.rooms.find({"project_id": str(project_data["_id"])}).to_list(1000)
         project_data["rooms"] = []
         
         for room_data in rooms:
