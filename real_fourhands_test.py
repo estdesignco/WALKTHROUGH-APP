@@ -256,7 +256,7 @@ class RealFourHandsProductTester:
         
         # Test with a simple URL first
         test_data = {"url": "https://fourhands.com"}
-        success, response, status_code = self.make_request('POST', '/search/scrape-products', test_data)
+        success, response, status_code = self.make_request('POST', '/real-integrations/scrape-product', test_data)
         
         if success:
             self.log_test("Scraping Endpoint Basic", True, f"Endpoint responding (Status: {status_code})")
