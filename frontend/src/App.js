@@ -2,6 +2,8 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import StudioLandingPage from "./components/StudioLandingPage";
+import CustomerLandingPage from "./components/CustomerLandingPage";
+import CustomerfacingQuestionnaire from "./components/CustomerfacingQuestionnaire";
 
 const App = () => {
   return (
@@ -16,6 +18,14 @@ const App = () => {
             <Route 
               path="/studio" 
               element={<StudioLandingPage />}
+            />
+            <Route 
+              path="/customer" 
+              element={<CustomerLandingPage />}
+            />
+            <Route 
+              path="/customer/questionnaire" 
+              element={<CustomerfacingQuestionnaire />}
             />
           </Routes>
         </main>
