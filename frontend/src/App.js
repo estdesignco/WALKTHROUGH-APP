@@ -16,6 +16,8 @@ import CustomerfacingLandingPage from './components/CustomerfacingLandingPage';
 import CustomerfacingQuestionnaire from './components/CustomerfacingQuestionnaire';
 import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectDetailPage';
 import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
+import MasterDashboard from './components/MasterDashboard';
+import IntegrationHub from './components/IntegrationHub';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
