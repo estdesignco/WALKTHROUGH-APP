@@ -399,35 +399,127 @@ class RealHouzzIntegration:
             if not self.driver:
                 await self.initialize_session()
             
-            logger.info("🏠 REAL HOUZZ PRO AUTOMATION TEST - Opening Houzz Pro...")
+            logger.info("🚀 FULL HOUZZ PRO AUTOMATION - Opening visible browser...")
             
-            # Go directly to Houzz Pro login page
-            self.driver.get("https://pro.houzz.com/login")
+            # Start with regular Houzz (not pro) to potentially avoid some security
+            self.driver.get("https://www.houzz.com/pro")
             await asyncio.sleep(5)
             
-            # Fill login form
-            logger.info("🔐 Attempting Houzz Pro login...")
+            # Look for "Sign In" or "Log In" link to pro version
             try:
-                # Find and fill email
-                email_field = WebDriverWait(self.driver, 10).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='email'], input[name='email']"))
-                )
-                email_field.clear()
-                email_field.send_keys(self.email)
-                logger.info("✅ Email entered")
+                sign_in_links = [
+                    "//a[contains(text(), 'Sign In')]",
+                    "//a[contains(text(), 'Log In')]", 
+                    "//button[contains(text(), 'Sign In')]",
+                    "//a[contains(@href, 'login')]"
+                ]
                 
-                # Find and fill password  
-                password_field = self.driver.find_element(By.CSS_SELECTOR, "input[type='password'], input[name='password']")
-                password_field.clear()
-                password_field.send_keys(self.password)
-                logger.info("✅ Password entered")
+                for xpath in sign_in_links:
+                    try:
+                        sign_in = WebDriverWait(self.driver, 5).until(
+                            EC.element_to_be_clickable((By.XPATH, xpath))
+                        )
+                        sign_in.click()
+                        await asyncio.sleep(3)
+                        logger.info(f"✅ Clicked sign in: {xpath}")
+                        break
+                    except:
+                        continue
+            except:
+                # If no sign in found, go directly to pro login
+                logger.info("🔄 Going directly to pro.houzz.com/login")
+                self.driver.get("https://pro.houzz.com/login")
+                await asyncio.sleep(5)
+            
+            # Fill login form
+            logger.info("🔐 FILLING LOGIN CREDENTIALS...")
+            try:
+                # Try multiple selectors for email field
+                email_selectors = [
+                    "input[type='email']",
+                    "input[name='email']",
+                    "input[id*='email']",
+                    "input[placeholder*='email']",
+                    "input[autocomplete='email']"
+                ]
                 
-                # Click login button
-                login_button = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Sign In') or contains(text(), 'Log In') or contains(text(), 'Login')]")
-                login_button.click()
-                logger.info("✅ Login button clicked")
+                email_field = None
+                for selector in email_selectors:
+                    try:
+                        email_field = WebDriverWait(self.driver, 5).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                        )
+                        break
+                    except:
+                        continue
                 
-                await asyncio.sleep(8)  # Wait for login redirect
+                if email_field:
+                    email_field.clear()
+                    email_field.send_keys(self.email)
+                    logger.info(f"✅ Email entered: {self.email}")
+                else:
+                    logger.error("❌ Could not find email field")
+                    return False
+                
+                # Try multiple selectors for password field
+                password_selectors = [
+                    "input[type='password']",
+                    "input[name='password']", 
+                    "input[id*='password']",
+                    "input[placeholder*='password']",
+                    "input[autocomplete='current-password']"
+                ]
+                
+                password_field = None
+                for selector in password_selectors:
+                    try:
+                        password_field = self.driver.find_element(By.CSS_SELECTOR, selector)
+                        break
+                    except:
+                        continue
+                
+                if password_field:
+                    password_field.clear()
+                    password_field.send_keys(self.password)
+                    logger.info("✅ Password entered")
+                else:
+                    logger.error("❌ Could not find password field")
+                    return False
+                
+                # Try multiple selectors for login button
+                login_selectors = [
+                    "//button[contains(text(), 'Sign In')]",
+                    "//button[contains(text(), 'Log In')]",
+                    "//button[contains(text(), 'Login')]", 
+                    "//input[@type='submit']",
+                    "//button[@type='submit']",
+                    "button[type='submit']",
+                    ".login-button",
+                    "#login-button"
+                ]
+                
+                login_clicked = False
+                for selector in login_selectors:
+                    try:
+                        if selector.startswith('//'):
+                            login_button = self.driver.find_element(By.XPATH, selector)
+                        else:
+                            login_button = self.driver.find_element(By.CSS_SELECTOR, selector)
+                        
+                        login_button.click()
+                        logger.info(f"✅ Login button clicked: {selector}")
+                        login_clicked = True
+                        break
+                    except:
+                        continue
+                
+                if not login_clicked:
+                    logger.error("❌ Could not find login button")
+                    return False
+                
+                # Wait for login process
+                logger.info("⏳ Waiting for login to complete...")
+                await asyncio.sleep(10)  # Give more time for login
                 
                 # Check if we're logged in
                 current_url = self.driver.current_url
