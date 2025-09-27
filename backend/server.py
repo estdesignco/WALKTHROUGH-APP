@@ -3536,24 +3536,67 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # ===== 3. INTELLIGENT IMAGE EXTRACTION =====
             print("🖼️ EXTRACTING PRODUCT IMAGES...")
             
-            # Advanced image extraction with quality scoring
-            image_strategies = [
-                # High-priority product images
+            # Enhanced image extraction with site-specific strategies
+            image_strategies = []
+            
+            # SITE-SPECIFIC OPTIMIZATIONS
+            if 'fourhands.com' in domain:
+                image_strategies.extend([
+                    '.product-media img:first-child',
+                    '.product-gallery img:first-child',
+                    '.ProductGallery img:first-child',
+                    'img[src*="/products/"]',
+                    '.hero-image img'
+                ])
+            elif 'wayfair.com' in domain:
+                image_strategies.extend([
+                    '[data-testid="product-media"] img:first-child',
+                    '.ProductMediaContainer img:first-child',
+                    '[data-testid="media-gallery"] img:first-child',
+                    '.Media-gallery img:first-child'
+                ])
+            elif 'cb2.com' in domain:
+                image_strategies.extend([
+                    '.product-images img:first-child',
+                    '.carousel-image img:first-child',
+                    '.hero-product-image img'
+                ])
+            elif 'westelm.com' in domain:
+                image_strategies.extend([
+                    '.product-images img:first-child',
+                    '.carousel-image img:first-child',
+                    '.hero-product-image img'
+                ])
+            elif 'restorationhardware.com' in domain or 'rh.com' in domain:
+                image_strategies.extend([
+                    '.product-media img:first-child',
+                    '.product-carousel img:first-child'
+                ])
+            
+            # UNIVERSAL HIGH-PRIORITY STRATEGIES
+            image_strategies.extend([
+                # Structured data
                 'img[itemProp="image"], img[property="og:image"]',
                 
-                # E-commerce specific
-                '.product-image img, .product-gallery img:first-child',
-                '.hero-image img, .main-image img',
+                # Modern e-commerce patterns
                 '[data-testid*="image"] img:first-child',
+                '[data-test*="image"] img:first-child',
+                
+                # Traditional product images
+                '.product-image img:first-child, .product-gallery img:first-child',
+                '.hero-image img, .main-image img, .primary-image img',
                 
                 # Generic product images
-                'img[class*="product"]:not([class*="thumb"])',
-                'img[alt*="product" i], img[title*="product" i]',
-                'img[src*="product"], img[data-src*="product"]',
+                'img[class*="product"]:not([class*="thumb"]):not([class*="small"])',
+                'img[alt*="product" i]:not([alt*="thumbnail" i])',
+                'img[src*="product"]:not([src*="thumb"]):not([src*="small"])',
                 
-                # Fallback to first meaningful image
-                'img[width][height]'
-            ]
+                # Data attributes for lazy loading
+                'img[data-src*="product"], img[data-lazy-src]',
+                
+                # Fallback strategies
+                'img[width][height]:not([width="1"]):not([height="1"])'
+            ])
             
             best_image = None
             best_score = 0
