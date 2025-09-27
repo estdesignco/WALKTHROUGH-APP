@@ -991,11 +991,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "✅ SCRAPING ENDPOINT TESTING COMPLETED: /api/scrape-product tested with all 3 review request URLs"
-    - "✅ CATEGORIES COMPREHENSIVE TESTING COMPLETED: POST /api/categories/comprehensive endpoint verified"
-    - "✅ VENDOR DETECTION FIXED: Added missing mappings for westelm.com, cb2.com, restorationhardware.com"
-    - "✅ PLAYWRIGHT INSTALLATION CONFIRMED: No browser installation issues"
-    - "⚠️ ANTI-BOT PROTECTION EXPECTED: Retail sites blocking scrapers is normal behavior"
+    - "🚨 URGENT: Fix Product Data Display - Show Correct Products Instead of Sample Data"
+    - "🔥 CRITICAL HOUZZ PRO BROWSER AUTOMATION TEST"
   stuck_tasks: []
   test_all: false
   test_priority: "review_request_completed"
