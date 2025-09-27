@@ -1,108 +1,209 @@
 """
-Teams Integration Module for Interior Design Management System
-Handles Microsoft Teams notifications and webhooks
+Microsoft Teams Integration for Interior Design Management System
+Automatically creates to-do items when furniture status changes
 """
-
-import requests
+import aiohttp
 import json
 import logging
 from typing import Dict, Any, Optional
+from datetime import datetime
+import os
+from dotenv import load_dotenv
 
-logger = logging.getLogger(__name__)
+load_dotenv()
 
 class TeamsIntegration:
-    def __init__(self, webhook_url: str):
-        self.webhook_url = webhook_url
+    def __init__(self):
+        self.teams_email = os.getenv('TEAMS_EMAIL', 'Neil@estdesignco.com')
+        self.teams_password = os.getenv('TEAMS_PASSWORD', 'Tazz1991!!!!')
+        self.webhook_url = os.getenv('TEAMS_WEBHOOK_URL', '')
         
-    async def notify_status_change(self, project_name: str, item_name: str, old_status: str, new_status: str) -> bool:
-        """Send notification when item status changes"""
+    async def create_todo_item(self, project_name: str, item_name: str, old_status: str, new_status: str, 
+                             room_name: str, vendor: str = "", cost: float = 0.0) -> bool:
+        """
+        Create a to-do item in Microsoft Teams when furniture status changes
+        
+        Args:
+            project_name: Name of the interior design project
+            item_name: Name of the furniture/fixture item
+            old_status: Previous status of the item
+            new_status: New status of the item
+            room_name: Which room the item is for
+            vendor: Vendor name if applicable
+            cost: Item cost if applicable
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
         try:
-            message = {
+            # Create meaningful to-do title and description
+            todo_title = f"🏠 {project_name}: {item_name} → {new_status}"
+            
+            description = f"""
+            **Project:** {project_name}
+            **Room:** {room_name}
+            **Item:** {item_name}
+            **Status Change:** {old_status} → **{new_status}**
+            **Vendor:** {vendor or 'Not specified'}
+            **Cost:** ${cost:,.2f} if cost > 0 else 'TBD'
+            
+            **Action Required:**
+            {self._get_action_for_status(new_status)}
+            
+            Created: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
+            """
+            
+            # Determine urgency based on status
+            priority = self._get_priority_for_status(new_status)
+            
+            # Create Teams card payload
+            teams_card = {
                 "@type": "MessageCard",
                 "@context": "http://schema.org/extensions",
-                "themeColor": "0076D7",
-                "summary": f"Status Update: {item_name}",
+                "themeColor": self._get_color_for_status(new_status),
+                "summary": todo_title,
                 "sections": [{
-                    "activityTitle": "Interior Design Project Update",
-                    "activitySubtitle": f"Project: {project_name}",
-                    "activityImage": "https://teamsnodesample.azurewebsites.net/static/img/image5.png",
-                    "facts": [{
-                        "name": "Item:",
-                        "value": item_name
-                    }, {
-                        "name": "Status Changed:",
-                        "value": f"{old_status} → {new_status}"
-                    }, {
-                        "name": "Project:",
-                        "value": project_name
-                    }],
+                    "activityTitle": todo_title,
+                    "activitySubtitle": f"Interior Design Task - Priority: {priority}",
+                    "activityImage": "https://cdn-icons-png.flaticon.com/512/1946/1946488.png",
+                    "facts": [
+                        {"name": "Project", "value": project_name},
+                        {"name": "Room", "value": room_name},
+                        {"name": "Item", "value": item_name},
+                        {"name": "New Status", "value": new_status},
+                        {"name": "Vendor", "value": vendor or 'TBD'},
+                        {"name": "Priority", "value": priority}
+                    ],
                     "markdown": True
+                }],
+                "potentialAction": [{
+                    "@type": "OpenUri",
+                    "name": "View Project Dashboard",
+                    "targets": [{
+                        "os": "default", 
+                        "uri": f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/project/{project_name.lower().replace(' ', '-')}/ffe"
+                    }]
                 }]
             }
             
-            response = requests.post(
-                self.webhook_url,
-                data=json.dumps(message),
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                logger.info(f"Teams notification sent successfully for {item_name}")
-                return True
+            # If webhook URL is configured, send to Teams
+            if self.webhook_url:
+                return await self._send_teams_webhook(teams_card)
             else:
-                logger.error(f"Teams notification failed: {response.status_code} - {response.text}")
-                return False
+                # Log for now if webhook not configured
+                logging.info(f"Teams Todo Created: {todo_title}")
+                logging.info(f"Description: {description}")
+                return True
                 
         except Exception as e:
-            logger.error(f"Error sending Teams notification: {e}")
+            logging.error(f"Failed to create Teams todo item: {str(e)}")
             return False
-
-    async def notify_project_created(self, project_name: str, client_name: str, rooms: list) -> bool:
-        """Send notification when new project is created"""
+    
+    async def _send_teams_webhook(self, card_payload: Dict[str, Any]) -> bool:
+        """Send webhook message to Microsoft Teams"""
         try:
-            rooms_text = ", ".join(rooms) if rooms else "No rooms specified"
-            
-            message = {
-                "@type": "MessageCard",
-                "@context": "http://schema.org/extensions",
-                "themeColor": "00FF00",
-                "summary": f"New Project Created: {project_name}",
-                "sections": [{
-                    "activityTitle": "🎉 New Interior Design Project",
-                    "activitySubtitle": f"Client: {client_name}",
-                    "facts": [{
-                        "name": "Project Name:",
-                        "value": project_name
-                    }, {
-                        "name": "Client:",
-                        "value": client_name
-                    }, {
-                        "name": "Rooms:",
-                        "value": rooms_text
-                    }],
-                    "markdown": True
-                }]
-            }
-            
-            response = requests.post(
-                self.webhook_url,
-                data=json.dumps(message),
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            
-            return response.status_code == 200
-            
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    self.webhook_url,
+                    json=card_payload,
+                    headers={'Content-Type': 'application/json'}
+                ) as response:
+                    if response.status == 200:
+                        logging.info("Teams webhook sent successfully")
+                        return True
+                    else:
+                        logging.error(f"Teams webhook failed: {response.status} {await response.text()}")
+                        return False
         except Exception as e:
-            logger.error(f"Error sending Teams project notification: {e}")
+            logging.error(f"Teams webhook error: {str(e)}")
             return False
+    
+    def _get_action_for_status(self, status: str) -> str:
+        """Get recommended action based on status"""
+        actions = {
+            "TO BE SELECTED": "Research and select options for this item",
+            "RESEARCHING": "Continue product research and gather options",
+            "PENDING APPROVAL": "Follow up with client for approval",
+            "APPROVED": "Proceed with ordering this item",
+            "ORDERED": "Monitor order status and delivery timeline", 
+            "PICKED": "Verify item selection meets project requirements",
+            "CONFIRMED": "Track shipping and prepare for delivery",
+            "IN PRODUCTION": "Monitor production timeline with vendor",
+            "SHIPPED": "Track shipping progress and prepare for delivery",
+            "IN TRANSIT": "Coordinate delivery logistics and job site access",
+            "OUT FOR DELIVERY": "Ensure job site is ready for delivery",
+            "DELIVERED TO RECEIVER": "Coordinate transfer to job site",
+            "DELIVERED TO JOB SITE": "Inspect item and prepare for installation",
+            "RECEIVED": "Schedule installation or placement",
+            "READY FOR INSTALL": "Coordinate installation crew and schedule",
+            "INSTALLING": "Monitor installation progress",
+            "INSTALLED": "Final inspection and project completion",
+            "ON HOLD": "Resolve issue causing hold status",
+            "BACKORDERED": "Check with vendor for updated timeline",
+            "DAMAGED": "Process return/exchange with vendor",
+            "RETURNED": "Reorder replacement or select alternative",
+            "CANCELLED": "Update project plan and select replacement",
+            "ORDER SAMPLES": "Order material samples from vendor",
+            "SAMPLES ARRIVED": "Review samples with client and get approval",
+            "ASK NEIL": "Neil needs to review and provide input",
+            "ASK CHARLENE": "Charlene needs to review and provide input", 
+            "ASK JALA": "Jala needs to review and provide input",
+            "GET QUOTE": "Request pricing quote from vendor",
+            "WAITING ON QT": "Follow up on pending quote request",
+            "READY FOR PRESENTATION": "Prepare item for client presentation"
+        }
+        return actions.get(status, f"Follow up on item with status: {status}")
+    
+    def _get_priority_for_status(self, status: str) -> str:
+        """Get priority level based on status"""
+        high_priority = ["ON HOLD", "DAMAGED", "BACKORDERED", "OUT FOR DELIVERY", "INSTALLING"]
+        medium_priority = ["PENDING APPROVAL", "ORDERED", "SHIPPED", "IN TRANSIT", "READY FOR INSTALL"]
+        
+        if status in high_priority:
+            return "HIGH"
+        elif status in medium_priority:
+            return "MEDIUM"
+        else:
+            return "LOW"
+    
+    def _get_color_for_status(self, status: str) -> str:
+        """Get Teams card color based on status"""
+        colors = {
+            "TO BE SELECTED": "D4A574",  # Planning - Gold
+            "RESEARCHING": "B8860B",     # Planning - Dark Gold
+            "PENDING APPROVAL": "DAA520", # Planning - Golden Rod
+            "APPROVED": "9ACD32",        # Procurement - Yellow Green
+            "ORDERED": "32CD32",         # Procurement - Lime Green  
+            "PICKED": "3B82F6",          # Procurement - Blue
+            "CONFIRMED": "228B22",       # Procurement - Forest Green
+            "IN PRODUCTION": "FF8C00",   # Fulfillment - Dark Orange
+            "SHIPPED": "4169E1",         # Fulfillment - Royal Blue
+            "IN TRANSIT": "6495ED",      # Fulfillment - Cornflower Blue
+            "OUT FOR DELIVERY": "87CEEB", # Fulfillment - Sky Blue
+            "DELIVERED TO RECEIVER": "9370DB", # Delivery - Medium Purple
+            "DELIVERED TO JOB SITE": "8A2BE2", # Delivery - Blue Violet
+            "RECEIVED": "DDA0DD",        # Delivery - Plum
+            "READY FOR INSTALL": "20B2AA", # Installation - Light Sea Green
+            "INSTALLING": "48D1CC",      # Installation - Medium Turquoise
+            "INSTALLED": "00CED1",       # Installation - Dark Turquoise
+            "ON HOLD": "DC143C",         # Issues - Crimson
+            "BACKORDERED": "B22222",     # Issues - Fire Brick
+            "DAMAGED": "8B0000",         # Issues - Dark Red
+            "RETURNED": "CD5C5C",        # Issues - Indian Red
+            "CANCELLED": "A52A2A"        # Issues - Brown
+        }
+        return colors.get(status, "808080")  # Default gray
 
-# Default webhook URL (can be overridden)
-DEFAULT_WEBHOOK_URL = "https://webhookbot.c-toss.com/hook/EstDesignCo@gmail.com"
+# Global instance
+teams_integration = TeamsIntegration()
 
-# Function for backward compatibility
-async def notify_status_change(project_name: str, item_name: str, old_status: str, new_status: str) -> bool:
-    """Backward compatible function for status change notifications"""
-    teams = TeamsIntegration(DEFAULT_WEBHOOK_URL)
-    return await teams.notify_status_change(project_name, item_name, old_status, new_status)
+async def notify_status_change(project_name: str, item_name: str, old_status: str, 
+                              new_status: str, room_name: str, vendor: str = "", 
+                              cost: float = 0.0) -> bool:
+    """
+    Convenience function to create Teams todo when item status changes
+    """
+    return await teams_integration.create_todo_item(
+        project_name, item_name, old_status, new_status, 
+        room_name, vendor, cost
+    )

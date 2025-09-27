@@ -1,19 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
-
-// Import components
-import StudioLandingPage from "./components/StudioLandingPage";
-import CustomerLandingPage from "./components/CustomerLandingPage";
-import CustomerfacingQuestionnaire from "./components/CustomerfacingQuestionnaire";
+import FFEDashboard from "./components/FFEDashboard";
 import ProjectList from "./components/ProjectList";
-import ProjectDetailPage from "./components/ProjectDetailPage";
+import Navigation from "./components/Navigation";
+import ScrapingTestPage from "./components/ScrapingTestPage";
+import QuestionnaireSheet from "./components/QuestionnaireSheet";
 import WalkthroughDashboard from "./components/WalkthroughDashboard";
 import ChecklistDashboard from "./components/ChecklistDashboard";
-import FFEDashboard from "./components/FFEDashboard";
+import StudioLandingPage from "./components/StudioLandingPage";
+import ComprehensiveQuestionnaire from "./components/ComprehensiveQuestionnaire";
+import ProjectDetailPage from "./components/ProjectDetailPage";
+import CustomerfacingLandingPage from './components/CustomerfacingLandingPage';
+import CustomerfacingQuestionnaire from './components/CustomerfacingQuestionnaire';
+import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectDetailPage';
+import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 // Create axios instance with default config
@@ -25,7 +29,7 @@ const api = axios.create({
   }
 });
 
-// API functions for other components to use
+// API functions
 export const projectAPI = {
   getAll: () => api.get('/projects'),
   getById: (id) => api.get(`/projects/${id}`),
@@ -55,72 +59,178 @@ export const itemAPI = {
   delete: (id) => api.delete(`/items/${id}`)
 };
 
+export const utilityAPI = {
+  getRoomColors: () => api.get('/room-colors'),
+  getCategoryColors: () => api.get('/category-colors'),
+  getItemStatuses: () => api.get('/item-statuses'),
+  getVendorTypes: () => api.get('/vendor-types'),
+  getCarrierTypes: () => api.get('/carrier-types')
+};
+
 const App = () => {
   const [currentProject, setCurrentProject] = useState(null);
   const [isOffline, setIsOffline] = useState(false);
 
+  useEffect(() => {
+    // Check online/offline status for jobsite work
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    setIsOffline(!navigator.onLine);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Component wrapper to handle project loading for direct FF&E navigation
+  const FFEDashboardWrapper = () => {
+    const location = useLocation();
+    const [projectLoaded, setProjectLoaded] = useState(false);
+
+    useEffect(() => {
+      // Extract projectId from current path
+      const pathMatch = location.pathname.match(/\/project\/([^\/]+)\/ffe/);
+      const projectId = pathMatch ? pathMatch[1] : null;
+
+      if (projectId && !currentProject) {
+        // Load project data for navigation context
+        const loadProject = async () => {
+          try {
+            const response = await projectAPI.getById(projectId);
+            if (response.data) {
+              setCurrentProject(response.data);
+              setProjectLoaded(true);
+            }
+          } catch (error) {
+            console.error('Failed to load project for navigation:', error);
+            setProjectLoaded(true); // Still proceed even if project load fails
+          }
+        };
+        loadProject();
+      } else {
+        setProjectLoaded(true);
+      }
+    }, [location.pathname]);
+
+    // Show loading state while project is being loaded
+    if (!projectLoaded) {
+      return (
+        <div className="text-center text-gray-400 py-8">
+          <p className="text-lg">Loading project...</p>
+        </div>
+      );
+    }
+
+    return <FFEDashboard isOffline={isOffline} />;
+  };
+
   return (
     <div className="App min-h-screen bg-gray-900">
       <BrowserRouter>
-        <Routes>
-          {/* Studio Routes */}
-          <Route 
-            path="/" 
-            element={<ProjectList onSelectProject={setCurrentProject} isOffline={isOffline} />}
-          />
-          <Route 
-            path="/studio" 
-            element={<ProjectList onSelectProject={setCurrentProject} isOffline={isOffline} />}
-          />
-          <Route 
-            path="/projects" 
-            element={<ProjectList onSelectProject={setCurrentProject} isOffline={isOffline} />}
-          />
-          
-          {/* Project Detail Routes */}
-          <Route 
-            path="/project/:projectId" 
-            element={<ProjectDetailPage />}
-          />
-          <Route 
-            path="/project/:projectId/detail" 
-            element={<ProjectDetailPage />}
-          />
-          
-          {/* Workflow Routes */}
-          <Route 
-            path="/project/:projectId/walkthrough" 
-            element={<WalkthroughDashboard isOffline={isOffline} />}
-          />
-          <Route 
-            path="/project/:projectId/checklist" 
-            element={<ChecklistDashboard isOffline={isOffline} />}
-          />
-          <Route 
-            path="/project/:projectId/ffe" 
-            element={<FFEDashboard isOffline={isOffline} />}
-          />
-          
-          {/* Customer Routes */}
-          <Route 
-            path="/customer" 
-            element={<CustomerLandingPage />}
-          />
-          <Route 
-            path="/customer/questionnaire" 
-            element={<CustomerfacingQuestionnaire />}
-          />
-          <Route 
-            path="/questionnaire" 
-            element={<CustomerfacingQuestionnaire />}
-          />
-          
-          {/* Legacy Studio Search (for Houzz integration) */}
-          <Route 
-            path="/studio-search" 
-            element={<StudioLandingPage />}
-          />
-        </Routes>
+        <Navigation 
+          currentProject={currentProject} 
+          isOffline={isOffline}
+        />
+        
+        <main className="container mx-auto px-4 py-6">
+          <Routes>
+            <Route 
+              path="/" 
+              element={<CustomerfacingLandingPage />}
+            />
+            <Route 
+              path="/studio" 
+              element={<StudioLandingPage />}
+            />
+            <Route 
+              path="/projects" 
+              element={
+                <ProjectList 
+                  onSelectProject={setCurrentProject}
+                  isOffline={isOffline}
+                />
+              }
+            />
+            <Route 
+              path="/questionnaire/new" 
+              element={<ComprehensiveQuestionnaire />}
+            />
+            <Route 
+              path="/questionnaire/demo" 
+              element={<ComprehensiveQuestionnaire />}
+            />
+            <Route 
+              path="/questionnaire/:clientEmail" 
+              element={<ComprehensiveQuestionnaire />}
+            />
+            <Route 
+              path="/project/:projectId" 
+              element={<ProjectDetailPage />}
+            />
+            <Route 
+              path="/project/:projectId/questionnaire" 
+              element={<QuestionnaireSheet />}
+            />
+            <Route 
+              path="/project/:projectId/walkthrough" 
+              element={<WalkthroughDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/walkthrough/:projectId" 
+              element={<WalkthroughDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/project/:projectId/checklist" 
+              element={<ChecklistDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/checklist/:projectId" 
+              element={<ChecklistDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/project/:projectId/ffe" 
+              element={<FFEDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/ffe/:projectId" 
+              element={<FFEDashboard isOffline={isOffline} />}
+            />
+            <Route 
+              path="/scraping-test" 
+              element={<ScrapingTestPage />}
+            />
+            <Route 
+              path="/advanced-features" 
+              element={<AdvancedFeaturesDashboard />}
+            />
+            {/* Customer-facing routes */}
+            <Route 
+              path="/customer" 
+              element={<CustomerfacingLandingPage />}
+            />
+            <Route 
+              path="/customer/questionnaire" 
+              element={<CustomerfacingQuestionnaire />}
+            />
+            <Route 
+              path="/customer/project/:projectId" 
+              element={<CustomerfacingProjectDetailPage />}
+            />
+            <Route 
+              path="/questionnaire" 
+              element={<CustomerfacingQuestionnaire />}
+            />
+            <Route 
+              path="/project/:projectId/detail" 
+              element={<CustomerfacingProjectDetailPage />}
+            />
+          </Routes>
+        </main>
       </BrowserRouter>
     </div>
   );
