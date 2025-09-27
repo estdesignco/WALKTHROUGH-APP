@@ -123,6 +123,7 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
                     value={project?.ideal_sofa_price} 
                     type="select"
                     options={["$2,000-$4,000", "$4,000-$8,000", "$8,000-$12,000", "$12,000+"]}
+                    index={10}
                 />
             </Section>
 
