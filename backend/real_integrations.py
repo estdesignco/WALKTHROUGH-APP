@@ -370,21 +370,28 @@ class RealHouzzIntegration:
             
             logger.info("✅ HOUZZ PRO CLIPPER DATA GENERATED!")
             
-            return {
-                "success": True,
-                "message": f"🔥 COMPLETE HOUZZ PRO CLIPPER DATA READY for {product_data.get('title')}",
-                "automation_completed": automation_success,
-                "houzz_clipper_data": houzz_clipper_data,
-                "instructions": "Copy the data above to your Houzz Pro clipper form. All fields are pre-filled!",
-                "details": {
-                    "title_generated": True,
-                    "markup_set_to_125": True,
-                    "images_ready": len(product_images),
-                    "description_generated": True,
-                    "all_dropdowns_ready": True,
-                    "browser_automation": automation_success
+            if automation_success:
+                return {
+                    "success": True,
+                    "message": f"🎉 FULL AUTOMATION SUCCESS! Product '{product_data.get('title')}' has been added to your Houzz Pro account!",
+                    "automation_completed": True,
+                    "browser_opened": True,
+                    "houzz_login_attempted": True,
+                    "form_filled": True,
+                    "instructions": "Check your Houzz Pro account - the product should be there!",
+                    "houzz_clipper_data": houzz_clipper_data
                 }
-            }
+            else:
+                return {
+                    "success": True,
+                    "message": f"🔥 BROWSER AUTOMATION ATTEMPTED for {product_data.get('title')} - Check the browser window that opened!",
+                    "automation_completed": False,
+                    "browser_opened": True,
+                    "houzz_login_attempted": True,
+                    "form_filled": False,
+                    "instructions": "A browser window opened and attempted to login to Houzz Pro. Check the browser window!",
+                    "houzz_clipper_data": houzz_clipper_data
+                }
         
         except Exception as e:
             logger.error(f"Houzz clipper data generation error: {e}")
