@@ -243,7 +243,7 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
                                 // Here you would save the data to the backend
                                 console.log('Saving questionnaire data:', formData);
                             }}
-                            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-6 py-3 rounded text-white font-medium transition-all duration-200 border border-[#B49B7E]/20"
+                            className="bg-gradient-to-r from-[#8B7355] to-[#6B5B4B] hover:from-[#7A6749] hover:to-[#5A4F40] px-6 py-3 rounded text-[#F5F5DC] font-medium transition-all duration-200 border border-[#A08B6F]/20"
                         >
                             Save All Changes
                         </button>
