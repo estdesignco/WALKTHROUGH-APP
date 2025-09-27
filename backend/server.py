@@ -1578,6 +1578,17 @@ async def get_projects():
         if project_data.get("budget_range") is None:
             project_data["budget_range"] = "Not specified"
         
+        # Fix client_info if it exists
+        if "client_info" in project_data and project_data["client_info"]:
+            if project_data["client_info"].get("address") is None:
+                project_data["client_info"]["address"] = "Not specified"
+        elif "client_info" not in project_data or project_data["client_info"] is None:
+            project_data["client_info"] = {
+                "address": "Not specified",
+                "phone": "Not specified",
+                "email": "Not specified"
+            }
+        
         result.append(Project(**project_data))
     
     return result
