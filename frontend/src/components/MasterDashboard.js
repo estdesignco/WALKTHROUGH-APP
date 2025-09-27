@@ -243,74 +243,80 @@ const MasterDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
           
           {/* Client Management */}
-          <QuickActionCard
-            title="New Client"
-            description="Start new project with questionnaire"
-            icon={Plus}
-            onClick={() => window.location.href = '/questionnaire/new'}
-            color="hover:bg-[#374151]"
-          />
+          <div className="bg-[#2D3748] rounded-lg p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#374151]"
+               onClick={() => window.location.href = '/questionnaire/new'}>
+            <div className="flex items-start justify-between mb-4">
+              <Plus className="w-8 h-8 text-[#B49B7E]" />
+            </div>
+            <h3 className="text-lg font-bold text-[#F5F5DC] mb-2">New Client</h3>
+            <p className="text-[#F5F5DC] text-sm opacity-80">Start new project with questionnaire</p>
+          </div>
           
-          <QuickActionCard
-            title="Email Client"
-            description="Send questionnaire via email"
-            icon={Mail}
-            onClick={() => {/* Open email modal */}}
-            color="hover:bg-[#374151]"
-            badge="New"
-          />
+          <div className="bg-[#2D3748] rounded-lg p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#374151]"
+               onClick={() => window.location.href = '/'}>
+            <div className="flex items-start justify-between mb-4">
+              <Mail className="w-8 h-8 text-[#B49B7E]" />
+              <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">New</span>
+            </div>
+            <h3 className="text-lg font-bold text-[#F5F5DC] mb-2">Email Client</h3>
+            <p className="text-[#F5F5DC] text-sm opacity-80">Send questionnaire via email</p>
+          </div>
           
           {/* Project Management */}
-          <QuickActionCard
-            title="View Projects"
-            description="Manage all active projects"
-            icon={FileText}
-            onClick={() => window.location.href = '/projects'}
-            color="hover:bg-[#374151]"
-          />
+          <div className="bg-[#2D3748] rounded-lg p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#374151]"
+               onClick={() => window.location.href = '/'}>
+            <div className="flex items-start justify-between mb-4">
+              <FileText className="w-8 h-8 text-[#B49B7E]" />
+            </div>
+            <h3 className="text-lg font-bold text-[#F5F5DC] mb-2">View Projects</h3>
+            <p className="text-[#F5F5DC] text-sm opacity-80">Manage all active projects</p>
+          </div>
           
-          <QuickActionCard
-            title="Project Analytics"
-            description="View project performance"
-            icon={BarChart3}
-            onClick={() => {/* Open analytics */}}
-            color="hover:bg-[#374151]"
-          />
+          <div className="bg-[#2D3748] rounded-lg p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#374151]">
+            <div className="flex items-start justify-between mb-4">
+              <BarChart3 className="w-8 h-8 text-[#B49B7E]" />
+            </div>
+            <h3 className="text-lg font-bold text-[#F5F5DC] mb-2">Project Analytics</h3>
+            <p className="text-[#F5F5DC] text-sm opacity-80">View project performance</p>
+          </div>
           
           {/* Furniture Search & Houzz Integration */}
-          <QuickActionCard
-            title="Furniture Search"
-            description="Search & add to Houzz Pro"
-            icon={Search}
-            onClick={() => window.location.href = '/studio-search'}
-            color="hover:bg-[#374151]"
-          />
+          <div className="bg-[#2D3748] rounded-lg p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#374151]"
+               onClick={() => window.location.href = '/integrations'}>
+            <div className="flex items-start justify-between mb-4">
+              <Search className="w-8 h-8 text-[#B49B7E]" />
+            </div>
+            <h3 className="text-lg font-bold text-[#F5F5DC] mb-2">Furniture Search</h3>
+            <p className="text-[#F5F5DC] text-sm opacity-80">Search & add to Houzz Pro</p>
+          </div>
           
-          <QuickActionCard
-            title="Houzz Automation"
-            description="Manage Houzz Pro integration"
-            icon={ShoppingCart}
-            onClick={() => {/* Open Houzz dashboard */}}
-            color="hover:bg-[#374151]"
-          />
+          <div className="bg-[#2D3748] rounded-lg p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#374151]"
+               onClick={() => window.location.href = '/integrations'}>
+            <div className="flex items-start justify-between mb-4">
+              <ShoppingCart className="w-8 h-8 text-[#B49B7E]" />
+            </div>
+            <h3 className="text-lg font-bold text-[#F5F5DC] mb-2">Houzz Automation</h3>
+            <p className="text-[#F5F5DC] text-sm opacity-80">Manage Houzz Pro integration</p>
+          </div>
           
           {/* Mobile & Team */}
-          <QuickActionCard
-            title="Mobile Sync"
-            description="Sync with mobile walkthrough app"
-            icon={Smartphone}
-            onClick={() => {/* Open mobile sync */}}
-            color="hover:bg-[#374151]"
-            badge={isOffline ? 'Offline' : ''}
-          />
+          <div className="bg-[#2D3748] rounded-lg p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#374151]">
+            <div className="flex items-start justify-between mb-4">
+              <Smartphone className="w-8 h-8 text-[#B49B7E]" />
+              {isOffline && <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">Offline</span>}
+            </div>
+            <h3 className="text-lg font-bold text-[#F5F5DC] mb-2">Mobile Sync</h3>
+            <p className="text-[#F5F5DC] text-sm opacity-80">Sync with mobile walkthrough app</p>
+          </div>
           
-          <QuickActionCard
-            title="Team Management"
-            description="Teams integration & notifications"
-            icon={Users}
-            onClick={() => {/* Open teams dashboard */}}
-            color="hover:bg-[#374151]"
-          />
+          <div className="bg-[#2D3748] rounded-lg p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#374151]"
+               onClick={() => window.location.href = '/integrations'}>
+            <div className="flex items-start justify-between mb-4">
+              <Users className="w-8 h-8 text-[#B49B7E]" />
+            </div>
+            <h3 className="text-lg font-bold text-[#F5F5DC] mb-2">Team Management</h3>
+            <p className="text-[#F5F5DC] text-sm opacity-80">Teams integration & notifications</p>
+          </div>
         </div>
 
         {/* Recent Projects */}
