@@ -1036,7 +1036,11 @@ const SimpleChecklistSpreadsheet = ({
                               <tbody>
                                 {/* ITEMS UNDER THIS SUBCATEGORY */}
                                 {subcategory.items?.map((item, itemIndex) => (
-                                      <tr key={item.id} className="bg-slate-900">
+                                      <tr key={item.id} className={itemIndex % 2 === 0 ? '' : ''} style={{ 
+                                        background: itemIndex % 2 === 0 
+                                          ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 50%, rgba(15, 23, 42, 0.95) 100%)'
+                                          : 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.9) 50%, rgba(30, 41, 59, 0.95) 100%)'
+                                      }}>
                                         {/* CHECKBOX - AUTO SET TO PICKED */}
                                         <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
                                           <input 
