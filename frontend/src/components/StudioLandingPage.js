@@ -152,6 +152,14 @@ const StudioLandingPage = () => {
               <span>+</span>
               <span>Full Questionnaire</span>
             </button>
+            
+            <button
+              onClick={() => window.location.href = '/dashboard'}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+            >
+              <span>📊</span>
+              <span>Master Dashboard</span>
+            </button>
           </div>
         </div>
 
