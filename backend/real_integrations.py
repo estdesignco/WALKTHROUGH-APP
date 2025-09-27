@@ -1577,19 +1577,27 @@ class RealVendorScraper:
             # Return a simple placeholder base64 image
             return await self.create_placeholder_image(max_size)
     
-    def extract_price_number(self, price_text: str) -> Optional[float]:
-        """Extract numeric price from text"""
+    def extract_price_number(self, price_text) -> Optional[float]:
+        """Extract numeric price from text or number"""
         if not price_text:
             return None
         
-        # Remove common currency symbols and text
-        price_clean = re.sub(r'[^\d.,]', '', price_text)
-        price_clean = price_clean.replace(',', '')
+        # If it's already a number, return it
+        if isinstance(price_text, (int, float)):
+            return float(price_text)
         
-        try:
-            return float(price_clean)
-        except:
-            return None
+        # If it's a string, clean it up
+        if isinstance(price_text, str):
+            # Remove common currency symbols and text
+            price_clean = re.sub(r'[^\d.,]', '', price_text)
+            price_clean = price_clean.replace(',', '')
+            
+            try:
+                return float(price_clean)
+            except:
+                return None
+        
+        return None
     
     async def create_placeholder_image(self, size: tuple = (400, 300)) -> str:
         """Create a simple placeholder image as base64"""
