@@ -246,8 +246,12 @@ class RealHouzzIntegration:
         chrome_options.add_argument("--disable-web-security")
         chrome_options.add_argument("--disable-features=VizDisplayCompositor")
         # Add unique user data directory to avoid conflicts
-        chrome_options.add_argument(f"--user-data-dir=/tmp/chrome_user_data_{int(time.time())}")
-        chrome_options.add_argument("--remote-debugging-port=9222")
+        import uuid
+        unique_id = str(uuid.uuid4())
+        chrome_options.add_argument(f"--user-data-dir=/tmp/chrome_user_data_{unique_id}")
+        chrome_options.add_argument("--remote-debugging-port=0")  # Use random port
+        chrome_options.add_argument("--disable-extensions")
+        chrome_options.add_argument("--disable-plugins")
         
         # Use system chromium-driver instead of downloading
         service = Service('/usr/bin/chromedriver')
