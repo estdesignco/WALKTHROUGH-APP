@@ -718,7 +718,7 @@ const UnifiedFurnitureSearch = () => {
               </div>
 
               {/* Product Info */}
-              <h4 className="text-[#B49B7E] font-bold text-xl mb-2">{product.name}</h4>
+              <h4 className="text-[#B49B7E] font-bold text-xl mb-2">{product.title || product.name}</h4>
               
               <p className="text-lg mb-2" style={{ color: '#F5F5DC' }}>
                 <strong>Vendor:</strong> {product.vendor}
