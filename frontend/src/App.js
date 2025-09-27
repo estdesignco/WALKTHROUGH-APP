@@ -18,6 +18,7 @@ import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectD
 import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
 import MasterDashboard from './components/MasterDashboard';
 import IntegrationHub from './components/IntegrationHub';
+import UnifiedFurnitureSearchPage from './components/UnifiedFurnitureSearchPage';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
