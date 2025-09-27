@@ -21,11 +21,11 @@ const App = () => {
             />
             <Route 
               path="/customer" 
-              element={<TestCustomerPage />}
+              element={<CustomerLandingPage />}
             />
             <Route 
               path="/customer/questionnaire" 
-              element={<TestQuestionnairePage />}
+              element={<CustomerfacingQuestionnaire />}
             />
           </Routes>
         </main>
