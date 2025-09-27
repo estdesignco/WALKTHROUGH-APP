@@ -1365,19 +1365,27 @@ class RealHouzzIntegration:
             logger.error(f"Error getting Houzz projects: {e}")
             return "Default Project - Interior Design"
     
-    def extract_price_number(self, price_text: str) -> Optional[float]:
-        """Extract numeric price from text"""
+    def extract_price_number(self, price_text) -> Optional[float]:
+        """Extract numeric price from text or number"""
         if not price_text:
             return None
         
-        # Remove common currency symbols and text
-        price_clean = re.sub(r'[^\d.,]', '', price_text)
-        price_clean = price_clean.replace(',', '')
+        # If it's already a number, return it
+        if isinstance(price_text, (int, float)):
+            return float(price_text)
         
-        try:
-            return float(price_clean)
-        except:
-            return None
+        # If it's a string, clean it up
+        if isinstance(price_text, str):
+            # Remove common currency symbols and text
+            price_clean = re.sub(r'[^\d.,]', '', price_text)
+            price_clean = price_clean.replace(',', '')
+            
+            try:
+                return float(price_clean)
+            except:
+                return None
+        
+        return None
     
     def cleanup(self):
         """Clean up browser session"""
