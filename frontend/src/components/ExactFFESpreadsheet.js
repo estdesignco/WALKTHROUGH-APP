@@ -692,11 +692,8 @@ const ExactFFESpreadsheet = ({
   return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
       
-      {/* SEARCH AND FILTER SECTION - EXACT SAME TREATMENT AS GRAPH CONTAINERS */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/20 mb-6" 
-           style={{
-             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-           }}>
+      {/* SEARCH AND FILTER SECTION - MATCHING CHECKLIST AND WALKTHROUGH */}
+      <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
         <div className="flex flex-col lg:flex-row gap-4 items-center">
           {/* Search Input */}
           <div className="flex-1">
