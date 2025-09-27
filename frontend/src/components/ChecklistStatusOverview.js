@@ -139,7 +139,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold text-[#F5F5DC] mb-4">Status Overview</h3>
+        <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">Status Overview</h3>
         
         {/* STATUS PIE CHART */}
         <div className="mb-6">
@@ -156,7 +156,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
 
         {/* STATUS SUMMARY */}
         <div className="text-center">
-          <div className="text-2xl font-bold text-[#F5F5DC]">
+          <div className="text-2xl font-bold text-[#D4C5A9]">
             {totalPicked} Total Items
           </div>
           <div className="text-sm text-[#D4A574] mt-1">
@@ -169,7 +169,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold text-[#F5F5DC] mb-4">Status Breakdown</h3>
+        <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
@@ -199,7 +199,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
                       }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-[#F5F5DC] w-8 text-right">
+                  <span className="text-sm font-medium text-[#D4C5A9] w-8 text-right">
                     {count}
                   </span>
                 </div>
@@ -213,7 +213,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold text-[#F5F5DC] mb-4">Shipping Information</h3>
+        <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
@@ -252,7 +252,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
                       }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-[#F5F5DC] w-8 text-right">
+                  <span className="text-sm font-medium text-[#D4C5A9] w-8 text-right">
                     {count}
                   </span>
                 </div>
