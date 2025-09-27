@@ -949,7 +949,7 @@ const ExactFFESpreadsheet = ({
                                                       {/* ACTUAL INSTALLEDS FROM BACKEND DATA */}
                                                       {category.subcategories?.map((subcategory) => (
                                                         subcategory.items?.map((item, itemIndex) => (
-                                                        <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
+                                                        <tr key={item.id} className="bg-slate-900">
                                                           {/* INSTALLED - INSTALLED NAME GOES HERE */}
                                                           <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#F5F5DC]">
                                                             {item.name}
