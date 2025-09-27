@@ -1036,7 +1036,7 @@ const SimpleChecklistSpreadsheet = ({
                               <tbody>
                                 {/* ITEMS UNDER THIS SUBCATEGORY */}
                                 {subcategory.items?.map((item, itemIndex) => (
-                                      <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
+                                      <tr key={item.id} className="bg-slate-900">
                                         {/* CHECKBOX - AUTO SET TO PICKED */}
                                         <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
                                           <input 
