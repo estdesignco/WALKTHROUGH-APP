@@ -1561,7 +1561,7 @@ async def get_projects():
                 
                 for subcategory_data in subcategories:
                     # Fetch items for each subcategory
-                    items = await db.items.find({"subcategory_id": subcategory_data["id"]}).to_list(1000)
+                    items = await db.items.find({"subcategory_id": str(subcategory_data["_id"])}).to_list(1000)
                     subcategory_data["items"] = [Item(**item) for item in items]
                     
                 category_data["subcategories"] = [SubCategory(**subcat) for subcat in subcategories]
