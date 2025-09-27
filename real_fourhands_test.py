@@ -132,7 +132,7 @@ class RealFourHandsProductTester:
             print(f"   URL: {product_info['url']}")
             
             scrape_data = {"url": product_info["url"]}
-            success, response, status_code = self.make_request('POST', '/search/scrape-products', scrape_data)
+            success, response, status_code = self.make_request('POST', '/real-integrations/scrape-product', scrape_data)
             
             if not success:
                 self.log_test(f"Scrape {product_info['name']}", False, 
