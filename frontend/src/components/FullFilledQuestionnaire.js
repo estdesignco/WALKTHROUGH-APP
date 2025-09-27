@@ -28,8 +28,13 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
     );
 
     const Field = ({ label, value, type = "text", isTextArea = false, options = [] }) => (
-        <div>
-            <label className="block text-sm font-medium text-[#B49B7E] mb-2">{label}</label>
+        <div style={{
+            background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+            padding: '1rem',
+            borderRadius: '0.5rem',
+            border: '1px solid rgba(212, 165, 116, 0.2)'
+        }}>
+            <label className="block text-sm font-medium text-[#D4A574] mb-2">{label}</label>
             {isTextArea ? (
                 <textarea
                     value={value || ''}
