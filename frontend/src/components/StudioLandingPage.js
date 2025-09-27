@@ -154,11 +154,11 @@ const StudioLandingPage = () => {
             </button>
             
             <button
-              onClick={() => window.location.href = '/dashboard'}
+              onClick={() => window.location.href = '/integrations'}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
             >
-              <span>📊</span>
-              <span>Master Dashboard</span>
+              <span>🔗</span>
+              <span>All Integrations</span>
             </button>
           </div>
         </div>
