@@ -65,7 +65,16 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false
+        position: 'right',
+        labels: {
+          color: '#D4A574',
+          font: {
+            size: 12
+          },
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 15
+        }
       },
       tooltip: {
         backgroundColor: '#1F2937',
