@@ -73,7 +73,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Project Name</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
                                 {project.name || 'Not provided'}
                             </div>
@@ -89,7 +89,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Phone Number</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
                                 {project.client_info?.phone || 'Not provided'}
                             </div>
@@ -105,7 +105,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Best Time to Call</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
                                 {project.best_time_to_call || 'Not specified'}
                             </div>
@@ -121,7 +121,7 @@ export default function ProjectPage() {
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Previous Designer Experience</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] min-h-[80px]" style={{
-                                background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
                                 {project.worked_with_designer_before || 'Not provided'}
                             </div>
@@ -137,7 +137,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Involvement Level</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
                                 {project.involvement_level || 'Not specified'}
                             </div>
