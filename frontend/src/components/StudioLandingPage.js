@@ -19,12 +19,16 @@ const StudioLandingPage = () => {
   const loadProjects = async () => {
     try {
       setLoading(true);
+      console.log('🔥 LOADING PROJECTS - START');
       const response = await projectAPI.getAll();
-      setProjects(response.data);
+      console.log('🔥 API RESPONSE:', response);
+      console.log('🔥 RESPONSE DATA:', response.data);
+      console.log('🔥 PROJECTS COUNT:', response.data?.length || 0);
+      setProjects(response.data || []);
       setError(null);
     } catch (err) {
-      setError('Failed to load projects');
-      console.error('Error loading projects:', err);
+      setError('Failed to load projects: ' + err.message);
+      console.error('❌ ERROR loading projects:', err);
     } finally {
       setLoading(false);
     }
