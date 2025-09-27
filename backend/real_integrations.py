@@ -237,8 +237,8 @@ class RealHouzzIntegration:
     async def initialize_session(self):
         """Initialize browser session for Houzz Pro"""
         chrome_options = Options()
-        # Remove headless for testing - we want to see what's happening!
-        # chrome_options.add_argument("--headless")  # DISABLED FOR TESTING
+        # Use headless mode for server environment but still attempt automation
+        chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-gpu")
@@ -252,6 +252,9 @@ class RealHouzzIntegration:
         chrome_options.add_argument("--remote-debugging-port=0")  # Use random port
         chrome_options.add_argument("--disable-extensions")
         chrome_options.add_argument("--disable-plugins")
+        chrome_options.add_argument("--disable-background-timer-throttling")
+        chrome_options.add_argument("--disable-backgrounding-occluded-windows")
+        chrome_options.add_argument("--disable-renderer-backgrounding")
         
         # Use system chromium-driver instead of downloading
         service = Service('/usr/bin/chromedriver')
