@@ -246,7 +246,8 @@ class RealHouzzIntegration:
         chrome_options.add_argument("--disable-web-security")
         chrome_options.add_argument("--disable-features=VizDisplayCompositor")
         
-        service = Service(ChromeDriverManager().install())
+        # Use system chromium-driver instead of downloading
+        service = Service('/usr/bin/chromedriver')
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
         # Login to Houzz Pro
