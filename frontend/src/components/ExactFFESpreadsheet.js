@@ -676,7 +676,7 @@ const ExactFFESpreadsheet = ({
           <div className="mt-4">
             <button 
               onClick={handleAddRoom}
-              className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-[#F5F5DC] rounded font-medium"
+              className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-[#D4C5A9] rounded font-medium"
             >
               + ADD FIRST ROOM
             </button>
@@ -800,7 +800,7 @@ const ExactFFESpreadsheet = ({
           <div className="flex gap-3">
             <button 
               onClick={handleAddRoom}
-              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-[#F5F5DC]"
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-[#D4C5A9]"
             >
               ✚ ADD ROOM
             </button>
@@ -809,7 +809,7 @@ const ExactFFESpreadsheet = ({
                 console.log('🚀 FF&E Filter Transfer button clicked');
                 alert('Transfer functionality will be implemented next.');
               }}
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-6 py-2 rounded-full shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-green-500/20 text-[#F5F5DC]"
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-6 py-2 rounded-full shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-green-500/20 text-[#D4C5A9]"
             >
               → TRANSFER FROM CHECKLIST
             </button>
@@ -846,13 +846,13 @@ const ExactFFESpreadsheet = ({
                                 {/* ROOM HEADER ROW - Full width like your screenshots */}
                                 <tr>
                                   <td colSpan="12" 
-                                      className="border border-[#D4A574] px-3 py-2 text-[#F5F5DC] text-sm font-bold"
+                                      className="border border-[#D4A574] px-3 py-2 text-[#D4C5A9] text-sm font-bold"
                                       style={{ backgroundColor: getRoomColor(room.name) }}>
                                     <div className="flex justify-between items-center">
                                       <div className="flex items-center gap-2">
                                         <button
                                           onClick={() => toggleRoomExpansion(room.id)}
-                                          className="text-[#F5F5DC] hover:text-[#D4A574]"
+                                          className="text-[#D4C5A9] hover:text-[#D4A574]"
                                         >
                                           {isRoomExpanded ? '▼' : '▶'}
                                         </button>
@@ -891,12 +891,12 @@ const ExactFFESpreadsheet = ({
                                                   {/* CATEGORY HEADER ROW */}
                                                   <tr>
                                                     <td colSpan="14" 
-                                                        className="border border-[#D4A574] px-4 py-2 text-[#F5F5DC] text-sm font-bold"
+                                                        className="border border-[#D4A574] px-4 py-2 text-[#D4C5A9] text-sm font-bold"
                                                         style={{ backgroundColor: getCategoryColor() }}>
                                                       <div className="flex items-center gap-2">
                                                         <button
                                                           onClick={() => toggleCategoryExpansion(category.id)}
-                                                          className="text-[#F5F5DC] hover:text-[#D4A574]"
+                                                          className="text-[#D4C5A9] hover:text-[#D4A574]"
                                                         >
                                                           {isCategoryExpanded ? '▼' : '▶'}
                                                         </button>
@@ -910,39 +910,39 @@ const ExactFFESpreadsheet = ({
                                                     <React.Fragment>
                                                       {/* RED HEADER GOES AFTER CATEGORY - LAST IN HIERARCHY */}
                                                       <tr>
-                                                        <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-[#F5F5DC] text-center" 
+                                                        <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-[#D4C5A9] text-center" 
                                                             style={{ backgroundColor: '#7F1D1D', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
                                                         </td>
-                                                        <td colSpan="3" className="border border-[#D4A574] px-2 py-1 text-xs font-bold text-[#F5F5DC] text-center" 
+                                                        <td colSpan="3" className="border border-[#D4A574] px-2 py-1 text-xs font-bold text-[#D4C5A9] text-center" 
                                                             style={{ backgroundColor: '#8B4513' }}>
                                                           ADDITIONAL INFO.
                                                         </td>
-                                                        <td colSpan="5" className="border border-[#D4A574] px-2 py-1 text-xs font-bold text-[#F5F5DC] text-center" 
+                                                        <td colSpan="5" className="border border-[#D4A574] px-2 py-1 text-xs font-bold text-[#D4C5A9] text-center" 
                                                             style={{ backgroundColor: '#6B46C1' }}>
                                                           SHIPPING INFO.
                                                         </td>
-                                                        <td colSpan="2" className="border-gray-400 px-2 py-1 text-xs font-bold text-[#F5F5DC] text-center" 
+                                                        <td colSpan="2" className="border-gray-400 px-2 py-1 text-xs font-bold text-[#D4C5A9] text-center" 
                                                             style={{ backgroundColor: '#7F1D1D', borderRight: '1px solid #9CA3AF', borderLeft: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
                                                         </td>
                                                       </tr>
                                                       
                                                       {/* MAIN RED HEADER ROW */}
                                                       <tr>
-                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#7F1D1D' }}>INSTALLED</td>
-                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#7F1D1D' }}>VENDOR/SKU</td>
-                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#7F1D1D' }}>QTY</td>
-                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#7F1D1D' }}>SIZE</td>
-                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#8B4513' }}>FINISH/Color</td>
-                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#8B4513' }}>Cost/Price</td>
-                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#8B4513' }}>Image</td>
-                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#6B46C1' }}>Order Date</td>
-                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#6B46C1' }}>Order Status<br/>Order Number</td>
-                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#6B46C1' }}>Estimated Ship Date<br/>Estimated Delivery Date</td>
-                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#6B46C1' }}>Install Date<br/>Ship To</td>
-                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#6B46C1' }}>Tracking<br/>Carrier</td>
-                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#7F1D1D' }}>NOTES</td>
-                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#7F1D1D' }}>LINK</td>
-                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#7F1D1D' }}>ACTIONS</td>
+                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#7F1D1D' }}>INSTALLED</td>
+                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#7F1D1D' }}>VENDOR/SKU</td>
+                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#7F1D1D' }}>QTY</td>
+                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#7F1D1D' }}>SIZE</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4513' }}>FINISH/Color</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4513' }}>Cost/Price</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4513' }}>Image</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#6B46C1' }}>Order Date</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#6B46C1' }}>Order Status<br/>Order Number</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#6B46C1' }}>Estimated Ship Date<br/>Estimated Delivery Date</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#6B46C1' }}>Install Date<br/>Ship To</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#6B46C1' }}>Tracking<br/>Carrier</td>
+                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#7F1D1D' }}>NOTES</td>
+                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#7F1D1D' }}>LINK</td>
+                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#7F1D1D' }}>ACTIONS</td>
                                                       </tr>
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
@@ -955,13 +955,13 @@ const ExactFFESpreadsheet = ({
                                                             : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
                                                         }}>
                                                           {/* INSTALLED - INSTALLED NAME GOES HERE */}
-                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#F5F5DC]">
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4C5A9]">
                                                             {item.name}
                                                           </td>
                                                           
                                                           {/* VENDOR/SKU - DIRECTLY EDITABLE */}
                                                           <td 
-                                                            className="border border-[#D4A574] px-2 py-2 text-sm text-[#F5F5DC]"
+                                                            className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4C5A9]"
                                                             contentEditable
                                                             suppressContentEditableWarning={true}
                                                             onBlur={(e) => handleItemFieldChange(item.id, 'vendor', e.target.textContent)}
@@ -971,11 +971,11 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* QTY */}
-                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-center text-[#F5F5DC]">
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-center text-[#D4C5A9]">
                                                             <div 
                                                               contentEditable
                                                               suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-[#F5F5DC] text-sm text-center outline-none"
+                                                              className="w-full bg-transparent text-[#D4C5A9] text-sm text-center outline-none"
                                                               onBlur={(e) => handleItemFieldChange(item.id, 'quantity', parseInt(e.target.textContent) || 1)}
                                                             >
                                                               {item.quantity || 1}
@@ -983,11 +983,11 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* SIZE */}
-                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#F5F5DC]">
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4C5A9]">
                                                             <div 
                                                               contentEditable
                                                               suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-[#F5F5DC] text-sm outline-none"
+                                                              className="w-full bg-transparent text-[#D4C5A9] text-sm outline-none"
                                                               onBlur={(e) => handleItemFieldChange(item.id, 'size', e.target.textContent)}
                                                             >
                                                               {item.size || ''}
@@ -995,11 +995,11 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* FINISH/Color */}
-                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#F5F5DC]">
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4C5A9]">
                                                             <div 
                                                               contentEditable
                                                               suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-[#F5F5DC] text-sm outline-none"
+                                                              className="w-full bg-transparent text-[#D4C5A9] text-sm outline-none"
                                                               onBlur={(e) => handleItemFieldChange(item.id, 'finish_color', e.target.textContent)}
                                                             >
                                                               {item.finish_color || ''}
@@ -1008,7 +1008,7 @@ const ExactFFESpreadsheet = ({
                                                           
                                                           {/* Cost/Price - DIRECTLY EDITABLE */}
                                                           <td 
-                                                            className="border border-[#D4A574] px-2 py-2 text-sm text-[#F5F5DC]"
+                                                            className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4C5A9]"
                                                             contentEditable
                                                             suppressContentEditableWarning={true}
                                                             onBlur={(e) => {
@@ -1021,7 +1021,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Image - SCRAPED AUTOMATICALLY */}
-                                                          <td className="border border-[#D4A574] px-2 py-2 text-center text-[#F5F5DC]">
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-center text-[#D4C5A9]">
                                                             {item.image_url ? (
                                                               <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
                                                             ) : (
@@ -1032,11 +1032,11 @@ const ExactFFESpreadsheet = ({
                                                           {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
                                                           
                                                           {/* Order Date (ALONE) */}
-                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#F5F5DC]">
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4C5A9]">
                                                             <input 
                                                               type="date" 
                                                               value={item.order_date || ''}
-                                                              className="w-full bg-transparent border-none text-[#F5F5DC] text-sm"
+                                                              className="w-full bg-transparent border-none text-[#D4C5A9] text-sm"
                                                               onChange={(e) => {
                                                                 handleItemFieldChange(item.id, 'order_date', e.target.value);
                                                               }}
@@ -1055,7 +1055,7 @@ const ExactFFESpreadsheet = ({
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <select 
-                                                                  className="w-full h-full text-[#F5F5DC] text-xs p-0"
+                                                                  className="w-full h-full text-[#D4C5A9] text-xs p-0"
                                                                   value={item.status || ''}
                                                                   style={{ 
                                                                     backgroundColor: getStatusColor(item.status || ''),
@@ -1101,7 +1101,7 @@ const ExactFFESpreadsheet = ({
                                                                   type="text" 
                                                                   value={item.order_number || ''}
                                                                   placeholder="Order #"
-                                                                  className="w-full h-full bg-transparent border-none text-[#F5F5DC] text-xs p-0"
+                                                                  className="w-full h-full bg-transparent border-none text-[#D4C5A9] text-xs p-0"
                                                                   onChange={(e) => {
                                                                     handleItemFieldChange(item.id, 'order_number', e.target.value);
                                                                   }}
@@ -1116,14 +1116,14 @@ const ExactFFESpreadsheet = ({
                                                               <div className="h-6 mb-1">
                                                                 <input 
                                                                   type="date" 
-                                                                  className="w-full h-full bg-transparent border-none text-[#F5F5DC] text-xs p-0"
+                                                                  className="w-full h-full bg-transparent border-none text-[#D4C5A9] text-xs p-0"
                                                                   onChange={(e) => console.log('Estimated ship date changed:', e.target.value)}
                                                                 />
                                                               </div>
                                                               <div className="h-6">
                                                                 <input 
                                                                   type="date" 
-                                                                  className="w-full h-full bg-transparent border-none text-[#F5F5DC] text-xs p-0"
+                                                                  className="w-full h-full bg-transparent border-none text-[#D4C5A9] text-xs p-0"
                                                                   onChange={(e) => console.log('Estimated delivery date changed:', e.target.value)}
                                                                 />
                                                               </div>
@@ -1136,13 +1136,13 @@ const ExactFFESpreadsheet = ({
                                                               <div className="h-6 mb-1">
                                                                 <input 
                                                                   type="date" 
-                                                                  className="w-full h-full bg-transparent border-none text-[#F5F5DC] text-xs p-0"
+                                                                  className="w-full h-full bg-transparent border-none text-[#D4C5A9] text-xs p-0"
                                                                   onChange={(e) => console.log('Install date changed:', e.target.value)}
                                                                 />
                                                               </div>
                                                               <div className="h-6">
                                                                 <select 
-                                                                  className="w-full h-full bg-transparent border-none text-[#F5F5DC] text-xs p-0"
+                                                                  className="w-full h-full bg-transparent border-none text-[#D4C5A9] text-xs p-0"
                                                                   onChange={(e) => console.log('Ship to changed:', e.target.value)}
                                                                 >
                                                                   <option value="">Ship To...</option>
@@ -1173,7 +1173,7 @@ const ExactFFESpreadsheet = ({
                                                                 <input 
                                                                   type="text" 
                                                                   placeholder="Live Tracking #"
-                                                                  className="w-full h-full text-[#F5F5DC] text-xs p-0"
+                                                                  className="w-full h-full text-[#D4C5A9] text-xs p-0"
                                                                   style={{ 
                                                                     backgroundColor: getCarrierColor(item.carrier || ''),
                                                                     background: getCarrierColor(item.carrier || ''),
@@ -1187,7 +1187,7 @@ const ExactFFESpreadsheet = ({
                                                               </div>
                                                               <div className="h-6">
                                                                 <select 
-                                                                  className="w-full h-full text-[#F5F5DC] text-xs p-0"
+                                                                  className="w-full h-full text-[#D4C5A9] text-xs p-0"
                                                                   value={item.carrier || ''}
                                                                   style={{ 
                                                                     backgroundColor: getCarrierColor(item.carrier || ''),
@@ -1227,17 +1227,17 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* NOTES */}
-                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#F5F5DC]">
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4C5A9]">
                                                             <input 
                                                               type="text" 
                                                               placeholder="Notes"
-                                                              className="w-full bg-transparent border-none text-[#F5F5DC] text-sm"
+                                                              className="w-full bg-transparent border-none text-[#D4C5A9] text-sm"
                                                               onChange={(e) => console.log('Notes changed:', e.target.value)}
                                                             />
                                                           </td>
                                                           
                                                           {/* LINK */}
-                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#F5F5DC]">
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4C5A9]">
                                                             {item.link ? (
                                                               <a 
                                                                 href={item.link} 
@@ -1257,7 +1257,7 @@ const ExactFFESpreadsheet = ({
                                                           <td className="border border-[#D4A574] px-2 py-2 text-center">
                                                             <button 
                                                               onClick={() => handleDeleteItem(item.id)}
-                                                              className="bg-red-600 hover:bg-red-500 text-[#F5F5DC] text-xs px-2 py-1 rounded"
+                                                              className="bg-red-600 hover:bg-red-500 text-[#D4C5A9] text-xs px-2 py-1 rounded"
                                                               title="Delete Item"
                                                             >
                                                               🗑️
@@ -1282,7 +1282,7 @@ const ExactFFESpreadsheet = ({
                                                                   alert('This category has no subcategories. Please contact support.');
                                                                 }
                                                               }}
-                                                              className="bg-amber-700 hover:bg-amber-600 text-[#F5F5DC] px-3 py-1 rounded text-sm font-medium"
+                                                              className="bg-amber-700 hover:bg-amber-600 text-[#D4C5A9] px-3 py-1 rounded text-sm font-medium"
                                                             >
                                                               ✚ Add Item
                                                             </button>
@@ -1292,7 +1292,7 @@ const ExactFFESpreadsheet = ({
                                                             {/* Delete Section Button - RED COLOR */}
                                                             <button
                                                               onClick={() => handleDeleteRoom(room.id)}
-                                                              className="bg-red-700 hover:bg-red-600 text-[#F5F5DC] px-3 py-1 rounded text-sm font-medium"
+                                                              className="bg-red-700 hover:bg-red-600 text-[#D4C5A9] px-3 py-1 rounded text-sm font-medium"
                                                             >
                                                               🗑️ Delete Section
                                                             </button>
@@ -1336,7 +1336,7 @@ const ExactFFESpreadsheet = ({
                 alert('Please add a room first before adding categories.');
               }
             }}
-            className="text-[#F5F5DC] px-4 py-2 rounded font-medium border border-[#D4A574]/20" 
+            className="text-[#D4C5A9] px-4 py-2 rounded font-medium border border-[#D4A574]/20" 
             style={{ backgroundColor: '#8b7355' }}
           >
             <option value="">+ ADD CATEGORY ▼</option>
@@ -1368,7 +1368,7 @@ const ExactFFESpreadsheet = ({
               console.log('🚀 FF&E Transfer button clicked');
               alert('Transfer functionality will be implemented next.');
             }}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-6 py-2 rounded-full shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-green-500/20 text-[#F5F5DC]"
+            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-6 py-2 rounded-full shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-green-500/20 text-[#D4C5A9]"
           >
             → TRANSFER TO CHECKLIST
           </button>
@@ -1387,7 +1387,7 @@ const ExactFFESpreadsheet = ({
                 alert('Please add a category first before adding items.');
               }
             }}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 px-6 py-2 rounded-full shadow-xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-blue-500/20 text-[#F5F5DC]"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 px-6 py-2 rounded-full shadow-xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-blue-500/20 text-[#D4C5A9]"
           >
             + ADD ITEM
           </button>
@@ -1416,7 +1416,7 @@ const ExactFFESpreadsheet = ({
                 alert('Please add a room first before adding categories.');
               }
             }}
-            className="text-[#F5F5DC] px-6 py-3 rounded font-bold border border-[#D4A574]/20 text-lg" 
+            className="text-[#D4C5A9] px-6 py-3 rounded font-bold border border-[#D4A574]/20 text-lg" 
             style={{ backgroundColor: '#8b7355' }}
           >
             <option value="">+ ADD CATEGORY ▼</option>
