@@ -14,14 +14,9 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
              style={{
                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
              }}>
-            <h3 className="text-xl font-bold text-[#D4A574] mb-2">{title}</h3>
+            <h3 className="text-xl font-bold text-[#D4A574] mb-4">{title}</h3>
             {description && <p className="text-[#D4C5A9]/80 mb-4 text-sm">{description}</p>}
-            <div className="space-y-4" style={{
-                background: 'linear-gradient(135deg, rgba(15,15,25,0.95) 0%, rgba(45,45,55,0.9) 30%, rgba(25,25,35,0.95) 70%, rgba(15,15,25,0.95) 100%)',
-                padding: '1rem',
-                borderRadius: '0.75rem',
-                border: '1px solid rgba(212, 165, 116, 0.3)'
-            }}>
+            <div className="space-y-1">
                 {children}
             </div>
         </div>
