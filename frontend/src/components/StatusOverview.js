@@ -227,7 +227,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: getStatusColor(status) }}
                   ></div>
-                  <span className="text-sm text-[#F5F5DC]">{status}</span>
+                  <span className="text-sm text-[#D4C5A9]">{status}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="bg-black/40 rounded-full h-2 w-16">
@@ -296,7 +296,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                       className="w-3 h-3 rounded-full" 
                       style={{ backgroundColor: getCarrierColor(carrier) }}
                     ></div>
-                    <span className="text-sm text-[#F5F5DC]">{carrier}</span>
+                    <span className="text-sm text-[#D4C5A9]">{carrier}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="bg-black/40 rounded-full h-2 w-16">
@@ -323,7 +323,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           <div className="grid grid-cols-2 gap-3">
             {/* Total Items */}
             <div className="bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-[#F5F5DC]">{totalItems}</div>
+              <div className="text-2xl font-bold text-[#D4C5A9]">{totalItems}</div>
               <div className="text-sm text-[#D4A574]">Total Items</div>
             </div>
             
