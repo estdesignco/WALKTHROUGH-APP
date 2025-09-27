@@ -1535,7 +1535,8 @@ class RealVendorScraper:
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--disable-gpu")
             
-            service = Service(ChromeDriverManager().install())
+            # Use system chromium-driver instead of downloading
+            service = Service('/usr/bin/chromedriver')
             driver = webdriver.Chrome(service=service, options=chrome_options)
             
             try:
