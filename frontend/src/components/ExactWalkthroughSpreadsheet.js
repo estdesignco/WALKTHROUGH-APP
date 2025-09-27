@@ -738,7 +738,7 @@ const ExactWalkthroughSpreadsheet = ({
                 console.log('🔍 FILTER APPLIED - Search:', searchTerm, 'Room:', selectedRoom, 'Category:', selectedCategory, 'Vendor:', selectedVendor, 'Status:', selectedStatus, 'Carrier:', selectedCarrier);
                 // Filters are applied automatically via useEffect
               }}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-[#F5F5DC] rounded font-medium"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-[#D4C5A9] rounded font-medium"
             >
               🔍 FILTER
             </button>
@@ -752,7 +752,7 @@ const ExactWalkthroughSpreadsheet = ({
                 setSelectedCarrier('');
                 console.log('🧹 FILTER CLEARED');
               }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-[#F5F5DC] rounded font-medium"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-[#D4C5A9] rounded font-medium"
             >
               CLEAR
             </button>
@@ -785,13 +785,13 @@ const ExactWalkthroughSpreadsheet = ({
                                 {/* ROOM HEADER ROW - Full width like your screenshots */}
                                 <tr>
                                   <td colSpan="12" 
-                                      className="border border-gray-400 px-3 py-2 text-[#F5F5DC] text-sm font-bold"
+                                      className="border border-gray-400 px-3 py-2 text-[#D4C5A9] text-sm font-bold"
                                       style={{ backgroundColor: getRoomColor(room.name) }}>
                                     <div className="flex justify-between items-center">
                                       <div className="flex items-center gap-2">
                                         <button
                                           onClick={() => toggleRoomExpansion(room.id)}
-                                          className="text-[#F5F5DC] hover:text-[#D4A574]"
+                                          className="text-[#D4C5A9] hover:text-[#D4A574]"
                                         >
                                           {isRoomExpanded ? '▼' : '▶'}
                                         </button>
@@ -830,12 +830,12 @@ const ExactWalkthroughSpreadsheet = ({
                                                   {/* CATEGORY HEADER ROW */}
                                                   <tr>
                                                     <td colSpan="14" 
-                                                        className="border border-gray-400 px-4 py-2 text-[#F5F5DC] text-sm font-bold"
+                                                        className="border border-gray-400 px-4 py-2 text-[#D4C5A9] text-sm font-bold"
                                                         style={{ backgroundColor: getCategoryColor() }}>
                                                       <div className="flex items-center gap-2">
                                                         <button
                                                           onClick={() => toggleCategoryExpansion(category.id)}
-                                                          className="text-[#F5F5DC] hover:text-[#D4A574]"
+                                                          className="text-[#D4C5A9] hover:text-[#D4A574]"
                                                         >
                                                           {isCategoryExpanded ? '▼' : '▶'}
                                                         </button>
@@ -849,10 +849,10 @@ const ExactWalkthroughSpreadsheet = ({
                                                     <React.Fragment>
                                                       {/* RED HEADER GOES AFTER CATEGORY - LAST IN HIERARCHY */}
                                                       <tr>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#8B4444' }}>QTY</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#F5F5DC]" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4444' }}>QTY</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
                                                       </tr>
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
@@ -865,22 +865,22 @@ const ExactWalkthroughSpreadsheet = ({
                                                             : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
                                                         }}>
                                                           {/* INSTALLED */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-[#F5F5DC] text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
                                                             {item.name}
                                                           </td>
                                                           
                                                           {/* VENDOR/SKU */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-[#F5F5DC] text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
                                                             {item.vendor || ''}
                                                           </td>
                                                           
                                                           {/* QTY */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-[#F5F5DC] text-sm text-center">
+                                                          <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm text-center">
                                                             {item.quantity || 1}
                                                           </td>
                                                           
                                                           {/* SIZE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-[#F5F5DC] text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
                                                             {item.size || ''}
                                                           </td>
                                                         </tr>
@@ -894,7 +894,7 @@ const ExactWalkthroughSpreadsheet = ({
                                                             {/* Add Item Button - GOLD/AMBER COLOR */}
                                                             <button
                                                               onClick={() => setShowAddItem(true)}
-                                                              className="bg-amber-700 hover:bg-amber-600 text-[#F5F5DC] px-3 py-1 rounded text-sm font-medium"
+                                                              className="bg-amber-700 hover:bg-amber-600 text-[#D4C5A9] px-3 py-1 rounded text-sm font-medium"
                                                             >
                                                               ✚ Add Item
                                                             </button>
@@ -912,7 +912,7 @@ const ExactWalkthroughSpreadsheet = ({
                                                                   handleAddCategory(room.id, e.target.value);
                                                                 }
                                                               }}
-                                                              className="bg-amber-700 hover:bg-amber-600 text-[#F5F5DC] px-3 py-1 rounded text-sm font-medium border-none outline-none"
+                                                              className="bg-amber-700 hover:bg-amber-600 text-[#D4C5A9] px-3 py-1 rounded text-sm font-medium border-none outline-none"
                                                             >
                                                               <option value="">Add Category ▼</option>
                                                               <option value="Lighting">Lighting</option>
@@ -933,7 +933,7 @@ const ExactWalkthroughSpreadsheet = ({
                                                             {/* Delete Section Button - RED COLOR */}
                                                             <button
                                                               onClick={() => handleDeleteRoom(room.id)}
-                                                              className="bg-red-700 hover:bg-red-600 text-[#F5F5DC] px-3 py-1 rounded text-sm font-medium"
+                                                              className="bg-red-700 hover:bg-red-600 text-[#D4C5A9] px-3 py-1 rounded text-sm font-medium"
                                                             >
                                                               🗑️ Delete Section
                                                             </button>
