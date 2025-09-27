@@ -221,6 +221,18 @@ backend:
         comment: "🎯 REVIEW REQUEST DIAGNOSTIC TESTING COMPLETED - SCRAPING ISSUES IDENTIFIED AND RESOLVED: Conducted comprehensive diagnostic testing of scraping functionality as requested. ✅ PLAYWRIGHT BROWSERS INSTALLED: Fixed critical issue - Playwright browsers were missing, now installed and functional (/pw-browsers/chromium-1091). ✅ SCRAPING ENDPOINT OPERATIONAL: POST /api/scrape-product responding correctly with 200 status and proper JSON format {success: true, data: {...}}. ✅ FOUR HANDS URL CORRECTED: User's URL 'fourhandshome.com' has typo - correct URL 'fourhands.com/product/248067-003' works perfectly, extracts name='Fenn Chair', vendor='Four Hands', sku='248067-003', price='$1,899', image_url. ✅ USER REPORTED ISSUES CONFIRMED: Size and finish_color fields are blank - this is due to website structure not matching selectors, not a system failure. ❌ WAYFAIR BLOCKED: Wayfair URL returns 'Access denied' - site blocks automated scraping. ✅ CORE FUNCTIONALITY WORKING: Basic scraping (name, price, vendor, sku, image) works correctly for supported sites. The scraping system is fully operational - user's main issue was the typo in the Four Hands URL."
 
 frontend:
+  - task: "🚨 URGENT: Fix Product Data Display - Show Correct Products Instead of Sample Data"
+    implemented: false
+    working: false
+    file: "StudioLandingPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL ISSUE IDENTIFIED: User reports 'still nothing' when clicking Houzz buttons, but testing reveals Houzz buttons work perfectly. ROOT CAUSE: System displays wrong products ('Hudson Valley Sample Light', 'Four Hands Sample Product') instead of expected products ('Fenn Console Table - Natural Oak', 'Industrial Mango Wood Console Table', 'Ashford Dining Table - Live Edge Walnut'). The API /api/search/products returns sample data from unified search system instead of real product data. User confusion stems from seeing different products than expected, not from button functionality. SUCCESS MESSAGES ARE WORKING: Green success box displays correctly with 'AUTOMATION ATTEMPTED' message. TECHNICAL FUNCTIONALITY PERFECT: API calls successful (HTTP 200), browser automation working, console logs showing complete data flow. SOLUTION NEEDED: Update product data source to show correct products or fix unified search API to return real product data instead of sample data."
+
   - task: "Filter Functionality Implementation"
     implemented: true
     working: true
