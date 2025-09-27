@@ -29,7 +29,7 @@ const ComprehensiveQuestionnaire = () => {
     custom_rooms: '',
     
     // PROJECT TYPE
-    project_type: 'New Build',
+    project_type: 'Renovation',
     project_description: '',
     
     // DESIGN QUESTIONS
