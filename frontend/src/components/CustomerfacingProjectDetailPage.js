@@ -65,7 +65,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Full Name</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(15, 20, 30, 0.9) 30%, rgba(5, 10, 15, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
                                 {project.client_info?.full_name || 'Not provided'}
                             </div>
@@ -81,7 +81,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Email Address</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(15, 20, 30, 0.9) 30%, rgba(5, 10, 15, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
                                 {project.client_info?.email || 'Not provided'}
                             </div>
@@ -97,7 +97,7 @@ export default function ProjectPage() {
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Project Address</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(15, 20, 30, 0.9) 30%, rgba(5, 10, 15, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
                                 {project.client_info?.address || 'Not provided'}
                             </div>
@@ -113,7 +113,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Preferred Communication</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(15, 20, 30, 0.9) 30%, rgba(5, 10, 15, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
                                 {Array.isArray(project.contact_preferences) ? project.contact_preferences.join(', ') : project.contact_preferences || 'Not specified'}
                             </div>
@@ -129,7 +129,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Primary Decision Maker(s)</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(15, 20, 30, 0.9) 30%, rgba(5, 10, 15, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
                                 {project.primary_decision_maker || 'Not specified'}
                             </div>
@@ -145,7 +145,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Ideal Sofa Price Point</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(15, 20, 30, 0.9) 30%, rgba(5, 10, 15, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
                                 {project.ideal_sofa_price || 'Not specified'}
                             </div>
