@@ -23,16 +23,13 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
     );
 
     const Field = ({ label, value, type = "text", isTextArea = false, options = [], index = 0 }) => (
-        <div style={{ 
+        <tr style={{ 
             background: index % 2 === 0 
               ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
-              : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)',
-            padding: '1rem',
-            borderRadius: '0.5rem',
-            border: '1px solid rgba(212, 165, 116, 0.3)',
-            marginBottom: '0.5rem'
+              : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
         }}>
-            <label className="block text-sm font-medium text-[#D4A574] mb-2">{label}</label>
+            <td className="border border-[#D4A574] px-4 py-3 text-sm font-medium text-[#D4A574]" style={{minWidth: '200px'}}>{label}</td>
+            <td className="border border-[#D4A574] px-4 py-3"
             {isTextArea ? (
                 <textarea
                     value={value || ''}
