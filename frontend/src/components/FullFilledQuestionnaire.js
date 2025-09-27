@@ -134,17 +134,17 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
                     value={project?.property_type} 
                     type="select"
                     options={["Primary Residence", "Vacation Home", "Rental Property", "Commercial Space", "Other"]}
+                    index={11}
                 />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Field label="Desired timeline for project completion" value={project?.timeline} />
-                    <Field 
-                        label="Investment / Budget Range" 
-                        value={project?.budget_range} 
-                        type="select"
-                        options={["$35k - $65k", "$75k - $100k", "$125k - $500k", "$600k - $1M", "$2M - $5M", "$7M - $10M", "Other"]}
-                    />
-                </div>
-                <Field label="What is your priority for this project? (Check all that apply)" value={project?.project_priority} isTextArea />
+                <Field label="Desired timeline for project completion" value={project?.timeline} index={12} />
+                <Field 
+                    label="Investment / Budget Range" 
+                    value={project?.budget_range} 
+                    type="select"
+                    options={["$35k - $65k", "$75k - $100k", "$125k - $500k", "$600k - $1M", "$2M - $5M", "$7M - $10M", "Other"]}
+                    index={13}
+                />
+                <Field label="What is your priority for this project? (Check all that apply)" value={project?.project_priority} isTextArea index={14} />
             </Section>
 
             {/* Section 3: Type of Project */}
