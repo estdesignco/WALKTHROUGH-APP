@@ -30,44 +30,37 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
         }}>
             <td className="border border-[#D4A574] px-4 py-3 text-sm font-medium text-[#D4A574]" style={{minWidth: '200px'}}>{label}</td>
             <td className="border border-[#D4A574] px-4 py-3"
-            {isTextArea ? (
-                <textarea
-                    value={value || ''}
-                    onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
-                    readOnly={!isEditing}
-                    className="w-full p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] min-h-[80px] focus:border-[#D4A574] focus:outline-none"
-                    style={{
-                        background: 'transparent'
-                    }}
-                />
-            ) : type === "select" ? (
-                <select
-                    value={value || ''}
-                    onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
-                    disabled={!isEditing}
-                    className="w-full p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] focus:border-[#D4A574] focus:outline-none"
-                    style={{
-                        background: 'transparent'
-                    }}
-                >
-                    <option value="">Select...</option>
-                    {options.map(option => (
-                        <option key={option} value={option}>{option}</option>
-                    ))}
-                </select>
-            ) : (
-                <input
-                    type={type}
-                    value={value || ''}
-                    onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
-                    readOnly={!isEditing}
-                    className="w-full p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] focus:border-[#D4A574] focus:outline-none"
-                    style={{
-                        background: 'transparent'
-                    }}
-                />
-            )}
-        </div>
+                {isTextArea ? (
+                    <textarea
+                        value={value || ''}
+                        onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
+                        readOnly={!isEditing}
+                        className="w-full p-2 bg-transparent border-0 text-[#D4C5A9] min-h-[60px] focus:outline-none resize-none"
+                        placeholder={value ? '' : 'Not provided'}
+                    />
+                ) : type === "select" ? (
+                    <select
+                        value={value || ''}
+                        onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
+                        disabled={!isEditing}
+                        className="w-full p-2 bg-transparent border-0 text-[#D4C5A9] focus:outline-none"
+                    >
+                        <option value="">Not specified</option>
+                        {options.map(option => (
+                            <option key={option} value={option}>{option}</option>
+                        ))}
+                    </select>
+                ) : (
+                    <input
+                        type={type}
+                        value={value || 'Not provided'}
+                        onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
+                        readOnly={!isEditing}
+                        className="w-full p-2 bg-transparent border-0 text-[#D4C5A9] focus:outline-none"
+                    />
+                )}
+            </td>
+        </tr>
     );
 
     return (
