@@ -141,11 +141,21 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
-              element={<CustomerfacingLandingPage />}
+              element={
+                <ProjectList 
+                  onSelectProject={setCurrentProject}
+                  isOffline={isOffline}
+                />
+              }
             />
             <Route 
               path="/studio" 
-              element={<StudioLandingPage />}
+              element={
+                <ProjectList 
+                  onSelectProject={setCurrentProject}
+                  isOffline={isOffline}
+                />
+              }
             />
             <Route 
               path="/projects" 
@@ -155,6 +165,14 @@ const App = () => {
                   isOffline={isOffline}
                 />
               }
+            />
+            <Route 
+              path="/customer" 
+              element={<CustomerfacingLandingPage />}
+            />
+            <Route 
+              path="/customer/questionnaire" 
+              element={<ComprehensiveQuestionnaire />}
             />
             <Route 
               path="/questionnaire/new" 
