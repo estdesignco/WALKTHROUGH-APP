@@ -30,8 +30,8 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
               ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
               : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
         }}>
-            <td className="border border-[#D4A574] px-4 py-3 text-sm font-medium text-[#D4A574]" style={{minWidth: '200px'}}>{label}</td>
-            <td className="border border-[#D4A574] px-4 py-3"
+            <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm" style={{minWidth: '200px'}}>{label}</td>
+            <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm"
                 {isTextArea ? (
                     <textarea
                         value={value || ''}
