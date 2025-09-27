@@ -358,14 +358,15 @@ class RealHouzzIntegration:
                 "image_5": product_images[4] if len(product_images) > 4 else "https://via.placeholder.com/800x600/DEB887/000000?text=Room+Setting"
             }
             
-            # 2. ATTEMPT REAL BROWSER AUTOMATION (Optional)
+            # 2. FULL BROWSER AUTOMATION (REQUIRED!)
             automation_success = False
             try:
-                if self.email and self.password:  # Only if credentials provided
-                    logger.info("🤖 Attempting real browser automation...")
-                    automation_success = await self.fill_real_houzz_clipper(product_data, houzz_clipper_data)
+                logger.info("🚀 STARTING FULL HOUZZ PRO AUTOMATION...")
+                automation_success = await self.fill_real_houzz_clipper(product_data, houzz_clipper_data)
+                logger.info(f"🎯 Automation completed: {automation_success}")
             except Exception as e:
-                logger.warning(f"Browser automation failed (continuing anyway): {e}")
+                logger.error(f"❌ FULL AUTOMATION FAILED: {e}")
+                return {"success": False, "error": f"Automation failed: {str(e)}"}
             
             logger.info("✅ HOUZZ PRO CLIPPER DATA GENERATED!")
             
