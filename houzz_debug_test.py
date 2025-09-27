@@ -13,7 +13,7 @@ import sys
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://luxe-designer-suite.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://interiorsuite-2.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 def print_header(title):
