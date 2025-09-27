@@ -37,7 +37,7 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
                     value={value || ''}
                     onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
                     disabled={!isEditing}
-                    className="w-full p-3 bg-gray-700 border border-[#B49B7E]/30 rounded text-[#F5F5DC] focus:border-[#B49B7E] focus:outline-none"
+                    className="w-full p-3 bg-gray-900/50 border border-[#D4A574]/50 rounded text-[#D4A574] focus:border-[#D4A574] focus:outline-none"
                 >
                     <option value="">Select...</option>
                     {options.map(option => (
@@ -50,7 +50,7 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
                     value={value || ''}
                     onChange={(e) => isEditing && handleChange(label.toLowerCase().replace(/\s+/g, '_'), e.target.value)}
                     readOnly={!isEditing}
-                    className="w-full p-3 bg-gray-700 border border-[#B49B7E]/30 rounded text-[#F5F5DC] focus:border-[#B49B7E] focus:outline-none"
+                    className="w-full p-3 bg-gray-900/50 border border-[#D4A574]/50 rounded text-[#D4A574] focus:border-[#D4A574] focus:outline-none"
                 />
             )}
         </div>
