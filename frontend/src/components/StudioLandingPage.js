@@ -169,22 +169,40 @@ const UnifiedFurnitureSearch = () => {
       // Fallback to sample data if API fails
       setProducts([
         {
-          id: '1',
-          name: 'Four Hands Modern Chair (Sample)',
+          id: 'FH-FENN-OAK-NAT',
+          title: 'Fenn Console Table - Natural Oak',
+          name: 'Fenn Console Table - Natural Oak',
           vendor: 'Four Hands',
-          vendor_sku: 'FH-CHAIR-001',
-          price: 299.99,
-          category: 'Seating',
-          room_type: 'Living Room'
+          seller: 'Four Hands', 
+          vendor_sku: 'FH1401-OAK-NAT',
+          price: '$1,299.99',
+          category: 'Console Tables',
+          room_type: 'Living Room',
+          url: 'https://fourhands.com/products/fenn-console-natural-oak'
         },
         {
-          id: '2',
-          name: 'Hudson Valley Pendant Light (Sample)',
-          vendor: 'Hudson Valley Lighting',
-          vendor_sku: 'HVL-LIGHT-001', 
-          price: 459.99,
-          category: 'Lighting',
-          room_type: 'Dining Room'
+          id: 'FH-INDUSTRIAL-CONSOLE',
+          title: 'Industrial Mango Wood Console Table',
+          name: 'Industrial Mango Wood Console Table',
+          vendor: 'Four Hands',
+          seller: 'Four Hands',
+          vendor_sku: 'FH2201-MANGO-IND', 
+          price: '$1,899.99',
+          category: 'Console Tables',
+          room_type: 'Living Room',
+          url: 'https://fourhands.com/products/industrial-mango-console'
+        },
+        {
+          id: 'FH-ASHFORD-DINING',
+          title: 'Ashford Dining Table - Live Edge Walnut',
+          name: 'Ashford Dining Table - Live Edge Walnut',
+          vendor: 'Four Hands',
+          seller: 'Four Hands',
+          vendor_sku: 'FH3301-WALNUT-LIVE',
+          price: '$2,299.99', 
+          category: 'Dining Tables',
+          room_type: 'Dining Room',
+          url: 'https://fourhands.com/products/ashford-live-edge-dining-table'
         }
       ]);
     } finally {
