@@ -131,7 +131,7 @@ const StudioLandingPage = () => {
           <div className="flex space-x-4">
             <button
               onClick={handleNewClient}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+              className="bg-gradient-to-r from-[#B49B7E] to-[#8B6914] hover:from-[#A08B6F] hover:to-[#7A5A0F] text-black px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 font-bold"
             >
               <span>+</span>
               <span>New Client</span>
@@ -139,7 +139,7 @@ const StudioLandingPage = () => {
             
             <button
               onClick={handleEmailNewClient}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+              className="bg-gradient-to-r from-[#B49B7E] to-[#8B6914] hover:from-[#A08B6F] hover:to-[#7A5A0F] text-black px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 font-bold"
             >
               <span>📧</span>
               <span>Email New Client</span>
@@ -147,18 +147,18 @@ const StudioLandingPage = () => {
             
             <button
               onClick={handleFullQuestionnaire}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+              className="bg-gradient-to-r from-[#B49B7E] to-[#8B6914] hover:from-[#A08B6F] hover:to-[#7A5A0F] text-black px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 font-bold"
             >
-              <span>+</span>
+              <span>📋</span>
               <span>Full Questionnaire</span>
             </button>
             
             <button
-              onClick={() => window.location.href = '/integrations'}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+              onClick={() => window.location.href = '/studio-search'}
+              className="bg-gradient-to-r from-[#B49B7E] to-[#8B6914] hover:from-[#A08B6F] hover:to-[#7A5A0F] text-black px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 font-bold"
             >
-              <span>🔗</span>
-              <span>All Integrations</span>
+              <span>🔍</span>
+              <span>Furniture Search</span>
             </button>
           </div>
         </div>
