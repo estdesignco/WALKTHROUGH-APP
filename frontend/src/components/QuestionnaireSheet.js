@@ -275,53 +275,72 @@ const QuestionnaireSheet = () => {
           </span>
         </div>
 
-        <div className="space-y-8">
-          {currentQuestionSection.questions.map((question, index) => (
-            <div key={question.id} className="space-y-4">
-              <h3 className="text-lg font-medium text-[#F5F5DC]">
-                {index + 1}. {question.question}
-              </h3>
+        <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
+            <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
+              <table className="w-full border-collapse border border-gray-400">
+                <tbody>
+                  {currentQuestionSection.questions.map((question, index) => (
+                    <tr key={question.id} style={{ 
+                      background: index % 2 === 0 
+                        ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                        : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                    }}>
+                      <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm" style={{minWidth: '300px'}}>
+                        {index + 1}. {question.question}
+                      </td>
+                      <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
+                        {question.type === 'radio' && (
+                          <div className="space-y-2">
+                            {question.options.map(option => (
+                              <label key={option} className="flex items-center space-x-2 cursor-pointer">
+                                <input
+                                  type="radio"
+                                  name={question.id}
+                                  value={option}
+                                  checked={answers[question.id] === option}
+                                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                                  className="w-3 h-3 text-[#D4A574]"
+                                />
+                                <span className="text-[#D4C5A9] text-sm">{option}</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
 
-              <div className="space-y-3">
-                {question.type === 'radio' && question.options.map(option => (
-                  <label key={option} className="flex items-center space-x-3 cursor-pointer">
-                    <input
-                      type="radio"
-                      name={question.id}
-                      value={option}
-                      checked={answers[question.id] === option}
-                      onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                      className="w-4 h-4 text-[#B49B7E] bg-gray-700 border-[#B49B7E]/50"
-                    />
-                    <span className="text-[#F5F5DC]/90">{option}</span>
-                  </label>
-                ))}
+                        {question.type === 'checkbox' && (
+                          <div className="space-y-2">
+                            {question.options.map(option => (
+                              <label key={option} className="flex items-center space-x-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  value={option}
+                                  checked={(answers[question.id] || []).includes(option)}
+                                  onChange={(e) => handleAnswerChange(question.id, e.target.value, true)}
+                                  className="w-3 h-3 text-[#D4A574]"
+                                />
+                                <span className="text-[#D4C5A9] text-sm">{option}</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
 
-                {question.type === 'checkbox' && question.options.map(option => (
-                  <label key={option} className="flex items-center space-x-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      value={option}
-                      checked={(answers[question.id] || []).includes(option)}
-                      onChange={(e) => handleAnswerChange(question.id, e.target.value, true)}
-                      className="w-4 h-4 text-[#B49B7E] bg-gray-700 border-[#B49B7E]/50 rounded"
-                    />
-                    <span className="text-[#F5F5DC]/90">{option}</span>
-                  </label>
-                ))}
-
-                {question.type === 'text' && (
-                  <textarea
-                    value={answers[question.id] || ''}
-                    onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                    className="w-full bg-gray-700 text-[#F5F5DC] px-4 py-3 rounded border border-[#B49B7E]/30 focus:border-[#B49B7E] focus:outline-none"
-                    rows="4"
-                    placeholder="Please provide details..."
-                  />
-                )}
-              </div>
+                        {question.type === 'text' && (
+                          <textarea
+                            value={answers[question.id] || ''}
+                            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                            className="w-full bg-transparent border-0 text-[#D4C5A9] text-sm focus:outline-none resize-none"
+                            rows="3"
+                            placeholder="Please provide details..."
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
+          </div>
         </div>
 
         {/* Navigation Buttons */}
