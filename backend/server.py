@@ -1580,10 +1580,18 @@ async def get_projects():
         
         # Fix client_info if it exists
         if "client_info" in project_data and project_data["client_info"]:
-            if project_data["client_info"].get("address") is None:
-                project_data["client_info"]["address"] = "Not specified"
+            client_info = project_data["client_info"]
+            if client_info.get("address") is None:
+                client_info["address"] = "Not specified"
+            if client_info.get("phone") is None:
+                client_info["phone"] = "Not specified"  
+            if client_info.get("email") is None:
+                client_info["email"] = "Not specified"
+            if client_info.get("full_name") is None:
+                client_info["full_name"] = "Not specified"
         elif "client_info" not in project_data or project_data["client_info"] is None:
             project_data["client_info"] = {
+                "full_name": "Not specified",
                 "address": "Not specified",
                 "phone": "Not specified",
                 "email": "Not specified"
