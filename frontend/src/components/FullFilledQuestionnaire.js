@@ -10,17 +10,18 @@ const FullFilledQuestionnaire = ({ project, projectId }) => {
     };
 
     const Section = ({ title, description, children }) => (
-        <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60 mb-6" 
-             style={{
-               background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
-             }}>
-            <h3 className="text-xl font-bold text-[#D4A574] mb-4">{title}</h3>
-            {description && <p className="text-[#D4C5A9]/80 mb-4 text-sm">{description}</p>}
-            <table className="w-full border-collapse border border-[#D4A574]">
-                <tbody>
-                    {children}
-                </tbody>
-            </table>
+        <div className="w-full overflow-x-auto mb-6" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
+                <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
+                    <h3 className="text-xl font-bold text-[#D4A574] mb-4 px-4">{title}</h3>
+                    {description && <p className="text-[#D4C5A9]/80 mb-4 text-sm px-4">{description}</p>}
+                    <table className="w-full border-collapse border border-gray-400">
+                        <tbody>
+                            {children}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 
