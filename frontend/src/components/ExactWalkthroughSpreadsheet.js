@@ -791,7 +791,7 @@ const ExactWalkthroughSpreadsheet = ({
                                       <div className="flex items-center gap-2">
                                         <button
                                           onClick={() => toggleRoomExpansion(room.id)}
-                                          className="text-[#F5F5DC] hover:text-gray-200"
+                                          className="text-[#F5F5DC] hover:text-[#D4A574]"
                                         >
                                           {isRoomExpanded ? '▼' : '▶'}
                                         </button>
@@ -835,7 +835,7 @@ const ExactWalkthroughSpreadsheet = ({
                                                       <div className="flex items-center gap-2">
                                                         <button
                                                           onClick={() => toggleCategoryExpansion(category.id)}
-                                                          className="text-[#F5F5DC] hover:text-gray-200"
+                                                          className="text-[#F5F5DC] hover:text-[#D4A574]"
                                                         >
                                                           {isCategoryExpanded ? '▼' : '▶'}
                                                         </button>
