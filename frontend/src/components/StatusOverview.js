@@ -155,7 +155,8 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                   strokeStyle: dataset.backgroundColor[i],
                   pointStyle: 'circle',
                   hidden: false,
-                  index: i
+                  index: i,
+                  fontColor: '#D4A574'
                 };
               });
             }
