@@ -51,7 +51,8 @@ class RealCanvaIntegration:
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--window-size=1920x1080")
         
-        service = Service(ChromeDriverManager().install())
+        # Use system chromium-driver instead of downloading
+        service = Service('/usr/bin/chromedriver')
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
         # Login to Canva
