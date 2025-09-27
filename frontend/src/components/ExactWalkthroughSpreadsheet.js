@@ -622,7 +622,7 @@ const ExactWalkthroughSpreadsheet = ({
 
   if (!project || !project.rooms || project.rooms.length === 0) {
     return (
-      <div className="text-center text-gray-400 py-8">
+      <div className="text-center text-[#D4A574] py-8">
         <p className="text-lg">Loading FF&E data...</p>
         <p className="text-sm mt-2">Please wait while we load your project information.</p>
       </div>
