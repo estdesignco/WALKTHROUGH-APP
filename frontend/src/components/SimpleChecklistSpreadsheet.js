@@ -903,7 +903,7 @@ const SimpleChecklistSpreadsheet = ({
             <div key={room.id} className="mb-8">
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS AND EXPAND/COLLAPSE */}
               <div 
-                className="px-4 py-2 text-[#F5F5DC] font-bold mb-4"
+                className="px-4 py-2 text-[#D4C5A9] font-bold mb-4"
                 style={{ backgroundColor: getRoomColor(room.name, roomIndex) }}
               >
                 <div className="flex justify-between items-center">
@@ -956,7 +956,7 @@ const SimpleChecklistSpreadsheet = ({
                   <div key={category.id} className="mb-6">
                     {/* CATEGORY HEADER WITH EXPAND/COLLAPSE */}
                     <div 
-                      className="px-4 py-2 text-[#F5F5DC] font-bold mb-2"
+                      className="px-4 py-2 text-[#D4C5A9] font-bold mb-2"
                       style={{ backgroundColor: getCategoryColor() }}
                     >
                       <div className="flex justify-between items-center">
@@ -1008,8 +1008,8 @@ const SimpleChecklistSpreadsheet = ({
                             <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10">
                               <thead>
                                 <tr>
-                                  <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-8 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>✓</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>
+                                  <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#D4C5A9] w-8 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>✓</th>
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#D4C5A9] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>
                                     {subcategory.name.toUpperCase()}
                                     <button
                                       onClick={() => {
@@ -1115,11 +1115,11 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* FINISH/COLOR - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm">
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#F5F5DC] text-sm outline-none"
+                                      className="w-full bg-transparent text-[#D4C5A9] text-sm outline-none"
                                       onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
                                     >
                                       {item.finish_color || ''}
@@ -1128,7 +1128,7 @@ const SimpleChecklistSpreadsheet = ({
                                   
                                   {/* STATUS - DROPDOWN WITH FORCED COLORED CELL */}
                                   <td 
-                                    className="border border-[#B49B7E] px-1 py-1 text-[#F5F5DC] text-sm"
+                                    className="border border-[#B49B7E] px-1 py-1 text-[#D4C5A9] text-sm"
                                     style={{ 
                                       backgroundColor: getStatusColor(item.status || '') + ' !important',
                                       background: getStatusColor(item.status || ''),
@@ -1136,7 +1136,7 @@ const SimpleChecklistSpreadsheet = ({
                                     }}
                                   >
                                     <select 
-                                      className="w-full text-[#F5F5DC] text-xs"
+                                      className="w-full text-[#D4C5A9] text-xs"
                                       value={item.status || ''}
                                       style={{ 
                                         backgroundColor: getStatusColor(item.status || ''),
@@ -1167,7 +1167,7 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* IMAGE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm w-20">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm w-20">
                                     {item.image_url ? (
                                       <img 
                                         src={item.image_url} 
@@ -1235,7 +1235,7 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* LINK - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm w-20">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm w-20">
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
@@ -1247,11 +1247,11 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* REMARKS - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm">
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#F5F5DC] text-sm outline-none"
+                                      className="w-full bg-transparent text-[#D4C5A9] text-sm outline-none"
                                       onBlur={(e) => console.log('Remarks updated:', e.target.textContent)}
                                     >
                                       {item.remarks || ''}
@@ -1289,7 +1289,7 @@ const SimpleChecklistSpreadsheet = ({
                               }
                               e.target.value = ''; // Reset dropdown
                             }}
-                            className="text-[#F5F5DC] px-3 py-2 rounded font-medium border-none outline-none text-sm" 
+                            className="text-[#D4C5A9] px-3 py-2 rounded font-medium border-none outline-none text-sm" 
                             style={{ backgroundColor: '#8b7355' }}
                           >
                             <option value="">+ ADD CATEGORY ▼</option>
@@ -1312,7 +1312,7 @@ const SimpleChecklistSpreadsheet = ({
                                 alert('This category has no subcategories. Please contact support.');
                               }
                             }}
-                            className="bg-blue-600 hover:bg-blue-500 text-[#F5F5DC] px-4 py-2 rounded text-sm"
+                            className="bg-blue-600 hover:bg-blue-500 text-[#D4C5A9] px-4 py-2 rounded text-sm"
                           >
                             + ADD ITEM
                           </button>
@@ -1362,7 +1362,7 @@ const SimpleChecklistSpreadsheet = ({
                 alert('Please add a room first before adding categories.');
               }
             }}
-            className="text-[#F5F5DC] px-6 py-3 rounded font-bold border-none outline-none text-lg" 
+            className="text-[#D4C5A9] px-6 py-3 rounded font-bold border-none outline-none text-lg" 
             style={{ backgroundColor: '#8b7355' }}
           >
             <option value="">+ ADD CATEGORY ▼</option>
