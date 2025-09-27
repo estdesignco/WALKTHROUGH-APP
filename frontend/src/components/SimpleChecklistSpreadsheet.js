@@ -1115,11 +1115,11 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* FINISH/COLOR - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-white text-sm">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm">
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-white text-sm outline-none"
+                                      className="w-full bg-transparent text-[#F5F5DC] text-sm outline-none"
                                       onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
                                     >
                                       {item.finish_color || ''}
@@ -1128,7 +1128,7 @@ const SimpleChecklistSpreadsheet = ({
                                   
                                   {/* STATUS - DROPDOWN WITH FORCED COLORED CELL */}
                                   <td 
-                                    className="border border-[#B49B7E] px-1 py-1 text-white text-sm"
+                                    className="border border-[#B49B7E] px-1 py-1 text-[#F5F5DC] text-sm"
                                     style={{ 
                                       backgroundColor: getStatusColor(item.status || '') + ' !important',
                                       background: getStatusColor(item.status || ''),
@@ -1136,7 +1136,7 @@ const SimpleChecklistSpreadsheet = ({
                                     }}
                                   >
                                     <select 
-                                      className="w-full text-white text-xs"
+                                      className="w-full text-[#F5F5DC] text-xs"
                                       value={item.status || ''}
                                       style={{ 
                                         backgroundColor: getStatusColor(item.status || ''),
@@ -1167,7 +1167,7 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* IMAGE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-white text-sm w-20">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm w-20">
                                     {item.image_url ? (
                                       <img 
                                         src={item.image_url} 
@@ -1235,7 +1235,7 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* LINK - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-white text-sm w-20">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm w-20">
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
@@ -1247,11 +1247,11 @@ const SimpleChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* REMARKS - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-white text-sm">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#F5F5DC] text-sm">
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-white text-sm outline-none"
+                                      className="w-full bg-transparent text-[#F5F5DC] text-sm outline-none"
                                       onBlur={(e) => console.log('Remarks updated:', e.target.textContent)}
                                     >
                                       {item.remarks || ''}
@@ -1289,7 +1289,7 @@ const SimpleChecklistSpreadsheet = ({
                               }
                               e.target.value = ''; // Reset dropdown
                             }}
-                            className="text-white px-3 py-2 rounded font-medium border-none outline-none text-sm" 
+                            className="text-[#F5F5DC] px-3 py-2 rounded font-medium border-none outline-none text-sm" 
                             style={{ backgroundColor: '#8b7355' }}
                           >
                             <option value="">+ ADD CATEGORY ▼</option>
@@ -1312,7 +1312,7 @@ const SimpleChecklistSpreadsheet = ({
                                 alert('This category has no subcategories. Please contact support.');
                               }
                             }}
-                            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
+                            className="bg-blue-600 hover:bg-blue-500 text-[#F5F5DC] px-4 py-2 rounded text-sm"
                           >
                             + ADD ITEM
                           </button>
@@ -1362,7 +1362,7 @@ const SimpleChecklistSpreadsheet = ({
                 alert('Please add a room first before adding categories.');
               }
             }}
-            className="text-white px-6 py-3 rounded font-bold border-none outline-none text-lg" 
+            className="text-[#F5F5DC] px-6 py-3 rounded font-bold border-none outline-none text-lg" 
             style={{ backgroundColor: '#8b7355' }}
           >
             <option value="">+ ADD CATEGORY ▼</option>
