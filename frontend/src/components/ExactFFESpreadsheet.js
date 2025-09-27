@@ -1249,7 +1249,7 @@ const ExactFFESpreadsheet = ({
                                                                 🔗 LINK
                                                               </a>
                                                             ) : (
-                                                              <span className="text-gray-500 text-xs">No Link</span>
+                                                              <span className="text-[#D4A574] text-xs">No Link</span>
                                                             )}
                                                           </td>
                                                           
