@@ -323,7 +323,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           <div className="grid grid-cols-2 gap-3">
             {/* Total Items */}
             <div className="bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-white">{totalItems}</div>
+              <div className="text-2xl font-bold text-[#F5F5DC]">{totalItems}</div>
               <div className="text-sm text-[#D4A574]">Total Items</div>
             </div>
             
