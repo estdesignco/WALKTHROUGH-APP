@@ -196,6 +196,45 @@ async def scrape_vendor_products(
         logger.error(f"Vendor scraping error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/scrape-product")
+async def scrape_single_product(request: ScrapeProductRequest):
+    """Scrape a single product from a URL"""
+    try:
+        logger.info(f"🔍 Scraping single product: {request.url}")
+        
+        # Use the integration manager's scraper to scrape the product
+        scraped_data = await integration_manager.scraper.scrape_live_product_data(request.url)
+        
+        if scraped_data:
+            # Convert to expected format
+            result = {
+                "success": True,
+                "data": {
+                    "name": scraped_data.get('title', ''),
+                    "vendor": scraped_data.get('vendor', ''),
+                    "sku": scraped_data.get('sku', ''),
+                    "cost": scraped_data.get('price', ''),
+                    "price": scraped_data.get('price', ''),
+                    "size": scraped_data.get('size', ''),
+                    "finish_color": scraped_data.get('finish_color', ''),
+                    "image_url": scraped_data.get('image_url', '')
+                }
+            }
+            logger.info(f"✅ Successfully scraped: {result['data'].get('name', 'Unknown')}")
+            return result
+        else:
+            return {
+                "success": False,
+                "error": "Could not extract product data from URL"
+            }
+    
+    except Exception as e:
+        logger.error(f"Single product scraping error: {e}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
 @router.post("/quick-workflow")
 async def quick_workflow(
     search_query: str = Body(...),
