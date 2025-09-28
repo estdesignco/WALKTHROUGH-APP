@@ -10,6 +10,7 @@ import QuestionnaireSheet from "./components/QuestionnaireSheet";
 import WalkthroughDashboard from "./components/WalkthroughDashboard";
 import ChecklistDashboard from "./components/ChecklistDashboard";
 import StudioLandingPage from "./components/StudioLandingPage";
+import StudioDashboard from "./components/StudioDashboard";
 import ComprehensiveQuestionnaire from "./components/ComprehensiveQuestionnaire";
 import ProjectDetailPage from "./components/ProjectDetailPage";
 import CustomerfacingLandingPage from './components/CustomerfacingLandingPage';
