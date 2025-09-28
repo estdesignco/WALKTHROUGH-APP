@@ -166,7 +166,7 @@ const App = () => {
             />
             <Route 
               path="/customer" 
-              element={<CustomerfacingLandingPage />}
+              element={<CustomerLandingPage />}
             />
             <Route 
               path="/projects" 
@@ -244,7 +244,7 @@ const App = () => {
             {/* Customer-facing routes */}
             <Route 
               path="/customer" 
-              element={<CustomerfacingLandingPage />}
+              element={<CustomerLandingPage />}
             />
             <Route 
               path="/customer/questionnaire" 
