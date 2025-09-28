@@ -19,6 +19,22 @@ const EmailPreview = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 py-8 px-4">
+            {/* Back Button */}
+            <div className="absolute top-4 left-4 z-50">
+                <button
+                    onClick={() => navigate('/')}
+                    className="text-white hover:text-stone-300 transition-colors duration-200 flex items-center space-x-2 p-2 rounded-lg"
+                    style={{
+                        background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+                        border: '1px solid #d4af37',
+                        boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3)'
+                    }}
+                >
+                    <span>←</span>
+                    <span>Back to Dashboard</span>
+                </button>
+            </div>
+
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
