@@ -148,7 +148,7 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
-              element={<SimpleDashboard />}
+              element={<BeautifulDashboard />}
             />
             <Route 
               path="/studio" 
