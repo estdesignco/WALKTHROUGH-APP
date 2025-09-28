@@ -145,6 +145,14 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
+              element={<DesignFlowLandingPage />}
+            />
+            <Route 
+              path="/studio" 
+              element={<StudioLandingPage />}
+            />
+            <Route 
+              path="/customer" 
               element={<CustomerfacingLandingPage />}
             />
             <Route 
