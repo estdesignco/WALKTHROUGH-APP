@@ -69,7 +69,7 @@ const MainDashboard = () => {
         {/* Navigation Links at Top with Thin Gold Borders */}
         <div className="max-w-4xl mx-auto mb-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
-            onClick={() => window.open('https://designstudio-14.preview.emergentagent.com/', '_blank')}
+            onClick={() => window.open('https://luxspacepro.preview.emergentagent.com/', '_blank')}
             className="text-stone-300 p-4 rounded-lg transition-all duration-200"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
@@ -124,7 +124,7 @@ const MainDashboard = () => {
         {/* Three Main Action Buttons - NO BORDERS */}
         <div className="flex justify-center space-x-4 mb-12">
           <button 
-            onClick={() => window.open('https://designstudio-14.preview.emergentagent.com/customer/questionnaire', '_blank')}
+            onClick={() => window.open('https://luxspacepro.preview.emergentagent.com/customer/questionnaire', '_blank')}
             className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
@@ -164,7 +164,7 @@ const MainDashboard = () => {
             <span>Email New Client</span>
           </button>
           <button 
-            onClick={() => window.open('https://designstudio-14.preview.emergentagent.com/customer/questionnaire', '_blank')}
+            onClick={() => window.open('https://luxspacepro.preview.emergentagent.com/customer/questionnaire', '_blank')}
             className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
