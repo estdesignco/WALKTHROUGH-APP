@@ -26,6 +26,7 @@ import BeautifulDashboard from './components/BeautifulDashboard';
 import CorrectDashboard from './components/CorrectDashboard';
 import ActualDashboard from './components/ActualDashboard';
 import FinalDashboard from './components/FinalDashboard';
+import ExactDashboard from './components/ExactDashboard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
