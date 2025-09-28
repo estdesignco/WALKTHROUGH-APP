@@ -82,37 +82,39 @@ const ProjectList = ({ onSelectProject, isOffline }) => {
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Interior Design Projects</h1>
-          <p className="text-gray-400">Select a project to manage FF&E or create a new one</p>
+          <h1 className="text-4xl font-light text-[#B49B7E] mb-2 tracking-wide">Interior Design Projects</h1>
+          <p style={{ color: '#F5F5DC', opacity: '0.8' }}>Select a project to manage FF&E or create a new one</p>
         </div>
         
         <div className="flex space-x-4">
           <button
             onClick={createSampleProject}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 rounded-lg transition-all duration-300 shadow-lg"
+            style={{ color: '#F5F5DC' }}
           >
             🏠 Create Sample Project
           </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors">
+          <button className="bg-gradient-to-br from-black/80 to-gray-900/90 hover:from-gray-900/80 hover:to-black/90 px-6 py-3 rounded-lg transition-all duration-300 border border-[#B49B7E]/30" style={{ color: '#F5F5DC' }}>
             📥 Import from Sheets
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-900 border border-red-700 text-red-100 p-4 rounded-lg mb-6">
+        <div className="bg-red-900/20 border border-red-500/30 p-4 rounded-lg mb-6" style={{ color: '#F5F5DC' }}>
           {error}
         </div>
       )}
 
       {projects.length === 0 ? (
-        <div className="bg-gray-800 rounded-xl p-12 text-center">
+        <div className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-xl p-12 text-center border border-[#B49B7E]/20 shadow-2xl">
           <div className="text-6xl mb-4">🏗️</div>
-          <h3 className="text-xl font-semibold text-white mb-2">No Projects Yet</h3>
-          <p className="text-gray-400 mb-6">Get started by creating your first interior design project</p>
+          <h3 className="text-2xl font-light mb-2" style={{ color: '#F5F5DC' }}>No Projects Yet</h3>
+          <p className="mb-6" style={{ color: '#F5F5DC', opacity: '0.7' }}>Get started by creating your first interior design project</p>
           <button
             onClick={createSampleProject}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white px-8 py-3 rounded-lg transition-colors"
+            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-3 rounded-lg transition-all duration-300 shadow-lg"
+            style={{ color: '#F5F5DC' }}
           >
             Create Your First Project
           </button>
@@ -122,39 +124,39 @@ const ProjectList = ({ onSelectProject, isOffline }) => {
           {projects.map((project) => (
             <div
               key={project.id}
-              className="bg-gray-800 rounded-xl p-6 cursor-pointer hover:bg-gray-700 transition-colors border border-gray-700"
+              className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-xl p-6 cursor-pointer hover:border-[#B49B7E]/40 transition-all duration-300 border border-[#B49B7E]/20 shadow-lg"
               onClick={() => handleSelectProject(project)}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">{project.name}</h3>
-                <span className="bg-blue-600 text-white px-2 py-1 rounded text-sm">
+                <h3 className="text-lg font-light text-[#B49B7E]">{project.name}</h3>
+                <span className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] px-3 py-1 rounded-full text-sm" style={{ color: '#F5F5DC' }}>
                   {project.project_type}
                 </span>
               </div>
               
               <div className="space-y-2">
-                <p className="text-gray-300">
-                  <span className="font-medium">Client:</span> {project.client_info.full_name}
+                <p style={{ color: '#F5F5DC' }}>
+                  <span className="font-medium text-[#B49B7E]">Client:</span> {project.client_info.full_name}
                 </p>
-                <p className="text-gray-300">
-                  <span className="font-medium">Timeline:</span> {project.timeline || 'Not specified'}
+                <p style={{ color: '#F5F5DC' }}>
+                  <span className="font-medium text-[#B49B7E]">Timeline:</span> {project.timeline || 'Not specified'}
                 </p>
-                <p className="text-gray-300">
-                  <span className="font-medium">Budget:</span> {project.budget || 'Not specified'}
+                <p style={{ color: '#F5F5DC' }}>
+                  <span className="font-medium text-[#B49B7E]">Budget:</span> {project.budget || 'Not specified'}
                 </p>
-                <p className="text-gray-300">
-                  <span className="font-medium">Rooms:</span> {project.rooms?.length || 0}
+                <p style={{ color: '#F5F5DC' }}>
+                  <span className="font-medium text-[#B49B7E]">Rooms:</span> {project.rooms?.length || 0}
                 </p>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-600">
+              <div className="mt-4 pt-4 border-t border-[#B49B7E]/20">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">
+                  <span className="text-sm" style={{ color: '#F5F5DC', opacity: '0.7' }}>
                     Created {new Date(project.created_at).toLocaleDateString()}
                   </span>
                   <div className="flex space-x-2">
-                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                    <span className="text-xs text-green-400">Active</span>
+                    <span className="w-2 h-2 bg-[#B49B7E] rounded-full"></span>
+                    <span className="text-xs text-[#B49B7E]">Active</span>
                   </div>
                 </div>
               </div>

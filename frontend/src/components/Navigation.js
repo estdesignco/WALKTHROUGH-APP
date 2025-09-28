@@ -34,18 +34,58 @@ const Navigation = ({ currentProject, isOffline }) => {
                   to="/"
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     location.pathname === '/' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'text-gray-300 hover:bg-gray-700'
+                      ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-[#F5F5DC]' 
+                      : 'text-[#F5F5DC]/70 hover:bg-[#B49B7E]/20'
                   }`}
                 >
                   📋 Questionnaire
                 </Link>
-                {/* Navigation tabs removed per user request */}
+                <Link
+                  to={`/project/${currentProject.id}/walkthrough`}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    location.pathname.includes('/walkthrough') 
+                      ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-[#F5F5DC]' 
+                      : 'text-[#F5F5DC]/70 hover:bg-[#B49B7E]/20'
+                  }`}
+                >
+                  🚶 Walkthrough
+                </Link>
+                <Link
+                  to={`/project/${currentProject.id}/checklist`}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    location.pathname.includes('/checklist') 
+                      ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-[#F5F5DC]' 
+                      : 'text-[#F5F5DC]/70 hover:bg-[#B49B7E]/20'  
+                  }`}
+                >
+                  ✅ Checklist
+                </Link>
+                <Link
+                  to={`/project/${currentProject.id}/ffe`}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    location.pathname.includes('/ffe') 
+                      ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-[#F5F5DC]' 
+                      : 'text-[#F5F5DC]/70 hover:bg-[#B49B7E]/20'
+                  }`}
+                >
+                  📦 FF&E
+                </Link>
               </div>
             </div>
           )}
 
-          {/* Actions removed per user request */}
+          {/* Actions */}
+          <div className="flex items-center space-x-4">
+            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-4 py-2 rounded-lg transition-all duration-300">
+              📤 Export FF&E
+            </button>
+            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-4 py-2 rounded-lg transition-all duration-300">
+              📊 Spec Sheet  
+            </button>
+            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-4 py-2 rounded-lg transition-all duration-300">
+              ➕ Add Room
+            </button>
+          </div>
         </div>
       </div>
     </nav>

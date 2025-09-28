@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import CompletePageLayout from './CompletePageLayout';
 
 const QuestionnaireSheet = () => {
   const { projectId } = useParams();
@@ -236,167 +235,172 @@ const QuestionnaireSheet = () => {
   const completionPercentage = calculateCompletionPercentage();
 
   return (
-    <CompletePageLayout 
-      projectId={projectId}
-      activeTab="questionnaire"
-      title="CLIENT QUESTIONNAIRE & DISCOVERY"
-      hideNavigation={false}
-    >
-      {/* Progress Bar Container */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
-           style={{
-             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-           }}>
-        <div className="max-w-2xl mx-auto">
-          <div className="flex justify-between text-sm text-[#F5F5DC]/80 mb-2">
+    <div className="max-w-full mx-auto bg-gray-950 min-h-screen p-6">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="text-center mb-4">
+          <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
+          <p className="text-gray-300">Client Questionnaire & Discovery</p>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="flex justify-center space-x-8 mb-6">
+          <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
+            <span>📋</span>
+            <span className="font-semibold">Questionnaire</span>
+          </div>
+          <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+            <span>🚶</span>
+            <span>Walkthrough</span>
+          </a>
+          <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+            <span>✅</span>
+            <span>Checklist</span>
+          </a>
+          <a href={`/project/${projectId}/ffe`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+            <span>📊</span>
+            <span>FF&E</span>
+          </a>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <div className="flex justify-between text-sm text-gray-400 mb-2">
             <span>Progress</span>
             <span>{completionPercentage}% Complete</span>
           </div>
-          <div className="w-full bg-gray-700/50 rounded-full h-3 border border-[#B49B7E]/20">
+          <div className="w-full bg-gray-700 rounded-full h-2">
             <div 
-              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] h-3 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-blue-600 to-green-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${completionPercentage}%` }}
             ></div>
           </div>
         </div>
       </div>
 
-      {/* Questionnaire Content Container */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-8 border border-[#B49B7E]/20 mb-6" 
-           style={{
-             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-           }}>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-[#F5F5DC]">
-            {currentQuestionSection.title}
-          </h2>
-          <span className="text-[#B49B7E] text-sm font-medium">
-            Section {currentSection + 1} of {questionSections.length}
-          </span>
-        </div>
+      {/* Questionnaire Content */}
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-gray-800 rounded-lg p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-white">
+              {currentQuestionSection.title}
+            </h2>
+            <span className="text-gray-400 text-sm">
+              Section {currentSection + 1} of {questionSections.length}
+            </span>
+          </div>
 
-        <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
-          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
-            <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
-              <table className="w-full border-collapse border border-gray-400">
-                <tbody>
-                  {currentQuestionSection.questions.map((question, index) => (
-                    <tr key={question.id} style={{ 
-                      background: index % 2 === 0 
-                        ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
-                        : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
-                    }}>
-                      <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm" style={{minWidth: '300px'}}>
-                        {index + 1}. {question.question}
-                      </td>
-                      <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
-                        {question.type === 'radio' && (
-                          <div className="space-y-2">
-                            {question.options.map(option => (
-                              <label key={option} className="flex items-center space-x-2 cursor-pointer">
-                                <input
-                                  type="radio"
-                                  name={question.id}
-                                  value={option}
-                                  checked={answers[question.id] === option}
-                                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                                  className="w-3 h-3 text-[#D4A574]"
-                                />
-                                <span className="text-[#D4C5A9] text-sm">{option}</span>
-                              </label>
-                            ))}
-                          </div>
-                        )}
+          <div className="space-y-8">
+            {currentQuestionSection.questions.map((question, index) => (
+              <div key={question.id} className="space-y-4">
+                <h3 className="text-lg font-medium text-white">
+                  {index + 1}. {question.question}
+                </h3>
 
-                        {question.type === 'checkbox' && (
-                          <div className="space-y-2">
-                            {question.options.map(option => (
-                              <label key={option} className="flex items-center space-x-2 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  value={option}
-                                  checked={(answers[question.id] || []).includes(option)}
-                                  onChange={(e) => handleAnswerChange(question.id, e.target.value, true)}
-                                  className="w-3 h-3 text-[#D4A574]"
-                                />
-                                <span className="text-[#D4C5A9] text-sm">{option}</span>
-                              </label>
-                            ))}
-                          </div>
-                        )}
-
-                        {question.type === 'text' && (
-                          <textarea
-                            value={answers[question.id] || ''}
-                            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                            className="w-full bg-transparent border-0 text-[#D4C5A9] text-sm focus:outline-none resize-none"
-                            rows="3"
-                            placeholder="Please provide details..."
-                          />
-                        )}
-                      </td>
-                    </tr>
+                <div className="space-y-3">
+                  {question.type === 'radio' && question.options.map(option => (
+                    <label key={option} className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name={question.id}
+                        value={option}
+                        checked={answers[question.id] === option}
+                        onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                        className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600"
+                      />
+                      <span className="text-gray-300">{option}</span>
+                    </label>
                   ))}
-                </tbody>
-              </table>
-            </div>
+
+                  {question.type === 'checkbox' && question.options.map(option => (
+                    <label key={option} className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        value={option}
+                        checked={(answers[question.id] || []).includes(option)}
+                        onChange={(e) => handleAnswerChange(question.id, e.target.value, true)}
+                        className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded"
+                      />
+                      <span className="text-gray-300">{option}</span>
+                    </label>
+                  ))}
+
+                  {question.type === 'text' && (
+                    <textarea
+                      value={answers[question.id] || ''}
+                      onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                      className="w-full bg-gray-700 text-white px-4 py-3 rounded border border-gray-600"
+                      rows="4"
+                      placeholder="Please provide details..."
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-8">
+            <button
+              onClick={() => setCurrentSection(Math.max(0, currentSection - 1))}
+              disabled={currentSection === 0}
+              className="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:text-gray-500 text-white px-6 py-2 rounded"
+            >
+              ← Previous
+            </button>
+
+            <button
+              onClick={saveAnswers}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+            >
+              💾 Save Progress
+            </button>
+
+            {!isLastSection ? (
+              <button
+                onClick={() => setCurrentSection(Math.min(questionSections.length - 1, currentSection + 1))}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+              >
+                Next →
+              </button>
+            ) : (
+              <button
+                onClick={async () => {
+                  const saved = await saveAnswers();
+                  if (saved) {
+                    alert('Questionnaire completed! Ready to proceed to Walkthrough.');
+                    // Navigate to walkthrough
+                    window.location.href = `/project/${projectId}/walkthrough`;
+                  }
+                }}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold"
+                style={{ backgroundColor: '#8b7355' }}
+              >
+                Complete → Start Walkthrough
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-8">
-          <button
-            onClick={() => setCurrentSection(Math.max(0, currentSection - 1))}
-            disabled={currentSection === 0}
-            className="bg-[#8B4444]/80 hover:bg-[#8B4444] disabled:bg-gray-800/50 disabled:text-[#F5F5DC]/30 text-[#F5F5DC] px-6 py-2 rounded border border-[#B49B7E]/20"
-          >
-            ← Previous
-          </button>
-          
-          {currentSection < questionSections.length - 1 ? (
-            <button
-              onClick={() => setCurrentSection(Math.min(questionSections.length - 1, currentSection + 1))}
-              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-black px-6 py-2 rounded border border-[#B49B7E]/20"
-            >
-              Next →
-            </button>
-          ) : (
-            <button
-              onClick={async () => {
-                const saved = await saveAnswers();
-                if (saved) {
-                  alert('Questionnaire completed and saved!');
-                }
-              }}
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-[#F5F5DC] px-8 py-2 rounded border border-[#B49B7E]/20"
-            >
-              Complete Questionnaire
-            </button>
-          )}
-        </div>
+        {/* Walkthrough Preparation Panel */}
+        {completionPercentage > 70 && (
+          <div className="mt-6 bg-gray-800 rounded-lg p-6 border border-gray-600">
+            <h3 className="text-lg font-bold text-white mb-4">Walkthrough Preparation</h3>
+            <p className="text-gray-300 mb-4">
+              Based on your answers, here's what to focus on during the walkthrough:
+            </p>
+            <ul className="space-y-2">
+              {generateWalkthroughPriorities().map((priority, index) => (
+                <li key={index} className="flex items-center space-x-2 text-gray-300">
+                  <span className="text-green-400">✓</span>
+                  <span>{priority}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
-
-      {/* Walkthrough Preparation (if completed) */}
-      {completionPercentage === 100 && (
-        <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20" 
-             style={{
-               background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-             }}>
-          <h3 className="text-lg font-bold text-[#F5F5DC] mb-4">Walkthrough Preparation</h3>
-          <p className="text-[#F5F5DC]/80 mb-4">
-            Based on your answers, here's what to focus on during the walkthrough:
-          </p>
-          <ul className="space-y-2">
-            {generateWalkthroughPriorities().map((priority, index) => (
-              <li key={index} className="flex items-center space-x-2 text-[#F5F5DC]/90">
-                <span className="text-[#B49B7E]">✓</span>
-                <span>{priority}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </CompletePageLayout>
+    </div>
   );
 };
 

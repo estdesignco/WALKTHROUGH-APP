@@ -100,29 +100,24 @@ const ChecklistSpreadsheet = ({
 
   const handleAddCategory = async (roomId, categoryName) => {
     try {
-      console.log(`🚀 ADD CATEGORY: Creating comprehensive '${categoryName}' with ALL subcategories and items`);
-      
-      // Use the new comprehensive endpoint that auto-populates with ALL items and subcategories
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: categoryName,
+          room_id: roomId,
+          order_index: 0
+        })
       });
 
       if (response.ok) {
-        const newCategory = await response.json();
-        console.log(`✅ SUCCESS: Created comprehensive category '${categoryName}' with ${newCategory.subcategories?.length || 0} subcategories`);
-        
-        alert(`✅ Added comprehensive category '${categoryName}' with all subcategories and items!`);
-        
-        if (onReload) onReload();
+        console.log('✅ Checklist category added successfully');
+        window.location.reload();
       } else {
-        const errorText = await response.text();
-        console.error(`❌ Failed to create comprehensive category: ${errorText}`);
-        alert(`Failed to add category '${categoryName}'. Please try again.`);
+        throw new Error(`HTTP ${response.status}`);
       }
     } catch (error) {
-      console.error('Error adding comprehensive category:', error);
-      alert(`Error adding category '${categoryName}'. Please try again.`);
+      console.error('❌ Error adding checklist category:', error);
     }
   };
 
@@ -288,7 +283,7 @@ const ChecklistSpreadsheet = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none placeholder-[#D4A574]/70"
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
           
@@ -531,18 +526,8 @@ const ChecklistSpreadsheet = ({
                                         <option value="">Add Category ▼</option>
                                         <option value="Lighting">Lighting</option>
                                         <option value="Furniture">Furniture</option>
-                                        <option value="Window Treatments">Window Treatments</option>
-                                        <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
-                                        <option value="Art & Accessories">Art & Accessories</option>
-                                        <option value="Fireplace & Built-ins">Fireplace & Built-ins</option>
-                                        <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
-                                        <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
-                                        <option value="Furniture & Storage">Furniture & Storage</option>
-                                        <option value="Cabinets & Storage">Cabinets & Storage</option>
-                                        <option value="Cabinets, Built-ins, and Trim">Cabinets, Built-ins, and Trim</option>
-                                        <option value="Tile and Tops">Tile and Tops</option>
-                                        <option value="Appliances">Appliances</option>
                                         <option value="Decor & Accessories">Decor & Accessories</option>
+                                        <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
                                       </select>
                                       
                                       <button

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import CompletePageLayout from './CompletePageLayout';
 
 const ComprehensiveQuestionnaire = () => {
   const navigate = useNavigate();
@@ -208,7 +207,7 @@ const ComprehensiveQuestionnaire = () => {
 
   const renderClientInformation = () => (
     <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-[#F5F5DC] mb-4">CLIENT INFORMATION</h3>
+      <h3 className="text-xl font-semibold text-white mb-4">CLIENT INFORMATION</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -217,7 +216,7 @@ const ComprehensiveQuestionnaire = () => {
             type="text"
             value={formData.full_name}
             onChange={(e) => handleInputChange('full_name', e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
             required
           />
         </div>
@@ -228,7 +227,7 @@ const ComprehensiveQuestionnaire = () => {
             type="text"
             value={formData.project_name}
             onChange={(e) => handleInputChange('project_name', e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
             required
           />
         </div>
@@ -239,7 +238,7 @@ const ComprehensiveQuestionnaire = () => {
             type="email"
             value={formData.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           />
         </div>
         
@@ -249,7 +248,7 @@ const ComprehensiveQuestionnaire = () => {
             type="tel"
             value={formData.phone}
             onChange={(e) => handleInputChange('phone', e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           />
         </div>
       </div>
@@ -260,7 +259,7 @@ const ComprehensiveQuestionnaire = () => {
           type="text"
           value={formData.address}
           onChange={(e) => handleInputChange('address', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
       </div>
       
@@ -289,7 +288,7 @@ const ComprehensiveQuestionnaire = () => {
           type="text"
           value={formData.call_time}
           onChange={(e) => handleInputChange('call_time', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
       </div>
       
@@ -298,7 +297,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.designer_experience}
           onChange={(e) => handleInputChange('designer_experience', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -309,7 +308,7 @@ const ComprehensiveQuestionnaire = () => {
           type="text"
           value={formData.decision_makers}
           onChange={(e) => handleInputChange('decision_makers', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
       </div>
       
@@ -318,7 +317,7 @@ const ComprehensiveQuestionnaire = () => {
         <select
           value={formData.involvement_level}
           onChange={(e) => handleInputChange('involvement_level', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         >
           <option value="Very involved - I want to approve every detail">Very involved - I want to approve every detail</option>
           <option value="Somewhat involved - I want to approve major decisions">Somewhat involved - I want to approve major decisions</option>
@@ -331,7 +330,7 @@ const ComprehensiveQuestionnaire = () => {
         <select
           value={formData.sofa_price_point}
           onChange={(e) => handleInputChange('sofa_price_point', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         >
           <option value="$2,000-$4,000">$2,000-$4,000</option>
           <option value="$4,000-$8,000">$4,000-$8,000</option>
@@ -344,14 +343,14 @@ const ComprehensiveQuestionnaire = () => {
 
   const renderScopeOfWork = () => (
     <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-[#F5F5DC] mb-4">TOTAL SCOPE OF WORK FOR YOUR PROJECT</h3>
+      <h3 className="text-xl font-semibold text-white mb-4">TOTAL SCOPE OF WORK FOR YOUR PROJECT</h3>
       
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">What type of property is this?</label>
         <select
           value={formData.property_type}
           onChange={(e) => handleInputChange('property_type', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         >
           <option value="Primary Residence">Primary Residence</option>
           <option value="Vacation Home">Vacation Home</option>
@@ -367,7 +366,7 @@ const ComprehensiveQuestionnaire = () => {
           type="text"
           value={formData.timeline}
           onChange={(e) => handleInputChange('timeline', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
       </div>
       
@@ -376,7 +375,7 @@ const ComprehensiveQuestionnaire = () => {
         <select
           value={formData.budget_range}
           onChange={(e) => handleInputChange('budget_range', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         >
           <option value="$15k-$30k">$15k-$30k</option>
           <option value="$30k-$50k">$30k-$50k</option>
@@ -435,7 +434,7 @@ const ComprehensiveQuestionnaire = () => {
           type="text"
           value={formData.custom_rooms}
           onChange={(e) => handleInputChange('custom_rooms', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           placeholder="Enter custom room name"
         />
       </div>
@@ -444,7 +443,7 @@ const ComprehensiveQuestionnaire = () => {
 
   const renderProjectType = () => (
     <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-[#F5F5DC] mb-4">TYPE OF PROJECT</h3>
+      <h3 className="text-xl font-semibold text-white mb-4">TYPE OF PROJECT</h3>
       
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">What type of project is this?</label>
@@ -470,7 +469,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.project_description}
           onChange={(e) => handleInputChange('project_description', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="4"
         />
       </div>
@@ -479,14 +478,14 @@ const ComprehensiveQuestionnaire = () => {
 
   const renderDesignQuestions = () => (
     <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-[#F5F5DC] mb-4">DESIGN QUESTIONS</h3>
+      <h3 className="text-xl font-semibold text-white mb-4">DESIGN QUESTIONS</h3>
       
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">What do you love about your current home?</label>
         <textarea
           value={formData.home_loves}
           onChange={(e) => handleInputChange('home_loves', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -496,7 +495,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.space_usage}
           onChange={(e) => handleInputChange('space_usage', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -506,7 +505,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.first_impression}
           onChange={(e) => handleInputChange('first_impression', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -516,7 +515,7 @@ const ComprehensiveQuestionnaire = () => {
         <select
           value={formData.preferred_color_palette}
           onChange={(e) => handleInputChange('preferred_color_palette', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         >
           <option value="Dark & Moody">Dark & Moody</option>
           <option value="Light & Airy">Light & Airy</option>
@@ -576,7 +575,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.meaningful_pieces}
           onChange={(e) => handleInputChange('meaningful_pieces', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -608,7 +607,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.material_preferences_notes}
           onChange={(e) => handleInputChange('material_preferences_notes', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -617,14 +616,14 @@ const ComprehensiveQuestionnaire = () => {
 
   const renderLifestyle = () => (
     <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-[#F5F5DC] mb-4">GETTING TO KNOW YOU BETTER...</h3>
+      <h3 className="text-xl font-semibold text-white mb-4">GETTING TO KNOW YOU BETTER...</h3>
       
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">Who lives in your household? (Include ages of children if applicable)</label>
         <textarea
           value={formData.household_members}
           onChange={(e) => handleInputChange('household_members', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -635,7 +634,7 @@ const ComprehensiveQuestionnaire = () => {
           type="text"
           value={formData.pets}
           onChange={(e) => handleInputChange('pets', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
       </div>
       
@@ -644,7 +643,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.entertaining_style}
           onChange={(e) => handleInputChange('entertaining_style', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -654,7 +653,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.hobbies}
           onChange={(e) => handleInputChange('hobbies', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -664,7 +663,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.happiness}
           onChange={(e) => handleInputChange('happiness', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -675,7 +674,7 @@ const ComprehensiveQuestionnaire = () => {
           type="text"
           value={formData.favorite_restaurant}
           onChange={(e) => handleInputChange('favorite_restaurant', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
       </div>
       
@@ -685,7 +684,7 @@ const ComprehensiveQuestionnaire = () => {
           type="text"
           value={formData.favorite_vacation}
           onChange={(e) => handleInputChange('favorite_vacation', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
       </div>
       
@@ -694,7 +693,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.favorite_space}
           onChange={(e) => handleInputChange('favorite_space', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="3"
         />
       </div>
@@ -704,7 +703,7 @@ const ComprehensiveQuestionnaire = () => {
         <textarea
           value={formData.additional_sharing}
           onChange={(e) => handleInputChange('additional_sharing', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           rows="4"
         />
       </div>
@@ -713,14 +712,14 @@ const ComprehensiveQuestionnaire = () => {
 
   const renderReferralSource = () => (
     <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-[#F5F5DC] mb-4">HOW DID YOU HEAR ABOUT US</h3>
+      <h3 className="text-xl font-semibold text-white mb-4">HOW DID YOU HEAR ABOUT US</h3>
       
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">How did you hear about us?</label>
         <select
           value={formData.referral_source}
           onChange={(e) => handleInputChange('referral_source', e.target.value)}
-          className="w-full px-3 py-2 bg-gray-700 border border-[#B49B7E]/30 rounded-md text-[#F5F5DC]"
+          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         >
           <option value="Internet Search">Internet Search</option>
           <option value="Social Media">Social Media</option>
@@ -747,48 +746,51 @@ const ComprehensiveQuestionnaire = () => {
   };
 
   return (
-    <CompletePageLayout 
-      projectId={clientId}
-      activeTab="questionnaire"
-      title="COMPREHENSIVE CLIENT QUESTIONNAIRE"
-      hideNavigation={true}
-    >
-      {/* Progress Bar Container */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
-           style={{
-             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-           }}>
-        <div className="flex items-center justify-between mb-4">
+    <div className="min-h-screen bg-gray-900">
+      {/* Header */}
+      <div className="bg-gray-800 border-b border-gray-700">
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <h1 className="text-3xl font-bold text-white tracking-wider text-center">
+            ESTABLISHED DESIGN CO.
+          </h1>
+          <h2 className="text-xl text-yellow-400 text-center mt-2">
+            COMPREHENSIVE CLIENT QUESTIONNAIRE
+          </h2>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="flex items-center justify-between mb-2">
           {sections.map((section, index) => (
             <div
               key={section}
               className={`flex-1 text-center text-sm ${
                 index === currentSection
-                  ? 'text-[#B49B7E] font-semibold'
+                  ? 'text-yellow-400 font-semibold'
                   : index < currentSection
                   ? 'text-green-400'
-                  : 'text-[#F5F5DC]/60'
+                  : 'text-gray-500'
               }`}
             >
               {section}
             </div>
           ))}
         </div>
-        <div className="w-full bg-gray-700/50 rounded-full h-2 border border-[#B49B7E]/20">
+        <div className="w-full bg-gray-700 rounded-full h-2">
           <div
-            className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] h-2 rounded-full transition-all duration-300"
+            className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
             style={{ width: `${((currentSection + 1) / sections.length) * 100}%` }}
           ></div>
         </div>
       </div>
 
-      {/* Form Content Container */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-8 border border-[#B49B7E]/20 mb-6" 
-           style={{
-             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-           }}>
+      {/* Form Content */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
         <form onSubmit={handleSubmit}>
-          {renderCurrentSection()}
+          <div className="bg-gray-800 rounded-lg p-8">
+            {renderCurrentSection()}
+          </div>
 
           {/* Navigation Buttons */}
           <div className="flex justify-between mt-8">
@@ -796,7 +798,7 @@ const ComprehensiveQuestionnaire = () => {
               type="button"
               onClick={prevSection}
               disabled={currentSection === 0}
-              className="px-6 py-3 bg-[#8B4444]/80 hover:bg-[#8B4444] disabled:bg-gray-800/50 text-[#F5F5DC] rounded-lg transition-colors border border-[#B49B7E]/20"
+              className="px-6 py-3 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 text-white rounded-lg transition-colors"
             >
               Previous
             </button>
@@ -806,7 +808,7 @@ const ComprehensiveQuestionnaire = () => {
                 <button
                   type="button"
                   onClick={nextSection}
-                  className="px-6 py-3 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-black rounded-lg transition-colors border border-[#B49B7E]/20"
+                  className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
                 >
                   Next
                 </button>
@@ -814,7 +816,7 @@ const ComprehensiveQuestionnaire = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting || !formData.full_name || !formData.project_name}
-                  className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 disabled:bg-gray-600/50 text-[#F5F5DC] rounded-lg transition-colors border border-[#B49B7E]/20"
+                  className="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors"
                 >
                   {isSubmitting ? 'Creating Project...' : 'Submit Questionnaire'}
                 </button>
@@ -823,7 +825,7 @@ const ComprehensiveQuestionnaire = () => {
           </div>
         </form>
       </div>
-    </CompletePageLayout>
+    </div>
   );
 };
 

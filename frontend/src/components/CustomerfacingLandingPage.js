@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Loader2, Home, Trash2, Mail, Send } from 'lucide-react';
+import { Plus, Loader2, Home, Trash2, Mail, Send, FileSpreadsheet } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -165,7 +165,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [newRoomName, setNewRoomName] = useState("");
 
-    const handleFormChange = React.useCallback((field, value) => {
+    const handleFormChange = (field, value) => {
         if (field === 'phone') {
             const onlyNums = value.replace(/[^\d]/g, '');
             let formatted = onlyNums;
@@ -178,7 +178,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
         } else {
             setFormData(prev => ({ ...prev, [field]: value }));
         }
-    }, []);
+    };
 
     const handleRoomsChange = (newRooms) => {
         handleFormChange('rooms_involved', newRooms);
@@ -197,56 +197,76 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
 
     const handleCreateProject = async (e) => {
         e.preventDefault();
+        if (!formData.name && !formData.client_name) {
+            alert('Please provide at least a project name or client name.');
+            return;
+        }
         setIsLoading(true);
-
         try {
-            const formData = new FormData(e.target);
-            const formValues = Object.fromEntries(formData.entries());
-            
-            const projectData = {
-                name: formValues.name || `${formValues.client_name}'s Project`,
-                client_info: {
-                    full_name: formValues.client_name,
-                    email: formValues.email,
-                    phone: formValues.phone,
-                    address: formValues.address || '',
-                    contact_preferences: [],
-                    best_time_to_call: formValues.best_time_to_call || ''
-                },
-                project_type: formValues.project_type || 'Renovation',
-                timeline: formValues.timeline || '',
-                budget: formValues.budget_range || '$35k-65k',
-                rooms_involved: [],
-                design_styles_preference: [],
-                design_preferred_palette: [],
-                design_artwork_preference: []
-            };
+            console.log('🏠 Creating project with formData:', formData);
+            console.log('🏠 Rooms involved:', formData.rooms_involved);
+            const newProject = await Project.create(formData);
 
-            console.log('Creating project with data:', projectData);
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(projectData),
-            });
+            // Create rooms WITH THE CORRECT STARTER ITEMS
+            if (formData.rooms_involved && formData.rooms_involved.length > 0) {
+                console.log('🏠 Creating rooms for:', formData.rooms_involved);
+                const uniqueRooms = [...new Set(formData.rooms_involved)];
+                
+                for (const roomName of uniqueRooms) {
+                    console.log('🏠 Creating room:', roomName);
+                    const newRoom = await Room.create({ 
+                        project_id: newProject.id, 
+                        name: roomName, 
+                        notes: '' 
+                    });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                    // THIS IS THE CORRECTED, SIMPLIFIED ITEM POPULATION LOGIC
+                    const basicItems = [
+                        { category: 'LIGHTING', sub_category: 'CEILING', name: 'Ceiling Light - Click to edit' },
+                        { category: 'FURNITURE', sub_category: 'SEATING', name: 'Seating - Click to edit' },
+                        { category: 'ACCESSORIES', sub_category: 'ART & DECOR', name: 'Art & Decor - Click to edit' },
+                        { category: 'PAINT, WALLPAPER, HARDWARE & FINISHES', sub_category: 'WALL', name: 'Wall Finish - Click to edit' },
+                        { category: 'PAINT, WALLPAPER, HARDWARE & FINISHES', sub_category: 'FLOORING', name: 'Flooring - Click to edit' }
+                    ];
+
+                    if (roomName.toLowerCase().includes('kitchen')) {
+                        basicItems.push(
+                            { category: 'APPLIANCES', sub_category: 'KITCHEN APPLIANCES', name: 'Refrigerator - Click to edit' },
+                            { category: 'PLUMBING', sub_category: 'KITCHEN SINKS & FAUCETS', name: 'Kitchen Sink - Click to edit' },
+                            { category: 'CABINETS', sub_category: 'LOWER', name: 'Lower Cabinets - Click to edit' },
+                            { category: 'COUNTERTOPS & TILE', sub_category: 'COUNTERTOPS', name: 'Countertops - Click to edit' }
+                        );
+                    } else if (roomName.toLowerCase().includes('bath')) {
+                        basicItems.push(
+                            { category: 'PLUMBING', sub_category: 'SHOWER & TUB', name: 'Shower/Tub - Click to edit' },
+                            { category: 'CABINETS', sub_category: 'VANITY', name: 'Vanity - Click to edit' },
+                            { category: 'COUNTERTOPS & TILE', sub_category: 'TILE', name: 'Floor Tile - Click to edit' }
+                        );
+                    } else if (roomName.toLowerCase().includes('bedroom')) {
+                        basicItems.push(
+                            { category: 'FURNITURE', sub_category: 'BEDS', name: 'Bed - Click to edit' },
+                            { category: 'TEXTILES', sub_category: 'BEDDING', name: 'Bedding - Click to edit' }
+                        );
+                    }
+
+                    const itemsToCreate = basicItems.map(item => ({
+                        project_id: newProject.id,
+                        room_id: newRoom.id,
+                        category: item.category,
+                        sub_category: item.sub_category,
+                        name: item.name,
+                        status: 'Walkthrough',
+                        quantity: 1,
+                    }));
+
+                    await Item.bulkCreate(itemsToCreate);
+                }
             }
 
-            const newProject = await response.json();
-            console.log('Project created successfully:', newProject);
-            
-            alert('Project created successfully!');
-            onOpenChange(false);
-            
-            // Reset form
-            e.target.reset();
+            window.location.href = `/project/${newProject.id}/detail`;
         } catch (error) {
-            console.error('Error creating project:', error);
-            alert('Error creating project. Please try again.');
-        } finally {
+            console.error('Failed to create project:', error);
+            alert('Failed to create project. Please try again.');
             setIsLoading(false);
         }
     };
@@ -301,18 +321,10 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
         </div>
     );
 
-    const InputField = ({ label, id, name, type = "text", placeholder = "", className = "" }) => (
+    const InputField = ({ label, id, value, onChange, type = "text", placeholder = "", className = "" }) => (
         <div className="space-y-1">
             <Label htmlFor={id} className="text-sm font-medium text-stone-300">{label}</Label>
-            <input 
-                id={id} 
-                name={name}
-                type={type} 
-                placeholder={placeholder} 
-                className={`${inputStyles} ${className} w-full px-3 py-2 rounded-md border-0 bg-gray-700 text-stone-200 focus:outline-none focus:ring-2 focus:ring-[#8B7355]`}
-                autoComplete="off"
-                defaultValue=""
-            />
+            <Input id={id} type={type} value={value} onChange={onChange} placeholder={placeholder} className={`${inputStyles} ${className}`} />
         </div>
     );
 
@@ -385,12 +397,12 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                     {/* Client Information */}
                     <Section title="Client Information">
                         <div className="grid grid-cols-2 gap-3">
-                            <InputField label="Client Name" id="client_name" name="client_name" />
-                            <InputField label="Project Name" id="name" name="name" />
+                            <InputField label="Client Name" id="client_name" value={formData.client_name || ''} onChange={(e) => handleFormChange('client_name', e.target.value)} />
+                            <InputField label="Project Name" id="name" value={formData.name || ''} onChange={(e) => handleFormChange('name', e.target.value)} />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                            <InputField label="Email Address" id="email" name="email" type="email" />
-                            <InputField label="Phone Number" id="phone" name="phone" type="tel" />
+                            <InputField label="Email Address" id="email" type="email" value={formData.email || ''} onChange={(e) => handleFormChange('email', e.target.value)} />
+                            <InputField label="Phone Number" id="phone" type="tel" value={formData.phone || ''} onChange={(e) => handleFormChange('phone', e.target.value)} />
                         </div>
                         <FieldWrapper label="Project Address">
                             <Textarea className={inputStyles} value={formData.address || ''} onChange={(e) => handleFormChange('address', e.target.value)} />
@@ -398,7 +410,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                         <FieldWrapper label="Contact Preferences">
                             <CheckboxGroup options={contactPrefOptions} value={formData.contact_preferences} onChange={(v) => handleFormChange('contact_preferences', v)} />
                         </FieldWrapper>
-                        <InputField label="Best Time to Call" id="best_time_to_call" name="best_time_to_call" />
+                        <InputField label="Best Time to Call" id="best_time_to_call" value={formData.best_time_to_call || ''} onChange={(e) => handleFormChange('best_time_to_call', e.target.value)} />
                     </Section>
 
                     {/* Project Type & Budget */}
@@ -406,7 +418,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                         <FieldWrapper label="What type of project is this?">
                             <RadioGroup value={formData.project_type} onValueChange={(value) => handleFormChange('project_type', value)} className="text-stone-200">
                                 <div className="grid grid-cols-2 gap-2">
-                                    {["New Build", "Renovation", "Furniture/Styling Refresh", "Other"].map(option => (
+                                    {["Renovation", "New Construction", "Design Consultation", "Furniture Only"].map(option => (
                                         <div key={option} className="flex items-center space-x-2">
                                             <RadioGroupItem value={option} id={`type-${option}`} className="border-stone-400 text-[#8B7355]" />
                                             <Label htmlFor={`type-${option}`} className="text-sm text-stone-200">{option}</Label>
@@ -416,7 +428,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                             </RadioGroup>
                         </FieldWrapper>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                            <InputField label="Your Timeline" id="timeline" name="timeline" />
+                            <InputField label="Your Timeline" id="timeline" value={formData.timeline} onChange={(e) => handleFormChange('timeline', e.target.value)} />
                             <div>
                                 <Label htmlFor="budget_range" className="font-semibold text-stone-300">Budget Range</Label>
                                 <Select value={formData.budget_range} onValueChange={(value) => handleFormChange('budget_range', value)}>
@@ -780,6 +792,11 @@ export default function Index() {
               <Link to={createPageUrl("Questionnaire")}>
                   <Button className="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md transition-all duration-300 text-base">
                       <Plus className="mr-2 h-5 w-5" /> Full Questionnaire
+                  </Button>
+              </Link>
+              <Link to="/google-sheets-import">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-5 rounded-lg shadow-md transition-all duration-300 text-base">
+                      <FileSpreadsheet className="mr-2 h-5 w-5" /> Import Google Sheets
                   </Button>
               </Link>
           </div>

@@ -56,33 +56,33 @@ const createPageUrl = (page) => {
 
 // Section wrapper component
 const Section = ({ title, description, children }) => (
-    <Card className="bg-gray-800 border-stone-700 shadow-lg">
-        <CardHeader>
-            <CardTitle className="text-2xl font-bold text-stone-300">{title}</CardTitle>
-            {description && <CardDescription className="text-md text-stone-400">{description}</CardDescription>}
+    <Card className="bg-gradient-to-br from-black/80 to-gray-900/90 border-[#B49B7E]/20 shadow-2xl backdrop-blur-sm">
+        <CardHeader className="border-b border-[#B49B7E]/10 pb-6">
+            <CardTitle className="text-3xl font-light text-[#B49B7E] tracking-wide">{title}</CardTitle>
+            {description && <CardDescription className="text-lg text-[#F5F5DC]/70 mt-3 leading-relaxed">{description}</CardDescription>}
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8 pt-8">
             {children}
         </CardContent>
     </Card>
 );
 
 const FieldWrapper = ({ label, children, required }) => (
-    <div className="space-y-2">
-        <Label className="text-lg font-semibold text-[#8B7355]">
-            {label} {required && <span className="text-red-400">*</span>}
+    <div className="space-y-3">
+        <Label className="text-lg font-light text-[#B49B7E] tracking-wide">
+            {label} {required && <span className="text-[#B49B7E]/80">*</span>}
         </Label>
         {children}
     </div>
 );
 
-const inputStyles = "bg-gray-700 border-gray-600 text-[#F5F5DC] focus:border-[#8B7355] placeholder:text-stone-400";
+const inputStyles = "bg-black/40 border-[#B49B7E]/30 text-[#F5F5DC] focus:border-[#B49B7E] focus:bg-black/60 placeholder:text-[#B49B7E]/50 transition-all duration-300";
 
 // New InputField component
 const InputField = ({ label, id, value, onChange, required = false, type = "text", placeholder = "" }) => (
-    <div className="space-y-2">
-        <Label htmlFor={id} className="text-lg font-semibold text-[#8B7355]">
-            {label} {required && <span className="text-red-400">*</span>}
+    <div className="space-y-3">
+        <Label htmlFor={id} className="text-lg font-light text-[#B49B7E] tracking-wide">
+            {label} {required && <span className="text-[#B49B7E]/80">*</span>}
         </Label>
         <Input
             id={id}
@@ -112,9 +112,9 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
                         id={option}
                         checked={value.includes(option)}
                         onCheckedChange={(checked) => handleCheckedChange(option, checked)}
-                        className="border-stone-400 data-[state=checked]:bg-[#F5F5DC] data-[state=checked]:border-[#F5F5DC] data-[state=checked]:text-[#8B7355]"
+                        className="border-[#B49B7E]/50 data-[state=checked]:bg-[#B49B7E] data-[state=checked]:border-[#B49B7E] data-[state=checked]:text-white"
                     />
-                    <label htmlFor={option} className="text-sm font-medium leading-none text-[#F5F5DC]">
+                    <label htmlFor={option} className="text-sm font-light leading-relaxed text-[#F5F5DC]/90">
                         {option}
                     </label>
                 </div>
@@ -396,27 +396,29 @@ export default function Questionnaire() {
 
 
     return (
-        <div className="bg-[#1E293B] min-h-screen p-4 sm:p-6 lg:p-8" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
-            <div className="max-w-4xl mx-auto bg-[#2D3748] p-8 rounded-lg shadow-2xl">
+        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black p-4 sm:p-6 lg:p-8" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+            <div className="max-w-4xl mx-auto bg-gradient-to-br from-black/60 to-gray-900/80 p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm">
                 {/* Back Button */}
-                <div className="mb-6">
-                    <Link to="/" className="flex items-center text-stone-400 hover:text-stone-200 transition-colors">
+                <div className="mb-8">
+                    <Link to="/customer" className="flex items-center text-[#B49B7E]/70 hover:text-[#B49B7E] transition-all duration-300">
                         <ArrowLeft className="w-5 h-5 mr-2" />
-                        Back to Projects
+                        Back to Home
                     </Link>
                 </div>
 
-                {/* Header that matches your drawing - bigger and more proportionate container */}
-                <div className="w-full bg-[#8B7355] shadow-lg flex items-center justify-center my-8" style={{ height: '130px' }}>
+                {/* Header with your actual logo */}
+                <div className="w-full bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] shadow-2xl flex items-center justify-center my-8 rounded-2xl px-4 py-2" style={{ height: '150px' }}>
                     <img
-                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf5_Establishedlogo.png"
+                        src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
                         alt="Established Design Co."
                         className="w-full h-full object-contain"
+                        style={{ transform: 'scale(1.8)', maxWidth: '95%', maxHeight: '90%' }}
                     />
                 </div>
 
                 <div className="text-center mb-12">
-                    <h1 className="text-xl font-bold text-[#8B7355]">COMPREHENSIVE CLIENT QUESTIONNAIRE</h1>
+                    <h2 className="text-2xl font-light text-[#B49B7E] tracking-wider">COMPREHENSIVE CLIENT QUESTIONNAIRE</h2>
+                    <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mt-4"></div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-12 mt-8">
@@ -439,18 +441,18 @@ export default function Questionnaire() {
                         <InputField label="Who will be the primary decision maker(s) for this project?" id="primary_decision_maker" value={formData.primary_decision_maker || ''} onChange={(e) => handleFormChange('primary_decision_maker', e.target.value)} />
                         <FieldWrapper label="How involved would you like to be in the design process?">
                             <RadioGroup value={formData.involvement_level} onValueChange={(value) => handleFormChange('involvement_level', value)} className="text-[#F5F5DC]">
-                                <div className="flex flex-col space-y-2">
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="Very involved - I want to approve every detail" id="very-involved" className="border-stone-400 text-[#8B7355]" />
-                                        <Label htmlFor="very-involved" className="text-[#F5F5DC]">Very involved - I want to approve every detail</Label>
+                                <div className="flex flex-col space-y-3">
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="Very involved - I want to approve every detail" id="very-involved" className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                        <Label htmlFor="very-involved" className="text-[#F5F5DC]/90 font-light">Very involved - I want to approve every detail</Label>
                                     </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="Somewhat involved - I want to approve major decisions" id="somewhat-involved" className="border-stone-400 text-[#8B7355]" />
-                                        <Label htmlFor="somewhat-involved" className="text-[#F5F5DC]">Somewhat involved - I want to approve major decisions</Label>
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="Somewhat involved - I want to approve major decisions" id="somewhat-involved" className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                        <Label htmlFor="somewhat-involved" className="text-[#F5F5DC]/90 font-light">Somewhat involved - I want to approve major decisions</Label>
                                     </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="Minimally involved - I trust your expertise" id="minimally-involved" className="border-stone-400 text-[#8B7355]" />
-                                        <Label htmlFor="minimally-involved" className="text-[#F5F5DC]">Minimally involved - I trust your expertise</Label>
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="Minimally involved - I trust your expertise" id="minimally-involved" className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                        <Label htmlFor="minimally-involved" className="text-[#F5F5DC]/90 font-light">Minimally involved - I trust your expertise</Label>
                                     </div>
                                 </div>
                             </RadioGroup>
@@ -766,7 +768,81 @@ export default function Questionnaire() {
                         </FieldWrapper>
                     </Section>
 
-                    {/* Section 9: How Did You Hear About Us */}
+                    {/* Section 9: Lifestyle & Preferences */}
+                    <Section title="LIFESTYLE & SPECIAL CONSIDERATIONS" description="Help us understand your unique needs and preferences to create the perfect space for your lifestyle.">
+                        <FieldWrapper label="Are you interested in smart home technology integration?">
+                            <RadioGroup value={formData.smart_home_interest} onValueChange={(value) => handleFormChange('smart_home_interest', value)} className="text-[#F5F5DC]">
+                                <div className="flex flex-col space-y-3">
+                                    {["Very interested - I want a fully automated home", "Somewhat interested - Basic smart features", "Not interested - I prefer traditional controls", "Unsure - I'd like to learn more"].map(option => (
+                                        <div key={option} className="flex items-center space-x-3">
+                                            <RadioGroupItem value={option} id={`smart-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                            <Label htmlFor={`smart-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="text-[#F5F5DC]/90 font-light">{option}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </RadioGroup>
+                        </FieldWrapper>
+
+                        <FieldWrapper label="Do you prioritize eco-friendly or sustainable materials?">
+                            <RadioGroup value={formData.sustainability_priority} onValueChange={(value) => handleFormChange('sustainability_priority', value)} className="text-[#F5F5DC]">
+                                <div className="flex flex-col space-y-3">
+                                    {["Extremely important - Sustainability is a top priority", "Important - I prefer eco-friendly when possible", "Somewhat important - If it doesn't compromise design", "Not a priority - Design and function come first"].map(option => (
+                                        <div key={option} className="flex items-center space-x-3">
+                                            <RadioGroupItem value={option} id={`eco-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                            <Label htmlFor={`eco-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="text-[#F5F5DC]/90 font-light">{option}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </RadioGroup>
+                        </FieldWrapper>
+
+                        <FieldWrapper label="What are your biggest storage and organization challenges?">
+                            <Textarea className={inputStyles} value={formData.storage_challenges || ''} onChange={(e) => handleFormChange('storage_challenges', e.target.value)} placeholder="Tell us about your storage needs, clutter concerns, or organization goals..." />
+                        </FieldWrapper>
+
+                        <FieldWrapper label="Do you prefer hidden storage or decorative storage solutions?">
+                            <RadioGroup value={formData.storage_preference} onValueChange={(value) => handleFormChange('storage_preference', value)} className="text-[#F5F5DC]">
+                                <div className="flex flex-col space-y-3">
+                                    {["Hidden storage - Clean, minimal appearance", "Decorative storage - Beautiful and functional display", "Mix of both - Hidden for clutter, decorative for special items", "Depends on the room - Different solutions for different spaces"].map(option => (
+                                        <div key={option} className="flex items-center space-x-3">
+                                            <RadioGroupItem value={option} id={`storage-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                            <Label htmlFor={`storage-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="text-[#F5F5DC]/90 font-light">{option}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </RadioGroup>
+                        </FieldWrapper>
+
+                        <FieldWrapper label="Do you need spaces for specific activities or wellness features?">
+                            <CheckboxGroup 
+                                options={[
+                                    "Home gym/exercise space", "Yoga/meditation area", "Reading nook", "Music room", 
+                                    "Art studio/craft room", "Home office", "Study/library", "Game room", 
+                                    "Wine cellar/bar area", "Outdoor living space", "Air purification systems", 
+                                    "Natural lighting optimization", "Quiet zones/soundproofing"
+                                ]} 
+                                value={formData.special_activity_spaces || []} 
+                                onChange={(v) => handleFormChange('special_activity_spaces', v)} 
+                            />
+                        </FieldWrapper>
+
+                        <FieldWrapper label="How much maintenance are you comfortable with for finishes and materials?">
+                            <RadioGroup value={formData.maintenance_preference} onValueChange={(value) => handleFormChange('maintenance_preference', value)} className="text-[#F5F5DC]">
+                                <div className="flex flex-col space-y-3">
+                                    {["Low maintenance - I want beautiful but easy-care materials", "Moderate maintenance - I'm okay with some upkeep for beauty", "High maintenance - I love luxury materials regardless of care required", "It depends - Different standards for different areas"].map(option => (
+                                        <div key={option} className="flex items-center space-x-3">
+                                            <RadioGroupItem value={option} id={`maint-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="border-[#B49B7E]/50 text-[#B49B7E]" />
+                                            <Label htmlFor={`maint-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="text-[#F5F5DC]/90 font-light">{option}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </RadioGroup>
+                        </FieldWrapper>
+
+                        <InputField label="What's your ideal dinner party or gathering size?" id="ideal_party_size" value={formData.ideal_party_size || ''} onChange={(e) => handleFormChange('ideal_party_size', e.target.value)} placeholder="e.g., Intimate dinners for 4-6, Large parties up to 20, etc." />
+                    </Section>
+
+                    {/* Section 10: How Did You Hear About Us */}
                     <Section title="HOW DID YOU HEAR ABOUT US AND HOW TO STAY IN TOUCH">
                         <FieldWrapper label="How did you hear about us?">
                             <RadioGroup value={formData.how_heard} onValueChange={(value) => handleFormChange('how_heard', value)} className="text-[#F5F5DC]">
@@ -803,21 +879,23 @@ export default function Questionnaire() {
                         </Section>
                     )}
 
-                    <div className="flex justify-end pt-8">
-                        <Button type="submit" disabled={isSubmitting} className="bg-[#B49B7E] hover:bg-[#A08B6F] text-white font-bold py-3 px-8 text-lg rounded-lg w-full sm:w-auto">
-                            {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+                    <div className="flex justify-center pt-12">
+                        <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-white font-light py-4 px-12 text-xl rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide">
+                            {isSubmitting ? <Loader2 className="mr-3 h-6 w-6 animate-spin" /> : null}
                             Submit Questionnaire
                         </Button>
                     </div>
 
                     {submissionStatus === 'success' && (
-                        <div className="mt-4 p-4 bg-green-100 text-green-800 rounded-md">
-                            Questionnaire submitted successfully! Redirecting...
+                        <div className="mt-6 p-6 bg-gradient-to-r from-[#B49B7E]/20 to-[#A08B6F]/20 text-[#B49B7E] rounded-2xl border border-[#B49B7E]/30 text-center">
+                            <h3 className="text-xl font-light mb-2">Questionnaire submitted successfully!</h3>
+                            <p className="text-[#F5F5DC]/70">Thank you for sharing your vision with us. We'll be in touch soon.</p>
                         </div>
                     )}
                     {submissionStatus === 'error' && (
-                        <div className="mt-4 p-4 bg-red-100 text-red-800 rounded-md">
-                            Failed to submit questionnaire. Please try again.
+                        <div className="mt-6 p-6 bg-red-900/20 text-red-300 rounded-2xl border border-red-500/30 text-center">
+                            <h3 className="text-xl font-light mb-2">Something went wrong</h3>
+                            <p className="text-[#F5F5DC]/70">Please try submitting again or contact us directly.</p>
                         </div>
                     )}
                 </form>

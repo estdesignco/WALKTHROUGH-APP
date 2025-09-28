@@ -14,7 +14,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
   // Convert regular status breakdown to checklist format
   const getChecklistStatusBreakdown = () => {
     const checklistStatuses = {
-      'TO BE PICKED': { count: 0, color: '#6B7280' },        // Changed from BLANK to TO BE PICKED (gray)
+      'BLANK': { count: 0, color: '#6B7280' },        // Add BLANK as first status (gray)
       'PICKED': { count: 0, color: '#3B82F6' },
       'ORDER SAMPLES': { count: 0, color: '#10B981' },
       'SAMPLES ARRIVED': { count: 0, color: '#8B5CF6' },
@@ -30,12 +30,12 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
     Object.keys(statusBreakdown).forEach(status => {
       if (checklistStatuses[status]) {
         checklistStatuses[status].count = statusBreakdown[status];
-      } else if (status === '' || status === 'TO BE SELECTED' || status === 'TO BE PICKED') {
-        // Map blank, "TO BE SELECTED", and "TO BE PICKED" to TO BE PICKED
-        checklistStatuses['TO BE PICKED'].count += statusBreakdown[status];
+      } else if (status === '' || status === 'TO BE SELECTED') {
+        // Map blank and "TO BE SELECTED" to BLANK
+        checklistStatuses['BLANK'].count += statusBreakdown[status];
       } else {
-        // For any other unknown statuses, add them to TO BE PICKED as well
-        checklistStatuses['TO BE PICKED'].count += statusBreakdown[status];
+        // For any other unknown statuses, add them to BLANK as well
+        checklistStatuses['BLANK'].count += statusBreakdown[status];
       }
     });
     
@@ -65,16 +65,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right',
-        labels: {
-          color: '#D4A574',
-          font: {
-            size: 12
-          },
-          usePointStyle: true,
-          pointStyle: 'circle',
-          padding: 15
-        }
+        display: false
       },
       tooltip: {
         backgroundColor: '#1F2937',
@@ -136,10 +127,8 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
       {/* LEFT COLUMN - STATUS OVERVIEW */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">Status Overview</h3>
+      <div className="bg-gray-800 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Status Overview</h3>
         
         {/* STATUS PIE CHART */}
         <div className="mb-6">
@@ -147,7 +136,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             {totalItems > 0 ? (
               <Pie data={statusPieData} options={pieOptions} />
             ) : (
-              <div className="flex items-center justify-center h-full text-[#D4A574]">
+              <div className="flex items-center justify-center h-full text-gray-400">
                 No items to display
               </div>
             )}
@@ -156,20 +145,18 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
 
         {/* STATUS SUMMARY */}
         <div className="text-center">
-          <div className="text-2xl font-bold text-[#D4C5A9]">
+          <div className="text-2xl font-bold text-white">
             {totalPicked} Total Items
           </div>
-          <div className="text-sm text-[#D4A574] mt-1">
+          <div className="text-sm text-gray-400 mt-1">
             ({totalItems > 0 ? Math.round((totalPicked / totalItems) * 100) : 0}% Complete)
           </div>
         </div>
       </div>
 
       {/* MIDDLE COLUMN - STATUS BREAKDOWN */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">Status Breakdown</h3>
+      <div className="bg-gray-800 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
@@ -187,7 +174,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: statusData.color }}
                   ></div>
-                  <span className="text-sm text-[#D4A574]">{status}</span>
+                  <span className="text-sm text-gray-300">{status}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="bg-gray-700 rounded-full h-2 w-16">
@@ -199,7 +186,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
                       }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-[#D4C5A9] w-8 text-right">
+                  <span className="text-sm font-medium text-white w-8 text-right">
                     {count}
                   </span>
                 </div>
@@ -210,19 +197,17 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       </div>
 
       {/* RIGHT COLUMN - SHIPPING SECTION */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">Shipping Information</h3>
+      <div className="bg-gray-800 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
-          <h4 className="text-md font-medium text-[#D4A574] mb-3">Carrier Distribution</h4>
+          <h4 className="text-md font-medium text-gray-300 mb-3">Carrier Distribution</h4>
           <div className="h-48">
             {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
               <Pie data={carrierPieData} options={pieOptions} />
             ) : (
-              <div className="flex items-center justify-center h-full text-[#D4A574]">
+              <div className="flex items-center justify-center h-full text-gray-400">
                 No carrier data
               </div>
             )}
@@ -240,7 +225,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: getCarrierColor(carrier) }}
                   ></div>
-                  <span className="text-sm text-[#D4A574]">{carrier}</span>
+                  <span className="text-sm text-gray-300">{carrier}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="bg-gray-700 rounded-full h-2 w-16">
@@ -252,7 +237,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
                       }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-[#D4C5A9] w-8 text-right">
+                  <span className="text-sm font-medium text-white w-8 text-right">
                     {count}
                   </span>
                 </div>

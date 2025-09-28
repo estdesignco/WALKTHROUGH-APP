@@ -133,7 +133,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
       legend: {
         position: 'right',
         labels: {
-          color: '#D4A574',
+          color: '#ffffff',
           font: {
             size: 12
           },
@@ -155,8 +155,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                   strokeStyle: dataset.backgroundColor[i],
                   pointStyle: 'circle',
                   hidden: false,
-                  index: i,
-                  fontColor: '#D4A574'
+                  index: i
                 };
               });
             }
@@ -184,31 +183,28 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 border-t border-[#D4A574]/60 pt-4">
-      
-      {/* LEFT COLUMN - STATUS PIE CHART with DIMMED BORDER */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#D4A574' }}>Status Overview</h3>
+    <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* LEFT COLUMN - STATUS PIE CHART */}
+        <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl p-6 border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
+          <h3 className="text-lg font-semibold text-[#B49B7E] mb-4 tracking-wide">Status Overview</h3>
         
         {/* REAL PIE CHART WITH LABELS AND LINES */}
         <div className="h-64 mb-4">
           {totalItems > 0 ? (
             <Pie data={statusPieData} options={pieOptions} />
           ) : (
-            <div className="flex items-center justify-center h-full text-[#B49B7E]/60">
+            <div className="flex items-center justify-center h-full text-gray-400">
               No items to display
             </div>
           )}
         </div>
       </div>
 
-      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST with DIMMED BORDER */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#D4A574' }}>Status Breakdown</h3>
+      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST with Beautiful Rounded Treatment */}
+      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl p-6 border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
+        <h3 className="text-lg font-semibold text-[#B49B7E] mb-4 tracking-wide">Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
@@ -228,10 +224,10 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: getStatusColor(status) }}
                   ></div>
-                  <span className="text-sm text-[#D4C5A9]">{status}</span>
+                  <span className="text-sm text-[#F5F5DC]/90">{status}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="bg-black/40 rounded-full h-2 w-16">
+                  <div className="bg-gray-700 rounded-full h-2 w-16">
                     <div
                       className="h-2 rounded-full transition-all duration-300"
                       style={{
@@ -240,7 +236,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                       }}
                     />
                   </div>
-                  <span className="text-sm font-medium w-8 text-right text-[#D4A574]">
+                  <span className="text-sm font-medium text-[#F5F5DC] w-8 text-right">
                     {count}
                   </span>
                 </div>
@@ -250,23 +246,18 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* RIGHT COLUMN - SHIPPING SECTION with DIMMED BORDER */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#D4A574' }}>Shipping Information</h3>
+      {/* RIGHT COLUMN - SHIPPING SECTION with Beautiful Rounded Treatment */}
+      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl p-6 border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
+        <h3 className="text-lg font-semibold text-[#B49B7E] mb-4 tracking-wide">Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
-          <h4 className="text-md font-medium mb-3 border-b border-[#D4A574]/60 pb-1" style={{ 
-            color: '#D4A574', 
-            opacity: '0.9'
-          }}>Carrier Distribution</h4>
+          <h4 className="text-md font-medium text-[#F5F5DC]/80 mb-3">Carrier Distribution</h4>
           <div className="h-48">
             {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
               <Pie data={carrierPieData} options={pieOptions} />
             ) : (
-              <div className="flex items-center justify-center h-full text-[#B49B7E]/60">
+              <div className="flex items-center justify-center h-full text-gray-400">
                 No carrier data
               </div>
             )}
@@ -275,10 +266,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
 
         {/* 2. SHIPPING BREAKDOWN - EXACTLY LIKE STATUS BREAKDOWN! */}
         <div className="mb-6">
-          <h4 className="text-md font-medium mb-3 border-b border-[#D4A574]/60 pb-1" style={{ 
-            color: '#D4A574', 
-            opacity: '0.9'
-          }}>Shipping Breakdown</h4>
+          <h4 className="text-md font-medium text-[#F5F5DC]/80 mb-3">Shipping Breakdown</h4>
           <div className="space-y-3 max-h-60 overflow-y-auto">{/*INCREASED HEIGHT*/}
             {[
               'FedEx', 'UPS', 'USPS', 'DHL', 'Brooks', 'Zenith', 'Sunbelt',
@@ -297,10 +285,10 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                       className="w-3 h-3 rounded-full" 
                       style={{ backgroundColor: getCarrierColor(carrier) }}
                     ></div>
-                    <span className="text-sm text-[#D4C5A9]">{carrier}</span>
+                    <span className="text-sm text-[#F5F5DC]/90">{carrier}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="bg-black/40 rounded-full h-2 w-16">
+                    <div className="bg-gray-700 rounded-full h-2 w-16">
                       <div
                         className="h-2 rounded-full transition-all duration-300"
                         style={{
@@ -309,7 +297,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                         }}
                       />
                     </div>
-                    <span className="text-sm font-medium w-8 text-right text-[#D4A574]">
+                    <span className="text-sm font-medium text-[#F5F5DC] w-8 text-right">
                       {count}
                     </span>
                   </div>
@@ -324,31 +312,31 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           <div className="grid grid-cols-2 gap-3">
             {/* Total Items */}
             <div className="bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-[#D4C5A9]">{totalItems}</div>
-              <div className="text-sm text-[#D4A574]">Total Items</div>
+              <div className="text-2xl font-bold text-white">{totalItems}</div>
+              <div className="text-sm text-gray-400">Total Items</div>
             </div>
             
             {/* Delivered */}
             <div className="bg-gray-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">{getCompletedItems()}</div>
-              <div className="text-sm text-[#D4A574]">Delivered</div>
+              <div className="text-sm text-gray-400">Delivered</div>
             </div>
             
             {/* In Transit */}
             <div className="bg-gray-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-orange-400">{getInTransitItems()}</div>
-              <div className="text-sm text-[#D4A574]">In Transit</div>
+              <div className="text-sm text-gray-400">In Transit</div>
             </div>
             
             {/* On Hold */}
             <div className="bg-gray-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-red-400">{statusBreakdown['ON HOLD'] || 0}</div>
-              <div className="text-sm text-[#D4A574]">On Hold</div>
+              <div className="text-sm text-gray-400">On Hold</div>
             </div>
           </div>
         </div>
       </div>
-      
+      </div>
     </div>
   );
 };

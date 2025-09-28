@@ -622,7 +622,7 @@ const ExactWalkthroughSpreadsheet = ({
 
   if (!project || !project.rooms || project.rooms.length === 0) {
     return (
-      <div className="text-center text-[#D4A574] py-8">
+      <div className="text-center text-gray-400 py-8">
         <p className="text-lg">Loading FF&E data...</p>
         <p className="text-sm mt-2">Please wait while we load your project information.</p>
       </div>
@@ -642,7 +642,7 @@ const ExactWalkthroughSpreadsheet = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none placeholder-[#D4A574]/70"
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
           
@@ -651,7 +651,7 @@ const ExactWalkthroughSpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Rooms</option>
               {project.rooms.map(room => (
@@ -662,7 +662,7 @@ const ExactWalkthroughSpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Categories</option>
               {availableCategories.map(category => (
@@ -673,7 +673,7 @@ const ExactWalkthroughSpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Vendors</option>
               <option value="Visual Comfort">Visual Comfort</option>
@@ -689,7 +689,7 @@ const ExactWalkthroughSpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Status</option>
               <option value="TO BE SELECTED">TO BE SELECTED</option>
@@ -719,7 +719,7 @@ const ExactWalkthroughSpreadsheet = ({
             <select 
               value={selectedCarrier}
               onChange={(e) => setSelectedCarrier(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Carriers</option>
               <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
@@ -738,7 +738,7 @@ const ExactWalkthroughSpreadsheet = ({
                 console.log('🔍 FILTER APPLIED - Search:', searchTerm, 'Room:', selectedRoom, 'Category:', selectedCategory, 'Vendor:', selectedVendor, 'Status:', selectedStatus, 'Carrier:', selectedCarrier);
                 // Filters are applied automatically via useEffect
               }}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-[#D4C5A9] rounded font-medium"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
             >
               🔍 FILTER
             </button>
@@ -752,13 +752,19 @@ const ExactWalkthroughSpreadsheet = ({
                 setSelectedCarrier('');
                 console.log('🧹 FILTER CLEARED');
               }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-[#D4C5A9] rounded font-medium"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium"
             >
               CLEAR
             </button>
           </div>
           
-          {/* Add Room button removed per user request */}
+          {/* Add Room Button - GOLD/AMBER COLOR */}
+          <button 
+            onClick={handleAddRoom}
+            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+          >
+            ✚ ADD ROOM
+          </button>
         </div>
       </div>
 
@@ -785,13 +791,13 @@ const ExactWalkthroughSpreadsheet = ({
                                 {/* ROOM HEADER ROW - Full width like your screenshots */}
                                 <tr>
                                   <td colSpan="12" 
-                                      className="border border-gray-400 px-3 py-2 text-[#D4C5A9] text-sm font-bold"
+                                      className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                                       style={{ backgroundColor: getRoomColor(room.name) }}>
                                     <div className="flex justify-between items-center">
                                       <div className="flex items-center gap-2">
                                         <button
                                           onClick={() => toggleRoomExpansion(room.id)}
-                                          className="text-[#D4C5A9] hover:text-[#D4A574]"
+                                          className="text-white hover:text-gray-200"
                                         >
                                           {isRoomExpanded ? '▼' : '▶'}
                                         </button>
@@ -830,12 +836,12 @@ const ExactWalkthroughSpreadsheet = ({
                                                   {/* CATEGORY HEADER ROW */}
                                                   <tr>
                                                     <td colSpan="14" 
-                                                        className="border border-gray-400 px-4 py-2 text-[#D4C5A9] text-sm font-bold"
+                                                        className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
                                                         style={{ backgroundColor: getCategoryColor() }}>
                                                       <div className="flex items-center gap-2">
                                                         <button
                                                           onClick={() => toggleCategoryExpansion(category.id)}
-                                                          className="text-[#D4C5A9] hover:text-[#D4A574]"
+                                                          className="text-white hover:text-gray-200"
                                                         >
                                                           {isCategoryExpanded ? '▼' : '▶'}
                                                         </button>
@@ -849,38 +855,34 @@ const ExactWalkthroughSpreadsheet = ({
                                                     <React.Fragment>
                                                       {/* RED HEADER GOES AFTER CATEGORY - LAST IN HIERARCHY */}
                                                       <tr>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4444' }}>QTY</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
                                                       </tr>
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
                                                       {/* ACTUAL INSTALLEDS FROM BACKEND DATA */}
                                                       {category.subcategories?.map((subcategory) => (
                                                         subcategory.items?.map((item, itemIndex) => (
-                                                        <tr key={item.id} style={{ 
-                                                          background: itemIndex % 2 === 0 
-                                                            ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
-                                                            : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
-                                                        }}>
+                                                        <tr key={item.id}>
                                                           {/* INSTALLED */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                                             {item.name}
                                                           </td>
                                                           
                                                           {/* VENDOR/SKU */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                                             {item.vendor || ''}
                                                           </td>
                                                           
                                                           {/* QTY */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm text-center">
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
                                                             {item.quantity || 1}
                                                           </td>
                                                           
                                                           {/* SIZE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">
+                                                          <td className="border border-gray-400 px-2 py-2 text-white text-sm">
                                                             {item.size || ''}
                                                           </td>
                                                         </tr>
@@ -894,7 +896,7 @@ const ExactWalkthroughSpreadsheet = ({
                                                             {/* Add Item Button - GOLD/AMBER COLOR */}
                                                             <button
                                                               onClick={() => setShowAddItem(true)}
-                                                              className="bg-amber-700 hover:bg-amber-600 text-[#D4C5A9] px-3 py-1 rounded text-sm font-medium"
+                                                              className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium"
                                                             >
                                                               ✚ Add Item
                                                             </button>
@@ -912,7 +914,7 @@ const ExactWalkthroughSpreadsheet = ({
                                                                   handleAddCategory(room.id, e.target.value);
                                                                 }
                                                               }}
-                                                              className="bg-amber-700 hover:bg-amber-600 text-[#D4C5A9] px-3 py-1 rounded text-sm font-medium border-none outline-none"
+                                                              className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium border-none outline-none"
                                                             >
                                                               <option value="">Add Category ▼</option>
                                                               <option value="Lighting">Lighting</option>
@@ -933,7 +935,7 @@ const ExactWalkthroughSpreadsheet = ({
                                                             {/* Delete Section Button - RED COLOR */}
                                                             <button
                                                               onClick={() => handleDeleteRoom(room.id)}
-                                                              className="bg-red-700 hover:bg-red-600 text-[#D4C5A9] px-3 py-1 rounded text-sm font-medium"
+                                                              className="bg-red-700 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
                                                             >
                                                               🗑️ Delete Section
                                                             </button>
