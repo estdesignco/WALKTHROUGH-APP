@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Smartphone, Mail, MessageSquare, Search, 
-  Upload, Download, Sync, Settings, 
+  Upload, Download, RefreshCw, Settings, 
   CheckCircle, AlertCircle, Clock, Wifi
 } from 'lucide-react';
 
