@@ -216,6 +216,18 @@ const App = () => {
               path="/advanced-features" 
               element={<AdvancedFeaturesDashboard />}
             />
+            <Route 
+              path="/email-preview" 
+              element={<EmailPreview />}
+            />
+            <Route 
+              path="/furniture-search" 
+              element={<UnifiedFurnitureSearch />}
+            />
+            <Route 
+              path="/workflow-dashboard" 
+              element={<WorkflowDashboard />}
+            />
             {/* Customer-facing routes */}
             <Route 
               path="/customer" 
