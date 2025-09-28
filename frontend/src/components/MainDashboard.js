@@ -101,7 +101,7 @@ const MainDashboard = () => {
             }}
             onMouseLeave={(e) => {
               e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inert 0 1px 0 rgba(255, 255, 255, 0.2)';
+              e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
             }}
           >
             <span>📧</span>
