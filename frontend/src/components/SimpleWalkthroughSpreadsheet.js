@@ -132,51 +132,30 @@ const SimpleWalkthroughSpreadsheet = ({
 
   // Handle adding a new category WITH ALL SUBCATEGORIES AND ITEMS - SIMPLIFIED
   const handleAddCategory = async (roomId, categoryName) => {
-    if (!roomId || !categoryName) {
-      console.error('❌ Missing roomId or categoryName');
-      return;
-    }
-
     try {
-      console.log('🔄 Creating comprehensive walkthrough category:', categoryName, 'for room:', roomId);
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      console.log(`🚀 WALKTHROUGH ADD CATEGORY: Creating comprehensive '${categoryName}' with ALL subcategories and items`);
       
-      // Use the enhanced backend category creation that loads full structure
-      const categoryData = {
-        name: categoryName,
-        room_id: roomId,
-        description: `${categoryName} category with full subcategories and items`,
-        order_index: 0
-      };
-      
-      console.log('📤 Creating category with data:', categoryData);
-      
-      const response = await fetch(`${backendUrl}/api/categories/comprehensive`, {
+      // Use the new comprehensive endpoint that auto-populates with ALL items and subcategories
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(categoryData)
+        headers: { 'Content-Type': 'application/json' }
       });
-
-      console.log('📡 Category creation response:', response.status);
 
       if (response.ok) {
         const newCategory = await response.json();
-        console.log('✅ Category created with full structure:', newCategory.name);
-        alert(`✅ Successfully added ${categoryName} category with all subcategories and items!`);
+        console.log(`✅ WALKTHROUGH SUCCESS: Created comprehensive category '${categoryName}' with ${newCategory.subcategories?.length || 0} subcategories`);
         
-        // Reload to show the new category
-        if (onReload) {
-          await onReload();
-        }
+        alert(`✅ Added comprehensive category '${categoryName}' with all subcategories and items!`);
+        
+        if (onReload) onReload();
       } else {
         const errorText = await response.text();
-        console.error('❌ Category creation failed:', response.status, errorText);
-        alert(`❌ Failed to create ${categoryName} category: ${errorText}`);
+        console.error(`❌ Failed to create comprehensive category: ${errorText}`);
+        alert(`Failed to add category '${categoryName}'. Please try again.`);
       }
     } catch (error) {
-      console.error('❌ Error adding comprehensive walkthrough category:', error);
+      console.error('Error adding comprehensive category:', error);
+      alert(`Error adding category '${categoryName}'. Please try again.`);
     }
   };
 
@@ -413,46 +392,39 @@ const SimpleWalkthroughSpreadsheet = ({
 
   const handleTransferToChecklist = async () => {
     try {
-      console.log('🚀 TRANSFER TO CHECKLIST: GOOGLE APPS SCRIPT LOGIC IMPLEMENTATION');
-      console.log('📊 checkedItems state:', checkedItems);
-      console.log('📊 checkedItems.size:', checkedItems.size);
-      console.log('📊 Checked item IDs:', Array.from(checkedItems));
+      // 🚨 EXACT REPLICATION OF GOOGLE APPS SCRIPT populateChecklistFromWalkthroughApp() LOGIC
+      console.log('🚀 GOOGLE APPS SCRIPT TRANSFER: populateChecklistFromWalkthroughApp()');
       
+      // STEP 1: Validation - Mirror Google Apps Script lines 462-467
       if (checkedItems.size === 0) {
-        alert('No items are checked for transfer. Please check the items you want to transfer first.');
+        alert('Please select items in the Walkthrough App by checking their checkboxes (Column A) before attempting to transfer.');
         return;
       }
       
-      // EXACT GOOGLE APPS SCRIPT LOGIC: Only process items where checkbox === true
+      console.log(`Attempting to transfer ${checkedItems.size} items to Checklist.`);
+      
+      // STEP 2: Collect ONLY checked items - Mirror Google Apps Script itemsToInsert array
       const itemsToTransfer = [];
       
-      console.log('🔍 SCANNING PROJECT DATA FOR CHECKED ITEMS...');
+      // Convert Set to Array for direct iteration - like Google Apps Script's approach
+      const checkedItemIds = Array.from(checkedItems);
+      console.log('🔍 Checked Item IDs:', checkedItemIds);
       
+      // Find actual item objects for the checked IDs
       if (filteredProject?.rooms) {
-        filteredProject.rooms.forEach((room, roomIndex) => {
-          console.log(`🏠 Scanning room: ${room.name}`);
-          
-          room.categories?.forEach((category, categoryIndex) => {
-            console.log(`📂 Scanning category: ${category.name}`);
-            
-            category.subcategories?.forEach((subcategory, subcategoryIndex) => {
-              console.log(`📁 Scanning subcategory: ${subcategory.name}`);
-              
-              subcategory.items?.forEach((item, itemIndex) => {
-                const isChecked = checkedItems.has(item.id);
-                console.log(`📝 Item: ${item.name} (ID: ${item.id}) - Checked: ${isChecked}`);
-                
-                // EXACT SAME LOGIC AS GOOGLE APPS SCRIPT: if (checkboxValue === true)
-                if (isChecked) {
-                  console.log(`✅ ADDING TO TRANSFER: ${item.name}`);
+        filteredProject.rooms.forEach(room => {
+          room.categories?.forEach(category => {
+            category.subcategories?.forEach(subcategory => {
+              subcategory.items?.forEach(item => {
+                // CRITICAL: Only include if this item's ID is in the checked list
+                if (checkedItemIds.includes(item.id)) {
+                  console.log(`✅ MATCHED CHECKED ITEM: "${item.name}" (ID: ${item.id})`);
                   itemsToTransfer.push({
                     item,
                     roomName: room.name,
                     categoryName: category.name,
                     subcategoryName: subcategory.name
                   });
-                } else {
-                  console.log(`❌ SKIPPING (not checked): ${item.name}`);
                 }
               });
             });
@@ -460,31 +432,28 @@ const SimpleWalkthroughSpreadsheet = ({
         });
       }
       
-      console.log(`🎯 FINAL TRANSFER COUNT: ${itemsToTransfer.length} items`);
-      console.log('📋 Items to transfer:', itemsToTransfer.map(i => i.item.name));
-      
-      // Validation check - ensure we found the expected number of items
+      // VALIDATION: Ensure we found all checked items
       if (itemsToTransfer.length !== checkedItems.size) {
-        console.warn(`⚠️ MISMATCH: Found ${itemsToTransfer.length} items but expected ${checkedItems.size} checked items`);
+        console.error(`🚨 MISMATCH: Found ${itemsToTransfer.length} items but expected ${checkedItems.size}`);
+        alert(`Error: Could not find all checked items. Expected ${checkedItems.size}, found ${itemsToTransfer.length}`);
+        return;
       }
       
-      if (itemsToTransfer.length === 0) {
-        console.error('❌ NO ITEMS FOUND FOR TRANSFER despite having checked items');
-        alert('No checked items found for transfer. There may be an issue with the data structure.');
+      console.log(`Verified: ${itemsToTransfer.length} items ready for transfer`);
+      
+      // Confirm transfer - like Google Apps Script
+      if (!confirm(`Transfer ${itemsToTransfer.length} selected items to Checklist?`)) {
         return;
       }
 
-      // Confirm transfer with exact count
-      if (!confirm(`Transfer ${itemsToTransfer.length} checked items to Checklist?\n\nItems: ${itemsToTransfer.map(i => i.item.name).join(', ')}`)) {
-        return;
-      }
-
-      // STEP 2: Transfer ONLY the checked items
+      // STEP 2: Google Apps Script Transfer Logic - Create structure then add ONLY checked items
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const projectId = filteredProject.id;
       
       let successCount = 0;
       const createdStructures = new Map();
+      
+      console.log(`🚀 GOOGLE APPS SCRIPT TRANSFER: Creating structure and adding ${itemsToTransfer.length} checked items`);
 
       for (const itemData of itemsToTransfer) {
         try {
@@ -492,17 +461,19 @@ const SimpleWalkthroughSpreadsheet = ({
           const categoryKey = `${roomKey}_${itemData.categoryName}`;
           const subcategoryKey = `${categoryKey}_${itemData.subcategoryName}`;
           
-          // Create room if needed
+          // Create EMPTY checklist room if needed (backend now creates empty rooms for checklist)
           let roomId = createdStructures.get(roomKey);
           if (!roomId) {
+            console.log(`📁 Creating EMPTY checklist room: ${itemData.roomName}`);
             const roomResponse = await fetch(`${backendUrl}/api/rooms`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 name: itemData.roomName,
                 project_id: projectId,
-                sheet_type: 'checklist',
-                description: `Transferred from walkthrough`
+                sheet_type: 'checklist',  // Backend will create EMPTY room
+                description: `Transferred from walkthrough`,
+                auto_populate: false  // CRITICAL: Don't auto-populate for transfer
               })
             });
             
@@ -510,8 +481,9 @@ const SimpleWalkthroughSpreadsheet = ({
               const newRoom = await roomResponse.json();
               roomId = newRoom.id;
               createdStructures.set(roomKey, roomId);
+              console.log(`✅ Created empty checklist room: ${itemData.roomName}`);
             } else {
-              console.error(`Failed to create room: ${itemData.roomName}`);
+              console.error(`❌ Failed to create room: ${itemData.roomName}`);
               continue;
             }
           }
@@ -519,6 +491,7 @@ const SimpleWalkthroughSpreadsheet = ({
           // Create category if needed
           let categoryId = createdStructures.get(categoryKey);
           if (!categoryId) {
+            console.log(`📂 Creating category: ${itemData.categoryName}`);
             const categoryResponse = await fetch(`${backendUrl}/api/categories`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -535,8 +508,9 @@ const SimpleWalkthroughSpreadsheet = ({
               const newCategory = await categoryResponse.json();
               categoryId = newCategory.id;
               createdStructures.set(categoryKey, categoryId);
+              console.log(`✅ Created category: ${itemData.categoryName}`);
             } else {
-              console.error(`Failed to create category: ${itemData.categoryName}`);
+              console.error(`❌ Failed to create category: ${itemData.categoryName}`);
               continue;
             }
           }
@@ -544,6 +518,7 @@ const SimpleWalkthroughSpreadsheet = ({
           // Create subcategory if needed
           let subcategoryId = createdStructures.get(subcategoryKey);
           if (!subcategoryId) {
+            console.log(`📄 Creating subcategory: ${itemData.subcategoryName}`);
             const subcategoryResponse = await fetch(`${backendUrl}/api/subcategories`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -560,13 +535,15 @@ const SimpleWalkthroughSpreadsheet = ({
               const newSubcategory = await subcategoryResponse.json();
               subcategoryId = newSubcategory.id;
               createdStructures.set(subcategoryKey, subcategoryId);
+              console.log(`✅ Created subcategory: ${itemData.subcategoryName}`);
             } else {
-              console.error(`Failed to create subcategory: ${itemData.subcategoryName}`);
+              console.error(`❌ Failed to create subcategory: ${itemData.subcategoryName}`);
               continue;
             }
           }
           
-          // Create the item
+          // Create ONLY the checked item - Google Apps Script insertRows() equivalent
+          console.log(`📝 Creating ONLY CHECKED ITEM: "${itemData.item.name}"`);
           const itemResponse = await fetch(`${backendUrl}/api/items`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -576,19 +553,19 @@ const SimpleWalkthroughSpreadsheet = ({
               sku: itemData.item.sku || '',
               cost: itemData.item.cost || 0,
               size: itemData.item.size || '',
-              finish_color: '', // COMPLETELY BLANK as requested
+              finish_color: '', // ALWAYS BLANK as requested
               quantity: itemData.item.quantity || 1,
               subcategory_id: subcategoryId,
-              status: 'PICKED',
+              status: '', // BLANK STATUS as required for transfer
               order_index: 0
             })
           });
           
           if (itemResponse.ok) {
             successCount++;
-            console.log(`✅ Created: ${itemData.item.name}`);
+            console.log(`✅ SUCCESSFULLY CREATED CHECKED ITEM: ${itemData.item.name}`);
           } else {
-            console.error(`❌ Failed to create: ${itemData.item.name}`);
+            console.error(`❌ Failed to create checked item: ${itemData.item.name}`);
           }
           
         } catch (error) {
@@ -596,12 +573,17 @@ const SimpleWalkthroughSpreadsheet = ({
         }
       }
 
+      // STEP 4: Clear checkboxes and notify - Mirror Google Apps Script success handling
       if (successCount > 0) {
-        alert(`✅ Successfully transferred ${successCount} CHECKED items to Checklist!`);
-        setCheckedItems(new Set()); // Clear checkboxes
+        // Clear checkboxes like Google Apps Script: "checkboxRange.setValue(false)"
+        setCheckedItems(new Set());
+        console.log(`Cleared ${checkedItems.size} checkboxes in Walkthrough App.`);
+        
+        alert(`Successfully transferred ${successCount} items to the Checklist.`);
+        
         if (onReload) onReload();
       } else {
-        alert('❌ Failed to transfer items.');
+        alert('No items were transferred.');
       }
 
     } catch (error) {
@@ -688,8 +670,11 @@ const SimpleWalkthroughSpreadsheet = ({
   return (
     <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       
-      {/* ENHANCED FILTER SECTION - MATCHING OTHER SHEETS FUNCTIONALITY */}
-      <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
+      {/* ENHANCED FILTER SECTION - EXACT SAME TREATMENT AS GRAPHS */}
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+           style={{
+             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+           }}>
         <div className="flex flex-col gap-4">
           {/* Search Bar */}
           <div className="w-full">
@@ -698,7 +683,7 @@ const SimpleWalkthroughSpreadsheet = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="w-full px-4 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none placeholder-[#D4A574]/70"
             />
           </div>
           
@@ -707,7 +692,7 @@ const SimpleWalkthroughSpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
             >
               <option value="">All Rooms</option>
               {(project?.rooms || []).map(room => (
@@ -717,7 +702,7 @@ const SimpleWalkthroughSpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
             >
               <option value="">All Categories</option>
               <option value="Lighting">Lighting</option>
@@ -729,7 +714,7 @@ const SimpleWalkthroughSpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
             >
               <option value="">All Vendors</option>
               {(vendorTypes || []).map(vendor => (
@@ -739,7 +724,7 @@ const SimpleWalkthroughSpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+              className="px-3 py-2 rounded bg-gray-900/50 text-[#B49B7E] border border-[#B49B7E]/50 focus:border-[#B49B7E] focus:outline-none"
             >
               <option value="">All Status</option>
               <option value="PICKED">PICKED</option>
@@ -754,46 +739,17 @@ const SimpleWalkthroughSpreadsheet = ({
             </select>
           </div>
           
-          {/* Filter Buttons - WORKING FILTER */}
-          <div className="flex gap-4">
-            <button 
-              onClick={() => {
-                console.log('🔍 WALKTHROUGH FILTER APPLIED');
-                // Filters are already applied via useEffect, just trigger a manual update
-                setFilteredProject({...filteredProject});
-              }}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium"
-            >
-              🔍 FILTER
-            </button>
-            <button 
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedRoom('');
-                setSelectedCategory('');
-                setSelectedVendor('');
-                setSelectedStatus('');
-                setFilteredProject(project); // Reset to original project
-                console.log('🧹 WALKTHROUGH FILTER CLEARED');
-              }}
-              className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded font-medium"
-            >
-              CLEAR
-            </button>
-          </div>
-          
           {/* Action Buttons */}
           <div className="flex gap-3">
             <button 
               onClick={onAddRoom}
-              className="text-white px-4 py-2 rounded font-medium" 
-              style={{ backgroundColor: '#8b7355' }}
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-black"
             >
-              + ADD ROOM
+              ➕ ADD ROOM
             </button>
             <button 
               onClick={handleTransferToChecklist}
-              className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
+              className="bg-gradient-to-r from-[#8B7355] to-[#6B5B4B] hover:from-[#7A6749] hover:to-[#5A4F40] px-6 py-2 rounded-full shadow-xl hover:shadow-[#8B7355]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#A08B6F]/20 text-[#F5F5DC]"
             >
               → TRANSFER TO CHECKLIST
             </button>
@@ -801,17 +757,21 @@ const SimpleWalkthroughSpreadsheet = ({
         </div>
       </div>
       
-      {/* DYNAMIC SPREADSHEET WITH REAL DATA */}
-      <div className="overflow-x-auto">
-        
-        {/* USE FILTERED PROJECT DATA */}
-        {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
+      {/* DYNAMIC SPREADSHEET WITH REAL DATA - EXACT SAME TREATMENT AS GRAPHS */}
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+           style={{
+             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+           }}>
+        <div className="overflow-x-auto">
+          
+          {/* USE FILTERED PROJECT DATA */}
+          {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
           const isRoomExpanded = expandedRooms[room.id];
           
           return (
             <div key={room.id} className="mb-8">
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS FOR EACH ROOM */}
-              <div className="mt-8 mb-4 px-4 py-2 text-white font-bold" style={{ 
+              <div className="mt-8 mb-4 px-4 py-2 text-[#F5F5DC] font-bold" style={{ 
                 backgroundColor: roomColors?.[room.name.toLowerCase()] || 
                   ['#7A5A8A', '#5A6A5A', '#6A5A7A', '#7A5A5A', '#5A6A6A', '#5A5A7A', '#6A4A4A', '#4A6A6A'][roomIndex % 8]
               }}>
@@ -819,7 +779,7 @@ const SimpleWalkthroughSpreadsheet = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => toggleRoomExpansion(room.id)}
-                      className="text-white hover:text-gray-200"
+                      className="text-[#F5F5DC] hover:text-[#F5F5DC]/80"
                     >
                       {isRoomExpanded ? '▼' : '▶'}
                     </button>
@@ -844,12 +804,12 @@ const SimpleWalkthroughSpreadsheet = ({
                     return (
                       <div key={category.id} className="mb-4">
                         {/* CATEGORY HEADER (GREEN) WITH EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
-                        <div className="mb-4 px-4 py-2 text-white font-bold" style={{ backgroundColor: '#065F46' }}>
+                        <div className="mb-4 px-4 py-2 text-[#F5F5DC] font-bold" style={{ backgroundColor: '#065F46' }}>
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => toggleCategoryExpansion(category.id)}
-                                className="text-white hover:text-gray-200"
+                                className="text-[#F5F5DC] hover:text-[#F5F5DC]/80"
                               >
                                 {isCategoryExpanded ? '▼' : '▶'}
                               </button>
@@ -865,27 +825,28 @@ const SimpleWalkthroughSpreadsheet = ({
                           </div>
                         </div>
                         
-                        {/* TABLE - ONLY SHOW WHEN CATEGORY EXPANDED */}
+                        {/* SUBCATEGORY TABLES - EXACTLY LIKE CHECKLIST AND FFE */}
                         {isCategoryExpanded && (
-                          <div>
-                            {/* TABLE WITH CORRECT HEADERS - MATCHING CHECKLIST EXACTLY */}
-                            <table className="w-full border-collapse border border-gray-400 mb-6">
-                              <thead>
-                                <tr>
-                                  <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-6" style={{ backgroundColor: '#8b7355' }}>✓</th>
-                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>ITEM NAME</th>
-                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white w-16" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
-                                  <th className="border border-gray-400 px-1 py-2 text-xs font-bold text-white w-12" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {/* REAL DATA FROM SUBCATEGORIES */}
-                                {(category.subcategories || []).map((subcategory) => 
-                                  (subcategory.items || []).map((item, itemIndex) => (
-                                    <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
-                                      <td className="border border-gray-400 px-1 py-1 text-center w-6">
+                          <>
+                            {category.subcategories?.map((subcategory) => (
+                              <React.Fragment key={subcategory.id || subcategory.name}>
+                                {/* TABLE WITH SUBCATEGORY NAME IN HEADER - MATCHING CHECKLIST */}
+                                <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10">
+                                  <thead>
+                                    <tr>
+                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-6 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8b7355' }}>✓</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-16 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-12 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {/* ITEMS FOR THIS SUBCATEGORY */}
+                                    {(subcategory.items || []).map((item, itemIndex) => (
+                                    <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-gradient-to-r from-black/80 to-gray-900/80' : 'bg-gradient-to-r from-gray-900/60 to-black/60'}>
+                                      <td className="border border-[#B49B7E]/20 px-1 py-1 text-center w-6">
                                         <input 
                                           type="checkbox" 
                                           className="w-6 h-6 cursor-pointer" 
@@ -901,47 +862,51 @@ const SimpleWalkthroughSpreadsheet = ({
                                           }}
                                         />
                                       </td>
-                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
-                                          className="w-full bg-transparent text-white text-sm outline-none"
+                                          className="w-full bg-transparent text-sm outline-none"
+                                          style={{ color: '#F5F5DC' }}
                                           onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
                                         >
                                           {item.name}
                                         </div>
                                       </td>
-                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm text-center w-16">
+                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm text-center w-16" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
-                                          className="w-full bg-transparent text-white text-sm outline-none text-center"
+                                          className="w-full bg-transparent text-sm outline-none text-center"
+                                          style={{ color: '#F5F5DC' }}
                                           onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
                                         >
                                           {item.quantity || 1}
                                         </div>
                                       </td>
-                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
-                                          className="w-full bg-transparent text-white text-sm outline-none"
+                                          className="w-full bg-transparent text-sm outline-none"
+                                          style={{ color: '#F5F5DC' }}
                                           onBlur={(e) => console.log('Size updated:', e.target.textContent)}
                                         >
                                           {item.size || ''}
                                         </div>
                                       </td>
-                                      <td className="border border-gray-400 px-2 py-1 text-white text-sm">
+                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
-                                          className="w-full bg-transparent text-white text-sm outline-none"
+                                          className="w-full bg-transparent text-sm outline-none"
+                                          style={{ color: '#F5F5DC' }}
                                           onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
                                         >
                                           {item.finish_color || ''}
                                         </div>
                                       </td>
-                                      <td className="border border-gray-400 px-1 py-1 text-center w-12">
+                                      <td className="border border-[#B49B7E]/20 px-1 py-1 text-center w-12">
                                         <button 
                                           onClick={() => handleDeleteItem(item.id)}
                                           className="text-red-400 hover:text-red-300 text-xs"
@@ -950,8 +915,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                         </button>
                                       </td>
                                     </tr>
-                                  ))
-                                )}
+                                  ))}
                               </tbody>
                             </table>
                             
@@ -975,26 +939,30 @@ const SimpleWalkthroughSpreadsheet = ({
                                 <option value="">+ ADD CATEGORY ▼</option>
                                 <option value="Lighting">Lighting</option>
                                 <option value="Furniture">Furniture</option>
-                                <option value="Decor & Accessories">Decor & Accessories</option>
+                                <option value="Window Treatments">Window Treatments</option>
+                                <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
+                                <option value="Art & Accessories">Art & Accessories</option>
+                                <option value="Fireplace & Built-ins">Fireplace & Built-ins</option>
                                 <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
                                 <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
+                                <option value="Furniture & Storage">Furniture & Storage</option>
+                                <option value="Cabinets & Storage">Cabinets & Storage</option>
+                                <option value="Cabinets, Built-ins, and Trim">Cabinets, Built-ins, and Trim</option>
+                                <option value="Tile and Tops">Tile and Tops</option>
                                 <option value="Appliances">Appliances</option>
+                                <option value="Decor & Accessories">Decor & Accessories</option>
                                 <option value="CREATE_NEW">+ Create New Category</option>
                               </select>
                               <button 
-                                onClick={() => {
-                                  // Use first subcategory ID from this category
-                                  const firstSubcategoryId = category.subcategories?.[0]?.id;
-                                  if (firstSubcategoryId) {
-                                    handleAddBlankRow(firstSubcategoryId);
-                                  }
-                                }}
+                                onClick={() => handleAddBlankRow(category.id)}
                                 className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
                               >
                                 + ADD ITEM
                               </button>
                             </div>
-                          </div>
+                              </React.Fragment>
+                            ))}
+                          </>
                         )}
                       </div>
                     );
@@ -1004,7 +972,8 @@ const SimpleWalkthroughSpreadsheet = ({
             </div>
           );
         })}
-      </div>
+        </div>
+      </div> {/* END DARK NAVY SPREADSHEET CONTAINER */}
 
       {/* FOOTER REMOVED - ADD CATEGORY NOW IN EACH SECTION */}
       

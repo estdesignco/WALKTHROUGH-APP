@@ -6,6 +6,7 @@ import SimpleChecklistSpreadsheet from './SimpleChecklistSpreadsheet';
 import ChecklistStatusOverview from './ChecklistStatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
+import CompletePageLayout from './CompletePageLayout';
 
 const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.error("🚨 CHECKLIST DASHBOARD IS LOADING!");
@@ -196,7 +197,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       room.categories.forEach(category => {
         (category.subcategories || []).forEach(subcategory => {
           (subcategory.items || []).forEach(item => {
-            const status = item.status || 'TO BE SELECTED';
+            const status = item.status || 'TO BE PICKED';
             breakdown[status] = (breakdown[status] || 0) + 1;
           });
         });
@@ -225,103 +226,33 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   };
 
   return (
-    <div className="max-w-full mx-auto bg-gray-950 min-h-screen">
-      {/* TOP HEADER */}
-      <div className="mb-6">
-        <div className="text-center mb-4">
-          <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
-          <p className="text-gray-300">Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
-        </div>
+    <CompletePageLayout 
+      projectId={projectId}
+      activeTab="checklist"
+      title="CHECKLIST - GREENE"
+      hideNavigation={hideNavigation}
+      onAddRoom={() => setShowAddRoom(true)}
+    >
+      {/* STATUS OVERVIEW SECTION */}
+      <ChecklistStatusOverview
+        totalItems={getTotalItems()}
+        statusBreakdown={getStatusBreakdown()}
+        carrierBreakdown={getCarrierBreakdown()}
+        itemStatuses={itemStatuses}
+      />
 
-        {!hideNavigation && (
-          <>
-            {/* Navigation Tabs */}
-            <div className="flex justify-center space-x-8 mb-6">
-              <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
-                <span>📋</span>
-                <span>Questionnaire</span>
-              </a>
-              <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
-                <span>🚶</span>
-                <span>Walkthrough</span>
-              </a>
-              <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
-                <span>✅</span>
-                <span>Checklist</span>
-              </a>
-              <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
-                <span>📊</span>
-                <span className="font-semibold">FF&E</span>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* LOGO BANNER */}
-        <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}>
-          <img 
-            src="/established-logo.png" 
-            alt="Established Design Co. Logo" 
-            style={{ height: '200px', width: 'auto', objectFit: 'contain', display: 'block' }}
-          />
-        </div>
-
-        {!hideNavigation && (
-          <>
-            {/* CHECKLIST TITLE */}
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>CHECKLIST - GREENE</h3>
-            </div>
-
-            {/* SEARCH BAR AND ADD ROOM BUTTON */}
-            <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
-              <div className="flex items-center space-x-4 flex-1">
-                <input
-                  type="text"
-                  placeholder="Search Items..."
-                  className="flex-1 bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500"
-                />
-                <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
-                  <option>All Rooms</option>
-                </select>
-                <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
-                  <option>All Statuses</option>
-                </select>
-              </div>
-              <button
-                onClick={() => setShowAddRoom(true)}
-                style={{ backgroundColor: '#8b7355' }}
-                className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors ml-4"
-              >
-                ➕ Add Room
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* PIE CHART AND STATUS BREAKDOWN - ALWAYS VISIBLE */}
-        <ChecklistStatusOverview
-          totalItems={getTotalItems()}
-          statusBreakdown={getStatusBreakdown()}
-          carrierBreakdown={getCarrierBreakdown()}
-          itemStatuses={itemStatuses}
-        />
-      </div>
-
-      {/* FF&E Spreadsheet */}
-      <div className="px-6 mt-4">
-        <SimpleChecklistSpreadsheet
-          project={project}
-          roomColors={roomColors}
-          categoryColors={categoryColors}
-          itemStatuses={itemStatuses}
-          vendorTypes={vendorTypes}
-          carrierTypes={carrierTypes}
-          onDeleteRoom={handleDeleteRoom}
-          onAddRoom={() => setShowAddRoom(true)}
-          onReload={loadSimpleProject}
-        />
-      </div>
+      {/* CHECKLIST SPREADSHEET */}
+      <SimpleChecklistSpreadsheet
+        project={project}
+        roomColors={roomColors}
+        categoryColors={categoryColors}
+        itemStatuses={itemStatuses}
+        vendorTypes={vendorTypes}
+        carrierTypes={carrierTypes}
+        onDeleteRoom={(roomId) => handleDeleteRoom(roomId)}
+        onAddRoom={() => setShowAddRoom(true)}
+        onReload={loadSimpleProject}
+      />
 
       {/* Add Room Modal */}
       {showAddRoom && (
@@ -331,7 +262,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           roomColors={roomColors}
         />
       )}
-    </div>
+    </CompletePageLayout>
   );
 };
 
