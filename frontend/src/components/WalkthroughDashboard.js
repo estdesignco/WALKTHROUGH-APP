@@ -269,22 +269,6 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
             {/* FF&E TITLE WITH EXPORT BUTTONS */}
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>WALKTHROUGH - GREENE</h3>
-              <div className="flex space-x-4">
-                <button
-                  style={{ backgroundColor: '#8b7355' }}
-                  className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
-                >
-                  <span>📥</span>
-                  <span>Export FF&E</span>
-                </button>
-                <button
-                  style={{ backgroundColor: '#8b7355' }}
-                  className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
-                >
-                  <span>📋</span>
-                  <span>Spec Sheet</span>
-                </button>
-              </div>
             </div>
 
             {/* SEARCH BAR AND ADD ROOM BUTTON */}
