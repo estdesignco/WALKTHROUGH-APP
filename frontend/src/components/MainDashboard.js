@@ -197,7 +197,7 @@ const MainDashboard = () => {
               onClick={() => handleProjectClick(project.id)}
               className="rounded-lg p-6 cursor-pointer transition-all duration-200"
               style={{
-                background: `linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%)`,
+                background: `linear-gradient(135deg, #000000 0%, #0a0a1a 30%, #1a1a2e 60%, #0a0a1a 100%)`,
                 border: '1px solid #8b7355',
                 boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
               }}
