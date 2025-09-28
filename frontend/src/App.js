@@ -16,12 +16,6 @@ import CustomerfacingLandingPage from './components/CustomerfacingLandingPage';
 import CustomerfacingQuestionnaire from './components/CustomerfacingQuestionnaire';
 import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectDetailPage';
 import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
-import MasterDashboard from './components/MasterDashboard';
-import IntegrationHub from './components/IntegrationHub';
-import UnifiedFurnitureSearchPage from './components/UnifiedFurnitureSearchPage';
-import EmailPreview from './components/EmailPreview';
-import WorkflowDashboard from './components/WorkflowDashboard';
-import DesignFlowLandingPage from './components/DesignFlowLandingPage';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -147,27 +141,11 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
-              element={<DesignFlowLandingPage />}
+              element={<CustomerfacingLandingPage />}
             />
             <Route 
               path="/studio" 
               element={<StudioLandingPage />}
-            />
-            <Route 
-              path="/dashboard" 
-              element={<MasterDashboard />}
-            />
-            <Route 
-              path="/integrations" 
-              element={<IntegrationHub />}
-            />
-            <Route 
-              path="/studio-search" 
-              element={<UnifiedFurnitureSearchPage />}
-            />
-            <Route 
-              path="/customer-landing" 
-              element={<CustomerfacingLandingPage />}
             />
             <Route 
               path="/projects" 
@@ -229,14 +207,6 @@ const App = () => {
             <Route 
               path="/advanced-features" 
               element={<AdvancedFeaturesDashboard />}
-            />
-            <Route 
-              path="/email-preview" 
-              element={<EmailPreview />}
-            />
-            <Route 
-              path="/workflow-dashboard" 
-              element={<WorkflowDashboard />}
             />
             {/* Customer-facing routes */}
             <Route 
