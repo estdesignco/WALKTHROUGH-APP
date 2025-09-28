@@ -175,7 +175,7 @@ const IntegrationHub = () => {
             disabled={syncInProgress}
             className="flex items-center space-x-2 bg-gradient-to-r from-[#B49B7E] to-[#8B6914] hover:from-[#A08B6F] hover:to-[#7A5A0F] disabled:from-gray-600 disabled:to-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300"
           >
-            <Sync className={`w-5 h-5 ${syncInProgress ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 ${syncInProgress ? 'animate-spin' : ''}`} />
             <span>{syncInProgress ? 'Syncing All...' : 'Sync All'}</span>
           </button>
         </div>
