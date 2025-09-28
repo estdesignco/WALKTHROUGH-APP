@@ -184,38 +184,58 @@ const MainDashboard = () => {
           )}
         </div>
 
-        {/* Additional Navigation Links */}
+        {/* Additional Navigation Links with Gold Theme */}
         <div className="max-w-4xl mx-auto mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
-            onClick={() => handleNavigation('/furniture-search')}
-            className="bg-stone-800 hover:bg-stone-700 text-stone-300 p-4 rounded-lg transition-colors duration-200"
+            onClick={() => window.open('https://designflow-29.preview.emergentagent.com/', '_blank')}
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200 border-2"
+            style={{
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              borderColor: '#8b7355',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
+            }}
           >
             <div className="text-2xl mb-2">🔍</div>
             <div className="text-sm">Furniture Search</div>
           </button>
           
           <button
-            onClick={() => projects.length > 0 ? handleNavigation(`/walkthrough/${projects[0].id}`) : alert('No projects available')}
-            className="bg-stone-800 hover:bg-stone-700 text-stone-300 p-4 rounded-lg transition-colors duration-200"
+            onClick={() => window.open('https://luxinterior.preview.emergentagent.com/project/4196e0c9-399d-43d3-aac2-198b84cde03e/detail', '_blank')}
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200 border-2"
+            style={{
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              borderColor: '#8b7355',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
+            }}
           >
             <div className="text-2xl mb-2">🏠</div>
             <div className="text-sm">Walkthrough App</div>
           </button>
           
           <button
-            onClick={() => handleNavigation('/advanced-features')}
-            className="bg-stone-800 hover:bg-stone-700 text-stone-300 p-4 rounded-lg transition-colors duration-200"
+            onClick={() => window.open('https://luxinterior.preview.emergentagent.com/project/4196e0c9-399d-43d3-aac2-198b84cde03e/detail', '_blank')}
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200 border-2"
+            style={{
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              borderColor: '#8b7355',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
+            }}
           >
-            <div className="text-2xl mb-2">📊</div>
-            <div className="text-sm">Export FF&E</div>
+            <div className="text-2xl mb-2">📋</div>
+            <div className="text-sm">Checklist</div>
           </button>
           
           <button
-            onClick={() => handleNavigation('/workflow-dashboard')}
-            className="bg-stone-800 hover:bg-stone-700 text-stone-300 p-4 rounded-lg transition-colors duration-200"
+            onClick={() => window.open('https://luxinterior.preview.emergentagent.com/project/4196e0c9-399d-43d3-aac2-198b84cde03e/detail', '_blank')}
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200 border-2"
+            style={{
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              borderColor: '#8b7355',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
+            }}
           >
-            <div className="text-2xl mb-2">📋</div>
-            <div className="text-sm">Spec Sheet</div>
+            <div className="text-2xl mb-2">📊</div>
+            <div className="text-sm">FF&E</div>
           </button>
         </div>
       </div>
