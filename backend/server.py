@@ -1546,22 +1546,22 @@ async def get_projects():
     
     for project_data in projects:
         # Fetch rooms for each project
-        rooms = await db.rooms.find({"project_id": str(project_data["_id"])}).to_list(1000)
+        rooms = await db.rooms.find({"project_id": project_data["id"]}).to_list(1000)
         project_data["rooms"] = []
         
         for room_data in rooms:
             # Fetch categories for each room
-            categories = await db.categories.find({"room_id": str(room_data["_id"])}).to_list(1000)
+            categories = await db.categories.find({"room_id": room_data["id"]}).to_list(1000)
             room_data["categories"] = []
             
             for category_data in categories:
                 # Fetch subcategories for each category
-                subcategories = await db.subcategories.find({"category_id": str(category_data["_id"])}).to_list(1000)
+                subcategories = await db.subcategories.find({"category_id": category_data["id"]}).to_list(1000)
                 category_data["subcategories"] = []
                 
                 for subcategory_data in subcategories:
                     # Fetch items for each subcategory
-                    items = await db.items.find({"subcategory_id": str(subcategory_data["_id"])}).to_list(1000)
+                    items = await db.items.find({"subcategory_id": subcategory_data["id"]}).to_list(1000)
                     subcategory_data["items"] = [Item(**item) for item in items]
                     
                 category_data["subcategories"] = [SubCategory(**subcat) for subcat in subcategories]
@@ -1569,34 +1569,6 @@ async def get_projects():
             room_data["categories"] = [Category(**cat) for cat in categories]
             
         project_data["rooms"] = [Room(**room) for room in rooms]
-        
-        # Clean up project_data for Pydantic validation
-        if project_data.get("project_type") is None:
-            project_data["project_type"] = "Design Consultation"
-        if project_data.get("timeline") is None:
-            project_data["timeline"] = "Not specified"
-        if project_data.get("budget_range") is None:
-            project_data["budget_range"] = "Not specified"
-        
-        # Fix client_info if it exists
-        if "client_info" in project_data and project_data["client_info"]:
-            client_info = project_data["client_info"]
-            if client_info.get("address") is None:
-                client_info["address"] = "Not specified"
-            if client_info.get("phone") is None:
-                client_info["phone"] = "Not specified"  
-            if client_info.get("email") is None:
-                client_info["email"] = "Not specified"
-            if client_info.get("full_name") is None:
-                client_info["full_name"] = "Not specified"
-        elif "client_info" not in project_data or project_data["client_info"] is None:
-            project_data["client_info"] = {
-                "full_name": "Not specified",
-                "address": "Not specified",
-                "phone": "Not specified",
-                "email": "Not specified"
-            }
-        
         result.append(Project(**project_data))
     
     return result
@@ -1635,9 +1607,7 @@ async def get_project(project_id: str, sheet_type: str = None):
         
     project_data["rooms"] = [Room(**room) for room in rooms]
     
-    # Convert ObjectId to string for JSON serialization
-    project_data["_id"] = str(project_data["_id"])
-    return project_data
+    return Project(**project_data)
 
 # ROOM UPDATE ENDPOINT (for drag & drop)
 @api_router.put("/rooms/{room_id}", response_model=Room)
