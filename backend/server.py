@@ -1607,7 +1607,9 @@ async def get_project(project_id: str, sheet_type: str = None):
         
     project_data["rooms"] = [Room(**room) for room in rooms]
     
-    return Project(**project_data)
+    # Convert ObjectId to string for JSON serialization
+    project_data["_id"] = str(project_data["_id"])
+    return project_data
 
 # ROOM UPDATE ENDPOINT (for drag & drop)
 @api_router.put("/rooms/{room_id}", response_model=Room)
