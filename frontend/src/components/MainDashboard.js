@@ -64,20 +64,68 @@ const MainDashboard = () => {
 
       {/* Main Content */}
       <div className="px-8 py-12">
-        {/* Studio Projects Title */}
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-light text-stone-400 mb-2">Studio Projects</h2>
-          <div className="w-16 h-px bg-stone-600 mx-auto"></div>
+        {/* Additional Navigation Links at Top with Thin Gold Borders */}
+        <div className="max-w-4xl mx-auto mb-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <button
+            onClick={() => window.open('https://designflow-29.preview.emergentagent.com/', '_blank')}
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200"
+            style={{
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              border: '1px solid #8b7355',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
+            }}
+          >
+            <div className="text-2xl mb-2">🔍</div>
+            <div className="text-sm">Furniture Search</div>
+          </button>
+          
+          <button
+            onClick={() => window.open('https://luxinterior.preview.emergentagent.com/project/4196e0c9-399d-43d3-aac2-198b84cde03e/detail', '_blank')}
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200"
+            style={{
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              border: '1px solid #8b7355',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
+            }}
+          >
+            <div className="text-2xl mb-2">🏠</div>
+            <div className="text-sm">Walkthrough</div>
+          </button>
+          
+          <button
+            onClick={() => window.open('https://luxinterior.preview.emergentagent.com/project/4196e0c9-399d-43d3-aac2-198b84cde03e/detail', '_blank')}
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200"
+            style={{
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              border: '1px solid #8b7355',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
+            }}
+          >
+            <div className="text-2xl mb-2">📋</div>
+            <div className="text-sm">Checklist</div>
+          </button>
+          
+          <button
+            onClick={() => window.open('https://luxinterior.preview.emergentagent.com/project/4196e0c9-399d-43d3-aac2-198b84cde03e/detail', '_blank')}
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200"
+            style={{
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              border: '1px solid #8b7355',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
+            }}
+          >
+            <div className="text-2xl mb-2">📊</div>
+            <div className="text-sm">FF&E</div>
+          </button>
         </div>
 
-        {/* Three Main Action Buttons with Gold Theme */}
+        {/* Three Main Action Buttons - NO BORDERS */}
         <div className="flex justify-center space-x-4 mb-12">
           <button 
             onClick={() => handleNavigation('/questionnaire/new')}
-            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2 border-2"
+            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              borderColor: '#d4af37',
               boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
               filter: 'drop-shadow(0 0 5px rgba(212, 175, 55, 0.3))'
             }}
@@ -95,10 +143,9 @@ const MainDashboard = () => {
           </button>
           <button 
             onClick={() => handleNavigation('/email-preview')}
-            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2 border-2"
+            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              borderColor: '#d4af37',
               boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
               filter: 'drop-shadow(0 0 5px rgba(212, 175, 55, 0.3))'
             }}
@@ -116,10 +163,9 @@ const MainDashboard = () => {
           </button>
           <button 
             onClick={() => window.open('https://designstudio-13.preview.emergentagent.com/customer/questionnaire', '_blank')}
-            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2 border-2"
+            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              borderColor: '#d4af37',
               boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
               filter: 'drop-shadow(0 0 5px rgba(212, 175, 55, 0.3))'
             }}
@@ -135,6 +181,12 @@ const MainDashboard = () => {
             <span>🔍</span>
             <span>Full Questionnaire</span>
           </button>
+        </div>
+
+        {/* Studio Projects Title - Moved Below */}
+        <div className="text-center mb-12">
+          <h2 className="text-2xl font-light text-stone-400 mb-2">Studio Projects</h2>
+          <div className="w-16 h-px bg-stone-600 mx-auto"></div>
         </div>
 
         {/* Project Cards */}
