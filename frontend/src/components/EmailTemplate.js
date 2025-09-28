@@ -21,7 +21,7 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                 marginBottom: '0'
             }}>
                 <img 
-                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf5_Establishedlogo.png" 
+                    src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
                     alt="Established Design Co." 
                     style={{
                         height: '120px',
@@ -153,7 +153,7 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
                 {/* Footer */}
                 <div style={{ textAlign: 'center' }}>
                     <img 
-                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf5_Establishedlogo.png" 
+                        src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
                         alt="Established Design Co." 
                         style={{
                             height: '50px',
@@ -199,7 +199,7 @@ export const generateEmailHTML = (clientName, questionnaireLinkId) => {
                         <tr>
                             <td style="background: linear-gradient(135deg, #B49B7E 0%, #A08B6F 50%, #8B7355 100%); padding: 60px 40px; text-align: center;">
                                 <div style="width: 80px; height: 1px; background-color: rgba(255, 255, 255, 0.3); margin: 0 auto 30px auto;"></div>
-                                <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf5_Establishedlogo.png" alt="Established Design Co." style="height: 120px; object-fit: contain;" />
+                                <img src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" alt="Established Design Co." style="height: 120px; object-fit: contain;" />
                                 <div style="width: 120px; height: 1px; background-color: rgba(255, 255, 255, 0.4); margin: 0 auto;"></div>
                             </td>
                         </tr>
@@ -247,7 +247,7 @@ export const generateEmailHTML = (clientName, questionnaireLinkId) => {
                         <!-- Footer -->
                         <tr>
                             <td style="background-color: #0F0F0F; padding: 40px; text-align: center;">
-                                <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3b546fdf5_Establishedlogo.png" alt="Established Design Co." style="height: 50px; object-fit: contain; filter: brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(664%) hue-rotate(349deg) brightness(95%) contrast(88%);" />
+                                <img src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" alt="Established Design Co." style="height: 50px; object-fit: contain; filter: brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(664%) hue-rotate(349deg) brightness(95%) contrast(88%);" />
                                 <p style="font-size: 14px; color: #808080; margin: 0 0 20px 0;">Creating extraordinary spaces since 2020</p>
                                 <p style="margin: 0 0 20px 0;">
                                     <a href="#" style="color: #B49B7E; text-decoration: none; font-size: 13px; margin: 0 15px;">Pinterest</a>
