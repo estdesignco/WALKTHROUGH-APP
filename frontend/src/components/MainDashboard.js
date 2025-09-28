@@ -195,10 +195,10 @@ const MainDashboard = () => {
             <div 
               key={project.id}
               onClick={() => handleProjectClick(project.id)}
-              className="rounded-lg p-6 cursor-pointer transition-all duration-200 border-2"
+              className="rounded-lg p-6 cursor-pointer transition-all duration-200"
               style={{
-                background: `linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%)`,
-                borderColor: '#8b7355',
+                background: `linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%)`,
+                border: '1px solid #8b7355',
                 boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
               }}
               onMouseEnter={(e) => {
