@@ -20,6 +20,7 @@ import MasterDashboard from './components/MasterDashboard';
 import IntegrationHub from './components/IntegrationHub';
 import UnifiedFurnitureSearchPage from './components/UnifiedFurnitureSearchPage';
 import EmailPreview from './components/EmailPreview';
+import WorkflowDashboard from './components/WorkflowDashboard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
