@@ -549,7 +549,7 @@ export default function Questionnaire() {
                         <FieldWrapper label="What type of project is this?">
                             <RadioGroup value={formData.project_type} onValueChange={(value) => handleFormChange('project_type', value)} className="text-[#F5F5DC]">
                                 <div className="flex flex-col space-y-2">
-                                    {["Renovation", "New Construction", "Design Consultation", "Furniture Only"].map(option => (
+                                    {["New Build", "Renovation", "Furniture/Styling Refresh", "Other"].map(option => (
                                         <div key={option} className="flex items-center space-x-2">
                                             <RadioGroupItem value={option} id={`type-${option}`} className="border-stone-400 text-[#8B7355]" />
                                             <Label htmlFor={`type-${option}`} className="text-[#F5F5DC]">{option}</Label>
@@ -566,9 +566,9 @@ export default function Questionnaire() {
                         )}
                     </Section>
 
-                    {/* Section 4: New Construction (Conditional) */}
-                    {formData.project_type === 'New Construction' && (
-                        <Section title="NEW CONSTRUCTION" description="If you are not currently building a new home, please feel free to skip these questions!">
+                    {/* Section 4: New Build (Conditional) */}
+                    {formData.project_type === 'New Build' && (
+                        <Section title="NEW BUILD" description="If you are not currently building a new home, please feel free to skip these questions!">
                             <FieldWrapper label="Please list NEW BUILD address">
                                 <Textarea className={inputStyles} value={formData.new_build_address || ''} onChange={(e) => handleFormChange('new_build_address', e.target.value)} />
                             </FieldWrapper>
