@@ -69,27 +69,69 @@ const MainDashboard = () => {
           <div className="w-16 h-px bg-stone-600 mx-auto"></div>
         </div>
 
-        {/* Three Main Action Buttons */}
+        {/* Three Main Action Buttons with Gold Theme */}
         <div className="flex justify-center space-x-4 mb-12">
           <button 
             onClick={() => handleNavigation('/questionnaire/new')}
-            className="bg-amber-700 hover:bg-amber-600 text-white px-8 py-3 rounded-full font-medium transition-colors duration-200 flex items-center space-x-2"
+            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2 border-2"
+            style={{
+              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
+              borderColor: '#d4af37',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+              filter: 'drop-shadow(0 0 5px rgba(212, 175, 55, 0.3))'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 20px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+            }}
           >
             <span>+</span>
             <span>New Client</span>
           </button>
           <button 
             onClick={() => handleNavigation('/email-preview')}
-            className="bg-amber-700 hover:bg-amber-600 text-white px-8 py-3 rounded-full font-medium transition-colors duration-200 flex items-center space-x-2"
+            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2 border-2"
+            style={{
+              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
+              borderColor: '#d4af37',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+              filter: 'drop-shadow(0 0 5px rgba(212, 175, 55, 0.3))'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 20px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+            }}
           >
             <span>📧</span>
             <span>Email New Client</span>
           </button>
           <button 
-            onClick={() => handleNavigation('/customer/questionnaire')}
-            className="bg-amber-700 hover:bg-amber-600 text-white px-8 py-3 rounded-full font-medium transition-colors duration-200 flex items-center space-x-2"
+            onClick={() => window.open('https://designstudio-13.preview.emergentagent.com/customer/questionnaire', '_blank')}
+            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2 border-2"
+            style={{
+              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
+              borderColor: '#d4af37',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+              filter: 'drop-shadow(0 0 5px rgba(212, 175, 55, 0.3))'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 20px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+            }}
           >
-            <span>+</span>
+            <span>🔍</span>
             <span>Full Questionnaire</span>
           </button>
         </div>
