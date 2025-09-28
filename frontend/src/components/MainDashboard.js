@@ -41,10 +41,8 @@ const MainDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900" style={{
-      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB2aWV3Qm94PSIwIDAgMTkyMCAxMDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxOTIwIiBoZWlnaHQ9IjEwODAiIGZpbGw9IiMyMjIyMjIiLz48L3N2Zz4=')`",
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
+    <div className="min-h-screen" style={{
+      background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%)',
       backgroundAttachment: 'fixed'
     }}>
       {/* Top Navigation Buttons */}
