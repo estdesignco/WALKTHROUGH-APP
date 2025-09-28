@@ -130,27 +130,65 @@ const StudioLandingPage = () => {
           </Link>
         </div>
 
-        {/* Projects Grid */}
-        {projects.length > 0 && (
-          <div className="w-full max-w-6xl">
-            <h2 className="text-2xl font-light text-[#D4AF37] mb-8 text-center">
-              Current Projects
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.slice(0, 6).map((project) => (
-                <Link
-                  key={project.id}
-                  to={`/project/${project.id}`}
-                  className="bg-black/60 border border-white/20 rounded-2xl p-6 hover:bg-black/70 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
-                >
-                  <h3 className="text-[#D4AF37] font-medium mb-2">{project.name}</h3>
-                  <p className="text-white/80 text-sm mb-1">{project.client_info?.full_name}</p>
-                  <p className="text-white/60 text-xs">{project.project_type}</p>
-                </Link>
-              ))}
+        {/* TO DO LIST */}
+        <div className="w-full max-w-4xl">
+          <h2 className="text-2xl font-light text-[#D4AF37] mb-8 text-center">
+            TO DO LIST
+          </h2>
+          <div className="bg-black/60 border border-white/20 rounded-2xl p-8 backdrop-blur-sm">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
+                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
+                <span className="text-white/90">Complete Johnson Project - Living Room Walkthrough</span>
+                <span className="ml-auto text-[#D4AF37] text-sm">High Priority</span>
+              </div>
+              
+              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
+                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
+                <span className="text-white/90">Send FF&E specifications to Smith client</span>
+                <span className="ml-auto text-yellow-400 text-sm">Medium</span>
+              </div>
+              
+              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
+                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
+                <span className="text-white/90">Update vendor credentials - Four Hands</span>
+                <span className="ml-auto text-green-400 text-sm">Low</span>
+              </div>
+              
+              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
+                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" checked />
+                <span className="text-white/60 line-through">Review Greene Project checklist items</span>
+                <span className="ml-auto text-gray-400 text-sm">Completed</span>
+              </div>
+              
+              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
+                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
+                <span className="text-white/90">Schedule client meeting for Brown residence</span>
+                <span className="ml-auto text-[#D4AF37] text-sm">High Priority</span>
+              </div>
+              
+              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
+                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
+                <span className="text-white/90">Export and share Wilson Project mood board</span>
+                <span className="ml-auto text-yellow-400 text-sm">Medium</span>
+              </div>
+              
+              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
+                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
+                <span className="text-white/90">Update Teams integration for status notifications</span>
+                <span className="ml-auto text-green-400 text-sm">Low</span>
+              </div>
+            </div>
+            
+            {/* Add New Task Button */}
+            <div className="mt-6 pt-6 border-t border-white/20">
+              <button className="w-full bg-gradient-to-r from-[#D4AF37]/20 to-[#B8941F]/20 hover:from-[#D4AF37]/30 hover:to-[#B8941F]/30 border border-[#D4AF37]/50 text-[#D4AF37] py-3 rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
+                <span className="text-xl">+</span>
+                Add New Task
+              </button>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* New Client Modal */}
