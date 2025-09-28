@@ -169,6 +169,18 @@ const App = () => {
               }
             />
             <Route 
+              path="/furniture-search" 
+              element={<UnifiedFurnitureSearch />}
+            />
+            <Route 
+              path="/email-preview" 
+              element={<EmailPreview />}
+            />
+            <Route 
+              path="/workflow-dashboard" 
+              element={<WorkflowDashboard />}
+            />
+            <Route 
               path="/questionnaire/new" 
               element={<ComprehensiveQuestionnaire />}
             />
