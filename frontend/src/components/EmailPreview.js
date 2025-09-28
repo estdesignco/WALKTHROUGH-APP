@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import EmailTemplate, { generateEmailHTML } from './EmailTemplate';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 
 const EmailPreview = () => {
+    const navigate = useNavigate();
     const [clientName, setClientName] = useState('Sarah Johnson');
     const [questionnaireLinkId, setQuestionnaireLinkId] = useState('abc123xyz');
 
