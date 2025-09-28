@@ -37,7 +37,8 @@ const MainDashboard = () => {
   };
 
   const handleProjectClick = (projectId) => {
-    navigate(`/project/${projectId}`);
+    // Navigate to the actual walkthrough dashboard that's already in the app
+    navigate(`/walkthrough/${projectId}`);
   };
 
   return (
