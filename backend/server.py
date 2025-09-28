@@ -1607,6 +1607,10 @@ async def get_project(project_id: str, sheet_type: str = None):
         
     project_data["rooms"] = [Room(**room) for room in rooms]
     
+    # Ensure project_type has a valid value
+    if not project_data.get("project_type"):
+        project_data["project_type"] = "Renovation"
+    
     return Project(**project_data)
 
 # ROOM UPDATE ENDPOINT (for drag & drop)
