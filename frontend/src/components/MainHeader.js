@@ -1,12 +1,31 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const MainHeader = ({ 
   projectId, 
   activeTab = 'walkthrough', // 'walkthrough', 'checklist', 'ffe'
   hideNavigation = false 
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="max-w-full mx-auto bg-gradient-to-b from-black via-gray-900 to-black min-h-screen">
+      {/* BACK BUTTON */}
+      <div className="absolute top-4 left-4 z-50">
+        <button
+          onClick={() => navigate('/')}
+          className="text-white hover:text-stone-300 transition-colors duration-200 flex items-center space-x-2 p-2 rounded-lg"
+          style={{
+            background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+            border: '1px solid #d4af37',
+            boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3)'
+          }}
+        >
+          <span>←</span>
+          <span>Back to Dashboard</span>
+        </button>
+      </div>
+      
       {/* TOP HEADER */}
       <div className="mb-1 pt-2"> {/* Much tighter spacing */}
         <div className="text-center mb-1"> {/* Much tighter spacing */}
