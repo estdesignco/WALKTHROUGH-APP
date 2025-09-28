@@ -83,11 +83,13 @@ const DesignFlowLandingPage = () => {
                 UNIFIED FURNITURE SEARCH ENGINE
               </h3>
             </div>
-            <div className="flex items-center gap-2 mb-6">
-              <span className="text-red-500">⭕</span>
-              <p className="text-lg font-medium text-white">
-                THE DREAM IS REAL! Search ALL vendor products in ONE place!
-              </p>
+            <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2">
+                <span className="text-red-500 text-2xl">⭕</span>
+                <p className="text-lg font-bold text-white">
+                  THE DREAM IS REAL! Search ALL vendor products in ONE place!
+                </p>
+              </div>
             </div>
           </div>
         </div>
