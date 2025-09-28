@@ -151,7 +151,7 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
-              element={<ActualDashboard />}
+              element={<FinalDashboard />}
             />
             <Route 
               path="/studio" 
