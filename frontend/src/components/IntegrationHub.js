@@ -146,7 +146,7 @@ const IntegrationHub = () => {
           disabled={syncInProgress}
           className="flex-1 bg-[#B49B7E] hover:bg-[#A08B6F] disabled:bg-gray-600 text-white py-2 px-4 rounded transition-colors text-sm"
         >
-          <Sync className="w-4 h-4 inline mr-2" />
+          <RefreshCw className="w-4 h-4 inline mr-2" />
           Sync
         </button>
         <button
