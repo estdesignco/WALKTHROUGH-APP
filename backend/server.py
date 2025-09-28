@@ -1574,6 +1574,17 @@ async def get_projects():
         if not project_data.get("project_type"):
             project_data["project_type"] = "Renovation"
             
+        # Ensure client_info fields have valid values
+        if project_data.get("client_info"):
+            if not project_data["client_info"].get("address"):
+                project_data["client_info"]["address"] = ""
+            if not project_data["client_info"].get("full_name"):
+                project_data["client_info"]["full_name"] = "Unknown Client"
+            if not project_data["client_info"].get("email"):
+                project_data["client_info"]["email"] = ""
+            if not project_data["client_info"].get("phone"):
+                project_data["client_info"]["phone"] = ""
+            
         result.append(Project(**project_data))
     
     return result
