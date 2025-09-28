@@ -8,7 +8,7 @@ import uuid
 # Database connection
 MONG_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = motor.motor_asyncio.AsyncIOMotorClient(MONG_URL)
-db = client.interior_design
+db = client.test_database
 
 async def populate_walkthrough_data():
     """Add walkthrough, checklist, and FFE data to existing projects"""
