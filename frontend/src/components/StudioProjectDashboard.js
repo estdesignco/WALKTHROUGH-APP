@@ -11,7 +11,17 @@ const StudioProjectDashboard = () => {
     const fetchProjects = async () => {
       try {
         const response = await projectAPI.getAll();
-        setProjects(response.data || []);
+        // Map the API response to the expected format
+        const mappedProjects = (response.data || []).map(project => ({
+          id: project.id,
+          projectName: project.name,
+          clientName: project.client_info?.full_name || 'Unknown Client',
+          address: project.client_info?.address || '',
+          status: 'Active',
+          lastUpdated: new Date(project.updated_at).toLocaleDateString() || 'Unknown',
+          createdDate: new Date(project.created_at).toLocaleDateString() || 'Unknown'
+        }));
+        setProjects(mappedProjects);
       } catch (error) {
         console.error('Error fetching projects:', error);
         // Set some demo projects if API fails
