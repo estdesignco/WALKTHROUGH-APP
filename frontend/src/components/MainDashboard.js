@@ -95,7 +95,7 @@ const MainDashboard = () => {
               className="bg-gray-900 border border-gray-700 rounded-lg p-6 cursor-pointer hover:bg-gray-800 transition-colors duration-200"
             >
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl text-stone-300 font-medium">{project.projectName}</h3>
+                <h3 className="text-xl text-stone-300 font-medium">{project.name}</h3>
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-stone-500">Last Updated</span>
                   <div className="w-4 h-4 bg-stone-600 rounded"></div>
