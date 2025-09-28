@@ -198,7 +198,7 @@ const MasterDashboard = () => {
               disabled={syncStatus === 'syncing'}
               className="flex items-center space-x-2 bg-[#B49B7E] hover:bg-[#A08B6F] text-white px-4 py-2 rounded-lg transition-colors"
             >
-              <Sync className={`w-4 h-4 ${syncStatus === 'syncing' ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${syncStatus === 'syncing' ? 'animate-spin' : ''}`} />
               <span>
                 {syncStatus === 'syncing' ? 'Syncing...' : 
                  syncStatus === 'error' ? 'Sync Failed' : 'Sync All'}
