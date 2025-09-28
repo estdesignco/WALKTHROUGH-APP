@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { projectAPI } from '../App';
+import { Link } from 'react-router-dom';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const StudioLandingPage = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showNewClientModal, setShowNewClientModal] = useState(false);
-  const [newClientForm, setNewClientForm] = useState({
-    name: '',
-    client_info: {
-      full_name: '',
-      email: '',
-      phone: '',
-      address: ''
-    },
-    project_type: 'Renovation',
-    timeline: '3-6 months',
-    budget_range: '$10,000-$25,000'
+  const [showModal, setShowModal] = useState(false);
+  const [newClientData, setNewClientData] = useState({
+    full_name: '',
+    email: '',
+    phone: '',
+    address: '',
+    project_type: 'Design Consultation',
+    timeline: '',
+    budget: ''
   });
 
   useEffect(() => {
@@ -25,319 +23,189 @@ const StudioLandingPage = () => {
 
   const loadProjects = async () => {
     try {
-      setLoading(true);
-      console.log('🔥 LOADING PROJECTS - START');
-      const response = await projectAPI.getAll();
-      console.log('🔥 API RESPONSE:', response);
-      console.log('🔥 RESPONSE DATA:', response.data);
-      console.log('🔥 PROJECTS COUNT:', response.data?.length || 0);
-      setProjects(response.data || []);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load projects: ' + err.message);
-      console.error('❌ ERROR loading projects:', err);
+      const response = await fetch(`${BACKEND_URL}/api/projects`);
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data || []);
+      }
+    } catch (error) {
+      console.error('Failed to load projects:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleNewClient = () => {
-    setShowNewClientModal(true);
-  };
-
-  const handleEmailNewClient = () => {
-    console.log('Email new client clicked');
-  };
-
-  const handleFullQuestionnaire = () => {
-    window.location.href = '/questionnaire/new';
-  };
-
-  const handleSubmitNewClient = async (e) => {
-    e.preventDefault();
+  const handleCreateProject = async () => {
     try {
-      const response = await projectAPI.create(newClientForm);
-      console.log('Project created:', response.data);
-      setShowNewClientModal(false);
-      setNewClientForm({
-        name: '',
-        client_info: { full_name: '', email: '', phone: '', address: '' },
-        project_type: 'Renovation',
-        timeline: '3-6 months',
-        budget_range: '$10,000-$25,000'
-      });
-      loadProjects(); // Reload projects
-    } catch (err) {
-      setError('Failed to create project: ' + err.message);
-    }
-  };
-
-  const handleFormChange = (field, value) => {
-    if (field.includes('client_info.')) {
-      const clientField = field.split('.')[1];
-      setNewClientForm(prev => ({
-        ...prev,
-        client_info: {
-          ...prev.client_info,
-          [clientField]: value
-        }
-      }));
-    } else {
-      setNewClientForm(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    }
-  };
-
-  const sendQuestionnaireEmail = async () => {
-    try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/send-questionnaire`, {
+      const response = await fetch(`${BACKEND_URL}/api/projects`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: 'client@example.com',
-          clientName: 'Client Name',
-          projectName: 'New Project'
-        }),
+          name: `${newClientData.full_name} Project`,
+          client_info: newClientData,
+          project_type: newClientData.project_type,
+          timeline: newClientData.timeline,
+          budget: newClientData.budget
+        })
       });
-
+      
       if (response.ok) {
-        alert('Questionnaire email sent successfully!');
-      } else {
-        alert('Failed to send questionnaire email');
+        setShowModal(false);
+        setNewClientData({
+          full_name: '',
+          email: '',
+          phone: '',
+          address: '',
+          project_type: 'Design Consultation',
+          timeline: '',
+          budget: ''
+        });
+        loadProjects();
       }
-    } catch (err) {
-      alert('Error sending questionnaire email');
+    } catch (error) {
+      console.error('Failed to create project:', error);
     }
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom, #1a202c 0%, #2d3748 50%, #1a202c 100%)' }}>
+    <div className="min-h-screen" style={{
+      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2158&q=80')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }}>
       {/* Header */}
-      <div className="border-b border-gray-700 px-6 py-4">
-        <h1 className="text-6xl font-bold" style={{ color: '#B49B7E' }}>ESTABLISHEDDESIGN CO.</h1>
+      <div className="absolute top-0 right-0 p-6 z-10">
+        <div className="flex gap-3">
+          <button className="bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg">
+            📦 Export FF&E
+          </button>
+          <button className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg">
+            📊 Spec Sheet
+          </button>
+          <button 
+            onClick={() => setShowModal(true)}
+            className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg"
+          >
+            ✨ Add Room
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="px-6 py-8">
-        {/* Studio Projects Header and Action Buttons */}
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold" style={{ color: '#B49B7E' }}>Studio Projects</h2>
-          
-          <div className="flex space-x-4">
-            <button
-              onClick={handleNewClient}
-              className="px-6 py-3 rounded-lg font-bold transition-colors"
-              style={{ 
-                background: 'linear-gradient(to right, #B49B7E, #8B6914)',
-                color: '#000000'
-              }}
-            >
-              + New Client
-            </button>
-            
-            <button
-              onClick={handleEmailNewClient}
-              className="px-6 py-3 rounded-lg font-bold transition-colors"
-              style={{ 
-                background: 'linear-gradient(to right, #B49B7E, #8B6914)',
-                color: '#000000'
-              }}
-            >
-              📧 Email New Client
-            </button>
-            
-            <button
-              onClick={handleFullQuestionnaire}
-              className="px-6 py-3 rounded-lg font-bold transition-colors"
-              style={{ 
-                background: 'linear-gradient(to right, #B49B7E, #8B6914)',
-                color: '#000000'
-              }}
-            >
-              📋 Full Questionnaire
-            </button>
-            
-            <button
-              onClick={() => window.location.href = '/studio-search'}
-              className="px-6 py-3 rounded-lg font-bold transition-colors"
-              style={{ 
-                background: 'linear-gradient(to right, #B49B7E, #8B6914)',
-                color: '#000000'
-              }}
-            >
-              🔍 Furniture Search
-            </button>
-          </div>
+      <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
+        {/* Logo/Brand */}
+        <div className="mb-12">
+          <h1 className="text-5xl md:text-6xl font-light text-[#D4AF37] mb-4 tracking-[0.2em]">
+            ESTABLISHEDDESIGN CO.
+          </h1>
+          <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-8"></div>
         </div>
 
-        {error && (
-          <div className="bg-red-900 border border-red-700 text-red-100 p-4 rounded-lg mb-6">
-            {error}
+        {/* Tagline */}
+        <div className="max-w-4xl mb-12">
+          <p className="text-xl md:text-2xl text-white/90 font-light leading-relaxed">
+            Creating extraordinary spaces that reflect your unique story and elevate your everyday life
+          </p>
+        </div>
+
+        {/* Video/Meet Our Team Section */}
+        <div className="mb-12">
+          <div className="relative w-80 h-48 bg-black/40 rounded-2xl border border-white/20 flex items-center justify-center mb-4 backdrop-blur-sm">
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-0 h-0 border-l-8 border-l-white border-y-6 border-y-transparent ml-1"></div>
+            </div>
           </div>
-        )}
+          <p className="text-white/80 text-sm font-medium">Meet Our Team</p>
+        </div>
+
+        {/* CTA Button */}
+        <div className="mb-16">
+          <Link 
+            to="/customer/questionnaire"
+            className="bg-gradient-to-r from-[#D4AF37] to-[#B8941F] hover:from-[#B8941F] hover:to-[#9A7A1A] text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-2xl inline-flex items-center gap-2"
+          >
+            Begin Your Design Journey
+            <span className="text-xl">→</span>
+          </Link>
+        </div>
 
         {/* Projects Grid */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#B49B7E' }}></div>
-          </div>
-        ) : projects.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">📋</div>
-            <h3 className="text-2xl font-bold mb-4" style={{ color: '#F5F5DC' }}>Your Project Library is Empty</h3>
-            <p className="mb-6" style={{ color: '#F5F5DC', opacity: 0.8 }}>Start your first project by creating a new client or sending a questionnaire.</p>
-            <button
-              onClick={handleNewClient}
-              className="px-6 py-3 rounded-lg font-bold"
-              style={{ 
-                background: 'linear-gradient(to right, #B49B7E, #8B6914)',
-                color: '#000000'
-              }}
-            >
-              + Create Your First Project
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => (
-              <div
-                key={project.id}
-                className="p-6 rounded-lg border border-gray-700 hover:border-gray-600 transition-all duration-300 transform hover:scale-105 cursor-pointer"
-                style={{ background: 'rgba(45, 55, 72, 0.8)' }}
-                onClick={() => window.location.href = `/project/${project.id}/detail`}
-              >
-                <h3 className="text-xl font-bold mb-3" style={{ color: '#B49B7E' }}>
-                  {project.name}
-                </h3>
-                
-                <div className="space-y-2 mb-4">
-                  <p className="text-sm" style={{ color: '#F5F5DC' }}>
-                    <span style={{ color: '#B49B7E' }}>Client:</span>{' '}
-                    {project.client_info?.full_name || 'Not specified'}
-                  </p>
-                  <p className="text-sm" style={{ color: '#F5F5DC' }}>
-                    <span style={{ color: '#B49B7E' }}>Type:</span>{' '}
-                    {project.project_type || 'Not specified'}
-                  </p>
-                  <p className="text-sm" style={{ color: '#F5F5DC' }}>
-                    <span style={{ color: '#B49B7E' }}>Budget:</span>{' '}
-                    {project.budget_range || 'Not specified'}
-                  </p>
-                </div>
-                
-                <div className="flex justify-between items-center text-xs" style={{ color: '#B49B7E', opacity: 0.8 }}>
-                  <span>{project.rooms?.length || 0} rooms</span>
-                  <span>Last Updated: {project.updated_at ? new Date(project.updated_at).toLocaleDateString() : 'Invalid Date'}</span>
-                </div>
-              </div>
-            ))}
+        {projects.length > 0 && (
+          <div className="w-full max-w-6xl">
+            <h2 className="text-2xl font-light text-[#D4AF37] mb-8 text-center">
+              Current Projects
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.slice(0, 6).map((project) => (
+                <Link
+                  key={project.id}
+                  to={`/project/${project.id}`}
+                  className="bg-black/60 border border-white/20 rounded-2xl p-6 hover:bg-black/70 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
+                >
+                  <h3 className="text-[#D4AF37] font-medium mb-2">{project.name}</h3>
+                  <p className="text-white/80 text-sm mb-1">{project.client_info?.full_name}</p>
+                  <p className="text-white/60 text-xs">{project.project_type}</p>
+                </Link>
+              ))}
+            </div>
           </div>
         )}
       </div>
 
       {/* New Client Modal */}
-      {showNewClientModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="rounded-lg p-6 w-full max-w-lg" style={{ background: '#2D3748' }}>
-            <h2 className="text-2xl font-bold mb-6" style={{ color: '#B49B7E' }}>New Client Project</h2>
+      {showModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-black/90 border border-[#D4AF37]/30 rounded-2xl p-8 w-full max-w-md mx-4 backdrop-blur-sm">
+            <h3 className="text-2xl font-light text-[#D4AF37] mb-6 text-center">
+              Add New Client
+            </h3>
             
-            <form onSubmit={handleSubmitNewClient} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#F5F5DC' }}>
-                  Project Name
-                </label>
-                <input
-                  type="text"
-                  value={newClientForm.name}
-                  onChange={(e) => handleFormChange('name', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:border-[#B49B7E] focus:outline-none"
-                  style={{ background: '#1A202C', color: '#F5F5DC' }}
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#F5F5DC' }}>
-                  Client Full Name
-                </label>
-                <input
-                  type="text"
-                  value={newClientForm.client_info.full_name}
-                  onChange={(e) => handleFormChange('client_info.full_name', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:border-[#B49B7E] focus:outline-none"
-                  style={{ background: '#1A202C', color: '#F5F5DC' }}
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#F5F5DC' }}>
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={newClientForm.client_info.email}
-                  onChange={(e) => handleFormChange('client_info.email', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:border-[#B49B7E] focus:outline-none"
-                  style={{ background: '#1A202C', color: '#F5F5DC' }}
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#F5F5DC' }}>
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  value={newClientForm.client_info.phone}
-                  onChange={(e) => handleFormChange('client_info.phone', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:border-[#B49B7E] focus:outline-none"
-                  style={{ background: '#1A202C', color: '#F5F5DC' }}
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#F5F5DC' }}>
-                  Project Type
-                </label>
-                <select
-                  value={newClientForm.project_type}
-                  onChange={(e) => handleFormChange('project_type', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:border-[#B49B7E] focus:outline-none"
-                  style={{ background: '#1A202C', color: '#F5F5DC' }}
-                >
-                  <option value="New Construction">New Construction</option>
-                  <option value="Renovation">Renovation</option>
-                  <option value="Design Consultation">Design Consultation</option>
-                  <option value="Furniture Only">Furniture Only</option>
-                </select>
-              </div>
-              
-              <div className="flex space-x-4 pt-4">
-                <button
-                  type="submit"
-                  className="flex-1 py-2 px-4 rounded-lg font-medium"
-                  style={{ 
-                    background: 'linear-gradient(to right, #B49B7E, #8B6914)',
-                    color: '#000000'
-                  }}
-                >
-                  Create Project
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowNewClientModal(false)}
-                  className="flex-1 py-2 px-4 rounded-lg font-medium border border-gray-600"
-                  style={{ color: '#F5F5DC' }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={newClientData.full_name}
+                onChange={(e) => setNewClientData({ ...newClientData, full_name: e.target.value })}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-[#D4AF37]"
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={newClientData.email}
+                onChange={(e) => setNewClientData({ ...newClientData, email: e.target.value })}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-[#D4AF37]"
+              />
+              <input
+                type="tel"
+                placeholder="Phone"
+                value={newClientData.phone}
+                onChange={(e) => setNewClientData({ ...newClientData, phone: e.target.value })}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-[#D4AF37]"
+              />
+              <input
+                type="text"
+                placeholder="Address"
+                value={newClientData.address}
+                onChange={(e) => setNewClientData({ ...newClientData, address: e.target.value })}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-[#D4AF37]"
+              />
+            </div>
+            
+            <div className="flex gap-4 pt-6">
+              <button
+                onClick={handleCreateProject}
+                className="flex-1 bg-gradient-to-r from-[#D4AF37] to-[#B8941F] hover:from-[#B8941F] hover:to-[#9A7A1A] text-white py-3 rounded-lg transition-all duration-300"
+              >
+                Create Project
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="flex-1 bg-white/20 hover:bg-white/30 text-white py-3 rounded-lg transition-all duration-300"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
