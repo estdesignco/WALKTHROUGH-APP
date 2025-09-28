@@ -10,9 +10,16 @@ const MainDashboard = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
+        console.log('🔄 Fetching projects from API...');
         const response = await projectAPI.getAll();
+        console.log('📡 API Response:', response);
+        
+        // Handle both response.data and direct array response
+        const projectsData = response.data || response || [];
+        console.log('📊 Projects data:', projectsData);
+        
         // Map the API response to the expected format
-        const mappedProjects = (response.data || []).map(project => ({
+        const mappedProjects = projectsData.map(project => ({
           id: project.id,
           name: project.name,
           clientName: project.client_info?.full_name || 'Unknown Client',
@@ -21,9 +28,11 @@ const MainDashboard = () => {
           lastUpdated: new Date(project.updated_at).toLocaleDateString() || 'Unknown',
           createdDate: new Date(project.created_at).toLocaleDateString() || 'Unknown'
         }));
+        
+        console.log('✅ Mapped projects:', mappedProjects);
         setProjects(mappedProjects);
       } catch (error) {
-        console.error('Error fetching projects:', error);
+        console.error('❌ Error fetching projects:', error);
         setProjects([]);
       } finally {
         setLoading(false);
