@@ -142,7 +142,22 @@ const MainDashboard = () => {
             <div 
               key={project.id}
               onClick={() => handleProjectClick(project.id)}
-              className="bg-gray-900 border border-gray-700 rounded-lg p-6 cursor-pointer hover:bg-gray-800 transition-colors duration-200"
+              className="rounded-lg p-6 cursor-pointer transition-all duration-200 border-2"
+              style={{
+                background: `linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%)`,
+                borderColor: '#8b7355',
+                boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.borderColor = '#d4af37';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)';
+                e.currentTarget.style.borderColor = '#8b7355';
+              }}
             >
               <div className="flex justify-between items-start mb-4">
                 <h3 className="text-xl text-stone-300 font-medium">{project.name}</h3>
