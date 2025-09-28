@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello } from "lucide-react";
 import WalkthroughDashboard from './WalkthroughDashboard';
 import ChecklistDashboard from './ChecklistDashboard';
