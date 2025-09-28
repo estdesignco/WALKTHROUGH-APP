@@ -157,19 +157,15 @@ const App = () => {
             />
             <Route 
               path="/studio" 
-              element={<CustomerfacingQuestionnaire />}
+              element={<StudioLandingPage />}
             />
             <Route 
               path="/customer/questionnaire" 
-              element={<StudioLandingPage />}
+              element={<CustomerfacingQuestionnaire />}
             />
             <Route 
               path="/customer" 
               element={<CustomerfacingLandingPage />}
-            />
-            <Route 
-              path="/studio" 
-              element={<StudioLandingPage />}
             />
             <Route 
               path="/projects" 
