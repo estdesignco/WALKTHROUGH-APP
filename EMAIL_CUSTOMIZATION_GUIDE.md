@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://interiorsuite-2.preview.emergentagent.com/email-template.html
+https://designstudio-13.preview.emergentagent.com/email-template.html
 
 ---
 
