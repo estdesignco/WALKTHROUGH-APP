@@ -68,134 +68,123 @@ const StudioLandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{
-      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2158&q=80')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed'
-    }}>
-      {/* Header */}
-      <div className="absolute top-0 right-0 p-6 z-10">
+    <div className="min-h-screen bg-black text-white">
+      {/* Top Action Buttons */}
+      <div className="absolute top-4 right-4 z-10">
         <div className="flex gap-3">
-          <button className="bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg">
+          <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg">
             📦 Export FF&E
           </button>
-          <button className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg">
+          <button className="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg">
             📊 Spec Sheet
           </button>
           <button 
             onClick={() => setShowModal(true)}
-            className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg"
+            className="bg-yellow-700 hover:bg-yellow-800 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg"
           >
             ✨ Add Room
           </button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
-        {/* Logo/Brand */}
-        <div className="mb-12">
-          <h1 className="text-5xl md:text-6xl font-light text-[#D4AF37] mb-4 tracking-[0.2em]">
+      {/* Header */}
+      <div className="bg-[#D4C5A0] py-12">
+        <div className="text-center">
+          <h1 className="text-5xl font-light text-black tracking-widest">
             ESTABLISHEDDESIGN CO.
           </h1>
-          <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-8"></div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        {/* Studio Projects Title */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-light text-[#B49B7E] mb-4">
+            Studio Projects
+          </h2>
+          <div className="w-24 h-0.5 bg-[#B49B7E] mx-auto"></div>
         </div>
 
-        {/* Tagline */}
-        <div className="max-w-4xl mb-12">
-          <p className="text-xl md:text-2xl text-white/90 font-light leading-relaxed">
-            Creating extraordinary spaces that reflect your unique story and elevate your everyday life
-          </p>
-        </div>
-
-        {/* Video/Meet Our Team Section */}
-        <div className="mb-12">
-          <div className="relative w-80 h-48 bg-black/40 rounded-2xl border border-white/20 flex items-center justify-center mb-4 backdrop-blur-sm">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-              <div className="w-0 h-0 border-l-8 border-l-white border-y-6 border-y-transparent ml-1"></div>
-            </div>
-          </div>
-          <p className="text-white/80 text-sm font-medium">Meet Our Team</p>
-        </div>
-
-        {/* CTA Button */}
-        <div className="mb-16">
-          <Link 
-            to="/customer/questionnaire"
-            className="bg-gradient-to-r from-[#D4AF37] to-[#B8941F] hover:from-[#B8941F] hover:to-[#9A7A1A] text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-2xl inline-flex items-center gap-2"
+        {/* Action Buttons */}
+        <div className="flex justify-center gap-6 mb-12">
+          <button 
+            onClick={() => setShowModal(true)}
+            className="bg-[#B49B7E] hover:bg-[#A08B6F] text-white px-8 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2"
           >
-            Begin Your Design Journey
-            <span className="text-xl">→</span>
+            + New Client
+          </button>
+          <Link
+            to="/email-preview"
+            className="bg-[#B49B7E] hover:bg-[#A08B6F] text-white px-8 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2"
+          >
+            ✉ Email New Client
+          </Link>
+          <Link
+            to="/questionnaire/new"
+            className="bg-gray-700 hover:bg-gray-800 text-white px-8 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2"
+          >
+            + Full Questionnaire
           </Link>
         </div>
 
-        {/* TO DO LIST */}
-        <div className="w-full max-w-4xl">
-          <h2 className="text-2xl font-light text-[#D4AF37] mb-8 text-center">
-            TO DO LIST
-          </h2>
-          <div className="bg-black/60 border border-white/20 rounded-2xl p-8 backdrop-blur-sm">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
-                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
-                <span className="text-white/90">Complete Johnson Project - Living Room Walkthrough</span>
-                <span className="ml-auto text-[#D4AF37] text-sm">High Priority</span>
-              </div>
-              
-              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
-                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
-                <span className="text-white/90">Send FF&E specifications to Smith client</span>
-                <span className="ml-auto text-yellow-400 text-sm">Medium</span>
-              </div>
-              
-              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
-                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
-                <span className="text-white/90">Update vendor credentials - Four Hands</span>
-                <span className="ml-auto text-green-400 text-sm">Low</span>
-              </div>
-              
-              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
-                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" checked />
-                <span className="text-white/60 line-through">Review Greene Project checklist items</span>
-                <span className="ml-auto text-gray-400 text-sm">Completed</span>
-              </div>
-              
-              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
-                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
-                <span className="text-white/90">Schedule client meeting for Brown residence</span>
-                <span className="ml-auto text-[#D4AF37] text-sm">High Priority</span>
-              </div>
-              
-              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
-                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
-                <span className="text-white/90">Export and share Wilson Project mood board</span>
-                <span className="ml-auto text-yellow-400 text-sm">Medium</span>
-              </div>
-              
-              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300">
-                <input type="checkbox" className="w-5 h-5 rounded border-[#D4AF37] text-[#D4AF37] focus:ring-[#D4AF37]" />
-                <span className="text-white/90">Update Teams integration for status notifications</span>
-                <span className="ml-auto text-green-400 text-sm">Low</span>
-              </div>
-            </div>
-            
-            {/* Add New Task Button */}
-            <div className="mt-6 pt-6 border-t border-white/20">
-              <button className="w-full bg-gradient-to-r from-[#D4AF37]/20 to-[#B8941F]/20 hover:from-[#D4AF37]/30 hover:to-[#B8941F]/30 border border-[#D4AF37]/50 text-[#D4AF37] py-3 rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
-                <span className="text-xl">+</span>
-                Add New Task
-              </button>
-            </div>
+        {/* Projects List */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B49B7E] mx-auto"></div>
+            <p className="mt-4 text-gray-400">Loading projects...</p>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-6">
+            {projects.map((project, index) => (
+              <Link
+                key={project.id}
+                to={`/project/${project.id}`}
+                className="block border border-gray-700 rounded-lg p-6 hover:border-[#B49B7E]/50 transition-all duration-300"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-xl font-medium text-white mb-2">{project.name}</h3>
+                    <p className="text-gray-400 mb-1">
+                      Client: <span className="text-white">{project.client_info?.full_name || 'Unknown Client'}</span>
+                    </p>
+                    {project.client_info?.address && (
+                      <p className="text-gray-400">
+                        Address: <span className="text-white">{project.client_info.address}</span>
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-green-400">Last Updated</span>
+                      <span className="text-gray-400">📄</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      <span className="text-green-400 text-sm">Active</span>
+                    </div>
+                    <p className="text-gray-500 text-sm mt-1">
+                      Created {new Date(project.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            
+            {projects.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-400">No projects found. Create your first project!</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* New Client Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div className="bg-black/90 border border-[#D4AF37]/30 rounded-2xl p-8 w-full max-w-md mx-4 backdrop-blur-sm">
-            <h3 className="text-2xl font-light text-[#D4AF37] mb-6 text-center">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 w-full max-w-md mx-4">
+            <h3 className="text-2xl font-light text-[#B49B7E] mb-6 text-center">
               Add New Client
             </h3>
             
@@ -205,41 +194,41 @@ const StudioLandingPage = () => {
                 placeholder="Full Name"
                 value={newClientData.full_name}
                 onChange={(e) => setNewClientData({ ...newClientData, full_name: e.target.value })}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#B49B7E]"
               />
               <input
                 type="email"
                 placeholder="Email"
                 value={newClientData.email}
                 onChange={(e) => setNewClientData({ ...newClientData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#B49B7E]"
               />
               <input
                 type="tel"
                 placeholder="Phone"
                 value={newClientData.phone}
                 onChange={(e) => setNewClientData({ ...newClientData, phone: e.target.value })}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#B49B7E]"
               />
               <input
                 type="text"
                 placeholder="Address"
                 value={newClientData.address}
                 onChange={(e) => setNewClientData({ ...newClientData, address: e.target.value })}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-[#D4AF37]"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#B49B7E]"
               />
             </div>
             
             <div className="flex gap-4 pt-6">
               <button
                 onClick={handleCreateProject}
-                className="flex-1 bg-gradient-to-r from-[#D4AF37] to-[#B8941F] hover:from-[#B8941F] hover:to-[#9A7A1A] text-white py-3 rounded-lg transition-all duration-300"
+                className="flex-1 bg-[#B49B7E] hover:bg-[#A08B6F] text-white py-3 rounded-lg transition-all duration-300"
               >
                 Create Project
               </button>
               <button
                 onClick={() => setShowModal(false)}
-                className="flex-1 bg-white/20 hover:bg-white/30 text-white py-3 rounded-lg transition-all duration-300"
+                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg transition-all duration-300"
               >
                 Cancel
               </button>
