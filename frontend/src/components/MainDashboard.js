@@ -42,14 +42,22 @@ const MainDashboard = () => {
 
   return (
     <div className="min-h-screen bg-black">
-      {/* Large Beige Header with Logo */}
-      <div className="w-full h-32 bg-gradient-to-r from-amber-100 to-stone-200" style={{ 
-        background: 'linear-gradient(135deg, #f5f5dc 0%, #e8dcc6 100%)'
+      {/* Gold Header with Logo and Shimmer */}
+      <div className="w-full h-32" style={{ 
+        background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
+        boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
       }}>
-        <div className="flex items-center justify-center h-full">
-          <h1 className="text-5xl font-serif text-black tracking-wider">
-            ESTABLISHEDDESIGN CO.
-          </h1>
+        <div className="flex items-center justify-center h-full relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10 animate-pulse"></div>
+          <img 
+            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
+            alt="ESTABLISHEDDESIGN CO." 
+            className="h-20 object-contain filter drop-shadow-lg"
+            style={{
+              filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.2))',
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-transparent to-yellow-400 opacity-5 animate-pulse"></div>
         </div>
       </div>
 
