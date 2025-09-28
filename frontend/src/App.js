@@ -23,6 +23,7 @@ import MainDashboard from './components/MainDashboard';
 import ActualStudioLandingPage from './components/ActualStudioLandingPage';
 import SimpleDashboard from './components/SimpleDashboard';
 import BeautifulDashboard from './components/BeautifulDashboard';
+import CorrectDashboard from './components/CorrectDashboard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
