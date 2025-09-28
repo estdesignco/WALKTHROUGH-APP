@@ -218,7 +218,7 @@ const App = () => {
             />
             <Route 
               path="/project/:projectId/ffe" 
-              element={<FFEDashboard isOffline={isOffline} />}
+              element={<FFEDashboardWrapper />}
             />
             <Route 
               path="/ffe/:projectId" 
