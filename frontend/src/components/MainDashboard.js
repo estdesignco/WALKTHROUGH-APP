@@ -123,7 +123,7 @@ const MainDashboard = () => {
         {/* Three Main Action Buttons - NO BORDERS */}
         <div className="flex justify-center space-x-4 mb-12">
           <button 
-            onClick={() => handleNavigation('/questionnaire/new')}
+            onClick={() => window.open('https://studio-project-hub.preview.emergentagent.com/customer/questionnaire', '_blank')}
             className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
@@ -156,14 +156,14 @@ const MainDashboard = () => {
             }}
             onMouseLeave={(e) => {
               e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+              e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inert 0 1px 0 rgba(255, 255, 255, 0.2)';
             }}
           >
             <span>📧</span>
             <span>Email New Client</span>
           </button>
           <button 
-            onClick={() => window.open('https://designstudio-13.preview.emergentagent.com/customer/questionnaire', '_blank')}
+            onClick={() => window.open('https://studio-project-hub.preview.emergentagent.com/customer/questionnaire', '_blank')}
             className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
@@ -179,7 +179,7 @@ const MainDashboard = () => {
               e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
             }}
           >
-            <span>🔍</span>
+            <span>📝</span>
             <span>Full Questionnaire</span>
           </button>
         </div>
