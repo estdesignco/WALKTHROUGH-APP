@@ -1,314 +1,301 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Play, CheckCircle, Users, Award, Heart, Star } from 'lucide-react';
-import { Button } from './ui/button';
+import { Link } from 'react-router-dom';
+import { Play, ArrowRight, Star, CheckCircle } from 'lucide-react';
 
 const CustomerLandingPage = () => {
-    const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const navigate = useNavigate();
-
-    // Sample portfolio images - replace with your actual images
-    const portfolioImages = [
-        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2058&q=80",
-        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-        "https://images.unsplash.com/photo-1554995207-c18c203602cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-        "https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2043&q=80"
-    ];
-
-    // Auto-rotate portfolio images
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentImageIndex((prev) => (prev + 1) % portfolioImages.length);
-        }, 4000);
-        return () => clearInterval(interval);
-    }, []);
-
-    return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
-            {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-                {/* Background - Your Stunning Interior Photo */}
-                <div className="absolute inset-0 z-0">
-                    <img 
-                        src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/pbaudki8_10-web-or-mls-014%203.JPG"
-                        alt="Established Design Co. - Luxury Interior Design" 
-                        className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40"></div>
-                </div>
-
-                {/* Hero Content */}
-                <div className="relative z-10 text-center px-6 max-w-6xl mx-auto">
-                    {/* Your Logo */}
-                    <div className="mb-8">
-                        <img
-                            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
-                            alt="Established Design Co."
-                            className="h-24 md:h-32 mx-auto object-contain"
-                            style={{ filter: 'brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(664%) hue-rotate(349deg) brightness(95%) contrast(88%)' }} // Converts to your brand gold color
-                        />
-                        <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mt-6"></div>
-                    </div>
-
-                    {/* Tagline */}
-                    <p className="text-xl md:text-2xl font-light mb-8 max-w-3xl mx-auto leading-relaxed" style={{ color: '#F5F5DC' }}>
-                        Creating extraordinary spaces that reflect your unique story and elevate your everyday life
-                    </p>
-
-                    {/* Video Section */}
-                    <div className="mb-12">
-                        <div className="relative inline-block">
-                            {!isVideoPlaying ? (
-                                <div 
-                                    className="relative cursor-pointer group"
-                                    onClick={() => setIsVideoPlaying(true)}
-                                >
-                                    <div className="w-64 h-36 bg-black/50 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-[#B49B7E]/30 group-hover:border-[#B49B7E]/60 transition-all duration-300">
-                                        <Play className="w-12 h-12 text-[#B49B7E] group-hover:scale-110 transition-transform duration-300" />
-                                    </div>
-                                    <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-sm font-light" style={{ color: '#F5F5DC' }}>
-                                        Meet Our Team
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="w-96 h-56 bg-black rounded-2xl overflow-hidden border border-[#B49B7E]/30">
-                                    {/* Replace with your actual video */}
-                                    <iframe
-                                        src="https://player.vimeo.com/video/example"
-                                        className="w-full h-full"
-                                        allow="autoplay; fullscreen"
-                                        allowFullScreen
-                                    ></iframe>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* CTA Button */}
-                    <Button 
-                        onClick={() => navigate('/customer/questionnaire')}
-                        className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-white px-12 py-4 text-lg font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105"
-                    >
-                        Begin Your Design Journey
-                        <ArrowRight className="ml-3 w-5 h-5" />
-                    </Button>
-
-                    {/* Scroll Indicator */}
-                    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-                        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-                            <div className="w-1 h-3 bg-white/50 rounded-full mt-2"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Who We Are Section */}
-            <section className="py-20 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-5xl font-light text-[#B49B7E] mb-6">Who We Are</h2>
-                        <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mb-8"></div>
-                        <p className="text-xl max-w-4xl mx-auto leading-relaxed" style={{ color: '#F5F5DC' }}>
-                            We are passionate creators of extraordinary living spaces, dedicated to transforming your vision into reality with unparalleled attention to detail and timeless elegance.
-                        </p>
-                    </div>
-
-                    {/* Team Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                        {/* Philosophy */}
-                        <div className="text-center group">
-                            <div className="w-20 h-20 bg-gradient-to-br from-[#B49B7E] to-[#A08B6F] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <Heart className="w-10 h-10 text-white" />
-                            </div>
-                            <h3 className="text-2xl font-light mb-4" style={{ color: '#F5F5DC' }}>Our Philosophy</h3>
-                            <p className="leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.8' }}>
-                                Every space tells a story. We believe in creating environments that not only inspire but deeply connect with who you are and how you live.
-                            </p>
-                        </div>
-
-                        {/* Expertise */}
-                        <div className="text-center group">
-                            <div className="w-20 h-20 bg-gradient-to-br from-[#B49B7E] to-[#A08B6F] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <Award className="w-10 h-10 text-white" />
-                            </div>
-                            <h3 className="text-2xl font-light mb-4" style={{ color: '#F5F5DC' }}>Our Expertise</h3>
-                            <p className="leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.8' }}>
-                                With years of experience in luxury design, we specialize in new builds, renovations, and complete styling transformations.
-                            </p>
-                        </div>
-
-                        {/* Commitment */}
-                        <div className="text-center group">
-                            <div className="w-20 h-20 bg-gradient-to-br from-[#B49B7E] to-[#A08B6F] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <Star className="w-10 h-10 text-white" />
-                            </div>
-                            <h3 className="text-2xl font-light mb-4" style={{ color: '#F5F5DC' }}>Our Commitment</h3>
-                            <p className="leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.8' }}>
-                                From initial concept to final installation, we ensure every detail exceeds your expectations and creates lasting memories.
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Process Overview */}
-                    <div className="bg-gradient-to-br from-black/80 to-gray-900/90 backdrop-blur-sm rounded-3xl p-12 border border-[#B49B7E]/20 shadow-2xl">
-                        <h3 className="text-4xl font-light text-[#B49B7E] text-center mb-12">Our Design Process</h3>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                            {[
-                                { step: "01", title: "Discovery", desc: "We start with your comprehensive questionnaire to understand your vision, lifestyle, and dreams." },
-                                { step: "02", title: "Planning", desc: "Our team creates detailed plans and concepts tailored specifically to your unique needs." },
-                                { step: "03", title: "Curation", desc: "We carefully select every piece, from furniture to finishes, ensuring perfect harmony." },
-                                { step: "04", title: "Installation", desc: "We bring your vision to life with meticulous attention to every detail and timeline." }
-                            ].map((item, index) => (
-                                <div key={index} className="text-center">
-                                    <div className="text-3xl font-light text-[#B49B7E] mb-4">{item.step}</div>
-                                    <h4 className="text-xl font-medium mb-3" style={{ color: '#F5F5DC' }}>{item.title}</h4>
-                                    <p className="text-sm leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.8' }}>{item.desc}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* All in the Details Showcase */}
-            <section className="py-20 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-5xl font-light text-[#B49B7E] mb-6">All in the Details</h2>
-                        <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mb-8"></div>
-                        <p className="text-xl max-w-3xl mx-auto" style={{ color: '#F5F5DC', opacity: '0.9' }}>
-                            The thoughtful curation and styling that transforms houses into extraordinary homes
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Vintage Clock Collection */}
-                        <div className="group cursor-pointer">
-                            <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
-                                <img 
-                                    src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/lhwi6kpk_0FB9969A-C111-4078-A3FC-6711D2015941_1_105_c.jpeg"
-                                    alt="Curated vintage clock collection"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <h4 className="text-lg font-medium" style={{ color: '#F5F5DC' }}>Curated Collections</h4>
-                                    <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>Thoughtful styling & vintage finds</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Brass & Books Styling */}
-                        <div className="group cursor-pointer">
-                            <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
-                                <img 
-                                    src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/uw773jrc_17-IMG_2489.jpg"
-                                    alt="Brass accessories and book styling"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <h4 className="text-lg font-medium" style={{ color: '#F5F5DC' }}>Artful Arrangements</h4>
-                                    <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>Brass accents & curated objects</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Office Design with Dog */}
-                        <div className="group cursor-pointer">
-                            <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
-                                <img 
-                                    src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/gtmb5fh5_20-IMG_2441.jpg"
-                                    alt="Custom home office design"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <h4 className="text-lg font-medium" style={{ color: '#F5F5DC' }}>Custom Built-Ins</h4>
-                                    <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>Functional luxury & pattern play</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Luxury Bathroom */}
-                        <div className="group cursor-pointer">
-                            <div className="relative overflow-hidden rounded-2xl aspect-[4/3]">
-                                <img 
-                                    src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/unq2tzy0_5-IMG_2599.jpg"
-                                    alt="Luxury bathroom with pattern tiles"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <h4 className="text-lg font-medium" style={{ color: '#F5F5DC' }}>Luxury Finishes</h4>
-                                    <p className="text-sm" style={{ color: '#F5F5DC', opacity: '0.8' }}>Statement tiles & elegant fixtures</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Final CTA Section */}
-            <section className="py-20 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
-                <div className="max-w-4xl mx-auto">
-                    <div className="bg-gradient-to-br from-black/80 to-gray-900/90 backdrop-blur-sm rounded-3xl p-12 border border-[#B49B7E]/20 shadow-2xl text-center">
-                        <h2 className="text-5xl font-light text-[#B49B7E] mb-8">Ready to Begin?</h2>
-                        <p className="text-xl mb-12 leading-relaxed" style={{ color: '#F5F5DC', opacity: '0.9' }}>
-                            Take the first step towards your dream space. Our comprehensive questionnaire helps us understand your unique vision and creates the foundation for an extraordinary design journey.
-                        </p>
-                        
-                        <div className="flex flex-col items-center gap-6">
-                            <Button 
-                                onClick={() => navigate('/customer/questionnaire')}
-                                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-16 py-6 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105"
-                            >
-                                Start Your Questionnaire
-                                <ArrowRight className="ml-4 w-6 h-6" />
-                            </Button>
-                            
-                            <div className="flex items-center gap-6 text-sm" style={{ color: '#F5F5DC', opacity: '0.7' }}>
-                                <div className="flex items-center gap-2">
-                                    <CheckCircle className="w-4 h-4 text-[#B49B7E]" />
-                                    <span>Takes 10-15 minutes</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <CheckCircle className="w-4 h-4 text-[#B49B7E]" />
-                                    <span>Completely confidential</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <CheckCircle className="w-4 h-4 text-[#B49B7E]" />
-                                    <span>No obligation consultation</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="py-12 px-6 bg-black">
-                <div className="max-w-4xl mx-auto text-center">
-                    <img
-                        src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
-                        alt="Established Design Co."
-                        className="h-12 mx-auto object-contain mb-4"
-                        style={{ filter: 'brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(664%) hue-rotate(349deg) brightness(95%) contrast(88%)' }}
-                    />
-                    <p className="text-sm mb-6" style={{ color: '#F5F5DC', opacity: '0.7' }}>
-                        Creating extraordinary spaces since 2020
-                    </p>
-                    <div className="flex justify-center gap-8 text-sm" style={{ color: '#F5F5DC', opacity: '0.5' }}>
-                        <span>Privacy Policy</span>
-                        <span>Terms of Service</span>
-                        <span>Contact</span>
-                    </div>
-                </div>
-            </footer>
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  
+  return (
+    <div className="min-h-screen bg-black text-white">
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')`,
+          }}
+        />
+        
+        {/* Content */}
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-6xl md:text-8xl font-light mb-4" style={{ color: '#D4A574' }}>
+              ESTABLISHED
+            </h1>
+            <h2 className="text-4xl md:text-6xl font-light" style={{ color: '#F5F5DC' }}>
+              DESIGN CO.
+            </h2>
+          </div>
+          
+          <p className="text-xl md:text-2xl font-light mb-12 max-w-2xl mx-auto" style={{ color: '#F5F5DC' }}>
+            Creating timeless, luxurious interiors that reflect your unique story
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Link 
+              to="/customer/questionnaire"
+              className="px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 transform hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #D4A574 0%, #F5F5DC 50%, #D4A574 100%)',
+                color: '#000',
+                boxShadow: '0 8px 32px rgba(212, 165, 116, 0.3)'
+              }}
+            >
+              Start Your Design Journey
+              <ArrowRight className="inline-block ml-2" size={20} />
+            </Link>
+            
+            <button 
+              onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+              className="px-8 py-4 text-lg font-medium rounded-full border-2 transition-all duration-300 transform hover:scale-105"
+              style={{
+                borderColor: '#D4A574',
+                color: '#D4A574',
+                background: 'rgba(0,0,0,0.3)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <Play className="inline-block mr-2" size={20} />
+              Watch Our Story
+            </button>
+          </div>
         </div>
-    );
+      </section>
+
+      {/* Who We Are Section */}
+      <section className="py-20 px-4" style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h3 className="text-4xl font-light mb-6" style={{ color: '#D4A574' }}>
+                Who We Are
+              </h3>
+              <p className="text-lg leading-relaxed mb-6" style={{ color: '#F5F5DC' }}>
+                We are a luxury interior design studio specializing in creating spaces that tell your unique story. 
+                With over a decade of experience, we blend timeless elegance with contemporary sophistication.
+              </p>
+              <p className="text-lg leading-relaxed mb-8" style={{ color: '#F5F5DC' }}>
+                Our approach is deeply personal – we believe great design starts with understanding how you live, 
+                what you love, and what makes you feel at home.
+              </p>
+              
+              <div className="flex items-center space-x-4">
+                <div className="flex">
+                  {[1,2,3,4,5].map(star => (
+                    <Star key={star} className="w-6 h-6 fill-current" style={{ color: '#D4A574' }} />
+                  ))}
+                </div>
+                <span className="text-lg" style={{ color: '#F5F5DC' }}>5.0 from 200+ clients</span>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <img 
+                src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                alt="Luxury Interior Design"
+                className="rounded-lg shadow-2xl"
+              />
+              <div className="absolute inset-0 rounded-lg" style={{ background: 'linear-gradient(45deg, rgba(212,165,116,0.1), transparent)' }} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Design Process Section */}
+      <section className="py-20 px-4 bg-black">
+        <div className="max-w-6xl mx-auto text-center">
+          <h3 className="text-4xl font-light mb-12" style={{ color: '#D4A574' }}>
+            Our Design Process
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {[
+              {
+                step: '01',
+                title: 'Discovery',
+                description: 'We start with an in-depth questionnaire to understand your vision, lifestyle, and preferences.',
+                image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
+              },
+              {
+                step: '02', 
+                title: 'Design Development',
+                description: 'Our team creates a comprehensive design plan tailored specifically to you and your space.',
+                image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
+              },
+              {
+                step: '03',
+                title: 'Implementation',
+                description: 'We manage every detail from procurement to installation, ensuring flawless execution.',
+                image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
+              }
+            ].map((process, index) => (
+              <div key={index} className="text-center">
+                <div className="relative mb-6">
+                  <img 
+                    src={process.image}
+                    alt={process.title}
+                    className="w-full h-64 object-cover rounded-lg"
+                  />
+                  <div 
+                    className="absolute top-4 left-4 w-12 h-12 rounded-full flex items-center justify-center text-black font-bold text-lg"
+                    style={{ background: '#D4A574' }}
+                  >
+                    {process.step}
+                  </div>
+                </div>
+                
+                <h4 className="text-2xl font-light mb-4" style={{ color: '#D4A574' }}>
+                  {process.title}
+                </h4>
+                <p className="text-lg leading-relaxed" style={{ color: '#F5F5DC' }}>
+                  {process.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* All in the Details Section */}
+      <section className="py-20 px-4" style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)' }}>
+        <div className="max-w-6xl mx-auto">
+          <h3 className="text-4xl font-light mb-12 text-center" style={{ color: '#D4A574' }}>
+            All in the Details
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                title: 'Custom Furniture',
+                description: 'Bespoke pieces designed specifically for your space',
+                image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+              },
+              {
+                title: 'Luxury Textiles',
+                description: 'Premium fabrics and materials sourced globally',
+                image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+              },
+              {
+                title: 'Art Curation',
+                description: 'Carefully selected artwork to complete your vision',
+                image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+              },
+              {
+                title: 'Lighting Design',
+                description: 'Custom lighting solutions for ambiance and function',
+                image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+              },
+              {
+                title: 'Color Consultation',
+                description: 'Perfect color palettes that reflect your personality',
+                image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+              },
+              {
+                title: 'Project Management',
+                description: 'Seamless coordination from concept to completion',
+                image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+              }
+            ].map((detail, index) => (
+              <div key={index} className="group cursor-pointer">
+                <div className="relative overflow-hidden rounded-lg mb-4">
+                  <img 
+                    src={detail.image}
+                    alt={detail.title}
+                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-40 transition-opacity duration-300 group-hover:bg-opacity-20" />
+                </div>
+                
+                <h4 className="text-xl font-light mb-2" style={{ color: '#D4A574' }}>
+                  {detail.title}
+                </h4>
+                <p className="text-base" style={{ color: '#F5F5DC' }}>
+                  {detail.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 px-4 bg-black text-center">
+        <div className="max-w-4xl mx-auto">
+          <h3 className="text-4xl font-light mb-6" style={{ color: '#D4A574' }}>
+            Ready to Transform Your Space?
+          </h3>
+          <p className="text-xl leading-relaxed mb-12" style={{ color: '#F5F5DC' }}>
+            Let's begin the journey to create your dream interior. Our comprehensive questionnaire 
+            will help us understand your vision and preferences.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Link 
+              to="/customer/questionnaire"
+              className="px-12 py-4 text-xl font-medium rounded-full transition-all duration-300 transform hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #D4A574 0%, #F5F5DC 50%, #D4A574 100%)',
+                color: '#000',
+                boxShadow: '0 8px 32px rgba(212, 165, 116, 0.3)'
+              }}
+            >
+              Start Your Design Journey
+              <ArrowRight className="inline-block ml-2" size={24} />
+            </Link>
+            
+            <Link 
+              to="/contact"
+              className="px-12 py-4 text-xl font-medium rounded-full border-2 transition-all duration-300 transform hover:scale-105"
+              style={{
+                borderColor: '#D4A574',
+                color: '#D4A574',
+                background: 'rgba(0,0,0,0.3)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              Schedule Consultation
+            </Link>
+          </div>
+          
+          <div className="mt-12 flex justify-center items-center space-x-8">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-6 h-6" style={{ color: '#D4A574' }} />
+              <span style={{ color: '#F5F5DC' }}>Free Consultation</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-6 h-6" style={{ color: '#D4A574' }} />
+              <span style={{ color: '#F5F5DC' }}>No Obligation</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-6 h-6" style={{ color: '#D4A574' }} />
+              <span style={{ color: '#F5F5DC' }}>Personalized Service</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Modal */}
+      {isVideoPlaying && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" onClick={() => setIsVideoPlaying(false)}>
+          <div className="relative w-full max-w-4xl mx-4">
+            <button 
+              onClick={() => setIsVideoPlaying(false)}
+              className="absolute -top-12 right-0 text-white text-2xl hover:text-gray-300"
+            >
+              ✕
+            </button>
+            <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+              <div className="text-center">
+                <Play className="w-16 h-16 mx-auto mb-4" style={{ color: '#D4A574' }} />
+                <p style={{ color: '#F5F5DC' }}>Video content would be embedded here</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default CustomerLandingPage;
