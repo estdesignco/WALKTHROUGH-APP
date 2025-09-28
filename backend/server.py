@@ -1569,6 +1569,11 @@ async def get_projects():
             room_data["categories"] = [Category(**cat) for cat in categories]
             
         project_data["rooms"] = [Room(**room) for room in rooms]
+        
+        # Ensure project_type has a valid value
+        if not project_data.get("project_type"):
+            project_data["project_type"] = "Renovation"
+            
         result.append(Project(**project_data))
     
     return result
