@@ -228,6 +228,10 @@ const App = () => {
               path="/advanced-features" 
               element={<AdvancedFeaturesDashboard />}
             />
+            <Route 
+              path="/email-preview" 
+              element={<EmailPreview />}
+            />
             {/* Customer-facing routes */}
             <Route 
               path="/customer" 
