@@ -74,18 +74,7 @@ const Navigation = ({ currentProject, isOffline }) => {
             </div>
           )}
 
-          {/* Actions */}
-          <div className="flex items-center space-x-4">
-            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-4 py-2 rounded-lg transition-all duration-300">
-              📤 Export FF&E
-            </button>
-            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-4 py-2 rounded-lg transition-all duration-300">
-              📊 Spec Sheet  
-            </button>
-            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-4 py-2 rounded-lg transition-all duration-300">
-              ➕ Add Room
-            </button>
-          </div>
+          {/* Actions - BUTTONS REMOVED PER USER REQUEST */}
         </div>
       </div>
     </nav>
