@@ -16,10 +16,6 @@ import CustomerfacingLandingPage from './components/CustomerfacingLandingPage';
 import CustomerfacingQuestionnaire from './components/CustomerfacingQuestionnaire';
 import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectDetailPage';
 import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
-import DesignFlowLandingPage from './components/DesignFlowLandingPage';
-import EmailPreview from './components/EmailPreview';
-import WorkflowDashboard from './components/WorkflowDashboard';
-import UnifiedFurnitureSearch from './components/UnifiedFurnitureSearch';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -145,14 +141,6 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
-              element={<DesignFlowLandingPage />}
-            />
-            <Route 
-              path="/studio" 
-              element={<StudioLandingPage />}
-            />
-            <Route 
-              path="/customer" 
               element={<CustomerfacingLandingPage />}
             />
             <Route 
@@ -167,18 +155,6 @@ const App = () => {
                   isOffline={isOffline}
                 />
               }
-            />
-            <Route 
-              path="/furniture-search" 
-              element={<UnifiedFurnitureSearch />}
-            />
-            <Route 
-              path="/email-preview" 
-              element={<EmailPreview />}
-            />
-            <Route 
-              path="/workflow-dashboard" 
-              element={<WorkflowDashboard />}
             />
             <Route 
               path="/questionnaire/new" 
