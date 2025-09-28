@@ -160,11 +160,11 @@ const App = () => {
             />
             <Route 
               path="/studio" 
-              element={<StudioLandingPage />}
+              element={<CustomerfacingQuestionnaire />}
             />
             <Route 
               path="/customer/questionnaire" 
-              element={<CustomerfacingQuestionnaire />}
+              element={<StudioLandingPage />}
             />
             <Route 
               path="/customer" 
