@@ -34,8 +34,8 @@ const Navigation = ({ currentProject, isOffline }) => {
                   to="/"
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     location.pathname === '/' 
-                      ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-[#F5F5DC]' 
-                      : 'text-[#F5F5DC]/70 hover:bg-[#B49B7E]/20'
+                      ? 'bg-blue-600 text-white' 
+                      : 'text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   📋 Questionnaire
@@ -44,8 +44,8 @@ const Navigation = ({ currentProject, isOffline }) => {
                   to={`/project/${currentProject.id}/walkthrough`}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     location.pathname.includes('/walkthrough') 
-                      ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-[#F5F5DC]' 
-                      : 'text-[#F5F5DC]/70 hover:bg-[#B49B7E]/20'
+                      ? 'bg-green-600 text-white' 
+                      : 'text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   🚶 Walkthrough
@@ -54,8 +54,8 @@ const Navigation = ({ currentProject, isOffline }) => {
                   to={`/project/${currentProject.id}/checklist`}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     location.pathname.includes('/checklist') 
-                      ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-[#F5F5DC]' 
-                      : 'text-[#F5F5DC]/70 hover:bg-[#B49B7E]/20'  
+                      ? 'bg-yellow-600 text-white' 
+                      : 'text-gray-300 hover:bg-gray-700'  
                   }`}
                 >
                   ✅ Checklist
@@ -64,8 +64,8 @@ const Navigation = ({ currentProject, isOffline }) => {
                   to={`/project/${currentProject.id}/ffe`}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     location.pathname.includes('/ffe') 
-                      ? 'bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] text-[#F5F5DC]' 
-                      : 'text-[#F5F5DC]/70 hover:bg-[#B49B7E]/20'
+                      ? 'bg-purple-600 text-white' 
+                      : 'text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   📦 FF&E
@@ -74,7 +74,18 @@ const Navigation = ({ currentProject, isOffline }) => {
             </div>
           )}
 
-          {/* Actions - BUTTONS REMOVED PER USER REQUEST */}
+          {/* Actions */}
+          <div className="flex items-center space-x-4">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+              📤 Export FF&E
+            </button>
+            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+              📊 Spec Sheet  
+            </button>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+              ➕ Add Room
+            </button>
+          </div>
         </div>
       </div>
     </nav>

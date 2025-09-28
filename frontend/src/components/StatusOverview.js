@@ -183,12 +183,11 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
   };
 
   return (
-    <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mb-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* LEFT COLUMN - STATUS PIE CHART */}
-        <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl p-6 border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
-          <h3 className="text-lg font-semibold text-[#B49B7E] mb-4 tracking-wide">Status Overview</h3>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      
+      {/* LEFT COLUMN - STATUS PIE CHART */}
+      <div className="bg-gray-800 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Status Overview</h3>
         
         {/* REAL PIE CHART WITH LABELS AND LINES */}
         <div className="h-64 mb-4">
@@ -202,9 +201,9 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST with Beautiful Rounded Treatment */}
-      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl p-6 border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
-        <h3 className="text-lg font-semibold text-[#B49B7E] mb-4 tracking-wide">Status Breakdown</h3>
+      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST */}
+      <div className="bg-gray-800 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
@@ -224,7 +223,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: getStatusColor(status) }}
                   ></div>
-                  <span className="text-sm text-[#F5F5DC]/90">{status}</span>
+                  <span className="text-sm text-gray-300">{status}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="bg-gray-700 rounded-full h-2 w-16">
@@ -236,7 +235,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                       }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-[#F5F5DC] w-8 text-right">
+                  <span className="text-sm font-medium text-white w-8 text-right">
                     {count}
                   </span>
                 </div>
@@ -246,13 +245,13 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* RIGHT COLUMN - SHIPPING SECTION with Beautiful Rounded Treatment */}
-      <div className="bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl p-6 border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
-        <h3 className="text-lg font-semibold text-[#B49B7E] mb-4 tracking-wide">Shipping Information</h3>
+      {/* RIGHT COLUMN - SHIPPING SECTION */}
+      <div className="bg-gray-800 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
-          <h4 className="text-md font-medium text-[#F5F5DC]/80 mb-3">Carrier Distribution</h4>
+          <h4 className="text-md font-medium text-gray-300 mb-3">Carrier Distribution</h4>
           <div className="h-48">
             {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
               <Pie data={carrierPieData} options={pieOptions} />
@@ -266,7 +265,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
 
         {/* 2. SHIPPING BREAKDOWN - EXACTLY LIKE STATUS BREAKDOWN! */}
         <div className="mb-6">
-          <h4 className="text-md font-medium text-[#F5F5DC]/80 mb-3">Shipping Breakdown</h4>
+          <h4 className="text-md font-medium text-gray-300 mb-3">Shipping Breakdown</h4>
           <div className="space-y-3 max-h-60 overflow-y-auto">{/*INCREASED HEIGHT*/}
             {[
               'FedEx', 'UPS', 'USPS', 'DHL', 'Brooks', 'Zenith', 'Sunbelt',
@@ -285,7 +284,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                       className="w-3 h-3 rounded-full" 
                       style={{ backgroundColor: getCarrierColor(carrier) }}
                     ></div>
-                    <span className="text-sm text-[#F5F5DC]/90">{carrier}</span>
+                    <span className="text-sm text-gray-300">{carrier}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="bg-gray-700 rounded-full h-2 w-16">
@@ -297,7 +296,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                         }}
                       />
                     </div>
-                    <span className="text-sm font-medium text-[#F5F5DC] w-8 text-right">
+                    <span className="text-sm font-medium text-white w-8 text-right">
                       {count}
                     </span>
                   </div>
@@ -336,7 +335,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
           </div>
         </div>
       </div>
-      </div>
+      
     </div>
   );
 };
