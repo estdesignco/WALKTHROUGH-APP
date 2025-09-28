@@ -13,6 +13,7 @@ import StudioLandingPage from "./components/StudioLandingPage";
 import ComprehensiveQuestionnaire from "./components/ComprehensiveQuestionnaire";
 import ProjectDetailPage from "./components/ProjectDetailPage";
 import CustomerfacingLandingPage from './components/CustomerfacingLandingPage';
+import CustomerLandingPage from './components/CustomerLandingPage';
 import CustomerfacingQuestionnaire from './components/CustomerfacingQuestionnaire';
 import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectDetailPage';
 import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
