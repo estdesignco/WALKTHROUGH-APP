@@ -343,19 +343,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
 
         {!hideNavigation && (
           <>
-            {/* Action Buttons - Same style as Studio Dashboard */}
-            <div className="flex justify-center gap-4 mb-8">
-              <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2"
-                      style={{ color: '#F5F5DC' }}>
-                <span>📥</span>
-                <span>Export FF&E</span>
-              </button>
-              <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2"
-                      style={{ color: '#F5F5DC' }}>
-                <span>📋</span>
-                <span>Spec Sheet</span>
-              </button>
-            </div>
+
 
             {/* Search and Controls - Darker Gradient to Match Top */}
             <div className="flex items-center justify-between mt-6 p-6 bg-gradient-to-b from-black via-gray-900 to-black rounded-2xl border border-[#B49B7E]/20 shadow-xl backdrop-blur-sm">
