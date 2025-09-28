@@ -91,7 +91,7 @@ const MainDashboard = () => {
           </button>
           
           <button
-            onClick={() => projects.length > 0 ? handleNavigation(`/walkthrough/${projects[0].id}`) : alert('No projects available')}
+            onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=Walkthrough`) : alert('No projects available')}
             className="text-stone-300 p-4 rounded-lg transition-all duration-200"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
@@ -104,7 +104,7 @@ const MainDashboard = () => {
           </button>
           
           <button
-            onClick={() => projects.length > 0 ? handleNavigation(`/checklist/${projects[0].id}`) : alert('No projects available')}
+            onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=Checklist`) : alert('No projects available')}
             className="text-stone-300 p-4 rounded-lg transition-all duration-200"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
@@ -117,7 +117,7 @@ const MainDashboard = () => {
           </button>
           
           <button
-            onClick={() => projects.length > 0 ? handleNavigation(`/ffe/${projects[0].id}`) : alert('No projects available')}
+            onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=FF&E`) : alert('No projects available')}
             className="text-stone-300 p-4 rounded-lg transition-all duration-200"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
