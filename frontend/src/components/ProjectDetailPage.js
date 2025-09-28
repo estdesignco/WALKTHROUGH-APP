@@ -18,9 +18,10 @@ const Project = {
 
 export default function ProjectDetailPage() {
     const { projectId } = useParams();
+    const [searchParams] = useSearchParams();
     const [project, setProject] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState("Questionnaire");
+    const [activeTab, setActiveTab] = useState(searchParams.get('tab') || "Questionnaire");
 
     useEffect(() => {
         const fetchProject = async () => {
