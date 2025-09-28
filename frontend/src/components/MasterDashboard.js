@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Plus, Mail, FileText, Search, Smartphone, Users, 
-  BarChart3, Settings, Download, Upload, Sync,
+  BarChart3, Settings, Download, Upload, RefreshCw,
   ShoppingCart, Package, Truck, CheckCircle,
   Calendar, Clock, DollarSign, Camera, Wifi, WifiOff
 } from 'lucide-react';
