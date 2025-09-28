@@ -221,7 +221,7 @@ const MainDashboard = () => {
                 </div>
               </div>
               
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mb-4">
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-stone-500">Client:</span>
@@ -242,6 +242,37 @@ const MainDashboard = () => {
                   </div>
                   <div className="text-sm text-stone-500">Created {project.createdDate}</div>
                 </div>
+              </div>
+              
+              {/* Project Action Buttons */}
+              <div className="flex space-x-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/walkthrough/${project.id}`);
+                  }}
+                  className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs transition-colors duration-200"
+                >
+                  Walkthrough
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/checklist/${project.id}`);
+                  }}
+                  className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs transition-colors duration-200"
+                >
+                  Checklist
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/ffe/${project.id}`);
+                  }}
+                  className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs transition-colors duration-200"
+                >
+                  FF&E
+                </button>
               </div>
             </div>
           ))}
