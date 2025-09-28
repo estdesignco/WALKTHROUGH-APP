@@ -147,7 +147,7 @@ const App = () => {
           <Routes>
             <Route 
               path="/" 
-              element={<StudioLandingPage />}
+              element={<DesignFlowLandingPage />}
             />
             <Route 
               path="/studio" 
