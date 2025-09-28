@@ -38,8 +38,8 @@ const MainDashboard = () => {
   };
 
   const handleProjectClick = (projectId) => {
-    // Navigate to the actual walkthrough dashboard that's already in the app
-    navigate(`/walkthrough/${projectId}`);
+    // Navigate to the project detail page with 4 tabs (Questionnaire, Walkthrough, Checklist, FF&E)
+    navigate(`/project/${projectId}`);
   };
 
   return (
