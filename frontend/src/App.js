@@ -19,6 +19,7 @@ import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
 import EmailPreview from './components/EmailPreview';
 import UnifiedFurnitureSearch from './components/UnifiedFurnitureSearch';
 import WorkflowDashboard from './components/WorkflowDashboard';
+import MainDashboard from './components/MainDashboard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
