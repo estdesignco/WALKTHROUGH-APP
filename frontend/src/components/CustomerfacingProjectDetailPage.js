@@ -482,6 +482,7 @@ export default function ProjectPage() {
             </div>
 
             <div className="py-4">
+                {console.log('🔍 Active tab:', activeTab, 'Available tabs:', tabs.map(t => t.name)) || null}
                 {tabs.find(tab => tab.name === activeTab)?.component}
             </div>
         </div>
