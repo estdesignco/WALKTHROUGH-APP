@@ -466,7 +466,10 @@ export default function ProjectPage() {
                         return (
                             <button
                                 key={tab.name}
-                                onClick={() => setActiveTab(tab.name)}
+                                onClick={() => {
+                                    console.log('🔘 Tab clicked:', tab.name);
+                                    setActiveTab(tab.name);
+                                }}
                                 className={`${
                                     activeTab === tab.name
                                         ? 'border-stone-400 text-stone-200'
