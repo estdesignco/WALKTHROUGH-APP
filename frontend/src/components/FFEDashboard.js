@@ -24,29 +24,8 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
   
   useEffect(() => {
     if (projectId) {
-      console.log('🚀 Loading project:', projectId);
-      
-      // IMMEDIATE TEST - Force load project data
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-      fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=ffe`)
-        .then(response => {
-          console.log('📡 Response received:', response.status);
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error(`HTTP ${response.status}`);
-          }
-        })
-        .then(projectData => {
-          console.log('✅ SUCCESS - Project data:', projectData.name);
-          setProject(projectData);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error('❌ ERROR loading project:', err);
-          setError('Failed to load project: ' + err.message);
-          setLoading(false);
-        });
+      console.log('🚀 FF&E: Loading project:', projectId);
+      loadSimpleProject();
     }
   }, [projectId]);
 
