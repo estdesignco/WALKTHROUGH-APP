@@ -537,34 +537,68 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Handle tracking items
-  const handleTrackItem = async (item) => {
-    if (!item.tracking_number) {
-      console.error('❌ No tracking number available');
+  // Handle tracking items - OPEN CARRIER WEBSITE DIRECTLY
+  const handleTrackShipment = (trackingNumber, carrier) => {
+    if (!trackingNumber) {
+      alert('Please enter a tracking number first');
       return;
     }
 
+    let trackingUrl = '';
+    
+    switch (carrier) {
+      case 'FedEx':
+        trackingUrl = `https://www.fedex.com/apps/fedextrack/?tracknumbers=${trackingNumber}`;
+        break;
+      case 'UPS':
+        trackingUrl = `https://www.ups.com/track?tracknum=${trackingNumber}`;
+        break;
+      case 'USPS':
+        trackingUrl = `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}`;
+        break;
+      case 'DHL':
+        trackingUrl = `https://www.dhl.com/en/express/tracking.html?AWB=${trackingNumber}`;
+        break;
+      case 'Brooks':
+        trackingUrl = `https://www.brooksdelivery.com/track/${trackingNumber}`;
+        break;
+      case 'Zenith':
+        trackingUrl = `https://zenithdelivery.com/tracking/${trackingNumber}`;
+        break;
+      case 'Sunbelt':
+        trackingUrl = `https://sunbeltdelivery.com/track/${trackingNumber}`;
+        break;
+      case 'R+L Carriers':
+        trackingUrl = `https://www.rlcarriers.com/tracking/?pro=${trackingNumber}`;
+        break;
+      default:
+        alert('Please select a carrier first');
+        return;
+    }
+
+    // Open tracking URL in new tab
+    window.open(trackingUrl, '_blank');
+    console.log('🚚 Opening tracking URL:', trackingUrl);
+  };
+
+  // Handle updating tracking number
+  const handleTrackingNumberChange = async (itemId, trackingNumber) => {
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-      const response = await fetch(`${backendUrl}/api/track-shipment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          tracking_number: item.tracking_number,
-          carrier: item.carrier || 'auto-detect'
-        })
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tracking_number: trackingNumber })
       });
-
+      
       if (response.ok) {
-        const trackingData = await response.json();
-        console.log('✅ Tracking data retrieved');
+        console.log('✅ Tracking number updated successfully');
+        if (onReload) onReload();
       } else {
-        console.error('❌ Failed to get tracking information');
+        console.error('❌ Failed to update tracking number');
       }
     } catch (error) {
-      console.error('❌ Tracking error:', error);
+      console.error('❌ Error updating tracking number:', error);
     }
   };
 
