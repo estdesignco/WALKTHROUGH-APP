@@ -156,6 +156,7 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
   }
 
   if (!project) {
+    console.error('🚨 FFE: No project data available!');
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">❌</div>
@@ -164,6 +165,8 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
       </div>
     );
   }
+
+  console.log('✅ FFE: Project data available, rendering...', project.name);
 
   const getTotalItems = () => {
     return project.rooms.reduce((total, room) => 
