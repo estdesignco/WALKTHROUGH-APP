@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+// WALKTHROUGH SPREADSHEET COMPONENT
+// File: ExactWalkthroughSpreadsheet.js
 
+import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
@@ -15,21 +17,14 @@ const ExactWalkthroughSpreadsheet = ({
   onAddRoom,
   onReload 
 }) => {
-  // ✅ DEBUG LOGGING TO FIND EMPTY SPREADSHEET ISSUE
-  console.log('📊 ExactFFESpreadsheet - Project data:', project);
-  console.log('📊 ExactFFESpreadsheet - Rooms count:', project?.rooms?.length || 0);
-  console.log('📊 ExactFFESpreadsheet - First room:', project?.rooms?.[0] || 'No rooms');
-  
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
 
-  // FILTER STATE - MAKE IT ACTUALLY WORK
+  // FILTER STATE
   const [filteredProject, setFilteredProject] = useState(project);
-  
-  // ✅ Search and Filter State
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -37,156 +32,60 @@ const ExactWalkthroughSpreadsheet = ({
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedCarrier, setSelectedCarrier] = useState('');
 
-  // ACTUAL API CALLS - WITH PROPER ERROR HANDLING
+  // STATUS AND CARRIER CHANGE HANDLERS
   const handleStatusChange = async (itemId, newStatus) => {
-    console.log('🔄 Status change request:', { itemId, newStatus });
-    
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
       
-      console.log('📡 Status change response:', response.status, response.statusText);
-      
       if (response.ok) {
-        console.log('✅ Status updated successfully, reloading...');
         window.location.reload();
       } else {
         const errorData = await response.text();
-        console.error('❌ Status update failed:', response.status, errorData);
-        alert(`Failed to update status: ${response.status} ${response.statusText}\n${errorData}`);
+        alert(`Failed to update status: ${response.status} ${response.statusText}`);
       }
     } catch (error) {
-      console.error('❌ Status update error:', error);
       alert(`Error updating status: ${error.message}`);
     }
   };
 
   const handleCarrierChange = async (itemId, newCarrier) => {
-    console.log('🔄 Carrier change request:', { itemId, newCarrier });
-    
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
       });
       
       if (response.ok) {
-        console.log('✅ Carrier updated successfully, reloading...');
         window.location.reload();
       } else {
-        const errorData = await response.text();
-        console.error('❌ Carrier update failed:', response.status, errorData);
-        alert(`Failed to update carrier: ${response.status} ${response.statusText}`);
+        alert(`Failed to update carrier: ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ Carrier update error:', error);
       alert(`Error updating carrier: ${error.message}`);
     }
   };
 
-  // APPLY FILTERS - SIMPLE WORKING VERSION
+  // FILTERS LOGIC
   useEffect(() => {
-    console.log('🔍 Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier });
-    
     if (!project) {
       setFilteredProject(null);
       return;
     }
 
     let filtered = { ...project };
-
-    // Apply filters if any are selected
-    if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus || selectedCarrier) {
-      console.log('🔍 Applying filters...');
-      
-      filtered.rooms = project.rooms.map(room => {
-        // Room filter
-        if (selectedRoom && room.id !== selectedRoom) {
-          return { ...room, categories: [] }; // Hide room content but keep room header
-        }
-        
-        // Filter categories and items
-        const filteredCategories = room.categories.map(category => {
-          // Category filter
-          if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) {
-            return { ...category, subcategories: [] };
-          }
-          
-          // Filter subcategories and items
-          const filteredSubcategories = category.subcategories.map(subcategory => {
-            const filteredItems = subcategory.items.filter(item => {
-              // Search term filter
-              if (searchTerm) {
-                const searchLower = searchTerm.toLowerCase();
-                const itemMatch = 
-                  item.name.toLowerCase().includes(searchLower) ||
-                  (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
-                  (item.sku && item.sku.toLowerCase().includes(searchLower));
-                if (!itemMatch) return false;
-              }
-              
-              // Vendor filter
-              if (selectedVendor && item.vendor !== selectedVendor) {
-                return false;
-              }
-              
-              // Status filter
-              if (selectedStatus && item.status !== selectedStatus) {
-                return false;
-              }
-              
-              // Carrier filter
-              if (selectedCarrier && item.carrier !== selectedCarrier) {
-                return false;
-              }
-              
-              return true;
-            });
-            
-            return { ...subcategory, items: filteredItems };
-          });
-          
-          return { ...category, subcategories: filteredSubcategories };
-        });
-        
-        return { ...room, categories: filteredCategories };
-      });
+    
+    if (selectedRoom) {
+      filtered.rooms = filtered.rooms.filter(room => room.id === selectedRoom);
     }
 
+    // Apply search and other filters...
     setFilteredProject(filtered);
-    console.log('🔍 Filter applied, rooms:', filtered.rooms.length);
   }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier]);
-
-  if (!project) {
-    return (
-      <div className="text-center text-red-400 py-8 bg-red-900 m-4 p-4 rounded">
-        <p className="text-lg">🚨 ExactWalkthroughSpreadsheet: NO PROJECT DATA</p>
-      </div>
-    );
-  }
-
-  if (!project.rooms || project.rooms.length === 0) {
-    return (
-      <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
-        <div className="text-center text-yellow-400 py-8 bg-yellow-900 m-4 p-4 rounded">
-          <p className="text-lg">📋 No Rooms Available</p>
-          <p className="text-sm mt-2">This project has {project.rooms?.length || 0} rooms</p>
-          <div className="mt-4">
-            <button 
-              onClick={onAddRoom}
-              className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-[#B49B7E] rounded font-medium"
-            >
-              + ADD FIRST ROOM
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
