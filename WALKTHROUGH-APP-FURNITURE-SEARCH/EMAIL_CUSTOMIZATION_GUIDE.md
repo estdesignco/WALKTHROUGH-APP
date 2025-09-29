@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://roomnote.preview.emergentagent.com/email-template.html
+https://designflow-32.preview.emergentagent.com/email-template.html
 
 ---
 
