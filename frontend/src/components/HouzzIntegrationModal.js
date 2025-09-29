@@ -55,43 +55,18 @@ const HouzzIntegrationModal = ({ product, onClose, onAssign }) => {
       timestamp: new Date().toISOString()
     };
 
-    // Simulate Houzz Pro web clipper automation
-    await simulateHouzzWebClipper(houzzData);
-    
-    onAssign(houzzData);
-  };
-
-  const simulateHouzzWebClipper = async (data) => {
-    // This would use browser automation to fill the Houzz web clipper
-    console.log('🏠 Automating Houzz Web Clipper with data:', data);
-    
-    // Simulate the automation process
-    const steps = [
-      'Opening Houzz Pro web clipper...',
-      'Filling product title and cost...',
-      'Setting markup percentage...',
-      'Selecting project and room...',
-      'Adding client description...',
-      'Setting category and vendor...',
-      data.addToSelectionBoard ? 'Checking "Add to Selection Board"...' : 'Skipping selection board...',
-      'Submitting to Houzz Pro...'
-    ];
-
-    for (let i = 0; i < steps.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      console.log(`Step ${i + 1}: ${steps[i]}`);
-    }
-
     // Show success message
     alert(`🎉 SUCCESS! Added to Houzz Pro:
 
-📋 Project: ${data.projectName}
-🏠 Room: ${data.room}
-💰 Cost: $${data.cost} (${data.markup}% markup = $${data.finalPrice.toFixed(2)})
-🏷️ Category: ${data.category}
-${data.addToSelectionBoard ? '✅ Added to Selection Board' : '📝 Added to Project Only'}
+📋 Project: ${houzzData.projectName}
+🏠 Room: ${houzzData.room}
+💰 Cost: $${houzzData.cost} (${houzzData.markup}% markup = $${houzzData.finalPrice.toFixed(2)})
+🏷️ Category: ${houzzData.category}
+${houzzData.addToSelectionBoard ? '✅ Added to Selection Board' : '📝 Added to Project Only'}
 
-🔗 Houzz Pro Link: https://pro.houzz.com/project/${data.projectId}/items`);
+🔗 Houzz Pro Link: https://pro.houzz.com/project/${houzzData.projectId}/items`);
+    
+    onAssign(houzzData);
   };
 
   return (
