@@ -1,53 +1,57 @@
 <analysis>
-The previous AI engineer's work has been primarily defined by the user's strict insistence on exact code replication for the application's aesthetic and functional components. The trajectory began with clarifying which version of the newly introduced Unified Furniture Search engine should be used, leading to the identification of the advanced code base in . Work shifted to integrating the precise versions of the core spreadsheet components (FFE and Checklist) from this directory, a process marred by component mix-ups that angered the user. Specifically, the Checklist implementation was found to contain FFE code. After fixing the spreadsheets and facing continued criticism that the Customer Questionnaire was also incomplete, the user provided a complete, final code package for the customer landing page, questionnaire, and email templates in the last message (Chat 93). The engineer's immediate next step is to apply this comprehensive replacement package without modification, as explicitly demanded by the user, to ensure aesthetic and structural fidelity before proceeding to the complex back-end integrations.
+The previous trajectory focused on achieving EXACT code replication for critical frontend components, addressing user dissatisfaction regarding aesthetics and functionality, which led to high churn in key files. The initial effort to replace the customer-facing components resulted in the incorrect replacement of the essential Comprehensive Questionnaire with a simpler version. This was corrected by locating and implementing the true comprehensive questionnaire () and restoring the luxury landing page ().
+
+The subsequent phase targeted the core spreadsheet components (Walkthrough, Checklist, FFE). This phase also saw a failure, as the Checklist was mistakenly replaced with FFE logic, forcing the AI to revert the file. The final action was conceptual: the AI defined the structure and key features of the corrected Walkthrough, Checklist (with scraping/Canva logic), and FFE (with live tracking logic) in temporary files, essentially confirming the architectural plan before proceeding with the complex integration and feature implementation. The system is currently stable regarding the core customer flow but requires full implementation of the spreadsheet functionality and associated backend integrations.
 </analysis>
 
 <product_requirements>
-The core requirement is a technologically advanced, robust interior design project management system with a luxury black/gold/cream aesthetic.
+The goal is to build an advanced, high-luxury interior design project management tool, adhering strictly to a black/gold/cream aesthetic and existing spreadsheet structure.
 
-1.  **Customer-Facing Flow:** Sending an email containing a link to a BEAUTIFUL questionnaire (now a detailed, multi-section form) that captures client, project, design, and lifestyle information.
-2.  **Designer Sheets:** The questionnaire data must automatically populate four core project sheets:
-    *   **Walkthrough Sheet:** Must support offline use, mobile app interface, pre-loaded room/item structures, dynamic editing (add/delete/rearrange rooms/items), picture taking, and measurement tools (planned Leica D5 integration).
-    *   **Checklist Sheet (Curation Phase):** Must feature all dynamic editing from the Walkthrough, support item scraping from links (populating name, size, cost, image, SKU), status tracking (linking to a pie chart), integration with Canva, and sending To-Do tasks to Microsoft Teams.
-    *   **FFE Sheet (Final Phase):** The project Bible, requiring offline support, picture/measurement tools, **LIVE SHIPPING TRACKING**, and order date management.
-3.  **Unified Furniture Search Engine:** A major, recently introduced requirement: a central, single-view search platform to scrape and display products from multiple vendors with advanced filtering. This feature requires real-time integration with Houzz Pro and Canva. All components must use the exact code structure provided by the user.
+1.  **Customer Intake:** Send a personalized email linked to a beautiful, multi-section Comprehensive Client Questionnaire. The form must auto-create , , and starter  entries upon submission.
+2.  **Walkthrough Sheet:** Must support offline/mobile use for on-site data entry. Features required: pre-loaded room/item structures, dynamic editing (add/delete/rearrange rooms/items), and integrated picture/measurement tools (Leica D5 future plan).
+3.  **Checklist Sheet (Curation):** Must handle the sourcing phase. Key features: Web scraping from product links (populating details like SKU, cost, image), status linking to pie charts, Canva integration for design boards, and Microsoft Teams notifications.
+4.  **FFE Sheet (Logistics/Bible):** The final project tracker. Must include features for **LIVE SHIPPING TRACKING** (via major carriers), order dates, carrier selection, and status updates for installation readiness.
+5.  **Unified Search Engine (Planned):** A single view to aggregate and filter scraped products from vendors like Houzz Pro.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full Stack:** React.js frontend (Tailwind CSS, advanced component structure), FastAPI (Python) backend.
--   **Data Persistence:** MongoDB (), utilizing project, room, and item schemas.
--   **Integrations (Simulated/Planned):** Web scraping (, , **Selenium** for Houzz Pro), Canva API, Microsoft Teams webhooks, SMTP for email sending.
--   **State Management:** Complex local state management within highly dynamic spreadsheet components (, ).
+-   **Frontend:** React.js, Tailwind CSS (enforcing strict luxury color palette: black, gold/cream).
+-   **Backend/DB:** FastAPI (Python), MongoDB (), utilizing UUIDs for primary keys.
+-   **Core Logic:** CRUD operations for Project, Room, and Item schemas.
+-   **Integrations:** Planned Web scraping (Checklist), Canva API, Microsoft Teams API, Shipping Carrier Tracking API (FFE).
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a standard Python/FastAPI backend and a React/Tailwind frontend structure. The key architectural decision involves storing complex, dynamic spreadsheet logic directly within highly specific, user-mandated components (e.g., ). The codebase also contains external, comprehensive code packages in adjacent directories that the AI is tasked with incrementally integrating.
+The application uses a standard full-stack configuration with key logic centralized in specific frontend components based on user requirements (the Exact naming convention).
 
 
 
 **Key Files and Status:**
-
-*   ** (and associated Email components):** This file, along with , , and , is queued for immediate replacement using the comprehensive code package provided in Chat 93. It currently holds the aesthetically correct luxury landing page structure.
-*   **:** Currently contains a complex form, but the user insists it is not the complete, newest version. The full replacement is pending. This component includes logic to auto-create , , and starter  entries upon submission, crucial for initial data population.
-*   **:** Recently replaced/created using the exact version found in the source directory. This handles the complex FFE lifecycle (shipping, order dates).
-*   **:** Recently replaced/created, but suffered a temporary mix-up where FFE code was incorrectly copied. This component handles the Curation phase and scraping/integration tasks.
-*   **:** Contains basic CRUD routes for Projects, Rooms, and Items, and includes routers for Google Sheets and the unified search. The item creation logic in the backend must align with the room types selected in the Questionnaire (implemented in the frontend submission logic).
+-   **:** Currently holds the comprehensive, multi-section questionnaire logic, including the required backend API calls for creating initial Projects, Rooms, and Starter Items (e.g., 'Seating - Click to edit', 'Wall Finish - Click to edit'). This is confirmed correct.
+-   **:** Restored to the correct luxury marketing page that links to the Questionnaire. This is confirmed correct.
+-   **:** This component, crucial for curation and scraping, was incorrectly modified and subsequently reverted. It currently holds the stable, pre-feature-addition version. Its intended functionality (demonstrated in ) includes scraping links, vendor tracking, and status management.
+-   **:** Contains the logic for the final logistics sheet, including status/carrier updates and live tracking button functionality. This file is currently implemented and stable.
+-   **:** Contains basic API endpoints for projects, rooms, and items, crucial for data persistence and the frontend components' functionality (e.g., status updates, bulk item creation).
 </code_architecture>
 
 <pending_tasks>
--   **Implement Latest Code Package:** Overwrite the customer-facing components (, , , , ) with the full, final code package provided in Chat 93.
--   **Upgrade Unified Furniture Search:** Integrate the newer, comprehensive version of the Unified Furniture Search engine and its backend routes/logic from the  directory.
--   **Core Integrations:** Implement actual (non-simulated) functionality for Houzz Pro scraping, Canva API interaction, and Microsoft Teams notifications, as hinted by the existence of files like .
+-   **Implement Checklist Functionality:** Integrate the precise scraping, Canva linking, and Curation phase logic into .
+-   **Backend Integration:** Implement the  endpoint required by the Checklist for product data retrieval.
+-   **FFE Live Tracking Update:** Enhance  to correctly handle tracking number input and update the backend model.
 </pending_tasks>
 
 <current_work>
-The most recent, active work revolved around correcting the spreadsheet component implementations to match the user's EXACT aesthetic and structure. The AI successfully integrated the user-provided code for both  and , validating that the components load and display project data correctly on the dashboard views (Checklist and FFE views).
+The immediate work before this summary was dedicated to stabilizing the application's core presentation layers following user complaints about incorrect code and aesthetics.
 
-However, this process was immediately followed by a user instruction to fix the **CustomerfacingQuestionnaire.js**, which the user claimed was still wrong and incomplete. After an internal search for the most complete version, the user bypassed the search and provided a comprehensive, six-file code package in Chat 93. This package contains the definitive versions of all customer-facing elements, including the full Questionnaire, Landing Page, and Email Template (both React and static HTML).
+1.  **Customer Flow Stabilization:** The  and the comprehensive  (the multi-section, luxury form) are correctly implemented and verified against the user's expectations. This ensures the first step of the workflow—data ingestion and project initialization—is functionally and aesthetically sound.
+2.  **Spreadsheet Review:** The three spreadsheet components (, , and ) were reviewed. After a confusing mix-up, the Checklist component was reverted to a stable state. The AI then created conceptual files (, , etc.) to define the exact feature set planned for each sheet:
+    *   **Walkthrough:** Basic item management, status updates.
+    *   **Checklist (Curation):** Focus on item image/cost/SKU capture,  buttons, and Canva linking.
+    *   **FFE (Logistics):** Focus on  selection,  number management, and  button functionality for live shipment tracking.
 
-The task immediately before this summary concluded with the AI acknowledging the critical nature of this final code dump and planning to implement it exactly as provided, addressing the user's explicit mandate for exact structural replication across the initial parts of the application workflow.
+The current state is ready to move past aesthetics and into implementing the complex, high-value integrations required for the Checklist (scraping) and FFE (tracking).
 </current_work>
 
 <optional_next_step>
-Implement the full code package provided by the user (Chat 93) to update the customer landing page, questionnaire, and email templates immediately.
+Implement the core scraping logic and UI elements for the Checklist component, ensuring  handles product link scraping as planned in .
 </optional_next_step>
