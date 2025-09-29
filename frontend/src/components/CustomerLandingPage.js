@@ -39,16 +39,18 @@ const CustomerLandingPage = () => {
           </Link>
         </div>
 
-        {/* Hero Image - Real Portfolio Image */}
-        <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-4 text-center mb-8">
-          <img
-            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/unq2tzy0_5-IMG_2599.jpg"
-            alt="Luxury Interior Design by Established Design Co."
-            className="w-full h-64 object-cover rounded-lg mb-4"
-          />
-          <p className="text-lg text-[#F5F5DC]/80">
-            Experience Our Award-Winning Design Excellence
-          </p>
+        {/* Hero Image Placeholder */}
+        <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-8 text-center mb-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-4 bg-[#B49B7E]/20 rounded-full flex items-center justify-center">
+                <Play className="w-8 h-8 text-[#B49B7E]" />
+              </div>
+              <p className="text-lg text-[#F5F5DC]/80">
+                Watch Our Design Process
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -87,13 +89,16 @@ const CustomerLandingPage = () => {
             </div>
           </div>
 
-          {/* Real Portfolio Image */}
-          <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-4">
-            <img
-              src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/gtmb5fh5_20-IMG_2441.jpg"
-              alt="Established Design Co. Portfolio"
-              className="w-full aspect-square object-cover rounded-xl"
-            />
+          {/* Image Placeholder */}
+          <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-8">
+            <div className="aspect-square bg-[#B49B7E]/10 rounded-xl flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-3 bg-[#B49B7E]/20 rounded-full flex items-center justify-center">
+                  <Award className="w-8 h-8 text-[#B49B7E]" />
+                </div>
+                <p className="text-[#F5F5DC]/60">Studio Portfolio Image</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -109,65 +114,17 @@ const CustomerLandingPage = () => {
           </p>
         </div>
 
-        {/* Portfolio Grid with REAL Images */}
+        {/* Portfolio Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-xl border border-[#B49B7E]/20 p-4">
-            <img
-              src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/unq2tzy0_5-IMG_2599.jpg"
-              alt="Luxury Living Room Design"
-              className="w-full aspect-square object-cover rounded-lg mb-3"
-            />
-            <h3 className="text-[#B49B7E] font-medium mb-2">Luxury Living Room</h3>
-            <p className="text-sm text-[#F5F5DC]/70">Modern elegance meets timeless sophistication in this custom living space design.</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-xl border border-[#B49B7E]/20 p-4">
-            <img
-              src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/uw773jrc_17-IMG_2489.jpg"
-              alt="Designer Kitchen"
-              className="w-full aspect-square object-cover rounded-lg mb-3"
-            />
-            <h3 className="text-[#B49B7E] font-medium mb-2">Gourmet Kitchen</h3>
-            <p className="text-sm text-[#F5F5DC]/70">A chef's dream featuring premium finishes and thoughtful functionality.</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-xl border border-[#B49B7E]/20 p-4">
-            <img
-              src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/gtmb5fh5_20-IMG_2441.jpg"
-              alt="Master Bedroom Suite"
-              className="w-full aspect-square object-cover rounded-lg mb-3"
-            />
-            <h3 className="text-[#B49B7E] font-medium mb-2">Master Suite</h3>
-            <p className="text-sm text-[#F5F5DC]/70">Serene and luxurious bedroom retreat with custom built-ins and lighting.</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-xl border border-[#B49B7E]/20 p-4">
-            <img
-              src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/pbaudki8_10-web-or-mls-014%203.JPG"
-              alt="Contemporary Dining Room"
-              className="w-full aspect-square object-cover rounded-lg mb-3"
-            />
-            <h3 className="text-[#B49B7E] font-medium mb-2">Dining Experience</h3>
-            <p className="text-sm text-[#F5F5DC]/70">Sophisticated dining area perfect for intimate gatherings and entertainment.</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-xl border border-[#B49B7E]/20 p-4">
-            <img
-              src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/lhwi6kpk_0FB9969A-C111-4078-A3FC-6711D2015941_1_105_c.jpeg"
-              alt="Custom Home Office"
-              className="w-full aspect-square object-cover rounded-lg mb-3"
-            />
-            <h3 className="text-[#B49B7E] font-medium mb-2">Executive Office</h3>
-            <p className="text-sm text-[#F5F5DC]/70">Productive workspace combining comfort with executive-level sophistication.</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-xl border border-[#B49B7E]/20 p-4">
-            <div className="aspect-square bg-[#B49B7E]/10 rounded-lg mb-3 flex items-center justify-center">
-              <Star className="w-8 h-8 text-[#B49B7E]/50" />
+          {[1, 2, 3, 4, 5, 6].map((item) => (
+            <div key={item} className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-xl border border-[#B49B7E]/20 p-4">
+              <div className="aspect-square bg-[#B49B7E]/10 rounded-lg mb-3 flex items-center justify-center">
+                <Star className="w-8 h-8 text-[#B49B7E]/50" />
+              </div>
+              <h3 className="text-[#B49B7E] font-medium mb-2">Project {item}</h3>
+              <p className="text-sm text-[#F5F5DC]/70">Luxury residential design showcasing our expertise in creating beautiful, functional spaces.</p>
             </div>
-            <h3 className="text-[#B49B7E] font-medium mb-2">Your Project</h3>
-            <p className="text-sm text-[#F5F5DC]/70">Ready to create your dream space? Let's start your design journey today.</p>
-          </div>
+          ))}
         </div>
 
         {/* Call to Action */}
