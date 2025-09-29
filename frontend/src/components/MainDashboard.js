@@ -78,7 +78,7 @@ const MainDashboard = () => {
         {/* Navigation Links at Top with Thin Gold Borders */}
         <div className="max-w-4xl mx-auto mb-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
-            onClick={() => window.open('https://roomnote.preview.emergentagent.com/', '_blank')}
+            onClick={() => handleNavigation('/furniture-search')}
             className="text-stone-300 p-4 rounded-lg transition-all duration-200"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
