@@ -1,71 +1,53 @@
 <analysis>
-The AI engineer's work has been an iterative and challenging process, largely driven by the user's persistent demand for exact code replication and specific visual aesthetics. Initial efforts involved copying components from various user-referenced directories, leading to repeated user criticism for not using the *exact* code, particularly for customer-facing elements. The AI frequently claimed successful implementation based on limited testing, only to be immediately corrected. A significant issue revolved around the integration of real images into the customer landing page, which the user rejected as altering the correct layout. This led to the AI reverting the image integration to preserve the user's exact (but placeholder) visual. The user then provided a *new, complete code package* for a unified furniture search engine which the AI successfully integrated, updating both frontend and backend. The navigation button for this search engine was also fixed. The trajectory concludes with the AI having integrated this new search engine and confirmed its functionality, but the history of user dissatisfaction indicates a delicate state requiring explicit confirmation of the current state and next steps.
+The previous AI engineer's work has been primarily defined by the user's strict insistence on exact code replication for the application's aesthetic and functional components. The trajectory began with clarifying which version of the newly introduced Unified Furniture Search engine should be used, leading to the identification of the advanced code base in . Work shifted to integrating the precise versions of the core spreadsheet components (FFE and Checklist) from this directory, a process marred by component mix-ups that angered the user. Specifically, the Checklist implementation was found to contain FFE code. After fixing the spreadsheets and facing continued criticism that the Customer Questionnaire was also incomplete, the user provided a complete, final code package for the customer landing page, questionnaire, and email templates in the last message (Chat 93). The engineer's immediate next step is to apply this comprehensive replacement package without modification, as explicitly demanded by the user, to ensure aesthetic and structural fidelity before proceeding to the complex back-end integrations.
 </analysis>
 
 <product_requirements>
-The user requires a feature-rich interior design project management application with a strict luxury black/gold/cream aesthetic. Key features include a customer-facing questionnaire (emailed link, beautiful UI, captures project/personal info) that auto-populates a designer's landing page. A Contact Sheet for all project contacts is needed. The Walkthrough Sheet is critical, requiring offline capability, mobile app interface, pre-loaded rooms/items, dynamic editing, picture/measurement tools, and data transfer to the Checklist. The Checklist must support item scraping (populating details from links), status dropdowns (linking to a pie chart), To-Do tasks in Teams, and Canva integration. The FFE (Furniture, Fixtures, and Equipment) sheet is a Bible for designers, needing offline support, app interfacing, picture/measurement capabilities, live shipping tracking, and order date cells. A central dashboard displaying project cards with the correct logo and styling is required, along with a Project Detail Page with four sub-tabs (Questionnaire, Walkthrough, Checklist, FF&E), demanding exact structural and aesthetic replication. Additionally, a comprehensive furniture search engine with real product data, multi-vendor search, advanced filtering, quick search buttons, one-click Houzz Pro integration, Canva integration, and Teams notifications has been introduced.
+The core requirement is a technologically advanced, robust interior design project management system with a luxury black/gold/cream aesthetic.
+
+1.  **Customer-Facing Flow:** Sending an email containing a link to a BEAUTIFUL questionnaire (now a detailed, multi-section form) that captures client, project, design, and lifestyle information.
+2.  **Designer Sheets:** The questionnaire data must automatically populate four core project sheets:
+    *   **Walkthrough Sheet:** Must support offline use, mobile app interface, pre-loaded room/item structures, dynamic editing (add/delete/rearrange rooms/items), picture taking, and measurement tools (planned Leica D5 integration).
+    *   **Checklist Sheet (Curation Phase):** Must feature all dynamic editing from the Walkthrough, support item scraping from links (populating name, size, cost, image, SKU), status tracking (linking to a pie chart), integration with Canva, and sending To-Do tasks to Microsoft Teams.
+    *   **FFE Sheet (Final Phase):** The project Bible, requiring offline support, picture/measurement tools, **LIVE SHIPPING TRACKING**, and order date management.
+3.  **Unified Furniture Search Engine:** A major, recently introduced requirement: a central, single-view search platform to scrape and display products from multiple vendors with advanced filtering. This feature requires real-time integration with Houzz Pro and Canva. All components must use the exact code structure provided by the user.
 </product_requirements>
 
 <key_technical_concepts>
-- **Frontend**: React.js, React Router DOM, Tailwind CSS, , .
-- **Backend**: Python (FastAPI), MongoDB, Pydantic, ,  (encryption), ,  (scraping), .
-- **Integrations**: Houzz Pro (web scraping/automation), Canva API (simulated/planned), Microsoft Teams webhooks (simulated/planned), SMTP (email sending - planned).
-- **Deployment**: Kubernetes, backend                          RUNNING   pid 41, uptime 0:00:02
-code-server                      RUNNING   pid 43, uptime 0:00:02
-frontend                         STOPPING  
-mcp-server                       RUNNING   pid 49, uptime 0:00:02
-mongodb                          RUNNING   pid 50, uptime 0:00:02
-supervisor> .
+-   **Full Stack:** React.js frontend (Tailwind CSS, advanced component structure), FastAPI (Python) backend.
+-   **Data Persistence:** MongoDB (), utilizing project, room, and item schemas.
+-   **Integrations (Simulated/Planned):** Web scraping (, , **Selenium** for Houzz Pro), Canva API, Microsoft Teams webhooks, SMTP for email sending.
+-   **State Management:** Complex local state management within highly dynamic spreadsheet components (, ).
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a React frontend and a FastAPI (Python) backend with MongoDB.
+The application uses a standard Python/FastAPI backend and a React/Tailwind frontend structure. The key architectural decision involves storing complex, dynamic spreadsheet logic directly within highly specific, user-mandated components (e.g., ). The codebase also contains external, comprehensive code packages in adjacent directories that the AI is tasked with incrementally integrating.
 
 
--   ****:
-    -   **Importance**: Central routing and application layout.
-    -   **Changes**: Routes , , and  now point to the *exact* user-provided components. Duplicate routes were removed.
--   ****:
-    -   **Importance**: Displays project cards and navigates to various app sections.
-    -   **Changes**: Modified the 🔍 Furniture Search button to correctly navigate to .
--   ****:
-    -   **Importance**: Customer-facing entry point.
-    -   **Changes**: Replaced multiple times; currently uses the exact code from , now displaying user's real images and desired layout.
--   ****:
-    -   **Importance**: Customer-facing questionnaire form.
-    -   **Changes**: Replaced multiple times; currently uses the exact code from .
--   ****:
-    -   **Importance**: Frontend for the new unified furniture search engine.
-    -   **Changes**: Created/overwritten from .
--   ****:
-    -   **Importance**: Modal for Houzz Pro integration.
-    -   **Changes**: Created/overwritten from .
--   ****:
-    -   **Importance**: Main FastAPI backend.
-    -   **Changes**: Modified to include  from .
--   ****:
-    -   **Importance**: New backend module for the unified furniture search engine.
-    -   **Changes**: Created from . Implements APIs for vendor credentials, product scraping (simulated), searching, listing products/vendors/filters, and product deletion.
+
+**Key Files and Status:**
+
+*   ** (and associated Email components):** This file, along with , , and , is queued for immediate replacement using the comprehensive code package provided in Chat 93. It currently holds the aesthetically correct luxury landing page structure.
+*   **:** Currently contains a complex form, but the user insists it is not the complete, newest version. The full replacement is pending. This component includes logic to auto-create , , and starter  entries upon submission, crucial for initial data population.
+*   **:** Recently replaced/created using the exact version found in the source directory. This handles the complex FFE lifecycle (shipping, order dates).
+*   **:** Recently replaced/created, but suffered a temporary mix-up where FFE code was incorrectly copied. This component handles the Curation phase and scraping/integration tasks.
+*   **:** Contains basic CRUD routes for Projects, Rooms, and Items, and includes routers for Google Sheets and the unified search. The item creation logic in the backend must align with the room types selected in the Questionnaire (implemented in the frontend submission logic).
 </code_architecture>
 
 <pending_tasks>
--   **Implement Complete System Code (Email Template):** Integrate the user's exact email template and its associated functionality.
--   **Address Checklist/FFE Errors**: Investigate and fix the Unexpected token < for Checklist and Script error: name console is not defined for FF&E.
--   **Houzz Pro Clipper Automation**: Implement actual Houzz Pro automation beyond simulation in .
--   **Canva API Integration**: Implement real API calls for Canva in the furniture search.
--   **Microsoft Teams Webhook Integration**: Fully resolve Teams webhook integration for the furniture search.
--   **Actual Product Scraping**: Implement real product scraping from vendors.
+-   **Implement Latest Code Package:** Overwrite the customer-facing components (, , , , ) with the full, final code package provided in Chat 93.
+-   **Upgrade Unified Furniture Search:** Integrate the newer, comprehensive version of the Unified Furniture Search engine and its backend routes/logic from the  directory.
+-   **Core Integrations:** Implement actual (non-simulated) functionality for Houzz Pro scraping, Canva API interaction, and Microsoft Teams notifications, as hinted by the existence of files like .
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer successfully integrated the user's newly provided COMPLETE UNIFIED SEARCH ENGINE CODE PACKAGE. This involved:
-1.  **Backend Integration:** Creating  and updating  to include the . Dependencies were installed from the new .
-2.  **Frontend Integration:** Creating  and , then copying them to the main  directory.
-3.  **Routing Fix:** The 🔍 Furniture Search button on  was corrected to navigate directly to .
+The most recent, active work revolved around correcting the spreadsheet component implementations to match the user's EXACT aesthetic and structure. The AI successfully integrated the user-provided code for both  and , validating that the components load and display project data correctly on the dashboard views (Checklist and FFE views).
 
-Currently, the customer landing page and questionnaire are displaying the exact user-provided versions, including real images and the desired layout. The unified furniture search engine is also implemented with its UI and backend routes, although actual scraping and full third-party integrations (Houzz, Canva, Teams) are largely simulated or using sample data. The AI has confirmed that these components are now live and functional according to the user's , and the furniture search button navigates correctly.
+However, this process was immediately followed by a user instruction to fix the **CustomerfacingQuestionnaire.js**, which the user claimed was still wrong and incomplete. After an internal search for the most complete version, the user bypassed the search and provided a comprehensive, six-file code package in Chat 93. This package contains the definitive versions of all customer-facing elements, including the full Questionnaire, Landing Page, and Email Template (both React and static HTML).
+
+The task immediately before this summary concluded with the AI acknowledging the critical nature of this final code dump and planning to implement it exactly as provided, addressing the user's explicit mandate for exact structural replication across the initial parts of the application workflow.
 </current_work>
 
 <optional_next_step>
-Confirm the content of the newly integrated furniture search and prioritize pending integrations (Houzz, Canva, Teams, real scraping).
+Implement the full code package provided by the user (Chat 93) to update the customer landing page, questionnaire, and email templates immediately.
 </optional_next_step>

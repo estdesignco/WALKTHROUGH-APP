@@ -12,7 +12,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://designflow-32.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://interiorhub-5.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 class HouzzClipperTester:
