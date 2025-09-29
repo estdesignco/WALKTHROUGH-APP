@@ -4,6 +4,7 @@ import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello } from 
 import WalkthroughDashboard from './WalkthroughDashboard';
 import ChecklistDashboard from './ChecklistDashboard';
 import FFEDashboard from './FFEDashboard';
+console.log('✅ FFEDashboard imported successfully:', FFEDashboard);
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
