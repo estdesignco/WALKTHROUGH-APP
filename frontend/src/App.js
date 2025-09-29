@@ -18,7 +18,7 @@ import CustomerfacingQuestionnaire from './components/CustomerfacingQuestionnair
 import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectDetailPage';
 import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
 import EmailPreview from './components/EmailPreview';
-import UnifiedFurnitureSearch from './components/UnifiedFurnitureSearch';
+import CompleteFurnitureSearch from './components/CompleteFurnitureSearch';
 import WorkflowDashboard from './components/WorkflowDashboard';
 import MainDashboard from './components/MainDashboard';
 import ActualStudioLandingPage from './components/ActualStudioLandingPage';
