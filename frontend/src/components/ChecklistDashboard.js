@@ -242,7 +242,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       />
 
       {/* CHECKLIST SPREADSHEET */}
-      <SimpleChecklistSpreadsheet
+      <ExactChecklistSpreadsheet
         project={project}
         roomColors={roomColors}
         categoryColors={categoryColors}
