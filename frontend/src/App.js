@@ -235,7 +235,7 @@ const App = () => {
             />
             <Route 
               path="/furniture-search" 
-              element={<UnifiedFurnitureSearch />}
+              element={<CompleteFurnitureSearch />}
             />
             <Route 
               path="/workflow-dashboard" 
