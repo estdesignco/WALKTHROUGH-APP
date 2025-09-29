@@ -166,7 +166,7 @@ const App = () => {
             />
             <Route 
               path="/customer" 
-              element={<CustomerfacingLandingPage />}
+              element={<CustomerLandingPage />}
             />
             <Route 
               path="/projects" 
