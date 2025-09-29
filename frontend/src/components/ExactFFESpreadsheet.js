@@ -1307,15 +1307,14 @@ const ExactFFESpreadsheet = ({
                                                               >
                                                                 🗑️
                                                               </button>
-                                                              {item.tracking_number && (
-                                                                <button
-                                                                  onClick={() => handleTrackItem(item)}
-                                                                  className="text-blue-400 hover:text-blue-300 text-xs"
-                                                                  title="Track Shipment"
-                                                                >
-                                                                  📦
-                                                                </button>
-                                                              )}
+                                                              <button
+                                                                onClick={() => handleTrackShipment(item.tracking_number, item.carrier)}
+                                                                className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded"
+                                                                title="Track Shipment"
+                                                                disabled={!item.tracking_number || !item.carrier}
+                                                              >
+                                                                TRACK
+                                                              </button>
                                                             </div>
                                                           </td>
                                                         </tr>
