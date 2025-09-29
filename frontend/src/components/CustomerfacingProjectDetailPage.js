@@ -425,6 +425,7 @@ export default function ProjectPage() {
         ) : <div className="text-center text-stone-300 py-8">Loading checklist...</div> },
         { name: "FF&E", icon: Trello, component: project ? (
             <div className="ffe-content">
+                {console.log('🚛 Rendering FF&E Dashboard component...') || null}
                 <FFEDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading FF&E...</div> },
