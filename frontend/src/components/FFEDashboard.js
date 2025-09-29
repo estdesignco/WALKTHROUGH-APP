@@ -22,50 +22,42 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
   
-  useEffect(() => {
-    if (projectId) {
-      console.log('🚀 FF&E: Loading project:', projectId);
-      loadSimpleProject();
-    }
-  }, [projectId]);
-
   const loadSimpleProject = async () => {
     try {
-      console.log('🚀 Loading project data for:', projectId);
+      console.log('🚀 FF&E: Loading project data for:', projectId);
       
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
       const response = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=ffe`);
       
       if (response.ok) {
         const projectData = await response.json();
-        console.log('✅ Project loaded successfully:', projectData.name);
+        console.log('✅ FF&E: Project loaded successfully:', projectData.name);
         setProject(projectData);
         setError(null);
+        
+        // Set utility data
+        setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']);
+        setVendorTypes(['Four Hands', 'Uttermost', 'Visual Comfort']);
+        setCarrierTypes(['FedEx', 'UPS', 'USPS', 'DHL']);
       } else {
-        console.error('❌ Failed to load project:', response.status);
+        console.error('❌ FF&E: Failed to load project:', response.status);
         setError('Failed to load project');
       }
     } catch (err) {
-      console.error('❌ Error loading project:', err);
+      console.error('❌ FF&E: Error loading project:', err);
       setError('Error loading project: ' + err.message);
     } finally {
-      console.log('🚀 FORCE SETTING LOADING = FALSE');
+      console.log('🚀 FF&E: Setting loading = false');
       setLoading(false);
-      
-      // Set utility data
-      setItemStatuses(['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']);
-      setVendorTypes(['Four Hands', 'Uttermost', 'Visual Comfort']);
-      setCarrierTypes(['FedEx', 'UPS', 'USPS', 'DHL']);
     }
   };
 
-  // PREVENT LOADING LOOP WITH useEffect  
   useEffect(() => {
-    if (loading && project) {
-      console.log('🔧 FORCE STOPPING LOADING LOOP');
-      setLoading(false);
+    if (projectId) {
+      console.log('🚀 FF&E useEffect: Starting load for projectId:', projectId);
+      loadSimpleProject();
     }
-  }, [loading, project]);
+  }, [projectId]);
 
   const handleAddRoom = async (roomData) => {
     try {
