@@ -87,16 +87,13 @@ const CustomerLandingPage = () => {
             </div>
           </div>
 
-          {/* Image Placeholder */}
-          <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-8">
-            <div className="aspect-square bg-[#B49B7E]/10 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-3 bg-[#B49B7E]/20 rounded-full flex items-center justify-center">
-                  <Award className="w-8 h-8 text-[#B49B7E]" />
-                </div>
-                <p className="text-[#F5F5DC]/60">Studio Portfolio Image</p>
-              </div>
-            </div>
+          {/* Real Portfolio Image */}
+          <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-4">
+            <img
+              src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/gtmb5fh5_20-IMG_2441.jpg"
+              alt="Established Design Co. Portfolio"
+              className="w-full aspect-square object-cover rounded-xl"
+            />
           </div>
         </div>
       </div>
