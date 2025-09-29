@@ -39,18 +39,16 @@ const CustomerLandingPage = () => {
           </Link>
         </div>
 
-        {/* Hero Image Placeholder */}
-        <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-8 text-center mb-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-4 bg-[#B49B7E]/20 rounded-full flex items-center justify-center">
-                <Play className="w-8 h-8 text-[#B49B7E]" />
-              </div>
-              <p className="text-lg text-[#F5F5DC]/80">
-                Watch Our Design Process
-              </p>
-            </div>
-          </div>
+        {/* Hero Image - Real Portfolio Image */}
+        <div className="bg-gradient-to-br from-black/40 to-gray-900/60 rounded-2xl border border-[#B49B7E]/20 p-4 text-center mb-8">
+          <img
+            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/unq2tzy0_5-IMG_2599.jpg"
+            alt="Luxury Interior Design by Established Design Co."
+            className="w-full h-64 object-cover rounded-lg mb-4"
+          />
+          <p className="text-lg text-[#F5F5DC]/80">
+            Experience Our Award-Winning Design Excellence
+          </p>
         </div>
       </div>
 
