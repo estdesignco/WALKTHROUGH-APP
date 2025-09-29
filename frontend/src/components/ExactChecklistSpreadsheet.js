@@ -232,6 +232,61 @@ const SimpleChecklistSpreadsheet = ({
     }
   };
 
+  // Handle scraping product information
+  const handleScrapeProduct = async (productLink, itemId) => {
+    if (!productLink?.trim()) {
+      alert('Please enter a product URL first');
+      return;
+    }
+
+    try {
+      console.log('🔍 Scraping product from:', productLink);
+      
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const response = await fetch(`${backendUrl}/api/scrape-product`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: productLink })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Scraping successful:', result);
+
+        // Update the item with scraped data
+        const updateData = {
+          ...result.data,
+          link: productLink // Ensure link is preserved
+        };
+
+        // Remove fields we don't want to overwrite if they're empty
+        if (!updateData.name) delete updateData.name;
+        
+        const updateResponse = await fetch(`${backendUrl}/api/items/${itemId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updateData)
+        });
+
+        if (updateResponse.ok) {
+          console.log('✅ Item updated with scraped data');
+          alert(`✅ Successfully scraped: ${result.data.name || 'Product information'}`);
+          if (onReload) onReload();
+        } else {
+          console.error('❌ Failed to update item with scraped data');
+          alert('❌ Failed to update item with scraped data');
+        }
+      } else {
+        const errorData = await response.json();
+        console.error('❌ Scraping failed:', errorData);
+        alert(`❌ Scraping failed: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('❌ Scraping error:', error);
+      alert(`❌ Error during scraping: ${error.message}`);
+    }
+  };
+
   // Handle adding new items - COPIED EXACTLY FROM WORKING FFE
   const handleAddItem = async (itemData) => {
     try {
