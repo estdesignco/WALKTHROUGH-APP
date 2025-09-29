@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://luxspacepro.preview.emergentagent.com/email-template.html
+https://roomnote.preview.emergentagent.com/email-template.html
 
 ---
 
