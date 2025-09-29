@@ -4756,6 +4756,7 @@ async def scrape_canva_pdf(data: dict):
 
 # Include the router in the main app
 app.include_router(api_router)
+app.include_router(furniture_router)
 
 # Advanced Integration Endpoints
 @api_router.post("/integrations/walkthrough/complete")
