@@ -243,10 +243,6 @@ const App = () => {
             />
             {/* Customer-facing routes */}
             <Route 
-              path="/customer" 
-              element={<CustomerfacingLandingPage />}
-            />
-            <Route 
               path="/customer/questionnaire" 
               element={<CustomerfacingQuestionnaire />}
             />
