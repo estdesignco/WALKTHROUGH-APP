@@ -14,10 +14,10 @@ const ExactChecklistSpreadsheet = ({
   onAddRoom,
   onReload 
 }) => {
-  // ✅ DEBUG LOGGING TO FIND EMPTY SPREADSHEET ISSUE
-  console.log('📊 ExactChecklistSpreadsheet - Project data:', project);
-  console.log('📊 ExactChecklistSpreadsheet - Rooms count:', project?.rooms?.length || 0);
-  console.log('📊 ExactChecklistSpreadsheet - First room:', project?.rooms?.[0] || 'No rooms');
+  // ✅ DEBUG LOGGING FOR CHECKLIST SPREADSHEET
+  console.log('📋 ExactChecklistSpreadsheet - Project data:', project);
+  console.log('📋 ExactChecklistSpreadsheet - Rooms count:', project?.rooms?.length || 0);
+  console.log('📋 ExactChecklistSpreadsheet - First room:', project?.rooms?.[0] || 'No rooms');
   
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
