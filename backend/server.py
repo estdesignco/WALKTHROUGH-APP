@@ -3670,8 +3670,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 
                 for strategy in image_strategies:
                     try:
-                    images = await page.query_selector_all(strategy)
-                    for img in images[:5]:  # Check top 5 images per strategy
+                        images = await page.query_selector_all(strategy)
+                        for img in images[:10]:  # Check top 10 images per strategy
                         src = await img.get_attribute('src')
                         data_src = await img.get_attribute('data-src')
                         data_lazy = await img.get_attribute('data-lazy-src')
