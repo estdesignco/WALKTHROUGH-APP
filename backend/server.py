@@ -3795,19 +3795,20 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 
                 if best_image:
                     result['image_url'] = best_image
-                    print(f"✅ IMAGE FOUND: {best_image[:80]}...")
-            else:
-                # FALLBACK: Try to find ANY reasonable image
-                print("🔄 FALLBACK IMAGE SEARCH...")
+                    print(f"✅ IMAGE FOUND FROM STRATEGY 4: {best_image[:80]}...")
+            
+            # FINAL FALLBACK: Only if NO image found from any strategy
+            if not result['image_url']:
+                print("🔄 FINAL FALLBACK: Searching for any reasonable image...")
                 try:
                     all_images = await page.query_selector_all('img')
                     for img in all_images[:20]:  # Check first 20 images
                         src = await img.get_attribute('src')
                         if src and len(src) > 10:
-                            # Basic quality check
-                            if not any(bad in src.lower() for bad in ['logo', 'icon', 'tracking', 'pixel', '1x1']):
+                            # Basic quality check - STRICT filtering
+                            if not any(bad in src.lower() for bad in ['logo', 'icon', 'tracking', 'pixel', '1x1', 'wordmark', '.svg']):
                                 result['image_url'] = src if src.startswith('http') else urljoin(url, src)
-                                print(f"🎯 FALLBACK IMAGE: {result['image_url'][:60]}...")
+                                print(f"🎯 FALLBACK IMAGE FOUND: {result['image_url'][:60]}...")
                                 break
                 except:
                     print("⚠️ FALLBACK IMAGE SEARCH FAILED")
