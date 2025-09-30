@@ -3592,8 +3592,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         price_val = float(match.group(1).replace(',', ''))
                         if 10 <= price_val <= 100000:
                             result['cost'] = price_val
-                            result['price'] = f"${price_val:.2f}"
-                            print(f"✅ REGEX PRICE: {result['price']}")
+                            result['price'] = price_val  # Store as float
+                            print(f"✅ REGEX PRICE: ${price_val:.2f}")
                             break
                     except:
                         continue
