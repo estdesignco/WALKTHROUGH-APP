@@ -425,6 +425,7 @@ const ExactFFESpreadsheet = ({
   };
 
   if (!project || !project.rooms || project.rooms.length === 0) {
+    return (
       <div className="text-center text-gray-400 py-8">
         <p className="text-lg">Loading FF&E data...</p>
         <p className="text-sm mt-2">Please wait while we load your project information.</p>
@@ -432,6 +433,7 @@ const ExactFFESpreadsheet = ({
     );
   }
 
+  return (
     <div className="space-y-6">
       {/* EXACT SPREADSHEET TABLE */}
       <div className="bg-gray-900 border border-gray-600 rounded-lg shadow-lg overflow-hidden">
