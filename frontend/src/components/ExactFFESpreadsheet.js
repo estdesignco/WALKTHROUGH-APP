@@ -956,12 +956,18 @@ const ExactFFESpreadsheet = ({
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* Image - SCRAPED AUTOMATICALLY */}
+                                                          {/* Image - SCRAPED AUTOMATICALLY - CLICKABLE TO EXPAND */}
                                                           <td className="border border-gray-400 px-2 py-2 text-center text-white">
                                                             {item.image_url ? (
-                                                              <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
+                                                              <img 
+                                                                src={item.image_url} 
+                                                                alt={item.name} 
+                                                                className="w-16 h-16 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity" 
+                                                                onClick={() => setExpandedImage(item.image_url)}
+                                                                title="Click to expand"
+                                                              />
                                                             ) : (
-                                                              ''
+                                                              <div className="w-16 h-16 bg-gray-700 rounded flex items-center justify-center text-xs">No Image</div>
                                                             )}
                                                           </td>
                                                           
