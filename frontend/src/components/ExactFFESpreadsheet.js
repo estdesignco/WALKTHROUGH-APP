@@ -407,4 +407,4 @@ const ExactFFESpreadsheet = ({
   );
 };
 
-export default CorrectFFESpreadsheet;
+export default ExactFFESpreadsheet;
