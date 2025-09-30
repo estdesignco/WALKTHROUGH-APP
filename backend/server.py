@@ -3398,18 +3398,19 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             except:
                 print("⚠️ Product elements timeout - proceeding with available content")
             
-            # Initialize result structure
+            # Initialize result structure - matches Item schema exactly
             result = {
                 'name': None,
                 'vendor': None,
-                'cost': None,
-                'price': None,
+                'cost': None,  # Will be float
+                'price': None,  # Will be float (not string)
                 'image_url': None,
                 'finish_color': None,
                 'size': None,
                 'description': None,
                 'sku': None,
-                'availability': None
+                'availability': None,
+                'link': url  # Add the URL as the link field
             }
             
             print("🧠 STARTING AI-POWERED EXTRACTION...")
