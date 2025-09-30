@@ -3598,90 +3598,72 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     except:
                         continue
             
-            # ===== 3. INTELLIGENT IMAGE EXTRACTION =====
-            print("🖼️ EXTRACTING PRODUCT IMAGES...")
+            # ===== 3. SUPER POWERFUL IMAGE EXTRACTION =====
+            print("🖼️ EXTRACTING PRODUCT IMAGE WITH MULTIPLE STRATEGIES...")
             
-            # Enhanced image extraction with site-specific strategies
-            image_strategies = []
+            # STRATEGY 1: META TAGS (Most Reliable - Always correct!)
+            print("📌 Strategy 1: Checking Open Graph meta tags...")
+            try:
+                og_image = await page.locator('meta[property="og:image"]').first.get_attribute('content', timeout=2000)
+                if og_image and not og_image.endswith('.svg') and 'logo' not in og_image.lower():
+                    print(f"✅ Found OG:IMAGE: {og_image[:80]}")
+                    result['image_url'] = og_image
+            except:
+                print("⚠️ No og:image found")
             
-            # SITE-SPECIFIC OPTIMIZATIONS
-            if 'fourhands.com' in domain:
-                image_strategies.extend([
-                    # Priority: Main gallery images (not swatches/thumbnails)
-                    'div[class*="Gallery"] picture img:first-child',
-                    'div[class*="gallery"] picture img:first-child', 
-                    'div[class*="MainImage"] img',
-                    'div[class*="main-image"] img',
-                    '[data-testid*="gallery"] img:first-child',
-                    '[data-testid*="product-image"] img:first-child',
-                    
-                    # Modern picture elements
-                    'main picture img:first-child',
-                    'article picture img:first-child',
-                    
-                    # Product specific
-                    '[class*="ProductImage"]:not([class*="thumbnail"]) img:first-child',
-                    '[class*="productImage"]:not([class*="thumb"]) img:first-child',
-                    '[class*="product-image"]:not([class*="nav"]) img:first-child',
-                    
-                    # Shopify patterns
-                    'img[src*="cdn.shopify.com/s/files/"]:not([src*="thumb"]):not([width="100"])',
-                    'img[src*="/products/"]:not([class*="swatch"]):not([class*="option"])',
-                    
-                    # Fallbacks
-                    '.product-media img:first-child',
-                    '.hero-image img',
-                    'main img[width][height]:first-of-type'
-                ])
-            elif 'wayfair.com' in domain:
-                image_strategies.extend([
-                    '[data-testid="product-media"] img:first-child',
-                    '.ProductMediaContainer img:first-child',
-                    '[data-testid="media-gallery"] img:first-child',
-                    '.Media-gallery img:first-child'
-                ])
-            elif 'cb2.com' in domain:
-                image_strategies.extend([
-                    '.product-images img:first-child',
-                    '.carousel-image img:first-child',
-                    '.hero-product-image img'
-                ])
-            elif 'westelm.com' in domain:
-                image_strategies.extend([
-                    '.product-images img:first-child',
-                    '.carousel-image img:first-child',
-                    '.hero-product-image img'
-                ])
-            elif 'restorationhardware.com' in domain or 'rh.com' in domain:
-                image_strategies.extend([
-                    '.product-media img:first-child',
-                    '.product-carousel img:first-child'
-                ])
+            # STRATEGY 2: Twitter Card (Backup meta tag)
+            if not result['image_url']:
+                print("📌 Strategy 2: Checking Twitter Card meta tags...")
+                try:
+                    twitter_image = await page.locator('meta[name="twitter:image"]').first.get_attribute('content', timeout=2000)
+                    if twitter_image and not twitter_image.endswith('.svg'):
+                        print(f"✅ Found TWITTER:IMAGE: {twitter_image[:80]}")
+                        result['image_url'] = twitter_image
+                except:
+                    print("⚠️ No twitter:image found")
             
-            # UNIVERSAL HIGH-PRIORITY STRATEGIES
-            image_strategies.extend([
-                # Structured data
-                'img[itemProp="image"], img[property="og:image"]',
+            # STRATEGY 3: JSON-LD Structured Data
+            if not result['image_url']:
+                print("📌 Strategy 3: Checking JSON-LD structured data...")
+                try:
+                    json_ld = await page.locator('script[type="application/ld+json"]').all_text_contents()
+                    import json
+                    for script_content in json_ld:
+                        try:
+                            data = json.loads(script_content)
+                            if isinstance(data, dict) and 'image' in data:
+                                img_url = data['image'] if isinstance(data['image'], str) else data['image'][0]
+                                if img_url and not img_url.endswith('.svg'):
+                                    print(f"✅ Found JSON-LD IMAGE: {img_url[:80]}")
+                                    result['image_url'] = img_url
+                                    break
+                        except:
+                            continue
+                except:
+                    print("⚠️ No JSON-LD image found")
+            
+            # STRATEGY 4: Wait for gallery images to load and score them
+            if not result['image_url']:
+                print("📌 Strategy 4: Waiting for gallery images to load...")
+                await page.wait_for_timeout(3000)  # Wait longer for React/JS images
                 
-                # Modern e-commerce patterns
-                '[data-testid*="image"] img:first-child',
-                '[data-test*="image"] img:first-child',
-                
-                # Traditional product images
-                '.product-image img:first-child, .product-gallery img:first-child',
-                '.hero-image img, .main-image img, .primary-image img',
-                
-                # Generic product images
-                'img[class*="product"]:not([class*="thumb"]):not([class*="small"])',
-                'img[alt*="product" i]:not([alt*="thumbnail" i])',
-                'img[src*="product"]:not([src*="thumb"]):not([src*="small"])',
-                
-                # Data attributes for lazy loading
-                'img[data-src*="product"], img[data-lazy-src]',
-                
-                # Fallback strategies
-                'img[width][height]:not([width="1"]):not([height="1"])'
-            ])
+                # Site-specific selectors
+                if 'fourhands.com' in domain:
+                    image_strategies = [
+                        'picture source[type="image/jpeg"]',  # Modern picture elements
+                        'picture img',
+                        'img[src*="cdn.shopify.com"][src*="products"]',
+                        '[class*="Gallery"] img',
+                        '[class*="ProductImage"] img',
+                        'main img[src*="cloudfront"]',
+                    ]
+                else:
+                    image_strategies = [
+                        'img[itemProp="image"]',
+                        '.product-image img',
+                        '.main-image img',
+                        '[data-testid*="image"] img',
+                    ]
             
             best_image = None
             best_score = 0
