@@ -291,7 +291,6 @@ async def search_furniture_catalog(
             search_filter["$or"] = [
                 {"name": {"$regex": query, "$options": "i"}},
                 {"description": {"$regex": query, "$options": "i"}},
-                {"tags": {"$in": [re.compile(query, re.IGNORECASE) for re in [__import__('re')]][0]}},
                 {"materials": {"$regex": query, "$options": "i"}},
                 {"category": {"$regex": query, "$options": "i"}}
             ]
