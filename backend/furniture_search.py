@@ -699,6 +699,86 @@ async def webhook_status():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# MASS CATALOG SCRAPING ENDPOINTS
+
+@router.post("/furniture-catalog/start-mass-scraping")
+async def start_mass_scraping(background_tasks: BackgroundTasks, max_vendors: int = None):
+    """
+    START MASS SCRAPING OPERATION
+    
+    This will scrape ALL products from ALL your trade vendor websites
+    and populate the furniture catalog database
+    """
+    try:
+        from mass_catalog_scraper import MassCatalogScraper
+        
+        print("\n" + "="*80)
+        print("🚀 STARTING MASS CATALOG SCRAPING OPERATION")
+        print("="*80)
+        
+        # Run scraping in background
+        background_tasks.add_task(run_mass_scraping_task, max_vendors)
+        
+        return {
+            "success": True,
+            "message": "Mass scraping operation started in background",
+            "status": "running",
+            "vendors_to_process": max_vendors or len(TRADE_VENDORS),
+            "estimated_time": "30-60 minutes depending on catalog sizes"
+        }
+        
+    except Exception as e:
+        print(f"❌ Error starting mass scraping: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def run_mass_scraping_task(max_vendors: int = None):
+    """Background task to run mass scraping"""
+    try:
+        from mass_catalog_scraper import MassCatalogScraper
+        
+        scraper = MassCatalogScraper()
+        products = await scraper.run_mass_scraping(max_vendors)
+        
+        print(f"✅ Mass scraping complete: {len(products)} products scraped")
+        
+    except Exception as e:
+        print(f"❌ Mass scraping task failed: {e}")
+
+
+@router.get("/furniture-catalog/scraping-status")
+async def get_scraping_status():
+    """Get status of mass scraping operation"""
+    try:
+        # Get current catalog stats
+        total_items = await db.furniture_catalog.count_documents({})
+        
+        # Get items by vendor
+        vendor_counts = {}
+        for vendor in TRADE_VENDORS:
+            count = await db.furniture_catalog.count_documents({"vendor": vendor['name']})
+            vendor_counts[vendor['name']] = count
+        
+        # Get recent scraping activity
+        one_hour_ago = datetime.utcnow().replace(hour=datetime.utcnow().hour-1)
+        recent_scraped = await db.furniture_catalog.count_documents({
+            "scraped_date": {"$gte": one_hour_ago},
+            "source": "mass_catalog_scraper"
+        })
+        
+        return {
+            "success": True,
+            "total_products_in_catalog": total_items,
+            "vendor_breakdown": vendor_counts,
+            "recent_scraped_1h": recent_scraped,
+            "configured_vendors": len(TRADE_VENDORS),
+            "scraping_sources": ["mass_catalog_scraper", "houzz_pro_clipper", "browser_extension"]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # CANVA INTEGRATION PREPARATION
 
 @router.post("/furniture-catalog/prepare-canva-board")
