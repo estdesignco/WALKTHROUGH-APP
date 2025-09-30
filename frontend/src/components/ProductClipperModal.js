@@ -49,9 +49,18 @@ const ProductClipperModal = ({ isOpen, onClose, scrapedData = {}, projects = [],
   };
 
   const handleSaveToHouzzAndApp = async () => {
-    if (!formData.productTitle || !formData.projectId || !formData.room || !formData.category) {
-      alert('Please fill in required fields: Product Title, Project, Room, and Category');
-      return;
+    // Validation based on mode
+    if (mode === 'project') {
+      if (!formData.productTitle || !formData.projectId || !formData.room || !formData.category) {
+        alert('Please fill in required fields: Product Title, Project, Room, and Category');
+        return;
+      }
+    } else {
+      // Catalog mode - only need title, category, and vendor
+      if (!formData.productTitle || !formData.category || !formData.vendor) {
+        alert('Please fill in required fields: Product Title, Category, and Vendor');
+        return;
+      }
     }
 
     setLoading(true);
@@ -61,17 +70,20 @@ const ProductClipperModal = ({ isOpen, onClose, scrapedData = {}, projects = [],
       // Calculate retail price if markup exists
       const retailPrice = formData.markup ? parseFloat(formData.cost) * (1 + parseFloat(formData.markup) / 100) : parseFloat(formData.cost);
 
-      // Prepare data for our app
+      // Prepare data
       const itemData = {
         name: formData.productTitle,
         vendor: formData.vendor || formData.manufacturer,
+        manufacturer: formData.manufacturer,
+        category: formData.category,
         cost: parseFloat(formData.cost) || 0,
         price: retailPrice,
         sku: formData.sku,
-        size: formData.dimensions,
+        dimensions: formData.dimensions,
         finish_color: formData.finishColor,
         image_url: formData.images[0],
-        link: formData.productUrl,
+        images: formData.images,
+        product_url: formData.productUrl,
         remarks: formData.internalNotes,
         description: formData.clientDescription,
         materials: formData.materials,
@@ -80,36 +92,62 @@ const ProductClipperModal = ({ isOpen, onClose, scrapedData = {}, projects = [],
         taxable: formData.taxable
       };
 
-      // 1. Save to our Furniture App
-      const appResponse = await fetch(`${backendUrl}/api/clipper/save-to-app`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          projectId: formData.projectId,
-          roomName: formData.room,
-          categoryName: formData.category,
-          itemData: itemData
-        })
-      });
+      if (mode === 'catalog') {
+        // CATALOG MODE: Save to furniture catalog only
+        const catalogResponse = await fetch(`${backendUrl}/api/furniture-catalog/add`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(itemData)
+        });
 
-      if (!appResponse.ok) {
-        throw new Error('Failed to save to Furniture App');
+        if (!catalogResponse.ok) {
+          throw new Error('Failed to save to Furniture Catalog');
+        }
+
+        alert('✅ Furniture added to your searchable catalog!');
+        onClose();
+        window.location.reload();
+        
+      } else {
+        // PROJECT MODE: Save to project AND catalog
+        // 1. Save to our Furniture App
+        const appResponse = await fetch(`${backendUrl}/api/clipper/save-to-app`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            projectId: formData.projectId,
+            roomName: formData.room,
+            categoryName: formData.category,
+            itemData: itemData
+          })
+        });
+
+        if (!appResponse.ok) {
+          throw new Error('Failed to save to Furniture App');
+        }
+
+        // 2. Also save to furniture catalog for future searches
+        await fetch(`${backendUrl}/api/furniture-catalog/add`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(itemData)
+        });
+
+        // 3. Save to Houzz Pro
+        const houzzResponse = await fetch(`${backendUrl}/api/clipper/save-to-houzz`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+
+        if (!houzzResponse.ok) {
+          console.warn('Failed to save to Houzz Pro - continuing anyway');
+        }
+
+        alert('✅ Product saved successfully to Project, Catalog, and Houzz Pro!');
+        onClose();
+        window.location.reload(); // Refresh to show new item
       }
-
-      // 2. Save to Houzz Pro
-      const houzzResponse = await fetch(`${backendUrl}/api/clipper/save-to-houzz`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      if (!houzzResponse.ok) {
-        console.warn('Failed to save to Houzz Pro - continuing anyway');
-      }
-
-      alert('✅ Product saved successfully to both Houzz Pro and your Furniture App!');
-      onClose();
-      window.location.reload(); // Refresh to show new item
 
     } catch (error) {
       console.error('Error saving product:', error);
