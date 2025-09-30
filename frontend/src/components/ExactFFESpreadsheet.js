@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AddItemModal from './AddItemModal';
 
-const ProfessionalFFESpreadsheet = ({ 
+const ExactFFESpreadsheet = ({ 
   project, 
   roomColors, 
   categoryColors, 
