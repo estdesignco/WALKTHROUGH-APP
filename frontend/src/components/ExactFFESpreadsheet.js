@@ -565,4 +565,4 @@ const ExactFFESpreadsheet = ({
   );
 };
 
-export default ProfessionalFFESpreadsheet;
+export default ExactFFESpreadsheet;
