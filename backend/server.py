@@ -3672,15 +3672,15 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     try:
                         images = await page.query_selector_all(strategy)
                         for img in images[:10]:  # Check top 10 images per strategy
-                        src = await img.get_attribute('src')
-                        data_src = await img.get_attribute('data-src')
-                        data_lazy = await img.get_attribute('data-lazy-src')
-                        alt = await img.get_attribute('alt') or ""
-                        
-                        # Try different src attributes
-                        image_url = src or data_src or data_lazy
-                        if not image_url:
-                            continue
+                            src = await img.get_attribute('src')
+                            data_src = await img.get_attribute('data-src')
+                            data_lazy = await img.get_attribute('data-lazy-src')
+                            alt = await img.get_attribute('alt') or ""
+                            
+                            # Try different src attributes
+                            image_url = src or data_src or data_lazy
+                            if not image_url:
+                                continue
                         
                         # Fix relative URLs
                         if image_url.startswith('//'):
