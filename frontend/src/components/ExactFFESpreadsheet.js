@@ -24,6 +24,7 @@ const ExactFFESpreadsheet = ({
   const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
+  const [expandedImage, setExpandedImage] = useState(null);  // For image modal
 
   // FILTER STATE - MAKE IT ACTUALLY WORK
   const [filteredProject, setFilteredProject] = useState(project);
