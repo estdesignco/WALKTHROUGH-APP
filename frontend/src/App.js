@@ -237,11 +237,11 @@ const App = () => {
             />
             <Route 
               path="/furniture-search" 
-              element={<FurnitureSearchPage />}
+              element={<UnifiedFurnitureSearch currentProject={currentProject} />}
             />
             <Route 
               path="/furniture-catalog" 
-              element={<FurnitureSearchPage />}
+              element={<UnifiedFurnitureSearch currentProject={currentProject} />}
             />
             <Route 
               path="/workflow-dashboard" 
