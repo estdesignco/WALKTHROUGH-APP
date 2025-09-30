@@ -1237,4 +1237,4 @@ const ExactFFESpreadsheet = ({
   );
 };
 
-export default ChecklistFFE;
+export default ExactFFESpreadsheet;
