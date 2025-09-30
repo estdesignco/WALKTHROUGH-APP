@@ -11,11 +11,13 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     category: '',
     min_price: '',
     max_price: '',
-    source: ''  // New: filter by source (houzz, extension, etc.)
+    source: ''
   });
   const [searchResults, setSearchResults] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [quickCategories, setQuickCategories] = useState([]);
+  const [tradeVendors, setTradeVendors] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -27,6 +29,8 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     loadVendorsAndCategories();
     loadDatabaseStats();
     loadWebhookStatus();
+    loadQuickCategories();
+    loadTradeVendors();
   }, []);
 
   const loadVendorsAndCategories = async () => {
@@ -40,6 +44,24 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
       setCategories(categoriesResponse.data.categories || []);
     } catch (error) {
       console.error('Failed to load vendors and categories:', error);
+    }
+  };
+
+  const loadQuickCategories = async () => {
+    try {
+      const response = await axios.get(`${API}/furniture/furniture-catalog/quick-categories`);
+      setQuickCategories(response.data.categories || []);
+    } catch (error) {
+      console.error('Failed to load quick categories:', error);
+    }
+  };
+
+  const loadTradeVendors = async () => {
+    try {
+      const response = await axios.get(`${API}/furniture/furniture-catalog/trade-vendors`);
+      setTradeVendors(response.data.vendors || []);
+    } catch (error) {
+      console.error('Failed to load trade vendors:', error);
     }
   };
 
@@ -61,8 +83,11 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     }
   };
 
-  const searchFurniture = async () => {
-    if (!searchQuery.trim() && !filters.vendor && !filters.category) {
+  const searchFurniture = async (categoryFilter = '') => {
+    const effectiveQuery = searchQuery.trim();
+    const effectiveCategory = categoryFilter || filters.category;
+    
+    if (!effectiveQuery && !filters.vendor && !effectiveCategory) {
       return;
     }
 
@@ -70,9 +95,9 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     try {
       const params = new URLSearchParams();
       
-      if (searchQuery.trim()) params.append('query', searchQuery.trim());
+      if (effectiveQuery) params.append('query', effectiveQuery);
       if (filters.vendor) params.append('vendor', filters.vendor);
-      if (filters.category) params.append('category', filters.category);
+      if (effectiveCategory) params.append('category', effectiveCategory);
       if (filters.min_price) params.append('min_price', filters.min_price);
       if (filters.max_price) params.append('max_price', filters.max_price);
       if (filters.source) params.append('source', filters.source);
@@ -85,6 +110,12 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     } finally {
       setIsSearching(false);
     }
+  };
+
+  const quickCategorySearch = (category) => {
+    setFilters({ ...filters, category: category });
+    setSearchQuery('');
+    searchFurniture(category);
   };
 
   const clearFilters = () => {
@@ -157,14 +188,14 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
   const testWebhook = async () => {
     try {
       const testData = {
-        productTitle: "Test Dining Chair",
-        vendor: "Test Vendor",
-        cost: 299.99,
-        sku: "TEST-001",
-        category: "Seating",
-        dimensions: "18\"W x 22\"D x 32\"H",
-        description: "Beautiful test dining chair",
-        productUrl: "https://example.com/chair"
+        productTitle: "Test Regina Andrew Chandelier",
+        vendor: "Regina Andrew",
+        cost: 599.99,
+        sku: "RA-CHANDELIER-001",
+        category: "Lighting",
+        dimensions: "24\"W x 24\"D x 36\"H",
+        description: "Beautiful crystal chandelier",
+        productUrl: "https://reginaandrew.com/chandelier-test"
       };
 
       const response = await axios.post(`${API}/furniture/manual-webhook-test`, testData);
@@ -192,13 +223,23 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     }
   };
 
+  const getVendorBadgeColor = (vendorName) => {
+    // Different colors for different trade vendors
+    const colors = [
+      'bg-amber-600', 'bg-blue-600', 'bg-purple-600', 'bg-green-600', 
+      'bg-red-600', 'bg-indigo-600', 'bg-pink-600', 'bg-teal-600'
+    ];
+    const index = vendorName ? vendorName.length % colors.length : 0;
+    return colors[index];
+  };
+
   return (
     <div className="bg-gray-800 rounded-lg border border-gray-700">
       {/* Header with Webhook Status */}
       <div className="p-6 border-b border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-white">
-            🔍 Unified Furniture Search Engine
+            🔍 Unified Trade Furniture Search Engine
           </h2>
           <div className="flex space-x-2">
             <button
@@ -223,15 +264,15 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
         </div>
         
         <p className="text-gray-300 mb-4">
-          <strong>THE DREAM IS REAL!</strong> Search ALL furniture from ALL vendors in one place. 
-          Now with Houzz Pro clipper integration and Canva board creation!
+          <strong>THE DREAM IS NOW REAL!</strong> Search ALL trade furniture from YOUR vendors in one place. 
+          No more 1000 browser tabs! Houzz Pro clipper integration + Canva board creation ready!
         </p>
 
         {/* Webhook Status Panel */}
         {showWebhookStatus && webhookStatus && (
           <div className="mb-4 p-4 bg-gray-900 rounded-lg border border-gray-600">
             <h3 className="text-lg font-semibold text-white mb-2">📡 Webhook System Status</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
               <div className="text-sm">
                 <span className="text-gray-400">Status: </span>
                 <span className="text-green-400 font-semibold">
@@ -245,6 +286,10 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
               <div className="text-sm">
                 <span className="text-gray-400">Houzz Items: </span>
                 <span className="text-green-400 font-semibold">{webhookStatus.total_houzz_items}</span>
+              </div>
+              <div className="text-sm">
+                <span className="text-gray-400">Trade Vendors: </span>
+                <span className="text-amber-400 font-semibold">{webhookStatus.trade_vendors_configured}</span>
               </div>
             </div>
             <div className="text-xs text-gray-400">
@@ -261,7 +306,7 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
               <div className="text-2xl font-bold text-white">{stats.total_items?.toLocaleString()}</div>
             </div>
             <div className="bg-gray-900 p-3 rounded border border-gray-600">
-              <div className="text-amber-400 font-semibold">Vendors</div>
+              <div className="text-amber-400 font-semibold">Trade Vendors</div>
               <div className="text-2xl font-bold text-white">{Object.keys(stats.vendors || {}).length}</div>
             </div>
             <div className="bg-gray-900 p-3 rounded border border-gray-600">
@@ -271,6 +316,25 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
             <div className="bg-gray-900 p-3 rounded border border-gray-600">
               <div className="text-amber-400 font-semibold">Recent (7 days)</div>
               <div className="text-2xl font-bold text-green-400">{stats.recent_additions}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Trade Vendors Overview */}
+        {tradeVendors.length > 0 && (
+          <div className="mb-4">
+            <h4 className="text-sm font-semibold text-gray-400 mb-2">Your Trade Vendors ({tradeVendors.length} configured)</h4>
+            <div className="flex flex-wrap gap-2">
+              {tradeVendors.slice(0, 8).map((vendor, index) => (
+                <span key={index} className={`px-3 py-1 rounded-full text-xs font-semibold text-white ${getVendorBadgeColor(vendor.name)}`}>
+                  {vendor.name}
+                </span>
+              ))}
+              {tradeVendors.length > 8 && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold text-gray-300 bg-gray-600">
+                  +{tradeVendors.length - 8} more
+                </span>
+              )}
             </div>
           </div>
         )}
@@ -319,6 +383,33 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
           </div>
         )}
 
+        {/* QUICK SEARCH CATEGORY BUTTONS - NOW WORKING! */}
+        {quickCategories.length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-white mb-3">⚡ Quick Category Search</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+              {quickCategories.slice(0, 12).map((category, index) => (
+                <button
+                  key={index}
+                  onClick={() => quickCategorySearch(category)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    filters.category === category 
+                      ? 'bg-amber-600 text-white' 
+                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+            {quickCategories.length > 12 && (
+              <div className="mt-2 text-center">
+                <span className="text-gray-400 text-sm">+{quickCategories.length - 12} more categories available in dropdown</span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Search Bar */}
         <div className="mb-4">
           <input
@@ -326,7 +417,7 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && searchFurniture()}
-            placeholder="Search furniture... (e.g., 'dining chair', 'table lamp', 'sofa')"
+            placeholder="Search furniture... (e.g., 'console table', 'pendant light', 'dining chair')"
             className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 text-lg"
           />
         </div>
@@ -385,7 +476,7 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
         {/* Action Buttons */}
         <div className="flex space-x-4 mb-6">
           <button
-            onClick={searchFurniture}
+            onClick={() => searchFurniture()}
             disabled={isSearching}
             className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-md font-medium transition-colors"
           >
@@ -438,7 +529,7 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
                     
                     <div className="text-sm text-gray-300 mb-2">
                       <div className="flex justify-between">
-                        <span className="text-amber-400">{product.vendor}</span>
+                        <span className="text-amber-400 font-semibold">{product.vendor}</span>
                         <span className="font-semibold text-white">{formatPrice(product.cost)}</span>
                       </div>
                     </div>
@@ -507,7 +598,7 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
         )}
 
         {/* No Results */}
-        {searchResults.length === 0 && isSearching === false && searchQuery && (
+        {searchResults.length === 0 && isSearching === false && (searchQuery || filters.category) && (
           <div className="text-center py-8">
             <div className="text-gray-400 mb-2">No products found matching your search.</div>
             <div className="text-gray-500 text-sm">Try adjusting your search terms or filters.</div>
@@ -515,13 +606,14 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
         )}
 
         {/* Instructions */}
-        {!searchQuery && searchResults.length === 0 && (
+        {!searchQuery && !filters.category && searchResults.length === 0 && (
           <div className="text-center py-8">
             <div className="text-gray-400 mb-4">
-              <h3 className="text-lg font-semibold mb-2">How to use the Unified Search:</h3>
+              <h3 className="text-lg font-semibold mb-2">How to use your Unified Trade Search:</h3>
               <div className="text-left max-w-2xl mx-auto space-y-2">
+                <p><strong>⚡ Quick Search:</strong> Click category buttons above for instant results</p>
                 <p><strong>🏠 Houzz Pro Integration:</strong> Furniture clipped in Houzz Pro automatically appears here</p>
-                <p><strong>🔍 Search:</strong> Find products across all vendors and sources</p>
+                <p><strong>🔍 Search:</strong> Find products across all {tradeVendors.length} trade vendors in one place</p>
                 <p><strong>📋 Add to Checklist:</strong> Move items directly to your project checklist</p>
                 <p><strong>🎨 Add to Canva:</strong> Create mood boards with selected furniture</p>
               </div>
