@@ -3717,13 +3717,25 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             'bat.bing.com', 'tracking', 'analytics', 'pixel', 'beacon',
                             'googletagmanager', 'facebook.com/tr', 'doubleclick',
                             'amazon-adsystem', 'googlesyndication', 'googleadservices',
-                            '1x1', 'transparent.gif', 'blank.gif'
+                            '1x1', 'transparent.gif', 'blank.gif', 'wordmark', 'brand-logo',
+                            'header-logo', 'footer-logo', 'site-logo', 'company-logo'
                         ]
                         
                         if any(keyword in image_url.lower() for keyword in exclusion_keywords):
-                            score -= 25
-                        if any(keyword in alt.lower() for keyword in ['logo', 'brand', 'icon', 'advertisement']):
-                            score -= 15
+                            score -= 50  # Stronger penalty
+                        if any(keyword in alt.lower() for keyword in ['logo', 'brand', 'icon', 'advertisement', 'wordmark']):
+                            score -= 50  # Stronger penalty
+                        
+                        # Check if image is too small (likely a logo/icon)
+                        try:
+                            width = await img.get_attribute('width')
+                            height = await img.get_attribute('height')
+                            if width and height:
+                                w, h = int(width), int(height)
+                                if w < 150 or h < 150:  # Too small to be product image
+                                    score -= 30
+                        except:
+                            pass
                         
                         # Site-specific optimizations
                         if 'fourhands.com' in domain:
