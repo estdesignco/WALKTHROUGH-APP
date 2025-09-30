@@ -5233,6 +5233,156 @@ async def get_questionnaire(project_id: str):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to get questionnaire: {str(e)}")
 
+# PRODUCT CLIPPER ENDPOINTS - HOUZZ INTEGRATION
+@api_router.post("/clipper/save-to-app")
+async def save_clipped_product_to_app(data: dict):
+    """Save clipped product to our Furniture App"""
+    try:
+        project_id = data.get('projectId')
+        room_name = data.get('roomName')
+        category_name = data.get('categoryName')
+        item_data = data.get('itemData', {})
+        
+        # Find the project
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Find or create room
+        room = None
+        for r in project.get('rooms', []):
+            if r['name'].lower() == room_name.lower():
+                room = r
+                break
+        
+        if not room:
+            # Create new room
+            room = {
+                "id": str(uuid.uuid4()),
+                "name": room_name,
+                "sheet_type": "checklist",  # Default to checklist
+                "categories": []
+            }
+            await db.projects.update_one(
+                {"id": project_id},
+                {"$push": {"rooms": room}}
+            )
+        
+        # Find or create category
+        category = None
+        for cat in room.get('categories', []):
+            if cat['name'].lower() == category_name.lower():
+                category = cat
+                break
+        
+        if not category:
+            # Create new category
+            category = {
+                "id": str(uuid.uuid4()),
+                "name": category_name,
+                "subcategories": [{
+                    "id": str(uuid.uuid4()),
+                    "name": "NEEDED",
+                    "items": []
+                }]
+            }
+            # Add category to room
+            await db.projects.update_one(
+                {"id": project_id, "rooms.id": room['id']},
+                {"$push": {"rooms.$.categories": category}}
+            )
+        
+        # Create new item
+        new_item = {
+            "id": str(uuid.uuid4()),
+            "name": item_data.get('name', 'Unnamed Item'),
+            "vendor": item_data.get('vendor', ''),
+            "cost": item_data.get('cost', 0),
+            "price": item_data.get('price', 0),
+            "sku": item_data.get('sku', ''),
+            "size": item_data.get('size', ''),
+            "finish_color": item_data.get('finish_color', ''),
+            "image_url": item_data.get('image_url', ''),
+            "link": item_data.get('link', ''),
+            "remarks": item_data.get('remarks', ''),
+            "description": item_data.get('description', ''),
+            "materials": item_data.get('materials', ''),
+            "msrp": item_data.get('msrp', 0),
+            "tags": item_data.get('tags', []),
+            "taxable": item_data.get('taxable', True),
+            "status": "PICKED",
+            "quantity": 1
+        }
+        
+        # Add item to first subcategory
+        await db.projects.update_one(
+            {
+                "id": project_id,
+                "rooms.id": room['id'],
+                "rooms.categories.id": category['id'] if category.get('id') else category.get('name')
+            },
+            {"$push": {"rooms.$[room].categories.$[cat].subcategories.0.items": new_item}},
+            array_filters=[
+                {"room.id": room['id']},
+                {"cat.id": category['id'] if category.get('id') else category.get('name')}
+            ]
+        )
+        
+        return {"success": True, "message": "Product saved to Furniture App", "item_id": new_item['id']}
+        
+    except Exception as e:
+        print(f"Error saving to app: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/clipper/save-to-houzz")
+async def save_clipped_product_to_houzz(data: dict):
+    """Save clipped product to Houzz Pro - Placeholder for Houzz API integration"""
+    try:
+        # TODO: Integrate with actual Houzz Pro API
+        # For now, just log the data
+        print("\n" + "="*60)
+        print("HOUZZ PRO CLIPPER DATA:")
+        print("="*60)
+        print(f"Product: {data.get('productTitle')}")
+        print(f"Cost: {data.get('cost')}")
+        print(f"Vendor: {data.get('vendor')}")
+        print(f"Project: {data.get('projectId')}")
+        print(f"Room: {data.get('room')}")
+        print("="*60 + "\n")
+        
+        # Return success for now
+        return {"success": True, "message": "Product logged for Houzz Pro (API integration pending)"}
+        
+    except Exception as e:
+        print(f"Error saving to Houzz: {e}")
+        # Don't fail if Houzz save fails
+        return {"success": False, "message": str(e)}
+
+
+# COMPLETE WALKTHROUGH ENDPOINT
+@api_router.post("/complete-walkthrough/{project_id}")
+async def complete_walkthrough_endpoint(project_id: str):
+    """Complete walkthrough and transition to checklist mode"""
+    try:
+        # Find the project
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Mark project as walkthrough complete
+        await db.projects.update_one(
+            {"id": project_id},
+            {"$set": {"walkthrough_complete": True, "updated_at": datetime.utcnow()}}
+        )
+        
+        return {"success": True, "message": "Walkthrough completed successfully"}
+        
+    except Exception as e:
+        print(f"Error completing walkthrough: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.post("/integrations/mobile/sync")
 async def mobile_sync(data: dict):
     """Sync mobile app data with server"""
