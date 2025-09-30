@@ -186,29 +186,51 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     }
   };
 
-  const testWebhook = async () => {
+  const startMassScraping = async (maxVendors = null) => {
     try {
-      const testData = {
-        productTitle: "Test Regina Andrew Chandelier",
-        vendor: "Regina Andrew",
-        cost: 599.99,
-        sku: "RA-CHANDELIER-001",
-        category: "Lighting",
-        dimensions: "24\"W x 24\"D x 36\"H",
-        description: "Beautiful crystal chandelier",
-        productUrl: "https://reginaandrew.com/chandelier-test",
-        images: ["https://via.placeholder.com/400x400/8B5CF6/FFFFFF?text=Regina+Andrew+Chandelier"]
-      };
-
-      const response = await axios.post(`${API}/furniture/manual-webhook-test`, testData);
+      const confirmed = window.confirm(
+        `🚀 START MASS CATALOG SCRAPING?\n\n` +
+        `This will scrape ALL products from ${maxVendors || 'ALL'} trade vendors:\n` +
+        `• Four Hands\n• Regina Andrew\n• Visual Comfort\n• Hudson Valley Lighting\n• Global Views\n• Arteriors\n• Uttermost\n• Currey & Company\n\n` +
+        `This operation will take 30-60 minutes and will populate your furniture catalog with thousands of products.\n\n` +
+        `Each product will be:\n` +
+        `✅ Scraped from vendor website\n` +
+        `✅ Added to your unified database\n` +
+        `✅ Clipped to Houzz Pro\n\n` +
+        `Continue?`
+      );
+      
+      if (!confirmed) return;
+      
+      setLoading(true);
+      
+      const response = await axios.post(`${API}/furniture/furniture-catalog/start-mass-scraping`, {
+        max_vendors: maxVendors
+      });
       
       if (response.data.success) {
-        alert('✅ Webhook test successful! Check the database stats.');
-        loadDatabaseStats();
+        alert(`🎉 Mass scraping started!\n\n` +
+              `Status: ${response.data.status}\n` +
+              `Vendors: ${response.data.vendors_to_process}\n` +
+              `Estimated time: ${response.data.estimated_time}\n\n` +
+              `You can monitor progress by refreshing the stats.`);
+        
+        // Auto-refresh stats every 30 seconds during scraping
+        const refreshInterval = setInterval(() => {
+          loadDatabaseStats();
+        }, 30000);
+        
+        // Stop auto-refresh after 1 hour
+        setTimeout(() => {
+          clearInterval(refreshInterval);
+        }, 3600000);
       }
+      
     } catch (error) {
-      console.error('Webhook test failed:', error);
-      alert('❌ Webhook test failed');
+      console.error('Failed to start mass scraping:', error);
+      alert(`❌ Failed to start mass scraping: ${error.response?.data?.detail || error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
