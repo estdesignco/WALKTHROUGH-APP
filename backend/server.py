@@ -3669,7 +3669,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 best_score = 0
                 
                 for strategy in image_strategies:
-                try:
+                    try:
                     images = await page.query_selector_all(strategy)
                     for img in images[:5]:  # Check top 5 images per strategy
                         src = await img.get_attribute('src')
