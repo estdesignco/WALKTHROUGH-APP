@@ -20,6 +20,7 @@ import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
 import EmailPreview from './components/EmailPreview';
 import CompleteFurnitureSearch from './components/CompleteFurnitureSearch';
 import FurnitureSearchPage from './components/FurnitureSearchPage';
+import UnifiedFurnitureSearch from './components/UnifiedFurnitureSearch';
 import WorkflowDashboard from './components/WorkflowDashboard';
 import MainDashboard from './components/MainDashboard';
 import ActualStudioLandingPage from './components/ActualStudioLandingPage';
