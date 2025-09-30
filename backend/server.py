@@ -3752,6 +3752,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             'nav', 'menu', 'button', 'badge', 'overlay'
                         ]
                         
+                        # NUCLEAR penalties - NEVER select logos/SVGs/swatches
+                        if image_url.endswith('.svg'):  # SVGs are NEVER product images
+                            score -= 1000
+                        if 'wordmark' in image_url.lower() or 'logo' in image_url.lower():
+                            score -= 1000
+                        
                         # Strong penalties for excluded patterns
                         if any(keyword in image_url.lower() for keyword in exclusion_keywords):
                             score -= 100  # Very strong penalty
