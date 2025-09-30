@@ -3607,17 +3607,31 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # SITE-SPECIFIC OPTIMIZATIONS
             if 'fourhands.com' in domain:
                 image_strategies.extend([
-                    'picture img:first-child',  # Modern picture element
-                    '[class*="ProductImage"] img:first-child',
-                    '[class*="productImage"] img:first-child',
-                    '[class*="product-image"] img:first-child',
+                    # Priority: Main gallery images (not swatches/thumbnails)
+                    'div[class*="Gallery"] picture img:first-child',
+                    'div[class*="gallery"] picture img:first-child', 
+                    'div[class*="MainImage"] img',
+                    'div[class*="main-image"] img',
+                    '[data-testid*="gallery"] img:first-child',
+                    '[data-testid*="product-image"] img:first-child',
+                    
+                    # Modern picture elements
+                    'main picture img:first-child',
+                    'article picture img:first-child',
+                    
+                    # Product specific
+                    '[class*="ProductImage"]:not([class*="thumbnail"]) img:first-child',
+                    '[class*="productImage"]:not([class*="thumb"]) img:first-child',
+                    '[class*="product-image"]:not([class*="nav"]) img:first-child',
+                    
+                    # Shopify patterns
+                    'img[src*="cdn.shopify.com/s/files/"]:not([src*="thumb"]):not([width="100"])',
+                    'img[src*="/products/"]:not([class*="swatch"]):not([class*="option"])',
+                    
+                    # Fallbacks
                     '.product-media img:first-child',
-                    '.product-gallery img:first-child',
-                    '.ProductGallery img:first-child',
-                    'img[src*="/products/"]',
-                    'img[src*="cdn.shopify.com/s/files/"]',  # Shopify CDN
                     '.hero-image img',
-                    'main img:first-of-type'  # First image in main content
+                    'main img[width][height]:first-of-type'
                 ])
             elif 'wayfair.com' in domain:
                 image_strategies.extend([
