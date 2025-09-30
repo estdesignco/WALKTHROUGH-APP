@@ -4974,7 +4974,7 @@ async def scrape_canva_pdf(data: dict):
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(furniture_router)
-app.include_router(furniture_search_router)
+app.include_router(furniture_search_router, prefix="/api/furniture")
 
 # HOUZZ CLIPPER WEBHOOK - Intercepts data on its way to Houzz
 @app.post("/api/houzz-clipper-webhook")
