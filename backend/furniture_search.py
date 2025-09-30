@@ -15,6 +15,65 @@ db = client.get_database('furniture_tracker')
 # FURNITURE CATALOG COLLECTION - Central database of all furniture
 # Each document is a furniture item clipped from vendor sites
 
+@router.post("/houzz-webhook")
+async def houzz_clipper_webhook(data: dict):
+    """Webhook for Houzz Pro clipper - receives data on its way to Houzz"""
+    try:
+        print("\n" + "="*60)
+        print("🏠 HOUZZ CLIPPER DATA RECEIVED!")
+        print("="*60)
+        print(f"Product: {data.get('productTitle', data.get('name'))}")
+        print(f"Vendor: {data.get('vendor', data.get('manufacturer'))}")
+        print(f"Cost: {data.get('cost')}")
+        print("="*60 + "\n")
+        
+        # Transform Houzz data to our format
+        furniture_item = {
+            "id": str(uuid.uuid4()),
+            "name": data.get('productTitle') or data.get('name', ''),
+            "vendor": data.get('vendor') or data.get('manufacturer', ''),
+            "manufacturer": data.get('manufacturer', ''),
+            "category": data.get('category', ''),
+            "cost": float(data.get('cost', 0)) if data.get('cost') else 0,
+            "msrp": float(data.get('msrp', 0)) if data.get('msrp') else 0,
+            "sku": data.get('sku', ''),
+            "dimensions": data.get('dimensions', ''),
+            "finish_color": data.get('finishColor') or data.get('finish_color', ''),
+            "materials": data.get('materials', ''),
+            "description": data.get('clientDescription') or data.get('description', ''),
+            "image_url": data.get('images', [None])[0] if data.get('images') else '',
+            "images": data.get('images', []),
+            "product_url": data.get('productUrl') or data.get('link', ''),
+            "tags": data.get('tags', '').split(',') if isinstance(data.get('tags'), str) else data.get('tags', []),
+            "notes": data.get('internalNotes', ''),
+            "clipped_date": datetime.utcnow(),
+            "updated_date": datetime.utcnow(),
+            "times_used": 0
+        }
+        
+        # Check if already exists
+        existing = None
+        if furniture_item['sku']:
+            existing = await db.furniture_catalog.find_one({"sku": furniture_item['sku']})
+        if not existing and furniture_item['product_url']:
+            existing = await db.furniture_catalog.find_one({"product_url": furniture_item['product_url']})
+        
+        if existing:
+            await db.furniture_catalog.update_one(
+                {"id": existing['id']},
+                {"$set": {**furniture_item, "id": existing['id'], "updated_date": datetime.utcnow()}}
+            )
+            return {"success": True, "message": "Furniture updated", "item_id": existing['id']}
+        else:
+            await db.furniture_catalog.insert_one(furniture_item)
+            return {"success": True, "message": "Furniture added to catalog", "item_id": furniture_item['id']}
+        
+    except Exception as e:
+        print(f"Error in Houzz webhook: {e}")
+        # Don't fail - let Houzz clipper continue
+        return {"success": False, "error": str(e)}
+
+
 @router.post("/furniture-catalog/add")
 async def add_to_furniture_catalog(data: dict):
     """Add clipped furniture to central catalog"""
