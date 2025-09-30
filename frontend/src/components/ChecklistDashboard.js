@@ -26,10 +26,10 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     if (projectId) {
       console.log('🚀 Loading project:', projectId);
       
-      // IMMEDIATE TEST - Force load project data
-      fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}`)
+      // IMMEDIATE TEST - Force load project data WITH CHECKLIST SHEET_TYPE
+      fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`)
         .then(response => {
-          console.log('📡 Response received:', response.status);
+          console.log('📡 Checklist Response received:', response.status);
           if (response.ok) {
             return response.json();
           } else {
@@ -37,12 +37,12 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           }
         })
         .then(projectData => {
-          console.log('✅ SUCCESS - Project data:', projectData.name);
+          console.log('✅ SUCCESS - Checklist Project data:', projectData.name);
           setProject(projectData);
           setLoading(false);
         })
         .catch(err => {
-          console.error('❌ ERROR loading project:', err);
+          console.error('❌ ERROR loading checklist project:', err);
           setError('Failed to load project: ' + err.message);
           setLoading(false);
         });
