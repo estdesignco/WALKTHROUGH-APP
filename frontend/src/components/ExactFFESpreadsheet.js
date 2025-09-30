@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import AddItemModal from './AddItemModal';
 
-const ExactFFESpreadsheet = ({ 
+const CorrectFFESpreadsheet = ({ 
   project, 
   roomColors, 
   categoryColors, 
@@ -16,35 +16,6 @@ const ExactFFESpreadsheet = ({
   const [expandedSubcategories, setExpandedSubcategories] = useState({});
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
-  const [enhancedItemStatuses, setEnhancedItemStatuses] = useState([]);
-  const [carrierOptions, setCarrierOptions] = useState([]);
-
-  // Load enhanced data on component mount
-  useEffect(() => {
-    const loadEnhancedData = async () => {
-      try {
-        const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
-        
-        // Load enhanced item statuses
-        const statusRes = await fetch(`${backendUrl}/api/item-statuses-enhanced`);
-        if (statusRes.ok) {
-          const statusData = await statusRes.json();
-          setEnhancedItemStatuses(statusData.data || []);
-        }
-        
-        // Load carrier options
-        const carrierRes = await fetch(`${backendUrl}/api/carrier-options`);
-        if (carrierRes.ok) {
-          const carrierData = await carrierRes.json();
-          setCarrierOptions(carrierData.data || []);
-        }
-      } catch (error) {
-        console.error('Error loading enhanced data:', error);
-      }
-    };
-    
-    loadEnhancedData();
-  }, []);
 
   // Handle adding new items
   const handleAddItem = async (itemData) => {
@@ -79,7 +50,7 @@ const ExactFFESpreadsheet = ({
           await onReload();
         }
       } else {
-        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+        throw new Error(`HTTP ${response.status}`);
       }
     } catch (error) {
       console.error('❌ Error adding item:', error);
@@ -87,7 +58,7 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  // Toggle room expansion
+  // Toggle functions
   const toggleRoom = (roomId) => {
     setExpandedRooms(prev => ({
       ...prev,
@@ -95,7 +66,6 @@ const ExactFFESpreadsheet = ({
     }));
   };
 
-  // Toggle category expansion  
   const toggleCategory = (categoryId) => {
     setExpandedCategories(prev => ({
       ...prev,
@@ -103,7 +73,6 @@ const ExactFFESpreadsheet = ({
     }));
   };
 
-  // Toggle subcategory expansion
   const toggleSubcategory = (subcategoryId) => {
     setExpandedSubcategories(prev => ({
       ...prev,
@@ -111,452 +80,325 @@ const ExactFFESpreadsheet = ({
     }));
   };
 
-  // Count items in room/category/subcategory
-  const countItems = (items) => {
-    return items ? items.length : 0;
-  };
-
-  // Count total items in room
-  const countRoomItems = (room) => {
-    let total = 0;
-    if (room.categories) {
-      room.categories.forEach(category => {
-        if (category.subcategories) {
-          category.subcategories.forEach(subcategory => {
-            total += countItems(subcategory.items);
-          });
-        }
-      });
-    }
-    return total;
-  };
-
-  // Count total items in category
-  const countCategoryItems = (category) => {
-    let total = 0;
-    if (category.subcategories) {
-      category.subcategories.forEach(subcategory => {
-        total += countItems(subcategory.items);
-      });
-    }
-    return total;
-  };
-
-  // Get room color (PURPLE like your screenshots)
+  // EXACT COLORS FROM YOUR IMAGES - Muted professional colors
   const getRoomColor = (roomName) => {
-    const exactColors = {
-      'living room': '#8A5A8A',  // Muted purple like your image
-      'dining room': '#5A8A8A',  // Muted teal
-      'kitchen': '#5A6A5A',      // Muted green
-      'primary bedroom': '#6A5A7A', // Muted purple-brown
-      'primary bathroom': '#6A4A4A', // Muted brown
-      'powder room': '#4A6A6A',   // Muted gray-green
-    };
-    return exactColors[roomName.toLowerCase()] || '#8A5A8A';
+    return '#9B8E9B'; // Exact muted purple from your LIVING ROOM
   };
 
-  // Get category color (GREEN like your screenshots)
   const getCategoryColor = () => {
-    return '#5A7A5A'; // Muted green for all categories
+    return '#8B9B8B'; // Exact muted green from your LIGHTING  
   };
 
-  // Get subcategory color (RED like your screenshots)  
   const getSubcategoryColor = () => {
-    return '#8A5A5A'; // Muted red for all subcategories
-  };
-
-  // Get status color
-  const getStatusColor = (status) => {
-    const statusItem = enhancedItemStatuses.find(s => s.status === status);
-    return statusItem ? statusItem.color : '#999999';
-  };
-
-  // Get carrier color
-  const getCarrierColor = (carrier) => {
-    const carrierItem = carrierOptions.find(c => c.name === carrier);
-    return carrierItem ? carrierItem.color : '#999999';
+    return '#B8A5A8'; // Exact muted reddish from your PORTABLE
   };
 
   if (!project || !project.rooms) {
     return (
-      <div className="p-8 text-center text-white">
-        <h2 className="text-2xl font-bold mb-4">Loading FF&E Project...</h2>
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto"></div>
+      <div className="p-8 text-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Loading FF&E Project...</h2>
       </div>
     );
   }
 
   return (
-    <div className="w-full bg-neutral-900 text-white">
-      {/* PROFESSIONAL HEADER MESSAGE */}
-      <div className="bg-neutral-800 p-4 mb-6 rounded border border-neutral-600">
-        <h2 className="text-xl font-bold text-center text-green-400">
-          🎉 PROFESSIONAL FF&E SPREADSHEET IS WORKING!
-        </h2>
-        <p className="text-center text-neutral-300 mt-2">
-          ✅ Enhanced Tracking ✅ Color-Coded Status ✅ Carrier Management ✅ Professional Layout
-        </p>
-      </div>
+    <div className="w-full bg-white flex" style={{ height: '80vh' }}>
+      
+      {/* LEFT PANEL - Hierarchical Navigation EXACTLY like your FFE LEFT.png */}
+      <div className="w-80 bg-gray-50 border-r border-gray-300 overflow-y-auto flex-shrink-0">
+        <div className="p-4">
+          <h3 className="text-lg font-semibold text-gray-700 mb-4">Project Structure</h3>
+          
+          {project.rooms.map((room) => (
+            <div key={room.id} className="mb-2">
+              {/* ROOM HEADER - Exact muted purple from your image */}
+              <div
+                className="px-3 py-2 text-white text-sm font-medium cursor-pointer rounded-sm flex items-center justify-between"
+                style={{ backgroundColor: getRoomColor(room.name) }}
+                onClick={() => toggleRoom(room.id)}
+              >
+                <span>{room.name.toUpperCase()}</span>
+                <span className="text-xs">{expandedRooms[room.id] ? '−' : '+'}</span>
+              </div>
 
-      {/* HORIZONTAL SCROLLING CONTAINER WITH PRECISE DIMENSIONS */}
-      <div 
-        className="relative w-full border border-neutral-600"
-        style={{ 
-          height: '70vh',
-          overflow: 'hidden'
-        }}
-      >
-        <div
-          className="w-full h-full overflow-auto"
-          id="professional-ffe-scroll-container"
-          style={{
-            overflowX: 'scroll',
-            overflowY: 'scroll', 
-            scrollBehavior: 'auto',
-            WebkitOverflowScrolling: 'touch'
-          }}
-        >
-          <table 
-            className="border-collapse bg-neutral-800"
-            style={{ 
-              minWidth: '4000px', // Force horizontal scroll - EXACTLY like your image
-              width: '4000px'
-            }}
-          >
-            {/* TABLE HEADERS - EXACTLY like your right-side image */}
-            <thead>
-              <tr className="bg-neutral-700 sticky top-0 z-10">
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[200px] text-left font-bold">INSTALLED NAME</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[150px] text-left font-bold">VENDOR</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[80px] text-center font-bold">QTY</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[120px] text-left font-bold">SIZE</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[150px] text-left font-bold">STATUS</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[120px] text-left font-bold">FINISH/COLOR</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[100px] text-right font-bold">COST</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[100px] text-right font-bold">PRICE</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[150px] text-left font-bold">LINK</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[120px] text-left font-bold">IMAGE</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[120px] text-left font-bold">CARRIER</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[150px] text-left font-bold">TRACKING #</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[120px] text-left font-bold">ORDER DATE</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[120px] text-left font-bold">DELIVERY DATE</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[120px] text-left font-bold">INSTALL DATE</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[200px] text-left font-bold">NOTES</th>
-                <th className="p-3 text-amber-300 border border-neutral-600 min-w-[100px] text-center font-bold">ACTIONS</th>
-              </tr>
-            </thead>
-            
-            <tbody>
-              {project.rooms.map((room) => {
-                const roomItemCount = countRoomItems(room);
-                const isRoomExpanded = expandedRooms[room.id];
-                
-                return (
-                  <React.Fragment key={room.id}>
-                    {/* ROOM HEADER - PURPLE like your left-side image */}
-                    <tr>
-                      <td 
-                        colSpan="17" 
-                        className="p-4 text-center font-semibold text-white text-lg border border-neutral-600 cursor-pointer hover:opacity-80 transition-opacity"
-                        style={{ backgroundColor: getRoomColor(room.name) }}
-                        onClick={() => toggleRoom(room.id)}
+              {/* ROOM CONTENT */}
+              {expandedRooms[room.id] && room.categories && (
+                <div className="ml-3 mt-1">
+                  {room.categories.map((category) => (
+                    <div key={category.id} className="mb-1">
+                      {/* CATEGORY HEADER - Exact muted green from your image */}
+                      <div
+                        className="px-3 py-1 text-white text-sm cursor-pointer rounded-sm flex items-center justify-between"
+                        style={{ backgroundColor: getCategoryColor() }}
+                        onClick={() => toggleCategory(category.id)}
                       >
-                        <div className="flex items-center justify-center space-x-2">
-                          <span>{isRoomExpanded ? '▼' : '▶'}</span>
-                          <span>{room.name.toUpperCase()} ({roomItemCount} items)</span>
-                        </div>
-                      </td>
-                    </tr>
-                    
-                    {/* ROOM CONTENT - Show when expanded */}
-                    {isRoomExpanded && room.categories && room.categories.map((category) => {
-                      const categoryItemCount = countCategoryItems(category);
-                      const isCategoryExpanded = expandedCategories[category.id];
-                      
-                      return (
-                        <React.Fragment key={category.id}>
-                          {/* CATEGORY HEADER - GREEN like your image */}
-                          <tr>
-                            <td 
-                              colSpan="17" 
-                              className="p-3 text-center font-medium text-white border border-neutral-600 cursor-pointer hover:opacity-80 transition-opacity"
-                              style={{ backgroundColor: getCategoryColor() }}
-                              onClick={() => toggleCategory(category.id)}
-                            >
-                              <div className="flex items-center justify-center space-x-2">
-                                <span>{isCategoryExpanded ? '▼' : '▶'}</span>
-                                <span>{category.name.toUpperCase()} ({categoryItemCount} items)</span>
+                        <span>{category.name.toUpperCase()}</span>
+                        <span className="text-xs">{expandedCategories[category.id] ? '−' : '+'}</span>
+                      </div>
+
+                      {/* CATEGORY CONTENT */}
+                      {expandedCategories[category.id] && category.subcategories && (
+                        <div className="ml-3 mt-1">
+                          {category.subcategories.map((subcategory) => (
+                            <div key={subcategory.id} className="mb-1">
+                              {/* SUBCATEGORY HEADER - Exact muted red from your image */}
+                              <div
+                                className="px-3 py-1 text-white text-xs cursor-pointer rounded-sm flex items-center justify-between"
+                                style={{ backgroundColor: getSubcategoryColor() }}
+                                onClick={() => toggleSubcategory(subcategory.id)}
+                              >
+                                <span>{subcategory.name.toUpperCase()}</span>
+                                <span className="text-xs">{expandedSubcategories[subcategory.id] ? '−' : '+'}</span>
                               </div>
-                            </td>
-                          </tr>
-                          
-                          {/* CATEGORY CONTENT - Show when expanded */}
-                          {isCategoryExpanded && category.subcategories && category.subcategories.map((subcategory) => {
-                            const subcategoryItemCount = countItems(subcategory.items);
-                            const isSubcategoryExpanded = expandedSubcategories[subcategory.id];
-                            
-                            return (
-                              <React.Fragment key={subcategory.id}>
-                                {/* SUBCATEGORY HEADER - RED like your image */}
-                                <tr>
-                                  <td 
-                                    colSpan="17" 
-                                    className="p-2 text-center font-medium text-white border border-neutral-600 cursor-pointer hover:opacity-80 transition-opacity"
-                                    style={{ backgroundColor: getSubcategoryColor() }}
-                                    onClick={() => toggleSubcategory(subcategory.id)}
-                                  >
-                                    <div className="flex items-center justify-center space-x-2">
-                                      <span>{isSubcategoryExpanded ? '▼' : '▶'}</span>
-                                      <span>{subcategory.name.toUpperCase()} ({subcategoryItemCount} items)</span>
+
+                              {/* INSTALLEDS LIST - Individual items like Console Lamp, Table Lamp */}
+                              {expandedSubcategories[subcategory.id] && subcategory.items && (
+                                <div className="ml-3 mt-1">
+                                  {subcategory.items.map((item, itemIndex) => (
+                                    <div key={item.id || itemIndex} className="px-2 py-1 text-xs text-gray-700 bg-white border border-gray-200 rounded-sm mb-1 shadow-sm">
+                                      {item.name || 'Unnamed Item'}
                                     </div>
-                                  </td>
-                                </tr>
-                                
-                                {/* SUBCATEGORY CONTENT - Show when expanded */}
-                                {isSubcategoryExpanded && (
-                                  <>
-                                    {/* INSTALLEDS */}
-                                    {subcategory.items && subcategory.items.map((item, itemIndex) => (
-                                      <tr key={item.id || itemIndex} className="hover:bg-neutral-700 transition-colors">
-                                        {/* INSTALLED NAME */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <input
-                                            type="text"
-                                            value={item.name || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none"
-                                            placeholder="Item name..."
-                                          />
-                                        </td>
-                                        
-                                        {/* VENDOR */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <input
-                                            type="text"
-                                            value={item.vendor || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none"
-                                            placeholder="Vendor..."
-                                          />
-                                        </td>
-                                        
-                                        {/* QUANTITY */}
-                                        <td className="p-2 border border-neutral-600 text-center">
-                                          <input
-                                            type="number"
-                                            value={item.quantity || 1}
-                                            className="w-full bg-transparent text-white border-none outline-none text-center"
-                                            min="1"
-                                          />
-                                        </td>
-                                        
-                                        {/* SIZE */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <input
-                                            type="text"
-                                            value={item.size || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none"
-                                            placeholder="Size..."
-                                          />
-                                        </td>
-                                        
-                                        {/* STATUS - Color-coded dropdown */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <select
-                                            value={item.status || 'TO BE SELECTED'}
-                                            className="w-full bg-neutral-700 text-white border-none outline-none p-1 rounded"
-                                            style={{ backgroundColor: getStatusColor(item.status) }}
-                                          >
-                                            {enhancedItemStatuses.map((status) => (
-                                              <option 
-                                                key={status.status} 
-                                                value={status.status}
-                                                style={{ backgroundColor: status.color }}
-                                              >
-                                                {status.status}
-                                              </option>
-                                            ))}
-                                          </select>
-                                        </td>
-                                        
-                                        {/* FINISH/COLOR */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <input
-                                            type="text"
-                                            value={item.finish_color || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none"
-                                            placeholder="Finish/Color..."
-                                          />
-                                        </td>
-                                        
-                                        {/* COST */}
-                                        <td className="p-2 border border-neutral-600 text-right">
-                                          <input
-                                            type="number"
-                                            value={item.cost || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none text-right"
-                                            placeholder="0.00"
-                                            step="0.01"
-                                          />
-                                        </td>
-                                        
-                                        {/* PRICE */}
-                                        <td className="p-2 border border-neutral-600 text-right">
-                                          <input
-                                            type="number"
-                                            value={item.price || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none text-right"
-                                            placeholder="0.00"
-                                            step="0.01"
-                                          />
-                                        </td>
-                                        
-                                        {/* LINK */}
-                                        <td className="p-2 border border-neutral-600">
-                                          {item.link ? (
-                                            <a 
-                                              href={item.link} 
-                                              target="_blank" 
-                                              rel="noopener noreferrer"
-                                              className="text-blue-400 hover:text-blue-300 underline text-sm"
-                                            >
-                                              View Link
-                                            </a>
-                                          ) : (
-                                            <input
-                                              type="url"
-                                              className="w-full bg-transparent text-white border-none outline-none text-sm"
-                                              placeholder="Product URL..."
-                                            />
-                                          )}
-                                        </td>
-                                        
-                                        {/* IMAGE */}
-                                        <td className="p-2 border border-neutral-600">
-                                          {item.image_url ? (
-                                            <img 
-                                              src={item.image_url} 
-                                              alt={item.name}
-                                              className="w-16 h-16 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
-                                              onClick={() => window.open(item.image_url, '_blank')}
-                                            />
-                                          ) : (
-                                            <button className="text-blue-400 hover:text-blue-300 text-sm">
-                                              + Image
-                                            </button>
-                                          )}
-                                        </td>
-                                        
-                                        {/* CARRIER - Color-coded dropdown */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <select
-                                            value={item.carrier || ''}
-                                            className="w-full bg-neutral-700 text-white border-none outline-none p-1 rounded text-sm"
-                                            style={{ backgroundColor: getCarrierColor(item.carrier) }}
-                                          >
-                                            <option value="">Select Carrier</option>
-                                            {carrierOptions.map((carrier) => (
-                                              <option 
-                                                key={carrier.name} 
-                                                value={carrier.name}
-                                                style={{ backgroundColor: carrier.color }}
-                                              >
-                                                {carrier.name}
-                                              </option>
-                                            ))}
-                                          </select>
-                                        </td>
-                                        
-                                        {/* TRACKING NUMBER */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <input
-                                            type="text"
-                                            value={item.tracking_number || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none text-sm"
-                                            placeholder="Tracking #..."
-                                          />
-                                        </td>
-                                        
-                                        {/* ORDER DATE */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <input
-                                            type="date"
-                                            value={item.order_date || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none text-sm"
-                                          />
-                                        </td>
-                                        
-                                        {/* DELIVERY DATE */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <input
-                                            type="date"
-                                            value={item.expected_delivery || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none text-sm"
-                                          />
-                                        </td>
-                                        
-                                        {/* INSTALL DATE */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <input
-                                            type="date"
-                                            value={item.install_date || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none text-sm"
-                                          />
-                                        </td>
-                                        
-                                        {/* NOTES */}
-                                        <td className="p-2 border border-neutral-600">
-                                          <textarea
-                                            value={item.notes || ''}
-                                            className="w-full bg-transparent text-white border-none outline-none text-sm resize-none"
-                                            placeholder="Notes..."
-                                            rows="1"
-                                          />
-                                        </td>
-                                        
-                                        {/* ACTIONS */}
-                                        <td className="p-2 border border-neutral-600 text-center">
-                                          <button className="text-red-400 hover:text-red-300 text-sm font-bold">
-                                            DELETE
-                                          </button>
-                                        </td>
-                                      </tr>
-                                    ))}
-                                    
-                                    {/* ADD INSTALLED BUTTON - At bottom of each subcategory */}
-                                    <tr>
-                                      <td colSpan="17" className="p-3 text-center border border-neutral-600">
-                                        <button
-                                          onClick={() => {
-                                            setSelectedSubCategoryId(subcategory.id);
-                                            setShowAddItem(true);
-                                          }}
-                                          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold transition-colors"
-                                        >
-                                          ➕ ADD INSTALLED (Test Scraping!)
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  </>
-                                )}
-                              </React.Fragment>
-                            );
-                          })}
-                        </React.Fragment>
-                      );
-                    })}
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
+                                  ))}
+                                  
+                                  {/* ADD INSTALLED BUTTON */}
+                                  <button
+                                    onClick={() => {
+                                      setSelectedSubCategoryId(subcategory.id);
+                                      setShowAddItem(true);
+                                    }}
+                                    className="w-full px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded-sm hover:bg-blue-100 transition-colors"
+                                  >
+                                    + Add Item
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-      
-      {/* ADD INSTALLED MODAL - Your sophisticated working modal with scraping */}
+
+      {/* RIGHT PANEL - ONE CONTINUOUS HORIZONTAL TABLE EXACTLY like your FFE RIGHT.png */}
+      <div className="flex-1 bg-white overflow-hidden flex flex-col">
+        
+        {/* TABLE HEADER */}
+        <div className="px-4 py-3 bg-gray-100 border-b border-gray-300 flex-shrink-0">
+          <h3 className="text-lg font-semibold text-gray-700">FF&E Spreadsheet</h3>
+        </div>
+
+        {/* HORIZONTAL SCROLLING TABLE - ONE CONTINUOUS TABLE */}
+        <div className="flex-1 overflow-auto">
+          <div style={{ minWidth: '2000px' }}>
+            
+            <table className="w-full border-collapse">
+              
+              {/* COLUMN GROUP HEADERS spanning across - EXACTLY like your image */}
+              <thead>
+                {/* Group headers spanning multiple columns */}
+                <tr>
+                  <th className="border border-gray-300 px-2 py-2 text-xs font-medium text-white text-center" 
+                      style={{ backgroundColor: '#8B7355' }} colSpan="8">
+                    ADDITIONAL INFO.
+                  </th>
+                  <th className="border border-gray-300 px-2 py-2 text-xs font-medium text-white text-center" 
+                      style={{ backgroundColor: '#9B8E9B' }} colSpan="7">
+                    SHIPPING INFO.
+                  </th>
+                </tr>
+                
+                {/* Individual column headers */}
+                <tr className="bg-gray-50">
+                  {/* ADDITIONAL INFO columns */}
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[200px]">INSTALLED NAME</th>
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[150px]">VENDOR/SKU</th>
+                  <th className="border border-gray-300 px-2 py-2 text-center text-xs font-medium text-gray-700 min-w-[60px]">QTY</th>
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[100px]">SIZE</th>
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[120px]">ORDER STATUS</th>
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[120px]">FINISH/Color</th>
+                  <th className="border border-gray-300 px-2 py-2 text-right text-xs font-medium text-gray-700 min-w-[100px]">Cost/Price</th>
+                  <th className="border border-gray-300 px-2 py-2 text-center text-xs font-medium text-gray-700 min-w-[80px]">Image</th>
+                  
+                  {/* SHIPPING INFO columns - continuing horizontally */}
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[100px]">CARRIER</th>
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[140px]">TRACKING #</th>
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[110px]">ORDER DATE</th>
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[120px]">DELIVERY DATE</th>
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[110px]">INSTALL DATE</th>
+                  <th className="border border-gray-300 px-2 py-2 text-left text-xs font-medium text-gray-700 min-w-[150px]">NOTES</th>
+                  <th className="border border-gray-300 px-2 py-2 text-center text-xs font-medium text-gray-700 min-w-[80px]">ACTIONS</th>
+                </tr>
+              </thead>
+              
+              <tbody>
+                {/* Data rows spanning all columns horizontally */}
+                {project.rooms.map((room) => 
+                  room.categories?.map((category) =>
+                    category.subcategories?.map((subcategory) =>
+                      subcategory.items?.map((item, itemIndex) => (
+                        <tr key={`${room.id}-${category.id}-${subcategory.id}-${itemIndex}`} 
+                            className="hover:bg-gray-50 transition-colors">
+                          
+                          {/* ADDITIONAL INFO columns */}
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <input 
+                              type="text" 
+                              value={item.name || ''} 
+                              className="w-full bg-transparent border-none outline-none text-gray-800"
+                              placeholder="Item name..."
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <input 
+                              type="text" 
+                              value={item.vendor || ''} 
+                              className="w-full bg-transparent border-none outline-none text-gray-800"
+                              placeholder="Vendor/SKU..."
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-center text-sm">
+                            <input 
+                              type="number" 
+                              value={item.quantity || 1} 
+                              className="w-full text-center bg-transparent border-none outline-none text-gray-800"
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <input 
+                              type="text" 
+                              value={item.size || ''} 
+                              className="w-full bg-transparent border-none outline-none text-gray-800"
+                              placeholder="Size..."
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <select 
+                              value={item.status || 'PICKED'} 
+                              className="w-full border-none outline-none rounded px-2 py-1 text-xs text-gray-800"
+                              style={{ 
+                                backgroundColor: item.status === 'PICKED' ? '#FEF3C7' : 
+                                                item.status === 'ORDERED' ? '#DBEAFE' :
+                                                item.status === 'DELIVERED TO JOB SITE' ? '#D1FAE5' : '#F3F4F6'
+                              }}
+                            >
+                              <option value="PICKED">PICKED</option>
+                              <option value="ORDERED">ORDERED</option>
+                              <option value="SHIPPED">SHIPPED</option>
+                              <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
+                            </select>
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <input 
+                              type="text" 
+                              value={item.finish_color || ''} 
+                              className="w-full bg-transparent border-none outline-none text-gray-800"
+                              placeholder="Finish/Color..."
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-right text-sm">
+                            <input 
+                              type="number" 
+                              value={item.cost || ''} 
+                              className="w-full text-right bg-transparent border-none outline-none text-gray-800"
+                              placeholder="0.00"
+                              step="0.01"
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-center">
+                            {item.image_url ? (
+                              <img 
+                                src={item.image_url} 
+                                alt={item.name}
+                                className="w-12 h-12 object-cover rounded cursor-pointer border border-gray-200"
+                                onClick={() => window.open(item.image_url, '_blank')}
+                              />
+                            ) : (
+                              <button className="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 border border-blue-200 rounded">
+                                + Image
+                              </button>
+                            )}
+                          </td>
+                          
+                          {/* SHIPPING INFO columns - continuing horizontally */}
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <select 
+                              value={item.carrier || ''} 
+                              className="w-full bg-transparent border-none outline-none text-xs text-gray-800"
+                            >
+                              <option value="">Select...</option>
+                              <option value="FedEx">FedEx</option>
+                              <option value="UPS">UPS</option>
+                              <option value="Brooks">Brooks</option>
+                              <option value="Zenith">Zenith</option>
+                              <option value="Sunbelt">Sunbelt</option>
+                            </select>
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <input 
+                              type="text" 
+                              value={item.tracking_number || ''} 
+                              className="w-full bg-transparent border-none outline-none text-gray-800"
+                              placeholder="Add Tracking #"
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <input 
+                              type="date" 
+                              value={item.order_date || ''} 
+                              className="w-full bg-transparent border-none outline-none text-xs text-gray-800"
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <input 
+                              type="date" 
+                              value={item.expected_delivery || ''} 
+                              className="w-full bg-transparent border-none outline-none text-xs text-gray-800"
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <input 
+                              type="date" 
+                              value={item.install_date || ''} 
+                              className="w-full bg-transparent border-none outline-none text-xs text-gray-800"
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-sm">
+                            <textarea 
+                              value={item.notes || ''} 
+                              className="w-full bg-transparent border-none outline-none text-xs resize-none text-gray-800"
+                              placeholder="Notes..."
+                              rows="1"
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-2 text-center">
+                            <button className="text-red-600 hover:text-red-800 text-xs px-2 py-1 border border-red-200 rounded">
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )
+                  )
+                )}
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+
+      {/* ADD INSTALLED MODAL */}
       {showAddItem && (
         <AddItemModal
           onClose={() => setShowAddItem(false)}
           onSubmit={handleAddItem}
-          itemStatuses={enhancedItemStatuses}
+          itemStatuses={itemStatuses}
           vendorTypes={vendorTypes}
           loading={false}
         />
@@ -565,4 +407,4 @@ const ExactFFESpreadsheet = ({
   );
 };
 
-export default ExactFFESpreadsheet;
+export default CorrectFFESpreadsheet;
