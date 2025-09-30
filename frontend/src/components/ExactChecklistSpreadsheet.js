@@ -1465,4 +1465,4 @@ const ExactChecklistSpreadsheet = ({
   );
 };
 
-export default SimpleChecklistSpreadsheet;
+export default ExactChecklistSpreadsheet;
