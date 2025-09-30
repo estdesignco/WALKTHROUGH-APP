@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import AddItemModal from './AddItemModal';
 import CanvaIntegrationModal from './CanvaIntegrationModal';
 
-const SimpleChecklistSpreadsheet = ({ 
+const ExactChecklistSpreadsheet = ({ 
   project, 
   roomColors, 
   categoryColors, 
