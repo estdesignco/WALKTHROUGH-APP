@@ -92,9 +92,61 @@ const FurnitureSearchPage = () => {
     }
   };
 
-  const handleAddToProject = (item) => {
-    setSelectedItem(item);
-    setShowAddToProjectModal(true);
+  const [projects, setProjects] = useState([]);
+  const [selectedProjectForAdd, setSelectedProjectForAdd] = useState('');
+  const [selectedRoomForAdd, setSelectedRoomForAdd] = useState('');
+
+  // Load projects
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  const loadProjects = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/projects`);
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data);
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
+    }
+  };
+
+  const handleAddToProject = async (item) => {
+    // Show simple prompt for project and room
+    const projectName = prompt('Enter project name to add this item to:');
+    if (!projectName) return;
+    
+    const project = projects.find(p => p.name.toLowerCase().includes(projectName.toLowerCase()));
+    if (!project) {
+      alert('Project not found. Please enter an existing project name.');
+      return;
+    }
+    
+    const roomName = prompt('Enter room name (e.g., Living Room, Bedroom):');
+    if (!roomName) return;
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/furniture-catalog/add-to-project`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_id: item.id,
+          project_id: project.id,
+          room_name: roomName
+        })
+      });
+      
+      if (response.ok) {
+        alert(`✅ Added "${item.name}" to ${project.name} > ${roomName} Checklist!`);
+      } else {
+        alert('Failed to add item to project');
+      }
+    } catch (error) {
+      console.error('Error adding to project:', error);
+      alert('Error adding item to project');
+    }
   };
 
   return (
