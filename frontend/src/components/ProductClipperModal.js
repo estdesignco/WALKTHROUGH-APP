@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
-const ProductClipperModal = ({ isOpen, onClose, scrapedData = {}, projects = [] }) => {
+const ProductClipperModal = ({ isOpen, onClose, scrapedData = {}, projects = [], mode = 'project' }) => {
+  // mode can be 'project' (add to specific project) or 'catalog' (add to furniture catalog)
   const [formData, setFormData] = useState({
     productTitle: scrapedData.name || '',
     cost: scrapedData.cost || scrapedData.price || '',
