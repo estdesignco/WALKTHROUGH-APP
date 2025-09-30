@@ -3725,6 +3725,14 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             pass
                         
                         # Positive scoring - Enhanced
+                        # Bonus for being in main/gallery containers (PRIORITIZE GALLERY IMAGES)
+                        try:
+                            parent_class = await img.evaluate('el => el.parentElement?.className || ""')
+                            if any(keyword in parent_class.lower() for keyword in ['gallery', 'main-image', 'hero', 'primary', 'featured', 'productimage']):
+                                score += 50  # HUGE bonus for gallery images
+                        except:
+                            pass
+                        
                         if any(keyword in alt.lower() for keyword in ['product', 'main', 'hero', 'primary', 'detail']):
                             score += 12
                         if any(keyword in image_url.lower() for keyword in ['product', 'main', 'hero', 'large', 'detail', '1920', '1080', 'full']):
