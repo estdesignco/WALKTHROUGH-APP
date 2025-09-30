@@ -3606,11 +3606,17 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # SITE-SPECIFIC OPTIMIZATIONS
             if 'fourhands.com' in domain:
                 image_strategies.extend([
+                    'picture img:first-child',  # Modern picture element
+                    '[class*="ProductImage"] img:first-child',
+                    '[class*="productImage"] img:first-child',
+                    '[class*="product-image"] img:first-child',
                     '.product-media img:first-child',
                     '.product-gallery img:first-child',
                     '.ProductGallery img:first-child',
                     'img[src*="/products/"]',
-                    '.hero-image img'
+                    'img[src*="cdn.shopify.com/s/files/"]',  # Shopify CDN
+                    '.hero-image img',
+                    'main img:first-of-type'  # First image in main content
                 ])
             elif 'wayfair.com' in domain:
                 image_strategies.extend([
