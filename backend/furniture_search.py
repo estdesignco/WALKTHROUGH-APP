@@ -212,6 +212,113 @@ async def get_furniture_vendors():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/furniture-catalog/add-to-project")
+async def add_catalog_item_to_project(data: dict):
+    """Add furniture from catalog to project Checklist + Canva board"""
+    try:
+        item_id = data.get('item_id')
+        project_id = data.get('project_id')
+        room_name = data.get('room_name', 'Living Room')
+        
+        # Get the furniture item from catalog
+        furniture = await db.furniture_catalog.find_one({"id": item_id})
+        if not furniture:
+            raise HTTPException(status_code=404, detail="Furniture not found in catalog")
+        
+        # Get the project
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Find or create room in Checklist
+        room = None
+        for r in project.get('rooms', []):
+            if r['name'].lower() == room_name.lower() and r.get('sheet_type') == 'checklist':
+                room = r
+                break
+        
+        if not room:
+            room = {
+                "id": str(uuid.uuid4()),
+                "name": room_name,
+                "sheet_type": "checklist",
+                "categories": []
+            }
+            await db.projects.update_one(
+                {"id": project_id},
+                {"$push": {"rooms": room}}
+            )
+        
+        # Find or create category based on furniture category
+        category_name = furniture.get('category', 'Furniture')
+        category = None
+        for cat in room.get('categories', []):
+            if cat['name'].lower() == category_name.lower():
+                category = cat
+                break
+        
+        if not category:
+            category = {
+                "id": str(uuid.uuid4()),
+                "name": category_name,
+                "subcategories": [{
+                    "id": str(uuid.uuid4()),
+                    "name": "NEEDED",
+                    "items": []
+                }]
+            }
+            await db.projects.update_one(
+                {"id": project_id, "rooms.id": room['id']},
+                {"$push": {"rooms.$.categories": category}}
+            )
+        
+        # Create item for project
+        new_item = {
+            "id": str(uuid.uuid4()),
+            "name": furniture.get('name', ''),
+            "vendor": furniture.get('vendor', ''),
+            "cost": furniture.get('cost', 0),
+            "sku": furniture.get('sku', ''),
+            "size": furniture.get('dimensions', ''),
+            "finish_color": furniture.get('finish_color', ''),
+            "image_url": furniture.get('image_url', ''),
+            "link": furniture.get('product_url', ''),
+            "remarks": furniture.get('notes', ''),
+            "status": "PICKED",
+            "quantity": 1
+        }
+        
+        # Add to project
+        await db.projects.update_one(
+            {"id": project_id, "rooms.id": room['id']},
+            {"$push": {"rooms.$[room].categories.$[cat].subcategories.0.items": new_item}},
+            array_filters=[
+                {"room.id": room['id']},
+                {"cat.name": category_name}
+            ]
+        )
+        
+        # Increment times_used counter
+        await db.furniture_catalog.update_one(
+            {"id": item_id},
+            {"$inc": {"times_used": 1}}
+        )
+        
+        # TODO: Add to Canva board via API
+        # Will implement Canva API integration separately
+        
+        return {
+            "success": True,
+            "message": "Item added to Checklist",
+            "item_id": new_item['id'],
+            "canva_status": "pending"  # Will be "added" once Canva API is integrated
+        }
+        
+    except Exception as e:
+        print(f"Error adding to project: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/furniture-catalog/stats")
 async def get_catalog_stats():
     """Get statistics about furniture catalog"""
