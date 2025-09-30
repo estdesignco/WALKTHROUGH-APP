@@ -3725,22 +3725,35 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             'googletagmanager', 'facebook.com/tr', 'doubleclick',
                             'amazon-adsystem', 'googlesyndication', 'googleadservices',
                             '1x1', 'transparent.gif', 'blank.gif', 'wordmark', 'brand-logo',
-                            'header-logo', 'footer-logo', 'site-logo', 'company-logo'
+                            'header-logo', 'footer-logo', 'site-logo', 'company-logo',
+                            'swatch', 'finish', 'color-option', 'material-option', 'thumbnail',
+                            'nav', 'menu', 'button', 'badge', 'overlay'
                         ]
                         
+                        # Strong penalties for excluded patterns
                         if any(keyword in image_url.lower() for keyword in exclusion_keywords):
-                            score -= 50  # Stronger penalty
-                        if any(keyword in alt.lower() for keyword in ['logo', 'brand', 'icon', 'advertisement', 'wordmark']):
-                            score -= 50  # Stronger penalty
+                            score -= 100  # Very strong penalty
+                        if any(keyword in alt.lower() for keyword in ['logo', 'brand', 'icon', 'advertisement', 'wordmark', 'swatch', 'finish', 'option']):
+                            score -= 100  # Very strong penalty
                         
-                        # Check if image is too small (likely a logo/icon)
+                        # Check if image is too small (likely a logo/icon/swatch)
                         try:
                             width = await img.get_attribute('width')
                             height = await img.get_attribute('height')
                             if width and height:
                                 w, h = int(width), int(height)
-                                if w < 150 or h < 150:  # Too small to be product image
-                                    score -= 30
+                                if w < 200 or h < 200:  # Too small to be main product image
+                                    score -= 50
+                                elif w < 100 or h < 100:  # Definitely too small
+                                    score -= 100
+                        except:
+                            pass
+                        
+                        # Check CSS classes for finish/swatch indicators
+                        try:
+                            css_class = await img.get_attribute('class') or ''
+                            if any(keyword in css_class.lower() for keyword in ['swatch', 'finish', 'option', 'variant', 'thumb', 'nav']):
+                                score -= 100
                         except:
                             pass
                         
