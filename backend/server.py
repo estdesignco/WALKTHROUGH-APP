@@ -3665,10 +3665,10 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         '[data-testid*="image"] img',
                     ]
             
-            best_image = None
-            best_score = 0
-            
-            for strategy in image_strategies:
+                best_image = None
+                best_score = 0
+                
+                for strategy in image_strategies:
                 try:
                     images = await page.query_selector_all(strategy)
                     for img in images[:5]:  # Check top 5 images per strategy
