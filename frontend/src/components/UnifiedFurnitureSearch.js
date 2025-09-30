@@ -351,10 +351,20 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
               CLEAR
             </button>
             <button
-              onClick={testWebhook}
-              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+              onClick={() => startMassScraping(2)}
+              disabled={loading}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded font-medium"
+              title="Scrape 2 vendors for testing"
             >
-              TEST WEBHOOK
+              {loading ? 'SCRAPING...' : '🏭 TEST SCRAPE (2)'}
+            </button>
+            <button
+              onClick={() => startMassScraping()}
+              disabled={loading}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white rounded font-medium"
+              title="Scrape ALL vendor catalogs"
+            >
+              {loading ? 'SCRAPING...' : '🚀 SCRAPE ALL'}
             </button>
           </div>
         </div>
