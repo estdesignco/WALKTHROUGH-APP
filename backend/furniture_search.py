@@ -1,0 +1,185 @@
+# FURNITURE SEARCH DATABASE - Central catalog of all clipped furniture
+from fastapi import APIRouter, HTTPException
+from motor.motor_asyncio import AsyncIOMotorClient
+import os
+from datetime import datetime
+import uuid
+
+router = APIRouter()
+
+# MongoDB connection
+MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+client = AsyncIOMotorClient(MONGO_URL)
+db = client.get_database('furniture_tracker')
+
+# FURNITURE CATALOG COLLECTION - Central database of all furniture
+# Each document is a furniture item clipped from vendor sites
+
+@router.post("/furniture-catalog/add")
+async def add_to_furniture_catalog(data: dict):
+    """Add clipped furniture to central catalog"""
+    try:
+        furniture_item = {
+            "id": str(uuid.uuid4()),
+            "name": data.get('name'),
+            "vendor": data.get('vendor'),
+            "manufacturer": data.get('manufacturer'),
+            "category": data.get('category'),  # Chairs, Tables, Lighting, etc.
+            "subcategory": data.get('subcategory', ''),
+            "cost": data.get('cost', 0),
+            "msrp": data.get('msrp', 0),
+            "sku": data.get('sku', ''),
+            "dimensions": data.get('dimensions', ''),
+            "finish_color": data.get('finish_color', ''),
+            "materials": data.get('materials', ''),
+            "description": data.get('description', ''),
+            "image_url": data.get('image_url', ''),
+            "images": data.get('images', []),  # Multiple images
+            "product_url": data.get('product_url', ''),
+            "tags": data.get('tags', []),
+            "style": data.get('style', []),  # Modern, Traditional, etc.
+            "room_type": data.get('room_type', []),  # Living Room, Bedroom, etc.
+            "in_stock": data.get('in_stock', True),
+            "lead_time": data.get('lead_time', ''),
+            "notes": data.get('notes', ''),
+            "clipped_date": datetime.utcnow(),
+            "updated_date": datetime.utcnow(),
+            "times_used": 0  # Track how many times used in projects
+        }
+        
+        # Check if already exists (by SKU or product URL)
+        existing = None
+        if furniture_item['sku']:
+            existing = await db.furniture_catalog.find_one({"sku": furniture_item['sku']})
+        if not existing and furniture_item['product_url']:
+            existing = await db.furniture_catalog.find_one({"product_url": furniture_item['product_url']})
+        
+        if existing:
+            # Update existing item
+            await db.furniture_catalog.update_one(
+                {"id": existing['id']},
+                {"$set": {**furniture_item, "id": existing['id'], "updated_date": datetime.utcnow()}}
+            )
+            return {"success": True, "message": "Furniture updated in catalog", "item_id": existing['id']}
+        else:
+            # Add new item
+            await db.furniture_catalog.insert_one(furniture_item)
+            return {"success": True, "message": "Furniture added to catalog", "item_id": furniture_item['id']}
+        
+    except Exception as e:
+        print(f"Error adding to furniture catalog: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/furniture-catalog/search")
+async def search_furniture_catalog(query: str = "", category: str = "", vendor: str = "", 
+                                   min_price: float = 0, max_price: float = 999999,
+                                   style: str = "", room_type: str = "", limit: int = 100):
+    """Search furniture catalog across ALL vendors"""
+    try:
+        # Build search filter
+        search_filter = {}
+        
+        # Text search on name, description, tags
+        if query:
+            search_filter["$or"] = [
+                {"name": {"$regex": query, "$options": "i"}},
+                {"description": {"$regex": query, "$options": "i"}},
+                {"tags": {"$regex": query, "$options": "i"}},
+                {"materials": {"$regex": query, "$options": "i"}}
+            ]
+        
+        # Category filter
+        if category:
+            search_filter["category"] = {"$regex": category, "$options": "i"}
+        
+        # Vendor filter
+        if vendor:
+            search_filter["vendor"] = {"$regex": vendor, "$options": "i"}
+        
+        # Price range
+        search_filter["cost"] = {"$gte": min_price, "$lte": max_price}
+        
+        # Style filter
+        if style:
+            search_filter["style"] = {"$regex": style, "$options": "i"}
+        
+        # Room type filter
+        if room_type:
+            search_filter["room_type"] = {"$regex": room_type, "$options": "i"}
+        
+        # Execute search
+        cursor = db.furniture_catalog.find(search_filter).sort("name", 1).limit(limit)
+        results = await cursor.to_list(length=limit)
+        
+        # Remove MongoDB _id from results
+        for item in results:
+            item.pop('_id', None)
+        
+        return {
+            "success": True,
+            "count": len(results),
+            "results": results,
+            "query": {
+                "search": query,
+                "category": category,
+                "vendor": vendor,
+                "price_range": f"${min_price}-${max_price}"
+            }
+        }
+        
+    except Exception as e:
+        print(f"Error searching furniture catalog: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/furniture-catalog/categories")
+async def get_furniture_categories():
+    """Get all unique categories in catalog"""
+    try:
+        categories = await db.furniture_catalog.distinct("category")
+        return {"success": True, "categories": sorted([c for c in categories if c])}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/furniture-catalog/vendors")
+async def get_furniture_vendors():
+    """Get all unique vendors in catalog"""
+    try:
+        vendors = await db.furniture_catalog.distinct("vendor")
+        return {"success": True, "vendors": sorted([v for v in vendors if v])}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/furniture-catalog/stats")
+async def get_catalog_stats():
+    """Get statistics about furniture catalog"""
+    try:
+        total_items = await db.furniture_catalog.count_documents({})
+        
+        # Count by category
+        category_counts = {}
+        categories = await db.furniture_catalog.distinct("category")
+        for cat in categories:
+            if cat:
+                count = await db.furniture_catalog.count_documents({"category": cat})
+                category_counts[cat] = count
+        
+        # Count by vendor
+        vendor_counts = {}
+        vendors = await db.furniture_catalog.distinct("vendor")
+        for vendor in vendors:
+            if vendor:
+                count = await db.furniture_catalog.count_documents({"vendor": vendor})
+                vendor_counts[vendor] = count
+        
+        return {
+            "success": True,
+            "total_items": total_items,
+            "categories": category_counts,
+            "vendors": vendor_counts
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
