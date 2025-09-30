@@ -18,6 +18,52 @@ MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(MONGO_URL)
 db = client.get_database('furniture_tracker')
 
+# TRADE FURNITURE VENDOR DATABASE - YOUR ACTUAL VENDORS
+TRADE_VENDORS = [
+    {'name': 'Four Hands', 'url': 'fourhands.com', 'category': 'Furniture'},
+    {'name': 'Regina Andrew', 'url': 'reginaandrew.com', 'category': 'Lighting & Decor'},
+    {'name': 'Global Views', 'url': 'globalviews.com', 'category': 'Accessories & Decor'},
+    {'name': 'Rowe Furniture', 'url': 'rowefurniture.com', 'category': 'Upholstery'},
+    {'name': 'Bernhardt', 'url': 'bernhardt.com', 'category': 'Case Goods & Upholstery'},
+    {'name': 'Bello Reps', 'url': 'belloreps.com', 'category': 'Rugs'},
+    {'name': 'Visual Comfort', 'url': 'visualcomfort.com', 'category': 'Lighting'},
+    {'name': 'Hudson Valley Lighting', 'url': 'hudsonvalleylighting.com', 'category': 'Lighting'},
+    {'name': 'Arteriors', 'url': 'arteriors.com', 'category': 'Lighting & Accessories'},
+    {'name': 'Riad', 'url': 'riad.com', 'category': 'Textiles'},
+    {'name': 'Florescence', 'url': 'florescence.com', 'category': 'Lighting'},
+    {'name': 'Crystal Corp', 'url': 'crystalcorp.com', 'category': 'Lighting'},
+    {'name': 'Uttermost', 'url': 'uttermost.com', 'category': 'Accessories & Mirrors'},
+    {'name': 'Currey & Company', 'url': 'curreyco.com', 'category': 'Lighting & Furniture'},
+    {'name': 'Gabby Home', 'url': 'gabbyhome.com', 'category': 'Furniture & Decor'},
+    {'name': 'Worlds Away', 'url': 'worldsaway.com', 'category': 'Furniture & Accessories'},
+    {'name': 'Surya', 'url': 'surya.com', 'category': 'Rugs & Textiles'}
+]
+
+# FURNITURE CATEGORIES FOR QUICK SEARCH BUTTONS
+FURNITURE_CATEGORIES = [
+    'Seating',
+    'Tables', 
+    'Case Goods',
+    'Lighting',
+    'Textiles',
+    'Rugs',
+    'Accessories',
+    'Mirrors',
+    'Art',
+    'Console Tables',
+    'Dining Tables',
+    'Coffee Tables',
+    'Side Tables',
+    'Sofas',
+    'Chairs',
+    'Bar Stools',
+    'Ottomans',
+    'Dressers',
+    'Nightstands',
+    'Bookcases',
+    'Desks'
+]
+
 # Pydantic models for request validation
 class HouzzWebhookData(BaseModel):
     productTitle: Optional[str] = None
@@ -347,20 +393,59 @@ async def search_furniture_catalog(
 
 @router.get("/furniture-catalog/categories")
 async def get_furniture_categories():
-    """Get all unique categories in catalog"""
+    """Get all unique categories in catalog + standard furniture categories"""
     try:
-        categories = await db.furniture_catalog.distinct("category")
-        return {"success": True, "categories": sorted([c for c in categories if c])}
+        # Get categories from database
+        db_categories = await db.furniture_catalog.distinct("category")
+        
+        # Combine with standard furniture categories
+        all_categories = list(set(FURNITURE_CATEGORIES + [c for c in db_categories if c]))
+        
+        return {"success": True, "categories": sorted(all_categories)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/furniture-catalog/quick-categories")
+async def get_quick_search_categories():
+    """Get quick search categories for the buttons that weren't working"""
+    try:
+        return {
+            "success": True, 
+            "categories": FURNITURE_CATEGORIES,
+            "description": "Quick search categories for instant filtering"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/furniture-catalog/trade-vendors")
+async def get_trade_vendors():
+    """Get your actual trade furniture vendors"""
+    try:
+        return {
+            "success": True, 
+            "vendors": TRADE_VENDORS,
+            "description": "Your actual trade furniture vendor websites"
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/furniture-catalog/vendors")
 async def get_furniture_vendors():
-    """Get all unique vendors in catalog"""
+    """Get all unique vendors in catalog + trade vendors"""
     try:
-        vendors = await db.furniture_catalog.distinct("vendor")
-        return {"success": True, "vendors": sorted([v for v in vendors if v])}
+        # Get vendors from database
+        db_vendors = await db.furniture_catalog.distinct("vendor")
+        
+        # Get trade vendor names
+        trade_vendor_names = [v['name'] for v in TRADE_VENDORS]
+        
+        # Combine
+        all_vendors = list(set(trade_vendor_names + [v for v in db_vendors if v]))
+        
+        return {"success": True, "vendors": sorted(all_vendors)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -396,7 +481,7 @@ async def get_catalog_stats():
                 source_counts[source] = count
         
         # Recent additions (last 7 days)
-        seven_days_ago = datetime.utcnow().replace(day=datetime.utcnow().day-7)
+        seven_days_ago = datetime.utcnow().replace(day=max(1, datetime.utcnow().day-7))
         recent_count = await db.furniture_catalog.count_documents(
             {"clipped_date": {"$gte": seven_days_ago}}
         )
@@ -408,6 +493,8 @@ async def get_catalog_stats():
             "vendors": vendor_counts,
             "sources": source_counts,
             "recent_additions": recent_count,
+            "trade_vendors_configured": len(TRADE_VENDORS),
+            "quick_categories_available": len(FURNITURE_CATEGORIES),
             "last_updated": datetime.utcnow().isoformat()
         }
     except Exception as e:
@@ -585,7 +672,7 @@ async def webhook_status():
     """Get webhook system status and recent activity"""
     try:
         # Get recent webhook activity (last 24 hours)
-        yesterday = datetime.utcnow().replace(day=datetime.utcnow().day-1)
+        yesterday = datetime.utcnow().replace(day=max(1, datetime.utcnow().day-1))
         recent_items = await db.furniture_catalog.count_documents(
             {"clipped_date": {"$gte": yesterday}}
         )
@@ -600,6 +687,7 @@ async def webhook_status():
             "recent_24h": recent_items,
             "total_houzz_items": total_houzz,
             "total_extension_items": total_extension,
+            "trade_vendors_configured": len(TRADE_VENDORS),
             "endpoints": {
                 "houzz_webhook": "/api/furniture/houzz-webhook",
                 "extension_webhook": "/api/furniture/browser-extension-webhook",
