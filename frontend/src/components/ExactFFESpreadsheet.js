@@ -609,4 +609,4 @@ const FFEItemRow = ({
   );
 };
 
-export default FFESpreadsheet;
+export default ExactFFESpreadsheet;
