@@ -3790,13 +3790,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             best_image = image_url
                             best_score = score
                             print(f"🏆 NEW BEST IMAGE (score: {score}): {image_url[:60]}...")
-                            
-                except:
-                    continue
-            
-            if best_image:
-                result['image_url'] = best_image
-                print(f"✅ IMAGE FOUND: {best_image[:80]}...")
+                    except:
+                        continue
+                
+                if best_image:
+                    result['image_url'] = best_image
+                    print(f"✅ IMAGE FOUND: {best_image[:80]}...")
             else:
                 # FALLBACK: Try to find ANY reasonable image
                 print("🔄 FALLBACK IMAGE SEARCH...")
