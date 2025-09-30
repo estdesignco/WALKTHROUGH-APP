@@ -3568,8 +3568,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                     # Validate reasonable price range for furniture
                                     if 10 <= price_val <= 100000:
                                         result['cost'] = price_val
-                                        result['price'] = f"${price_val:.2f}"
-                                        print(f"✅ PRICE EXTRACTED: {result['price']}")
+                                        result['price'] = price_val  # Store as float, not string
+                                        print(f"✅ PRICE EXTRACTED: ${price_val:.2f}")
                                         break
                                 except:
                                     continue
