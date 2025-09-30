@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AddItemModal from './AddItemModal';
 import AddSubCategoryModal from './AddSubCategoryModal';
 
-const FFESpreadsheet = ({ 
+const ExactFFESpreadsheet = ({ 
   project, 
   roomColors, 
   categoryColors, 
