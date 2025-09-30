@@ -4814,10 +4814,10 @@ async def scrape_canva_pdf(data: dict):
             }
         }
 
-# WEB SCRAPING ENDPOINTS
-@api_router.post("/scrape-product")
-async def scrape_product_endpoint(scrape_data: dict):
-    """Scrape product information from a given URL"""
+# WEB SCRAPING ENDPOINTS - DUPLICATE REMOVED (using advanced endpoint above)
+# @api_router.post("/scrape-product")
+# async def scrape_product_endpoint(scrape_data: dict):
+#     """Scrape product information from a given URL - OLD VERSION"""
     try:
         product_url = scrape_data.get('url', '').strip()
         
