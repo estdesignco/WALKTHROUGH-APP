@@ -1193,21 +1193,30 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
-                                                          {/* LINK */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            {item.link ? (
-                                                              <a 
-                                                                href={item.link} 
-                                                                target="_blank" 
-                                                                rel="noopener noreferrer"
-                                                                className="text-blue-400 hover:text-blue-300 text-xs underline"
-                                                                title="View Product Link"
+                                                          {/* LINK WITH SCRAPE BUTTON */}
+                                                          <td className="border border-gray-400 px-1 py-1 text-white w-32">
+                                                            <div className="flex flex-col gap-1">
+                                                              <input 
+                                                                type="text" 
+                                                                value={item.link || item.link_url || ''}
+                                                                placeholder="Product URL"
+                                                                className="w-full bg-transparent text-blue-400 text-xs outline-none border border-gray-600 rounded px-1"
+                                                                onChange={(e) => {
+                                                                  // Update item link immediately for scraping
+                                                                  item.link = e.target.value;
+                                                                  item.link_url = e.target.value;
+                                                                }}
+                                                                onBlur={(e) => console.log('Link updated:', e.target.value)}
+                                                              />
+                                                              <button
+                                                                onClick={() => handleScrapeProduct(item.link || item.link_url, item.id)}
+                                                                className="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded"
+                                                                disabled={!item.link && !item.link_url}
+                                                                title="Scrape product information from URL"
                                                               >
-                                                                🔗 LINK
-                                                              </a>
-                                                            ) : (
-                                                              <span className="text-gray-500 text-xs">No Link</span>
-                                                            )}
+                                                                SCRAPE
+                                                              </button>
+                                                            </div>
                                                           </td>
                                                           
                                                           {/* ACTIONS - DELETE INSTALLED */}
