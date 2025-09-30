@@ -472,4 +472,4 @@ const ExactFFESpreadsheet = ({
   );
 };
 
-export default ActualFFESpreadsheet;
+export default ExactFFESpreadsheet;
