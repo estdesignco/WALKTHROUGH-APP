@@ -4976,6 +4976,55 @@ app.include_router(api_router)
 app.include_router(furniture_router)
 app.include_router(furniture_search_router)
 
+# HOUZZ CLIPPER WEBHOOK - Intercepts data on its way to Houzz
+@app.post("/api/houzz-clipper-webhook")
+async def houzz_clipper_intercept(data: dict):
+    """Receives data from Houzz Pro clipper and saves to our catalog"""
+    try:
+        print("\n" + "="*60)
+        print("🏠 HOUZZ CLIPPER DATA INTERCEPTED!")
+        print("="*60)
+        print(f"Product: {data.get('product_title', data.get('name'))}")
+        print(f"Vendor: {data.get('vendor_subcontractor', data.get('vendor'))}")
+        print(f"Cost: {data.get('unit_cost')}")
+        print("="*60 + "\n")
+        
+        # Save to furniture catalog
+        furniture_item = {
+            "id": str(uuid.uuid4()),
+            "name": data.get('product_title') or data.get('name', ''),
+            "vendor": data.get('vendor_subcontractor') or data.get('vendor', ''),
+            "manufacturer": data.get('manufacturer', ''),
+            "category": data.get('category', ''),
+            "cost": float(data.get('unit_cost', 0)) if data.get('unit_cost') else 0,
+            "msrp": float(data.get('msrp', 0)) if data.get('msrp') else 0,
+            "sku": data.get('sku', ''),
+            "dimensions": data.get('dimensions', ''),
+            "finish_color": data.get('finish_color', ''),
+            "materials": data.get('materials', ''),
+            "description": data.get('client_description', ''),
+            "image_url": data.get('image_1', ''),
+            "images": [data.get(f'image_{i}') for i in range(1, 6) if data.get(f'image_{i}')],
+            "product_url": data.get('product_url', ''),
+            "notes": data.get('description_for_vendor', ''),
+            "clipped_date": datetime.utcnow(),
+            "updated_date": datetime.utcnow(),
+            "times_used": 0
+        }
+        
+        # Save to catalog
+        await db.furniture_catalog.insert_one(furniture_item)
+        
+        print(f"✅ Saved to furniture catalog: {furniture_item['name']}")
+        
+        # Return success so Houzz clipper continues
+        return {"success": True, "message": "Data saved to catalog", "continue_to_houzz": True}
+        
+    except Exception as e:
+        print(f"⚠️ Error saving Houzz data: {e}")
+        # Don't fail - let Houzz clipper continue
+        return {"success": False, "error": str(e), "continue_to_houzz": True}
+
 # Advanced Integration Endpoints
 @api_router.post("/integrations/walkthrough/complete")
 async def complete_walkthrough(data: dict):
