@@ -34,12 +34,28 @@ class HouzzProDebugger:
             
             playwright = await async_playwright().start()
             
-            # Launch browser in visible mode for debugging
-            browser = await playwright.chromium.launch(
-                headless=False,  # Visible browser for debugging
-                slow_mo=500,     # Slow down for visibility
-                args=['--no-sandbox', '--disable-dev-shm-usage']
-            )
+            # Launch browser (headless for server environment)
+            executable_paths = [
+                '/pw-browsers/chromium-1187/chrome-linux/chrome',
+                '/pw-browsers/chromium-1091/chrome-linux/chrome',
+                None
+            ]
+            
+            browser = None
+            for executable_path in executable_paths:
+                try:
+                    browser = await playwright.chromium.launch(
+                        headless=True,  # Headless for server
+                        executable_path=executable_path,
+                        args=['--no-sandbox', '--disable-dev-shm-usage']
+                    )
+                    print(f"✅ Browser launched with: {executable_path or 'auto-detect'}")
+                    break
+                except Exception as e:
+                    continue
+            
+            if not browser:
+                raise Exception("Could not launch browser")
             
             page = await browser.new_page(
                 viewport={'width': 1920, 'height': 1080}
