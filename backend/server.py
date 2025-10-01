@@ -4231,6 +4231,166 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         print(f"❌ Auto-clip to Houzz Pro failed: {e}")
         raise e
 
+@api_router.post("/import-canva-board")
+async def import_canva_board(data: dict):
+    """
+    Import products from a Canva board
+    Extracts all product links from a Canva board and bulk adds them to checklist
+    """
+    canva_board_url = data.get('board_url', '')
+    project_id = data.get('project_id', '')
+    room_name = data.get('room_name', '')
+    auto_clip_to_houzz = data.get('auto_clip_to_houzz', False)
+    
+    if not canva_board_url:
+        raise HTTPException(status_code=400, detail="Canva board URL is required")
+    
+    try:
+        print(f"🎨 IMPORTING FROM CANVA BOARD: {canva_board_url}")
+        
+        # Extract links from Canva board
+        extracted_links = await extract_links_from_canva_board(canva_board_url)
+        
+        if not extracted_links:
+            return {"success": False, "message": "No product links found on Canva board"}
+        
+        print(f"🔗 Found {len(extracted_links)} product links on Canva board")
+        
+        # Process each link: scrape + optionally clip to Houzz
+        results = []
+        successful_imports = 0
+        
+        for i, link in enumerate(extracted_links):
+            try:
+                print(f"📦 Processing product {i+1}/{len(extracted_links)}: {link[:50]}...")
+                
+                # Scrape product info
+                product_info = await scrape_product_with_playwright(link)
+                
+                # Auto-clip to Houzz Pro if requested
+                if auto_clip_to_houzz:
+                    try:
+                        clip_result = await auto_clip_to_houzz_pro(link, product_info)
+                        product_info["houzz_clip_result"] = clip_result
+                    except Exception as clip_error:
+                        product_info["houzz_clip_error"] = str(clip_error)
+                
+                # Add to checklist (this would integrate with your existing checklist API)
+                checklist_item = {
+                    "product_url": link,
+                    "name": product_info.get('name', 'Imported Product'),
+                    "vendor": product_info.get('vendor', 'Unknown'),
+                    "cost": product_info.get('cost', 0),
+                    "image_url": product_info.get('image_url', ''),
+                    "imported_from": "canva_board",
+                    "room_name": room_name,
+                    "project_id": project_id
+                }
+                
+                results.append(checklist_item)
+                successful_imports += 1
+                
+                # Small delay to avoid overwhelming servers
+                await asyncio.sleep(2)
+                
+            except Exception as e:
+                print(f"❌ Failed to process {link}: {e}")
+                results.append({"error": str(e), "url": link})
+        
+        return {
+            "success": True,
+            "message": f"Successfully imported {successful_imports}/{len(extracted_links)} products",
+            "results": results,
+            "total_found": len(extracted_links),
+            "successful_imports": successful_imports
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to import from Canva board: {str(e)}")
+
+async def extract_links_from_canva_board(board_url: str) -> list:
+    """
+    Extract product links from a Canva board
+    This would need to be customized based on how Canva boards expose their content
+    """
+    try:
+        print(f"🎨 EXTRACTING LINKS FROM CANVA BOARD")
+        
+        # Import Playwright for scraping
+        from playwright.async_api import async_playwright
+        
+        playwright = await async_playwright().start()
+        
+        # Launch browser
+        executable_paths = [
+            '/pw-browsers/chromium-1187/chrome-linux/chrome',
+            '/pw-browsers/chromium-1091/chrome-linux/chrome',
+            None
+        ]
+        
+        browser = None
+        for executable_path in executable_paths:
+            try:
+                browser = await playwright.chromium.launch(
+                    headless=True,
+                    executable_path=executable_path,
+                    args=['--no-sandbox', '--disable-dev-shm-usage']
+                )
+                break
+            except:
+                continue
+        
+        if not browser:
+            raise Exception("Could not launch browser for Canva scraping")
+        
+        page = await browser.new_page()
+        
+        # Navigate to Canva board
+        await page.goto(board_url, wait_until='domcontentloaded', timeout=30000)
+        await page.wait_for_timeout(5000)
+        
+        # Extract links - this would need customization based on Canva's structure
+        # For now, look for common link patterns
+        links = []
+        
+        # Look for various link selectors that might contain product URLs
+        link_selectors = [
+            'a[href*="fourh"]',          # Four Hands links
+            'a[href*="uttermost"]',      # Uttermost links  
+            'a[href*="visual"]',         # Visual Comfort links
+            'a[href*="regina"]',         # Regina Andrew links
+            'a[href*="hudson"]',         # Hudson Valley links
+            'a[href*="global"]',         # Global Views links
+            'a[href*="product"]',        # Generic product links
+            'a[href*="item"]',           # Item links
+            'a[href]'                    # All links as fallback
+        ]
+        
+        for selector in link_selectors:
+            try:
+                elements = await page.query_selector_all(selector)
+                for element in elements:
+                    href = await element.get_attribute('href')
+                    if href and href.startswith('http') and 'canva' not in href.lower():
+                        # Filter for product-like URLs
+                        if any(keyword in href.lower() for keyword in ['product', 'item', 'catalog', 'fourh', 'uttermost', 'visual', 'regina', 'hudson', 'global']):
+                            if href not in links:
+                                links.append(href)
+            except:
+                continue
+        
+        await browser.close()
+        await playwright.stop()
+        
+        print(f"🔗 Extracted {len(links)} potential product links from Canva board")
+        
+        # Return unique links
+        return list(set(links))
+        
+    except Exception as e:
+        print(f"❌ Failed to extract links from Canva board: {e}")
+        return []
+
 @api_router.post("/upload-canva-pdf")
 async def upload_canva_pdf(file: UploadFile = File(...), room_name: str = Form(...), project_id: str = Form(...)):
     """
