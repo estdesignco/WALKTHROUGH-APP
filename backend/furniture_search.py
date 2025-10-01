@@ -665,6 +665,62 @@ async def get_recent_items(limit: int = 20):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# HOUZZ PRO SCRAPER ENDPOINTS
+
+@router.post("/start-houzz-pro-scraper")
+async def start_houzz_pro_scraper(background_tasks: BackgroundTasks):
+    """
+    START HOUZZ PRO SCRAPER
+    
+    This will log into the user's Houzz Pro account and scrape
+    all existing saved products from:
+    - Selections board: https://pro.houzz.com/manage/selections/board/2321925  
+    - My Items collection: https://pro.houzz.com/manage/l/my-items
+    """
+    try:
+        print("\n" + "="*80)
+        print("🏠 STARTING HOUZZ PRO SCRAPER")
+        print("="*80)
+        
+        # Run Houzz Pro scraper in background
+        background_tasks.add_task(run_houzz_pro_scraper_task)
+        
+        return {
+            "success": True,
+            "message": "Houzz Pro scraper started successfully",
+            "status": "running", 
+            "description": "Scraping existing saved products from your Houzz Pro account",
+            "urls": [
+                "https://pro.houzz.com/manage/selections/board/2321925",
+                "https://pro.houzz.com/manage/l/my-items"
+            ],
+            "estimated_time": "2-5 minutes depending on number of saved products"
+        }
+        
+    except Exception as e:
+        print(f"❌ Error starting Houzz Pro scraper: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def run_houzz_pro_scraper_task():
+    """Background task to run Houzz Pro scraper"""
+    try:
+        print("🏠 Starting Houzz Pro scraper background task...")
+        
+        # Import and run the scraper
+        from houzz_pro_scraper import run_houzz_pro_scraper
+        
+        result = await run_houzz_pro_scraper()
+        
+        if result.get("success"):
+            print(f"✅ Houzz Pro scraper completed successfully: {result.get('products_found', 0)} products")
+        else:
+            print(f"❌ Houzz Pro scraper failed: {result.get('error', 'Unknown error')}")
+        
+    except Exception as e:
+        print(f"❌ Houzz Pro scraper task failed: {e}")
+
+
 # WEBHOOK STATUS AND TESTING
 
 @router.get("/webhook-status")
