@@ -383,9 +383,12 @@ class HouzzProScraper:
             print("\n📋 SCRAPING SELECTIONS BOARD...")
             print(f"🔗 URL: {self.selections_url}")
             
-            # Navigate to selections board
-            await self.page.goto(self.selections_url, wait_until='networkidle')
-            await self.page.wait_for_timeout(3000)
+            # Navigate to selections board with rate limit handling
+            if not await self._handle_rate_limit_with_retry(self.selections_url):
+                print("❌ Could not access selections board due to rate limiting")
+                return []
+            
+            await self.page.wait_for_timeout(5000)
             
             print("📄 Selections board loaded")
             
