@@ -699,6 +699,60 @@ async def webhook_status():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/start-houzz-clipper-bot")
+async def start_houzz_clipper_bot(background_tasks: BackgroundTasks):
+    """
+    START HOUZZ PRO CLIPPER BOT
+    
+    This will use YOUR Houzz Pro clipper extension to automatically clip
+    ALL products from ALL your trade vendor catalogs
+    """
+    try:
+        print("\n" + "="*80)
+        print("🤖 STARTING HOUZZ PRO CLIPPER BOT")
+        print("="*80)
+        
+        # Run Houzz clipper bot in background
+        background_tasks.add_task(run_houzz_clipper_bot_task)
+        
+        return {
+            "success": True,
+            "message": "Houzz Pro Clipper Bot started successfully",
+            "status": "running",
+            "description": "Bot is now using your Houzz Pro clipper to clip all vendor products",
+            "vendors": [
+                "Four Hands", "Regina Andrew", "Visual Comfort", 
+                "Hudson Valley Lighting", "Global Views"
+            ],
+            "estimated_time": "2-3 hours for complete catalog clipping"
+        }
+        
+    except Exception as e:
+        print(f"❌ Error starting Houzz clipper bot: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def run_houzz_clipper_bot_task():
+    """Background task to run Houzz clipper bot"""
+    try:
+        print("🤖 Starting Houzz Pro Clipper Bot background task...")
+        
+        # Import and run the clipper bot
+        import sys
+        import os
+        sys.path.append(os.path.dirname(__file__))
+        
+        from houzz_clipper_bot import HouzzClipperBot
+        
+        bot = HouzzClipperBot()
+        await bot.run_mass_houzz_clipping()
+        
+        print("✅ Houzz clipper bot task completed successfully")
+        
+    except Exception as e:
+        print(f"❌ Houzz clipper bot task failed: {e}")
+
+
 # MASS CATALOG SCRAPING ENDPOINTS
 
 @router.post("/furniture-catalog/start-mass-scraping")
