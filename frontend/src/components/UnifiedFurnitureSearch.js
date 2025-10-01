@@ -352,11 +352,11 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
                   {loading ? '🧪...' : '🧪 TEST 1'}
                 </button>
                 <button
-                  onClick={startHouzzClipperBot}
+                  onClick={startHouzzProScraper}
                   disabled={loading}
                   className="px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg font-semibold transition-colors"
                 >
-                  {loading ? '🤖...' : '🤖 CLIP ALL'}
+                  {loading ? '🏠...' : '🏠 SCRAPE HOUZZ PRO'}
                 </button>
               </div>
             </div>
