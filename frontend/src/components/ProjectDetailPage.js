@@ -213,11 +213,20 @@ export default function ProjectDetailPage() {
                         </div>
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Project Address</label>
-                            <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
-                            }}>
-                                {project.client_info?.address || 'Not provided'}
-                            </div>
+                            {isEditing ? (
+                                <textarea
+                                    value={editedProject?.client_info?.address || ''}
+                                    onChange={(e) => handleInputChange('address', e.target.value, 'client_info')}
+                                    className="w-full p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] bg-gray-800"
+                                    rows="3"
+                                />
+                            ) : (
+                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
+                                    background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                }}>
+                                    {project.client_info?.address || 'Not provided'}
+                                </div>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Best Time to Call</label>
