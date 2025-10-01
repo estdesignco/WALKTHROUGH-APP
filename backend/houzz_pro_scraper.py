@@ -72,16 +72,36 @@ class HouzzProScraper:
             playwright = await async_playwright().start()
             
             # Launch browser with stealth settings to avoid detection
-            self.browser = await playwright.chromium.launch(
-                headless=True,  # Use headless for server environment
-                args=[
-                    '--no-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--disable-blink-features=AutomationControlled',
-                    '--disable-web-security',
-                    '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-                ]
-            )
+            # Try different browser paths to work around version issues
+            executable_paths = [
+                '/pw-browsers/chromium-1187/chrome-linux/chrome',
+                '/pw-browsers/chromium-1091/chrome-linux/chrome',
+                None  # Let Playwright find it automatically
+            ]
+            
+            browser_launched = False
+            for executable_path in executable_paths:
+                try:
+                    self.browser = await playwright.chromium.launch(
+                        headless=True,  # Use headless for server environment
+                        executable_path=executable_path,
+                        args=[
+                            '--no-sandbox',
+                            '--disable-dev-shm-usage',
+                            '--disable-blink-features=AutomationControlled',
+                            '--disable-web-security',
+                            '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                        ]
+                    )
+                    browser_launched = True
+                    print(f"✅ Browser launched with executable: {executable_path or 'auto-detected'}")
+                    break
+                except Exception as e:
+                    print(f"⚠️ Failed to launch with {executable_path or 'auto-detect'}: {e}")
+                    continue
+            
+            if not browser_launched:
+                raise Exception("Could not launch browser with any executable path")
             
             # Create new page with realistic viewport and headers
             self.page = await self.browser.new_page(
