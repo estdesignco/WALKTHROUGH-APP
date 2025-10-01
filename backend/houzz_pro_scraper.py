@@ -167,10 +167,124 @@ class HouzzProScraper:
             
             # Find email input
             email_selectors = [
-                'input[type=\"email\"]',
-                'input[name=\"email\"]',
-                'input[id=\"email\"]',
-                'input[placeholder*=\"email\" i]',\n                'input[autocomplete=\"username\"]'\n            ]\n            \n            email_input = None\n            for selector in email_selectors:\n                try:\n                    email_input = await self.page.wait_for_selector(selector, timeout=3000)\n                    if email_input and await email_input.is_visible():\n                        print(f\"✅ Found email input: {selector}\")\n                        break\n                except:\n                    continue\n            \n            if not email_input:\n                print(\"❌ No email input found\")\n                return False\n            \n            # Clear and enter email\n            await email_input.click()\n            await email_input.fill('')\n            await email_input.type(self.email, delay=100)\n            await self.page.wait_for_timeout(1000)\n            print(\"📧 Email entered\")\n            \n            # Find password input\n            password_selectors = [\n                'input[type=\"password\"]',\n                'input[name=\"password\"]',\n                'input[id=\"password\"]',\n                'input[autocomplete=\"current-password\"]'\n            ]\n            \n            password_input = None\n            for selector in password_selectors:\n                try:\n                    password_input = await self.page.wait_for_selector(selector, timeout=3000)\n                    if password_input and await password_input.is_visible():\n                        print(f\"✅ Found password input: {selector}\")\n                        break\n                except:\n                    continue\n            \n            if not password_input:\n                print(\"❌ No password input found\")\n                return False\n            \n            # Clear and enter password\n            await password_input.click()\n            await password_input.fill('')\n            await password_input.type(self.password, delay=100)\n            await self.page.wait_for_timeout(1000)\n            print(\"🔒 Password entered\")\n            \n            # Find and click submit button\n            submit_selectors = [\n                'button[type=\"submit\"]',\n                'input[type=\"submit\"]',\n                'button:has-text(\"Sign In\")',\n                'button:has-text(\"Log In\")',\n                'button:has-text(\"Login\")',\n                '[data-testid*=\"login\"]',\n                '[data-testid*=\"submit\"]'\n            ]\n            \n            submit_clicked = False\n            for selector in submit_selectors:\n                try:\n                    submit_button = await self.page.wait_for_selector(selector, timeout=2000)\n                    if submit_button and await submit_button.is_visible():\n                        print(f\"✅ Found submit button: {selector}\")\n                        await submit_button.click()\n                        print(\"🎯 Submit button clicked\")\n                        submit_clicked = True\n                        break\n                except:\n                    continue\n            \n            if not submit_clicked:\n                # Try form submission as fallback\n                print(\"⚠️ No submit button found, trying form submission...\")\n                try:\n                    await self.page.keyboard.press('Enter')\n                    print(\"⌨️ Pressed Enter to submit\")\n                except:\n                    return False\n            \n            # Wait for login to process\n            print(\"⏳ Waiting for login to process...\")\n            await self.page.wait_for_timeout(8000)\n            \n            # Check if we're still on login page\n            current_url = self.page.url\n            if 'login' not in current_url.lower():\n                print(\"✅ Login successful - redirected away from login page\")\n                return True\n            else:\n                print(\"❌ Still on login page - login may have failed\")\n                \n                # Check for error messages\n                try:\n                    error_elements = await self.page.query_selector_all('.error, .alert, [class*=\"error\"], [class*=\"alert\"]')\n                    if len(error_elements) > 0:\n                        for error_elem in error_elements:\n                            error_text = await error_elem.text_content()\n                            if error_text and error_text.strip():\n                                print(f\"⚠️ Error message: {error_text.strip()}\")\n                except:\n                    pass\n                \n                return False\n                \n        except Exception as e:\n            print(f\"❌ Login flow failed: {e}\")\n            return False
+                'input[type="email"]',
+                'input[name="email"]',
+                'input[id="email"]',
+                'input[placeholder*="email" i]',
+                'input[autocomplete="username"]'
+            ]
+            
+            email_input = None
+            for selector in email_selectors:
+                try:
+                    email_input = await self.page.wait_for_selector(selector, timeout=3000)
+                    if email_input and await email_input.is_visible():
+                        print(f"✅ Found email input: {selector}")
+                        break
+                except:
+                    continue
+            
+            if not email_input:
+                print("❌ No email input found")
+                return False
+            
+            # Clear and enter email
+            await email_input.click()
+            await email_input.fill('')
+            await email_input.type(self.email, delay=100)
+            await self.page.wait_for_timeout(1000)
+            print("📧 Email entered")
+            
+            # Find password input
+            password_selectors = [
+                'input[type="password"]',
+                'input[name="password"]',
+                'input[id="password"]',
+                'input[autocomplete="current-password"]'
+            ]
+            
+            password_input = None
+            for selector in password_selectors:
+                try:
+                    password_input = await self.page.wait_for_selector(selector, timeout=3000)
+                    if password_input and await password_input.is_visible():
+                        print(f"✅ Found password input: {selector}")
+                        break
+                except:
+                    continue
+            
+            if not password_input:
+                print("❌ No password input found")
+                return False
+            
+            # Clear and enter password
+            await password_input.click()
+            await password_input.fill('')
+            await password_input.type(self.password, delay=100)
+            await self.page.wait_for_timeout(1000)
+            print("🔒 Password entered")
+            
+            # Find and click submit button
+            submit_selectors = [
+                'button[type="submit"]',
+                'input[type="submit"]',
+                'button:has-text("Sign In")',
+                'button:has-text("Log In")',
+                'button:has-text("Login")',
+                '[data-testid*="login"]',
+                '[data-testid*="submit"]'
+            ]
+            
+            submit_clicked = False
+            for selector in submit_selectors:
+                try:
+                    submit_button = await self.page.wait_for_selector(selector, timeout=2000)
+                    if submit_button and await submit_button.is_visible():
+                        print(f"✅ Found submit button: {selector}")
+                        await submit_button.click()
+                        print("🎯 Submit button clicked")
+                        submit_clicked = True
+                        break
+                except:
+                    continue
+            
+            if not submit_clicked:
+                # Try form submission as fallback
+                print("⚠️ No submit button found, trying form submission...")
+                try:
+                    await self.page.keyboard.press('Enter')
+                    print("⌨️ Pressed Enter to submit")
+                except:
+                    return False
+            
+            # Wait for login to process
+            print("⏳ Waiting for login to process...")
+            await self.page.wait_for_timeout(8000)
+            
+            # Check if we're still on login page
+            current_url = self.page.url
+            if 'login' not in current_url.lower():
+                print("✅ Login successful - redirected away from login page")
+                return True
+            else:
+                print("❌ Still on login page - login may have failed")
+                
+                # Check for error messages
+                try:
+                    error_elements = await self.page.query_selector_all('.error, .alert, [class*="error"], [class*="alert"]')
+                    if len(error_elements) > 0:
+                        for error_elem in error_elements:
+                            error_text = await error_elem.text_content()
+                            if error_text and error_text.strip():
+                                print(f"⚠️ Error message: {error_text.strip()}")
+                except:
+                    pass
+                
+                return False
+                
+        except Exception as e:
+            print(f"❌ Login flow failed: {e}")
+            return False
     
     # Login helper methods removed - using simplified flow
     
