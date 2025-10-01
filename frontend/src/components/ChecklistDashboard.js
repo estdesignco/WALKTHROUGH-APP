@@ -7,6 +7,7 @@ import ChecklistStatusOverview from './ChecklistStatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 import CompletePageLayout from './CompletePageLayout';
+import CanvaBoardImporter from './CanvaBoardImporter';
 
 const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.error("🚨 CHECKLIST DASHBOARD IS LOADING!");
