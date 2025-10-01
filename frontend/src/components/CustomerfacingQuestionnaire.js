@@ -856,8 +856,8 @@ export default function CustomerfacingQuestionnaire() {
                         </Button>
                         
                         {submissionStatus && (
-                            <p className={`mt-4 text-lg ${submissionStatus === 'success' ? 'text-green-400' : submissionStatus === 'error' ? 'text-red-400' : 'text-[#B49B7E]'}`}>
-                                {submissionStatus === 'success' ? 'Project created successfully!' : submissionStatus === 'error' ? 'Something went wrong. Please try again.' : submissionStatus}
+                            <p className={`mt-4 text-lg ${submissionStatus === 'success' ? 'text-green-400' : submissionStatus && submissionStatus.startsWith('error') ? 'text-red-400' : 'text-[#B49B7E]'}`}>
+                                {submissionStatus === 'success' ? 'Project created successfully!' : submissionStatus && submissionStatus.startsWith('error') ? submissionStatus.replace('error: ', '') : submissionStatus || ''}
                             </p>
                         )}
                     </div>
