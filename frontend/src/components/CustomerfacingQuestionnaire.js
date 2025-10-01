@@ -356,8 +356,8 @@ export default function CustomerfacingQuestionnaire() {
                     const itemsToCreate = basicItems.map(item => ({
                         project_id: newProject.id,
                         room_id: newRoom.id,
-                        category: item.category,
-                        sub_category: item.sub_category,
+                        category_id: item.category,
+                        subcategory_id: item.sub_category,
                         name: item.name,
                         status: 'Walkthrough',
                         quantity: 1,
