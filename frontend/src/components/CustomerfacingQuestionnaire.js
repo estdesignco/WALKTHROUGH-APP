@@ -282,9 +282,13 @@ export default function CustomerfacingQuestionnaire() {
             };
 
             console.log('🚀 Submitting project data:', projectData);
+            console.log('🔗 Backend URL:', BACKEND_URL);
+            
             const newProject = await Project.create(projectData);
+            console.log('✅ Project created successfully:', newProject);
 
             // Create rooms WITH THE CORRECT STARTER ITEMS
+            console.log('🏠 Checking rooms to create:', formData.rooms_involved);
             if (formData.rooms_involved && formData.rooms_involved.length > 0) {
                 const uniqueRooms = [...new Set(formData.rooms_involved)];
                 
