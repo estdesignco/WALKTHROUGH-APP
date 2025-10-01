@@ -336,7 +336,46 @@ class HouzzProScraper:
             print(f"❌ Login flow failed: {e}")
             return False
     
-    # Login helper methods removed - using simplified flow
+    async def _check_for_rate_limit(self) -> bool:
+        """Check if current page shows rate limiting"""
+        try:
+            title = await self.page.title()
+            content = await self.page.content()
+            
+            rate_limited = ('429' in title or 
+                          '429' in content or 
+                          'too many requests' in content.lower() or
+                          'rate limit' in content.lower())
+            
+            if rate_limited:
+                print("⚠️ Rate limit detected!")
+                return True
+            return False
+        except:
+            return False
+    
+    async def _handle_rate_limit_with_retry(self, url: str, max_retries: int = 3) -> bool:
+        """Navigate to URL with rate limit handling"""
+        for attempt in range(max_retries):
+            try:
+                await self.page.goto(url, wait_until='domcontentloaded', timeout=30000)
+                await asyncio.sleep(5)
+                
+                if not await self._check_for_rate_limit():
+                    print(f"✅ Successfully loaded {url}")
+                    return True
+                else:
+                    wait_time = (attempt + 1) * 45  # 45, 90, 135 seconds
+                    print(f"⚠️ Rate limited (attempt {attempt + 1}), waiting {wait_time} seconds...")
+                    await asyncio.sleep(wait_time)
+                    
+            except Exception as e:
+                print(f"❌ Attempt {attempt + 1} failed: {e}")
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(30)
+        
+        print(f"❌ Failed to load {url} after {max_retries} attempts")
+        return False
     
     async def scrape_selections_board(self) -> List[Dict]:
         """Scrape the user's Selections board"""
