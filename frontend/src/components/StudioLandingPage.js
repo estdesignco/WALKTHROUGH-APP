@@ -188,9 +188,10 @@ const StudioLandingPage = () => {
                         <span className="text-sm text-gray-400">Last Updated</span>
                         <button
                           onClick={(e) => handleDeleteProject(project.id, e)}
-                          className="text-gray-400 hover:text-red-400 transition-colors"
+                          className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded hover:bg-red-900/20 flex items-center justify-center"
+                          title="Delete Project"
                         >
-                          🗑️
+                          <span className="text-lg">🗑️</span>
                         </button>
                       </div>
                     </div>
