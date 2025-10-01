@@ -403,17 +403,17 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
             ) : searchResults.length === 0 ? (
               <div className="text-center py-16">
                 <div className="text-8xl mb-6">🪑</div>
-                <h3 className="text-3xl font-bold text-yellow-400 mb-4">Start Building Your Catalog</h3>
+                <h3 className="text-3xl font-bold text-yellow-400 mb-4">Mirror Your Houzz Pro Collection</h3>
                 <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-                  Use the "🤖 CLIP ALL" button to automatically clip all products from your trade vendors using Houzz Pro clipper.
-                  All clipped products will appear here as a beautiful, searchable catalog.
+                  Use the "🏠 SCRAPE HOUZZ PRO" button to automatically mirror all products you've already saved in your Houzz Pro account.
+                  All your clipped products will appear here as a beautiful, searchable catalog.
                 </p>
                 <button
-                  onClick={startHouzzClipperBot}
+                  onClick={startHouzzProScraper}
                   disabled={loading}
                   className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-bold rounded-xl text-lg transition-all transform hover:scale-105"
                 >
-                  🤖 START CLIPPING ALL PRODUCTS
+                  🏠 MIRROR HOUZZ PRO COLLECTION
                 </button>
               </div>
             ) : (
