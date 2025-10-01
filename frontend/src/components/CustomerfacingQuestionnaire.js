@@ -258,6 +258,13 @@ export default function CustomerfacingQuestionnaire() {
         setSubmissionStatus(null);
         try {
             // Transform formData to match backend ProjectCreate model
+            const projectTypeMap = {
+                'renovation': 'Renovation',
+                'new_construction': 'New Construction',
+                'design_consultation': 'Design Consultation', 
+                'furniture_only': 'Furniture Only'
+            };
+
             const projectData = {
                 name: formData.name || `${formData.client_name || 'Unnamed'} Project`,
                 client_info: {
@@ -266,7 +273,7 @@ export default function CustomerfacingQuestionnaire() {
                     phone: formData.phone || '',
                     address: formData.address || formData.renovation_address || formData.new_build_address || ''
                 },
-                project_type: formData.project_type || 'RENOVATION',
+                project_type: projectTypeMap[formData.project_type] || 'Renovation',
                 timeline: formData.timeline || '',
                 budget: formData.budget_range || '',
                 style_preferences: [], // Can be populated from other form fields if needed
