@@ -359,7 +359,7 @@ export default function CustomerfacingQuestionnaire() {
                         category_id: item.category,
                         subcategory_id: item.sub_category,
                         name: item.name,
-                        status: 'Walkthrough',
+                        status: 'TO BE SELECTED',
                         quantity: 1,
                     }));
 
