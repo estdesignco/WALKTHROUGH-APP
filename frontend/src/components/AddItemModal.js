@@ -19,6 +19,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
 
   const [isScraping, setIsScraping] = useState(false);
   const [scrapeError, setScrapeError] = useState('');
+  const [autoClipToHouzz, setAutoClipToHouzz] = useState(true); // Auto-clip to Houzz Pro by default
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
 
   const handleBarcodeResult = (productData) => {
