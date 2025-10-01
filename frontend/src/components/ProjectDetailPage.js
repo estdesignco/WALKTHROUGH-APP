@@ -22,6 +22,9 @@ export default function ProjectDetailPage() {
     const [project, setProject] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState(searchParams.get('tab') || "Questionnaire");
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedProject, setEditedProject] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         const fetchProject = async () => {
