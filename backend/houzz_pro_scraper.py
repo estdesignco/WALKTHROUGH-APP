@@ -119,8 +119,8 @@ class HouzzProScraper:
                 'Upgrade-Insecure-Requests': '1'
             })
             
-            # Add random delay to avoid rate limiting
-            await asyncio.sleep(2)
+            # Add longer delay and jitter to avoid rate limiting
+            await asyncio.sleep(10 + (asyncio.get_event_loop().time() % 5))
             
             print("✅ Browser started successfully")
             return True
