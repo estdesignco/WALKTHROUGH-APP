@@ -279,6 +279,17 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           roomColors={roomColors}
         />
       )}
+
+      {/* Canva Board Import Modal */}
+      {showCanvaImport && (
+        <CanvaBoardImporter
+          isOpen={showCanvaImport}
+          onClose={() => setShowCanvaImport(false)}
+          onImportComplete={handleCanvaImportComplete}
+          projectId={projectId}
+          roomName={project?.rooms?.[0]?.name || 'General'}
+        />
+      )}
     </CompletePageLayout>
   );
 };
