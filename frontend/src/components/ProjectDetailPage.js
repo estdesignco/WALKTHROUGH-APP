@@ -162,11 +162,20 @@ export default function ProjectDetailPage() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Project Name</label>
-                            <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
-                            }}>
-                                {project.name || 'Not provided'}
-                            </div>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    value={editedProject?.name || ''}
+                                    onChange={(e) => handleInputChange('name', e.target.value)}
+                                    className="w-full p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] bg-gray-800"
+                                />
+                            ) : (
+                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
+                                    background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
+                                }}>
+                                    {project.name || 'Not provided'}
+                                </div>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Email Address</label>
