@@ -339,6 +339,13 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
                   CLEAR
                 </button>
                 <button
+                  onClick={testSingleProduct}
+                  disabled={loading}
+                  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg font-semibold transition-colors"
+                >
+                  {loading ? '🧪...' : '🧪 TEST 1'}
+                </button>
+                <button
                   onClick={startHouzzClipperBot}
                   disabled={loading}
                   className="px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg font-semibold transition-colors"
