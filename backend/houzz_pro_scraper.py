@@ -130,16 +130,46 @@ class HouzzProScraper:
             return False
     
     async def login_to_houzz_pro(self) -> bool:
-        """Log into Houzz Pro with provided credentials"""
+        """Log into Houzz Pro with provided credentials with rate limit handling"""
         try:
             print("\n🔐 LOGGING INTO HOUZZ PRO...")
             print(f"📧 Using email: {self.email}")
             
+            # First, add a delay to avoid being immediately rate limited
+            print("⏳ Waiting to avoid rate limits...")
+            await asyncio.sleep(15)  # Wait 15 seconds before starting
+            
             # Navigate directly to selections URL which will redirect to login if needed
             print("🔍 Accessing selections URL (will redirect to login if needed)...")
             
-            await self.page.goto(self.selections_url, wait_until='domcontentloaded', timeout=20000)
-            await self.page.wait_for_timeout(5000)
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    await self.page.goto(self.selections_url, wait_until='domcontentloaded', timeout=30000)
+                    await self.page.wait_for_timeout(8000)  # Longer wait
+                    
+                    # Check for rate limiting
+                    title = await self.page.title()
+                    content = await self.page.content()
+                    
+                    if '429' in title or '429' in content or 'too many requests' in content.lower():
+                        wait_time = (attempt + 1) * 30  # 30, 60, 90 seconds
+                        print(f"⚠️ Rate limited (attempt {attempt + 1}), waiting {wait_time} seconds...")
+                        await asyncio.sleep(wait_time)
+                        continue
+                    else:
+                        print("✅ Successfully loaded page without rate limiting")
+                        break
+                        
+                except Exception as e:
+                    print(f"❌ Attempt {attempt + 1} failed: {e}")
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(20)
+                    else:
+                        return False
+            else:
+                print("❌ All attempts failed due to rate limiting")
+                return False
             
             current_url = self.page.url
             print(f"📍 Redirected to: {current_url}")
