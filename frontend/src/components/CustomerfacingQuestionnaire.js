@@ -21,7 +21,20 @@ const Project = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        if (!response.ok) throw new Error('Failed to create project');
+        
+        if (!response.ok) {
+            let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+            try {
+                const errorData = await response.text();
+                if (errorData) {
+                    errorMessage = errorData;
+                }
+            } catch (e) {
+                // Use default message if can't parse error
+            }
+            throw new Error(`Failed to create project - ${errorMessage}`);
+        }
+        
         return await response.json();
     }
 };
