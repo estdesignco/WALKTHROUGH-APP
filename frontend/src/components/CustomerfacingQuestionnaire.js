@@ -381,7 +381,12 @@ export default function CustomerfacingQuestionnaire() {
             // Redirect after successful project creation
             window.location.href = `/customer/project/${newProject.id}`;
         } catch (error) {
-            console.error("Failed to create project:", error);
+            console.error("❌ QUESTIONNAIRE SUBMISSION FAILED:", error);
+            console.error("❌ Error details:", {
+                message: error.message,
+                stack: error.stack,
+                name: error.name
+            });
             
             // Try to get more specific error message
             let errorMessage = 'Something went wrong. Please try again.';
@@ -395,6 +400,8 @@ export default function CustomerfacingQuestionnaire() {
                 errorMessage = 'Network error. Please check your connection and try again.';
             }
             
+            // Enhanced error details for debugging
+            console.error("❌ Setting error status:", `error: ${errorMessage}`);
             setSubmissionStatus(`error: ${errorMessage}`);
         } finally {
             setIsSubmitting(false);
