@@ -1631,6 +1631,36 @@ async def get_project(project_id: str, sheet_type: str = None):
     
     return Project(**project_data)
 
+@api_router.put("/projects/{project_id}", response_model=Project)
+async def update_project(project_id: str, project_update: ProjectCreate):
+    """Update project details including client info, project type, etc."""
+    try:
+        # Check if project exists
+        existing_project = await db.projects.find_one({"id": project_id})
+        if not existing_project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Convert to dict and remove None values
+        update_data = project_update.dict(exclude_unset=True)
+        update_data["updated_at"] = datetime.utcnow()
+        
+        # Update the project
+        result = await db.projects.update_one(
+            {"id": project_id}, 
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Project not found or no changes made")
+        
+        # Return updated project
+        updated_project = await db.projects.find_one({"id": project_id})
+        return Project(**updated_project)
+        
+    except Exception as e:
+        logging.error(f"Error updating project {project_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update project: {str(e)}")
+
 # ROOM UPDATE ENDPOINT (for drag & drop)
 @api_router.put("/rooms/{room_id}", response_model=Room)
 async def update_room(room_id: str, room_update: RoomUpdate):
