@@ -58,8 +58,9 @@ class HouzzProScraper:
         self.selections_url = "https://pro.houzz.com/manage/selections/board/2321925"
         self.my_items_url = "https://pro.houzz.com/manage/l/my-items"
         
-        # Login URL
-        self.login_url = "https://pro.houzz.com/login"
+        # Login URLs - Houzz redirects to their main login
+        self.login_url = "https://www.houzz.com/login"
+        self.pro_login_url = "https://pro.houzz.com/login"
         
         print("🏠 Houzz Pro Scraper initialized")
         print(f"📧 Email: {self.email}")
