@@ -2157,6 +2157,74 @@ async def create_item(item: ItemCreate):
         return item_obj
     raise HTTPException(status_code=400, detail="Failed to create item")
 
+@api_router.post("/items/bulk")
+async def bulk_create_items(items: List[ItemCreate]):
+    """Create multiple items in bulk for efficient batch operations"""
+    try:
+        print(f"📦 BULK CREATING {len(items)} ITEMS")
+        
+        if not items:
+            return {"success": True, "message": "No items to create", "created_count": 0}
+        
+        # Process items in batches to avoid overwhelming the database
+        batch_size = 50
+        total_created = 0
+        failed_items = []
+        
+        for i in range(0, len(items), batch_size):
+            batch = items[i:i + batch_size]
+            print(f"📦 Processing batch {i//batch_size + 1}: {len(batch)} items")
+            
+            # Prepare batch data
+            batch_data = []
+            for item in batch:
+                item_dict = item.dict()
+                item_obj = Item(**item_dict)
+                batch_data.append(item_obj.dict())
+            
+            try:
+                # Insert batch
+                result = await db.items.insert_many(batch_data)
+                created_in_batch = len(result.inserted_ids)
+                total_created += created_in_batch
+                print(f"✅ Batch {i//batch_size + 1}: Created {created_in_batch} items")
+                
+            except Exception as batch_error:
+                print(f"❌ Batch {i//batch_size + 1} failed: {batch_error}")
+                # Try to create items individually for this failed batch
+                for item in batch:
+                    try:
+                        item_dict = item.dict()
+                        item_obj = Item(**item_dict)
+                        await db.items.insert_one(item_obj.dict())
+                        total_created += 1
+                    except Exception as individual_error:
+                        failed_items.append({
+                            "name": item.name,
+                            "error": str(individual_error)
+                        })
+        
+        success_rate = (total_created / len(items)) * 100 if items else 100
+        
+        print(f"📊 BULK CREATE SUMMARY:")
+        print(f"   Total requested: {len(items)}")
+        print(f"   Successfully created: {total_created}")
+        print(f"   Failed: {len(failed_items)}")
+        print(f"   Success rate: {success_rate:.1f}%")
+        
+        return {
+            "success": True,
+            "message": f"Bulk create completed. Created {total_created}/{len(items)} items",
+            "created_count": total_created,
+            "failed_count": len(failed_items),
+            "success_rate": success_rate,
+            "failed_items": failed_items[:10]  # Return first 10 failures for debugging
+        }
+        
+    except Exception as e:
+        print(f"❌ Bulk create failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Bulk item creation failed: {str(e)}")
+
 @api_router.get("/items/{item_id}", response_model=Item)  
 async def get_item(item_id: str):
     item_data = await db.items.find_one({"id": item_id})
