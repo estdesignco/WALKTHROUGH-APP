@@ -116,6 +116,54 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     setSearchResults([]);
   };
 
+  const testSingleProduct = async () => {
+    try {
+      const confirmed = window.confirm(
+        `🧪 TEST SINGLE PRODUCT CLIPPING?\n\n` +
+        `This will test the entire Houzz Pro clipper workflow with ONE product:\n\n` +
+        `✅ Navigate to Four Hands dining chair\n` +
+        `✅ Extract product data (as Houzz clipper would)\n` +
+        `✅ Send to database via webhook\n` +
+        `✅ Verify it appears in catalog\n\n` +
+        `This takes 30-60 seconds and verifies everything works before mass operation.\n\n` +
+        `Continue?`
+      );
+      
+      if (!confirmed) return;
+      
+      setLoading(true);
+      
+      const response = await axios.post(`${API}/furniture/test-single-product-clip`);
+      
+      if (response.data.success) {
+        alert(`🧪 Single Product Test Started!\n\n` +
+              `Testing: ${response.data.test_url}\n` +
+              `Estimated time: ${response.data.estimated_time}\n\n` +
+              `Watch for the product to appear in your catalog!`);
+        
+        // Refresh stats and results every 10 seconds during test
+        const refreshInterval = setInterval(() => {
+          loadDatabaseStats();
+          searchFurniture();
+        }, 10000);
+        
+        // Stop refresh after 2 minutes
+        setTimeout(() => {
+          clearInterval(refreshInterval);
+          loadDatabaseStats();
+          searchFurniture();
+          alert('🧪 Single product test should be complete! Check your catalog for the new item.');
+        }, 120000);
+      }
+      
+    } catch (error) {
+      console.error('Failed to start single product test:', error);
+      alert(`❌ Failed to start test: ${error.response?.data?.detail || error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const startHouzzClipperBot = async () => {
     try {
       const confirmed = window.confirm(
