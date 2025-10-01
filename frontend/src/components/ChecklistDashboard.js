@@ -17,6 +17,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddRoom, setShowAddRoom] = useState(false);
+  const [showCanvaImport, setShowCanvaImport] = useState(false);
   const [roomColors, setRoomColors] = useState({});
   const [categoryColors, setCategoryColors] = useState({});
   const [itemStatuses, setItemStatuses] = useState([]);
