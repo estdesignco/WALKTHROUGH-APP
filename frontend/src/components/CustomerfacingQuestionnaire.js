@@ -278,6 +278,9 @@ export default function CustomerfacingQuestionnaire() {
                 'Other': 'Design Consultation'
             };
 
+            console.log('🔍 Raw project_type from form:', formData.project_type);
+            console.log('🔄 Mapped project_type:', projectTypeMap[formData.project_type] || 'Renovation');
+
             const projectData = {
                 name: formData.name || `${formData.client_name || 'Unnamed'} Project`,
                 client_info: {
