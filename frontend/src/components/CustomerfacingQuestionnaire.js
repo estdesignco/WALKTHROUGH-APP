@@ -271,10 +271,11 @@ export default function CustomerfacingQuestionnaire() {
         try {
             // Transform formData to match backend ProjectCreate model
             const projectTypeMap = {
-                'renovation': 'Renovation',
-                'new_construction': 'New Construction',
-                'design_consultation': 'Design Consultation', 
-                'furniture_only': 'Furniture Only'
+                'Renovation': 'Renovation',
+                'New Build': 'New Construction',
+                'Design Consultation': 'Design Consultation', 
+                'Furniture/Styling Refresh': 'Furniture Only',
+                'Other': 'Design Consultation'
             };
 
             const projectData = {
