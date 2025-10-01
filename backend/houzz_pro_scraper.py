@@ -70,26 +70,36 @@ class HouzzProScraper:
         try:
             playwright = await async_playwright().start()
             
-            # Launch browser in non-headless mode for better success
+            # Launch browser with stealth settings to avoid detection
             self.browser = await playwright.chromium.launch(
-                headless=False,  # Visible browser for debugging and avoiding detection
+                headless=True,  # Use headless for server environment
                 args=[
+                    '--no-sandbox',
+                    '--disable-dev-shm-usage',
                     '--disable-blink-features=AutomationControlled',
                     '--disable-web-security',
-                    '--disable-features=VizDisplayCompositor',
-                    '--no-sandbox',
-                    '--disable-dev-shm-usage'
+                    '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
                 ]
             )
             
-            # Create new page with realistic viewport
+            # Create new page with realistic viewport and headers
             self.page = await self.browser.new_page(
                 viewport={'width': 1920, 'height': 1080},
                 user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             )
             
-            # Block unnecessary resources to speed up loading
-            await self.page.route("**/*.{png,jpg,jpeg,gif,svg,ico,woff,woff2}", lambda route: route.abort())
+            # Set additional headers to look more like a real browser
+            await self.page.set_extra_http_headers({
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'DNT': '1',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1'
+            })
+            
+            # Add random delay to avoid rate limiting
+            await asyncio.sleep(2)
             
             print("✅ Browser started successfully")
             return True
