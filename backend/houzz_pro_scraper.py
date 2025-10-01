@@ -408,9 +408,12 @@ class HouzzProScraper:
             print("\n📚 SCRAPING MY ITEMS COLLECTION...")
             print(f"🔗 URL: {self.my_items_url}")
             
-            # Navigate to my items
-            await self.page.goto(self.my_items_url, wait_until='networkidle')
-            await self.page.wait_for_timeout(3000)
+            # Navigate to my items with rate limit handling
+            if not await self._handle_rate_limit_with_retry(self.my_items_url):
+                print("❌ Could not access my items due to rate limiting")
+                return []
+            
+            await self.page.wait_for_timeout(5000)
             
             print("📄 My Items page loaded")
             
