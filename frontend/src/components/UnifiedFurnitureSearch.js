@@ -164,18 +164,19 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     }
   };
 
-  const startHouzzClipperBot = async () => {
+  const startHouzzProScraper = async () => {
     try {
       const confirmed = window.confirm(
-        `🤖 START HOUZZ PRO CLIPPER BOT?\n\n` +
-        `This will automatically use your Houzz Pro clipper extension to clip ALL products from ALL your trade vendors:\n\n` +
-        `• Four Hands\n• Regina Andrew\n• Visual Comfort\n• Hudson Valley Lighting\n• Global Views\n• And more...\n\n` +
-        `The bot will:\n` +
-        `✅ Open each vendor's catalog\n` +
-        `✅ Use YOUR Houzz Pro clipper on every product\n` +
-        `✅ Products get clipped to Houzz Pro\n` +
-        `✅ Data also saved here for unified search\n\n` +
-        `This will take 2-3 hours and populate thousands of products.\n\n` +
+        `🏠 SCRAPE YOUR HOUZZ PRO ACCOUNT?\n\n` +
+        `This will log into your Houzz Pro account and mirror all products you've already saved:\n\n` +
+        `📋 Your "Selections" board\n` +
+        `📚 Your "My Items" collection\n\n` +
+        `The scraper will:\n` +
+        `✅ Log into pro.houzz.com safely\n` +
+        `✅ Extract all your saved product data\n` +
+        `✅ Download images and details\n` +
+        `✅ Add everything to your unified catalog\n\n` +
+        `This takes 2-5 minutes and mirrors your existing Houzz Pro collection.\n\n` +
         `Continue?`
       );
       
@@ -183,29 +184,34 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
       
       setLoading(true);
       
-      const response = await axios.post(`${API}/furniture/start-houzz-clipper-bot`);
+      const response = await axios.post(`${API}/furniture/start-houzz-pro-scraper`);
       
       if (response.data.success) {
-        alert(`🎉 Houzz Pro Clipper Bot Started!\n\n` +
-              `The bot is now automatically clipping products using your Houzz Pro clipper extension.\n\n` +
-              `You can monitor progress by refreshing the stats.\n\n` +
-              `All clipped products will appear here in your unified search!`);
+        alert(`🎉 Houzz Pro Scraper Started!\n\n` +
+              `The scraper is now mirroring products from your Houzz Pro account.\n\n` +
+              `URLs being scraped:\n` +
+              `• ${response.data.urls[0]}\n` +
+              `• ${response.data.urls[1]}\n\n` +
+              `All your saved products will appear here in the catalog!`);
         
-        // Auto-refresh stats every 30 seconds
+        // Auto-refresh stats every 10 seconds during scraping
         const refreshInterval = setInterval(() => {
           loadDatabaseStats();
           searchFurniture(); // Refresh results
-        }, 30000);
+        }, 10000);
         
-        // Stop auto-refresh after 3 hours
+        // Stop auto-refresh after 10 minutes
         setTimeout(() => {
           clearInterval(refreshInterval);
-        }, 10800000);
+          loadDatabaseStats();
+          searchFurniture();
+          alert('🏠 Houzz Pro scraping should be complete! Check your catalog for the mirrored items.');
+        }, 600000);
       }
       
     } catch (error) {
-      console.error('Failed to start Houzz clipper bot:', error);
-      alert(`❌ Failed to start Houzz clipper bot: ${error.response?.data?.detail || error.message}`);
+      console.error('Failed to start Houzz Pro scraper:', error);
+      alert(`❌ Failed to start Houzz Pro scraper: ${error.response?.data?.detail || error.message}`);
     } finally {
       setLoading(false);
     }
