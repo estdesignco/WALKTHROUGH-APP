@@ -303,32 +303,49 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Product Link (Optional)
                 </label>
-                <div className="flex space-x-2">
-                  <input
-                    type="url"
-                    value={formData.link}
-                    onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                    className="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                    placeholder="https://homedepot.com/product-link..."
-                  />
-                  <button
-                    type="button"
-                    onClick={handleLinkScraping}
-                    disabled={isScraping || !formData.link}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg transition-colors font-medium"
-                    title="Auto-fill product information from link"
-                  >
-                    {isScraping ? '🔍...' : '🔍 Fill'}
-                  </button>
+                <div className="space-y-3">
+                  <div className="flex space-x-2">
+                    <input
+                      type="url"
+                      value={formData.link}
+                      onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                      className="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                      placeholder="https://homedepot.com/product-link..."
+                    />
+                    <button
+                      type="button"
+                      onClick={handleLinkScraping}
+                      disabled={isScraping || !formData.link}
+                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg transition-colors font-medium"
+                      title="Auto-fill product information from link"
+                    >
+                      {isScraping ? '🔍...' : '🔍 Fill'}
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={() => setShowBarcodeScanner(true)}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors font-medium"
+                      title="Scan product barcode"
+                    >
+                      📷 Scan
+                    </button>
+                  </div>
                   
-                  <button
-                    type="button"
-                    onClick={() => setShowBarcodeScanner(true)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors font-medium"
-                    title="Scan product barcode"
-                  >
-                    📷 Scan
-                  </button>
+                  {/* Houzz Pro Auto-Clip Toggle */}
+                  <div className="flex items-center space-x-3 bg-gray-800 p-3 rounded-lg">
+                    <input
+                      type="checkbox"
+                      id="auto-clip-houzz"
+                      checked={autoClipToHouzz}
+                      onChange={(e) => setAutoClipToHouzz(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor="auto-clip-houzz" className="flex items-center space-x-2 text-sm text-gray-300 cursor-pointer">
+                      <span>🏠 Auto-clip to Houzz Pro</span>
+                      <span className="text-xs text-gray-400">(Recommended)</span>
+                    </label>
+                  </div>
                 </div>
                 {scrapeError && (
                   <p className="text-red-400 text-sm mt-2">{scrapeError}</p>
