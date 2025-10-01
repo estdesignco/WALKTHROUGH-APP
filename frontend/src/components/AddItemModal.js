@@ -62,7 +62,10 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url: formData.link })
+        body: JSON.stringify({ 
+          url: formData.link,
+          auto_clip_to_houzz: autoClipToHouzz 
+        })
       });
       
       console.log('🔗 SCRAPING RESPONSE STATUS:', response.status);
