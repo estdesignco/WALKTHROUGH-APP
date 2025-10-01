@@ -244,7 +244,25 @@ export default function CustomerfacingQuestionnaire() {
         setIsSubmitting(true);
         setSubmissionStatus(null);
         try {
-            const newProject = await Project.create(formData);
+            // Transform formData to match backend ProjectCreate model
+            const projectData = {
+                name: formData.name || `${formData.client_name || 'Unnamed'} Project`,
+                client_info: {
+                    full_name: formData.client_name || '',
+                    email: formData.email || '',
+                    phone: formData.phone || '',
+                    address: formData.address || formData.renovation_address || formData.new_build_address || ''
+                },
+                project_type: formData.project_type || 'RENOVATION',
+                timeline: formData.timeline || '',
+                budget: formData.budget_range || '',
+                style_preferences: [], // Can be populated from other form fields if needed
+                color_palette: '',
+                special_requirements: formData.other_project_description || ''
+            };
+
+            console.log('🚀 Submitting project data:', projectData);
+            const newProject = await Project.create(projectData);
 
             // Create rooms WITH THE CORRECT STARTER ITEMS
             if (formData.rooms_involved && formData.rooms_involved.length > 0) {
