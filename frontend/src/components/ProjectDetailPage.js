@@ -145,11 +145,20 @@ export default function ProjectDetailPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Full Name</label>
-                            <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
-                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
-                            }}>
-                                {project.client_info?.full_name || 'Not provided'}
-                            </div>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    value={editedProject?.client_info?.full_name || ''}
+                                    onChange={(e) => handleInputChange('full_name', e.target.value, 'client_info')}
+                                    className="w-full p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] bg-gray-800"
+                                />
+                            ) : (
+                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
+                                    background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                }}>
+                                    {project.client_info?.full_name || 'Not provided'}
+                                </div>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Project Name</label>
