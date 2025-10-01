@@ -699,6 +699,52 @@ async def webhook_status():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/test-single-product-clip")
+async def test_single_product_clip(background_tasks: BackgroundTasks, product_url: str = ""):
+    """
+    TEST SINGLE PRODUCT CLIPPING
+    
+    Test the entire Houzz Pro clipper workflow with just ONE product
+    before running the full mass operation
+    """
+    try:
+        print("\n🧪 STARTING SINGLE PRODUCT TEST")
+        
+        # Run single product test in background
+        background_tasks.add_task(run_single_product_test_task, product_url)
+        
+        return {
+            "success": True,
+            "message": "Single product test started",
+            "test_url": product_url or "https://fourhands.com/products/jaxon-dining-chair",
+            "description": "Testing entire workflow: Scrape → Houzz Clip → Database → Catalog",
+            "estimated_time": "30-60 seconds"
+        }
+        
+    except Exception as e:
+        print(f"❌ Error starting single product test: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def run_single_product_test_task(product_url: str = ""):
+    """Background task for single product test"""
+    try:
+        print("🧪 Running single product test background task...")
+        
+        from single_product_houzz_test import SingleProductHouzzTest
+        
+        tester = SingleProductHouzzTest()
+        result = await tester.test_single_product_clip(product_url or None)
+        
+        if result:
+            print("✅ Single product test completed successfully")
+        else:
+            print("❌ Single product test failed")
+            
+    except Exception as e:
+        print(f"❌ Single product test task failed: {e}")
+
+
 @router.post("/start-houzz-clipper-bot")
 async def start_houzz_clipper_bot(background_tasks: BackgroundTasks):
     """
