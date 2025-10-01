@@ -106,13 +106,9 @@ class HouzzProDebugger:
             if 'login' not in current_url.lower():
                 await self._debug_page_content(page, "My Items")
             
-            # Keep browser open for manual inspection
-            print("\n⏸️  BROWSER OPEN FOR MANUAL INSPECTION")
-            print("   - Check what you see in the browser")
-            print("   - Navigate to your pages manually if needed")
-            print("   - Press Enter when ready to continue...")
-            
-            input("Press Enter to continue...")
+            # Complete debug session
+            print("\n✅ DEBUG SESSION COMPLETE")
+            print("   Check the debug files created for analysis")
             
             await browser.close()
             
