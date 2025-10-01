@@ -16,26 +16,38 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 // API functions
 const Project = {
     create: async (data) => {
+        console.log('🚀 Project.create called with:', data);
+        console.log('🔗 Making request to:', `${BACKEND_URL}/api/projects`);
+        
         const response = await fetch(`${BACKEND_URL}/api/projects`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
         
+        console.log('📡 Response received:', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok
+        });
+        
         if (!response.ok) {
             let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
             try {
                 const errorData = await response.text();
+                console.log('❌ Error response body:', errorData);
                 if (errorData) {
                     errorMessage = errorData;
                 }
             } catch (e) {
-                // Use default message if can't parse error
+                console.log('❌ Could not parse error response:', e);
             }
             throw new Error(`Failed to create project - ${errorMessage}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+        console.log('✅ Project creation successful:', result);
+        return result;
     }
 };
 
