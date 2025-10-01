@@ -872,7 +872,7 @@ export default function CustomerfacingQuestionnaire() {
                     <div className="text-center pt-8">
                         <Button
                             type="submit"
-                            disabled={isSubmitting || !formData.name || !formData.client_name || !formData.email || formData.rooms_involved.length === 0}
+                            disabled={isSubmitting || !formData.name || !formData.client_name || !formData.email}
                             className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-12 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             {isSubmitting ? (
