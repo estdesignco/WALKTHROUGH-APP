@@ -430,14 +430,41 @@ export default function CustomerfacingQuestionnaire() {
 
     // Updated roomsOptions to include Entire Home and Classic style
     const roomsOptionsUpdated = [
-        "Entire Home", // Added 'Entire Home'
-        "Living Room", "Family Room", "Great Room", "Primary Bedroom", "Guest Bedroom", "Children's Bedroom", "Nursery",
-        "Home Office", "Study", "Library", "Primary Bathroom", "Guest Bathroom", "Half Bathroom", "Jack and Jill Bathroom",
-        "Kitchen", "Pantry", "Butler's Pantry", "Dining Room", "Breakfast Nook", "Bar Area", "Wine Cellar",
-        "Laundry Room", "Mudroom", "Utility Room", "Linen Closet", "Walk-in Closet", "Basement", "Home Theater",
-        "Media Room", "Game Room", "Home Gym", "Play Room", "Craft Room", "Music Room", "Art Studio",
-        "Workshop", "Foyer", "Entryway", "Hallway", "Sunroom", "Screened Porch", "Patio", "Deck",
-        "Outdoor Kitchen", "Pool House", "Guest House"
+        // WHOLE HOME
+        "Entire Home",
+        
+        // MAIN LIVING SPACES (Most Common)
+        "Living Room", "Family Room", "Great Room", "Kitchen", "Dining Room", "Foyer", "Entryway",
+        
+        // BEDROOMS & BATHROOMS (Primary First)  
+        "Primary Bedroom", "Primary Bathroom", "Guest Bedroom", "Guest Bathroom", "Children's Bedroom", "Nursery",
+        
+        // WORK & STUDY SPACES
+        "Home Office", "Study", "Library",
+        
+        // ADDITIONAL BATHROOMS
+        "Half Bathroom", "Jack and Jill Bathroom",
+        
+        // KITCHEN & DINING RELATED
+        "Pantry", "Butler's Pantry", "Breakfast Nook", "Bar Area", "Wine Cellar",
+        
+        // UTILITY & STORAGE
+        "Laundry Room", "Mudroom", "Utility Room", "Linen Closet", "Walk-in Closet",
+        
+        // ENTERTAINMENT & RECREATION  
+        "Home Theater", "Media Room", "Game Room", "Home Gym", "Play Room", "Music Room",
+        
+        // CREATIVE & HOBBY SPACES
+        "Craft Room", "Art Studio", "Workshop",
+        
+        // TRANSITIONAL SPACES
+        "Hallway", "Basement",
+        
+        // OUTDOOR & SEASONAL SPACES
+        "Sunroom", "Screened Porch", "Patio", "Deck", "Outdoor Kitchen",
+        
+        // ADDITIONAL STRUCTURES
+        "Pool House", "Guest House"
     ];
 
     // Updated projectPriorityOptions from outline's formConfig
