@@ -46,6 +46,61 @@ export default function ProjectDetailPage() {
         }
     }, [projectId]);
 
+    const handleEditClick = () => {
+        setEditedProject({ ...project });
+        setIsEditing(true);
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditedProject(null);
+    };
+
+    const handleSaveEdit = async () => {
+        try {
+            setIsSaving(true);
+            const response = await fetch(`${BACKEND_URL}/api/projects/${projectId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(editedProject)
+            });
+
+            if (response.ok) {
+                const updatedProject = await response.json();
+                setProject(updatedProject);
+                setIsEditing(false);
+                setEditedProject(null);
+                alert('Project updated successfully!');
+            } else {
+                throw new Error('Failed to update project');
+            }
+        } catch (error) {
+            console.error('Error updating project:', error);
+            alert('Failed to update project. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleInputChange = (field, value, nested = null) => {
+        if (nested) {
+            setEditedProject(prev => ({
+                ...prev,
+                [nested]: {
+                    ...prev[nested],
+                    [field]: value
+                }
+            }));
+        } else {
+            setEditedProject(prev => ({
+                ...prev,
+                [field]: value
+            }));
+        }
+    };
+
     // Complete Filled Questionnaire Component
     const CompleteFilledQuestionnaire = () => {
         if (!project) return <div className="text-center text-stone-300 py-8">Loading questionnaire...</div>;
