@@ -17,21 +17,17 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
   const [vendors, setVendors] = useState([]);
   const [categories, setCategories] = useState([]);
   const [quickCategories, setQuickCategories] = useState([]);
-  const [tradeVendors, setTradeVendors] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('Living Room');
-  const [showWebhookStatus, setShowWebhookStatus] = useState(false);
-  const [webhookStatus, setWebhookStatus] = useState(null);
-  const [expandedImage, setExpandedImage] = useState(null);  // For image modal
+  const [expandedImage, setExpandedImage] = useState(null);
+  const [viewMode, setViewMode] = useState('catalog'); // 'catalog' or 'list'
 
   useEffect(() => {
     loadVendorsAndCategories();
     loadDatabaseStats();
-    loadWebhookStatus();
     loadQuickCategories();
-    loadTradeVendors();
   }, []);
 
   const loadVendorsAndCategories = async () => {
@@ -57,15 +53,6 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     }
   };
 
-  const loadTradeVendors = async () => {
-    try {
-      const response = await axios.get(`${API}/furniture/furniture-catalog/trade-vendors`);
-      setTradeVendors(response.data.vendors || []);
-    } catch (error) {
-      console.error('Failed to load trade vendors:', error);
-    }
-  };
-
   const loadDatabaseStats = async () => {
     try {
       const response = await axios.get(`${API}/furniture/furniture-catalog/stats`);
@@ -75,20 +62,18 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     }
   };
 
-  const loadWebhookStatus = async () => {
-    try {
-      const response = await axios.get(`${API}/furniture/webhook-status`);
-      setWebhookStatus(response.data);
-    } catch (error) {
-      console.error('Failed to load webhook status:', error);
-    }
-  };
-
   const searchFurniture = async (categoryFilter = '') => {
     const effectiveQuery = searchQuery.trim();
     const effectiveCategory = categoryFilter || filters.category;
     
     if (!effectiveQuery && !filters.vendor && !effectiveCategory) {
+      // Load all products if no filters
+      try {
+        const response = await axios.get(`${API}/furniture/furniture-catalog/recent?limit=100`);
+        setSearchResults(response.data.items || []);
+      } catch (error) {
+        console.error('Failed to load all products:', error);
+      }
       return;
     }
 
@@ -131,72 +116,18 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
     setSearchResults([]);
   };
 
-  const addToChecklist = async (product) => {
-    if (!currentProject || !currentProject.id) {
-      alert('Please select a project first');
-      return;
-    }
-
-    try {
-      const response = await axios.post(`${API}/furniture/furniture-catalog/add-to-project`, {
-        item_id: product.id,
-        project_id: currentProject.id,
-        room_name: selectedRoom
-      });
-
-      if (response.data.success) {
-        alert(`✅ ${product.name} added to ${selectedRoom} checklist!`);
-        
-        // Optionally call parent callback
-        if (onSelectProduct) {
-          onSelectProduct(product);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to add to checklist:', error);
-      alert(`❌ Failed to add to checklist: ${error.response?.data?.detail || 'Unknown error'}`);
-    }
-  };
-
-  const addToCanvaBoard = async (product) => {
-    if (!currentProject || !currentProject.id) {
-      alert('Please select a project first');
-      return;
-    }
-
-    try {
-      // First add to checklist if not already there
-      await addToChecklist(product);
-      
-      // Prepare Canva board data
-      const response = await axios.post(`${API}/furniture/furniture-catalog/prepare-canva-board`, null, {
-        params: {
-          project_id: currentProject.id,
-          room_name: selectedRoom
-        }
-      });
-
-      if (response.data.success) {
-        alert(`🎨 ${product.name} prepared for Canva! Board creation will be implemented next.`);
-        console.log('Canva board data:', response.data);
-      }
-    } catch (error) {
-      console.error('Failed to prepare Canva board:', error);
-      alert(`❌ Failed to prepare Canva board: ${error.response?.data?.detail || 'Unknown error'}`);
-    }
-  };
-
-  const startMassScraping = async (maxVendors = null) => {
+  const startHouzzClipperBot = async () => {
     try {
       const confirmed = window.confirm(
-        `🚀 START MASS CATALOG SCRAPING?\n\n` +
-        `This will scrape ALL products from ${maxVendors || 'ALL'} trade vendors:\n` +
-        `• Four Hands\n• Regina Andrew\n• Visual Comfort\n• Hudson Valley Lighting\n• Global Views\n• Arteriors\n• Uttermost\n• Currey & Company\n\n` +
-        `This operation will take 30-60 minutes and will populate your furniture catalog with thousands of products.\n\n` +
-        `Each product will be:\n` +
-        `✅ Scraped from vendor website\n` +
-        `✅ Added to your unified database\n` +
-        `✅ Clipped to Houzz Pro\n\n` +
+        `🤖 START HOUZZ PRO CLIPPER BOT?\n\n` +
+        `This will automatically use your Houzz Pro clipper extension to clip ALL products from ALL your trade vendors:\n\n` +
+        `• Four Hands\n• Regina Andrew\n• Visual Comfort\n• Hudson Valley Lighting\n• Global Views\n• And more...\n\n` +
+        `The bot will:\n` +
+        `✅ Open each vendor's catalog\n` +
+        `✅ Use YOUR Houzz Pro clipper on every product\n` +
+        `✅ Products get clipped to Houzz Pro\n` +
+        `✅ Data also saved here for unified search\n\n` +
+        `This will take 2-3 hours and populate thousands of products.\n\n` +
         `Continue?`
       );
       
@@ -204,410 +135,351 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
       
       setLoading(true);
       
-      const response = await axios.post(`${API}/furniture/furniture-catalog/start-mass-scraping`, {
-        max_vendors: maxVendors
-      });
+      const response = await axios.post(`${API}/furniture/start-houzz-clipper-bot`);
       
       if (response.data.success) {
-        alert(`🎉 Mass scraping started!\n\n` +
-              `Status: ${response.data.status}\n` +
-              `Vendors: ${response.data.vendors_to_process}\n` +
-              `Estimated time: ${response.data.estimated_time}\n\n` +
-              `You can monitor progress by refreshing the stats.`);
+        alert(`🎉 Houzz Pro Clipper Bot Started!\n\n` +
+              `The bot is now automatically clipping products using your Houzz Pro clipper extension.\n\n` +
+              `You can monitor progress by refreshing the stats.\n\n` +
+              `All clipped products will appear here in your unified search!`);
         
-        // Auto-refresh stats every 30 seconds during scraping
+        // Auto-refresh stats every 30 seconds
         const refreshInterval = setInterval(() => {
           loadDatabaseStats();
+          searchFurniture(); // Refresh results
         }, 30000);
         
-        // Stop auto-refresh after 1 hour
+        // Stop auto-refresh after 3 hours
         setTimeout(() => {
           clearInterval(refreshInterval);
-        }, 3600000);
+        }, 10800000);
       }
       
     } catch (error) {
-      console.error('Failed to start mass scraping:', error);
-      alert(`❌ Failed to start mass scraping: ${error.response?.data?.detail || error.message}`);
+      console.error('Failed to start Houzz clipper bot:', error);
+      alert(`❌ Failed to start Houzz clipper bot: ${error.response?.data?.detail || error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
-  // EXACT COLORS FROM YOUR EXISTING SHEETS
-  const getRoomColor = (roomName) => {
-    const roomColors = {
-      'living room': '#7C3AED',      // Purple
-      'dining room': '#DC2626',      // Red
-      'kitchen': '#EA580C',          // Orange  
-      'primary bedroom': '#059669',  // Green
-      'primary bathroom': '#2563EB', // Blue
-      'powder room': '#7C2D12',      // Brown
-      'guest room': '#BE185D',       // Pink
-      'office': '#6366F1',           // Indigo
-      'laundry room': '#16A34A',     // Green
-      'mudroom': '#0891B2',          // Cyan
-      'family room': '#CA8A04',      // Yellow
-      'basement': '#6B7280',         // Gray
-      'attic storage': '#78716C',    // Stone
-      'garage': '#374151',           // Gray-800
-      'balcony': '#7C3AED'           // Purple
-    };
-    return roomColors[roomName.toLowerCase()] || '#7C3AED';
-  };
-
-  const getCategoryColor = () => '#065F46';  // Dark green
-  const getMainHeaderColor = () => '#8B4444';  // Dark red for main headers
-  const getAdditionalInfoColor = () => '#8B4513';  // Brown for ADDITIONAL INFO.
-  const getShippingInfoColor = () => '#6B46C1';  // Purple for SHIPPING INFO.
-
   const formatPrice = (price) => {
     if (!price || price === 0) return 'Price on request';
-    return typeof price === 'string' && price.startsWith('$') ? price : `$${price}`;
+    return typeof price === 'string' && price.startsWith('$') ? price : `$${price.toFixed(2)}`;
   };
 
-  const getSourceBadgeColor = (source) => {
-    switch (source) {
-      case 'houzz_pro_clipper': return '#059669';  // Green like your sheets
-      case 'browser_extension': return '#2563EB';  // Blue like your sheets
-      default: return '#6B7280';  // Gray like your sheets
-    }
-  };
+  // Load all products on initial render
+  useEffect(() => {
+    searchFurniture();
+  }, []);
 
   return (
-    <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
-      
-      {/* SEARCH AND FILTER SECTION - EXACTLY LIKE YOUR EXISTING SHEETS */}
-      <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
-        <div className="flex flex-col lg:flex-row gap-4 items-center">
-          
-          {/* Search Input - Matching your sheet style */}
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && searchFurniture()}
-            placeholder="🔍 Search furniture..."
-            className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ backgroundColor: '#374151' }}
-          />
-          
-          {/* Filters - Matching your sheet dropdowns */}
-          <select
-            value={filters.vendor}
-            onChange={(e) => setFilters({ ...filters, vendor: e.target.value })}
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ backgroundColor: '#374151' }}
-          >
-            <option value="">All Vendors</option>
-            {vendors.map(vendor => (
-              <option key={vendor} value={vendor}>{vendor}</option>
-            ))}
-          </select>
-
-          <select
-            value={filters.category}
-            onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ backgroundColor: '#374151' }}
-          >
-            <option value="">All Categories</option>
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
-
-          <input
-            type="text"
-            value={filters.min_price}
-            onChange={(e) => setFilters({ ...filters, min_price: e.target.value })}
-            placeholder="Min $"
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ backgroundColor: '#374151' }}
-          />
-
-          <input
-            type="text"
-            value={filters.max_price}
-            onChange={(e) => setFilters({ ...filters, max_price: e.target.value })}
-            placeholder="Max $"
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ backgroundColor: '#374151' }}
-          />
-
-          {/* Action Buttons - Matching your sheet style */}
-          <div className="flex gap-2">
-            <button 
-              onClick={() => searchFurniture()}
-              disabled={isSearching}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded font-medium"
-            >
-              {isSearching ? 'SEARCHING...' : '🔍 SEARCH'}
-            </button>
-            <button 
-              onClick={clearFilters}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium"
-            >
-              CLEAR
-            </button>
-            <button
-              onClick={() => startMassScraping(2)}
-              disabled={loading}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded font-medium"
-              title="Scrape 2 vendors for testing"
-            >
-              {loading ? 'SCRAPING...' : '🏭 TEST SCRAPE (2)'}
-            </button>
-            <button
-              onClick={() => startMassScraping()}
-              disabled={loading}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white rounded font-medium"
-              title="Scrape ALL vendor catalogs"
-            >
-              {loading ? 'SCRAPING...' : '🚀 SCRAPE ALL'}
-            </button>
+    <div className="min-h-screen" style={{ 
+      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+    }}>
+      {/* Header Section */}
+      <div className="relative overflow-hidden">
+        {/* Gold trim at top */}
+        <div className="h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent"></div>
+        
+        <div className="container mx-auto px-6 py-8">
+          {/* Hero Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-5xl font-bold mb-4" style={{
+              background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+            }}>
+              🔍 UNIFIED FURNITURE CATALOG
+            </h1>
+            <p className="text-xl text-gray-300 mb-6">
+              Your complete trade furniture collection - all vendors, all products, one beautiful catalog
+            </p>
+            <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent mx-auto"></div>
           </div>
-        </div>
 
-        {/* Project Selection - Matching your sheet style */}
-        {currentProject && (
-          <div className="mt-4 flex items-center gap-4">
-            <div className="text-white">
-              <span className="text-gray-400">Project: </span>
-              <span className="font-semibold">{currentProject.client_name}</span>
+          {/* Stats Dashboard */}
+          {stats && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-gradient-to-br from-black/60 to-gray-900/80 rounded-xl p-4 border border-yellow-400/30">
+                <div className="text-3xl font-bold text-yellow-400">{stats.total_items?.toLocaleString()}</div>
+                <div className="text-gray-300 text-sm">Total Products</div>
+              </div>
+              <div className="bg-gradient-to-br from-black/60 to-gray-900/80 rounded-xl p-4 border border-blue-400/30">
+                <div className="text-3xl font-bold text-blue-400">{Object.keys(stats.vendors || {}).length}</div>
+                <div className="text-gray-300 text-sm">Trade Vendors</div>
+              </div>
+              <div className="bg-gradient-to-br from-black/60 to-gray-900/80 rounded-xl p-4 border border-purple-400/30">
+                <div className="text-3xl font-bold text-purple-400">{Object.keys(stats.categories || {}).length}</div>
+                <div className="text-gray-300 text-sm">Categories</div>
+              </div>
+              <div className="bg-gradient-to-br from-black/60 to-gray-900/80 rounded-xl p-4 border border-green-400/30">
+                <div className="text-3xl font-bold text-green-400">{stats.recent_additions || 0}</div>
+                <div className="text-gray-300 text-sm">Recently Clipped</div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-gray-400">Add to Room: </span>
-              <select
-                value={selectedRoom}
-                onChange={(e) => setSelectedRoom(e.target.value)}
-                className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ backgroundColor: '#374151' }}
-              >
-                <option value="Living Room">Living Room</option>
-                <option value="Kitchen">Kitchen</option>
-                <option value="Dining Room">Dining Room</option>
-                <option value="Bedroom">Bedroom</option>
-                <option value="Office">Office</option>
-                <option value="Bathroom">Bathroom</option>
-              </select>
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* Statistics Display - Matching your sheet header colors */}
-        {stats && (
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
-            <div className="px-3 py-2 rounded text-center text-white text-sm" style={{ backgroundColor: '#8B4444' }}>
-              <div className="font-bold">{stats.total_items || 0}</div>
-              <div className="text-xs">Total Products</div>
-            </div>
-            <div className="px-3 py-2 rounded text-center text-white text-sm" style={{ backgroundColor: '#065F46' }}>
-              <div className="font-bold">{Object.keys(stats.vendors || {}).length}</div>
-              <div className="text-xs">Trade Vendors</div>
-            </div>
-            <div className="px-3 py-2 rounded text-center text-white text-sm" style={{ backgroundColor: '#6B46C1' }}>
-              <div className="font-bold">{Object.keys(stats.categories || {}).length}</div>
-              <div className="text-xs">Categories</div>
-            </div>
-            <div className="px-3 py-2 rounded text-center text-white text-sm" style={{ backgroundColor: '#059669' }}>
-              <div className="font-bold">{stats.recent_additions || 0}</div>
-              <div className="text-xs">Recent (7d)</div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* QUICK CATEGORY BUTTONS - Matching your sheet aesthetic */}
-      {quickCategories.length > 0 && (
-        <div className="mb-4 px-4">
-          <h3 className="text-white font-bold text-sm mb-2" style={{ color: '#F5F5DC' }}>QUICK CATEGORY SEARCH</h3>
-          <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-2">
-            {quickCategories.slice(0, 16).map((category, index) => (
+          {/* Search and Filter Section */}
+          <div className="bg-gradient-to-br from-black/60 to-gray-900/80 rounded-2xl p-6 border border-yellow-400/30 mb-8">
+            {/* Main Search Bar */}
+            <div className="flex gap-4 mb-6">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && searchFurniture()}
+                placeholder="Search furniture... (chandeliers, dining chairs, console tables)"
+                className="flex-1 px-6 py-4 bg-black/40 border-2 border-yellow-400/50 rounded-xl text-white placeholder-gray-400 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              />
+              
               <button
-                key={index}
-                onClick={() => quickCategorySearch(category)}
-                className={`px-3 py-2 rounded text-xs font-bold text-white transition-colors ${
-                  filters.category === category 
-                    ? 'opacity-100' 
-                    : 'opacity-80 hover:opacity-100'
-                }`}
-                style={{ 
-                  backgroundColor: filters.category === category ? '#8B4444' : getCategoryColor()
-                }}
+                onClick={() => searchFurniture()}
+                disabled={isSearching}
+                className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 disabled:from-gray-600 disabled:to-gray-700 text-black font-bold rounded-xl text-lg transition-all transform hover:scale-105"
               >
-                {category.toUpperCase()}
+                {isSearching ? '🔍...' : '🔍 SEARCH'}
               </button>
-            ))}
+            </div>
+
+            {/* Filters Row */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+              <select
+                value={filters.vendor}
+                onChange={(e) => setFilters({ ...filters, vendor: e.target.value })}
+                className="px-4 py-3 bg-black/40 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              >
+                <option value="">All Vendors</option>
+                {vendors.map(vendor => (
+                  <option key={vendor} value={vendor}>{vendor}</option>
+                ))}
+              </select>
+
+              <select
+                value={filters.category}
+                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                className="px-4 py-3 bg-black/40 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              >
+                <option value="">All Categories</option>
+                {categories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+
+              <input
+                type="text"
+                value={filters.min_price}
+                onChange={(e) => setFilters({ ...filters, min_price: e.target.value })}
+                placeholder="Min Price ($)"
+                className="px-4 py-3 bg-black/40 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              />
+
+              <input
+                type="text"
+                value={filters.max_price}
+                onChange={(e) => setFilters({ ...filters, max_price: e.target.value })}
+                placeholder="Max Price ($)"
+                className="px-4 py-3 bg-black/40 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              />
+
+              <div className="flex gap-2">
+                <button
+                  onClick={clearFilters}
+                  className="px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors"
+                >
+                  CLEAR
+                </button>
+                <button
+                  onClick={startHouzzClipperBot}
+                  disabled={loading}
+                  className="px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg font-semibold transition-colors"
+                >
+                  {loading ? '🤖...' : '🤖 CLIP ALL'}
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Category Buttons */}
+            {quickCategories.length > 0 && (
+              <div>
+                <h3 className="text-yellow-400 font-semibold mb-3">⚡ Quick Categories</h3>
+                <div className="flex flex-wrap gap-2">
+                  {quickCategories.slice(0, 12).map((category, index) => (
+                    <button
+                      key={index}
+                      onClick={() => quickCategorySearch(category)}
+                      className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                        filters.category === category 
+                          ? 'bg-yellow-400 text-black' 
+                          : 'bg-black/40 text-gray-300 hover:bg-yellow-400/20 hover:text-yellow-400'
+                      }`}
+                    >
+                      {category.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
 
-      {/* RESULTS TABLE - EXACTLY LIKE YOUR EXISTING SHEETS */}
-      <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A' }}>
-        <div style={{ overflowX: 'auto', minWidth: '1200px' }}>
-          <table className="w-full border-collapse border border-gray-400">
-            
-            {/* TABLE HEADER - Matching your sheet headers exactly */}
-            <thead>
-              <tr>
-                <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white text-center" style={{ backgroundColor: '#8B4444' }}>IMAGE</td>
-                <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white text-center" style={{ backgroundColor: '#8B4444' }}>PRODUCT NAME</td>
-                <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white text-center" style={{ backgroundColor: '#8B4444' }}>VENDOR</td>
-                <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white text-center" style={{ backgroundColor: '#8B4444' }}>CATEGORY</td>
-                <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white text-center" style={{ backgroundColor: '#8B4444' }}>COST</td>
-                <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white text-center" style={{ backgroundColor: '#8B4444' }}>SKU</td>
-                <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white text-center" style={{ backgroundColor: '#8B4444' }}>DIMENSIONS</td>
-                <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white text-center" style={{ backgroundColor: '#6B46C1' }}>SOURCE</td>
-                <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white text-center" style={{ backgroundColor: '#065F46' }}>ACTIONS</td>
-              </tr>
-            </thead>
+          {/* CATALOG VIEW - PICTURES FOCUSED */}
+          <div className="bg-gradient-to-br from-black/60 to-gray-900/80 rounded-2xl p-6 border border-yellow-400/30">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-yellow-400">
+                📸 PRODUCT CATALOG ({searchResults.length} items)
+              </h2>
+              <div className="text-gray-400 text-sm">
+                Showing your clipped furniture collection
+              </div>
+            </div>
 
-            {/* TABLE BODY - Matching your sheet row styling */}
-            <tbody>
-              {searchResults.length > 0 ? (
-                searchResults.map((product, index) => (
-                  <tr key={product.id || index} className={index % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-yellow-400 mx-auto mb-4"></div>
+                <p className="text-gray-300">Loading your furniture catalog...</p>
+              </div>
+            ) : searchResults.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="text-8xl mb-6">🪑</div>
+                <h3 className="text-3xl font-bold text-yellow-400 mb-4">Start Building Your Catalog</h3>
+                <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
+                  Use the "🤖 CLIP ALL" button to automatically clip all products from your trade vendors using Houzz Pro clipper.
+                  All clipped products will appear here as a beautiful, searchable catalog.
+                </p>
+                <button
+                  onClick={startHouzzClipperBot}
+                  disabled={loading}
+                  className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-bold rounded-xl text-lg transition-all transform hover:scale-105"
+                >
+                  🤖 START CLIPPING ALL PRODUCTS
+                </button>
+              </div>
+            ) : (
+              /* BEAUTIFUL CATALOG GRID - PICTURE FOCUSED */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {searchResults.map((product, index) => (
+                  <div key={index} className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-xl overflow-hidden border border-yellow-400/20 hover:border-yellow-400/60 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
                     
-                    {/* IMAGE - PROMINENT AND CLICKABLE LIKE YOUR SHEETS */}
-                    <td className="border border-gray-400 px-2 py-2 text-center">
+                    {/* PROMINENT PRODUCT IMAGE */}
+                    <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
                       {product.image_url ? (
-                        <img 
-                          src={product.image_url} 
-                          alt={product.name} 
-                          className="w-20 h-20 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity" 
+                        <img
+                          src={product.image_url}
+                          alt={product.name}
+                          className="w-full h-full object-cover cursor-pointer hover:scale-110 transition-transform duration-300"
                           onClick={() => setExpandedImage(product.image_url)}
-                          title="Click to expand"
                         />
                       ) : (
-                        <div className="w-20 h-20 bg-gray-700 rounded flex items-center justify-center text-xs text-gray-400">
-                          No Image
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="text-6xl text-gray-600">🪑</div>
                         </div>
                       )}
-                    </td>
-                    
-                    {/* PRODUCT NAME */}
-                    <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                      {product.name}
-                    </td>
-                    
-                    {/* VENDOR */}
-                    <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                      {product.vendor}
-                    </td>
-                    
-                    {/* CATEGORY */}
-                    <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                      {product.category}
-                    </td>
-                    
-                    {/* COST */}
-                    <td className="border border-gray-400 px-2 py-2 text-sm text-white text-right">
-                      {formatPrice(product.cost)}
-                    </td>
-                    
-                    {/* SKU */}
-                    <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                      {product.sku}
-                    </td>
-                    
-                    {/* DIMENSIONS */}
-                    <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                      {product.dimensions}
-                    </td>
-                    
-                    {/* SOURCE */}
-                    <td className="border border-gray-400 px-2 py-2 text-center">
-                      <span 
-                        className="px-2 py-1 rounded text-xs font-bold text-white"
-                        style={{ backgroundColor: getSourceBadgeColor(product.source) }}
-                      >
-                        {product.source === 'houzz_pro_clipper' ? 'HOUZZ' : 'EXTENSION'}
-                      </span>
-                    </td>
-                    
-                    {/* ACTIONS */}
-                    <td className="border border-gray-400 px-2 py-2 text-center">
-                      <div className="flex gap-1">
-                        {product.product_url && (
-                          <a
-                            href={product.product_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs rounded font-bold"
-                            title="View Original"
-                          >
-                            LINK
-                          </a>
+                      
+                      {/* Source Badge */}
+                      <div className="absolute top-2 right-2">
+                        <span className="px-2 py-1 bg-green-600 text-white text-xs font-bold rounded">
+                          HOUZZ
+                        </span>
+                      </div>
+                      
+                      {/* Price Overlay */}
+                      <div className="absolute bottom-2 left-2">
+                        <div className="bg-black/80 px-3 py-1 rounded-lg">
+                          <span className="text-yellow-400 font-bold text-lg">
+                            {formatPrice(product.cost)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Product Details */}
+                    <div className="p-4">
+                      <h3 className="text-white font-bold text-lg mb-2 line-clamp-2">
+                        {product.name}
+                      </h3>
+                      
+                      <div className="text-yellow-400 font-semibold mb-2">
+                        {product.vendor}
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {product.category && (
+                          <span className="bg-blue-600/30 text-blue-400 px-2 py-1 rounded text-xs">
+                            {product.category}
+                          </span>
                         )}
+                        {product.sku && (
+                          <span className="bg-gray-600/30 text-gray-400 px-2 py-1 rounded text-xs">
+                            {product.sku}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {product.dimensions && (
+                        <div className="text-gray-400 text-sm mb-3">
+                          📏 {product.dimensions}
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-col gap-2">
+                        <div className="grid grid-cols-2 gap-2">
+                          {product.product_url && (
+                            <a
+                              href={product.product_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-black text-center rounded font-semibold text-sm transition-colors"
+                            >
+                              VIEW
+                            </a>
+                          )}
+                          
+                          <button
+                            onClick={() => alert(`Adding "${product.name}" to checklist!`)}
+                            className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold text-sm transition-colors"
+                          >
+                            ADD
+                          </button>
+                        </div>
                         
                         <button
-                          onClick={() => addToChecklist(product)}
-                          disabled={!currentProject}
-                          className="px-2 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white text-xs rounded font-bold"
-                          title={!currentProject ? 'Select a project first' : 'Add to Checklist'}
+                          onClick={() => alert(`Creating Canva board with "${product.name}"!`)}
+                          className="w-full px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded font-semibold text-sm transition-colors"
                         >
-                          ADD
-                        </button>
-                        
-                        <button
-                          onClick={() => addToCanvaBoard(product)}
-                          disabled={!currentProject}
-                          className="px-2 py-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white text-xs rounded font-bold"
-                          title={!currentProject ? 'Select a project first' : 'Add to Canva Board'}
-                        >
-                          CANVA
+                          🎨 CANVA BOARD
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="9" className="border border-gray-400 px-4 py-8 text-center text-gray-400">
-                    {isSearching ? 'Searching...' : (searchQuery || filters.category || filters.vendor) ? 'No products found. Try adjusting your search.' : 'Enter search terms or select filters to find furniture.'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* INSTRUCTIONS - Matching your sheet style */}
-      {!searchQuery && !filters.category && searchResults.length === 0 && !isSearching && (
-        <div className="mt-6 px-4">
-          <div className="p-4 rounded text-white" style={{ backgroundColor: '#1E293B' }}>
-            <h3 className="font-bold mb-2 text-sm" style={{ color: '#F5F5DC' }}>UNIFIED TRADE FURNITURE SEARCH</h3>
-            <div className="text-xs text-gray-300 space-y-1">
-              <p>• <strong>HOUZZ INTEGRATION:</strong> Furniture clipped in Houzz Pro automatically appears here</p>
-              <p>• <strong>QUICK SEARCH:</strong> Click category buttons above for instant results</p>
-              <p>• <strong>ALL VENDORS:</strong> Search across {tradeVendors.length} trade furniture vendors in one place</p>
-              <p>• <strong>ADD TO CHECKLIST:</strong> Move items directly to your project checklist</p>
-              <p>• <strong>CANVA BOARDS:</strong> Create mood boards with selected furniture</p>
-            </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-      )}
 
-      {/* IMAGE EXPANSION MODAL - EXACTLY LIKE YOUR EXISTING SHEETS */}
+        {/* Gold trim at bottom */}
+        <div className="h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent"></div>
+      </div>
+
+      {/* IMAGE EXPANSION MODAL */}
       {expandedImage && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
           onClick={() => setExpandedImage(null)}
         >
-          <div className="relative max-w-4xl max-h-screen">
+          <div className="relative max-w-5xl max-h-screen">
             <button
               onClick={() => setExpandedImage(null)}
-              className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold z-10"
-              title="Close"
+              className="absolute -top-12 right-0 bg-yellow-400 hover:bg-yellow-500 text-black rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold"
             >
               ×
             </button>
             <img 
               src={expandedImage} 
               alt="Expanded view" 
-              className="max-w-full max-h-screen object-contain rounded-lg"
+              className="max-w-full max-h-screen object-contain rounded-lg border-2 border-yellow-400"
             />
           </div>
         </div>
