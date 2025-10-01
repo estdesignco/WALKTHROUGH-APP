@@ -114,140 +114,236 @@ class HouzzProScraper:
             print("\n🔐 LOGGING INTO HOUZZ PRO...")
             print(f"📧 Using email: {self.email}")
             
-            # Navigate to login page
-            await self.page.goto(self.login_url, wait_until='networkidle')
-            await self.page.wait_for_timeout(2000)
+            # First, try to access the target URLs directly to see if we need to login
+            print("🔍 Checking if already logged in...")
             
-            print("📄 Login page loaded")
+            try:
+                await self.page.goto(self.selections_url, wait_until='domcontentloaded', timeout=15000)
+                await self.page.wait_for_timeout(3000)
+                
+                # Check if we're redirected to login
+                current_url = self.page.url
+                if 'login' not in current_url.lower():
+                    print("✅ Already logged in or no login required!")
+                    return True
+                    
+            except:
+                print("📄 Need to login first...")
             
-            # Look for email input field with multiple selectors
-            email_selectors = [
-                'input[type="email"]',
-                'input[name="email"]', 
-                'input[id="email"]',
-                'input[placeholder*="email"]',
-                '#email',
-                '.email-input'
+            # Navigate to login page with retries
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    print(f"🌐 Attempting login (attempt {attempt + 1}/{max_retries})...")
+                    await self.page.goto(self.login_url, wait_until='domcontentloaded', timeout=20000)
+                    await self.page.wait_for_timeout(3000)
+                    
+                    # Check for rate limiting
+                    page_content = await self.page.content()
+                    if '429' in page_content or 'too many requests' in page_content.lower():
+                        print("⚠️ Rate limited, waiting longer...")
+                        await asyncio.sleep(10)
+                        continue
+                    
+                    print("📄 Login page loaded")
+                    break
+                    
+                except Exception as e:
+                    print(f"⚠️ Login page load attempt {attempt + 1} failed: {e}")
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(5)
+                    else:
+                        return False
+            
+            # Try different login approaches
+            login_approaches = [
+                self._try_standard_login,
+                self._try_alternative_login
             ]
             
-            email_input = None
-            for selector in email_selectors:
+            for approach in login_approaches:
                 try:
-                    email_input = await self.page.wait_for_selector(selector, timeout=3000)
-                    if email_input:
-                        print(f"✅ Found email input with selector: {selector}")
-                        break
-                except:
+                    success = await approach()
+                    if success:
+                        return True
+                except Exception as e:
+                    print(f"❌ Login approach failed: {e}")
                     continue
-            
-            if not email_input:
-                print("❌ Could not find email input field")
-                return False
-            
-            # Enter email
-            await email_input.fill(self.email)
-            await self.page.wait_for_timeout(1000)
-            print("📧 Email entered")
-            
-            # Look for password input field
-            password_selectors = [
-                'input[type="password"]',
-                'input[name="password"]',
-                'input[id="password"]',
-                '#password',
-                '.password-input'
-            ]
-            
-            password_input = None
-            for selector in password_selectors:
-                try:
-                    password_input = await self.page.wait_for_selector(selector, timeout=3000)
-                    if password_input:
-                        print(f"✅ Found password input with selector: {selector}")
-                        break
-                except:
-                    continue
-            
-            if not password_input:
-                print("❌ Could not find password input field")
-                return False
-            
-            # Enter password
-            await password_input.fill(self.password)
-            await self.page.wait_for_timeout(1000)
-            print("🔒 Password entered")
-            
-            # Look for login button
-            login_button_selectors = [
-                'button[type="submit"]',
-                'input[type="submit"]',
-                'button:text("Sign In")',
-                'button:text("Log In")',
-                'button:text("Login")',
-                '.login-button',
-                '.sign-in-button'
-            ]
-            
-            login_button = None
-            for selector in login_button_selectors:
-                try:
-                    login_button = await self.page.wait_for_selector(selector, timeout=3000)
-                    if login_button:
-                        print(f"✅ Found login button with selector: {selector}")
-                        break
-                except:
-                    continue
-            
-            if not login_button:
-                print("❌ Could not find login button")
-                return False
-            
-            # Click login button
-            await login_button.click()
-            print("🎯 Login button clicked")
-            
-            # Wait for login to complete
-            await self.page.wait_for_timeout(5000)
-            
-            # Check if we're logged in by looking for dashboard elements
-            current_url = self.page.url
-            print(f"📍 Current URL after login: {current_url}")
-            
-            # Look for indicators of successful login
-            login_success_indicators = [
-                '.dashboard',
-                '.user-profile',
-                '.pro-navigation',
-                '[data-testid="user-menu"]',
-                '.manage-selections',
-                'text="Manage"'
-            ]
-            
-            logged_in = False
-            for indicator in login_success_indicators:
-                try:
-                    element = await self.page.wait_for_selector(indicator, timeout=3000)
-                    if element:
-                        print(f"✅ Login success indicator found: {indicator}")
-                        logged_in = True
-                        break
-                except:
-                    continue
-            
-            if not logged_in and 'pro.houzz.com' in current_url and 'login' not in current_url:
-                # If we're on pro.houzz.com but not on login page, assume success
-                logged_in = True
-                print("✅ Login success inferred from URL redirect")
-            
-            if logged_in:
-                print("🎉 SUCCESSFULLY LOGGED INTO HOUZZ PRO!")
-                return True
-            else:
-                print("❌ Login may have failed - could not verify success")
-                return False
+                    
+            print("❌ All login approaches failed")
+            return False
                 
         except Exception as e:
-            print(f"❌ Login failed: {e}")
+            print(f"❌ Login process failed: {e}")
+            return False
+    
+    async def _try_standard_login(self) -> bool:
+        """Try standard email/password login"""
+        print("🔑 Trying standard login...")
+        
+        # Look for email input
+        email_selectors = [
+            'input[type="email"]',
+            'input[name="email"]', 
+            'input[id="email"]',
+            'input[placeholder*="email" i]',
+            '#email',
+            '.email-input',
+            'input[autocomplete="username"]'
+        ]
+        
+        email_input = None
+        for selector in email_selectors:
+            try:
+                email_input = await self.page.wait_for_selector(selector, timeout=2000)
+                if email_input and await email_input.is_visible():
+                    print(f"✅ Found email input: {selector}")
+                    break
+            except:
+                continue
+        
+        if not email_input:
+            print("❌ No email input found")
+            return False
+        
+        # Enter email with realistic typing
+        await email_input.click()
+        await email_input.fill('')  # Clear first
+        await email_input.type(self.email, delay=50)
+        await self.page.wait_for_timeout(1000)
+        print("📧 Email entered")
+        
+        # Look for password input
+        password_selectors = [
+            'input[type="password"]',
+            'input[name="password"]',
+            'input[id="password"]',
+            '#password',
+            'input[autocomplete="current-password"]'
+        ]
+        
+        password_input = None
+        for selector in password_selectors:
+            try:
+                password_input = await self.page.wait_for_selector(selector, timeout=2000)
+                if password_input and await password_input.is_visible():
+                    print(f"✅ Found password input: {selector}")
+                    break
+            except:
+                continue
+        
+        if not password_input:
+            print("❌ No password input found")
+            return False
+        
+        # Enter password with realistic typing
+        await password_input.click()
+        await password_input.fill('')  # Clear first
+        await password_input.type(self.password, delay=50)
+        await self.page.wait_for_timeout(1000)
+        print("🔒 Password entered")
+        
+        # Look for and click login button
+        login_selectors = [
+            'button[type="submit"]',
+            'input[type="submit"]',
+            'button:has-text("Sign In")',
+            'button:has-text("Log In")', 
+            'button:has-text("Login")',
+            '[data-testid="login-button"]',
+            '.login-button',
+            '.sign-in-button'
+        ]
+        
+        for selector in login_selectors:
+            try:
+                login_button = await self.page.wait_for_selector(selector, timeout=2000)
+                if login_button and await login_button.is_visible():
+                    print(f"✅ Found login button: {selector}")
+                    await login_button.click()
+                    print("🎯 Login button clicked")
+                    break
+            except:
+                continue
+        
+        # Wait for navigation after login
+        await self.page.wait_for_timeout(5000)
+        
+        return await self._verify_login()
+    
+    async def _try_alternative_login(self) -> bool:
+        """Try alternative login method (form submission, etc.)"""
+        print("🔄 Trying alternative login...")
+        
+        # Try form submission approach
+        try:
+            # Fill form using JavaScript
+            await self.page.evaluate(f"""
+                const emailInputs = document.querySelectorAll('input[type="email"], input[name="email"]');
+                const passwordInputs = document.querySelectorAll('input[type="password"], input[name="password"]');
+                
+                if (emailInputs.length > 0) emailInputs[0].value = '{self.email}';
+                if (passwordInputs.length > 0) passwordInputs[0].value = '{self.password}';
+                
+                // Try to submit the form
+                const forms = document.querySelectorAll('form');
+                if (forms.length > 0) forms[0].submit();
+            """)
+            
+            await self.page.wait_for_timeout(5000)
+            return await self._verify_login()
+            
+        except Exception as e:
+            print(f"❌ Alternative login failed: {e}")
+            return False
+    
+    async def _verify_login(self) -> bool:
+        """Verify if login was successful"""
+        try:
+            current_url = self.page.url
+            print(f"📍 Current URL: {current_url}")
+            
+            # Check if we're redirected away from login page
+            if 'login' not in current_url.lower():
+                print("✅ Redirected away from login page")
+                
+                # Try to access protected content
+                try:
+                    await self.page.goto(self.selections_url, wait_until='domcontentloaded', timeout=10000)
+                    await self.page.wait_for_timeout(3000)
+                    
+                    final_url = self.page.url
+                    if 'login' not in final_url.lower():
+                        print("🎉 LOGIN SUCCESSFUL - Can access protected pages!")
+                        return True
+                    
+                except:
+                    pass
+            
+            # Look for login success indicators
+            success_indicators = [
+                'text=Dashboard',
+                'text=Manage',
+                'text=Profile',
+                '[data-testid="user-menu"]',
+                '.user-dropdown',
+                '.account-menu'
+            ]
+            
+            for indicator in success_indicators:
+                try:
+                    element = await self.page.wait_for_selector(indicator, timeout=2000)
+                    if element:
+                        print(f"✅ Login indicator found: {indicator}")
+                        return True
+                except:
+                    continue
+            
+            print("❌ Login verification failed")
+            return False
+            
+        except Exception as e:
+            print(f"❌ Login verification error: {e}")
             return False
     
     async def scrape_selections_board(self) -> List[Dict]:
