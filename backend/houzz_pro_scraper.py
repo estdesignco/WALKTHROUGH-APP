@@ -243,7 +243,7 @@ class HouzzProScraper:
     async def scrape_selections_board(self) -> List[Dict]:
         """Scrape the user's Selections board"""
         try:
-            print(f"\n📋 SCRAPING SELECTIONS BOARD...")
+            print("\n📋 SCRAPING SELECTIONS BOARD...")
             print(f"🔗 URL: {self.selections_url}")
             
             # Navigate to selections board
@@ -265,7 +265,7 @@ class HouzzProScraper:
     async def scrape_my_items(self) -> List[Dict]:
         """Scrape the user's My Items collection"""
         try:
-            print(f"\n📚 SCRAPING MY ITEMS COLLECTION...")
+            print("\n📚 SCRAPING MY ITEMS COLLECTION...")
             print(f"🔗 URL: {self.my_items_url}")
             
             # Navigate to my items
@@ -332,7 +332,7 @@ class HouzzProScraper:
                         products.append(product_data)
                         print(f"✅ Product {len(products)}: {product_data['name'][:50]}...")
                     
-                except Exception as e:
+                except Exception:
                     # Don't log individual element errors as they're common
                     pass
             
@@ -431,7 +431,7 @@ class HouzzProScraper:
                 "image_url": image_url,
                 "images": [image_url] if image_url else [],
                 "tags": [],
-                "notes": f"Scraped from Houzz Pro account",
+                "notes": "Scraped from Houzz Pro account",
                 "source": "houzz_pro_scraper",
                 "scraped_date": datetime.utcnow().isoformat(),
                 "houzz_pro_data": {
@@ -442,7 +442,7 @@ class HouzzProScraper:
             
             return product_data
             
-        except Exception as e:
+        except Exception:
             # Silent fail for individual products
             return None
     
@@ -540,7 +540,7 @@ class HouzzProScraper:
                 # Small delay between saves
                 await asyncio.sleep(0.5)
             
-            print(f"\n📊 SAVE RESULTS:")
+            print("\n📊 SAVE RESULTS:")
             print(f"✅ Saved: {saved_count}")
             print(f"❌ Failed: {failed_count}")
             print(f"📈 Success rate: {(saved_count/len(products)*100):.1f}%")
@@ -590,7 +590,7 @@ class HouzzProScraper:
             my_items_products = await self.scrape_my_items()
             all_products.extend(my_items_products)
             
-            print(f"\n📊 SCRAPING SUMMARY:")
+            print("\n📊 SCRAPING SUMMARY:")
             print(f"📋 Selections Board: {len(selections_products)} products")
             print(f"📚 My Items: {len(my_items_products)} products")
             print(f"📦 Total Unique: {len(all_products)} products")
