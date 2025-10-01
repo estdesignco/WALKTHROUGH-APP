@@ -362,7 +362,20 @@ export default function CustomerfacingQuestionnaire() {
             window.location.href = `/customer/project/${newProject.id}`;
         } catch (error) {
             console.error("Failed to create project:", error);
-            setSubmissionStatus('error');
+            
+            // Try to get more specific error message
+            let errorMessage = 'Something went wrong. Please try again.';
+            
+            if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            // If it's a network error, try to parse the response
+            if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                errorMessage = 'Network error. Please check your connection and try again.';
+            }
+            
+            setSubmissionStatus(`error: ${errorMessage}`);
         } finally {
             setIsSubmitting(false);
         }
