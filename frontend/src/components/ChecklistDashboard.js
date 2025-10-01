@@ -243,13 +243,14 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   };
 
   return (
-    <CompletePageLayout 
-      projectId={projectId}
-      activeTab="checklist"
-      title="CHECKLIST - GREENE"
-      hideNavigation={hideNavigation}
-      onAddRoom={() => setShowAddRoom(true)}
-    >
+    <div className="relative">
+      <CompletePageLayout 
+        projectId={projectId}
+        activeTab="checklist"
+        title="CHECKLIST - GREENE"
+        hideNavigation={hideNavigation}
+        onAddRoom={() => setShowAddRoom(true)}
+      >
       {/* STATUS OVERVIEW SECTION */}
       <ChecklistStatusOverview
         totalItems={getTotalItems()}
