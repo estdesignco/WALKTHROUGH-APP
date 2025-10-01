@@ -127,6 +127,21 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     }
   };
 
+  const handleCanvaImportComplete = async (importResults) => {
+    try {
+      console.log('🎨 Canva import completed:', importResults);
+      
+      // Reload the project to show newly imported items
+      const updatedProject = await projectAPI.get(projectId, 'checklist');
+      setProject(updatedProject);
+      
+      // Show success message
+      alert(`✅ Successfully imported ${importResults.successful_imports} products from Canva board!`);
+    } catch (error) {
+      console.error('❌ Error reloading after Canva import:', error);
+    }
+  };
+
   const handleDeleteRoom = async (roomId) => {
     if (!window.confirm('Are you sure you want to delete this room? This will delete all categories and items within it.')) {
       return;
