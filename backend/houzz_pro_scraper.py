@@ -681,8 +681,9 @@ class HouzzProScraper:
             selections_products = await self.scrape_selections_board()
             all_products.extend(selections_products)
             
-            # Small delay between scraping operations
-            await asyncio.sleep(2)
+            # Longer delay between scraping operations to avoid rate limits
+            print("⏳ Waiting between page scrapes to avoid rate limits...")
+            await asyncio.sleep(30)
             
             # Scrape My Items
             my_items_products = await self.scrape_my_items()
