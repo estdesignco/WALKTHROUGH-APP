@@ -973,26 +973,14 @@ const ExactChecklistSpreadsheet = ({
                     <span>{room.name.toUpperCase()}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {/* FILE UPLOAD FOR CANVA PDF */}
-                    <input
-                      type="file"
-                      accept=".pdf,.png,.jpg,.jpeg"
-                      className="hidden"
-                      id={`canva-upload-${room.id}`}
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          handleCanvaPdfUpload(file, room.name);
-                        }
-                      }}
-                    />
-                    <label
-                      htmlFor={`canva-upload-${room.id}`}
-                      className="bg-purple-600 text-[#B49B7E] text-xs px-2 py-1 rounded hover:bg-purple-700 cursor-pointer"
-                      title="Upload Canva PDF/Image"
+                    {/* CANVA PAGE-SPECIFIC IMPORT BUTTON */}
+                    <button
+                      onClick={() => onRoomCanvaImport && onRoomCanvaImport(room.name)}
+                      className="bg-purple-600 text-white text-xs px-3 py-1 rounded hover:bg-purple-700 transition-colors"
+                      title={`Import from Canva Page for ${room.name}`}
                     >
-                      🎨 Upload Canva
-                    </label>
+                      🎨 Import Page
+                    </button>
                     <button
                       onClick={() => onDeleteRoom && onDeleteRoom(room.id)}
                       className="text-red-300 hover:text-red-100 text-lg"
