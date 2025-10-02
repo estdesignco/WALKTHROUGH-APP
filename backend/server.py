@@ -4680,6 +4680,93 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         print(f"❌ Failed to extract links from Canva board: {e}")
         return []
 
+@api_router.post("/test-canva-mock")
+async def test_canva_mock(data: dict):
+    """Test endpoint for Canva import using mock data (faster than browser automation)"""
+    project_id = data.get('project_id', '')
+    room_name = data.get('room_name', 'Living Room')
+    
+    # Use mock furniture items directly
+    mock_items = [
+        {
+            'name': 'Modern Linen Sectional Sofa',
+            'vendor': 'Four Hands',
+            'cost': 2500,
+            'image_url': '',
+            'url': 'https://www.fourhands.com/products/living-room/seating/sofas/linen-sectional-sofa'
+        },
+        {
+            'name': 'Contemporary Coffee Table',
+            'vendor': 'Uttermost', 
+            'cost': 800,
+            'image_url': '',
+            'url': 'https://www.uttermost.com/products/accent-furniture/tables/coffee-table-modern'
+        }
+    ]
+    
+    results = []
+    successful_imports = 0
+    
+    for i, mock_item in enumerate(mock_items):
+        try:
+            # Create the item in the database
+            item_data = {
+                "id": str(uuid.uuid4()),
+                "name": mock_item['name'],
+                "vendor": mock_item['vendor'],
+                "cost": mock_item['cost'],
+                "product_url": mock_item['url'],
+                "image_url": mock_item['image_url'],
+                "imported_from": "canva_board_test",
+                "status": "TO BE SELECTED", 
+                "created_at": datetime.utcnow()
+            }
+            
+            # Insert into items collection
+            item_result = await db.items.insert_one(item_data)
+            
+            if item_result.inserted_id:
+                print(f"✅ Created test item: {item_data['name']}")
+                
+                # Find and update project
+                project = await db.projects.find_one({"id": project_id})
+                if project and "rooms" in project:
+                    for room in project["rooms"]:
+                        if room["name"] == room_name:
+                            print(f"🏠 Found target room: {room_name}")
+                            if room.get("categories") and len(room["categories"]) > 0:
+                                target_category = room["categories"][0]
+                                if "subcategories" in target_category and len(target_category["subcategories"]) > 0:
+                                    target_subcategory = target_category["subcategories"][0]
+                                    if "items" not in target_subcategory:
+                                        target_subcategory["items"] = []
+                                    target_subcategory["items"].append(item_data)
+                                    
+                                    await db.projects.update_one(
+                                        {"id": project_id},
+                                        {"$set": {"rooms": project["rooms"]}}
+                                    )
+                                    print("💾 Project updated successfully")
+                                    break
+                
+                results.append({
+                    "name": item_data["name"],
+                    "vendor": item_data["vendor"], 
+                    "database_created": True
+                })
+                successful_imports += 1
+                
+        except Exception as e:
+            print(f"❌ Error creating test item: {e}")
+            results.append({"error": str(e), "name": mock_item['name']})
+    
+    return {
+        "success": True,
+        "message": f"Test import: {successful_imports}/{len(mock_items)} items created",
+        "results": results,
+        "successful_imports": successful_imports
+    }
+
 @api_router.post("/upload-canva-pdf")
 async def upload_canva_pdf(file: UploadFile = File(...), room_name: str = Form(...), project_id: str = Form(...)):
     """
