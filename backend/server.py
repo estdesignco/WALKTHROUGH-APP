@@ -4740,8 +4740,8 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
                     content = await page.content()
                     all_urls = re.findall(r'https?://[^\\s<>"\']+', content)
                     
-                    # Filter for potential furniture sites
-                    furniture_domains = ['fourh', 'uttermost', 'visual', 'houzz', 'wayfair', 'westelm', 'cb2', 'article', 'potterybarn', 'crateandbarrel']
+                    # Filter for YOUR trade vendor sites
+                    furniture_domains = ['fourhands.com', 'uttermost.com', 'hvlgroup.com', 'visualcomfort.com', 'fourh', 'uttermost', 'hvl', 'visual']
                     
                     for url in all_urls:
                         if any(domain in url.lower() for domain in furniture_domains) and 'canva' not in url.lower():
