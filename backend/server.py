@@ -4660,18 +4660,40 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         
         print(f"🔗 Extracted {len(links)} potential product links from Canva board")
         
-        # If no links found, create mock furniture items for testing
+        # If no links found, we need to actually get the real Canva content
         if len(links) == 0:
-            print("🏠 No links found, generating mock furniture items for testing...")
-            mock_items = [
-                "https://www.fourhands.com/products/living-room/seating/sofas/linen-sectional-sofa",
-                "https://www.uttermost.com/products/accent-furniture/tables/coffee-table-modern",
-                "https://visualcomfort.com/lighting/table-lamps/ceramic-table-lamp-white",
-                "https://www.houzz.com/products/modern-dining-table-walnut-wood",
-                "https://www.wayfair.com/furniture/pdp/mercury-row-accent-chair-upholstered.html"
-            ]
-            print(f"🎨 Generated {len(mock_items)} mock furniture items")
-            return mock_items
+            print("🚨 No furniture links found in Canva board!")
+            print("📋 This might mean:")
+            print("   1. The Canva design doesn't contain clickable furniture links")
+            print("   2. The design has product names/images that need to be processed differently")
+            print("   3. We need to access the shared/published version instead")
+            
+            # Try accessing the published version
+            if 'edit' in board_url:
+                published_url = board_url.replace('/edit', '/view')
+                print(f"🔄 Trying published version: {published_url}")
+                
+                try:
+                    await page.goto(published_url, wait_until='domcontentloaded', timeout=30000)
+                    await page.wait_for_timeout(3000)
+                    
+                    # Look for images and text that might be furniture items
+                    images = await page.query_selector_all('img')
+                    print(f"🖼️ Found {len(images)} images in published version")
+                    
+                    # Get image alt texts and surrounding text
+                    for img in images[:10]:  # Check first 10 images
+                        try:
+                            alt_text = await img.get_attribute('alt')
+                            if alt_text and any(word in alt_text.lower() for word in ['furniture', 'sofa', 'chair', 'table', 'lamp', 'bed']):
+                                print(f"🪑 Found furniture image: {alt_text}")
+                        except:
+                            continue
+                except Exception as e:
+                    print(f"⚠️ Could not access published version: {e}")
+            
+            # Return empty list - no mock data anymore
+            return []
         
         # Return unique links
         return list(set(links))
