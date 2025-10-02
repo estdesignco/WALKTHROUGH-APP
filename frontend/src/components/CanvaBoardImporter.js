@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 
 const CanvaBoardImporter = ({ isOpen, onClose, onImportComplete, projectId, roomName }) => {
   const [canvaUrl, setCanvaUrl] = useState('');
-  const [pageNumber, setPageNumber] = useState('');
+  const [roomPageMappings, setRoomPageMappings] = useState([
+    { roomName: 'Living Room', pageNumber: 1 },
+    { roomName: 'Kitchen', pageNumber: 2 },
+    { roomName: 'Bedroom', pageNumber: 3 }
+  ]);
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState('');
   const [importResults, setImportResults] = useState(null);
