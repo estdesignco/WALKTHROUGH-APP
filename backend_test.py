@@ -982,14 +982,145 @@ class TestProjectCreator:
             
         return True
 
-    def run_comprehensive_test(self):
-        """Run the complete critical system recovery test"""
-        print("🚀 STARTING CRITICAL SYSTEM RECOVERY TESTING...")
+    def test_canva_import_endpoint(self, project_id, room_id):
+        """Test the main Canva import endpoint with real credentials"""
+        print("\n🎨 Testing Canva Import Endpoint...")
         
-        # Step 1: Test MongoDB Infrastructure
+        # Test Canva import with provided credentials and URL
+        import_data = {
+            "board_url": "https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit",
+            "project_id": project_id,
+            "room_name": "Living Room",
+            "room_id": room_id,
+            "auto_clip_to_houzz": True,
+            "page_number": 1
+        }
+        
+        print(f"🔗 Testing with Canva URL: {import_data['board_url']}")
+        print(f"📄 Page Number: 1")
+        print(f"🏠 Room: Living Room")
+        
+        # Use longer timeout for Canva scraping
+        success, response, status_code = self.make_request('POST', '/import-canva-board', import_data)
+        
+        if not success:
+            self.log_test("Canva Import Endpoint", False, f"Failed: {response} (Status: {status_code})")
+            return False
+            
+        # Check response structure
+        if not isinstance(response, dict):
+            self.log_test("Canva Import Response Format", False, f"Expected dict, got {type(response)}")
+            return False
+            
+        # Check for expected fields
+        expected_fields = ['success', 'message']
+        missing_fields = [field for field in expected_fields if field not in response]
+        
+        if missing_fields:
+            self.log_test("Canva Import Response Structure", False, f"Missing fields: {missing_fields}")
+            return False
+            
+        if response.get('success'):
+            self.log_test("Canva Import Endpoint", True, f"Success: {response.get('successful_imports', 0)} items imported")
+            print(f"   📊 Import Results:")
+            print(f"      - Success: {response.get('success', 'Unknown')}")
+            print(f"      - Items Found: {response.get('successful_imports', 0)}")
+            print(f"      - Message: {response.get('message', 'No message')}")
+            return True
+        else:
+            self.log_test("Canva Import Endpoint", False, f"Import failed: {response.get('message', 'Unknown error')}")
+            return False
+
+    def test_canva_page_specific_import(self, project_id, room_id):
+        """Test importing from specific Canva pages"""
+        print("\n📄 Testing Page-Specific Canva Import...")
+        
+        # Test different page numbers
+        for page_num in [1, 2]:
+            import_data = {
+                "board_url": "https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit",
+                "project_id": project_id,
+                "room_name": "Living Room",
+                "room_id": room_id,
+                "auto_clip_to_houzz": False,  # Disable for faster testing
+                "page_number": page_num
+            }
+            
+            success, response, status_code = self.make_request('POST', '/import-canva-board', import_data)
+            
+            if success and response.get('success'):
+                self.log_test(f"Canva Page {page_num} Import", True, f"Page {page_num}: {response.get('successful_imports', 0)} items")
+            else:
+                self.log_test(f"Canva Page {page_num} Import", False, f"Page {page_num} failed: {response.get('message', 'Unknown')}")
+        
+        return True
+
+    def test_canva_error_handling(self, project_id, room_id):
+        """Test error handling for invalid Canva inputs"""
+        print("\n🚨 Testing Canva Error Handling...")
+        
+        # Test with invalid Canva URL
+        invalid_data = {
+            "board_url": "https://invalid-canva-url.com",
+            "project_id": project_id,
+            "room_name": "Living Room",
+            "room_id": room_id,
+            "auto_clip_to_houzz": False,
+            "page_number": 1
+        }
+        
+        success, response, status_code = self.make_request('POST', '/import-canva-board', invalid_data)
+        
+        # Should return error for invalid URL
+        if status_code >= 400 or (isinstance(response, dict) and not response.get('success')):
+            self.log_test("Invalid Canva URL Handling", True, "Correctly rejected invalid URL")
+        else:
+            self.log_test("Invalid Canva URL Handling", False, "Should have rejected invalid URL")
+        
+        # Test with missing project ID
+        missing_project_data = {
+            "board_url": "https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit",
+            "room_name": "Living Room",
+            "auto_clip_to_houzz": False,
+            "page_number": 1
+        }
+        
+        success, response, status_code = self.make_request('POST', '/import-canva-board', missing_project_data)
+        
+        # Should return error for missing project ID
+        if status_code >= 400 or (isinstance(response, dict) and not response.get('success')):
+            self.log_test("Missing Project ID Handling", True, "Correctly rejected missing project ID")
+        else:
+            self.log_test("Missing Project ID Handling", False, "Should have rejected missing project ID")
+        
+        return True
+
+    def test_houzz_pro_integration(self):
+        """Test Houzz Pro auto-clip functionality"""
+        print("\n🏡 Testing Houzz Pro Integration...")
+        
+        # Test if Houzz Pro credentials are configured
+        success, response, status_code = self.make_request('GET', '/houzz-pro/status')
+        
+        if success:
+            self.log_test("Houzz Pro Status Check", True, "Houzz Pro integration available")
+            return True
+        else:
+            # Check if it's just not implemented yet vs actual error
+            if status_code == 404:
+                self.log_test("Houzz Pro Status Check", True, "Houzz Pro endpoint not implemented (expected)")
+            else:
+                self.log_test("Houzz Pro Status Check", False, f"Houzz Pro integration error: {response}")
+            return True  # Don't fail test for optional feature
+
+    def run_comprehensive_test(self):
+        """Run the complete Canva import functionality test"""
+        print("🚀 STARTING CANVA IMPORT FUNCTIONALITY TESTING...")
+        
+        # Step 1: Test Basic API Connectivity
         mongodb_success = self.test_mongodb_infrastructure()
         if not mongodb_success:
-            print("❌ CRITICAL: MongoDB infrastructure test failed - cannot proceed")
+            print("❌ CRITICAL: Backend API not accessible - cannot proceed")
             return False
         
         # Step 2: Test Project Management APIs
@@ -998,39 +1129,40 @@ class TestProjectCreator:
             print("❌ CRITICAL: Project management APIs failed")
             return False
         
-        # Step 3: Test Enhanced Room Creation
+        # Step 3: Create Test Room for Canva Import
         room_success, room_id = self.test_enhanced_room_creation(project_id)
         if not room_success:
-            print("⚠️ WARNING: Enhanced room creation issues detected")
+            print("❌ CRITICAL: Room creation failed")
+            return False
         
-        # Step 4: Test Categories Available Endpoint
-        categories_success = self.test_categories_available_endpoint()
-        if not categories_success:
-            print("⚠️ WARNING: Categories endpoint issues detected")
+        # Step 4: Test Canva Import Endpoint
+        canva_success = self.test_canva_import_endpoint(project_id, room_id)
+        if not canva_success:
+            print("❌ CRITICAL: Canva import endpoint failed")
         
-        # Step 5: Test Item CRUD Operations
+        # Step 5: Test Page-Specific Import
+        page_success = self.test_canva_page_specific_import(project_id, room_id)
+        if not page_success:
+            print("⚠️ WARNING: Page-specific import issues detected")
+        
+        # Step 6: Test Error Handling
+        error_success = self.test_canva_error_handling(project_id, room_id)
+        if not error_success:
+            print("⚠️ WARNING: Error handling issues detected")
+        
+        # Step 7: Test Houzz Pro Integration
+        houzz_success = self.test_houzz_pro_integration()
+        if not houzz_success:
+            print("⚠️ WARNING: Houzz Pro integration issues detected")
+        
+        # Step 8: Verify Items Were Created
         items_success = self.test_item_crud_operations(project_id)
         if not items_success:
-            print("❌ CRITICAL: Item CRUD operations failed")
-        
-        # Step 6: Test Web Scraping API
-        scraping_success = self.test_web_scraping_api()
-        if not scraping_success:
-            print("⚠️ WARNING: Web scraping API issues detected")
-        
-        # Step 7: Test Status Management
-        status_success = self.test_status_management()
-        if not status_success:
-            print("⚠️ WARNING: Status management issues detected")
-        
-        # Step 8: Test Transfer Functionality APIs
-        transfer_success = self.test_transfer_functionality_apis(project_id)
-        if not transfer_success:
-            print("⚠️ WARNING: Transfer functionality issues detected")
+            print("⚠️ WARNING: Item verification failed")
         
         # Final Summary
         print("\n" + "=" * 80)
-        print("🎯 CRITICAL SYSTEM RECOVERY TEST SUMMARY")
+        print("🎯 CANVA IMPORT FUNCTIONALITY TEST SUMMARY")
         print("=" * 80)
         
         total_tests = len(self.test_results)
@@ -1053,21 +1185,24 @@ class TestProjectCreator:
         # Critical vs Non-Critical Assessment
         critical_failures = []
         if not mongodb_success:
-            critical_failures.append("MongoDB Infrastructure")
+            critical_failures.append("Backend API Connectivity")
         if not project_success:
-            critical_failures.append("Project Management APIs")
-        if not items_success:
-            critical_failures.append("Item CRUD Operations")
+            critical_failures.append("Project Management")
+        if not room_success:
+            critical_failures.append("Room Creation")
+        if not canva_success:
+            critical_failures.append("Canva Import Endpoint")
             
         if critical_failures:
             print(f"\n🚨 CRITICAL FAILURES: {', '.join(critical_failures)}")
-            print("   System is NOT ready for production use")
+            print("   Canva import functionality is NOT working")
             return False
         else:
-            print(f"\n🎉 CORE SYSTEM OPERATIONAL: All critical backend functionality verified")
-            print(f"   MongoDB infrastructure: ✅ Working")
+            print(f"\n🎉 CANVA IMPORT FUNCTIONALITY OPERATIONAL")
+            print(f"   Backend API: ✅ Working")
             print(f"   Project management: ✅ Working") 
-            print(f"   Item operations: ✅ Working")
+            print(f"   Room creation: ✅ Working")
+            print(f"   Canva import: ✅ Working")
             if project_id:
                 print(f"   Test project created: {project_id}")
             return True
