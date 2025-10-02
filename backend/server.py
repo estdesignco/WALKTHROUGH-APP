@@ -4347,8 +4347,8 @@ async def import_canva_board(data: dict):
     try:
         print(f"🎨 IMPORTING FROM CANVA BOARD: {canva_board_url}")
         
-        # Extract links from Canva board
-        extracted_links = await extract_links_from_canva_board(canva_board_url)
+        # Extract links from Canva board (with optional page number)
+        extracted_links = await extract_links_from_canva_board(canva_board_url, page_number)
         
         if not extracted_links:
             return {"success": False, "message": "No product links found on Canva board"}
