@@ -41,8 +41,15 @@ class CanvaIntegration:
                     'error': 'Could not extract design ID from URL'
                 }
             
+            # Build page-specific URL if page number provided
+            target_url = canva_url
+            if page_number:
+                # Add page parameter to URL
+                separator = '&' if '?' in canva_url else '?'
+                target_url = f"{canva_url}{separator}page={page_number}"
+            
             # Get Canva board content
-            board_data = await self._fetch_canva_board_data(canva_url)
+            board_data = await self._fetch_canva_board_data(target_url)
             
             if not board_data:
                 return {
