@@ -127,19 +127,37 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     }
   };
 
-  const handleCanvaImportComplete = async (importResults) => {
+  const handleRoomCanvaImportComplete = async (roomName, importResults) => {
     try {
-      console.log('🎨 Canva import completed:', importResults);
+      console.log(`🎨 Canva import completed for ${roomName}:`, importResults);
       
       // Reload the project to show newly imported items
       const updatedProject = await projectAPI.get(projectId, 'checklist');
       setProject(updatedProject);
       
-      // Show success message
-      alert(`✅ Successfully imported ${importResults.successful_imports} products from Canva board!`);
+      // Close the modal for this room
+      setRoomCanvaImports(prev => ({
+        ...prev,
+        [roomName]: false
+      }));
+      
     } catch (error) {
       console.error('❌ Error reloading after Canva import:', error);
     }
+  };
+
+  const openRoomCanvaImport = (roomName) => {
+    setRoomCanvaImports(prev => ({
+      ...prev,
+      [roomName]: true
+    }));
+  };
+
+  const closeRoomCanvaImport = (roomName) => {
+    setRoomCanvaImports(prev => ({
+      ...prev,
+      [roomName]: false
+    }));
   };
 
   const handleDeleteRoom = async (roomId) => {
