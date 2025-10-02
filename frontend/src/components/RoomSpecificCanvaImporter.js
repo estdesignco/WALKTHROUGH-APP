@@ -12,7 +12,72 @@ const RoomSpecificCanvaImporter = ({ isOpen, onClose, onImportComplete, projectI
     { name: '', vendor: '', cost: '', url: '' }
   ]);
 
+  const handleManualImport = async () => {
+    // Validate manual entries
+    const validItems = manualItems.filter(item => item.name.trim());
+    
+    if (validItems.length === 0) {
+      setImportError('Please enter at least one furniture item');
+      return;
+    }
+
+    setIsImporting(true);
+    setImportError('');
+    setImportResults(null);
+
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      
+      console.log(`🪑 MANUAL IMPORT - Room: ${roomName}, Items: ${validItems.length}`);
+      
+      const response = await fetch(`${backendUrl}/api/manual-furniture-import`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          project_id: projectId,
+          room_name: roomName,
+          room_id: roomId,
+          auto_clip_to_houzz: autoClipToHouzz,
+          items: validItems
+        })
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const results = await response.json();
+      console.log(`🪑 MANUAL IMPORT RESULTS for ${roomName}:`, results);
+      
+      setImportResults(results);
+      
+      if (results.success && results.successful_imports > 0) {
+        // Notify parent component of successful import
+        if (onImportComplete) {
+          onImportComplete(results);
+        }
+        // Auto-close modal after 2 seconds on success
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      }
+      
+    } catch (error) {
+      console.error(`❌ Manual import failed for ${roomName}:`, error);
+      setImportError(error.message);
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   const handleImport = async () => {
+    if (useManualEntry) {
+      return handleManualImport();
+    }
+
     if (!canvaUrl || !canvaUrl.includes('canva.com')) {
       setImportError('Please enter a valid Canva board URL');
       return;
@@ -74,6 +139,20 @@ const RoomSpecificCanvaImporter = ({ isOpen, onClose, onImportComplete, projectI
     } finally {
       setIsImporting(false);
     }
+  };
+
+  const addManualItem = () => {
+    setManualItems([...manualItems, { name: '', vendor: '', cost: '', url: '' }]);
+  };
+
+  const removeManualItem = (index) => {
+    setManualItems(manualItems.filter((_, i) => i !== index));
+  };
+
+  const updateManualItem = (index, field, value) => {
+    const updated = [...manualItems];
+    updated[index][field] = value;
+    setManualItems(updated);
   };
 
   if (!isOpen) return null;
