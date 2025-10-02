@@ -12,7 +12,8 @@ const ExactChecklistSpreadsheet = ({
   carrierTypes = [],
   onDeleteRoom, 
   onAddRoom,
-  onReload 
+  onReload,
+  onRoomCanvaImport
 }) => {
   console.log('🎯 SimpleChecklistSpreadsheet rendering with project:', project);
 
