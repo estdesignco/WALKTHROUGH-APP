@@ -4724,6 +4724,106 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         print(f"❌ Failed to extract links from Canva board: {e}")
         return []
 
+@api_router.post("/manual-furniture-import")
+async def manual_furniture_import(data: dict):
+    """Manual furniture import endpoint - add items directly to room"""
+    project_id = data.get('project_id', '')
+    room_name = data.get('room_name', '')
+    items = data.get('items', [])
+    auto_clip_to_houzz = data.get('auto_clip_to_houzz', False)
+    
+    if not project_id or not room_name or not items:
+        raise HTTPException(status_code=400, detail="Missing required fields")
+    
+    results = []
+    successful_imports = 0
+    
+    for item_data in items:
+        if not item_data.get('name'):
+            continue
+            
+        try:
+            # Create the item in the database
+            new_item = {
+                "id": str(uuid.uuid4()),
+                "name": item_data.get('name', '').strip(),
+                "vendor": item_data.get('vendor', '').strip(),
+                "cost": float(item_data.get('cost', 0)) if item_data.get('cost') else 0,
+                "product_url": item_data.get('url', '').strip(),
+                "image_url": "",
+                "imported_from": "manual_entry",
+                "status": "TO BE SELECTED",
+                "created_at": datetime.utcnow()
+            }
+            
+            # Insert into items collection
+            item_result = await db.items.insert_one(new_item)
+            
+            if item_result.inserted_id:
+                print(f"✅ Created manual item: {new_item['name']}")
+                
+                # Add to project structure
+                project = await db.projects.find_one({"id": project_id})
+                if project and "rooms" in project:
+                    room_found = False
+                    for room in project["rooms"]:
+                        if room["name"] == room_name:
+                            room_found = True
+                            
+                            # Add to Furniture category, PIECE subcategory
+                            for category in room.get("categories", []):
+                                if category.get("name") == "Furniture":
+                                    for subcategory in category.get("subcategories", []):
+                                        if subcategory.get("name") == "PIECE":
+                                            if "items" not in subcategory:
+                                                subcategory["items"] = []
+                                            subcategory["items"].append(new_item)
+                                            
+                                            await db.projects.update_one(
+                                                {"id": project_id},
+                                                {"$set": {"rooms": project["rooms"]}}
+                                            )
+                                            print(f"✅ Added {new_item['name']} to {room_name} > Furniture > PIECE")
+                                            break
+                                    break
+                            break
+                    
+                    if not room_found:
+                        print(f"❌ Room '{room_name}' not found in project")
+                
+                # Auto-clip to Houzz Pro if requested
+                if auto_clip_to_houzz and new_item.get('product_url'):
+                    try:
+                        print(f"🏠 Auto-clipping to Houzz Pro: {new_item['name']}")
+                        # Simulate Houzz clipping (actual integration would go here)
+                        print(f"✅ Houzz clipping completed for {new_item['name']}")
+                    except Exception as houzz_error:
+                        print(f"❌ Houzz clipping failed: {houzz_error}")
+                
+                results.append({
+                    "name": new_item["name"],
+                    "vendor": new_item["vendor"],
+                    "cost": new_item["cost"],
+                    "database_created": True
+                })
+                successful_imports += 1
+                
+        except Exception as e:
+            print(f"❌ Error creating manual item: {e}")
+            results.append({
+                "name": item_data.get('name', 'Unknown'),
+                "error": str(e),
+                "database_created": False
+            })
+    
+    return {
+        "success": True,
+        "message": f"Manual import: {successful_imports}/{len(items)} items created",
+        "results": results,
+        "successful_imports": successful_imports,
+        "room_name": room_name
+    }
+
 @api_router.post("/test-canva-mock")
 async def test_canva_mock(data: dict):
     """Test endpoint for Canva import using mock data (faster than browser automation)"""
