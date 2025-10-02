@@ -288,6 +288,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         onDeleteRoom={(roomId) => handleDeleteRoom(roomId)}
         onAddRoom={() => setShowAddRoom(true)}
         onReload={loadSimpleProject}
+        onRoomCanvaImport={openRoomCanvaImport}
       />
 
       {/* Add Room Modal */}
