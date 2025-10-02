@@ -4384,40 +4384,77 @@ async def import_canva_board(data: dict):
                     except Exception as clip_error:
                         product_info["houzz_clip_error"] = str(clip_error)
                 
-                # Add to checklist - ACTUALLY CREATE DATABASE ITEMS
+                # Add to checklist using NORMALIZED DATABASE STRUCTURE
                 try:
-                    # Create the item in the database
+                    # Find the target room in the normalized structure
+                    target_room = await db.rooms.find_one({
+                        "project_id": project_id,
+                        "name": room_name
+                    })
+                    
+                    if not target_room:
+                        print(f"❌ Room '{room_name}' not found for project {project_id}")
+                        continue
+                        
+                    print(f"🏠 Found target room: {room_name} ({target_room['id']})")
+                    
+                    # Find Furniture category, or create one if it doesn't exist
+                    furniture_category = await db.categories.find_one({
+                        "room_id": target_room["id"],
+                        "name": "Furniture"
+                    })
+                    
+                    if not furniture_category:
+                        print("📁 No Furniture category found, using first available category")
+                        furniture_category = await db.categories.find_one({"room_id": target_room["id"]})
+                    
+                    if not furniture_category:
+                        print("❌ No categories found in target room")
+                        continue
+                        
+                    print(f"📁 Using category: {furniture_category['name']} ({furniture_category['id']})")
+                    
+                    # Find PIECE subcategory, or use first available
+                    target_subcategory = await db.subcategories.find_one({
+                        "category_id": furniture_category["id"],
+                        "name": "PIECE"
+                    })
+                    
+                    if not target_subcategory:
+                        print("📂 No PIECE subcategory found, using first available subcategory")
+                        target_subcategory = await db.subcategories.find_one({"category_id": furniture_category["id"]})
+                    
+                    if not target_subcategory:
+                        print("❌ No subcategories found in target category")
+                        continue
+                        
+                    print(f"📂 Using subcategory: {target_subcategory['name']} ({target_subcategory['id']})")
+                    
+                    # Create the item with proper structure for normalized database
                     item_data = {
                         "id": str(uuid.uuid4()),
                         "name": product_info.get('name', f'Canva Import {i+1}'),
-                        "vendor": product_info.get('vendor', 'Canva Import'),
-                        "cost": product_info.get('cost', 0),
-                        "product_url": link,
-                        "image_url": product_info.get('image_url', ''),
-                        "imported_from": "canva_board",
+                        "quantity": 1,
+                        "size": "",
+                        "remarks": f"Imported from Canva board: {canva_board_url}",
+                        "vendor": product_info.get('vendor', 'Unknown Vendor'),
                         "status": "TO BE SELECTED",
-                        "created_at": datetime.utcnow()
+                        "cost": product_info.get('cost', 0),
+                        "link": link,
+                        "image_url": product_info.get('image_url', ''),
+                        "subcategory_id": target_subcategory["id"],
+                        "imported_from": "canva_board",
+                        "created_at": datetime.utcnow(),
+                        "updated_at": datetime.utcnow()
                     }
                     
                     # Insert into items collection
                     item_result = await db.items.insert_one(item_data)
                     
                     if item_result.inserted_id:
-                        print(f"✅ Created item: {item_data['name']}")
+                        print(f"✅ Created item: {item_data['name']} in {furniture_category['name']} > {target_subcategory['name']}")
                         
-                        # FIXED: Add item to project room structure
-                        try:
-                            project = await db.projects.find_one({"id": project_id})
-                            if project and "rooms" in project:
-                                room_found = False
-                                for room in project["rooms"]:
-                                    if room.get("name") == room_name:
-                                        room_found = True
-                                        print(f"🏠 Found target room: {room_name}")
-                                        
-                                        # Look for Furniture category, if not found use first category
-                                        target_category = None
-                                        for category in room.get("categories", []):
+                        # The item is now properly linked via subcategory_id - no need for embedded structure
                                             if category.get("name") == "Furniture":
                                                 target_category = category
                                                 break
