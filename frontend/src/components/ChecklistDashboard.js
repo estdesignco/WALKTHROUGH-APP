@@ -299,16 +299,18 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         />
       )}
 
-      {/* Canva Board Import Modal */}
-      {showCanvaImport && (
-        <CanvaBoardImporter
-          isOpen={showCanvaImport}
-          onClose={() => setShowCanvaImport(false)}
-          onImportComplete={handleCanvaImportComplete}
+      {/* Room-Specific Canva Import Modals */}
+      {project?.rooms?.map(room => (
+        <RoomSpecificCanvaImporter
+          key={room.id}
+          isOpen={roomCanvaImports[room.name] || false}
+          onClose={() => closeRoomCanvaImport(room.name)}
+          onImportComplete={(results) => handleRoomCanvaImportComplete(room.name, results)}
           projectId={projectId}
-          roomName={project?.rooms?.[0]?.name || 'General'}
+          roomName={room.name}
+          roomId={room.id}
         />
-      )}
+      ))}
     </CompletePageLayout>
 
     {/* Floating Action Buttons */}
