@@ -18,6 +18,16 @@ const CanvaBoardImporter = ({ isOpen, onClose, onImportComplete, projectId, room
       return;
     }
 
+    // Validate room-page mappings
+    const validMappings = roomPageMappings.filter(mapping => 
+      mapping.roomName.trim() && mapping.pageNumber > 0
+    );
+
+    if (validMappings.length === 0) {
+      setImportError('Please specify at least one room-page mapping');
+      return;
+    }
+
     setIsImporting(true);
     setImportError('');
     setImportResults(null);
@@ -25,36 +35,65 @@ const CanvaBoardImporter = ({ isOpen, onClose, onImportComplete, projectId, room
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
-      console.log('🎨 STARTING CANVA IMPORT:', canvaUrl);
+      console.log('🎨 STARTING MULTI-ROOM CANVA IMPORT:', canvaUrl);
+      console.log('🏠 Room-Page Mappings:', validMappings);
       
-      const response = await fetch(`${backendUrl}/api/import-canva-board`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          board_url: canvaUrl,
-          project_id: projectId,
-          room_name: roomName,
-          auto_clip_to_houzz: autoClipToHouzz,
-          page_number: pageNumber ? parseInt(pageNumber) : null
-        })
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      const allResults = [];
+      let totalSuccessfulImports = 0;
+
+      // Import each room-page mapping separately
+      for (const mapping of validMappings) {
+        try {
+          console.log(`🎯 Importing ${mapping.roomName} from page ${mapping.pageNumber}`);
+          
+          const response = await fetch(`${backendUrl}/api/import-canva-board`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              board_url: canvaUrl,
+              project_id: projectId,
+              room_name: mapping.roomName,
+              auto_clip_to_houzz: autoClipToHouzz,
+              page_number: mapping.pageNumber
+            })
+          });
+          
+          if (response.ok) {
+            const results = await response.json();
+            allResults.push({
+              room: mapping.roomName,
+              page: mapping.pageNumber,
+              ...results
+            });
+            
+            if (results.successful_imports) {
+              totalSuccessfulImports += results.successful_imports;
+            }
+          } else {
+            console.warn(`⚠️ Failed to import ${mapping.roomName}: ${response.status}`);
+          }
+          
+        } catch (roomError) {
+          console.error(`❌ Error importing ${mapping.roomName}:`, roomError);
+        }
       }
       
-      const results = await response.json();
-      console.log('🎨 CANVA IMPORT RESULTS:', results);
+      const combinedResults = {
+        success: totalSuccessfulImports > 0,
+        successful_imports: totalSuccessfulImports,
+        room_results: allResults,
+        message: `Imported ${totalSuccessfulImports} products across ${validMappings.length} rooms`
+      };
       
-      setImportResults(results);
+      console.log('🎨 COMBINED IMPORT RESULTS:', combinedResults);
+      setImportResults(combinedResults);
       
-      if (results.success && results.successful_imports > 0) {
+      if (combinedResults.success) {
         // Notify parent component of successful import
         if (onImportComplete) {
-          onImportComplete(results);
+          onImportComplete(combinedResults);
         }
       }
       
