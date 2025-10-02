@@ -4405,41 +4405,73 @@ async def import_canva_board(data: dict):
                     if item_result.inserted_id:
                         print(f"✅ Created item: {item_data['name']}")
                         
-                        # Find the appropriate room and category to add this item to
-                        project = await db.projects.find_one({"id": project_id})
-                        if project and "rooms" in project:
-                            room_found = False
-                            for room in project["rooms"]:
-                                if room["name"] == room_name:
-                                    room_found = True
-                                    print(f"🏠 Found target room: {room_name}")
-                                    
-                                    # Add to first category (Furniture) or create one
-                                    if room.get("categories"):
-                                        target_category = room["categories"][0]  # Use first category
-                                        print(f"📁 Using category: {target_category.get('name', 'Unknown')}")
+                        # FIXED: Add item to project room structure
+                        try:
+                            project = await db.projects.find_one({"id": project_id})
+                            if project and "rooms" in project:
+                                room_found = False
+                                for room in project["rooms"]:
+                                    if room.get("name") == room_name:
+                                        room_found = True
+                                        print(f"🏠 Found target room: {room_name}")
                                         
-                                        if "subcategories" in target_category and len(target_category["subcategories"]) > 0:
-                                            target_subcategory = target_category["subcategories"][0]
-                                            if "items" not in target_subcategory:
-                                                target_subcategory["items"] = []
-                                            target_subcategory["items"].append(item_data)
-                                            print(f"✅ Added item to subcategory: {target_subcategory.get('name', 'Unknown')}")
+                                        # Look for Furniture category, if not found use first category
+                                        target_category = None
+                                        for category in room.get("categories", []):
+                                            if category.get("name") == "Furniture":
+                                                target_category = category
+                                                break
+                                        
+                                        # If no Furniture category, use first category
+                                        if not target_category and room.get("categories"):
+                                            target_category = room["categories"][0]
+                                        
+                                        if target_category:
+                                            print(f"📁 Using category: {target_category.get('name', 'Unknown')}")
                                             
-                                            # Update the project in database
-                                            await db.projects.update_one(
-                                                {"id": project_id},
-                                                {"$set": {"rooms": project["rooms"]}}
-                                            )
-                                            print("💾 Project updated in database")
+                                            # Look for PIECE subcategory, if not found use first subcategory
+                                            target_subcategory = None
+                                            for subcat in target_category.get("subcategories", []):
+                                                if subcat.get("name") == "PIECE":
+                                                    target_subcategory = subcat
+                                                    break
+                                            
+                                            # If no PIECE subcategory, use first subcategory
+                                            if not target_subcategory and target_category.get("subcategories"):
+                                                target_subcategory = target_category["subcategories"][0]
+                                            
+                                            if target_subcategory:
+                                                if "items" not in target_subcategory:
+                                                    target_subcategory["items"] = []
+                                                target_subcategory["items"].append(item_data)
+                                                print(f"✅ Added item to {target_category.get('name')} > {target_subcategory.get('name')}")
+                                                
+                                                # Update the project in database
+                                                result = await db.projects.update_one(
+                                                    {"id": project_id},
+                                                    {"$set": {"rooms": project["rooms"]}}
+                                                )
+                                                
+                                                if result.modified_count > 0:
+                                                    print("💾 Project structure updated successfully!")
+                                                else:
+                                                    print("⚠️ Project update had no changes")
+                                            else:
+                                                print("❌ No subcategories found in target category")
                                         else:
-                                            print("❌ No subcategories found in target category")
-                                    else:
-                                        print("❌ No categories found in target room")
-                                    break
-                            
-                            if not room_found:
-                                print(f"❌ Room '{room_name}' not found in project")
+                                            print("❌ No categories found in target room")
+                                        break
+                                
+                                if not room_found:
+                                    print(f"❌ Room '{room_name}' not found in project")
+                                    # List available rooms for debugging
+                                    available_rooms = [r.get("name") for r in project.get("rooms", [])]
+                                    print(f"📋 Available rooms: {available_rooms}")
+                            else:
+                                print("❌ Project not found or has no rooms")
+                                
+                        except Exception as room_error:
+                            print(f"❌ Error updating project room structure: {room_error}")
                     
                     checklist_item = {
                         "id": item_data["id"],
