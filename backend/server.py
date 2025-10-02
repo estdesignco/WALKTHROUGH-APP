@@ -4657,6 +4657,42 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         
         page = await browser.new_page()
         
+        # Add stealth techniques to bypass bot detection
+        await page.add_init_script("""
+            // Remove webdriver property
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => undefined,
+            });
+            
+            // Mock languages and plugins
+            Object.defineProperty(navigator, 'languages', {
+                get: () => ['en-US', 'en'],
+            });
+            
+            Object.defineProperty(navigator, 'plugins', {
+                get: () => [1, 2, 3, 4, 5],
+            });
+            
+            // Mock chrome property
+            window.chrome = {
+                runtime: {},
+            };
+        """)
+        
+        # Set realistic headers
+        await page.set_extra_http_headers({
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+        })
+        
         # Build page-specific URL if page number is provided
         target_url = board_url
         if page_number:
