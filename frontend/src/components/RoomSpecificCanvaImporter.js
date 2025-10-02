@@ -174,39 +174,124 @@ const RoomSpecificCanvaImporter = ({ isOpen, onClose, onImportComplete, projectI
         </div>
 
         <div className="space-y-4">
-          {/* Canva URL Input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Canva Board URL
-            </label>
-            <input
-              type="url"
-              value={canvaUrl}
-              onChange={(e) => setCanvaUrl(e.target.value)}
-              className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
-              placeholder="https://www.canva.com/design/..."
-            />
-          </div>
-
-          {/* Page Number Input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Canva Page Number
-            </label>
-            <div className="flex items-center space-x-3">
-              <input
-                type="number"
-                value={pageNumber}
-                onChange={(e) => setPageNumber(parseInt(e.target.value) || 1)}
-                className="w-24 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
-                min="1"
-                placeholder="1"
-              />
-              <span className="text-sm text-gray-400">
-                Which page contains {roomName} items?
-              </span>
+          {/* Import Method Toggle */}
+          <div className="flex items-center justify-between bg-gray-700 rounded-lg p-3">
+            <span className="text-sm font-medium text-gray-300">Import Method</span>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setUseManualEntry(false)}
+                className={`px-3 py-1 text-xs rounded ${!useManualEntry ? 'bg-purple-600 text-white' : 'bg-gray-600 text-gray-300'}`}
+              >
+                🎨 Canva Auto
+              </button>
+              <button
+                onClick={() => setUseManualEntry(true)}
+                className={`px-3 py-1 text-xs rounded ${useManualEntry ? 'bg-green-600 text-white' : 'bg-gray-600 text-gray-300'}`}
+              >
+                ✏️ Manual Entry
+              </button>
             </div>
           </div>
+
+          {!useManualEntry ? (
+            <>
+              {/* Canva URL Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Canva Board URL
+                </label>
+                <input
+                  type="url"
+                  value={canvaUrl}
+                  onChange={(e) => setCanvaUrl(e.target.value)}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
+                  placeholder="https://www.canva.com/design/..."
+                />
+              </div>
+
+              {/* Page Number Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Canva Page Number
+                </label>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="number"
+                    value={pageNumber}
+                    onChange={(e) => setPageNumber(parseInt(e.target.value) || 1)}
+                    className="w-24 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
+                    min="1"
+                    placeholder="1"
+                  />
+                  <span className="text-sm text-gray-400">
+                    Which page contains {roomName} items?
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : (
+            /* Manual Entry Section */
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                🪑 Add {roomName} Furniture Items
+              </label>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {manualItems.map((item, index) => (
+                  <div key={index} className="bg-gray-600 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-400">Item {index + 1}</span>
+                      {manualItems.length > 1 && (
+                        <button
+                          onClick={() => removeManualItem(index)}
+                          className="text-red-400 hover:text-red-300 text-xs"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        placeholder="Furniture name"
+                        value={item.name}
+                        onChange={(e) => updateManualItem(index, 'name', e.target.value)}
+                        className="bg-gray-700 text-white px-3 py-2 rounded text-sm border border-gray-500 focus:border-purple-500 focus:outline-none"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Vendor"
+                        value={item.vendor}
+                        onChange={(e) => updateManualItem(index, 'vendor', e.target.value)}
+                        className="bg-gray-700 text-white px-3 py-2 rounded text-sm border border-gray-500 focus:border-purple-500 focus:outline-none"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Cost"
+                        value={item.cost}
+                        onChange={(e) => updateManualItem(index, 'cost', e.target.value)}
+                        className="bg-gray-700 text-white px-3 py-2 rounded text-sm border border-gray-500 focus:border-purple-500 focus:outline-none"
+                      />
+                      <input
+                        type="url"
+                        placeholder="Product URL (optional)"
+                        value={item.url}
+                        onChange={(e) => updateManualItem(index, 'url', e.target.value)}
+                        className="bg-gray-700 text-white px-3 py-2 rounded text-sm border border-gray-500 focus:border-purple-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                ))}
+                
+                <button
+                  onClick={addManualItem}
+                  className="w-full bg-gray-600 hover:bg-gray-500 text-gray-300 py-2 rounded text-sm transition-colors"
+                >
+                  + Add Another Item
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Auto-clip Toggle */}
           <div className="flex items-center justify-between">
