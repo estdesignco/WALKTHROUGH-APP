@@ -975,7 +975,14 @@ const ExactChecklistSpreadsheet = ({
                   <div className="flex items-center gap-2">
                     {/* CANVA PAGE-SPECIFIC IMPORT BUTTON */}
                     <button
-                      onClick={() => onRoomCanvaImport && onRoomCanvaImport(room.name)}
+                      onClick={() => {
+                        console.log(`🎨 Canva import clicked for room: ${room.name}`);
+                        if (onRoomCanvaImport) {
+                          onRoomCanvaImport(room.name);
+                        } else {
+                          alert(`Canva import for ${room.name} - Function not connected yet`);
+                        }
+                      }}
                       className="bg-purple-600 text-white text-xs px-3 py-1 rounded hover:bg-purple-700 transition-colors"
                       title={`Import from Canva Page for ${room.name}`}
                     >
