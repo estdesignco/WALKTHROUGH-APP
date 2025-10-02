@@ -4549,6 +4549,7 @@ async def import_canva_board(data: dict):
                         "vendor": product_info.get('vendor', 'Unknown Vendor'),
                         "status": "TO BE SELECTED",
                         "cost": product_info.get('cost', 0),
+                        "product_url": link,
                         "link": link,
                         "image_url": product_info.get('image_url', ''),
                         "subcategory_id": target_subcategory["id"],
