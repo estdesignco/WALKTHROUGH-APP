@@ -4453,10 +4453,10 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         
         # Check if we need to login first
         print(f"🌐 Navigating to Canva URL: {target_url}")
-        await page.goto(target_url, wait_until='domcontentloaded', timeout=30000)
+        await page.goto(target_url, wait_until='domcontentloaded', timeout=60000)
         
         # Wait for page to fully load
-        await page.wait_for_timeout(5000)
+        await page.wait_for_timeout(3000)
         
         # Check if we're on a login page or security page
         title = await page.title()
