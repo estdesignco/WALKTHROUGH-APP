@@ -4339,6 +4339,7 @@ async def import_canva_board(data: dict):
     project_id = data.get('project_id', '')
     room_name = data.get('room_name', '')
     auto_clip_to_houzz = data.get('auto_clip_to_houzz', False)
+    page_number = data.get('page_number', None)
     
     if not canva_board_url:
         raise HTTPException(status_code=400, detail="Canva board URL is required")
