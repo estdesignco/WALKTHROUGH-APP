@@ -4546,34 +4546,56 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
             try:
                 await page.wait_for_timeout(10000)  # Wait longer
                 
-                # Check if there's a login form
-                login_needed = await page.query_selector('input[type="email"], input[name="email"]')
-                if login_needed:
-                    print("📧 Login form detected, attempting login...")
+                # Try different approaches to bypass security
+                print("🔄 Attempting to bypass Canva security...")
+                
+                # Method 1: Try to login first at canva.com
+                try:
+                    print("🔐 Going to Canva login page...")
+                    await page.goto('https://www.canva.com/login', wait_until='domcontentloaded', timeout=30000)
+                    await page.wait_for_timeout(3000)
                     
                     # Fill email
-                    email_input = await page.query_selector('input[type="email"], input[name="email"]')
+                    email_input = await page.query_selector('input[type="email"], input[name="email"], input[placeholder*="email"]')
                     if email_input:
+                        print("📧 Filling email...")
                         await email_input.fill("EstablishedDesignCo@gmail.com")
-                    
-                    # Look for continue/next button
-                    continue_btn = await page.query_selector('button:has-text("Continue"), button:has-text("Next"), button[type="submit"]')
-                    if continue_btn:
-                        await continue_btn.click()
-                        await page.wait_for_timeout(3000)
+                        await page.wait_for_timeout(1000)
+                        
+                        # Look for continue/next button
+                        continue_btns = await page.query_selector_all('button')
+                        for btn in continue_btns:
+                            text = await btn.text_content()
+                            if text and any(word in text.lower() for word in ['continue', 'next', 'log in', 'sign in']):
+                                print(f"🔘 Clicking: {text}")
+                                await btn.click()
+                                await page.wait_for_timeout(3000)
+                                break
                     
                     # Fill password if field appears
-                    password_input = await page.query_selector('input[type="password"], input[name="password"]')
+                    password_input = await page.query_selector('input[type="password"], input[name="password"], input[placeholder*="password"]')
                     if password_input:
+                        print("🔑 Filling password...")
                         await password_input.fill("Zeke1919$$")
+                        await page.wait_for_timeout(1000)
                         
                         # Look for sign in button
-                        signin_btn = await page.query_selector('button:has-text("Sign in"), button:has-text("Login"), button[type="submit"]')
-                        if signin_btn:
-                            await signin_btn.click()
-                            await page.wait_for_timeout(5000)
+                        signin_btns = await page.query_selector_all('button')
+                        for btn in signin_btns:
+                            text = await btn.text_content()
+                            if text and any(word in text.lower() for word in ['log in', 'sign in', 'continue']):
+                                print(f"🔘 Clicking: {text}")
+                                await btn.click()
+                                await page.wait_for_timeout(5000)
+                                break
+                    
+                    print("✅ Login attempt completed, navigating to design...")
+                    
+                except Exception as login_error:
+                    print(f"⚠️ Login attempt failed: {login_error}")
                 
                 # Navigate to the design after login
+                print(f"🎯 Going to design: {target_url}")
                 await page.goto(target_url, wait_until='domcontentloaded', timeout=30000)
                 await page.wait_for_timeout(5000)
                 
