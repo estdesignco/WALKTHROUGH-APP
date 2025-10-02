@@ -32,7 +32,8 @@ const CanvaBoardImporter = ({ isOpen, onClose, onImportComplete, projectId, room
           board_url: canvaUrl,
           project_id: projectId,
           room_name: roomName,
-          auto_clip_to_houzz: autoClipToHouzz
+          auto_clip_to_houzz: autoClipToHouzz,
+          page_number: pageNumber ? parseInt(pageNumber) : null
         })
       });
       
