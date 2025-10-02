@@ -313,19 +313,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       ))}
     </CompletePageLayout>
 
-    {/* Floating Action Buttons */}
-    <div className="fixed bottom-6 right-6 flex flex-col space-y-3 z-50">
-      <button
-        onClick={() => setShowCanvaImport(true)}
-        className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-full shadow-lg transition-colors group"
-        title="Import products from Canva board"
-      >
-        <div className="flex items-center space-x-2">
-          <span className="text-xl">🎨</span>
-          <span className="text-sm font-medium hidden group-hover:block">Canva Import</span>
-        </div>
-      </button>
-    </div>
+    {/* No more floating action buttons - each room will have its own import button */}
   </div>
   );
 };
