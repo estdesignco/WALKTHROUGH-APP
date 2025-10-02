@@ -4407,7 +4407,7 @@ async def import_canva_board(data: dict):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to import from Canva board: {str(e)}")
 
-async def extract_links_from_canva_board(board_url: str) -> list:
+async def extract_links_from_canva_board(board_url: str, page_number: Optional[int] = None) -> list:
     """
     Extract product links from a Canva board
     This would need to be customized based on how Canva boards expose their content
