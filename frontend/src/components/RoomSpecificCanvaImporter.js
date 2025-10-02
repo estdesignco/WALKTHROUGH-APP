@@ -336,16 +336,16 @@ const RoomSpecificCanvaImporter = ({ isOpen, onClose, onImportComplete, projectI
             </button>
             <button
               onClick={handleImport}
-              disabled={isImporting || !canvaUrl}
+              disabled={isImporting || (!useManualEntry && !canvaUrl) || (useManualEntry && manualItems.filter(item => item.name.trim()).length === 0)}
               className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg disabled:opacity-50 transition-colors flex items-center justify-center"
             >
               {isImporting ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Importing... (may take 30-60s)
+                  {useManualEntry ? 'Adding Items...' : 'Importing... (may take 30-60s)'}
                 </>
               ) : (
-                `Import Page ${pageNumber}`
+                useManualEntry ? `Add ${manualItems.filter(item => item.name.trim()).length} Items` : `Import Page ${pageNumber}`
               )}
             </button>
           </div>
