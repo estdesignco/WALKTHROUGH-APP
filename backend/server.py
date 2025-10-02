@@ -4632,8 +4632,9 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         browser = None
         for executable_path in executable_paths:
             try:
+                print(f"🔍 Trying browser path: {executable_path}")
                 browser = await playwright.chromium.launch(
-                    headless=False,  # Use visible browser to bypass detection
+                    headless=True,  # Use headless mode in containerized environment
                     executable_path=executable_path,
                     args=[
                         '--no-sandbox',
@@ -4648,8 +4649,10 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
                         '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
                     ]
                 )
+                print(f"✅ Browser launched successfully with: {executable_path}")
                 break
-            except:
+            except Exception as e:
+                print(f"❌ Failed to launch with {executable_path}: {e}")
                 continue
         
         if not browser:
