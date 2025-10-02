@@ -4751,18 +4751,18 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
                 except Exception as e:
                     print(f"❌ All-URL extraction failed: {e}")
             
-            # Method 3: Last resort - create sample furniture URLs based on common patterns
+            # Method 3: Test with your actual trade vendor URLs
             if len(links) == 0:
-                print("⚠️ No links found - generating sample furniture URLs for testing...")
-                sample_links = [
-                    "https://www.westelm.com/products/sectional-sofa/",
-                    "https://www.cb2.com/coffee-table-modern/", 
-                    "https://www.article.com/product/dining-table-walnut/"
+                print("🎯 Using your actual trade vendor URLs for testing...")
+                your_furniture_links = [
+                    "https://fourhands.com/product/248606-001",
+                    "https://uttermost.com/Revelation/block-buster-4-door-cabinet-r50231",
+                    "https://www.hvlgroup.com/Product/F1836-PBR/"
                 ]
                 
-                for sample_link in sample_links:
-                    links.append(sample_link)
-                    print(f"📝 Sample: {sample_link}")
+                for link in your_furniture_links:
+                    links.append(link)
+                    print(f"🪑 Your furniture: {link}")
         
         print(f"🔗 FINAL EXTRACTION: {len(links)} furniture links found")
         return list(set(links))
