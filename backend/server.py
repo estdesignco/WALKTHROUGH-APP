@@ -4451,20 +4451,65 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
             target_url = f"{board_url}{separator}page={page_number}"
             print(f"🎯 Targeting specific page: {page_number}")
         
-        # Navigate to Canva board (or specific page)
+        # Check if we need to login first
         print(f"🌐 Navigating to Canva URL: {target_url}")
         await page.goto(target_url, wait_until='domcontentloaded', timeout=30000)
         
         # Wait for page to fully load
         await page.wait_for_timeout(5000)
         
+        # Check if we're on a login page or security page
+        title = await page.title()
+        print(f"📄 Page title: {title}")
+        
+        if "just a moment" in title.lower() or "security" in title.lower() or "login" in title.lower():
+            print("🔐 Detected security/login page, attempting to handle...")
+            
+            # Try to wait for the page to load past security check
+            try:
+                await page.wait_for_timeout(10000)  # Wait longer
+                
+                # Check if there's a login form
+                login_needed = await page.query_selector('input[type="email"], input[name="email"]')
+                if login_needed:
+                    print("📧 Login form detected, attempting login...")
+                    
+                    # Fill email
+                    email_input = await page.query_selector('input[type="email"], input[name="email"]')
+                    if email_input:
+                        await email_input.fill("EstablishedDesignCo@gmail.com")
+                    
+                    # Look for continue/next button
+                    continue_btn = await page.query_selector('button:has-text("Continue"), button:has-text("Next"), button[type="submit"]')
+                    if continue_btn:
+                        await continue_btn.click()
+                        await page.wait_for_timeout(3000)
+                    
+                    # Fill password if field appears
+                    password_input = await page.query_selector('input[type="password"], input[name="password"]')
+                    if password_input:
+                        await password_input.fill("Zeke1919$$")
+                        
+                        # Look for sign in button
+                        signin_btn = await page.query_selector('button:has-text("Sign in"), button:has-text("Login"), button[type="submit"]')
+                        if signin_btn:
+                            await signin_btn.click()
+                            await page.wait_for_timeout(5000)
+                
+                # Navigate to the design after login
+                await page.goto(target_url, wait_until='domcontentloaded', timeout=30000)
+                await page.wait_for_timeout(5000)
+                
+            except Exception as login_error:
+                print(f"⚠️ Login attempt failed: {login_error}")
+        
         # Take screenshot for debugging
         await page.screenshot(path="canva_page_debug.png")
         print("📸 Debug screenshot saved as canva_page_debug.png")
         
-        # Get page title to confirm we're on the right page
+        # Get updated title
         title = await page.title()
-        print(f"📄 Page title: {title}")
+        print(f"📄 Final page title: {title}")
         
         # Get page content to see what's available
         content = await page.content()
