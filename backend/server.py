@@ -4384,17 +4384,69 @@ async def import_canva_board(data: dict):
                     except Exception as clip_error:
                         product_info["houzz_clip_error"] = str(clip_error)
                 
-                # Add to checklist (this would integrate with your existing checklist API)
-                checklist_item = {
-                    "product_url": link,
-                    "name": product_info.get('name', 'Imported Product'),
-                    "vendor": product_info.get('vendor', 'Unknown'),
-                    "cost": product_info.get('cost', 0),
-                    "image_url": product_info.get('image_url', ''),
-                    "imported_from": "canva_board",
-                    "room_name": room_name,
-                    "project_id": project_id
-                }
+                # Add to checklist - ACTUALLY CREATE DATABASE ITEMS
+                try:
+                    # Create the item in the database
+                    item_data = {
+                        "id": str(uuid.uuid4()),
+                        "name": product_info.get('name', f'Canva Import {i+1}'),
+                        "vendor": product_info.get('vendor', 'Canva Import'),
+                        "cost": product_info.get('cost', 0),
+                        "product_url": link,
+                        "image_url": product_info.get('image_url', ''),
+                        "imported_from": "canva_board",
+                        "status": "TO BE SELECTED",
+                        "created_at": datetime.utcnow()
+                    }
+                    
+                    # Insert into items collection
+                    item_result = await db.items.insert_one(item_data)
+                    
+                    if item_result.inserted_id:
+                        print(f"✅ Created item: {item_data['name']}")
+                        
+                        # Find the appropriate room and category to add this item to
+                        project = await db.projects.find_one({"id": project_id})
+                        if project and "rooms" in project:
+                            for room in project["rooms"]:
+                                if room["name"] == room_name:
+                                    # Add to first category (Furniture) or create one
+                                    if room.get("categories"):
+                                        target_category = room["categories"][0]  # Use first category
+                                        if "subcategories" in target_category:
+                                            target_subcategory = target_category["subcategories"][0]
+                                            if "items" not in target_subcategory:
+                                                target_subcategory["items"] = []
+                                            target_subcategory["items"].append(item_data)
+                                            
+                                            # Update the project in database
+                                            await db.projects.update_one(
+                                                {"id": project_id},
+                                                {"$set": {"rooms": project["rooms"]}}
+                                            )
+                                            break
+                    
+                    checklist_item = {
+                        "id": item_data["id"],
+                        "product_url": link,
+                        "name": item_data["name"],
+                        "vendor": item_data["vendor"],
+                        "cost": item_data["cost"],
+                        "image_url": item_data["image_url"],
+                        "imported_from": "canva_board",
+                        "room_name": room_name,
+                        "project_id": project_id,
+                        "database_created": True
+                    }
+                    
+                except Exception as db_error:
+                    print(f"❌ Database error for item {i+1}: {db_error}")
+                    checklist_item = {
+                        "product_url": link,
+                        "name": product_info.get('name', f'Canva Import {i+1}'),
+                        "database_created": False,
+                        "database_error": str(db_error)
+                    }
                 
                 results.append(checklist_item)
                 successful_imports += 1
