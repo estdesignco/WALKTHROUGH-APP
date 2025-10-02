@@ -10,7 +10,7 @@ import CompletePageLayout from './CompletePageLayout';
 import RoomSpecificCanvaImporter from './RoomSpecificCanvaImporter';
 
 const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
-  console.error("🚨 CHECKLIST DASHBOARD IS LOADING!");
+  console.log("📋 Checklist Dashboard initializing...");
   const { projectId: paramProjectId } = useParams();
   const projectId = propProjectId || paramProjectId;
   const [project, setProject] = useState(null);
