@@ -7,6 +7,10 @@ const RoomSpecificCanvaImporter = ({ isOpen, onClose, onImportComplete, projectI
   const [importError, setImportError] = useState('');
   const [importResults, setImportResults] = useState(null);
   const [autoClipToHouzz, setAutoClipToHouzz] = useState(true);
+  const [useManualEntry, setUseManualEntry] = useState(false);
+  const [manualItems, setManualItems] = useState([
+    { name: '', vendor: '', cost: '', url: '' }
+  ]);
 
   const handleImport = async () => {
     if (!canvaUrl || !canvaUrl.includes('canva.com')) {
