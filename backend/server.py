@@ -4706,12 +4706,13 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
                     # Get ALL content and search for furniture URLs
                     content = await page.content()
                     
-                    # Ultra-aggressive URL extraction
+                    # Ultra-aggressive URL extraction - looking for your trade vendors
                     import re
                     furniture_patterns = [
-                        r'https?://[^\\s<>"\']*(?:fourh|uttermost|visual|houzz|wayfair|westelm|cb2|article|potterybarn)[^\\s<>"\']*',
-                        r'href=["\']([^"\']*(?:product|furniture|sofa|chair|table|lamp)[^"\']*)["\']',
-                        r'data-[^=]*=["\']([^"\']*(?:fourh|uttermost|visual)[^"\']*)["\']'
+                        r'https?://[^\\s<>"\']*(?:fourhands\.com|uttermost\.com|hvlgroup\.com|visualcomfort\.com)[^\\s<>"\']*',
+                        r'https?://[^\\s<>"\']*(?:fourh|uttermost|visual|hvl)[^\\s<>"\']*',
+                        r'href=["\']([^"\']*(?:fourhands|uttermost|hvlgroup|product)[^"\']*)["\']',
+                        r'data-[^=]*=["\']([^"\']*(?:fourhands|uttermost|hvlgroup)[^"\']*)["\']'
                     ]
                     
                     for pattern in furniture_patterns:
