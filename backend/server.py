@@ -1528,6 +1528,16 @@ def scrape_product_info(url: str) -> Dict[str, Any]:
             'error': str(e)
         }
 
+@api_router.get("/")
+async def root():
+    """Root API endpoint."""
+    return {"message": "InteriorSync API", "version": "1.0.0", "status": "healthy"}
+
+@api_router.get("/health")
+async def health_check():
+    """Health check endpoint."""
+    return {"status": "healthy", "timestamp": datetime.utcnow()}
+
 # PROJECT ENDPOINTS
 @api_router.post("/projects", response_model=Project)
 async def create_project(project: ProjectCreate):
