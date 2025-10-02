@@ -4444,8 +4444,15 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         
         page = await browser.new_page()
         
-        # Navigate to Canva board
-        await page.goto(board_url, wait_until='domcontentloaded', timeout=30000)
+        # Build page-specific URL if page number is provided
+        target_url = board_url
+        if page_number:
+            separator = '&' if '?' in board_url else '?'
+            target_url = f"{board_url}{separator}page={page_number}"
+            print(f"🎯 Targeting specific page: {page_number}")
+        
+        # Navigate to Canva board (or specific page)
+        await page.goto(target_url, wait_until='domcontentloaded', timeout=30000)
         await page.wait_for_timeout(5000)
         
         # Extract links - this would need customization based on Canva's structure
