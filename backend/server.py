@@ -4281,8 +4281,9 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         browser = None
         for executable_path in executable_paths:
             try:
+                print(f"🔍 Trying Houzz browser path: {executable_path}")
                 browser = await playwright.chromium.launch(
-                    headless=False,  # Use visible browser for debugging
+                    headless=True,  # Use headless mode in containerized environment
                     executable_path=executable_path,
                     args=[
                         '--no-sandbox',
@@ -4291,9 +4292,10 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
                         '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
                     ]
                 )
-                print(f"✅ Browser launched for REAL Houzz clipping")
+                print(f"✅ Browser launched successfully for REAL Houzz clipping with: {executable_path}")
                 break
             except Exception as e:
+                print(f"❌ Failed to launch Houzz browser with {executable_path}: {e}")
                 continue
         
         if not browser:
