@@ -4612,18 +4612,17 @@ async def import_canva_board(data: dict):
 
 async def extract_links_from_canva_board(board_url: str, page_number: Optional[int] = None) -> list:
     """
-    Extract product links from a Canva board
-    This would need to be customized based on how Canva boards expose their content
+    Extract product links from a Canva board using advanced bot detection bypass
     """
     try:
-        print(f"🎨 EXTRACTING LINKS FROM CANVA BOARD")
+        print(f"🎨 EXTRACTING LINKS FROM CANVA BOARD WITH STEALTH MODE")
         
         # Import Playwright for scraping
         from playwright.async_api import async_playwright
         
         playwright = await async_playwright().start()
         
-        # Launch browser
+        # Launch browser with advanced stealth settings
         executable_paths = [
             '/pw-browsers/chromium-1187/chrome-linux/chrome',
             '/pw-browsers/chromium-1091/chrome-linux/chrome',
@@ -4634,9 +4633,20 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         for executable_path in executable_paths:
             try:
                 browser = await playwright.chromium.launch(
-                    headless=True,
+                    headless=False,  # Use visible browser to bypass detection
                     executable_path=executable_path,
-                    args=['--no-sandbox', '--disable-dev-shm-usage']
+                    args=[
+                        '--no-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-blink-features=AutomationControlled',
+                        '--disable-automation',
+                        '--disable-extensions-file-access-check',
+                        '--disable-plugins-discovery',
+                        '--disable-default-apps',
+                        '--no-default-browser-check',
+                        '--no-first-run',
+                        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                    ]
                 )
                 break
             except:
