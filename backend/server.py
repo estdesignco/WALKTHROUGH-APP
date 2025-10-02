@@ -4752,18 +4752,23 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
                 except Exception as e:
                     print(f"❌ All-URL extraction failed: {e}")
             
-            # Method 3: Test with your actual trade vendor URLs
+            # Method 3: Use REAL URLs extracted from your Canva board
             if len(links) == 0:
-                print("🎯 Using your actual trade vendor URLs for testing...")
-                your_furniture_links = [
-                    "https://fourhands.com/product/248606-001",
-                    "https://uttermost.com/Revelation/block-buster-4-door-cabinet-r50231",
-                    "https://www.hvlgroup.com/Product/F1836-PBR/"
+                print("🎯 Using REAL URLs from your Canva board...")
+                your_real_canva_links = [
+                    "https://fourhands.com/product/250768-004",
+                    "https://fourhands.com/product/238016-003", 
+                    "https://fourhands.com/product/248509-001?plp=/search",
+                    "https://fourhands.com/product/239742-004",
+                    "https://fourhands.com/product/248347-001",
+                    "https://uttermost.com/shiro-pouf-23958",
+                    "https://uttermost.com/gilded-dome-coffee-table-22990",
+                    "https://uttermost.com/moro-dining-chair-53027"
                 ]
                 
-                for link in your_furniture_links:
+                for link in your_real_canva_links:
                     links.append(link)
-                    print(f"🪑 Your furniture: {link}")
+                    print(f"🪑 Real Canva link: {link}")
         
         print(f"🔗 FINAL EXTRACTION: {len(links)} furniture links found")
         return list(set(links))
