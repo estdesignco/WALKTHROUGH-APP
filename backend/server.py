@@ -4663,25 +4663,54 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         
         page = await browser.new_page()
         
-        # Add stealth techniques to bypass bot detection
+        # Add comprehensive stealth techniques
         await page.add_init_script("""
             // Remove webdriver property
             Object.defineProperty(navigator, 'webdriver', {
                 get: () => undefined,
             });
             
-            // Mock languages and plugins
+            // Mock languages and plugins  
             Object.defineProperty(navigator, 'languages', {
                 get: () => ['en-US', 'en'],
             });
             
             Object.defineProperty(navigator, 'plugins', {
-                get: () => [1, 2, 3, 4, 5],
+                get: () => [
+                    {name: 'Chrome PDF Plugin', length: 1},
+                    {name: 'Chrome PDF Viewer', length: 1},
+                    {name: 'Native Client', length: 1}
+                ],
             });
             
             // Mock chrome property
             window.chrome = {
                 runtime: {},
+                loadTimes: function(){},
+                csi: function(){}
+            };
+            
+            // Mock permissions
+            const originalQuery = window.navigator.permissions.query;
+            window.navigator.permissions.query = (parameters) => (
+                parameters.name === 'notifications' ?
+                    Promise.resolve({ state: Dispatchers.grant }) :
+                    originalQuery(parameters)
+            );
+            
+            // Hide automation indicators
+            delete window.navigator.__proto__.webdriver;
+            
+            // Mock getParameter method
+            const getParameter = WebGLRenderingContext.getParameter;
+            WebGLRenderingContext.prototype.getParameter = function(parameter) {
+                if (parameter === 37445) {
+                    return 'Intel Inc.';
+                }
+                if (parameter === 37446) {
+                    return 'Intel Iris OpenGL Engine';
+                }
+                return getParameter(parameter);
             };
         """)
         
