@@ -116,6 +116,24 @@ const CanvaBoardImporter = ({ isOpen, onClose, onImportComplete, projectId, room
               />
             </div>
 
+            {/* Page Number Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Specific Page (Optional)
+              </label>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="number"
+                  value={pageNumber}
+                  onChange={(e) => setPageNumber(e.target.value)}
+                  className="w-24 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  placeholder="1"
+                  min="1"
+                />
+                <span className="text-sm text-gray-400">Leave empty to import entire project, or specify page number (e.g., 1, 2, 3)</span>
+              </div>
+            </div>
+
             {/* Houzz Pro Auto-Clip Toggle */}
             <div className="flex items-center space-x-3 bg-gray-700 p-4 rounded-lg">
               <input
