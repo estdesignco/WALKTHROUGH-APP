@@ -1,24 +1,22 @@
 #!/usr/bin/env python3
 """
-CRITICAL SYSTEM RECOVERY TESTING - MongoDB Fixed, Verify All Core Backend Functionality
+ROOM-SPECIFIC CANVA IMPORT FUNCTIONALITY TESTING
 
-CONTEXT: Just fixed critical MongoDB infrastructure issue - service was down causing all API endpoints 
-to return HTTP 500 errors. MongoDB is now running and /api/projects endpoint returns HTTP 200 with empty array. 
-Need to verify ALL core backend functionality is operational.
+CONTEXT: Testing the room-specific Canva import functionality where each room has its own 
+'Import Page' button that can import from specific pages of a Canva board.
 
 PRIORITY TESTING SEQUENCE:
-1. **Project Management APIs** - Create, read, update, delete projects
-2. **Room Creation with Enhanced Structure** - Test room creation using enhanced_rooms.py comprehensive structure 
-   (kitchen should create 8 categories, 82+ items)
-3. **Category and Subcategory Management** - Test ADD CATEGORY functionality, verify GET /api/categories/available 
-   returns all 14 categories
-4. **Item CRUD Operations** - Create, read, update, delete items with proper subcategory relationships
-5. **Transfer Functionality APIs** - Test the critical Walkthrough → Checklist and Checklist → FFE transfer workflows
-6. **Web Scraping API** - Test POST /api/scrape-product with Four Hands URL
-7. **Status Management** - Verify status dropdowns and color coding for both FFE and Checklist
-8. **Data Structure Integrity** - Verify proper room/category/subcategory/item hierarchy with finish_color fields
+1. **Basic API Connectivity** - Verify backend is accessible
+2. **Project & Room Setup** - Create test project and rooms for Canva import testing
+3. **Canva Import Endpoint** - Test POST /api/import-canva-board with real Canva credentials
+4. **Page-Specific Import** - Test importing from specific Canva pages
+5. **Item Creation & Organization** - Verify items are created and organized by room
+6. **Houzz Pro Integration** - Test auto-clip to Houzz Pro functionality
+7. **Error Handling** - Test invalid URLs and missing parameters
+8. **Project Reload** - Verify items appear after import
 
-This is post-critical-fix testing to ensure the entire backend ecosystem is operational after MongoDB restart.
+Testing with real credentials: EstablishedDesignCo@gmail.com / Zeke1919$$
+Test Canva URL: https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit
 """
 
 import requests
