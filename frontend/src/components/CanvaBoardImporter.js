@@ -159,21 +159,64 @@ const CanvaBoardImporter = ({ isOpen, onClose, onImportComplete, projectId, room
               />
             </div>
 
-            {/* Page Number Input */}
+            {/* Room-Page Mapping */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Specific Page (Optional)
+              <label className="block text-sm font-medium text-gray-300 mb-3">
+                📄 Room-Page Mapping
               </label>
-              <div className="flex items-center space-x-3">
-                <input
-                  type="number"
-                  value={pageNumber}
-                  onChange={(e) => setPageNumber(e.target.value)}
-                  className="w-24 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                  placeholder="1"
-                  min="1"
-                />
-                <span className="text-sm text-gray-400">Leave empty to import entire project, or specify page number (e.g., 1, 2, 3)</span>
+              <div className="bg-gray-700 rounded-lg p-4 space-y-3">
+                <p className="text-sm text-gray-400 mb-3">
+                  Map each room to a specific page in your Canva project
+                </p>
+                
+                {roomPageMappings.map((mapping, index) => (
+                  <div key={index} className="flex items-center space-x-3">
+                    <input
+                      type="text"
+                      value={mapping.roomName}
+                      onChange={(e) => {
+                        const newMappings = [...roomPageMappings];
+                        newMappings[index].roomName = e.target.value;
+                        setRoomPageMappings(newMappings);
+                      }}
+                      className="flex-1 bg-gray-600 text-white px-3 py-2 rounded border border-gray-500 focus:border-blue-500 focus:outline-none"
+                      placeholder="Room Name (e.g., Living Room)"
+                    />
+                    <span className="text-gray-400 text-sm">→ Page</span>
+                    <input
+                      type="number"
+                      value={mapping.pageNumber}
+                      onChange={(e) => {
+                        const newMappings = [...roomPageMappings];
+                        newMappings[index].pageNumber = parseInt(e.target.value) || 1;
+                        setRoomPageMappings(newMappings);
+                      }}
+                      className="w-20 bg-gray-600 text-white px-3 py-2 rounded border border-gray-500 focus:border-blue-500 focus:outline-none"
+                      min="1"
+                      placeholder="1"
+                    />
+                    <button
+                      onClick={() => {
+                        const newMappings = roomPageMappings.filter((_, i) => i !== index);
+                        setRoomPageMappings(newMappings);
+                      }}
+                      className="text-red-400 hover:text-red-300 p-1"
+                      title="Remove mapping"
+                    >
+                      ❌
+                    </button>
+                  </div>
+                ))}
+                
+                <button
+                  onClick={() => {
+                    setRoomPageMappings([...roomPageMappings, { roomName: '', pageNumber: roomPageMappings.length + 1 }]);
+                  }}
+                  className="text-sm text-blue-400 hover:text-blue-300 flex items-center space-x-1"
+                >
+                  <span>➕</span>
+                  <span>Add Room-Page Mapping</span>
+                </button>
               </div>
             </div>
 
