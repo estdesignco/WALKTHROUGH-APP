@@ -4343,33 +4343,103 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         await page.goto(product_url, wait_until='domcontentloaded', timeout=30000)
         await page.wait_for_timeout(3000)
         
-        # STEP 3: Try to activate Houzz clipper or create ideabook entry
-        print("🎨 Attempting to clip product to Houzz...")
+        # STEP 3: Extract product information from vendor page
+        print("🎨 Extracting product info for Houzz...")
         
-        # Look for Houzz clipper button or save button
-        clipper_selectors = [
-            '.houzz-clipper-button',
-            '.save-to-houzz',
-            '.add-to-ideabook',
-            '[data-testid="save-product"]',
-            'button[class*="save"]',
-            'button[class*="clip"]',
-            'button[class*="add"]'
-        ]
+        # Extract product details from the current page
+        try:
+            product_name = await page.locator('h1, .product-title, .product-name, [data-testid*="title"]').first.inner_text()
+            print(f"📝 Product name: {product_name}")
+        except:
+            product_name = product_info.get('name', 'Imported Product')
+            
+        try:
+            product_image = await page.locator('img[src*="product"], .product-image img, .hero-image img').first.get_attribute('src')
+            print(f"🖼️ Product image: {product_image}")
+        except:
+            product_image = ""
+            
+        try:
+            price_element = await page.locator('.price, .cost, [class*="price"], [data-testid*="price"]').first.inner_text()
+            print(f"💰 Product price: {price_element}")
+        except:
+            price_element = ""
+        
+        # STEP 4: Add product directly to Houzz Pro
+        print("🏠 Adding product to Houzz Pro...")
+        
+        # Navigate to Houzz Pro in the same browser
+        await page.goto('https://pro.houzz.com/products', wait_until='domcontentloaded', timeout=30000)
+        await page.wait_for_timeout(3000)
         
         clipped_successfully = False
         
-        for selector in clipper_selectors:
+        # Look for "Add Product" or "Import Product" button
+        add_product_selectors = [
+            'button:has-text("Add Product")',
+            'button:has-text("Import Product")', 
+            'a:has-text("Add Product")',
+            '.add-product',
+            '[data-testid*="add-product"]',
+            'button[class*="add"]'
+        ]
+        
+        for selector in add_product_selectors:
             try:
-                clipper_button = await page.query_selector(selector)
-                if clipper_button:
-                    await clipper_button.click()
-                    print(f"✅ Clicked clipper button: {selector}")
-                    await page.wait_for_timeout(2000)
-                    clipped_successfully = True
+                add_button = await page.wait_for_selector(selector, timeout=5000)
+                if add_button:
+                    print(f"✅ Found add product button: {selector}")
+                    await add_button.click()
+                    await page.wait_for_timeout(3000)
+                    
+                    # Fill product details in Houzz Pro form
+                    try:
+                        # Fill product URL
+                        url_input = await page.query_selector('input[type="url"], input[name*="url"], input[placeholder*="url"]')
+                        if url_input:
+                            await url_input.fill(product_url)
+                            print("✅ Filled product URL")
+                        
+                        # Fill product name
+                        name_input = await page.query_selector('input[name*="name"], input[placeholder*="name"], input[name*="title"]')
+                        if name_input:
+                            await name_input.fill(product_name)
+                            print("✅ Filled product name")
+                        
+                        # Fill image URL if available
+                        if product_image:
+                            img_input = await page.query_selector('input[name*="image"], input[placeholder*="image"]')
+                            if img_input:
+                                await img_input.fill(product_image)
+                                print("✅ Filled product image")
+                        
+                        # Submit the form
+                        submit_selectors = [
+                            'button[type="submit"]',
+                            'button:has-text("Save")',
+                            'button:has-text("Add")',
+                            'button:has-text("Import")'
+                        ]
+                        
+                        for submit_selector in submit_selectors:
+                            try:
+                                submit_btn = await page.query_selector(submit_selector)
+                                if submit_btn:
+                                    await submit_btn.click()
+                                    print("✅ Submitted product to Houzz Pro")
+                                    await page.wait_for_timeout(3000)
+                                    clipped_successfully = True
+                                    break
+                            except:
+                                continue
+                                
+                    except Exception as form_error:
+                        print(f"⚠️ Error filling Houzz Pro form: {form_error}")
+                    
                     break
+                    
             except Exception as e:
-                print(f"❌ Failed to click {selector}: {e}")
+                print(f"❌ Failed to find add product button {selector}: {e}")
                 continue
         
         # STEP 4: Alternative method - Open Houzz Pro in new tab and manually add product
