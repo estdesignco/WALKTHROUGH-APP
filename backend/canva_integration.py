@@ -17,10 +17,14 @@ class CanvaIntegration:
     def __init__(self):
         self.canva_base_url = 'https://www.canva.com'
         
-    async def extract_canva_board_products(self, canva_url: str) -> Dict[str, Any]:
+    async def extract_canva_board_products(self, canva_url: str, page_number: Optional[int] = None) -> Dict[str, Any]:
         """
         Extract product information from a Canva design board
         This is for the feature where you place items on Canva boards and want to sync back to checklist
+        
+        Args:
+            canva_url: The Canva design URL
+            page_number: Optional specific page number to extract from (1-based)
         """
         try:
             if not self._is_valid_canva_url(canva_url):
