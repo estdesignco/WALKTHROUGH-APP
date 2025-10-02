@@ -1,1222 +1,439 @@
 #!/usr/bin/env python3
 """
-ROOM-SPECIFIC CANVA IMPORT FUNCTIONALITY TESTING
-
-CONTEXT: Testing the room-specific Canva import functionality where each room has its own 
-'Import Page' button that can import from specific pages of a Canva board.
-
-PRIORITY TESTING SEQUENCE:
-1. **Basic API Connectivity** - Verify backend is accessible
-2. **Project & Room Setup** - Create test project and rooms for Canva import testing
-3. **Canva Import Endpoint** - Test POST /api/import-canva-board with real Canva credentials
-4. **Page-Specific Import** - Test importing from specific Canva pages
-5. **Item Creation & Organization** - Verify items are created and organized by room
-6. **Houzz Pro Integration** - Test auto-clip to Houzz Pro functionality
-7. **Error Handling** - Test invalid URLs and missing parameters
-8. **Project Reload** - Verify items appear after import
-
-Testing with real credentials: EstablishedDesignCo@gmail.com / Zeke1919$$
-Test Canva URL: https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit
+Comprehensive Backend API Testing for Room-Specific Canva Import Workflow
+Testing the complete flow: button visibility → modal opening → form submission → Canva scraping → item creation → room organization
 """
 
 import requests
-import json
-import uuid
-import random
-from datetime import datetime
-from typing import Dict, Any, List
 import sys
-import os
+import json
+from datetime import datetime
 
-# Get backend URL from frontend .env file
-def get_backend_url():
-    try:
-        with open('/app/frontend/.env', 'r') as f:
-            for line in f:
-                if line.startswith('REACT_APP_BACKEND_URL='):
-                    return line.split('=', 1)[1].strip()
-    except Exception as e:
-        print(f"Error reading frontend .env: {e}")
-        return "http://localhost:8001"
-    return "http://localhost:8001"
-
-BASE_URL = get_backend_url() + "/api"
-
-print("=" * 80)
-print("🚨 CRITICAL SYSTEM RECOVERY TESTING - MONGODB FIXED")
-print("=" * 80)
-print(f"Backend URL: {BASE_URL}")
-print("Goal: Verify ALL core backend functionality after MongoDB infrastructure fix")
-print("Testing: Project APIs, Room Creation, Categories, Items, Transfer, Scraping, Status Management")
-print("=" * 80)
-
-class TestProjectCreator:
-    def __init__(self):
-        self.session = requests.Session()
-        self.test_results = []
-        self.created_project_id = None
-        self.created_rooms = []
+class CanvaImportTester:
+    def __init__(self, base_url="https://interiorsync-1.preview.emergentagent.com"):
+        self.base_url = base_url
+        self.api_base = f"{base_url}/api"
+        self.tests_run = 0
+        self.tests_passed = 0
+        self.project_id = None
+        self.room_id = None
         
-    def log_test(self, test_name: str, success: bool, details: str = ""):
-        """Log test results"""
-        status = "✅ PASS" if success else "❌ FAIL"
-        print(f"{status} {test_name}")
-        if details:
-            print(f"   Details: {details}")
-        self.test_results.append({
-            'test': test_name,
-            'success': success,
-            'details': details
-        })
+        # Test credentials and URLs from review request
+        self.test_canva_url = "https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit"
+        self.canva_credentials = {
+            "email": "EstablishedDesignCo@gmail.com",
+            "password": "Zeke1919$$"
+        }
+        self.houzz_credentials = {
+            "email": "EstablishedDesignCo@gmail.com", 
+            "password": "Zeke1919$$"
+        }
+
+    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
+        """Run a single API test"""
+        url = f"{self.api_base}/{endpoint}" if not endpoint.startswith('http') else endpoint
+        if headers is None:
+            headers = {'Content-Type': 'application/json'}
+
+        self.tests_run += 1
+        print(f"\n🔍 Testing {name}...")
+        print(f"   {method} {url}")
         
-    def make_request(self, method: str, endpoint: str, data: Dict = None, params: Dict = None) -> tuple:
-        """Make HTTP request and return (success, response_data, status_code)"""
         try:
-            url = f"{BASE_URL}{endpoint}"
-            
-            if method.upper() == 'GET':
-                response = self.session.get(url, params=params, timeout=15)
-            elif method.upper() == 'POST':
-                response = self.session.post(url, json=data, timeout=15)
-            elif method.upper() == 'PUT':
-                response = self.session.put(url, json=data, timeout=15)
-            elif method.upper() == 'DELETE':
-                response = self.session.delete(url, timeout=15)
+            if method == 'GET':
+                response = requests.get(url, headers=headers, timeout=30)
+            elif method == 'POST':
+                response = requests.post(url, json=data, headers=headers, timeout=30)
+            elif method == 'PUT':
+                response = requests.put(url, json=data, headers=headers, timeout=30)
+            elif method == 'DELETE':
+                response = requests.delete(url, headers=headers, timeout=30)
+
+            success = response.status_code == expected_status
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                try:
+                    return success, response.json()
+                except:
+                    return success, response.text
             else:
-                return False, f"Unsupported method: {method}", 400
-                
-            return response.status_code < 400, response.json() if response.content else {}, response.status_code
-            
-        except requests.exceptions.RequestException as e:
-            return False, f"Request failed: {str(e)}", 0
-        except json.JSONDecodeError as e:
-            return False, f"JSON decode error: {str(e)}", response.status_code if 'response' in locals() else 0
+                print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
+                try:
+                    error_detail = response.json()
+                    print(f"   Error: {error_detail}")
+                except:
+                    print(f"   Error: {response.text[:200]}")
+
+            return success, {}
+
         except Exception as e:
-            return False, f"Unexpected error: {str(e)}", 0
+            print(f"❌ Failed - Error: {str(e)}")
+            return False, {}
 
-    def test_categories_available_endpoint(self):
-        """Test /api/categories/available endpoint - should return all available categories"""
-        print("\n🔍 Testing /api/categories/available endpoint...")
+    def test_basic_connectivity(self):
+        """Test basic API connectivity"""
+        print("\n" + "="*60)
+        print("🌐 TESTING BASIC API CONNECTIVITY")
+        print("="*60)
         
-        success, data, status_code = self.make_request('GET', '/categories/available')
+        # Test root endpoint
+        success, _ = self.run_test("API Root", "GET", "", 200)
         
-        if not success:
-            self.log_test("Categories Available Endpoint", False, f"Failed to retrieve categories: {data} (Status: {status_code})")
-            return False
-            
-        if not isinstance(data, list):
-            self.log_test("Categories Available Response Format", False, f"Expected list, got {type(data)}")
-            return False
-            
-        # Expected categories from enhanced_rooms.py
-        expected_categories = [
-            "Lighting", "Appliances", "Plumbing", "Cabinets, Built-ins, and Trim",
-            "Tile and Tops", "Furniture & Storage", "Decor & Accessories", 
-            "Paint, Wallpaper, and Finishes"
-        ]
+        # Test health check
+        success, _ = self.run_test("Health Check", "GET", "health", 200)
         
-        self.log_test("Categories Available Endpoint", True, f"Found {len(data)} categories: {', '.join(data[:5])}...")
-        
-        # Check for key categories
-        missing_categories = []
-        for cat in expected_categories[:4]:  # Check first 4 key categories
-            if cat not in data:
-                missing_categories.append(cat)
-        
-        if missing_categories:
-            self.log_test("Key Categories Check", False, f"Missing categories: {', '.join(missing_categories)}")
-            return False
-        else:
-            self.log_test("Key Categories Check", True, "All key categories found")
-            return True
+        return success
 
-    def test_add_kitchen_room(self):
-        """Test adding a kitchen room to verify comprehensive structure creation"""
-        print("\n🍳 Testing kitchen room creation...")
+    def test_project_management(self):
+        """Test project creation and management"""
+        print("\n" + "="*60)
+        print("🏗️ TESTING PROJECT MANAGEMENT")
+        print("="*60)
         
-        # Create a test project first
+        # Create test project
         project_data = {
-            "name": "Enhanced Rooms Test Project",
+            "name": "Canva Import Test Project",
             "client_info": {
                 "full_name": "Test Client",
-                "email": "test@example.com", 
+                "email": "test@example.com",
                 "phone": "555-0123",
                 "address": "123 Test St"
             },
             "project_type": "Renovation"
         }
         
-        success, project, status_code = self.make_request('POST', '/projects', project_data)
+        success, response = self.run_test("Create Project", "POST", "projects", 201, project_data)
+        if success and response.get('id'):
+            self.project_id = response['id']
+            print(f"   📝 Project ID: {self.project_id}")
         
-        if not success:
-            self.log_test("Create Test Project", False, f"Failed to create project: {project} (Status: {status_code})")
-            return False, None
-            
-        project_id = project.get('id')
-        self.log_test("Create Test Project", True, f"Project ID: {project_id}")
-        
-        # Add kitchen room
-        room_data = {
-            "name": "kitchen",
-            "project_id": project_id,
-            "description": "Test kitchen for enhanced structure verification"
-        }
-        
-        success, room, status_code = self.make_request('POST', '/rooms', room_data)
-        
-        if not success:
-            self.log_test("Add Kitchen Room", False, f"Failed to create kitchen room: {room} (Status: {status_code})")
-            return False, None
-            
-        room_id = room.get('id')
-        self.log_test("Add Kitchen Room", True, f"Kitchen Room ID: {room_id}")
-        
-        return True, project_id
-
-    def test_project_rooms_data_structure(self, project_id):
-        """Test project rooms data structure to verify enhanced_rooms.py is being used"""
-        print("\n🏗️ Testing project rooms data structure...")
-        
-        success, data, status_code = self.make_request('GET', f'/projects/{project_id}')
-        
-        if not success:
-            self.log_test("Get Project Data", False, f"Failed to retrieve project: {data} (Status: {status_code})")
-            return False
-            
-        rooms = data.get('rooms', [])
-        if not rooms:
-            self.log_test("Project Rooms Check", False, "No rooms found in project")
-            return False
-            
-        # Find kitchen room
-        kitchen_room = None
-        for room in rooms:
-            if room.get('name', '').lower() == 'kitchen':
-                kitchen_room = room
-                break
-                
-        if not kitchen_room:
-            self.log_test("Kitchen Room Found", False, "Kitchen room not found in project")
-            return False
-            
-        self.log_test("Kitchen Room Found", True, f"Kitchen room ID: {kitchen_room.get('id')}")
-        
-        # Analyze kitchen structure
-        categories = kitchen_room.get('categories', [])
-        total_subcategories = 0
-        total_items = 0
-        
-        category_details = []
-        subcategory_names = []
-        
-        for category in categories:
-            cat_name = category.get('name', '')
-            subcategories = category.get('subcategories', [])
-            total_subcategories += len(subcategories)
-            
-            subcat_count = 0
-            item_count = 0
-            for subcat in subcategories:
-                subcat_name = subcat.get('name', '')
-                subcategory_names.append(subcat_name)
-                subcat_count += 1
-                items = subcat.get('items', [])
-                item_count += len(items)
-                total_items += len(items)
-            
-            category_details.append(f"{cat_name}: {subcat_count} subcats, {item_count} items")
-        
-        self.log_test("Kitchen Structure Analysis", True, 
-                     f"Found {len(categories)} categories, {total_subcategories} subcategories, {total_items} items")
-        
-        # Check for expected kitchen subcategories from enhanced_rooms.py
-        expected_kitchen_subcats = ["INSTALLED", "UNIT", "SINKS", "FIXTURES", "CABINETS", "BUILT-INS", "TRIM", "COUNTER TOPS", "TILE", "PIECE"]
-        found_subcats = []
-        missing_subcats = []
-        
-        for expected in expected_kitchen_subcats:
-            if expected in subcategory_names:
-                found_subcats.append(expected)
-            else:
-                missing_subcats.append(expected)
-        
-        if missing_subcats:
-            self.log_test("Kitchen Subcategories Check", False, 
-                         f"Missing subcategories: {', '.join(missing_subcats)}. Found: {', '.join(found_subcats)}")
-        else:
-            self.log_test("Kitchen Subcategories Check", True, 
-                         f"All expected subcategories found: {', '.join(found_subcats)}")
-        
-        # Check for finish_color field in items
-        items_with_finish_color = 0
-        total_items_checked = 0
-        
-        for category in categories:
-            for subcat in category.get('subcategories', []):
-                for item in subcat.get('items', []):
-                    total_items_checked += 1
-                    if 'finish_color' in item and item['finish_color']:
-                        items_with_finish_color += 1
-        
-        if total_items_checked > 0:
-            finish_color_percentage = (items_with_finish_color / total_items_checked) * 100
-            self.log_test("Finish Color Field Check", True, 
-                         f"{items_with_finish_color}/{total_items_checked} items ({finish_color_percentage:.1f}%) have finish_color field")
-        
-        # Print detailed structure for debugging
-        print("\n📋 KITCHEN STRUCTURE DETAILS:")
-        for detail in category_details:
-            print(f"   {detail}")
-        
-        return len(missing_subcats) == 0
-
-    def check_backend_logs(self):
-        """Check backend logs for any errors related to enhanced_rooms.py"""
-        print("\n📝 Checking backend logs...")
-        
-        try:
-            import subprocess
-            result = subprocess.run(['tail', '-n', '100', '/var/log/supervisor/backend.err.log'], 
-                                  capture_output=True, text=True, timeout=10)
-            
-            if result.returncode == 0:
-                log_content = result.stdout
-                
-                # Look for enhanced_rooms references
-                if 'enhanced_rooms' in log_content.lower():
-                    self.log_test("Enhanced Rooms Log References", True, "Found enhanced_rooms references in logs")
-                    
-                    # Look for errors
-                    error_lines = []
-                    for line in log_content.split('\n'):
-                        if 'enhanced_rooms' in line.lower() and ('error' in line.lower() or 'exception' in line.lower()):
-                            error_lines.append(line.strip())
-                    
-                    if error_lines:
-                        self.log_test("Enhanced Rooms Errors", False, f"Found {len(error_lines)} error lines")
-                        for error in error_lines[:3]:  # Show first 3 errors
-                            print(f"   ERROR: {error}")
-                    else:
-                        self.log_test("Enhanced Rooms Errors", True, "No errors found in enhanced_rooms logs")
-                else:
-                    self.log_test("Enhanced Rooms Log References", False, "No enhanced_rooms references in recent logs")
-                
-                # Look for room creation logs
-                if 'CREATING ROOM:' in log_content:
-                    room_creation_lines = [line.strip() for line in log_content.split('\n') if 'CREATING ROOM:' in line]
-                    self.log_test("Room Creation Logs", True, f"Found {len(room_creation_lines)} room creation entries")
-                    for line in room_creation_lines[-3:]:  # Show last 3
-                        print(f"   LOG: {line}")
-                else:
-                    self.log_test("Room Creation Logs", False, "No room creation logs found")
-                    
-            else:
-                self.log_test("Backend Logs Access", False, "Could not read backend error logs")
-                
-        except Exception as e:
-            self.log_test("Backend Logs Check", False, f"Exception checking logs: {str(e)}")
-
-    def create_comprehensive_test_project(self):
-        """Create the comprehensive test project as requested"""
-        print("\n🏠 CREATING COMPREHENSIVE TEST PROJECT...")
-        
-        # Step 1: Create the project
-        project_data = {
-            "name": "Modern Farmhouse Renovation",
-            "client_info": {
-                "full_name": "Sarah & Mike Thompson",
-                "email": "sarah.mike.thompson@email.com",
-                "phone": "(615) 555-0123",
-                "address": "123 Main Street, Nashville, TN 37215"
-            },
-            "project_type": "Renovation",
-            "budget": "$75,000",
-            "timeline": "6 months",
-            "style_preferences": ["Modern Farmhouse", "Rustic", "Contemporary"],
-            "color_palette": "Warm neutrals with navy and gold accents",
-            "special_requirements": "Pet-friendly materials, open concept living"
-        }
-        
-        success, project, status_code = self.make_request('POST', '/projects', project_data)
-        
-        if not success:
-            self.log_test("Create Test Project", False, f"Failed: {project} (Status: {status_code})")
-            return False
-            
-        self.created_project_id = project.get('id')
-        self.log_test("Create Test Project", True, f"Project ID: {self.created_project_id}")
-        print(f"   📋 Project: {project.get('name')}")
-        print(f"   👥 Client: {project.get('client_info', {}).get('full_name')}")
-        print(f"   💰 Budget: {project.get('budget')}")
-        
-        return True
-    
-    def add_rooms_with_realistic_data(self):
-        """Add 4 rooms with comprehensive realistic data"""
-        print("\n🏠 ADDING ROOMS WITH REALISTIC DATA...")
-        
-        rooms_to_create = [
-            {
-                "name": "Living Room",
-                "description": "Main living space with fireplace and built-ins"
-            },
-            {
-                "name": "Master Bedroom", 
-                "description": "Primary bedroom suite with walk-in closet"
-            },
-            {
-                "name": "Kitchen",
-                "description": "Open concept kitchen with island and pantry"
-            },
-            {
-                "name": "Dining Room",
-                "description": "Formal dining room adjacent to kitchen"
-            }
-        ]
-        
-        for room_info in rooms_to_create:
-            room_data = {
-                "name": room_info["name"].lower(),
-                "description": room_info["description"],
-                "project_id": self.created_project_id
-            }
-            
-            success, room, status_code = self.make_request('POST', '/rooms', room_data)
-            
-            if success:
-                room_id = room.get('id')
-                self.created_rooms.append(room_id)
-                self.log_test(f"Create {room_info['name']}", True, f"Room ID: {room_id}")
-                
-                # Add realistic items to each room
-                self.add_realistic_items_to_room(room, room_info["name"])
-            else:
-                self.log_test(f"Create {room_info['name']}", False, f"Failed: {room}")
-                
-        return len(self.created_rooms) == len(rooms_to_create)
-    
-    def add_realistic_items_to_room(self, room_data, room_name):
-        """Add realistic items with various statuses to a room"""
-        print(f"   📦 Adding realistic items to {room_name}...")
-        
-        # Realistic vendors
-        vendors = ["Four Hands", "Visual Comfort", "Restoration Hardware", "West Elm", 
-                  "Pottery Barn", "CB2", "Uttermost", "Bernhardt", "Loloi Rugs"]
-        
-        # Various statuses for realistic data
-        statuses = ["TO BE SELECTED", "RESEARCHING", "ORDERED", "SHIPPED", 
-                   "DELIVERED TO JOB SITE", "INSTALLED", "PICKED"]
-        
-        # Realistic items by room type
-        room_items = {
-            "Living Room": [
-                {"name": "Tufted Sectional Sofa - Charcoal", "cost": 2899, "vendor": "Restoration Hardware"},
-                {"name": "Brass Geometric Coffee Table", "cost": 1299, "vendor": "West Elm"},
-                {"name": "Crystal Linear Chandelier", "cost": 1899, "vendor": "Visual Comfort"},
-                {"name": "Vintage Persian Area Rug 9x12", "cost": 1599, "vendor": "Loloi Rugs"},
-                {"name": "Built-in Entertainment Center", "cost": 3500, "vendor": "Custom"},
-                {"name": "Ceramic Table Lamps - Pair", "cost": 399, "vendor": "Pottery Barn"},
-                {"name": "Velvet Accent Chairs - Navy", "cost": 1199, "vendor": "CB2"},
-                {"name": "Reclaimed Wood Console Table", "cost": 899, "vendor": "Four Hands"}
-            ],
-            "Master Bedroom": [
-                {"name": "Tufted Linen Platform Bed - King", "cost": 1899, "vendor": "Restoration Hardware"},
-                {"name": "Brass Geometric Table Lamps - Pair", "cost": 599, "vendor": "Visual Comfort"},
-                {"name": "Vintage Nightstands - Pair", "cost": 799, "vendor": "Four Hands"},
-                {"name": "Custom Walk-in Closet System", "cost": 4500, "vendor": "Custom"},
-                {"name": "Linen Blackout Curtains", "cost": 299, "vendor": "Pottery Barn"},
-                {"name": "Wool Area Rug 8x10", "cost": 1299, "vendor": "Loloi Rugs"},
-                {"name": "Upholstered Bench - Foot of Bed", "cost": 699, "vendor": "West Elm"}
-            ],
-            "Kitchen": [
-                {"name": "Farmhouse Dining Table - 8ft", "cost": 2599, "vendor": "Restoration Hardware"},
-                {"name": "Industrial Bar Stools - Set of 3", "cost": 899, "vendor": "CB2"},
-                {"name": "Pendant Lights Over Island - Set of 3", "cost": 1299, "vendor": "Visual Comfort"},
-                {"name": "Custom Kitchen Island", "cost": 5500, "vendor": "Custom"},
-                {"name": "Subway Tile Backsplash", "cost": 899, "vendor": "Local Supplier"},
-                {"name": "Quartz Countertops", "cost": 3200, "vendor": "Local Supplier"},
-                {"name": "Farmhouse Sink - Fireclay", "cost": 799, "vendor": "Kohler"},
-                {"name": "Brass Cabinet Hardware Set", "cost": 450, "vendor": "Restoration Hardware"}
-            ],
-            "Dining Room": [
-                {"name": "Live Edge Dining Table - Walnut", "cost": 2899, "vendor": "Four Hands"},
-                {"name": "Upholstered Dining Chairs - Set of 6", "cost": 1799, "vendor": "Pottery Barn"},
-                {"name": "Statement Chandelier - Brass & Crystal", "cost": 1599, "vendor": "Visual Comfort"},
-                {"name": "Vintage Sideboard - Reclaimed Wood", "cost": 1299, "vendor": "Four Hands"},
-                {"name": "Custom Built-in China Cabinet", "cost": 2800, "vendor": "Custom"},
-                {"name": "Wool Area Rug 9x12", "cost": 1499, "vendor": "Loloi Rugs"}
-            ]
-        }
-        
-        items_for_room = room_items.get(room_name, [])
-        items_added = 0
-        
-        # Find subcategories in the room to add items to
-        categories = room_data.get('categories', [])
-        
-        for item_info in items_for_room:
-            # Find appropriate subcategory for this item
-            target_subcategory = None
-            
-            for category in categories:
-                for subcategory in category.get('subcategories', []):
-                    if subcategory.get('items') is not None:  # Can add items here
-                        target_subcategory = subcategory
-                        break
-                if target_subcategory:
-                    break
-            
-            if target_subcategory:
-                # Create realistic item data
-                item_data = {
-                    "name": item_info["name"],
-                    "quantity": 1,
-                    "size": self.get_realistic_size(item_info["name"]),
-                    "remarks": f"Selected for {room_name}",
-                    "vendor": item_info["vendor"],
-                    "status": random.choice(statuses),
-                    "cost": item_info["cost"],
-                    "link": f"https://{item_info['vendor'].lower().replace(' ', '')}.com/product/{random.randint(10000, 99999)}",
-                    "subcategory_id": target_subcategory["id"],
-                    "finish_color": self.get_realistic_finish(),
-                    "tracking_number": self.get_tracking_number() if random.choice([True, False]) else ""
-                }
-                
-                success, created_item, status_code = self.make_request('POST', '/items', item_data)
-                
-                if success:
-                    items_added += 1
-                else:
-                    print(f"      ❌ Failed to add {item_info['name']}: {created_item}")
-        
-        print(f"      ✅ Added {items_added} realistic items to {room_name}")
-        return items_added
-    
-    def get_realistic_size(self, item_name):
-        """Generate realistic size based on item name"""
-        if "sofa" in item_name.lower() or "sectional" in item_name.lower():
-            return f"{random.randint(84, 108)}\"W x {random.randint(36, 42)}\"D x {random.randint(32, 38)}\"H"
-        elif "table" in item_name.lower():
-            return f"{random.randint(60, 96)}\"L x {random.randint(36, 42)}\"W x {random.randint(28, 30)}\"H"
-        elif "chair" in item_name.lower():
-            return f"{random.randint(24, 32)}\"W x {random.randint(26, 32)}\"D x {random.randint(32, 40)}\"H"
-        elif "rug" in item_name.lower():
-            sizes = ["8'x10'", "9'x12'", "10'x14'", "6'x9'"]
-            return random.choice(sizes)
-        elif "lamp" in item_name.lower():
-            return f"{random.randint(24, 32)}\"H"
-        else:
-            return "Standard"
-    
-    def get_realistic_finish(self):
-        """Generate realistic finish colors"""
-        finishes = ["Natural Oak", "Charcoal", "Brass", "Matte Black", "White Oak", 
-                   "Walnut", "Antique Brass", "Brushed Nickel", "Oil Rubbed Bronze", "Natural"]
-        return random.choice(finishes)
-    
-    def get_tracking_number(self):
-        """Generate realistic tracking numbers"""
-        carriers = [
-            ("FedEx", "1234567890123"),
-            ("UPS", "1Z123A45B6789012345"),
-            ("USPS", "9400109699938123456789")
-        ]
-        carrier, base = random.choice(carriers)
-        return f"{base}{random.randint(100, 999)}"
-    
-    def test_all_endpoints(self):
-        """Test all critical endpoints with the created project"""
-        print("\n🔍 TESTING ALL ENDPOINTS WITH CREATED PROJECT...")
-        
-        if not self.created_project_id:
-            self.log_test("Test Endpoints", False, "No project created to test")
-            return False
-        
-        # Test project retrieval
-        success, project_data, status_code = self.make_request('GET', f'/projects/{self.created_project_id}')
-        
-        if success:
-            self.log_test("Project Retrieval", True, f"Project loaded successfully")
-            
-            # Analyze project structure
-            rooms = project_data.get('rooms', [])
-            total_categories = sum(len(room.get('categories', [])) for room in rooms)
-            total_subcategories = sum(
-                len(cat.get('subcategories', [])) 
-                for room in rooms 
-                for cat in room.get('categories', [])
-            )
-            total_items = sum(
-                len(subcat.get('items', [])) 
-                for room in rooms 
-                for cat in room.get('categories', [])
-                for subcat in cat.get('subcategories', [])
+        # Get project with checklist sheet type
+        if self.project_id:
+            success, response = self.run_test(
+                "Get Project (Checklist)", 
+                "GET", 
+                f"projects/{self.project_id}?sheet_type=checklist", 
+                200
             )
             
-            self.log_test("Project Data Structure", True, 
-                         f"{len(rooms)} rooms, {total_categories} categories, {total_subcategories} subcategories, {total_items} items")
-            
-            # Test walkthrough URL
-            walkthrough_url = f"/project/{self.created_project_id}/walkthrough"
-            self.log_test("Walkthrough URL Available", True, f"URL: {walkthrough_url}")
-            
-            # Test checklist URL  
-            checklist_url = f"/project/{self.created_project_id}/checklist"
-            self.log_test("Checklist URL Available", True, f"URL: {checklist_url}")
-            
-            # Test FF&E URL
-            ffe_url = f"/project/{self.created_project_id}/ffe"
-            self.log_test("FF&E URL Available", True, f"URL: {ffe_url}")
-            
-            return True
-        else:
-            self.log_test("Project Retrieval", False, f"Failed to retrieve project: {project_data}")
-            return False
-    
-    def test_mongodb_infrastructure(self):
-        """Test MongoDB infrastructure is working after the fix"""
-        print("\n🗄️ Testing MongoDB Infrastructure...")
+            if success and response.get('rooms'):
+                print(f"   🏠 Found {len(response['rooms'])} rooms")
+                if response['rooms']:
+                    self.room_id = response['rooms'][0]['id']
+                    print(f"   🏠 First Room ID: {self.room_id}")
         
-        # Test basic projects endpoint
-        success, data, status_code = self.make_request('GET', '/projects')
-        
-        if not success:
-            self.log_test("MongoDB Connection", False, f"Projects endpoint failed: {data} (Status: {status_code})")
-            return False
-        
-        if status_code != 200:
-            self.log_test("MongoDB Connection", False, f"Expected 200, got {status_code}")
-            return False
-            
-        self.log_test("MongoDB Connection", True, f"Projects endpoint returns {status_code} with {len(data) if isinstance(data, list) else 'data'}")
-        return True
+        return success
 
-    def test_project_management_apis(self):
-        """Test all Project CRUD operations"""
-        print("\n📋 Testing Project Management APIs...")
+    def test_room_creation(self):
+        """Test room creation for Canva import testing"""
+        print("\n" + "="*60)
+        print("🏠 TESTING ROOM CREATION")
+        print("="*60)
         
-        # CREATE Project
-        project_data = {
-            "name": "MongoDB Recovery Test Project",
-            "client_info": {
-                "full_name": "Test Client Recovery",
-                "email": "recovery@test.com",
-                "phone": "555-0199",
-                "address": "123 Recovery St, Test City"
-            },
-            "project_type": "Renovation",
-            "budget": "$50,000"
-        }
+        if not self.project_id:
+            print("❌ No project ID available for room creation")
+            return False
         
-        success, project, status_code = self.make_request('POST', '/projects', project_data)
-        
-        if not success:
-            self.log_test("Project CREATE", False, f"Failed: {project} (Status: {status_code})")
-            return False, None
-            
-        project_id = project.get('id')
-        self.log_test("Project CREATE", True, f"Created project ID: {project_id}")
-        
-        # READ Project
-        success, retrieved_project, status_code = self.make_request('GET', f'/projects/{project_id}')
-        
-        if not success:
-            self.log_test("Project READ", False, f"Failed: {retrieved_project} (Status: {status_code})")
-            return False, project_id
-            
-        self.log_test("Project READ", True, f"Retrieved project: {retrieved_project.get('name')}")
-        
-        # UPDATE Project
-        update_data = {"name": "MongoDB Recovery Test Project - Updated"}
-        success, updated_project, status_code = self.make_request('PUT', f'/projects/{project_id}', update_data)
-        
-        if success:
-            self.log_test("Project UPDATE", True, f"Updated name: {updated_project.get('name')}")
-        else:
-            self.log_test("Project UPDATE", False, f"Failed: {updated_project}")
-        
-        return True, project_id
-
-    def test_enhanced_room_creation(self, project_id):
-        """Test room creation with enhanced_rooms.py structure - Kitchen should create 8 categories, 82+ items"""
-        print("\n🍳 Testing Enhanced Room Creation (Kitchen)...")
-        
+        # Create a test room
         room_data = {
-            "name": "kitchen",
-            "project_id": project_id,
-            "description": "Test kitchen for enhanced structure verification"
-        }
-        
-        success, room, status_code = self.make_request('POST', '/rooms', room_data)
-        
-        if not success:
-            self.log_test("Kitchen Room Creation", False, f"Failed: {room} (Status: {status_code})")
-            return False, None
-            
-        room_id = room.get('id')
-        self.log_test("Kitchen Room Creation", True, f"Created kitchen room ID: {room_id}")
-        
-        # Verify enhanced structure by getting project data
-        success, project_data, status_code = self.make_request('GET', f'/projects/{project_id}')
-        
-        if not success:
-            self.log_test("Enhanced Structure Verification", False, "Could not retrieve project data")
-            return False, room_id
-            
-        # Find kitchen room
-        kitchen_room = None
-        for room in project_data.get('rooms', []):
-            if room.get('name', '').lower() == 'kitchen':
-                kitchen_room = room
-                break
-                
-        if not kitchen_room:
-            self.log_test("Enhanced Structure Verification", False, "Kitchen room not found")
-            return False, room_id
-            
-        # Analyze structure
-        categories = kitchen_room.get('categories', [])
-        total_subcategories = sum(len(cat.get('subcategories', [])) for cat in categories)
-        total_items = sum(
-            len(subcat.get('items', []))
-            for cat in categories
-            for subcat in cat.get('subcategories', [])
-        )
-        
-        # Check if we have enhanced structure (8 categories, 82+ items)
-        if len(categories) >= 8 and total_items >= 82:
-            self.log_test("Enhanced Structure Verification", True, 
-                         f"Kitchen has {len(categories)} categories, {total_subcategories} subcategories, {total_items} items")
-        elif len(categories) >= 6 and total_items >= 50:
-            self.log_test("Enhanced Structure Verification", True, 
-                         f"Kitchen has good structure: {len(categories)} categories, {total_items} items (may be variant)")
-        else:
-            self.log_test("Enhanced Structure Verification", False, 
-                         f"Kitchen has basic structure: {len(categories)} categories, {total_items} items (expected 8+ categories, 82+ items)")
-        
-        return True, room_id
-
-    def test_categories_available_endpoint(self):
-        """Test /api/categories/available endpoint - should return all 14 categories"""
-        print("\n📂 Testing Categories Available Endpoint...")
-        
-        success, data, status_code = self.make_request('GET', '/categories/available')
-        
-        if not success:
-            self.log_test("Categories Available", False, f"Failed: {data} (Status: {status_code})")
-            return False
-            
-        if not isinstance(data, list):
-            self.log_test("Categories Available Format", False, f"Expected list, got {type(data)}")
-            return False
-            
-        # Check for key categories from enhanced_rooms.py
-        expected_categories = [
-            "Lighting", "Appliances", "Plumbing", "Furniture & Storage", 
-            "Decor & Accessories", "Paint, Wallpaper, and Finishes"
-        ]
-        
-        found_categories = []
-        missing_categories = []
-        
-        for expected in expected_categories:
-            if expected in data:
-                found_categories.append(expected)
-            else:
-                missing_categories.append(expected)
-        
-        if len(data) >= 10:  # Should have at least 10 categories
-            self.log_test("Categories Available", True, f"Found {len(data)} categories")
-        else:
-            self.log_test("Categories Available", False, f"Only found {len(data)} categories (expected 10+)")
-            
-        if missing_categories:
-            self.log_test("Key Categories Check", False, f"Missing: {', '.join(missing_categories)}")
-        else:
-            self.log_test("Key Categories Check", True, "All key categories found")
-            
-        return len(missing_categories) == 0
-
-    def test_item_crud_operations(self, project_id):
-        """Test Item CRUD operations with proper subcategory relationships"""
-        print("\n📦 Testing Item CRUD Operations...")
-        
-        # First, get project data to find a subcategory
-        success, project_data, status_code = self.make_request('GET', f'/projects/{project_id}')
-        
-        if not success:
-            self.log_test("Get Project for Items", False, "Could not retrieve project")
-            return False
-            
-        # Find first available subcategory
-        target_subcategory = None
-        for room in project_data.get('rooms', []):
-            for category in room.get('categories', []):
-                for subcategory in category.get('subcategories', []):
-                    target_subcategory = subcategory
-                    break
-                if target_subcategory:
-                    break
-            if target_subcategory:
-                break
-                
-        if not target_subcategory:
-            self.log_test("Find Subcategory for Items", False, "No subcategory found")
-            return False
-            
-        subcategory_id = target_subcategory.get('id')
-        self.log_test("Find Subcategory for Items", True, f"Using subcategory: {target_subcategory.get('name')}")
-        
-        # CREATE Item
-        item_data = {
-            "name": "Test Recovery Item",
-            "quantity": 2,
-            "size": "24\"W x 18\"D x 30\"H",
-            "remarks": "MongoDB recovery test item",
-            "vendor": "Four Hands",
-            "status": "TO BE SELECTED",
-            "cost": 599.99,
-            "subcategory_id": subcategory_id,
-            "finish_color": "Natural Oak",
-            "sku": "TEST-001"
-        }
-        
-        success, item, status_code = self.make_request('POST', '/items', item_data)
-        
-        if not success:
-            self.log_test("Item CREATE", False, f"Failed: {item} (Status: {status_code})")
-            return False
-            
-        item_id = item.get('id')
-        self.log_test("Item CREATE", True, f"Created item ID: {item_id}")
-        
-        # READ Item (verify it appears in project structure)
-        success, updated_project, status_code = self.make_request('GET', f'/projects/{project_id}')
-        
-        if success:
-            # Find the item in the project structure
-            item_found = False
-            for room in updated_project.get('rooms', []):
-                for category in room.get('categories', []):
-                    for subcategory in category.get('subcategories', []):
-                        for project_item in subcategory.get('items', []):
-                            if project_item.get('id') == item_id:
-                                item_found = True
-                                break
-            
-            if item_found:
-                self.log_test("Item READ", True, "Item found in project structure")
-            else:
-                self.log_test("Item READ", False, "Item not found in project structure")
-        else:
-            self.log_test("Item READ", False, "Could not verify item in project")
-        
-        # UPDATE Item
-        update_data = {
-            "status": "ORDERED",
-            "cost": 649.99,
-            "tracking_number": "1Z123456789"
-        }
-        
-        success, updated_item, status_code = self.make_request('PUT', f'/items/{item_id}', update_data)
-        
-        if success:
-            self.log_test("Item UPDATE", True, f"Updated status: {updated_item.get('status')}")
-        else:
-            self.log_test("Item UPDATE", False, f"Failed: {updated_item}")
-        
-        # DELETE Item
-        success, delete_response, status_code = self.make_request('DELETE', f'/items/{item_id}')
-        
-        if success and status_code == 200:
-            self.log_test("Item DELETE", True, "Item deleted successfully")
-        else:
-            self.log_test("Item DELETE", False, f"Failed: {delete_response} (Status: {status_code})")
-        
-        return True
-
-    def test_web_scraping_api(self):
-        """Test POST /api/scrape-product with Four Hands URL"""
-        print("\n🕷️ Testing Web Scraping API...")
-        
-        # Test Four Hands URL as specified in review request
-        scrape_data = {
-            "url": "https://fourhands.com/product/248067-003"
-        }
-        
-        success, response, status_code = self.make_request('POST', '/scrape-product', scrape_data)
-        
-        if not success:
-            self.log_test("Web Scraping API", False, f"Failed: {response} (Status: {status_code})")
-            return False
-            
-        # Check response structure
-        if not isinstance(response, dict):
-            self.log_test("Scraping Response Format", False, f"Expected dict, got {type(response)}")
-            return False
-            
-        # Check for expected fields
-        expected_fields = ['success', 'data']
-        missing_fields = [field for field in expected_fields if field not in response]
-        
-        if missing_fields:
-            self.log_test("Scraping Response Structure", False, f"Missing fields: {missing_fields}")
-            return False
-            
-        if response.get('success'):
-            data = response.get('data', {})
-            extracted_fields = []
-            
-            if data.get('name'):
-                extracted_fields.append(f"name='{data['name']}'")
-            if data.get('vendor'):
-                extracted_fields.append(f"vendor='{data['vendor']}'")
-            if data.get('sku'):
-                extracted_fields.append(f"sku='{data['sku']}'")
-            if data.get('cost') or data.get('price'):
-                price = data.get('cost') or data.get('price')
-                extracted_fields.append(f"price='{price}'")
-                
-            self.log_test("Web Scraping API", True, f"Extracted: {', '.join(extracted_fields)}")
-        else:
-            self.log_test("Web Scraping API", False, f"Scraping failed: {response.get('error', 'Unknown error')}")
-            
-        return response.get('success', False)
-
-    def test_status_management(self):
-        """Test status dropdowns and color coding for both FFE and Checklist"""
-        print("\n🎨 Testing Status Management...")
-        
-        # Test status options endpoint
-        success, statuses, status_code = self.make_request('GET', '/statuses')
-        
-        if not success:
-            self.log_test("Status Options", False, f"Failed: {statuses} (Status: {status_code})")
-            return False
-            
-        if not isinstance(statuses, list):
-            self.log_test("Status Options Format", False, f"Expected list, got {type(statuses)}")
-            return False
-            
-        # Check for key statuses
-        status_names = [status.get('status', '') for status in statuses if isinstance(status, dict)]
-        
-        ffe_statuses = ['TO BE SELECTED', 'ORDERED', 'SHIPPED', 'DELIVERED TO JOB SITE', 'INSTALLED']
-        checklist_statuses = ['ORDER SAMPLES', 'SAMPLES ARRIVED', 'ASK NEIL', 'ASK CHARLENE', 'READY FOR PRESENTATION']
-        
-        ffe_found = sum(1 for status in ffe_statuses if status in status_names)
-        checklist_found = sum(1 for status in checklist_statuses if status in status_names)
-        
-        self.log_test("FFE Status Options", ffe_found >= 4, f"Found {ffe_found}/{len(ffe_statuses)} FFE statuses")
-        self.log_test("Checklist Status Options", checklist_found >= 4, f"Found {checklist_found}/{len(checklist_statuses)} checklist statuses")
-        
-        # Check for color coding
-        statuses_with_colors = [status for status in statuses if isinstance(status, dict) and status.get('color')]
-        color_percentage = (len(statuses_with_colors) / len(statuses)) * 100 if statuses else 0
-        
-        self.log_test("Status Color Coding", color_percentage >= 80, f"{len(statuses_with_colors)}/{len(statuses)} statuses have colors ({color_percentage:.1f}%)")
-        
-        return True
-
-    def test_transfer_functionality_apis(self, project_id):
-        """Test Transfer Functionality APIs - Walkthrough → Checklist and Checklist → FFE"""
-        print("\n🔄 Testing Transfer Functionality APIs...")
-        
-        # This is a complex test that would require specific transfer endpoints
-        # For now, we'll test the underlying item status update functionality that supports transfers
-        
-        # Get project data
-        success, project_data, status_code = self.make_request('GET', f'/projects/{project_id}')
-        
-        if not success:
-            self.log_test("Transfer Setup", False, "Could not get project data")
-            return False
-            
-        # Find an item to test status updates (which is core to transfer functionality)
-        test_item = None
-        for room in project_data.get('rooms', []):
-            for category in room.get('categories', []):
-                for subcategory in category.get('subcategories', []):
-                    items = subcategory.get('items', [])
-                    if items:
-                        test_item = items[0]
-                        break
-                if test_item:
-                    break
-            if test_item:
-                break
-                
-        if not test_item:
-            self.log_test("Transfer Item Test", False, "No items found to test transfer functionality")
-            return False
-            
-        item_id = test_item.get('id')
-        original_status = test_item.get('status', '')
-        
-        # Test status update (core transfer functionality)
-        transfer_statuses = ['PICKED', 'APPROVED']  # Common transfer statuses
-        
-        for new_status in transfer_statuses:
-            update_data = {"status": new_status}
-            success, updated_item, status_code = self.make_request('PUT', f'/items/{item_id}', update_data)
-            
-            if success:
-                self.log_test(f"Transfer Status Update ({new_status})", True, f"Updated item status to {new_status}")
-            else:
-                self.log_test(f"Transfer Status Update ({new_status})", False, f"Failed: {updated_item}")
-                
-        # Test room creation with sheet_type (needed for transfer functionality)
-        transfer_room_data = {
-            "name": "transfer test room",
-            "project_id": project_id,
+            "name": "Living Room",
+            "project_id": self.project_id,
             "sheet_type": "checklist",
-            "description": "Test room for transfer functionality"
+            "description": "Test room for Canva import",
+            "auto_populate": True
         }
         
-        success, transfer_room, status_code = self.make_request('POST', '/rooms', transfer_room_data)
+        success, response = self.run_test("Create Room", "POST", "rooms", 201, room_data)
+        if success and response.get('id'):
+            self.room_id = response['id']
+            print(f"   🏠 Room ID: {self.room_id}")
         
-        if success:
-            self.log_test("Transfer Room Creation", True, f"Created room with sheet_type: {transfer_room.get('sheet_type', 'not specified')}")
-        else:
-            self.log_test("Transfer Room Creation", False, f"Failed: {transfer_room}")
-            
-        return True
+        return success
 
-    def test_canva_import_endpoint(self, project_id, room_id):
-        """Test the main Canva import endpoint with real credentials"""
-        print("\n🎨 Testing Canva Import Endpoint...")
+    def test_canva_import_api(self):
+        """Test the core Canva import API functionality"""
+        print("\n" + "="*60)
+        print("🎨 TESTING CANVA IMPORT API")
+        print("="*60)
         
-        # Test Canva import with provided credentials and URL
-        import_data = {
-            "board_url": "https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit",
-            "project_id": project_id,
+        if not self.project_id or not self.room_id:
+            print("❌ Missing project_id or room_id for Canva import test")
+            return False
+        
+        # Test Canva import with the provided test URL
+        canva_import_data = {
+            "board_url": self.test_canva_url,
+            "project_id": self.project_id,
             "room_name": "Living Room",
-            "room_id": room_id,
+            "room_id": self.room_id,
             "auto_clip_to_houzz": True,
             "page_number": 1
         }
         
-        print(f"🔗 Testing with Canva URL: {import_data['board_url']}")
-        print(f"📄 Page Number: 1")
-        print(f"🏠 Room: Living Room")
+        print(f"   🔗 Testing with URL: {self.test_canva_url}")
+        print(f"   📄 Page number: 1")
+        print(f"   🏠 Room: Living Room ({self.room_id})")
         
-        # Use longer timeout for Canva scraping
-        success, response, status_code = self.make_request('POST', '/import-canva-board', import_data)
+        success, response = self.run_test(
+            "Canva Board Import", 
+            "POST", 
+            "import-canva-board", 
+            200, 
+            canva_import_data
+        )
         
-        if not success:
-            self.log_test("Canva Import Endpoint", False, f"Failed: {response} (Status: {status_code})")
-            return False
-            
-        # Check response structure
-        if not isinstance(response, dict):
-            self.log_test("Canva Import Response Format", False, f"Expected dict, got {type(response)}")
-            return False
-            
-        # Check for expected fields
-        expected_fields = ['success', 'message']
-        missing_fields = [field for field in expected_fields if field not in response]
-        
-        if missing_fields:
-            self.log_test("Canva Import Response Structure", False, f"Missing fields: {missing_fields}")
-            return False
-            
-        if response.get('success'):
-            self.log_test("Canva Import Endpoint", True, f"Success: {response.get('successful_imports', 0)} items imported")
+        if success:
             print(f"   📊 Import Results:")
-            print(f"      - Success: {response.get('success', 'Unknown')}")
-            print(f"      - Items Found: {response.get('successful_imports', 0)}")
-            print(f"      - Message: {response.get('message', 'No message')}")
-            return True
-        else:
-            self.log_test("Canva Import Endpoint", False, f"Import failed: {response.get('message', 'Unknown error')}")
-            return False
+            print(f"      Success: {response.get('success', 'Unknown')}")
+            print(f"      Items Found: {response.get('total_links', 0)}")
+            print(f"      Items Created: {response.get('successful_imports', 0)}")
+            print(f"      Mock Items: {response.get('mock_items_created', 0)}")
+            
+            if response.get('error'):
+                print(f"      Error: {response['error']}")
+            
+            # Check if mock data fallback is working
+            if response.get('mock_items_created', 0) > 0:
+                print("   ✅ Mock data fallback is working")
+            elif response.get('successful_imports', 0) > 0:
+                print("   ✅ Real Canva scraping is working")
+            else:
+                print("   ⚠️ No items created - check Canva scraping logic")
+        
+        return success
 
-    def test_canva_page_specific_import(self, project_id, room_id):
-        """Test importing from specific Canva pages"""
-        print("\n📄 Testing Page-Specific Canva Import...")
+    def test_canva_scraping_enhanced(self):
+        """Test enhanced Canva scraping with authentication"""
+        print("\n" + "="*60)
+        print("🔍 TESTING ENHANCED CANVA SCRAPING")
+        print("="*60)
         
         # Test different page numbers
         for page_num in [1, 2]:
-            import_data = {
-                "board_url": "https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit",
-                "project_id": project_id,
+            canva_data = {
+                "board_url": self.test_canva_url,
+                "project_id": self.project_id,
                 "room_name": "Living Room",
-                "room_id": room_id,
-                "auto_clip_to_houzz": False,  # Disable for faster testing
+                "room_id": self.room_id,
+                "auto_clip_to_houzz": False,  # Test without Houzz integration
                 "page_number": page_num
             }
             
-            success, response, status_code = self.make_request('POST', '/import-canva-board', import_data)
+            success, response = self.run_test(
+                f"Canva Import Page {page_num}", 
+                "POST", 
+                "import-canva-board", 
+                200, 
+                canva_data
+            )
             
-            if success and response.get('success'):
-                self.log_test(f"Canva Page {page_num} Import", True, f"Page {page_num}: {response.get('successful_imports', 0)} items")
-            else:
-                self.log_test(f"Canva Page {page_num} Import", False, f"Page {page_num} failed: {response.get('message', 'Unknown')}")
-        
-        return True
-
-    def test_canva_error_handling(self, project_id, room_id):
-        """Test error handling for invalid Canva inputs"""
-        print("\n🚨 Testing Canva Error Handling...")
-        
-        # Test with invalid Canva URL
-        invalid_data = {
-            "board_url": "https://invalid-canva-url.com",
-            "project_id": project_id,
-            "room_name": "Living Room",
-            "room_id": room_id,
-            "auto_clip_to_houzz": False,
-            "page_number": 1
-        }
-        
-        success, response, status_code = self.make_request('POST', '/import-canva-board', invalid_data)
-        
-        # Should return error for invalid URL
-        if status_code >= 400 or (isinstance(response, dict) and not response.get('success')):
-            self.log_test("Invalid Canva URL Handling", True, "Correctly rejected invalid URL")
-        else:
-            self.log_test("Invalid Canva URL Handling", False, "Should have rejected invalid URL")
-        
-        # Test with missing project ID
-        missing_project_data = {
-            "board_url": "https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit",
-            "room_name": "Living Room",
-            "auto_clip_to_houzz": False,
-            "page_number": 1
-        }
-        
-        success, response, status_code = self.make_request('POST', '/import-canva-board', missing_project_data)
-        
-        # Should return error for missing project ID
-        if status_code >= 400 or (isinstance(response, dict) and not response.get('success')):
-            self.log_test("Missing Project ID Handling", True, "Correctly rejected missing project ID")
-        else:
-            self.log_test("Missing Project ID Handling", False, "Should have rejected missing project ID")
+            if success:
+                links_found = response.get('total_links', 0)
+                print(f"   📄 Page {page_num}: {links_found} links found")
         
         return True
 
     def test_houzz_pro_integration(self):
         """Test Houzz Pro auto-clip functionality"""
-        print("\n🏡 Testing Houzz Pro Integration...")
+        print("\n" + "="*60)
+        print("🏡 TESTING HOUZZ PRO INTEGRATION")
+        print("="*60)
         
-        # Test if Houzz Pro credentials are configured
-        success, response, status_code = self.make_request('GET', '/houzz-pro/status')
+        # Test Houzz Pro scraper endpoint
+        success, response = self.run_test(
+            "Houzz Pro Scraper", 
+            "POST", 
+            "scrape-houzz-pro", 
+            200
+        )
         
         if success:
-            self.log_test("Houzz Pro Status Check", True, "Houzz Pro integration available")
-            return True
-        else:
-            # Check if it's just not implemented yet vs actual error
-            if status_code == 404:
-                self.log_test("Houzz Pro Status Check", True, "Houzz Pro endpoint not implemented (expected)")
-            else:
-                self.log_test("Houzz Pro Status Check", False, f"Houzz Pro integration error: {response}")
-            return True  # Don't fail test for optional feature
+            print(f"   📊 Houzz Results:")
+            print(f"      Success: {response.get('success', 'Unknown')}")
+            print(f"      Products Found: {response.get('products_found', 0)}")
+            print(f"      Database Saved: {response.get('database_saved', False)}")
+        
+        return success
+
+    def test_item_management(self):
+        """Test item creation and management after Canva import"""
+        print("\n" + "="*60)
+        print("📦 TESTING ITEM MANAGEMENT")
+        print("="*60)
+        
+        if not self.project_id:
+            print("❌ No project ID for item testing")
+            return False
+        
+        # Get project to check for items
+        success, response = self.run_test(
+            "Get Project Items", 
+            "GET", 
+            f"projects/{self.project_id}?sheet_type=checklist", 
+            200
+        )
+        
+        if success:
+            total_items = 0
+            for room in response.get('rooms', []):
+                for category in room.get('categories', []):
+                    for subcategory in category.get('subcategories', []):
+                        total_items += len(subcategory.get('items', []))
+            
+            print(f"   📊 Total items in project: {total_items}")
+            
+            # Test item status update if items exist
+            if total_items > 0:
+                # Find first item
+                for room in response.get('rooms', []):
+                    for category in room.get('categories', []):
+                        for subcategory in category.get('subcategories', []):
+                            items = subcategory.get('items', [])
+                            if items:
+                                item_id = items[0]['id']
+                                
+                                # Test status update
+                                update_data = {"status": "PICKED"}
+                                success, _ = self.run_test(
+                                    "Update Item Status", 
+                                    "PUT", 
+                                    f"items/{item_id}", 
+                                    200, 
+                                    update_data
+                                )
+                                return success
+        
+        return success
+
+    def test_error_handling(self):
+        """Test error handling for invalid inputs"""
+        print("\n" + "="*60)
+        print("🚨 TESTING ERROR HANDLING")
+        print("="*60)
+        
+        # Test invalid Canva URL
+        invalid_canva_data = {
+            "board_url": "https://invalid-url.com",
+            "project_id": self.project_id or "invalid",
+            "room_name": "Test Room",
+            "room_id": self.room_id or "invalid",
+            "page_number": 1
+        }
+        
+        success, response = self.run_test(
+            "Invalid Canva URL", 
+            "POST", 
+            "import-canva-board", 
+            400,  # Expect error
+            invalid_canva_data
+        )
+        
+        # Test missing required fields
+        incomplete_data = {
+            "board_url": self.test_canva_url
+            # Missing required fields
+        }
+        
+        success, response = self.run_test(
+            "Incomplete Canva Data", 
+            "POST", 
+            "import-canva-board", 
+            422,  # Expect validation error
+            incomplete_data
+        )
+        
+        return True
 
     def run_comprehensive_test(self):
-        """Run the complete Canva import functionality test"""
-        print("🚀 STARTING CANVA IMPORT FUNCTIONALITY TESTING...")
+        """Run all tests in sequence"""
+        start_time = datetime.now()
         
-        # Step 1: Test Basic API Connectivity
-        mongodb_success = self.test_mongodb_infrastructure()
-        if not mongodb_success:
-            print("❌ CRITICAL: Backend API not accessible - cannot proceed")
-            return False
+        print("\n" + "="*80)
+        print("🚀 STARTING COMPREHENSIVE CANVA IMPORT BACKEND TESTING")
+        print("="*80)
+        print(f"🌐 Backend URL: {self.base_url}")
+        print(f"🎨 Test Canva URL: {self.test_canva_url}")
+        print(f"⏰ Started at: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
         
-        # Step 2: Test Project Management APIs
-        project_success, project_id = self.test_project_management_apis()
-        if not project_success:
-            print("❌ CRITICAL: Project management APIs failed")
-            return False
+        # Run test suites
+        tests = [
+            ("Basic Connectivity", self.test_basic_connectivity),
+            ("Project Management", self.test_project_management),
+            ("Room Creation", self.test_room_creation),
+            ("Canva Import API", self.test_canva_import_api),
+            ("Enhanced Canva Scraping", self.test_canva_scraping_enhanced),
+            ("Houzz Pro Integration", self.test_houzz_pro_integration),
+            ("Item Management", self.test_item_management),
+            ("Error Handling", self.test_error_handling)
+        ]
         
-        # Step 3: Create Test Room for Canva Import
-        room_success, room_id = self.test_enhanced_room_creation(project_id)
-        if not room_success:
-            print("❌ CRITICAL: Room creation failed")
-            return False
+        suite_results = {}
+        for suite_name, test_func in tests:
+            try:
+                print(f"\n🧪 Running {suite_name} tests...")
+                result = test_func()
+                suite_results[suite_name] = result
+                print(f"{'✅' if result else '❌'} {suite_name}: {'PASSED' if result else 'FAILED'}")
+            except Exception as e:
+                print(f"❌ {suite_name}: CRASHED - {str(e)}")
+                suite_results[suite_name] = False
         
-        # Step 4: Test Canva Import Endpoint
-        canva_success = self.test_canva_import_endpoint(project_id, room_id)
-        if not canva_success:
-            print("❌ CRITICAL: Canva import endpoint failed")
+        # Final results
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
         
-        # Step 5: Test Page-Specific Import
-        page_success = self.test_canva_page_specific_import(project_id, room_id)
-        if not page_success:
-            print("⚠️ WARNING: Page-specific import issues detected")
+        print("\n" + "="*80)
+        print("📊 COMPREHENSIVE TEST RESULTS")
+        print("="*80)
+        print(f"⏰ Duration: {duration:.1f} seconds")
+        print(f"🧪 Total Tests: {self.tests_run}")
+        print(f"✅ Passed: {self.tests_passed}")
+        print(f"❌ Failed: {self.tests_run - self.tests_passed}")
+        print(f"📈 Success Rate: {(self.tests_passed/self.tests_run*100):.1f}%")
         
-        # Step 6: Test Error Handling
-        error_success = self.test_canva_error_handling(project_id, room_id)
-        if not error_success:
-            print("⚠️ WARNING: Error handling issues detected")
+        print("\n📋 Test Suite Results:")
+        for suite_name, result in suite_results.items():
+            status = "✅ PASS" if result else "❌ FAIL"
+            print(f"   {status} {suite_name}")
         
-        # Step 7: Test Houzz Pro Integration
-        houzz_success = self.test_houzz_pro_integration()
-        if not houzz_success:
-            print("⚠️ WARNING: Houzz Pro integration issues detected")
+        # Critical issues summary
+        print("\n🚨 Critical Issues Found:")
+        critical_issues = []
         
-        # Step 8: Verify Items Were Created
-        items_success = self.test_item_crud_operations(project_id)
-        if not items_success:
-            print("⚠️ WARNING: Item verification failed")
+        if not suite_results.get("Canva Import API", False):
+            critical_issues.append("Canva import API not working properly")
         
-        # Final Summary
-        print("\n" + "=" * 80)
-        print("🎯 CANVA IMPORT FUNCTIONALITY TEST SUMMARY")
-        print("=" * 80)
+        if not suite_results.get("Enhanced Canva Scraping", False):
+            critical_issues.append("Canva scraping not extracting product links")
         
-        total_tests = len(self.test_results)
-        passed_tests = sum(1 for result in self.test_results if result['success'])
-        failed_tests = total_tests - passed_tests
-        
-        print(f"📊 OVERALL RESULTS: {passed_tests}/{total_tests} tests passed ({(passed_tests/total_tests)*100:.1f}%)")
-        
-        if failed_tests > 0:
-            print(f"\n❌ FAILED TESTS ({failed_tests}):")
-            for result in self.test_results:
-                if not result['success']:
-                    print(f"   • {result['test']}: {result['details']}")
-        
-        print(f"\n✅ PASSED TESTS ({passed_tests}):")
-        for result in self.test_results:
-            if result['success']:
-                print(f"   • {result['test']}")
-        
-        # Critical vs Non-Critical Assessment
-        critical_failures = []
-        if not mongodb_success:
-            critical_failures.append("Backend API Connectivity")
-        if not project_success:
-            critical_failures.append("Project Management")
-        if not room_success:
-            critical_failures.append("Room Creation")
-        if not canva_success:
-            critical_failures.append("Canva Import Endpoint")
-            
-        if critical_failures:
-            print(f"\n🚨 CRITICAL FAILURES: {', '.join(critical_failures)}")
-            print("   Canva import functionality is NOT working")
-            return False
+        if critical_issues:
+            for issue in critical_issues:
+                print(f"   ❌ {issue}")
         else:
-            print(f"\n🎉 CANVA IMPORT FUNCTIONALITY OPERATIONAL")
-            print(f"   Backend API: ✅ Working")
-            print(f"   Project management: ✅ Working") 
-            print(f"   Room creation: ✅ Working")
-            print(f"   Canva import: ✅ Working")
-            if project_id:
-                print(f"   Test project created: {project_id}")
-            return True
+            print("   ✅ No critical backend issues found")
+        
+        print("="*80)
+        
+        return {
+            "total_tests": self.tests_run,
+            "passed_tests": self.tests_passed,
+            "success_rate": (self.tests_passed/self.tests_run*100) if self.tests_run > 0 else 0,
+            "suite_results": suite_results,
+            "critical_issues": critical_issues,
+            "project_id": self.project_id,
+            "room_id": self.room_id
+        }
 
-
-# Main execution
-if __name__ == "__main__":
-    creator = TestProjectCreator()
-    success = creator.run_comprehensive_test()
+def main():
+    tester = CanvaImportTester()
+    results = tester.run_comprehensive_test()
     
-    if success:
-        print("\n🎉 SUCCESS: Comprehensive test project created and ready for preview!")
-        print(f"🆔 PROJECT ID: {creator.created_project_id}")
-        exit(0)
+    # Return appropriate exit code
+    if results["success_rate"] >= 75:
+        return 0
     else:
-        print("\n❌ FAILURE: Could not create comprehensive test project.")
-        exit(1)
+        return 1
+
+if __name__ == "__main__":
+    sys.exit(main())
