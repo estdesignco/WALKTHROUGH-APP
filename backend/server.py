@@ -4475,7 +4475,10 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         # For now, look for common link patterns
         links = []
         
-        # Look for various link selectors that might contain product URLs
+        # Look for text elements that might contain product URLs or names
+        # Since Canva designs might not have clickable links, let's look for text content
+        
+        # Method 1: Look for clickable links
         link_selectors = [
             'a[href*="fourh"]',          # Four Hands links
             'a[href*="uttermost"]',      # Uttermost links  
@@ -4491,15 +4494,44 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         for selector in link_selectors:
             try:
                 elements = await page.query_selector_all(selector)
+                print(f"🔍 Found {len(elements)} elements for selector: {selector}")
                 for element in elements:
                     href = await element.get_attribute('href')
+                    text = await element.text_content()
+                    print(f"   Link: {href}, Text: {text}")
                     if href and href.startswith('http') and 'canva' not in href.lower():
                         # Filter for product-like URLs
                         if any(keyword in href.lower() for keyword in ['product', 'item', 'catalog', 'fourh', 'uttermost', 'visual', 'regina', 'hudson', 'global']):
                             if href not in links:
                                 links.append(href)
-            except:
+            except Exception as e:
+                print(f"   Error with selector {selector}: {e}")
                 continue
+        
+        # Method 2: Look for text content that might be URLs
+        try:
+            # Get all text content
+            text_elements = await page.query_selector_all('*')
+            print(f"🔍 Scanning {len(text_elements)} elements for URLs in text content...")
+            
+            for element in text_elements[:100]:  # Limit to first 100 elements
+                try:
+                    text_content = await element.text_content()
+                    if text_content:
+                        # Look for URLs in text content
+                        import re
+                        url_pattern = r'https?://[^\s]+'
+                        found_urls = re.findall(url_pattern, text_content)
+                        for url in found_urls:
+                            if 'canva' not in url.lower() and any(keyword in url.lower() for keyword in ['product', 'item', 'fourh', 'uttermost', 'visual', 'houzz', 'wayfair']):
+                                print(f"   Found URL in text: {url}")
+                                if url not in links:
+                                    links.append(url)
+                except:
+                    continue
+                    
+        except Exception as e:
+            print(f"   Error scanning text content: {e}")
         
         await browser.close()
         await playwright.stop()
