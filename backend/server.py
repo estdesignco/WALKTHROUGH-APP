@@ -4452,7 +4452,23 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
             print(f"🎯 Targeting specific page: {page_number}")
         
         # Navigate to Canva board (or specific page)
+        print(f"🌐 Navigating to Canva URL: {target_url}")
         await page.goto(target_url, wait_until='domcontentloaded', timeout=30000)
+        
+        # Wait for page to fully load
+        await page.wait_for_timeout(5000)
+        
+        # Take screenshot for debugging
+        await page.screenshot(path="canva_page_debug.png")
+        print("📸 Debug screenshot saved as canva_page_debug.png")
+        
+        # Get page title to confirm we're on the right page
+        title = await page.title()
+        print(f"📄 Page title: {title}")
+        
+        # Get page content to see what's available
+        content = await page.content()
+        print(f"📝 Page content length: {len(content)} characters")
         await page.wait_for_timeout(5000)
         
         # Extract links - this would need customization based on Canva's structure
