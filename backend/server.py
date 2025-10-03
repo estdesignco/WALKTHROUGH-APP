@@ -4462,7 +4462,7 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         except:
             price_element = ""
         
-        # STEP 3: Interact with the injected Houzz Pro Clipper
+        # STEP 4: Interact with the injected Houzz Pro Clipper
         print("🏠 Interacting with Houzz Pro Clipper...")
         
         clipped_successfully = False
