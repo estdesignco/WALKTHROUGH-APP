@@ -218,8 +218,11 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
   };
 
   const formatPrice = (price) => {
-    if (!price || price === 0) return 'Price on request';
-    return typeof price === 'string' && price.startsWith('$') ? price : `$${price.toFixed(2)}`;
+    console.log('formatPrice called with:', price, typeof price);
+    if (!price || price === 0 || price === null || price === undefined) return 'Price on request';
+    const numPrice = typeof price === 'string' ? parseFloat(price.replace('$', '').replace(',', '')) : price;
+    if (isNaN(numPrice) || numPrice <= 0) return 'Price on request';
+    return `$${numPrice.toFixed(2)}`;
   };
 
   // Load all products on initial render
