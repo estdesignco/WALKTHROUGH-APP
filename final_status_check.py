@@ -27,7 +27,7 @@ async def comprehensive_status_check():
                         stats = await response.json()
                         print(f"   ✅ API Online")
                         print(f"   📊 Total Products: {stats.get('total_items', 0):,}")
-                        print(f"   🏢 Vendors: {len(stats.get('vendors', {}))}}")
+                        print(f"   🏢 Vendors: {len(stats.get('vendors', {}))}")
                         print(f"   📂 Categories: {len(stats.get('categories', {}))}")
                     else:
                         print(f"   ❌ API Error: {response.status}")
