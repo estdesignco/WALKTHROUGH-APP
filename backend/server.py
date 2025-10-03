@@ -4314,94 +4314,106 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         # STEP 2: Simulate Houzz Pro Clipper Extension Interface
         print("🎨 Injecting Houzz Pro Clipper Interface...")
         
-        # Inject the Houzz Pro clipper interface directly into the page
-        await page.evaluate(f"""
-            // Create Houzz Pro Clipper overlay similar to your screenshots
-            const clipperHTML = `
-                <div id="houzz-pro-clipper" style="
-                    position: fixed;
-                    top: 50px;
-                    right: 50px;
-                    width: 350px;
-                    background: white;
-                    border: 1px solid #ccc;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-                    z-index: 10000;
-                    font-family: Arial, sans-serif;
-                    padding: 20px;
-                ">
-                    <h3 style="margin: 0 0 15px 0; color: #2c5aa0;">Houzz Pro Clipper</h3>
-                    
-                    <label>Product Title (required)</label>
-                    <input type="text" id="clipper-title" value="{product_name}" style="width: 100%; padding: 8px; margin: 5px 0 10px 0; border: 1px solid #ddd; border-radius: 4px;">
-                    
-                    <div style="display: flex; gap: 10px;">
-                        <div style="flex: 1;">
-                            <label>Cost</label>
-                            <input type="number" id="clipper-cost" value="{product_info.get('cost', '')}" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px;">
+        # Create clipper data for injection
+        clipper_data = {
+            'title': product_name,
+            'cost': str(product_info.get('cost', '')),
+            'vendor': product_info.get('vendor', ''),
+            'sku': product_info.get('sku', ''),
+            'size': product_info.get('size', ''),
+            'finish_color': product_info.get('finish_color', '')
+        }
+        
+        # Inject the Houzz Pro clipper interface
+        await page.evaluate("""
+            (clipperData) => {
+                // Create Houzz Pro Clipper overlay
+                const clipperHTML = `
+                    <div id="houzz-pro-clipper" style="
+                        position: fixed;
+                        top: 50px;
+                        right: 50px;
+                        width: 350px;
+                        background: white;
+                        border: 1px solid #ccc;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                        z-index: 10000;
+                        font-family: Arial, sans-serif;
+                        padding: 20px;
+                    ">
+                        <h3 style="margin: 0 0 15px 0; color: #2c5aa0;">Houzz Pro Clipper</h3>
+                        
+                        <label>Product Title (required)</label>
+                        <input type="text" id="clipper-title" value="${clipperData.title}" style="width: 100%; padding: 8px; margin: 5px 0 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <label>Cost</label>
+                                <input type="number" id="clipper-cost" value="${clipperData.cost}" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            <div style="flex: 1;">
+                                <label>Markup</label>
+                                <input type="number" id="clipper-markup" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
                         </div>
-                        <div style="flex: 1;">
-                            <label>Markup</label>
-                            <input type="number" id="clipper-markup" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px;">
+                        
+                        <label>Category (required)</label>
+                        <select id="clipper-category" style="width: 100%; padding: 8px; margin: 5px 0 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Select Category (required)</option>
+                            <option value="furniture" selected>Furniture & Storage</option>
+                            <option value="lighting">Lighting</option>
+                            <option value="decor">Decor & Pillows</option>
+                        </select>
+                        
+                        <div style="margin: 15px 0;">
+                            <strong>Additional Details</strong>
+                            <div style="margin-top: 10px;">
+                                <label>Manufacturer</label>
+                                <input type="text" id="clipper-manufacturer" value="${clipperData.vendor}" style="width: 100%; padding: 6px; margin: 3px 0; border: 1px solid #ddd; border-radius: 4px;">
+                                
+                                <label>SKU</label>
+                                <input type="text" id="clipper-sku" value="${clipperData.sku}" style="width: 100%; padding: 6px; margin: 3px 0; border: 1px solid #ddd; border-radius: 4px;">
+                                
+                                <label>Dimensions</label>
+                                <input type="text" id="clipper-dimensions" value="${clipperData.size}" style="width: 100%; padding: 6px; margin: 3px 0; border: 1px solid #ddd; border-radius: 4px;">
+                                
+                                <label>Finish/Color</label>
+                                <input type="text" id="clipper-finish" value="${clipperData.finish_color}" style="width: 100%; padding: 6px; margin: 3px 0; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
                         </div>
+                        
+                        <button id="save-to-houzz-btn" style="
+                            width: 100%;
+                            background: #2c5aa0;
+                            color: white;
+                            border: none;
+                            padding: 12px;
+                            border-radius: 4px;
+                            font-size: 16px;
+                            cursor: pointer;
+                            margin-top: 15px;
+                        ">Save to Houzz Pro</button>
+                        
+                        <div id="clipper-status" style="margin-top: 10px; font-size: 14px;"></div>
                     </div>
-                    
-                    <label>Category (required)</label>
-                    <select id="clipper-category" style="width: 100%; padding: 8px; margin: 5px 0 10px 0; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="">Select Category (required)</option>
-                        <option value="furniture" selected>Furniture & Storage</option>
-                        <option value="lighting">Lighting</option>
-                        <option value="decor">Decor & Pillows</option>
-                    </select>
-                    
-                    <div style="margin: 15px 0;">
-                        <strong>Additional Details</strong>
-                        <div style="margin-top: 10px;">
-                            <label>Manufacturer</label>
-                            <input type="text" id="clipper-manufacturer" value="{product_info.get('vendor', '')}" style="width: 100%; padding: 6px; margin: 3px 0; border: 1px solid #ddd; border-radius: 4px;">
-                            
-                            <label>SKU</label>
-                            <input type="text" id="clipper-sku" value="{product_info.get('sku', '')}" style="width: 100%; padding: 6px; margin: 3px 0; border: 1px solid #ddd; border-radius: 4px;">
-                            
-                            <label>Dimensions</label>
-                            <input type="text" id="clipper-dimensions" value="{product_info.get('size', '')}" style="width: 100%; padding: 6px; margin: 3px 0; border: 1px solid #ddd; border-radius: 4px;">
-                            
-                            <label>Finish/Color</label>
-                            <input type="text" id="clipper-finish" value="{product_info.get('finish_color', '')}" style="width: 100%; padding: 6px; margin: 3px 0; border: 1px solid #ddd; border-radius: 4px;">
-                        </div>
-                    </div>
-                    
-                    <button id="save-to-houzz-btn" style="
-                        width: 100%;
-                        background: #2c5aa0;
-                        color: white;
-                        border: none;
-                        padding: 12px;
-                        border-radius: 4px;
-                        font-size: 16px;
-                        cursor: pointer;
-                        margin-top: 15px;
-                    ">Save to Houzz Pro</button>
-                    
-                    <div id="clipper-status" style="margin-top: 10px; font-size: 14px;"></div>
-                </div>
-            `;
-            
-            document.body.insertAdjacentHTML('beforeend', clipperHTML);
-            
-            // Add click handler for save button
-            document.getElementById('save-to-houzz-btn').addEventListener('click', function() {{
-                this.innerText = 'Saving...';
-                this.style.background = '#666';
+                `;
                 
-                setTimeout(() => {{
-                    document.getElementById('clipper-status').innerHTML = '<span style="color: green;">✅ Saved to Houzz Pro!</span>';
-                    this.innerText = 'Saved!';
-                    this.style.background = '#28a745';
-                }}, 1000);
-            }});
-        """)
+                document.body.insertAdjacentHTML('beforeend', clipperHTML);
+                
+                // Add click handler for save button
+                document.getElementById('save-to-houzz-btn').addEventListener('click', function() {
+                    this.innerText = 'Saving...';
+                    this.style.background = '#666';
+                    
+                    setTimeout(() => {
+                        document.getElementById('clipper-status').innerHTML = '<span style="color: green;">✅ Saved to Houzz Pro!</span>';
+                        this.innerText = 'Saved!';
+                        this.style.background = '#28a745';
+                    }, 1000);
+                });
+            }
+        """, clipper_data)
         
         print("✅ Houzz Pro Clipper interface injected!")
         await page.wait_for_timeout(2000)
