@@ -4311,7 +4311,29 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         await page.goto(product_url, wait_until='domcontentloaded', timeout=30000)
         await page.wait_for_timeout(3000)
         
-        # STEP 2: Simulate Houzz Pro Clipper Extension Interface
+        # STEP 2: Extract product information from vendor page
+        print("🎨 Extracting product info for clipper...")
+        
+        # Extract product details from the current page
+        try:
+            product_name = await page.locator('h1, .product-title, .product-name, [data-testid*="title"]').first.inner_text()
+            print(f"📝 Product name: {product_name}")
+        except:
+            product_name = product_info.get('name', 'Imported Product')
+            
+        try:
+            product_image = await page.locator('img[src*="product"], .product-image img, .hero-image img').first.get_attribute('src')
+            print(f"🖼️ Product image: {product_image}")
+        except:
+            product_image = ""
+            
+        try:
+            price_element = await page.locator('.price, .cost, [class*="price"], [data-testid*="price"]').first.inner_text()
+            print(f"💰 Product price: {price_element}")
+        except:
+            price_element = ""
+        
+        # STEP 3: Simulate Houzz Pro Clipper Extension Interface
         print("🎨 Injecting Houzz Pro Clipper Interface...")
         
         # Create clipper data for injection
