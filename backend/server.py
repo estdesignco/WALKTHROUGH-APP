@@ -4303,40 +4303,8 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         
         page = await browser.new_page()
         
-        # STEP 1: Login to Houzz Pro first
-        print("🔐 Logging into Houzz Pro...")
-        await page.goto('https://www.houzz.com/login', wait_until='domcontentloaded')
-        await page.wait_for_timeout(3000)
-        
-        # Fill login credentials
-        houzz_email = os.environ.get('HOUZZ_EMAIL', 'EstablishedDesignCo@gmail.com')
-        houzz_password = os.environ.get('HOUZZ_PASSWORD', 'Zeke1919$$')
-        
-        # Find and fill email field
-        email_selector = 'input[name="email"], input[type="email"], #email, [data-testid="email"]'
-        await page.wait_for_selector(email_selector, timeout=10000)
-        await page.fill(email_selector, houzz_email)
-        print(f"✅ Filled email: {houzz_email}")
-        
-        # Find and fill password field
-        password_selector = 'input[name="password"], input[type="password"], #password, [data-testid="password"]'
-        await page.fill(password_selector, houzz_password)
-        print("✅ Filled password")
-        
-        # Submit login form
-        login_button_selector = 'button[type="submit"], .login-button, [data-testid="login"], input[type="submit"]'
-        await page.click(login_button_selector)
-        print("🔄 Submitted login form")
-        
-        # Wait for login to complete
-        await page.wait_for_timeout(5000)
-        
-        # Check if login was successful
-        try:
-            await page.wait_for_selector('.dashboard, .user-menu, .profile-menu', timeout=10000)
-            print("✅ Successfully logged into Houzz Pro!")
-        except:
-            print("⚠️ Login may have failed or taken longer than expected")
+        # STEP 1: Navigate directly to product page (clipper works as browser extension)
+        print("🌐 Going directly to product page (simulating clipper extension workflow)...")
         
         # STEP 2: Navigate to the product page
         print(f"🌐 Navigating to product page: {product_url}")
