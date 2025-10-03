@@ -4365,82 +4365,128 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         except:
             price_element = ""
         
-        # STEP 4: Add product directly to Houzz Pro
-        print("🏠 Adding product to Houzz Pro...")
+        # STEP 4: Use the REAL Houzz Pro Clipper interface
+        print("🏠 Using REAL Houzz Pro Clipper...")
         
-        # Navigate to Houzz Pro in the same browser
-        await page.goto('https://pro.houzz.com/products', wait_until='domcontentloaded', timeout=30000)
-        await page.wait_for_timeout(3000)
-        
+        # The clipper should already be available - look for the specific interface you showed
         clipped_successfully = False
         
-        # Look for "Add Product" or "Import Product" button
-        add_product_selectors = [
-            'button:has-text("Add Product")',
-            'button:has-text("Import Product")', 
-            'a:has-text("Add Product")',
-            '.add-product',
-            '[data-testid*="add-product"]',
-            'button[class*="add"]'
-        ]
-        
-        for selector in add_product_selectors:
-            try:
-                add_button = await page.wait_for_selector(selector, timeout=5000)
-                if add_button:
-                    print(f"✅ Found add product button: {selector}")
-                    await add_button.click()
-                    await page.wait_for_timeout(3000)
-                    
-                    # Fill product details in Houzz Pro form
+        try:
+            # Wait for the Houzz Pro clipper interface to be available
+            await page.wait_for_timeout(2000)
+            
+            # Fill "Product Title (required)" field
+            title_selectors = [
+                'input[placeholder*="Product Title"]',
+                'input[name*="title"]',
+                'input[placeholder*="title"]',
+                'input:text:first'
+            ]
+            
+            for selector in title_selectors:
+                try:
+                    title_input = await page.query_selector(selector)
+                    if title_input:
+                        await title_input.fill(product_name)
+                        print(f"✅ Filled Product Title: {product_name}")
+                        break
+                except:
+                    continue
+            
+            # Fill Cost field
+            cost_value = str(product_info.get('cost', '')) if product_info.get('cost') else price_element.replace('$', '').replace(',', '') if price_element else ''
+            if cost_value:
+                cost_selectors = [
+                    'input[placeholder*="Cost"]',
+                    'input[name*="cost"]',
+                    'input[type="number"]:first'
+                ]
+                
+                for selector in cost_selectors:
                     try:
-                        # Fill product URL
-                        url_input = await page.query_selector('input[type="url"], input[name*="url"], input[placeholder*="url"]')
-                        if url_input:
-                            await url_input.fill(product_url)
-                            print("✅ Filled product URL")
-                        
-                        # Fill product name
-                        name_input = await page.query_selector('input[name*="name"], input[placeholder*="name"], input[name*="title"]')
-                        if name_input:
-                            await name_input.fill(product_name)
-                            print("✅ Filled product name")
-                        
-                        # Fill image URL if available
-                        if product_image:
-                            img_input = await page.query_selector('input[name*="image"], input[placeholder*="image"]')
-                            if img_input:
-                                await img_input.fill(product_image)
-                                print("✅ Filled product image")
-                        
-                        # Submit the form
-                        submit_selectors = [
-                            'button[type="submit"]',
-                            'button:has-text("Save")',
-                            'button:has-text("Add")',
-                            'button:has-text("Import")'
+                        cost_input = await page.query_selector(selector)
+                        if cost_input:
+                            await cost_input.fill(cost_value)
+                            print(f"✅ Filled Cost: ${cost_value}")
+                            break
+                    except:
+                        continue
+            
+            # Select Category dropdown - look for "Furniture & Storage" or similar
+            try:
+                category_dropdown = await page.query_selector('select:has-text("Select Category"), select[name*="category"]')
+                if category_dropdown:
+                    # Select Furniture category
+                    await category_dropdown.select_option(label='Furniture & Storage')
+                    print("✅ Selected Category: Furniture & Storage")
+                elif await page.query_selector('input[placeholder*="Category"]'):
+                    category_input = await page.query_selector('input[placeholder*="Category"]')
+                    await category_input.fill('Furniture')
+                    print("✅ Filled Category: Furniture")
+            except:
+                print("⚠️ Could not set category")
+            
+            # Fill Additional Details based on extracted product info
+            additional_fields = {
+                'Manufacturer': product_info.get('vendor', ''),
+                'SKU': product_info.get('sku', ''),
+                'Dimensions': product_info.get('size', ''),
+                'Finish/Color': product_info.get('finish_color', ''),
+                'MSRP': cost_value
+            }
+            
+            for field_name, field_value in additional_fields.items():
+                if field_value:
+                    try:
+                        field_selectors = [
+                            f'input[placeholder*="{field_name}"]',
+                            f'input[name*="{field_name.lower()}"]',
+                            f'textarea[placeholder*="{field_name}"]'
                         ]
                         
-                        for submit_selector in submit_selectors:
+                        for selector in field_selectors:
                             try:
-                                submit_btn = await page.query_selector(submit_selector)
-                                if submit_btn:
-                                    await submit_btn.click()
-                                    print("✅ Submitted product to Houzz Pro")
-                                    await page.wait_for_timeout(3000)
-                                    clipped_successfully = True
+                                field_input = await page.query_selector(selector)
+                                if field_input:
+                                    await field_input.fill(str(field_value))
+                                    print(f"✅ Filled {field_name}: {field_value}")
                                     break
                             except:
                                 continue
-                                
-                    except Exception as form_error:
-                        print(f"⚠️ Error filling Houzz Pro form: {form_error}")
-                    
-                    break
-                    
-            except Exception as e:
-                print(f"❌ Failed to find add product button {selector}: {e}")
-                continue
+                    except:
+                        continue
+            
+            # Click "Save to Houzz Pro" button
+            save_button_selectors = [
+                'button:has-text("Save to Houzz Pro")',
+                'button[class*="save"]:has-text("Houzz")',
+                'input[value*="Save to Houzz Pro"]',
+                'button:text-is("Save to Houzz Pro")'
+            ]
+            
+            for selector in save_button_selectors:
+                try:
+                    save_button = await page.query_selector(selector)
+                    if save_button:
+                        await save_button.click()
+                        print("🎉 CLICKED 'Save to Houzz Pro' BUTTON!")
+                        await page.wait_for_timeout(3000)
+                        clipped_successfully = True
+                        break
+                except Exception as e:
+                    print(f"❌ Failed to click save button {selector}: {e}")
+                    continue
+            
+            if not clipped_successfully:
+                print("⚠️ Could not find 'Save to Houzz Pro' button")
+                # Take screenshot for debugging
+                await page.screenshot(path='houzz_clipper_debug.png')
+                print("📸 Saved debug screenshot: houzz_clipper_debug.png")
+                
+        except Exception as form_error:
+            print(f"❌ Error using Houzz Pro clipper: {form_error}")
+            await page.screenshot(path='houzz_error_debug.png')
+            print("📸 Saved error screenshot: houzz_error_debug.png")
         
         # STEP 4: Alternative method - Open Houzz Pro in new tab and manually add product
         if not clipped_successfully:
