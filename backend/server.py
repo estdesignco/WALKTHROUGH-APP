@@ -4303,9 +4303,9 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         
         page = await browser.new_page()
         
-        # STEP 1: Login to Houzz Pro
+        # STEP 1: Login to Houzz Pro first
         print("🔐 Logging into Houzz Pro...")
-        await page.goto('https://pro.houzz.com/login', wait_until='domcontentloaded')
+        await page.goto('https://www.houzz.com/login', wait_until='domcontentloaded')
         await page.wait_for_timeout(3000)
         
         # Fill login credentials
