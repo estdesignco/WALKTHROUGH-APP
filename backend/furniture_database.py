@@ -418,6 +418,15 @@ class FurnitureDatabase:
             cursor = db.furniture_products.find(query_doc).sort('last_updated', -1).limit(100)
             results = await cursor.to_list(length=100)
             
+            # Convert ObjectIds to strings for JSON serialization
+            for result in results:
+                if '_id' in result:
+                    result['_id'] = str(result['_id'])
+                # Convert any other ObjectId fields if they exist
+                for key, value in result.items():
+                    if hasattr(value, '__class__') and 'ObjectId' in str(type(value)):
+                        result[key] = str(value)
+            
             return results
             
         except Exception as e:
