@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://design-import-tool.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://designtoolkit.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 def log_test(message, status="INFO"):
