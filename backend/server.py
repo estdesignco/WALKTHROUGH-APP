@@ -5252,14 +5252,25 @@ async def manual_furniture_import(data: dict):
                     if not room_found:
                         print(f"❌ Room '{room_name}' not found in project")
                 
-                # Auto-clip to Houzz Pro if requested
+                # Auto-clip to Houzz Pro if requested (REAL INTEGRATION)
+                houzz_result = None
                 if auto_clip_to_houzz and new_item.get('product_url'):
                     try:
-                        print(f"🏠 Auto-clipping to Houzz Pro: {new_item['name']}")
-                        # Simulate Houzz clipping (actual integration would go here)
-                        print(f"✅ Houzz clipping completed for {new_item['name']}")
+                        print(f"🏠 REAL Auto-clipping to Houzz Pro: {new_item['name']}")
+                        # Call the REAL Houzz Pro integration function
+                        product_info = {
+                            'name': new_item.get('name'),
+                            'vendor': new_item.get('vendor'),
+                            'cost': new_item.get('cost'),
+                            'image_url': new_item.get('image_url', ''),
+                            'size': item_data.get('size', ''),
+                            'sku': item_data.get('sku', '')
+                        }
+                        houzz_result = await auto_clip_to_houzz_pro(new_item['product_url'], product_info)
+                        print(f"✅ REAL Houzz clipping completed: {houzz_result}")
                     except Exception as houzz_error:
-                        print(f"❌ Houzz clipping failed: {houzz_error}")
+                        print(f"❌ REAL Houzz clipping failed: {houzz_error}")
+                        houzz_result = {"error": str(houzz_error)}
                 
                 results.append({
                     "name": new_item["name"],
