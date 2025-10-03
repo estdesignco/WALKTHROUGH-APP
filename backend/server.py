@@ -4560,7 +4560,7 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
             "message": f"Product {'successfully clipped' if clipped_successfully else 'clip attempted'} to Houzz Pro",
             "product_name": product_info.get('name', 'Unknown'),
             "product_url": product_url,
-            "houzz_account": houzz_email,
+            "houzz_account": os.environ.get('HOUZZ_EMAIL', 'EstablishedDesignCo@gmail.com'),
             "timestamp": datetime.utcnow().isoformat(),
             "method": "real_browser_automation",
             "clipped_successfully": clipped_successfully
