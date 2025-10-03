@@ -4306,8 +4306,8 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         # STEP 1: Navigate directly to product page (clipper works as browser extension)
         print("🌐 Going directly to product page (simulating clipper extension workflow)...")
         
-        # STEP 2: Navigate to the product page
-        print(f"🌐 Navigating to product page: {product_url}")
+        # Navigate to the product page
+        print(f"📦 Loading product page: {product_url}")
         await page.goto(product_url, wait_until='domcontentloaded', timeout=30000)
         await page.wait_for_timeout(3000)
         
