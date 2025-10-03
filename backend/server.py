@@ -5294,13 +5294,23 @@ async def manual_furniture_import(data: dict):
                 "database_created": False
             })
     
-    return {
+    # Collect Houzz results for summary
+    houzz_results = [r.get("houzz_clip_result") for r in results if r.get("houzz_clip_result")]
+    
+    response = {
         "success": True,
         "message": f"Manual import: {successful_imports}/{len(items)} items created",
         "results": results,
         "successful_imports": successful_imports,
         "room_name": room_name
     }
+    
+    # Add Houzz results if any exist
+    if houzz_results:
+        response["houzz_results"] = houzz_results
+        response["houzz_clips_attempted"] = len(houzz_results)
+    
+    return response
 
 @api_router.post("/test-canva-mock")
 async def test_canva_mock(data: dict):
