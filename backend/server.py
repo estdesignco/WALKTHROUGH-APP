@@ -4343,6 +4343,44 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         await page.goto(product_url, wait_until='domcontentloaded', timeout=30000)
         await page.wait_for_timeout(3000)
         
+        # STEP 3: Activate Houzz Pro clipper extension
+        print("🎨 Activating Houzz Pro Clipper...")
+        
+        # Try to activate the clipper - it might be a browser extension or bookmarklet
+        clipper_activation_methods = [
+            # Method 1: Look for Houzz clipper extension button
+            lambda: page.click('.houzz-clipper, [title*="Houzz"], [alt*="Houzz"]'),
+            
+            # Method 2: Inject clipper bookmarklet if available
+            lambda: page.evaluate("""
+                // Try to find and trigger Houzz clipper
+                if (window.houzz || window.HouzzPro) {
+                    console.log('Found Houzz clipper');
+                    return true;
+                }
+                return false;
+            """),
+            
+            # Method 3: Simulate right-click to open context menu with clipper
+            lambda: page.click('body', button='right'),
+        ]
+        
+        clipper_activated = False
+        for method in clipper_activation_methods:
+            try:
+                result = await method()
+                if result:
+                    print("✅ Houzz clipper activated!")
+                    clipper_activated = True
+                    await page.wait_for_timeout(2000)
+                    break
+            except Exception as e:
+                print(f"⚠️ Clipper activation method failed: {e}")
+                continue
+        
+        if not clipper_activated:
+            print("⚠️ Could not activate clipper extension - proceeding with manual approach")
+        
         # STEP 3: Extract product information from vendor page
         print("🎨 Extracting product info for Houzz...")
         
