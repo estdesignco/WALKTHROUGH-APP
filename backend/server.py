@@ -5272,12 +5272,18 @@ async def manual_furniture_import(data: dict):
                         print(f"❌ REAL Houzz clipping failed: {houzz_error}")
                         houzz_result = {"error": str(houzz_error)}
                 
-                results.append({
+                result_item = {
                     "name": new_item["name"],
                     "vendor": new_item["vendor"],
                     "cost": new_item["cost"],
                     "database_created": True
-                })
+                }
+                
+                # Add Houzz result if available
+                if houzz_result:
+                    result_item["houzz_clip_result"] = houzz_result
+                
+                results.append(result_item)
                 successful_imports += 1
                 
         except Exception as e:
