@@ -5231,9 +5231,10 @@ async def manual_furniture_import(data: dict):
                         if room["name"] == room_name:
                             room_found = True
                             
-                            # Add to Furniture category, PIECE subcategory
+                            # Add to Furniture category, PIECE subcategory (check multiple possible names)
                             for category in room.get("categories", []):
-                                if category.get("name") == "Furniture":
+                                category_name = category.get("name", "")
+                                if category_name in ["Furniture", "Furniture & Storage"]:
                                     for subcategory in category.get("subcategories", []):
                                         if subcategory.get("name") == "PIECE":
                                             if "items" not in subcategory:
