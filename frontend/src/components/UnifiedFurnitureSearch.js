@@ -424,7 +424,7 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
                   <div key={index} className="bg-gradient-to-br from-black/80 to-gray-900/90 rounded-xl overflow-hidden border border-yellow-400/20 hover:border-yellow-400/60 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
                     
                     {/* PROMINENT PRODUCT IMAGE */}
-                    <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
+                    <div className="aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
                       {product.image_url ? (
                         <img
                           src={product.image_url}
