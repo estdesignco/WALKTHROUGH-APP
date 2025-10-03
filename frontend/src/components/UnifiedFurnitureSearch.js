@@ -224,8 +224,9 @@ const UnifiedFurnitureSearch = ({ onSelectProduct, currentProject }) => {
 
   // Load all products on initial render
   useEffect(() => {
+    console.log('Loading initial products...');
     searchFurniture();
-  }, []);
+  }, [])
 
   return (
     <div className="min-h-screen" style={{ 
