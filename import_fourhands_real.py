@@ -121,7 +121,7 @@ async def scrape_fourhands_product(sku, page):
         print(f"    ✗ Error: {str(e)}")
         return None
 
-def import_fourhands_catalog(num_products=10, start_from=0):
+async def import_fourhands_catalog(num_products=10, start_from=0):
     """Import Four Hands products from Excel"""
     
     print("\n" + "="*80)
@@ -147,9 +147,9 @@ def import_fourhands_catalog(num_products=10, start_from=0):
         print(f"✓ {len(df_instock)} in-stock products")
         
         # Start Playwright
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
             
             processed = 0
             added = 0
