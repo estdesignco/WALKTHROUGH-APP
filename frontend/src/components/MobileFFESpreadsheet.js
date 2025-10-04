@@ -116,7 +116,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
           <thead>
             {/* SECTION HEADERS - EXACT SAME AS DESKTOP */}
             <tr>
-              <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+              <td colSpan="3" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                   style={{ backgroundColor: '#8B4444', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
               </td>
               <td colSpan="3" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
@@ -132,9 +132,8 @@ export default function MobileFFESpreadsheet({ projectId }) {
               </td>
             </tr>
             
-            {/* COLUMN HEADERS - EXACT SAME AS DESKTOP */}
+            {/* COLUMN HEADERS - EXACT SAME AS DESKTOP - NO INSTALLED CHECKBOX! */}
             <tr>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>QTY</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#6B46C1' }}>STATUS</th>
