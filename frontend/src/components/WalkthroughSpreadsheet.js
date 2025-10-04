@@ -19,6 +19,12 @@ const WalkthroughSpreadsheet = ({
   const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
+  
+  // PHOTO MANAGEMENT STATE
+  const [showPhotoManager, setShowPhotoManager] = useState(false);
+  const [selectedRoomForPhotos, setSelectedRoomForPhotos] = useState(null);
+  const [roomPhotos, setRoomPhotos] = useState({});  // {roomId: [{photo, measurements}]}
+  const [leicaConnected, setLeicaConnected] = useState(false);
 
   // FILTER STATE
   const [filteredProject, setFilteredProject] = useState(project);
