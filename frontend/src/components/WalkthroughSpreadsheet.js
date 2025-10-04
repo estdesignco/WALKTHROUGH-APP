@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 
 import AddItemModal from './AddItemModal';
+import PhotoManagerModal from './PhotoManagerModal';
 
 const WalkthroughSpreadsheet = ({
   project,
