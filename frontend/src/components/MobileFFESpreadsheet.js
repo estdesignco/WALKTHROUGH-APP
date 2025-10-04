@@ -13,6 +13,8 @@ export default function MobileFFESpreadsheet({ projectId }) {
   const [loading, setLoading] = useState(true);
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
+  const [showPhotoCapture, setShowPhotoCapture] = useState(false);
+  const [selectedRoomForPhoto, setSelectedRoomForPhoto] = useState(null);
   const [newRoomName, setNewRoomName] = useState('');
   
   // Offline sync hook
