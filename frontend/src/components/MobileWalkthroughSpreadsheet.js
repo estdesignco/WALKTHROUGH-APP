@@ -603,4 +603,4 @@ const MobileWalkthroughSpreadsheet = ({
   );
 };
 
-export default WalkthroughSpreadsheet;
+export default MobileWalkthroughSpreadsheet;
