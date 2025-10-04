@@ -113,6 +113,12 @@ async def scrape_uttermost_with_protection(num_products=10):
     proxies = get_free_proxies()
     
     async with async_playwright() as p:
+        # Launch browser ONCE at start (reuse for all products)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=['--no-sandbox', '--disable-blink-features=AutomationControlled']
+        )
+        
         success = 0
         
         for i in range(num_products):
