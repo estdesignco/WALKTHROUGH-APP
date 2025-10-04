@@ -208,27 +208,8 @@ async def scrape_fourhands_authenticated(num_products=5):
                     failed += 1
                     continue
                 
-                # Look for product link
-                product_link = None
-                try:
-                    link = await page.query_selector('a[href*="/products/"]')
-                    if link:
-                        product_link = await link.get_attribute('href')
-                        if not product_link.startswith('http'):
-                            product_link = 'https://fourhands.com' + product_link
-                except:
-                    pass
-                
-                if not product_link:
-                    print(f"  ✗ Product not found\n")
-                    failed += 1
-                    continue
-                
-                print(f"  ✓ Found: {product_link[:60]}...")
-                
-                # Go to product page
-                await page.goto(product_link, wait_until='domcontentloaded', timeout=30000)
-                await page.wait_for_timeout(3000)
+                # We're already on the product page from above
+                # Continue with image extraction
                 
                 # Extract images
                 print(f"  📸 Extracting images...")
