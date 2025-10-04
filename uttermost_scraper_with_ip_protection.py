@@ -199,24 +199,51 @@ async def scrape_uttermost_with_protection(num_products=10):
                 
                 # Scroll to trigger lazy-loaded images
                 await page.evaluate("window.scrollTo(0, 500)")
-                await page.wait_for_timeout(2000)
+                await page.wait_for_timeout(3000)
                 await page.evaluate("window.scrollTo(0, 1000)")
-                await page.wait_for_timeout(2000)
+                await page.wait_for_timeout(3000)
                 
                 # Extract images
                 print(f"  📸 Extracting images...")
                 images = []
                 
-                img_elements = await page.query_selector_all('img')
-                print(f"    Found {len(img_elements)} total img tags")
+                # Try to find main product gallery images first
+                gallery_imgs = await page.query_selector_all('.product-image-container img, .gallery-image img, [class*="product"] [class*="image"] img')
                 
-                for img_elem in img_elements[:20]:  # Check first 20
-                    src = await img_elem.get_attribute('src')
-                    data_src = await img_elem.get_attribute('data-src')
-                    alt = await img_elem.get_attribute('alt') or ''
+                if gallery_imgs:
+                    print(f"    Found {len(gallery_imgs)} gallery images")
+                    for img_elem in gallery_imgs[:10]:
+                        # Try multiple attributes where real image might be
+                        src = await img_elem.get_attribute('src')
+                        data_src = await img_elem.get_attribute('data-src')
+                        data_zoom = await img_elem.get_attribute('data-zoom-image')
+                        data_large = await img_elem.get_attribute('data-large-image')
+                        
+                        # Prefer high-res versions
+                        img_url = data_zoom or data_large or data_src or src
+                        
+                        if img_url and 'blank.png' not in img_url:
+                            print(f"    Real image found: {img_url[:60]}...")
+                            
+                            if img_url.startswith('//'):
+                                img_url = 'https:' + img_url
+                            elif img_url.startswith('/'):
+                                img_url = 'https://www.uttermost.com' + img_url
+                            
+                            if any(ext in img_url.lower() for ext in ['.jpg', '.jpeg', '.png', '.webp']):
+                                images.append(img_url)
+                
+                # If no gallery images, fallback to all images
+                if not images:
+                    img_elements = await page.query_selector_all('img')
+                    print(f"    Fallback: Found {len(img_elements)} total img tags")
                     
-                    # Try both src and data-src
-                    img_url = src or data_src
+                    for img_elem in img_elements[:20]:
+                        src = await img_elem.get_attribute('src')
+                        data_src = await img_elem.get_attribute('data-src')
+                        alt = await img_elem.get_attribute('alt') or ''
+                        
+                        img_url = data_src or src
                     
                     if img_url:
                         print(f"    Checking: {img_url[:80]}...")
