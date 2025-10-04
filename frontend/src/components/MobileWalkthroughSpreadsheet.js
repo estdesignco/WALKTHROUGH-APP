@@ -109,10 +109,33 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
 
   const toggleItemCheck = async (item) => {
     try {
-      await axios.put(`${API_URL}/items/${item.id}`, {
-        checked: !item.checked
+      const newChecked = !item.checked;
+      
+      // Use offline-capable update
+      await updateItemOffline(item.id, { checked: newChecked });
+      
+      // Update local state immediately
+      setProject(prevProject => {
+        const updatedProject = { ...prevProject };
+        updatedProject.rooms = updatedProject.rooms.map(room => ({
+          ...room,
+          categories: room.categories.map(cat => ({
+            ...cat,
+            subcategories: cat.subcategories.map(sub => ({
+              ...sub,
+              items: sub.items.map(i => 
+                i.id === item.id ? { ...i, checked: newChecked } : i
+              )
+            }))
+          }))
+        }));
+        return updatedProject;
       });
-      await loadProject();
+      
+      // Reload if online
+      if (online) {
+        await loadProject();
+      }
     } catch (error) {
       console.error('Failed to toggle:', error);
     }
