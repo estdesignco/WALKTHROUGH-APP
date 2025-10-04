@@ -280,7 +280,10 @@ export default function ProjectDetailPage() {
                 </div>
 
                 {/* Project Rooms - MOVED TO TOP */}
-                <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
+                <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60 mb-6" 
+                     style={{
+                       background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
+                     }}>
                     <h3 className="text-xl font-bold text-[#8B7355] mb-4">PROJECT ROOMS</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {project.rooms?.map((room, index) => (
