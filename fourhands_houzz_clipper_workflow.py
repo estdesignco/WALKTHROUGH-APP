@@ -279,17 +279,69 @@ async def main():
                 
                 print(f"  ✓ Product page loaded")
                 
-                # Extract images from Four Hands page
+                # Extract MAIN PRODUCT images (not fabric swatches!)
                 images = []
-                img_elements = await page.query_selector_all('img')
-                for img_elem in img_elements:
-                    src = await img_elem.get_attribute('src')
-                    if src and 'cloudfront' in src and 'logo' not in src.lower():
-                        if src.startswith('//'):
-                            src = 'https:' + src
-                        images.append(src)
-                        if len(images) >= 5:
-                            break
+                
+                # Try to get the main product gallery images
+                # Look for specific gallery selectors first
+                gallery_selectors = [
+                    '.product-gallery img',
+                    '.main-image img',
+                    '[class*="product-image"] img',
+                    '[class*="ProductImage"] img',
+                    'img[alt*="thumbnail"]'
+                ]
+                
+                found_gallery = False
+                for selector in gallery_selectors:
+                    try:
+                        gallery_imgs = await page.query_selector_all(selector)
+                        if gallery_imgs:
+                            for img_elem in gallery_imgs:
+                                src = await img_elem.get_attribute('src')
+                                alt = await img_elem.get_attribute('alt') or ''
+                                
+                                # Skip fabric swatches and small icons
+                                if src and 'cloudfront' in src:
+                                    # Skip if it's a fabric swatch (usually smaller URLs or has 'swatch' in name)
+                                    if 'swatch' in src.lower() or 'fabric' in alt.lower():
+                                        continue
+                                    
+                                    if src.startswith('//'):
+                                        src = 'https:' + src
+                                    
+                                    # Make sure it's a large product image
+                                    if 'thumbnail' in alt.lower() or len(src) > 100:
+                                        images.append(src)
+                                        if len(images) >= 5:
+                                            break
+                            
+                            if images:
+                                found_gallery = True
+                                break
+                    except:
+                        continue
+                
+                # If no gallery found, get ALL large images and filter
+                if not found_gallery:
+                    img_elements = await page.query_selector_all('img')
+                    for img_elem in img_elements:
+                        src = await img_elem.get_attribute('src')
+                        alt = await img_elem.get_attribute('alt') or ''
+                        
+                        if src and 'cloudfront' in src and 'logo' not in src.lower():
+                            # Skip swatches and small images
+                            if 'swatch' in src.lower() or 'fabric' in alt.lower() or 'icon' in src.lower():
+                                continue
+                            
+                            if src.startswith('//'):
+                                src = 'https:' + src
+                            
+                            # Only get large product images (URLs are usually longer)
+                            if len(src) > 150:  # Large image URLs are longer
+                                images.append(src)
+                                if len(images) >= 5:
+                                    break
                 
                 if images:
                     print(f"  ✓ Found {len(images)} images")
