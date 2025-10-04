@@ -188,6 +188,14 @@ function MobileWalkthroughScreen({ project, onNavigate, onSelectRoom }) {
     setRooms(updatedRooms);
   };
 
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
+        <div className="text-[#D4C5A9]">Loading spreadsheet...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-full overflow-auto bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
       {/* Header with buttons */}
@@ -198,12 +206,6 @@ function MobileWalkthroughScreen({ project, onNavigate, onSelectRoom }) {
             className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-1 rounded-lg text-sm font-semibold"
           >
             ← Back
-          </button>
-          <button 
-            onClick={() => onNavigate('photos', { project })}
-            className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-1 rounded-lg text-sm font-semibold"
-          >
-            📸 Photos
           </button>
         </div>
         <h2 className="text-lg font-bold bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">
