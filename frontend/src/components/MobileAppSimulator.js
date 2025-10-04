@@ -307,8 +307,10 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    loadPhotos();
-  }, []);
+    if (project?.id && room?.id) {
+      loadPhotos();
+    }
+  }, [project, room]);
 
   const loadPhotos = async () => {
     try {
