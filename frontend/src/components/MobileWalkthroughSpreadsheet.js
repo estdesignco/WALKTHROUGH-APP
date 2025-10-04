@@ -17,10 +17,13 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
   const [showAddItem, setShowAddItem] = useState(false);
   const [showPhotoCapture, setShowPhotoCapture] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [selectedRoomForPhoto, setSelectedRoomForPhoto] = useState(null);
   const [newRoomName, setNewRoomName] = useState('');
+  const [filteredProject, setFilteredProject] = useState(null);
   
-  const stats = project ? calculateProjectStats(project) : null;
+  const displayProject = filteredProject || project;
+  const stats = displayProject ? calculateProjectStats(displayProject) : null;
   
   // Offline sync hook
   const {
