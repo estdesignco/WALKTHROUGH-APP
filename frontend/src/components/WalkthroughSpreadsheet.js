@@ -243,12 +243,14 @@ const WalkthroughSpreadsheet = ({
   const getCategoryColor = () => '#065F46';
 
   if (!project || !project.rooms || project.rooms.length === 0) {
+    return (
       <div className="text-center text-gray-400 py-8">
         <p className="text-lg">Loading Walkthrough data...</p>
       </div>
     );
   }
 
+  return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
       
       {/* PHOTO MANAGEMENT HEADER */}
