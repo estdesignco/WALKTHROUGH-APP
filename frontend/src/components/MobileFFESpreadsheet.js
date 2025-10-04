@@ -364,7 +364,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse" style={{ minWidth: '1400px' }}>
           <tbody>
-            {project?.rooms?.map((room) => (
+            {displayProject?.rooms?.map((room) => (
               <React.Fragment key={room.id}>
                 {/* ROOM HEADER ROW */}
                 <tr>
