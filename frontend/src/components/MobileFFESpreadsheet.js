@@ -240,6 +240,13 @@ export default function MobileFFESpreadsheet({ projectId }) {
         </button>
         
         <button
+          onClick={() => setShowQuickAdd(true)}
+          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded text-sm"
+        >
+          ⚡ TEMPLATES
+        </button>
+        
+        <button
           onClick={() => {
             if (project?.rooms?.length > 0) {
               setSelectedRoomForPhoto(project.rooms[0]);
