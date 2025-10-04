@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useOfflineSync } from '../hooks/useOfflineSync';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
@@ -10,6 +11,17 @@ export default function MobileFFESpreadsheet({ projectId }) {
   const [loading, setLoading] = useState(true);
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [newRoomName, setNewRoomName] = useState('');
+  
+  // Offline sync hook
+  const {
+    online,
+    syncStatus,
+    pendingCount,
+    performSync,
+    updateItemOffline,
+    cacheProject,
+    loadProjectFromCache
+  } = useOfflineSync(projectId);
 
   const statuses = ['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED'];
   const carriers = ['FedEx', 'UPS', 'USPS', 'DHL', 'Other'];
