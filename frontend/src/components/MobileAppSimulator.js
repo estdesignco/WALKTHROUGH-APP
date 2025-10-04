@@ -353,20 +353,36 @@ export default function MobileAppSimulator() {
         return <MobileHomeScreen onNavigate={setScreen} />;
       case 'projects':
         return <MobileProjectListScreen onNavigate={setScreen} onSelectProject={handleSelectProject} />;
+      case 'project-menu':
+        return <ProjectMenuScreen project={selectedProject} onNavigate={setScreen} />;
       case 'walkthrough':
         return (
           <div className="h-full flex flex-col">
             <button 
-              onClick={() => setScreen('projects')}
+              onClick={() => setScreen('project-menu')}
               className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-2 m-2 rounded-lg text-sm font-semibold"
             >
-              ← Back to Projects
+              ← Back
             </button>
             <div className="flex-1 overflow-hidden">
               <MobileWalkthroughSpreadsheet 
                 projectId={selectedProject?.id} 
                 onOpenPhotos={handleSelectRoom}
               />
+            </div>
+          </div>
+        );
+      case 'ffe':
+        return (
+          <div className="h-full flex flex-col">
+            <button 
+              onClick={() => setScreen('project-menu')}
+              className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-2 m-2 rounded-lg text-sm font-semibold"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-hidden">
+              <MobileFFESpreadsheet projectId={selectedProject?.id} />
             </div>
           </div>
         );
