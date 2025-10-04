@@ -43,7 +43,7 @@ def url_to_base64(image_url, max_size=(400, 400)):
     except Exception as e:
         return None
 
-def scrape_fourhands_product(sku, page):
+async def scrape_fourhands_product(sku, page):
     """Scrape Four Hands product page for image"""
     try:
         # Go to Four Hands search
