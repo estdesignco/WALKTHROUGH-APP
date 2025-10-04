@@ -133,7 +133,7 @@ export default function MobileAddItemModal({
             type="text"
             value={size}
             onChange={(e) => setSize(e.target.value)}
-            placeholder="e.g., 24\" x 36\""
+            placeholder="e.g., 24'' x 36''"
             className="w-full bg-gray-700 text-white px-4 py-2 rounded"
           />
         </div>
