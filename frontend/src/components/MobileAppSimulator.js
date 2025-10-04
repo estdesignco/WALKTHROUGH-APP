@@ -290,7 +290,7 @@ export default function MobileAppSimulator() {
 
   const handleSelectProject = (project) => {
     setSelectedProject(project);
-    setScreen('walkthrough');
+    setScreen('project-menu');
   };
 
   const handleSelectRoom = (room) => {
