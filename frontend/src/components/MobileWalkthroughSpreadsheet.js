@@ -245,6 +245,13 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
           📸 PHOTO
         </button>
         
+        <button
+          onClick={() => setShowSearch(!showSearch)}
+          className={`flex-1 ${showSearch ? 'bg-yellow-600' : 'bg-gray-600'} hover:bg-yellow-700 text-white font-bold py-2 px-3 rounded text-sm`}
+        >
+          🔍 SEARCH
+        </button>
+        
         {online && pendingCount > 0 && (
           <button
             onClick={performSync}
@@ -254,6 +261,14 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
           </button>
         )}
       </div>
+      
+      {/* SEARCH & FILTER PANEL */}
+      {showSearch && (
+        <MobileSearchFilter 
+          project={project} 
+          onFilterChange={setFilteredProject} 
+        />
+      )}
 
       {/* STATS BAR */}
       {stats && !showStats && (
