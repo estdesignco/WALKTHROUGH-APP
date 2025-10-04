@@ -72,8 +72,8 @@ async def scrape_fourhands_product(sku, page):
         print(f"    ✓ Product page: {product_link[:50]}...")
         
         # Go to product page
-        page.goto(product_link, wait_until='domcontentloaded', timeout=20000)
-        page.wait_for_timeout(2000)
+        await page.goto(product_link, wait_until='domcontentloaded', timeout=20000)
+        await page.wait_for_timeout(2000)
         
         # Get main product image
         img_element = None
@@ -87,7 +87,7 @@ async def scrape_fourhands_product(sku, page):
         
         for sel in selectors:
             try:
-                img_element = page.query_selector(sel)
+                img_element = await page.query_selector(sel)
                 if img_element:
                     break
             except:
@@ -97,7 +97,7 @@ async def scrape_fourhands_product(sku, page):
             print(f"    ✗ No image found")
             return None
         
-        img_src = img_element.get_attribute('src')
+        img_src = await img_element.get_attribute('src')
         if img_src:
             if img_src.startswith('//'):
                 img_src = 'https:' + img_src
