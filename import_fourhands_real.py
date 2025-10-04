@@ -263,7 +263,7 @@ async def import_fourhands_catalog(num_products=10, start_from=0):
 
 if __name__ == "__main__":
     # Start with just 10 products as proof of concept
-    import_fourhands_catalog(num_products=10, start_from=0)
+    asyncio.run(import_fourhands_catalog(num_products=10, start_from=0))
     
     print(f"\n🎉 DONE! Refresh the frontend to see real Four Hands products!")
     print(f"🔗 https://design-search.preview.emergentagent.com/furniture-search")
