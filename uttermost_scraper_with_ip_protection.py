@@ -215,7 +215,7 @@ async def scrape_uttermost_with_protection(num_products=10):
                         if len(images) >= 5:
                             break
                 
-                await browser.close()
+                await context.close()
                 
                 if not images:
                     print(f"  ✗ No images found\n")
