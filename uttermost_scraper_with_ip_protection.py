@@ -304,4 +304,4 @@ async def scrape_uttermost_with_protection(num_products=10):
     client.close()
 
 if __name__ == "__main__":
-    asyncio.run(scrape_uttermost_with_protection(5))
+    asyncio.run(scrape_uttermost_with_protection(10))
