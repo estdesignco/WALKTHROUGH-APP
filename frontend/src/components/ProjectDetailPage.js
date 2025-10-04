@@ -289,10 +289,10 @@ export default function ProjectDetailPage() {
                         {project.rooms?.map((room, index) => (
                             <div key={room.id || index} className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                 <h4 className="font-semibold text-[#8B7355]">{room.name}</h4>
-                                {room.description && <p className="text-sm text-stone-400 mt-1">{room.description}</p>}
+                                {room.description && <p className="text-sm text-[#D4C5A9] mt-1">{room.description}</p>}
                             </div>
                         )) || (
-                            <p className="text-stone-400 col-span-full">No rooms specified</p>
+                            <p className="text-[#D4C5A9] col-span-full">No rooms specified</p>
                         )}
                     </div>
                 </div>
@@ -305,25 +305,25 @@ export default function ProjectDetailPage() {
                     <h3 className="text-xl font-bold text-[#8B7355] mb-4">TOTAL SCOPE OF WORK</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Property Type</label>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Property Type</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                 {project.property_type || 'Not specified'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Timeline</label>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Timeline</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                 {project.timeline || 'Not specified'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Budget Range</label>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Budget Range</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                 {project.budget_range || project.budget || 'Not specified'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Project Priority</label>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Project Priority</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                 {Array.isArray(project.project_priority) ? project.project_priority.join(', ') : project.project_priority || 'Not specified'}
                             </div>
@@ -342,19 +342,19 @@ export default function ProjectDetailPage() {
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-stone-300 mb-2">Working with Architect?</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Working with Architect?</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                         {project.new_build_architect || 'Not specified'}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-stone-300 mb-2">Working with Builder?</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Working with Builder?</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                         {project.new_build_builder || 'Not specified'}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-stone-300 mb-2">Square Footage</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Square Footage</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                         {project.new_build_square_footage || 'Not specified'}
                                     </div>
@@ -367,25 +367,25 @@ export default function ProjectDetailPage() {
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-stone-300 mb-2">Working with Architect?</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Working with Architect?</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                         {project.renovation_architect || 'Not specified'}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-stone-300 mb-2">Working with Builder?</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Working with Builder?</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                         {project.renovation_builder || 'Not specified'}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-stone-300 mb-2">Square Footage Being Renovated</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Square Footage Being Renovated</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                         {project.renovation_square_footage || 'Not specified'}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-stone-300 mb-2">Changing Layout/Footprint?</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Changing Layout/Footprint?</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                         {project.renovation_layout_change || 'Not specified'}
                                     </div>
@@ -398,15 +398,15 @@ export default function ProjectDetailPage() {
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-stone-300 mb-2">Square Footage Being Refreshed</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Square Footage Being Refreshed</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                         {project.furniture_refresh_square_footage || 'Not specified'}
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Keeping Any Existing Pieces?</label>
-                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Keeping Any Existing Pieces?</label>
+                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
                                     {project.furniture_refresh_keeping_pieces || 'Not specified'}
                                 </div>
                             </div>
@@ -423,51 +423,51 @@ export default function ProjectDetailPage() {
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Style in 3 Words</label>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Style in 3 Words</label>
                                 <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                     {project.design_style_words || 'Not provided'}
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Colors</label>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Preferred Colors</label>
                                 <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                     {project.design_preferred_colors || 'Not provided'}
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Disliked Colors</label>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Disliked Colors</label>
                                 <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                     {project.design_disliked_colors || 'Not provided'}
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Palette</label>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Preferred Palette</label>
                                 <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                     {Array.isArray(project.design_preferred_palette) ? project.design_preferred_palette.join(', ') : project.design_preferred_palette || 'Not specified'}
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Artwork Preference</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Artwork Preference</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
                                 {Array.isArray(project.design_artwork_preference) ? project.design_artwork_preference.join(', ') : project.design_artwork_preference || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Liked Design Styles</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Liked Design Styles</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
                                 {Array.isArray(project.design_styles_preference) ? project.design_styles_preference.join(', ') : project.design_styles_preference || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Disliked Design Styles</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Disliked Design Styles</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
                                 {project.design_styles_dislike || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Patterns & Textures Preference</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Patterns & Textures Preference</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
                                 {Array.isArray(project.finishes_patterns_preference) ? project.finishes_patterns_preference.join(', ') : project.finishes_patterns_preference || 'Not provided'}
                             </div>
                         </div>
@@ -482,40 +482,40 @@ export default function ProjectDetailPage() {
                     <h3 className="text-xl font-bold text-[#8B7355] mb-4">GETTING TO KNOW YOU BETTER</h3>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Tell us about your family</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Tell us about your family</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
                                 {project.family_info || 'Not provided'}
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Do you have pets?</label>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Do you have pets?</label>
                                 <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                     {project.pets_info || 'Not provided'}
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">How do you entertain?</label>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">How do you entertain?</label>
                                 <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                     {project.entertaining_style || 'Not provided'}
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">What are your hobbies?</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[60px]">
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What are your hobbies?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[60px]">
                                 {project.hobbies || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">What is your lifestyle like?</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What is your lifestyle like?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
                                 {project.lifestyle || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Any special requests or needs?</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Any special requests or needs?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
                                 {project.special_requests || project.notes || 'No special requests'}
                             </div>
                         </div>
@@ -530,19 +530,19 @@ export default function ProjectDetailPage() {
                     <h3 className="text-xl font-bold text-[#8B7355] mb-4">HOW DID YOU HEAR ABOUT US</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">How did you hear about us?</label>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">How did you hear about us?</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                 {project.how_heard_about_us || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Newsletter signup?</label>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Newsletter signup?</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                 {project.newsletter_signup || 'Not specified'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Social media preferences</label>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Social media preferences</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
                                 {project.social_media_preferences || 'Not provided'}
                             </div>
@@ -577,7 +577,7 @@ export default function ProjectDetailPage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <Loader2 className="w-12 h-12 mr-2 animate-spin text-stone-400" /> 
+                <Loader2 className="w-12 h-12 mr-2 animate-spin text-[#D4C5A9]" /> 
                 <span className="text-stone-300">Loading project...</span>
             </div>
         );
@@ -588,9 +588,9 @@ export default function ProjectDetailPage() {
     }
 
     return (
-        <div className="space-y-8 text-stone-200 min-h-screen bg-gray-900 p-6">
+        <div className="space-y-8 text-[#D4C5A9] min-h-screen bg-gray-900 p-6">
             <div className="flex items-center justify-between">
-                <Link to="/" className="flex items-center text-stone-400 hover:text-stone-200 transition-colors">
+                <Link to="/" className="flex items-center text-[#D4C5A9] hover:text-[#D4C5A9] transition-colors">
                     <ArrowLeft className="w-5 h-5 mr-2" />
                     Back to All Projects
                 </Link>
@@ -611,8 +611,8 @@ export default function ProjectDetailPage() {
                                 onClick={() => setActiveTab(tab.name)}
                                 className={`${
                                     activeTab === tab.name
-                                        ? 'border-stone-400 text-stone-200'
-                                        : 'border-transparent text-stone-400 hover:text-stone-200 hover:border-stone-300'
+                                        ? 'border-stone-400 text-[#D4C5A9]'
+                                        : 'border-transparent text-[#D4C5A9] hover:text-[#D4C5A9] hover:border-stone-300'
                                 } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2`}
                             >
                                 <Icon className="w-4 h-4" />
