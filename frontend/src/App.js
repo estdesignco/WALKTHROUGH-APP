@@ -160,6 +160,10 @@ const App = () => {
               element={<MainDashboard />}
             />
             <Route 
+              path="/mobile-app" 
+              element={<MobileAppSimulator />}
+            />
+            <Route 
               path="/studio" 
               element={<StudioLandingPage />}
             />
