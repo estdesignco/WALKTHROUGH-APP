@@ -1316,7 +1316,7 @@ const ExactFFESpreadsheet = ({
       {/* IMAGE EXPANSION MODAL */}
       {expandedImage && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black bg-opacity-90 flex items-start justify-center z-50 p-4 overflow-y-auto"
           onClick={() => setExpandedImage(null)}
         >
           <div className="relative max-w-4xl max-h-screen">
