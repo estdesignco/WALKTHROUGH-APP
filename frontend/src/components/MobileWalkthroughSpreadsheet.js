@@ -172,21 +172,28 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         </div>
       )}
       
-      {/* ADD ROOM BUTTON */}
+      {/* ACTION BUTTONS */}
       <div className="p-4 border-b border-gray-700 flex gap-2">
         <button
           onClick={() => setShowAddRoom(true)}
-          className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm"
         >
-          ➕ ADD ROOM
+          ➕ ROOM
+        </button>
+        
+        <button
+          onClick={() => setShowAddItem(true)}
+          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm"
+        >
+          ➕ ITEM
         </button>
         
         {online && pendingCount > 0 && (
           <button
             onClick={performSync}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm"
           >
-            🔄 Sync ({pendingCount})
+            🔄 ({pendingCount})
           </button>
         )}
       </div>
