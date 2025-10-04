@@ -402,9 +402,9 @@ export default function MobileAppSimulator() {
               ← Back
             </button>
             <div className="flex-1 overflow-auto">
-              {selectedProject && (
+              {selectedProject?.ffeData && (
                 <ExactFFESpreadsheet 
-                  project={selectedProject}
+                  project={selectedProject.ffeData}
                   roomColors={{}}
                   categoryColors={{}}
                   itemStatuses={['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']}
