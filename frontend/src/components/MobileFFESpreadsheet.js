@@ -115,8 +115,31 @@ export default function MobileFFESpreadsheet({ projectId }) {
 
   const updateItem = async (itemId, data) => {
     try {
-      await axios.put(`${API_URL}/items/${itemId}`, data);
-      await loadProject();
+      // Use offline-capable update
+      await updateItemOffline(itemId, data);
+      
+      // Update local state immediately for responsive UI
+      setProject(prevProject => {
+        const updatedProject = { ...prevProject };
+        updatedProject.rooms = updatedProject.rooms.map(room => ({
+          ...room,
+          categories: room.categories.map(cat => ({
+            ...cat,
+            subcategories: cat.subcategories.map(sub => ({
+              ...sub,
+              items: sub.items.map(item => 
+                item.id === itemId ? { ...item, ...data } : item
+              )
+            }))
+          }))
+        }));
+        return updatedProject;
+      });
+      
+      // Reload from server if online
+      if (online) {
+        await loadProject();
+      }
     } catch (error) {
       console.error('Update failed:', error);
     }
