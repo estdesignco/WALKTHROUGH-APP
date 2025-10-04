@@ -137,7 +137,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                   <React.Fragment key={category.id}>
                     {/* CATEGORY HEADER ROW */}
                     <tr>
-                      <td colSpan="4"
+                      <td colSpan="6"
                           className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
                           style={{ backgroundColor: getCategoryColor() }}>
                         <div className="flex items-center gap-2">
@@ -149,12 +149,24 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                       </td>
                     </tr>
 
+                    {/* HEADERS - Show when category expanded (BELOW category header) */}
+                    {expandedCategories[category.id] && (
+                      <tr>
+                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8b7355' }}>✓</th>
+                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>ITEM NAME</th>
+                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                      </tr>
+                    )}
+
                     {/* ITEMS - Show when category expanded */}
                     {expandedCategories[category.id] && category.subcategories?.map((subcategory) => (
                       <React.Fragment key={subcategory.id}>
                         {subcategory.items?.map((item) => (
                           <tr key={item.id} className="hover:bg-gray-800">
-                            {/* INSTALLED CHECKBOX */}
+                            {/* CHECKBOX */}
                             <td className="border border-gray-400 px-3 py-2 text-center">
                               <input
                                 type="checkbox"
@@ -164,7 +176,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                               />
                             </td>
                             
-                            {/* VENDOR/SKU */}
+                            {/* ITEM NAME */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm">
                               <div className="font-bold">{item.name}</div>
                               {item.vendor && <div className="text-xs text-gray-400">{item.vendor}</div>}
@@ -173,12 +185,24 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                             
                             {/* QTY */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">
-                              {item.quantity || '-'}
+                              {item.quantity || '1'}
                             </td>
                             
                             {/* SIZE */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm">
                               {item.size || '-'}
+                            </td>
+                            
+                            {/* FINISH/COLOR */}
+                            <td className="border border-gray-400 px-3 py-2 text-white text-sm">
+                              {item.finish_color || '-'}
+                            </td>
+                            
+                            {/* DELETE BUTTON */}
+                            <td className="border border-gray-400 px-3 py-2 text-center">
+                              <button className="text-red-400 hover:text-red-300 text-xs">
+                                🗑️
+                              </button>
                             </td>
                           </tr>
                         ))}
