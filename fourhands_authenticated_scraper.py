@@ -90,18 +90,40 @@ async def scrape_fourhands_authenticated(num_products=5):
         print("🔐 Step 1: Logging into Four Hands...")
         
         # Go to Four Hands LOGIN
-        await page.goto('https://fourhands.com/login', timeout=30000)
-        await page.wait_for_timeout(3000)
+        await page.goto('https://fourhands.com/login', wait_until='networkidle', timeout=60000)
+        print("  ✓ Page loaded, waiting for form...")
         
-        # Fill login form - try multiple selectors
+        # Wait for Vue.js to render the login form
+        await page.wait_for_timeout(5000)
+        
+        # Wait for input fields to appear
+        await page.wait_for_selector('input[type="text"], input[type="email"], input', timeout=30000)
+        print("  ✓ Login form rendered")
+        
+        # Fill login form
         try:
-            # Try account number field first
-            await page.fill('input[name="accountNumber"], input[placeholder*="Account"], #accountNumber', FOURHANDS_USERNAME)
-            await page.fill('input[name="password"], input[type="password"], #password', FOURHANDS_PASSWORD)
+            # Get all input fields
+            inputs = await page.query_selector_all('input')
+            print(f"  Found {len(inputs)} input fields")
             
-            # Submit
-            await page.click('button[type="submit"], input[type="submit"], .btn-login')
-            await page.wait_for_timeout(5000)
+            if len(inputs) >= 2:
+                # Fill first input (account number)
+                await inputs[0].fill(FOURHANDS_USERNAME)
+                print(f"  ✓ Filled username")
+                
+                # Fill second input (password)
+                await inputs[1].fill(FOURHANDS_PASSWORD)
+                print(f"  ✓ Filled password")
+                
+                # Click submit button
+                await page.click('button[type="submit"], button')
+                await page.wait_for_timeout(8000)
+            else:
+                # Try by selector
+                await page.fill('input:nth-of-type(1)', FOURHANDS_USERNAME)
+                await page.fill('input[type="password"]', FOURHANDS_PASSWORD)
+                await page.click('button')
+                await page.wait_for_timeout(8000)
             
             # Check if logged in
             if 'account' in page.url or 'dashboard' in page.url or 'my-account' in page.url:
