@@ -214,25 +214,39 @@ export default function MobileFFESpreadsheet({ projectId }) {
       )}
       
       {/* ACTION BUTTONS */}
-      <div className="p-4 border-b border-gray-700 flex gap-2">
+      <div className="p-4 border-b border-gray-700 flex flex-wrap gap-2">
         <button
           onClick={() => setShowAddRoom(true)}
-          className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm"
+          className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded text-sm"
         >
           ➕ ROOM
         </button>
         
         <button
           onClick={() => setShowAddItem(true)}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm"
+          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded text-sm"
         >
           ➕ ITEM
+        </button>
+        
+        <button
+          onClick={() => {
+            if (project?.rooms?.length > 0) {
+              setSelectedRoomForPhoto(project.rooms[0]);
+              setShowPhotoCapture(true);
+            } else {
+              alert('Please add a room first');
+            }
+          }}
+          className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-3 rounded text-sm"
+        >
+          📸 PHOTO
         </button>
         
         {online && pendingCount > 0 && (
           <button
             onClick={performSync}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm"
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded text-sm"
           >
             🔄 ({pendingCount})
           </button>
