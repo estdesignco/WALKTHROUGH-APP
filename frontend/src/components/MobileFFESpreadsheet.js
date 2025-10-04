@@ -311,7 +311,8 @@ export default function MobileFFESpreadsheet({ projectId }) {
                           <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>INSTALL/SHIP TO</td>
                           <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>TRACKING/CARRIER</td>
                           <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>NOTES</td>
-                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK/SCRAPE</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#DC2626' }}>DELETE</td>
                         </tr>
                       </React.Fragment>
                     )}
