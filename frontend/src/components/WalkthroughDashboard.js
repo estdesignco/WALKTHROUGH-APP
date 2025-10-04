@@ -242,13 +242,70 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
         {/* DIVIDER LINE */}
         <div className="w-full h-px bg-gradient-to-r from-transparent via-[#B49B7E]/20 to-transparent my-1"></div>
         
-        {/* PIE CHART AND STATUS BREAKDOWN - ALWAYS VISIBLE */}
-        <StatusOverview
-          totalItems={getTotalItems()}
-          statusBreakdown={getStatusBreakdown()}
-          carrierBreakdown={getCarrierBreakdown()}
-          itemStatuses={itemStatuses}
-        />
+        {/* PHOTO MANAGEMENT HEADER - Replaces status/shipping for Walkthrough */}
+        <div className="mb-6 p-6 rounded-2xl shadow-xl backdrop-blur-sm border border-[#D4A574]/60 mx-6" 
+             style={{
+               background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
+             }}>
+          <h2 className="text-2xl font-bold text-[#D4A574] mb-6">📸 PHOTO MANAGEMENT</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            {/* Photos Captured */}
+            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+              <div className="text-[#D4A574] text-sm mb-1">Photos Captured</div>
+              <div className="text-3xl font-bold text-[#D4C5A9]">0</div>
+            </div>
+            
+            {/* Measurements Added */}
+            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+              <div className="text-[#D4A574] text-sm mb-1">Measurements Added</div>
+              <div className="text-3xl font-bold text-[#D4C5A9]">0</div>
+            </div>
+            
+            {/* Rooms Photographed */}
+            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+              <div className="text-[#D4A574] text-sm mb-1">Rooms Photographed</div>
+              <div className="text-3xl font-bold text-[#D4C5A9]">
+                0 / {project?.rooms?.length || 0}
+              </div>
+            </div>
+            
+            {/* Leica D5 Status */}
+            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+              <div className="text-[#D4A574] text-sm mb-1">Leica D5 Status</div>
+              <div className="text-xl font-bold text-red-400">
+                ✗ Not Connected
+              </div>
+              <button 
+                onClick={() => alert('Leica D5 Bluetooth integration coming soon!')}
+                className="mt-2 px-3 py-1 bg-[#D4A574] hover:bg-[#C49564] text-black rounded text-sm font-medium"
+              >
+                Connect Leica D5
+              </button>
+            </div>
+          </div>
+          
+          {/* Room Photo Folders */}
+          <div className="border-t border-[#D4A574]/30 pt-4">
+            <h3 className="text-lg font-bold text-[#D4A574] mb-3">📁 Photos by Room</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {project?.rooms?.map(room => (
+                <button
+                  key={room.id}
+                  onClick={() => alert(`Photo manager for ${room.name} coming soon!`)}
+                  className="p-3 border border-[#D4A574]/50 rounded hover:bg-[#D4A574]/20 transition-colors"
+                  style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%)' }}
+                >
+                  <div className="text-2xl mb-1">📁</div>
+                  <div className="text-sm text-[#D4C5A9] font-medium truncate">{room.name}</div>
+                  <div className="text-xs text-[#D4A574]">
+                    0 photos
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
 
         {/* DIVIDER LINE */}
         <div className="w-full h-px bg-gradient-to-r from-transparent via-[#B49B7E]/20 to-transparent my-1"></div>
