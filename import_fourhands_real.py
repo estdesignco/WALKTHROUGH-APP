@@ -6,7 +6,7 @@ Process the actual Four Hands Excel catalog with real SKUs, prices, and scrape i
 
 import pandas as pd
 import pymongo
-from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 import requests
 import base64
 from io import BytesIO
@@ -14,6 +14,7 @@ from PIL import Image
 import time
 import uuid
 from datetime import datetime
+import asyncio
 
 # MongoDB connection
 client = pymongo.MongoClient('mongodb://localhost:27017')
