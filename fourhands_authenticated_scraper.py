@@ -125,11 +125,23 @@ async def scrape_fourhands_authenticated(num_products=5):
                 await page.click('button')
                 await page.wait_for_timeout(8000)
             
+            # Check for error messages
+            error_elem = await page.query_selector('.error, .alert, [class*="error"]')
+            if error_elem:
+                error_text = await error_elem.text_content()
+                print(f"  ✗ Login error: {error_text}")
+            
             # Check if logged in
-            if 'account' in page.url or 'dashboard' in page.url or 'my-account' in page.url:
-                print("✓ Successfully logged into Four Hands!\n")
+            current_url = page.url
+            print(f"  Current URL: {current_url}")
+            
+            if current_url != 'https://fourhands.com/login' and 'login' not in current_url:
+                print("  ✓ Successfully logged into Four Hands!\n")
             else:
-                print(f"⚠️ Login might have failed. Current URL: {page.url}\n")
+                print(f"  ⚠️ Still on login page - credentials may be incorrect\n")
+                # Take screenshot for debugging
+                await page.screenshot(path='/tmp/login_failed.png')
+                print("  📸 Screenshot saved to /tmp/login_failed.png\n")
         except Exception as e:
             print(f"✗ Login error: {e}\n")
         
