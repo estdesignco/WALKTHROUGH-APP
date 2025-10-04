@@ -19,6 +19,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
   const [showPhotoCapture, setShowPhotoCapture] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [selectedRoomForPhoto, setSelectedRoomForPhoto] = useState(null);
   const [newRoomName, setNewRoomName] = useState('');
   const [filteredProject, setFilteredProject] = useState(null);
