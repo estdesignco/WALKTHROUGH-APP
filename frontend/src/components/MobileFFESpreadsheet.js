@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useOfflineSync } from '../hooks/useOfflineSync';
 import MobileAddItemModal from './MobileAddItemModal';
 import MobilePhotoCapture from './MobilePhotoCapture';
+import MobileSearchFilter from './MobileSearchFilter';
+import { exportProjectToCSV, exportProjectSummary, calculateProjectStats } from '../utils/exportUtils';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
