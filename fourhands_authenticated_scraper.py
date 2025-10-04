@@ -157,8 +157,11 @@ async def scrape_fourhands_authenticated(num_products=5, max_attempts=50):
         
         success = 0
         failed = 0
+        attempted = 0
         
-        for i in range(num_products):
+        for i in range(max_attempts):
+            if success >= num_products:
+                break
             row = df_stock.iloc[i]
             
             sku = str(row['PRODUCT MASTER CODE']).strip()
