@@ -245,27 +245,27 @@ async def scrape_uttermost_with_protection(num_products=10):
                         
                         img_url = data_src or src
                     
-                    if img_url:
-                        print(f"    Checking: {img_url[:80]}...")
-                        
-                        # Skip obvious non-product images
-                        skip_keywords = ['logo', 'icon', 'arrow', 'button', 'badge', 'svg']
-                        if any(keyword in img_url.lower() for keyword in skip_keywords):
-                            print(f"      → Skipped (contains skip keyword)")
-                            continue
-                        
-                        # Make full URL
-                        if img_url.startswith('//'):
-                            img_url = 'https:' + img_url
-                        elif img_url.startswith('/'):
-                            img_url = 'https://www.uttermost.com' + img_url
-                        
-                        # Only accept reasonable image formats
-                        if any(ext in img_url.lower() for ext in ['.jpg', '.jpeg', '.png', '.webp']):
-                            images.append(img_url)
-                            print(f"      ✓ Added ({len(images)})")
-                            if len(images) >= 5:
-                                break
+                        if img_url and 'blank.png' not in img_url:
+                            print(f"        Checking: {img_url[:80]}...")
+                            
+                            # Skip obvious non-product images
+                            skip_keywords = ['logo', 'icon', 'arrow', 'button', 'badge', 'svg']
+                            if any(keyword in img_url.lower() for keyword in skip_keywords):
+                                print(f"          → Skipped (contains skip keyword)")
+                                continue
+                            
+                            # Make full URL
+                            if img_url.startswith('//'):
+                                img_url = 'https:' + img_url
+                            elif img_url.startswith('/'):
+                                img_url = 'https://www.uttermost.com' + img_url
+                            
+                            # Only accept reasonable image formats
+                            if any(ext in img_url.lower() for ext in ['.jpg', '.jpeg', '.png', '.webp']):
+                                images.append(img_url)
+                                print(f"          ✓ Added ({len(images)})")
+                                if len(images) >= 5:
+                                    break
                 
                 await context.close()
                 
