@@ -190,17 +190,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
                       <React.Fragment key={subcategory.id}>
                         {subcategory.items?.map((item) => (
                           <tr key={item.id} className="hover:bg-gray-800">
-                            {/* INSTALLED */}
-                            <td className="border border-gray-400 px-2 py-2 text-center">
-                              <input
-                                type="checkbox"
-                                checked={item.checked || false}
-                                onChange={() => toggleItemCheck(item)}
-                                className="w-5 h-5 cursor-pointer"
-                              />
-                            </td>
-                            
-                            {/* QTY */}
+                            {/* QTY - NO INSTALLED CHECKBOX IN FFE! */}
                             <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
                               {item.quantity || '-'}
                             </td>
