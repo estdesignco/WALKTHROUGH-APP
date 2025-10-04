@@ -251,6 +251,13 @@ export default function MobileFFESpreadsheet({ projectId }) {
           📸 PHOTO
         </button>
         
+        <button
+          onClick={() => setShowSearch(!showSearch)}
+          className={`flex-1 ${showSearch ? 'bg-yellow-600' : 'bg-gray-600'} hover:bg-yellow-700 text-white font-bold py-2 px-3 rounded text-sm`}
+        >
+          🔍 SEARCH
+        </button>
+        
         {online && pendingCount > 0 && (
           <button
             onClick={performSync}
@@ -260,6 +267,98 @@ export default function MobileFFESpreadsheet({ projectId }) {
           </button>
         )}
       </div>
+      
+      {/* SEARCH & FILTER PANEL */}
+      {showSearch && (
+        <MobileSearchFilter 
+          project={project} 
+          onFilterChange={setFilteredProject} 
+        />
+      )}
+      
+      {/* STATS BAR */}
+      {stats && !showStats && (
+        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 flex justify-between items-center text-xs">
+          <div className="text-gray-400">
+            <span className="text-white font-bold">{stats.totalItems}</span> items
+          </div>
+          <div className="text-gray-400">
+            Progress: <span className="text-yellow-400 font-bold">{stats.completionPercentage}%</span>
+          </div>
+          <button
+            onClick={() => setShowStats(true)}
+            className="text-blue-400 hover:text-blue-300"
+          >
+            Details →
+          </button>
+        </div>
+      )}
+
+      {/* STATS MODAL */}
+      {showStats && stats && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-white">📊 FFE Stats</h3>
+              <button
+                onClick={() => setShowStats(false)}
+                className="text-white text-2xl hover:text-red-400"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="bg-gray-700 p-4 rounded">
+                <div className="text-gray-400 text-sm">Total Items</div>
+                <div className="text-white text-2xl font-bold">{stats.totalItems}</div>
+              </div>
+              
+              <div className="bg-gray-700 p-4 rounded">
+                <div className="text-gray-400 text-sm">Progress</div>
+                <div className="flex items-baseline gap-2">
+                  <div className="text-green-400 text-2xl font-bold">{stats.completionPercentage}%</div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-700 p-4 rounded">
+                <div className="text-gray-400 text-sm mb-2">Breakdown</div>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between text-white">
+                    <span>Rooms:</span>
+                    <span className="font-bold">{stats.totalRooms}</span>
+                  </div>
+                  <div className="flex justify-between text-white">
+                    <span>Categories:</span>
+                    <span className="font-bold">{stats.totalCategories}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    exportProjectToCSV(project);
+                    alert('✅ CSV exported!');
+                  }}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold text-sm"
+                >
+                  📄 Export CSV
+                </button>
+                <button
+                  onClick={() => {
+                    exportProjectSummary(project);
+                    alert('✅ Summary exported!');
+                  }}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold text-sm"
+                >
+                  📋 Summary
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FFE TABLE - EXACT DESKTOP STRUCTURE */}
       <div className="overflow-x-auto">
