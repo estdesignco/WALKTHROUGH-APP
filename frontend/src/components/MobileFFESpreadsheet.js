@@ -137,7 +137,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
                   <React.Fragment key={category.id}>
                     {/* CATEGORY HEADER ROW */}
                     <tr>
-                      <td colSpan="13"
+                      <td colSpan="14"
                           className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
                           style={{ backgroundColor: getCategoryColor() }}>
                         <div className="flex items-center gap-2">
@@ -149,12 +149,58 @@ export default function MobileFFESpreadsheet({ projectId }) {
                       </td>
                     </tr>
 
-                    {/* ITEMS */}
+                    {/* SHOW HEADERS WHEN CATEGORY IS EXPANDED - BELOW CATEGORY HEADER */}
+                    {expandedCategories[category.id] && (
+                      <React.Fragment>
+                        {/* ROW 1: Section Headers (Brown and Purple) */}
+                        <tr>
+                          <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                              style={{ backgroundColor: '#8B4444', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+                          </td>
+                          <td colSpan="3" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                              style={{ backgroundColor: '#8B4513' }}>
+                            ADDITIONAL INFO.
+                          </td>
+                          <td colSpan="5" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                              style={{ backgroundColor: '#6B46C1' }}>
+                            SHIPPING INFO.
+                          </td>
+                          <td colSpan="2" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                              style={{ backgroundColor: '#8B4444', borderRight: '1px solid #9CA3AF', borderLeft: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+                          </td>
+                        </tr>
+                        
+                        {/* ROW 2: Column Headers (Red Row) */}
+                        <tr>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>IMAGE</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>ORDER DATE</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS/ORDER#</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>EST DATES</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>INSTALL/SHIP TO</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>TRACKING/CARRIER</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>NOTES</td>
+                          <td className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK/SCRAPE</td>
+                        </tr>
+                      </React.Fragment>
+                    )}
+
+                    {/* ITEMS - Only show when category is expanded */}
                     {expandedCategories[category.id] && category.subcategories?.map((subcategory) => (
                       <React.Fragment key={subcategory.id}>
                         {subcategory.items?.map((item) => (
                           <tr key={item.id} className="hover:bg-gray-800">
-                            {/* QTY - NO INSTALLED CHECKBOX IN FFE! */}
+                            {/* INSTALLED - Show item name */}
+                            <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                              {item.name}
+                            </td>
+                            
+                            {/* QTY */}
                             <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
                               {item.quantity || '-'}
                             </td>
@@ -176,17 +222,18 @@ export default function MobileFFESpreadsheet({ projectId }) {
                               </select>
                             </td>
                             
-                            {/* VENDOR/SKU */}
+                            {/* VENDOR */}
                             <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                              <div className="font-bold text-xs">{item.name}</div>
-                              {item.vendor && <div className="text-xs text-gray-400">{item.vendor}</div>}
+                              <div className="text-xs">{item.vendor || '-'}</div>
                               {item.sku && <div className="text-xs text-gray-400">SKU: {item.sku}</div>}
                             </td>
                             
                             {/* IMAGE */}
                             <td className="border border-gray-400 px-2 py-2">
-                              {item.image_url && (
-                                <img src={item.image_url} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                              {item.image_url ? (
+                                <img src={item.image_url} alt={item.name} className="w-12 h-12 object-cover rounded" />
+                              ) : (
+                                <div className="w-12 h-12 bg-gray-700 rounded flex items-center justify-center text-xs">No Img</div>
                               )}
                             </td>
                             
@@ -194,57 +241,117 @@ export default function MobileFFESpreadsheet({ projectId }) {
                             <td className="border border-gray-400 px-2 py-2">
                               {item.link && (
                                 <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs">
-                                  🔗 Link
+                                  🔗
                                 </a>
                               )}
                             </td>
                             
-                            {/* CARRIER */}
-                            <td className="border border-gray-400 px-2 py-2">
-                              <select
-                                value={item.carrier || ''}
-                                onChange={(e) => updateItem(item.id, { carrier: e.target.value })}
-                                className="w-full bg-gray-700 text-white text-xs px-1 py-1 rounded"
-                              >
-                                <option value="">Select</option>
-                                {carriers.map(c => <option key={c} value={c}>{c}</option>)}
-                              </select>
-                            </td>
-                            
-                            {/* TRACKING */}
-                            <td className="border border-gray-400 px-2 py-2">
+                            {/* ORDER DATE */}
+                            <td className="border border-gray-400 px-2 py-2 text-white text-xs">
                               <input
-                                type="text"
-                                value={item.tracking_number || ''}
-                                onChange={(e) => updateItem(item.id, { tracking_number: e.target.value })}
-                                className="w-full bg-gray-700 text-white text-xs px-1 py-1 rounded"
-                                placeholder="Tracking #"
+                                type="date"
+                                value={item.order_date || ''}
+                                onChange={(e) => updateItem(item.id, { order_date: e.target.value })}
+                                className="w-full bg-transparent text-white text-xs border-none"
                               />
                             </td>
                             
-                            {/* ORDER DATE */}
-                            <td className="border border-gray-400 px-2 py-2 text-white text-xs">
-                              {item.order_date || '-'}
+                            {/* STATUS/ORDER# - STACKED */}
+                            <td className="border border-gray-400 px-1 py-1">
+                              <div className="flex flex-col gap-1">
+                                <select
+                                  value={item.status || ''}
+                                  onChange={(e) => updateItem(item.id, { status: e.target.value })}
+                                  className="w-full bg-gray-700 text-white text-xs px-1 py-1 rounded"
+                                >
+                                  <option value="">Status</option>
+                                  {statuses.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                                <input
+                                  type="text"
+                                  placeholder="Order #"
+                                  value={item.order_number || ''}
+                                  onChange={(e) => updateItem(item.id, { order_number: e.target.value })}
+                                  className="w-full bg-gray-700 text-white text-xs px-1 py-1 rounded"
+                                />
+                              </div>
                             </td>
                             
-                            {/* DELIVERY DATE */}
-                            <td className="border border-gray-400 px-2 py-2 text-white text-xs">
-                              {item.delivery_date || '-'}
+                            {/* EST DATES - STACKED */}
+                            <td className="border border-gray-400 px-1 py-1">
+                              <div className="flex flex-col gap-1">
+                                <input
+                                  type="date"
+                                  placeholder="Ship"
+                                  className="w-full bg-transparent text-white text-xs border-none"
+                                />
+                                <input
+                                  type="date"
+                                  placeholder="Delivery"
+                                  value={item.delivery_date || ''}
+                                  onChange={(e) => updateItem(item.id, { delivery_date: e.target.value })}
+                                  className="w-full bg-transparent text-white text-xs border-none"
+                                />
+                              </div>
                             </td>
                             
-                            {/* COST */}
-                            <td className="border border-gray-400 px-2 py-2 text-white text-xs">
-                              {item.cost ? `$${item.cost}` : '-'}
+                            {/* INSTALL/SHIP TO - STACKED */}
+                            <td className="border border-gray-400 px-1 py-1">
+                              <div className="flex flex-col gap-1">
+                                <input
+                                  type="date"
+                                  placeholder="Install"
+                                  className="w-full bg-transparent text-white text-xs border-none"
+                                />
+                                <select className="w-full bg-gray-700 text-white text-xs px-1 py-1 rounded">
+                                  <option value="">Ship To</option>
+                                  <option value="JOB SITE">JOB SITE</option>
+                                  <option value="RECEIVER">RECEIVER</option>
+                                </select>
+                              </div>
+                            </td>
+                            
+                            {/* TRACKING/CARRIER - STACKED */}
+                            <td className="border border-gray-400 px-1 py-1">
+                              <div className="flex flex-col gap-1">
+                                <input
+                                  type="text"
+                                  placeholder="Tracking #"
+                                  value={item.tracking_number || ''}
+                                  onChange={(e) => updateItem(item.id, { tracking_number: e.target.value })}
+                                  className="w-full bg-gray-700 text-white text-xs px-1 py-1 rounded"
+                                />
+                                <select
+                                  value={item.carrier || ''}
+                                  onChange={(e) => updateItem(item.id, { carrier: e.target.value })}
+                                  className="w-full bg-gray-700 text-white text-xs px-1 py-1 rounded"
+                                >
+                                  <option value="">Carrier</option>
+                                  {carriers.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                              </div>
                             </td>
                             
                             {/* NOTES */}
-                            <td className="border border-gray-400 px-2 py-2 text-white text-xs">
-                              {item.notes || '-'}
+                            <td className="border border-gray-400 px-2 py-2">
+                              <input
+                                type="text"
+                                placeholder="Notes"
+                                value={item.notes || ''}
+                                onChange={(e) => updateItem(item.id, { notes: e.target.value })}
+                                className="w-full bg-gray-700 text-white text-xs px-1 py-1 rounded"
+                              />
                             </td>
                             
-                            {/* ACTIONS */}
-                            <td className="border border-gray-400 px-2 py-2 text-center">
-                              <button className="text-blue-400 text-xs">Edit</button>
+                            {/* LINK/SCRAPE */}
+                            <td className="border border-gray-400 px-2 py-2">
+                              {item.link ? (
+                                <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs">
+                                  View
+                                </a>
+                              ) : (
+                                <span className="text-gray-500 text-xs">-</span>
+                              )}
                             </td>
                           </tr>
                         ))}
