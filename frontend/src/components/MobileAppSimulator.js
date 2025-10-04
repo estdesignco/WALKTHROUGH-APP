@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import MobileWalkthroughSpreadsheet from './MobileWalkthroughSpreadsheet';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
