@@ -548,6 +548,16 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
           }}
         />
       )}
+      
+      {/* QUICK ADD TEMPLATES */}
+      {showQuickAdd && (
+        <MobileQuickAddTemplates
+          onClose={() => setShowQuickAdd(false)}
+          projectId={projectId}
+          rooms={project?.rooms || []}
+          onComplete={loadProject}
+        />
+      )}
     </div>
   );
 }
