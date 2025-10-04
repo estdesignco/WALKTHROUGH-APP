@@ -89,14 +89,15 @@ async def scrape_fourhands_authenticated(num_products=5):
         
         print("🔐 Step 1: Logging into Four Hands...")
         
-        # Go to Four Hands
-        await page.goto('https://fourhands.com/account/login', timeout=30000)
+        # Go to Four Hands LOGIN
+        await page.goto('https://fourhands.com/login', timeout=30000)
         await page.wait_for_timeout(3000)
         
-        # Fill login form
+        # Fill login form - try multiple selectors
         try:
-            await page.fill('input[name="customer[email]"], input[type="email"], #CustomerEmail', FOURHANDS_USERNAME)
-            await page.fill('input[name="customer[password]"], input[type="password"], #CustomerPassword', FOURHANDS_PASSWORD)
+            # Try account number field first
+            await page.fill('input[name="accountNumber"], input[placeholder*="Account"], #accountNumber', FOURHANDS_USERNAME)
+            await page.fill('input[name="password"], input[type="password"], #password', FOURHANDS_PASSWORD)
             
             # Submit
             await page.click('button[type="submit"], input[type="submit"], .btn-login')
