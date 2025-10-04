@@ -368,49 +368,31 @@ export default function MobileAppSimulator() {
         return <ProjectMenuScreen project={selectedProject} onNavigate={setScreen} />;
       case 'walkthrough':
         return (
-          <div className="h-full flex flex-col overflow-hidden">
-            <button 
-              onClick={() => setScreen('project-menu')}
-              className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-2 m-2 rounded-lg text-sm font-semibold flex-shrink-0"
-            >
-              ← Back
-            </button>
-            <div className="flex-1 overflow-auto">
-              {selectedProject?.walkthroughData && (
-                <WalkthroughSpreadsheet 
-                  project={selectedProject.walkthroughData}
-                  roomColors={{}}
-                  categoryColors={{}}
-                  itemStatuses={[]}
-                  vendorTypes={[]}
-                  carrierTypes={[]}
-                  onReload={() => {}}
-                />
-              )}
+          <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
+            <div className="text-center">
+              <button 
+                onClick={() => setScreen('project-menu')}
+                className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold"
+              >
+                ← Back
+              </button>
+              <div className="text-[#D4C5A9] text-lg mb-2">Walkthrough Feature</div>
+              <div className="text-gray-400 text-sm">Use the desktop version to access the full walkthrough spreadsheet</div>
             </div>
           </div>
         );
       case 'ffe':
         return (
-          <div className="h-full flex flex-col overflow-hidden">
-            <button 
-              onClick={() => setScreen('project-menu')}
-              className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-2 m-2 rounded-lg text-sm font-semibold flex-shrink-0"
-            >
-              ← Back
-            </button>
-            <div className="flex-1 overflow-auto">
-              {selectedProject?.ffeData && (
-                <ExactFFESpreadsheet 
-                  project={selectedProject.ffeData}
-                  roomColors={{}}
-                  categoryColors={{}}
-                  itemStatuses={['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']}
-                  vendorTypes={['Four Hands', 'Uttermost', 'Visual Comfort']}
-                  carrierTypes={['FedEx', 'UPS', 'USPS', 'DHL']}
-                  onReload={() => {}}
-                />
-              )}
+          <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
+            <div className="text-center">
+              <button 
+                onClick={() => setScreen('project-menu')}
+                className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold"
+              >
+                ← Back
+              </button>
+              <div className="text-[#D4C5A9] text-lg mb-2">FF&E Feature</div>
+              <div className="text-gray-400 text-sm">Use the desktop version to access the full FF&E spreadsheet</div>
             </div>
           </div>
         );
