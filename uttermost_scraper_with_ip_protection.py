@@ -261,7 +261,7 @@ async def scrape_uttermost_with_protection(num_products=10):
                     print(f"  ✗ Failed to convert images\n")
                     continue
                 
-                # Save to database
+                # Save to database with CORRECT URL
                 product = {
                     "id": str(uuid.uuid4()),
                     "name": name[:200],
@@ -273,7 +273,7 @@ async def scrape_uttermost_with_protection(num_products=10):
                     "image_url": base64_images[0],
                     "images": base64_images,
                     "description": name,
-                    "product_url": page.url,
+                    "product_url": product_url,  # Use the actual product URL!
                     "notes": f"Scraped from public Uttermost site (IP protected)",
                     "source": "uttermost_public",
                     "clipped_date": datetime.utcnow(),
