@@ -299,14 +299,17 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
               {project?.rooms?.map(room => (
                 <button
                   key={room.id}
-                  onClick={() => alert(`Photo manager for ${room.name} coming soon!`)}
+                  onClick={() => {
+                    setSelectedRoomForPhotos(room);
+                    setShowPhotoManager(true);
+                  }}
                   className="p-3 border border-[#D4A574]/50 rounded hover:bg-[#D4A574]/20 transition-colors"
                   style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%)' }}
                 >
                   <div className="text-2xl mb-1">📁</div>
                   <div className="text-sm text-[#D4C5A9] font-medium truncate">{room.name}</div>
                   <div className="text-xs text-[#D4A574]">
-                    0 photos
+                    {roomPhotos[room.id]?.length || 0} photos
                   </div>
                 </button>
               ))}
