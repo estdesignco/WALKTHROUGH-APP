@@ -227,15 +227,20 @@ function MobileWalkthroughScreen({ project, onNavigate, onSelectRoom }) {
               <div className="flex items-center gap-2">
                 <span className="text-lg">{expandedRoom === room.id ? '▼' : '▶'}</span>
                 <span className="font-bold text-white text-sm">{room.name}</span>
+              </div>
+              <div className="flex items-center gap-2">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onSelectRoom(room);
                   }}
-                  className="ml-2 bg-[#D4C5A9]/20 px-2 py-0.5 rounded text-xs text-[#D4C5A9] border border-[#D4C5A9]/40"
+                  className="bg-[#D4C5A9]/20 px-2 py-0.5 rounded text-xs text-[#D4C5A9] border border-[#D4C5A9]/40"
                 >
-                  📸
+                  📸 Photos
                 </button>
+                <span className="text-xs text-gray-300">
+                  {room.categories?.length || 0} categories
+                </span>
               </div>
               <span className="text-xs text-gray-300">
                 {room.categories?.length || 0} categories
