@@ -272,10 +272,12 @@ async def scrape_uttermost_with_protection(num_products=10):
             except Exception as e:
                 print(f"  ✗ Error: {e}\n")
                 try:
-                    await browser.close()
+                    await context.close()
                 except:
                     pass
                 continue
+        
+        await browser.close()
     
     print("="*80)
     print(f"🎉 COMPLETE!")
