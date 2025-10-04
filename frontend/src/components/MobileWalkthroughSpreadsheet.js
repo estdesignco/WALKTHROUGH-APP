@@ -328,6 +328,16 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
           </div>
         </div>
       )}
+      
+      {/* ADD ITEM MODAL */}
+      {showAddItem && (
+        <MobileAddItemModal
+          onClose={() => setShowAddItem(false)}
+          projectId={projectId}
+          rooms={project?.rooms || []}
+          onItemAdded={loadProject}
+        />
+      )}
     </div>
   );
 }
