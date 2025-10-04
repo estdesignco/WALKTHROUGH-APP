@@ -45,7 +45,7 @@ const MobileWalkthroughSpreadsheet = ({
   const [leicaConnected, setLeicaConnected] = useState(false);
 
   // FILTER STATE
-  const [filteredProject, setFilteredProject] = useState(project);
+  const [filteredProject, setFilteredProject] = useState(actualProject);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
