@@ -16,10 +16,10 @@ function MobileHomeScreen({ onNavigate }) {
         <p className="text-gray-400 text-sm">On-Site Project Management</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="space-y-3 mb-6">
         <button
           onClick={() => onNavigate('projects')}
-          className="col-span-2 bg-gradient-to-br from-[#2a2a3a] to-[#1a1a2a] hover:from-[#3a3a4a] hover:to-[#2a2a3a] rounded-2xl p-6 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4C5A9]/30"
+          className="w-full bg-gradient-to-br from-[#2a2a3a] to-[#1a1a2a] hover:from-[#3a3a4a] hover:to-[#2a2a3a] rounded-2xl p-6 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4C5A9]/30"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse"></div>
           <div className="relative z-10">
@@ -29,17 +29,22 @@ function MobileHomeScreen({ onNavigate }) {
           </div>
         </button>
 
-        <button className="bg-gradient-to-br from-[#1a1a2a] to-[#0a0a1a] rounded-2xl p-4 border-2 border-[#D4C5A9]/20 relative overflow-hidden group">
-          <div className="text-3xl mb-2">📸</div>
-          <div className="text-sm font-bold text-[#D4C5A9]">Photos</div>
-          <div className="text-xs text-gray-400">Capture & manage</div>
-        </button>
+        <div className="grid grid-cols-3 gap-2">
+          <button className="bg-gradient-to-br from-[#1a1a2a] to-[#0a0a1a] rounded-xl p-3 border-2 border-[#D4C5A9]/20">
+            <div className="text-2xl mb-1">📸</div>
+            <div className="text-xs font-bold text-[#D4C5A9]">Photos</div>
+          </button>
 
-        <button className="bg-gradient-to-br from-[#1a1a2a] to-[#0a0a1a] rounded-2xl p-4 border-2 border-[#D4C5A9]/20 relative overflow-hidden group">
-          <div className="text-3xl mb-2">📏</div>
-          <div className="text-sm font-bold text-[#D4C5A9]">Measure</div>
-          <div className="text-xs text-gray-400">Leica D5</div>
-        </button>
+          <button className="bg-gradient-to-br from-[#1a1a2a] to-[#0a0a1a] rounded-xl p-3 border-2 border-[#D4C5A9]/20">
+            <div className="text-2xl mb-1">📏</div>
+            <div className="text-xs font-bold text-[#D4C5A9]">Measure</div>
+          </button>
+
+          <button className="bg-gradient-to-br from-[#1a1a2a] to-[#0a0a1a] rounded-xl p-3 border-2 border-[#D4C5A9]/20">
+            <div className="text-2xl mb-1">🔄</div>
+            <div className="text-xs font-bold text-[#D4C5A9]">Sync</div>
+          </button>
+        </div>
       </div>
 
       <div className="bg-gradient-to-br from-[#1a1a2a]/80 to-[#0a0a1a]/60 rounded-2xl p-4 border-2 border-[#D4C5A9]/20 backdrop-blur-sm">
