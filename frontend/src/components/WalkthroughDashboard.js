@@ -5,6 +5,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
 import SimpleWalkthroughSpreadsheet from './SimpleWalkthroughSpreadsheet';
 import StatusOverview from './StatusOverview';
+import PhotoManagerModal from './PhotoManagerModal';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 import CompletePageLayout from './CompletePageLayout';
