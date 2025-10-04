@@ -332,8 +332,21 @@ export default function MobileAppSimulator() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
 
-  const handleSelectProject = (project) => {
-    setSelectedProject(project);
+  const handleSelectProject = async (project) => {
+    // Load full project with walkthrough data
+    try {
+      const walkthroughResponse = await axios.get(`${API_URL}/projects/${project.id}?sheet_type=walkthrough`);
+      const ffeResponse = await axios.get(`${API_URL}/projects/${project.id}?sheet_type=ffe`);
+      
+      setSelectedProject({
+        ...project,
+        walkthroughData: walkthroughResponse.data,
+        ffeData: ffeResponse.data
+      });
+    } catch (error) {
+      console.error('Failed to load project details:', error);
+      setSelectedProject(project);
+    }
     setScreen('project-menu');
   };
 
