@@ -11,24 +11,27 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [newRoomName, setNewRoomName] = useState('');
 
-  // EXACT SAME ROOM COLORS AS DESKTOP
+  // EXACT SAME ROOM COLORS AS DESKTOP - MATCHING DESKTOP VERSION
   const getRoomColor = (roomName) => {
     const roomColors = {
-      'living room': '#DC2626',
-      'dining room': '#EAB308',
-      'kitchen': '#F59E0B',
-      'master bedroom': '#3B82F6',
-      'bedroom': '#3B82F6',
-      'bathroom': '#8B5CF6',
-      'office': '#10B981',
-      'guest room': '#06B6D4',
-      'laundry room': '#16A34A',
-      'mudroom': '#0891B2',
-      'family room': '#CA8A04',
-      'basement': '#6B7280',
-      'attic storage': '#78716C',
-      'garage': '#374151',
-      'balcony': '#7C3AED'
+      'living room': '#7C3AED',      // Purple
+      'dining room': '#DC2626',      // Red
+      'kitchen': '#EA580C',          // Orange  
+      'primary bedroom': '#059669',  // Green
+      'master bedroom': '#059669',   // Green
+      'bedroom': '#3B82F6',          // Blue
+      'primary bathroom': '#2563EB', // Blue
+      'bathroom': '#8B5CF6',         // Violet
+      'powder room': '#7C2D12',      // Brown
+      'guest room': '#BE185D',       // Pink
+      'office': '#6366F1',           // Indigo
+      'laundry room': '#16A34A',     // Green
+      'mudroom': '#0891B2',          // Cyan
+      'family room': '#CA8A04',      // Yellow
+      'basement': '#6B7280',         // Gray
+      'attic storage': '#78716C',    // Stone
+      'garage': '#374151',           // Gray-800
+      'balcony': '#7C3AED'           // Purple
     };
     return roomColors[roomName.toLowerCase()] || '#7C3AED';
   };
