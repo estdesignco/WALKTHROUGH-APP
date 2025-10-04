@@ -163,36 +163,45 @@ async def scrape_uttermost_with_protection(num_products=10):
                 # Random delay before request (look human)
                 await asyncio.sleep(random.uniform(2, 5))
                 
-                # Try to find product on Uttermost.com
-                # Try different URL patterns
-                search_queries = [
-                    f"https://www.uttermost.com/search?q={sku}",
-                    f"https://www.uttermost.com/products/{sku}",
-                    f"https://www.uttermost.com/product/{sku}",
-                ]
+                # Search for product on Uttermost
+                search_url = f"https://www.uttermost.com/catalogsearch/result/?q={sku}"
+                print(f"  🔍 Searching: {search_url}")
                 
-                found = False
-                for search_url in search_queries:
-                    print(f"  🔍 Trying: {search_url}")
+                await page.goto(search_url, wait_until='networkidle', timeout=30000)
+                await page.wait_for_timeout(3000)
+                
+                # Find product link in search results
+                product_url = None
+                try:
+                    # Look for product links
+                    product_links = await page.query_selector_all('a[href*="/product/"], a.product-item-link, .product-item a')
                     
-                    try:
-                        await page.goto(search_url, wait_until='domcontentloaded', timeout=30000)
-                        await page.wait_for_timeout(random.randint(2000, 4000))
-                        
-                        # Check if product page
-                        has_product = await page.query_selector('.product, img[alt*="product"], .product-image')
-                        
-                        if has_product or '/product' in page.url:
-                            print(f"  ✓ Found product page!")
-                            found = True
+                    for link in product_links[:3]:
+                        href = await link.get_attribute('href')
+                        if href and '/product' in href:
+                            product_url = href
+                            if not product_url.startswith('http'):
+                                product_url = 'https://www.uttermost.com' + product_url
                             break
-                    except:
-                        continue
+                except:
+                    pass
                 
-                if not found:
-                    print(f"  ✗ Product not found on Uttermost.com\n")
-                    await browser.close()
+                if not product_url:
+                    print(f"  ✗ Product not found in search results\n")
+                    await context.close()
                     continue
+                
+                print(f"  ✓ Found product: {product_url[:80]}...")
+                
+                # Navigate to actual product page
+                await page.goto(product_url, wait_until='networkidle', timeout=30000)
+                await page.wait_for_timeout(3000)
+                
+                # Scroll to trigger lazy-loaded images
+                await page.evaluate("window.scrollTo(0, 500)")
+                await page.wait_for_timeout(2000)
+                await page.evaluate("window.scrollTo(0, 1000)")
+                await page.wait_for_timeout(2000)
                 
                 # Extract images
                 print(f"  📸 Extracting images...")
