@@ -378,9 +378,9 @@ export default function MobileAppSimulator() {
               ← Back
             </button>
             <div className="flex-1 overflow-auto">
-              {selectedProject && (
+              {selectedProject?.walkthroughData && (
                 <WalkthroughSpreadsheet 
-                  project={selectedProject}
+                  project={selectedProject.walkthroughData}
                   roomColors={{}}
                   categoryColors={{}}
                   itemStatuses={[]}
