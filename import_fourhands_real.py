@@ -174,7 +174,7 @@ async def import_fourhands_catalog(num_products=10, start_from=0):
                     print(f"  Category: {category} > {subcategory}")
                     
                     # Scrape image from Four Hands website
-                    image_base64 = scrape_fourhands_product(sku, page)
+                    image_base64 = await scrape_fourhands_product(sku, page)
                     
                     if not image_base64:
                         print(f"  ⚠️ Using placeholder image")
