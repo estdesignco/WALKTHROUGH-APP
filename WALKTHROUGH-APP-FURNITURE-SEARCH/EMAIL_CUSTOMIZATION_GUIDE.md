@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://designtoolkit.preview.emergentagent.com/email-template.html
+https://furnisync.preview.emergentagent.com/email-template.html
 
 ---
 
