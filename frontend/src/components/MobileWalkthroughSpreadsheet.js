@@ -4,10 +4,12 @@ import React, { useState, useEffect } from 'react';
 import AddItemModal from './AddItemModal';
 import PhotoManagerModal from './PhotoManagerModal';
 
-const WalkthroughSpreadsheet = ({
+const MobileWalkthroughSpreadsheet = ({
   project,
-  roomColors,
-  categoryColors,
+  projectId,
+  onOpenPhotos,
+  roomColors = {},
+  categoryColors = {},
   itemStatuses = [],
   vendorTypes = [],
   carrierTypes = [],
@@ -15,6 +17,21 @@ const WalkthroughSpreadsheet = ({
   onAddRoom,
   onReload
 }) => {
+  // Load project if only projectId provided
+  const [loadedProject, setLoadedProject] = React.useState(project);
+  
+  React.useEffect(() => {
+    if (projectId && !project) {
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects/${projectId}?sheet_type=walkthrough`)
+        .then(res => res.json())
+        .then(data => setLoadedProject(data))
+        .catch(err => console.error('Failed to load project:', err));
+    } else {
+      setLoadedProject(project);
+    }
+  }, [projectId, project]);
+  
+  const actualProject = loadedProject;
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
