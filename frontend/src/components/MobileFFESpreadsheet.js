@@ -43,7 +43,7 @@ const MobileFFESpreadsheet = ({
   const [expandedImage, setExpandedImage] = useState(null);  // For image modal
 
   // FILTER STATE - MAKE IT ACTUALLY WORK
-  const [filteredProject, setFilteredProject] = useState(project);
+  const [filteredProject, setFilteredProject] = useState(actualProject);
   
   // ✅ Search and Filter State
   const [searchTerm, setSearchTerm] = useState('');
