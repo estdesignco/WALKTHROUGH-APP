@@ -129,12 +129,31 @@ function MobileWalkthroughScreen({ project, onNavigate, onSelectRoom }) {
   const [rooms, setRooms] = useState([]);
   const [expandedRoom, setExpandedRoom] = useState(null);
   const [expandedCategory, setExpandedCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (project?.rooms) {
-      setRooms(project.rooms);
-    }
+    loadProjectData();
   }, [project]);
+
+  const loadProjectData = async () => {
+    if (!project?.id) return;
+    
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_URL}/projects/${project.id}`);
+      if (response.data?.rooms) {
+        setRooms(response.data.rooms);
+      }
+    } catch (error) {
+      console.error('Failed to load project data:', error);
+      // Fallback to project.rooms if API fails
+      if (project?.rooms) {
+        setRooms(project.rooms);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleRoom = (roomId) => {
     setExpandedRoom(expandedRoom === roomId ? null : roomId);
