@@ -174,12 +174,39 @@ async def scrape_fourhands_authenticated(num_products=5):
             print(f"  Cost: ${cost:.2f}")
             
             try:
-                # Search for product
-                search_url = f"https://fourhands.com/search?q={sku}"
-                print(f"  🔍 {search_url}")
+                # Try multiple search approaches
+                # Approach 1: Direct product URL format
+                product_url_formats = [
+                    f"https://fourhands.com/products/{sku.lower()}",
+                    f"https://fourhands.com/products/{sku}",
+                    f"https://fourhands.com/search?type=product&q={sku}",
+                    f"https://fourhands.com/search?q={sku}",
+                ]
                 
-                await page.goto(search_url, wait_until='domcontentloaded', timeout=30000)
-                await page.wait_for_timeout(3000)
+                product_link = None
+                
+                for test_url in product_url_formats:
+                    print(f"  🔍 Trying: {test_url[:80]}...")
+                    await page.goto(test_url, wait_until='domcontentloaded', timeout=30000)
+                    await page.wait_for_timeout(3000)
+                    
+                    # Check if we're on a product page
+                    if '/products/' in page.url and page.url != test_url:
+                        product_link = page.url
+                        print(f"  ✓ Redirected to product: {product_link[:60]}...")
+                        break
+                    
+                    # Or check if page has product content
+                    has_product = await page.query_selector('.product, [itemtype*="Product"], .product-single')
+                    if has_product:
+                        product_link = page.url
+                        print(f"  ✓ Found product page")
+                        break
+                
+                if not product_link:
+                    print(f"  ✗ Product not found with any URL pattern\n")
+                    failed += 1
+                    continue
                 
                 # Look for product link
                 product_link = None
