@@ -150,12 +150,7 @@ async def scrape_uttermost_with_protection(num_products=10):
                 user_agent = random.choice(USER_AGENTS)
                 print(f"  🛡️  Using User Agent: {user_agent[:50]}...")
                 
-                # Launch browser with protection
-                browser = await p.chromium.launch(
-                    headless=True,
-                    args=['--no-sandbox', '--disable-blink-features=AutomationControlled']
-                )
-                
+                # Create new context with rotating user agent
                 context = await browser.new_context(
                     user_agent=user_agent,
                     viewport={'width': 1920, 'height': 1080},
