@@ -413,6 +413,19 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
           onItemAdded={loadProject}
         />
       )}
+      
+      {/* PHOTO CAPTURE */}
+      {showPhotoCapture && selectedRoomForPhoto && (
+        <MobilePhotoCapture
+          projectId={projectId}
+          roomId={selectedRoomForPhoto.id}
+          onPhotoAdded={loadProject}
+          onClose={() => {
+            setShowPhotoCapture(false);
+            setSelectedRoomForPhoto(null);
+          }}
+        />
+      )}
     </div>
   );
 }
