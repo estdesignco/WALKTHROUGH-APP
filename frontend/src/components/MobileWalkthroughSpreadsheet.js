@@ -113,15 +113,6 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
       {/* WALKTHROUGH TABLE - EXACT DESKTOP STRUCTURE */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse" style={{ minWidth: '800px' }}>
-          <thead>
-            <tr>
-              {/* EXACT SAME HEADERS AS DESKTOP */}
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</th>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-              <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-            </tr>
-          </thead>
           <tbody>
             {project?.rooms?.map((room) => (
               <React.Fragment key={room.id}>
