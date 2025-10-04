@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import MobileWalkthroughSpreadsheet from './MobileWalkthroughSpreadsheet';
-import MobileFFESpreadsheet from './MobileFFESpreadsheet';
+import WalkthroughSpreadsheet from './WalkthroughSpreadsheet';
+import ExactFFESpreadsheet from './ExactFFESpreadsheet';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
