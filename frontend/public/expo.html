@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expo Mobile App - Connect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #111827;
+            color: #fff;
+        }
+        .container {
+            background: #1F2937;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        h1 {
+            color: #D4A574;
+        }
+        .qr-code {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 20px 0;
+        }
+        .url-box {
+            background: #374151;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 18px;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+        .step {
+            background: #374151;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: left;
+        }
+        .step-number {
+            color: #D4A574;
+            font-weight: bold;
+            font-size: 20px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Connect to Mobile App</h1>
+        
+        <div class="step">
+            <span class="step-number">Step 1:</span> Open <strong>Expo Go</strong> app on your phone
+        </div>
+        
+        <div class="step">
+            <span class="step-number">Step 2:</span> Choose one option below:
+        </div>
+        
+        <h2>Option A: Scan QR Code</h2>
+        <div class="qr-code" id="qrcode"></div>
+        
+        <h2>Option B: Enter URL Manually</h2>
+        <p>In Expo Go, tap "Enter URL manually" and paste:</p>
+        <div class="url-box" id="expo-url">
+            exp://designsurge.preview.emergentagent.com:8081
+        </div>
+        
+        <div class="step">
+            <span class="step-number">Step 3:</span> Wait for app to load (may take 30-60 seconds first time)
+        </div>
+        
+        <h3>✨ The app should open and you'll see the Home screen!</h3>
+    </div>
+    
+    <script>
+        // Generate QR code
+        const url = "exp://designsurge.preview.emergentagent.com:8081";
+        new QRCode(document.getElementById("qrcode"), {
+            text: url,
+            width: 256,
+            height: 256
+        });
+    </script>
+</body>
+</html>
