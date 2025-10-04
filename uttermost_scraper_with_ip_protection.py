@@ -115,6 +115,7 @@ async def scrape_uttermost_with_protection(num_products=10):
     async with async_playwright() as p:
         # Launch browser ONCE at start (reuse for all products)
         browser = await p.chromium.launch(
+            executable_path='/pw-browsers/chromium-1187/chrome-linux/chrome',
             headless=True,
             args=['--no-sandbox', '--disable-blink-features=AutomationControlled']
         )
