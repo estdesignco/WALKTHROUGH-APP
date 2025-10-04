@@ -260,34 +260,43 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
             {/* Photos Captured */}
             <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
               <div className="text-[#D4A574] text-sm mb-1">Photos Captured</div>
-              <div className="text-3xl font-bold text-[#D4C5A9]">0</div>
+              <div className="text-3xl font-bold text-[#D4C5A9]">
+                {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.length, 0)}
+              </div>
             </div>
             
             {/* Measurements Added */}
             <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
               <div className="text-[#D4A574] text-sm mb-1">Measurements Added</div>
-              <div className="text-3xl font-bold text-[#D4C5A9]">0</div>
+              <div className="text-3xl font-bold text-[#D4C5A9]">
+                {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.filter(p => p.measurements?.length > 0).length, 0)}
+              </div>
             </div>
             
             {/* Rooms Photographed */}
             <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
               <div className="text-[#D4A574] text-sm mb-1">Rooms Photographed</div>
               <div className="text-3xl font-bold text-[#D4C5A9]">
-                0 / {project?.rooms?.length || 0}
+                {Object.keys(roomPhotos).length} / {project?.rooms?.length || 0}
               </div>
             </div>
             
             {/* Leica D5 Status */}
             <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
               <div className="text-[#D4A574] text-sm mb-1">Leica D5 Status</div>
-              <div className="text-xl font-bold text-red-400">
-                ✗ Not Connected
+              <div className={`text-xl font-bold ${leicaConnected ? 'text-green-400' : 'text-red-400'}`}>
+                {leicaConnected ? '✓ Connected' : '✗ Not Connected'}
               </div>
               <button 
-                onClick={() => alert('Leica D5 Bluetooth integration coming soon!')}
+                onClick={() => {
+                  setLeicaConnected(!leicaConnected);
+                  if (!leicaConnected) {
+                    alert('Leica D5 Connected! (Simulated - real Bluetooth integration coming soon)');
+                  }
+                }}
                 className="mt-2 px-3 py-1 bg-[#D4A574] hover:bg-[#C49564] text-black rounded text-sm font-medium"
               >
-                Connect Leica D5
+                {leicaConnected ? 'Disconnect' : 'Connect Leica D5'}
               </button>
             </div>
           </div>
