@@ -242,9 +242,6 @@ function MobileWalkthroughScreen({ project, onNavigate, onSelectRoom }) {
                   {room.categories?.length || 0} categories
                 </span>
               </div>
-              <span className="text-xs text-gray-300">
-                {room.categories?.length || 0} categories
-              </span>
             </button>
 
             {/* Categories */}
