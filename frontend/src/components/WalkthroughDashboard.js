@@ -353,6 +353,37 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
           />
         )}
       </div>
+      
+      {/* Photo Manager Modal */}
+      {showPhotoManager && selectedRoomForPhotos && (
+        <PhotoManagerModal
+          room={selectedRoomForPhotos}
+          photos={roomPhotos[selectedRoomForPhotos.id] || []}
+          onClose={() => {
+            setShowPhotoManager(false);
+            setSelectedRoomForPhotos(null);
+          }}
+          onSavePhotos={(roomId, photos) => {
+            setRoomPhotos(prev => ({
+              ...prev,
+              [roomId]: photos
+            }));
+            // TODO: Save to backend API
+            console.log('📸 Photos saved for room:', roomId, photos.length, 'photos');
+          }}
+          leicaConnected={leicaConnected}
+          onConnectLeica={async () => {
+            try {
+              // TODO: Implement real Leica D5 Bluetooth connection
+              setLeicaConnected(true);
+              alert('Leica D5 Connected! You can now use laser measurements on photos.');
+            } catch (error) {
+              console.error('Failed to connect to Leica D5:', error);
+              alert('Failed to connect to Leica D5. Please try again.');
+            }
+          }}
+        />
+      )}
     </CompletePageLayout>
   );
 };
