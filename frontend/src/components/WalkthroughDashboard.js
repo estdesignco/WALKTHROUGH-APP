@@ -24,6 +24,12 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
   
+  // PHOTO MANAGEMENT STATE
+  const [showPhotoManager, setShowPhotoManager] = useState(false);
+  const [selectedRoomForPhotos, setSelectedRoomForPhotos] = useState(null);
+  const [roomPhotos, setRoomPhotos] = useState({});  // {roomId: [{photo, measurements}]}
+  const [leicaConnected, setLeicaConnected] = useState(false);
+  
   useEffect(() => {
     if (projectId) {
       console.log('🚀 Loading project:', projectId);
