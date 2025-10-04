@@ -15,8 +15,11 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [showPhotoCapture, setShowPhotoCapture] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   const [selectedRoomForPhoto, setSelectedRoomForPhoto] = useState(null);
   const [newRoomName, setNewRoomName] = useState('');
+  
+  const stats = project ? calculateProjectStats(project) : null;
   
   // Offline sync hook
   const {
