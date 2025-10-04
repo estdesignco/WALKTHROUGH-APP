@@ -198,3 +198,5 @@ frontend/node_modules/.cache/default-development/20.pack
 # Environment files
 *.env
 *.env.*
+frontend/public/mobile-app.tar.gz
+mobile-app.tar.gz
