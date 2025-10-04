@@ -357,32 +357,49 @@ export default function MobileAppSimulator() {
         return <ProjectMenuScreen project={selectedProject} onNavigate={setScreen} />;
       case 'walkthrough':
         return (
-          <div className="h-full flex flex-col">
+          <div className="h-full flex flex-col overflow-hidden">
             <button 
               onClick={() => setScreen('project-menu')}
-              className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-2 m-2 rounded-lg text-sm font-semibold"
+              className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-2 m-2 rounded-lg text-sm font-semibold flex-shrink-0"
             >
               ← Back
             </button>
-            <div className="flex-1 overflow-hidden">
-              <MobileWalkthroughSpreadsheet 
-                projectId={selectedProject?.id} 
-                onOpenPhotos={handleSelectRoom}
-              />
+            <div className="flex-1 overflow-auto">
+              {selectedProject && (
+                <WalkthroughSpreadsheet 
+                  project={selectedProject}
+                  roomColors={{}}
+                  categoryColors={{}}
+                  itemStatuses={[]}
+                  vendorTypes={[]}
+                  carrierTypes={[]}
+                  onReload={() => {}}
+                />
+              )}
             </div>
           </div>
         );
       case 'ffe':
         return (
-          <div className="h-full flex flex-col">
+          <div className="h-full flex flex-col overflow-hidden">
             <button 
               onClick={() => setScreen('project-menu')}
-              className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-2 m-2 rounded-lg text-sm font-semibold"
+              className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-2 m-2 rounded-lg text-sm font-semibold flex-shrink-0"
             >
               ← Back
             </button>
-            <div className="flex-1 overflow-hidden">
-              <MobileFFESpreadsheet projectId={selectedProject?.id} />
+            <div className="flex-1 overflow-auto">
+              {selectedProject && (
+                <ExactFFESpreadsheet 
+                  project={selectedProject}
+                  roomColors={{}}
+                  categoryColors={{}}
+                  itemStatuses={['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED']}
+                  vendorTypes={['Four Hands', 'Uttermost', 'Visual Comfort']}
+                  carrierTypes={['FedEx', 'UPS', 'USPS', 'DHL']}
+                  onReload={() => {}}
+                />
+              )}
             </div>
           </div>
         );
