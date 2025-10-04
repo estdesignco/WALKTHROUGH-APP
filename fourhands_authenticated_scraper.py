@@ -174,13 +174,10 @@ async def scrape_fourhands_authenticated(num_products=5):
             print(f"  Cost: ${cost:.2f}")
             
             try:
-                # Try multiple search approaches
-                # Approach 1: Direct product URL format
+                # Direct product URL format (singular!)
                 product_url_formats = [
-                    f"https://fourhands.com/products/{sku.lower()}",
-                    f"https://fourhands.com/products/{sku}",
-                    f"https://fourhands.com/search?type=product&q={sku}",
-                    f"https://fourhands.com/search?q={sku}",
+                    f"https://fourhands.com/product/{sku}",
+                    f"https://fourhands.com/product/{sku.lower()}",
                 ]
                 
                 product_link = None
