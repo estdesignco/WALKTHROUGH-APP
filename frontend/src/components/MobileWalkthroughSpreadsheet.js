@@ -57,10 +57,24 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
   const loadProject = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/projects/${projectId}?sheet_type=walkthrough`);
-      setProject(response.data);
+      
+      if (online) {
+        const response = await axios.get(`${API_URL}/projects/${projectId}?sheet_type=walkthrough`);
+        setProject(response.data);
+        await cacheProject(response.data);
+      } else {
+        console.log('📴 Offline - loading walkthrough from cache');
+        const cachedProject = await loadProjectFromCache();
+        if (cachedProject) {
+          setProject(cachedProject);
+        }
+      }
     } catch (error) {
       console.error('Failed to load walkthrough:', error);
+      const cachedProject = await loadProjectFromCache();
+      if (cachedProject) {
+        setProject(cachedProject);
+      }
     } finally {
       setLoading(false);
     }
