@@ -112,32 +112,52 @@ export default function MobileFFESpreadsheet({ projectId }) {
 
       {/* FFE TABLE - EXACT DESKTOP STRUCTURE WITH ALL COLUMNS */}
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse" style={{ minWidth: '1300px' }}>
+        <table className="w-full border-collapse" style={{ minWidth: '1400px' }}>
           <thead>
-            {/* SECTION HEADERS - EXACT SAME AS DESKTOP */}
+            {/* ROW 1: SECTION HEADERS - Brown and Purple sections */}
             <tr>
-              <td colSpan="3" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                  style={{ backgroundColor: '#8B4444', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
-              </td>
-              <td colSpan="3" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+              <td colSpan="4" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                   style={{ backgroundColor: '#8B4513' }}>
                 ADDITIONAL INFO.
               </td>
-              <td colSpan="5" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+              <td colSpan="6" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                   style={{ backgroundColor: '#6B46C1' }}>
                 SHIPPING INFO.
               </td>
-              <td colSpan="2" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                  style={{ backgroundColor: '#8B4444', borderRight: '1px solid #9CA3AF', borderLeft: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+              <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                  style={{ backgroundColor: '#8B4444' }}>
               </td>
             </tr>
             
-            {/* COLUMN HEADERS - EXACT SAME AS DESKTOP - NO INSTALLED CHECKBOX! */}
+            {/* ROW 2: Sub-headers */}
             <tr>
+              <td className="border border-gray-400 px-2 py-1 text-xs text-white text-center" style={{ backgroundColor: '#8B4513' }}>Vendor/SKU</td>
+              <td className="border border-gray-400 px-2 py-1 text-xs text-white text-center" style={{ backgroundColor: '#8B4513' }}>Track Light</td>
+              <td className="border border-gray-400 px-2 py-1 text-xs text-white text-center" style={{ backgroundColor: '#8B4513' }}>Ceiling Fan</td>
+              <td className="border border-gray-400 px-2 py-1 text-xs text-white text-center" style={{ backgroundColor: '#8B4513' }}>Art Lights</td>
+              
+              <td className="border border-gray-400 px-2 py-1 text-xs text-white text-center" style={{ backgroundColor: '#6B46C1' }}>Chandelier</td>
+              <td className="border border-gray-400 px-2 py-1 text-xs text-white text-center" style={{ backgroundColor: '#6B46C1' }}>Recessed</td>
+              <td className="border border-gray-400 px-2 py-1 text-xs text-white text-center" style={{ backgroundColor: '#6B46C1' }}>Sconces</td>
+              <td className="border border-gray-400 px-2 py-1 text-xs text-white text-center" style={{ backgroundColor: '#6B46C1' }}>Track Light</td>
+              <td className="border border-gray-400 px-2 py-1 text-xs text-white text-center" style={{ backgroundColor: '#6B46C1' }}>Ceiling Fan</td>
+              <td className="border border-gray-400 px-2 py-1 text-xs text-white text-center" style={{ backgroundColor: '#6B46C1' }}>Art Lights</td>
+              
+              <td className="border-gray-400 px-2 py-1" style={{ backgroundColor: '#8B4444' }}></td>
+              <td className="border-gray-400 px-2 py-1" style={{ backgroundColor: '#8B4444' }}></td>
+              <td className="border-gray-400 px-2 py-1" style={{ backgroundColor: '#8B4444' }}></td>
+              <td className="border-gray-400 px-2 py-1" style={{ backgroundColor: '#8B4444' }}></td>
+            </tr>
+            
+            {/* ROW 3: COLUMN HEADERS - RED ROW AT BOTTOM */}
+            <tr>
+              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>QTY</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#6B46C1' }}>STATUS</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</th>
+              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>ITEM NAME</th>
+              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>VENDOR</th>
+              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>SKU</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>LINK</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#6B46C1' }}>CARRIER</th>
@@ -145,8 +165,6 @@ export default function MobileFFESpreadsheet({ projectId }) {
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#6B46C1' }}>ORDER DATE</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#6B46C1' }}>DELIVERY DATE</th>
               <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#6B46C1' }}>COST</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>NOTES</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white sticky top-0" style={{ backgroundColor: '#8B4444' }}>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
