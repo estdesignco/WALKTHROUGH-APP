@@ -6243,6 +6243,160 @@ async def scrape_canva_pdf(data: dict):
             "message": f"Partial scraping completed. Error: {str(e)[:100]}"
         }
 
+# ====================================
+# MOBILE APP PHOTO MANAGEMENT ENDPOINTS
+# ====================================
+
+class PhotoUploadRequest(BaseModel):
+    project_id: str
+    room_id: str
+    photo_data: str  # Base64 encoded image
+    file_name: str
+    metadata: Optional[Dict[str, Any]] = {}
+
+@api_router.post("/photos/upload")
+async def upload_photo(request: PhotoUploadRequest):
+    """Upload photo for a specific room (mobile app)"""
+    try:
+        # Create photo document
+        photo = {
+            "id": str(uuid.uuid4()),
+            "project_id": request.project_id,
+            "room_id": request.room_id,
+            "file_name": request.file_name,
+            "photo_data": request.photo_data,  # Base64 string
+            "metadata": request.metadata,
+            "uploaded_at": datetime.now(timezone.utc).isoformat(),
+            "synced": True
+        }
+        
+        # Store in MongoDB
+        await db.photos.insert_one(photo)
+        
+        logging.info(f"Photo uploaded for room {request.room_id}: {request.file_name}")
+        
+        return {
+            "success": True,
+            "message": "Photo uploaded successfully",
+            "id": photo["id"],
+            "uploaded_at": photo["uploaded_at"]
+        }
+        
+    except Exception as e:
+        logging.error(f"Photo upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to upload photo: {str(e)}")
+
+@api_router.get("/photos/by-room/{project_id}/{room_id}")
+async def get_photos_by_room(project_id: str, room_id: str):
+    """Get all photos for a specific room"""
+    try:
+        photos = await db.photos.find({
+            "project_id": project_id,
+            "room_id": room_id
+        }).sort("uploaded_at", -1).to_list(length=None)
+        
+        # Remove MongoDB _id field
+        for photo in photos:
+            photo.pop('_id', None)
+        
+        return {
+            "success": True,
+            "photos": photos,
+            "count": len(photos)
+        }
+        
+    except Exception as e:
+        logging.error(f"Get photos error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get photos: {str(e)}")
+
+@api_router.delete("/photos/{photo_id}")
+async def delete_photo(photo_id: str):
+    """Delete a photo"""
+    try:
+        result = await db.photos.delete_one({"id": photo_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Photo not found")
+        
+        return {
+            "success": True,
+            "message": "Photo deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Delete photo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete photo: {str(e)}")
+
+# ====================================
+# LEICA D5 MEASUREMENT ENDPOINTS
+# ====================================
+
+class MeasurementData(BaseModel):
+    project_id: str
+    room_id: str
+    distance: float
+    height: float
+    angle: Optional[float] = 0
+    unit: str = "meters"
+    photo_id: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = {}
+
+@api_router.post("/measurements")
+async def save_measurement(data: MeasurementData):
+    """Save Leica D5 measurement data"""
+    try:
+        measurement = {
+            "id": str(uuid.uuid4()),
+            "project_id": data.project_id,
+            "room_id": data.room_id,
+            "distance": data.distance,
+            "height": data.height,
+            "angle": data.angle,
+            "unit": data.unit,
+            "photo_id": data.photo_id,
+            "metadata": data.metadata,
+            "measured_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.measurements.insert_one(measurement)
+        
+        logging.info(f"Measurement saved for room {data.room_id}")
+        
+        return {
+            "success": True,
+            "message": "Measurement saved successfully",
+            "id": measurement["id"]
+        }
+        
+    except Exception as e:
+        logging.error(f"Save measurement error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to save measurement: {str(e)}")
+
+@api_router.get("/measurements/{project_id}/{room_id}")
+async def get_measurements(project_id: str, room_id: str):
+    """Get all measurements for a specific room"""
+    try:
+        measurements = await db.measurements.find({
+            "project_id": project_id,
+            "room_id": room_id
+        }).sort("measured_at", -1).to_list(length=None)
+        
+        # Remove MongoDB _id field
+        for measurement in measurements:
+            measurement.pop('_id', None)
+        
+        return {
+            "success": True,
+            "measurements": measurements,
+            "count": len(measurements)
+        }
+        
+    except Exception as e:
+        logging.error(f"Get measurements error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get measurements: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(furniture_router)
