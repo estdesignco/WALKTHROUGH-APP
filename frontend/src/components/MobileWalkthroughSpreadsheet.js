@@ -11,6 +11,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
   const [expandedCategories, setExpandedCategories] = useState({});
   const [loading, setLoading] = useState(true);
   const [showAddRoom, setShowAddRoom] = useState(false);
+  const [showAddItem, setShowAddItem] = useState(false);
   const [newRoomName, setNewRoomName] = useState('');
   
   // Offline sync hook
