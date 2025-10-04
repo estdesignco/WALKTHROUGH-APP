@@ -3,17 +3,33 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
 
-const ExactFFESpreadsheet = ({ 
-  project, 
-  roomColors, 
-  categoryColors, 
-  itemStatuses = [],
-  vendorTypes = [],
-  carrierTypes = [],
+const MobileFFESpreadsheet = ({ 
+  project,
+  projectId,
+  roomColors = {}, 
+  categoryColors = {}, 
+  itemStatuses = ['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED'],
+  vendorTypes = ['Four Hands', 'Uttermost', 'Visual Comfort'],
+  carrierTypes = ['FedEx', 'UPS', 'USPS', 'DHL'],
   onDeleteRoom, 
   onAddRoom,
   onReload 
 }) => {
+  // Load project if only projectId provided
+  const [loadedProject, setLoadedProject] = React.useState(project);
+  
+  React.useEffect(() => {
+    if (projectId && !project) {
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects/${projectId}?sheet_type=ffe`)
+        .then(res => res.json())
+        .then(data => setLoadedProject(data))
+        .catch(err => console.error('Failed to load FFE:', err));
+    } else {
+      setLoadedProject(project);
+    }
+  }, [projectId, project]);
+  
+  const actualProject = loadedProject;
   // ✅ DEBUG LOGGING TO FIND EMPTY SPREADSHEET ISSUE
   console.log('📊 ExactFFESpreadsheet - Project data:', project);
   console.log('📊 ExactFFESpreadsheet - Rooms count:', project?.rooms?.length || 0);
