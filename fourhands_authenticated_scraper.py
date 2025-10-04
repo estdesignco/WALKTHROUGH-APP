@@ -54,7 +54,7 @@ def url_to_base64_HQ(image_url):
         print(f"        Error: {e}")
         return None
 
-async def scrape_fourhands_authenticated(num_products=5):
+async def scrape_fourhands_authenticated(num_products=5, max_attempts=50):
     """
     Login to Four Hands and scrape products with REAL images!
     """
