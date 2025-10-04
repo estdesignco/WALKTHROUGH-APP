@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://designsurge.preview.emergentagent.com
-API_URL=https://designsurge.preview.emergentagent.com/api
+BACKEND_URL=https://mobilewalkthru.preview.emergentagent.com
+API_URL=https://mobilewalkthru.preview.emergentagent.com/api
 ```
 
 ### App Configuration

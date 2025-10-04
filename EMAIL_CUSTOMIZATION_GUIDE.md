@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://designsurge.preview.emergentagent.com/email-template.html
+https://mobilewalkthru.preview.emergentagent.com/email-template.html
 
 ---
 

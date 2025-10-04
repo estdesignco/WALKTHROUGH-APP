@@ -127,7 +127,7 @@ TEST_PRODUCTS = [
 async def add_products_to_furniture_search():
     """Add test products to the furniture search database"""
     
-    base_url = "https://designsurge.preview.emergentagent.com/api"
+    base_url = "https://mobilewalkthru.preview.emergentagent.com/api"
     
     print("🎆 ADDING TEST PRODUCTS TO FURNITURE SEARCH")
     print("=" * 50)
@@ -238,7 +238,7 @@ async def add_products_to_furniture_search():
 async def test_search_functionality():
     """Test the search API to make sure products are searchable"""
     
-    base_url = "https://designsurge.preview.emergentagent.com/api"
+    base_url = "https://mobilewalkthru.preview.emergentagent.com/api"
     
     print(f"\n🔍 TESTING SEARCH FUNCTIONALITY")
     print("-" * 30)
@@ -296,7 +296,7 @@ async def main():
         await test_search_functionality()
         
         print(f"\n🔗 NEXT STEPS:")
-        print(f"1. Go to: https://designsurge.preview.emergentagent.com/furniture-search")
+        print(f"1. Go to: https://mobilewalkthru.preview.emergentagent.com/furniture-search")
         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
         print(f"3. Test the category filters and price ranges")
         print(f"4. Verify all {result['added_products']} products are visible and searchable")
