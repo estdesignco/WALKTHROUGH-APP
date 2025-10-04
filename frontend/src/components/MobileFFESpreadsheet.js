@@ -112,7 +112,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
 
       {/* FFE TABLE - EXACT DESKTOP STRUCTURE WITH ALL COLUMNS */}
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse" style={{ minWidth: '1400px' }}>
+        <table className="w-full border-collapse" style={{ minWidth: '1300px' }}>
           <thead>
             {/* SECTION HEADERS - EXACT SAME AS DESKTOP */}
             <tr>
