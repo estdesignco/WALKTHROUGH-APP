@@ -143,6 +143,38 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
     }
   };
 
+  const handleDeleteItem = async (itemId) => {
+    if (!window.confirm('Delete this item?')) return;
+    
+    try {
+      await axios.delete(`${API_URL}/items/${itemId}`);
+      
+      // Update local state immediately
+      setProject(prevProject => {
+        const updatedProject = { ...prevProject };
+        updatedProject.rooms = updatedProject.rooms.map(room => ({
+          ...room,
+          categories: room.categories.map(cat => ({
+            ...cat,
+            subcategories: cat.subcategories.map(sub => ({
+              ...sub,
+              items: sub.items.filter(i => i.id !== itemId)
+            }))
+          }))
+        }));
+        return updatedProject;
+      });
+      
+      // Reload if online
+      if (online) {
+        await loadProject();
+      }
+    } catch (error) {
+      console.error('Failed to delete:', error);
+      alert('Failed to delete item');
+    }
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-full" style={{ backgroundColor: '#0F172A' }}>
       <div className="text-white">Loading Walkthrough...</div>
