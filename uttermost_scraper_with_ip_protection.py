@@ -199,22 +199,37 @@ async def scrape_uttermost_with_protection(num_products=10):
                 images = []
                 
                 img_elements = await page.query_selector_all('img')
-                for img_elem in img_elements:
+                print(f"    Found {len(img_elements)} total img tags")
+                
+                for img_elem in img_elements[:20]:  # Check first 20
                     src = await img_elem.get_attribute('src')
+                    data_src = await img_elem.get_attribute('data-src')
                     alt = await img_elem.get_attribute('alt') or ''
                     
-                    if src and ('product' in src.lower() or 'uttermost' in src.lower()):
-                        if 'logo' in src.lower() or 'icon' in src.lower():
+                    # Try both src and data-src
+                    img_url = src or data_src
+                    
+                    if img_url:
+                        print(f"    Checking: {img_url[:80]}...")
+                        
+                        # Skip obvious non-product images
+                        skip_keywords = ['logo', 'icon', 'arrow', 'button', 'badge', 'svg']
+                        if any(keyword in img_url.lower() for keyword in skip_keywords):
+                            print(f"      → Skipped (contains skip keyword)")
                             continue
                         
-                        if src.startswith('//'):
-                            src = 'https:' + src
-                        elif src.startswith('/'):
-                            src = 'https://www.uttermost.com' + src
+                        # Make full URL
+                        if img_url.startswith('//'):
+                            img_url = 'https:' + img_url
+                        elif img_url.startswith('/'):
+                            img_url = 'https://www.uttermost.com' + img_url
                         
-                        images.append(src)
-                        if len(images) >= 5:
-                            break
+                        # Only accept reasonable image formats
+                        if any(ext in img_url.lower() for ext in ['.jpg', '.jpeg', '.png', '.webp']):
+                            images.append(img_url)
+                            print(f"      ✓ Added ({len(images)})")
+                            if len(images) >= 5:
+                                break
                 
                 await context.close()
                 
