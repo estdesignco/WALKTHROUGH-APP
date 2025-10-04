@@ -213,7 +213,7 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
                   type="text"
                   value={measurementText}
                   onChange={(e) => setMeasurementText(e.target.value)}
-                  placeholder="e.g., 8'6\" or 102 inches"
+                  placeholder="e.g., 8'6'' or 102 inches"
                   className="flex-1 bg-gray-700 text-white px-4 py-2 rounded"
                 />
                 <button
