@@ -61,6 +61,50 @@ function MobileHomeScreen({ onNavigate }) {
   );
 }
 
+// ===== PROJECT MENU SCREEN =====
+function ProjectMenuScreen({ project, onNavigate }) {
+  return (
+    <div className="h-full overflow-auto p-4 bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
+      <button 
+        onClick={() => onNavigate('projects')}
+        className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold"
+      >
+        ← Back to Projects
+      </button>
+      
+      <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">{project?.name}</h2>
+      <p className="text-gray-400 text-sm mb-6">Select which sheet to view</p>
+
+      <div className="space-y-3">
+        <button
+          onClick={() => onNavigate('walkthrough')}
+          className="w-full bg-gradient-to-br from-[#2a2a3a] to-[#1a1a2a] hover:from-[#3a3a4a] hover:to-[#2a2a3a] rounded-2xl p-6 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4C5A9]/30"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="relative z-10">
+            <div className="text-4xl mb-2">📋</div>
+            <div className="font-bold text-[#D4C5A9] text-lg mb-1">Walkthrough</div>
+            <div className="text-xs text-gray-300">On-site checklist - Check off items as you inspect</div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => onNavigate('ffe')}
+          className="w-full bg-gradient-to-br from-[#2a2a3a] to-[#1a1a2a] hover:from-[#3a3a4a] hover:to-[#2a2a3a] rounded-2xl p-6 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4C5A9]/30"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="relative z-10">
+            <div className="text-4xl mb-2">📖</div>
+            <div className="font-bold text-[#D4C5A9] text-lg mb-1">FF&E Bible</div>
+            <div className="text-xs text-gray-300">Your complete inventory - Status, tracking, delivery info</div>
+            <div className="mt-2 text-xs text-orange-300">💡 Works offline with auto-sync!</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ===== PROJECT LIST SCREEN =====
 function MobileProjectListScreen({ onNavigate, onSelectProject }) {
   const [projects, setProjects] = useState([]);
