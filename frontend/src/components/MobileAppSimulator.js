@@ -370,31 +370,29 @@ export default function MobileAppSimulator() {
         return <ProjectMenuScreen project={selectedProject} onNavigate={setScreen} />;
       case 'walkthrough':
         return (
-          <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
-            <div className="text-center">
-              <button 
-                onClick={() => setScreen('project-menu')}
-                className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold"
-              >
-                ← Back
-              </button>
-              <div className="text-[#D4C5A9] text-lg mb-2">Walkthrough Feature</div>
-              <div className="text-gray-400 text-sm">Use the desktop version to access the full walkthrough spreadsheet</div>
+          <div className="h-full flex flex-col">
+            <button 
+              onClick={() => setScreen('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-hidden">
+              <MobileWalkthroughSpreadsheet projectId={selectedProject?.id} />
             </div>
           </div>
         );
       case 'ffe':
         return (
-          <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
-            <div className="text-center">
-              <button 
-                onClick={() => setScreen('project-menu')}
-                className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold"
-              >
-                ← Back
-              </button>
-              <div className="text-[#D4C5A9] text-lg mb-2">FF&E Feature</div>
-              <div className="text-gray-400 text-sm">Use the desktop version to access the full FF&E spreadsheet</div>
+          <div className="h-full flex flex-col">
+            <button 
+              onClick={() => setScreen('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-hidden">
+              <MobileFFESpreadsheet projectId={selectedProject?.id} />
             </div>
           </div>
         );
