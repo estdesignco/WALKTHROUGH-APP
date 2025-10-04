@@ -50,16 +50,16 @@ async def scrape_fourhands_product(sku, page):
         search_url = f"https://fourhands.com/search?q={sku}"
         print(f"    🔍 {search_url}")
         
-        page.goto(search_url, wait_until='domcontentloaded', timeout=20000)
-        page.wait_for_timeout(3000)
+        await page.goto(search_url, wait_until='domcontentloaded', timeout=20000)
+        await page.wait_for_timeout(3000)
         
         # Look for first product result
         product_link = None
         try:
             # Try different selectors
-            link = page.query_selector('a[href*="/products/"]')
+            link = await page.query_selector('a[href*="/products/"]')
             if link:
-                product_link = link.get_attribute('href')
+                product_link = await link.get_attribute('href')
                 if product_link and not product_link.startswith('http'):
                     product_link = 'https://fourhands.com' + product_link
         except:
