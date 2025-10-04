@@ -160,16 +160,21 @@
             font-size: 14px;
         }
         .instructions {
-            background: rgba(59, 130, 246, 0.1);
-            border: 2px solid rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.2) 0%, rgba(17, 24, 39, 0.4) 100%);
+            border: 2px solid rgba(212, 197, 169, 0.3);
             border-radius: 16px;
             padding: 24px;
             margin-top: 30px;
+            backdrop-filter: blur(10px);
         }
         .instructions h3 {
-            color: #60A5FA;
+            background: linear-gradient(135deg, #D4C5A9 0%, #BCA888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 16px;
             font-size: 20px;
+            font-weight: 700;
         }
         .instructions ol {
             margin-left: 24px;
