@@ -240,7 +240,7 @@ async def import_fourhands_catalog(num_products=10, start_from=0):
                     failed += 1
                     continue
             
-            browser.close()
+            await browser.close()
         
         print(f"\n" + "="*80)
         print(f"✅ FOUR HANDS IMPORT COMPLETE")
