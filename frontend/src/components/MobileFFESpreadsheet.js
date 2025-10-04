@@ -57,10 +57,30 @@ export default function MobileFFESpreadsheet({ projectId }) {
   const loadProject = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/projects/${projectId}?sheet_type=ffe`);
-      setProject(response.data);
+      
+      if (online) {
+        // Try to load from server
+        const response = await axios.get(`${API_URL}/projects/${projectId}?sheet_type=ffe`);
+        setProject(response.data);
+        // Cache for offline use
+        await cacheProject(response.data);
+      } else {
+        // Load from offline cache
+        console.log('📴 Offline - loading from cache');
+        const cachedProject = await loadProjectFromCache();
+        if (cachedProject) {
+          setProject(cachedProject);
+        } else {
+          console.error('No cached data available');
+        }
+      }
     } catch (error) {
       console.error('Failed to load FFE:', error);
+      // Try loading from cache on error
+      const cachedProject = await loadProjectFromCache();
+      if (cachedProject) {
+        setProject(cachedProject);
+      }
     } finally {
       setLoading(false);
     }
