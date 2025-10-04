@@ -477,7 +477,22 @@ export default function MobileAppSimulator() {
       case 'projects':
         return <MobileProjectListScreen onNavigate={setScreen} onSelectProject={handleSelectProject} />;
       case 'walkthrough':
-        return <MobileWalkthroughScreen project={selectedProject} onNavigate={handleNavigate} onSelectRoom={handleSelectRoom} />;
+        return (
+          <div className="h-full flex flex-col">
+            <button 
+              onClick={() => setScreen('projects')}
+              className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-3 py-2 m-2 rounded-lg text-sm font-semibold"
+            >
+              ← Back to Projects
+            </button>
+            <div className="flex-1 overflow-hidden">
+              <MobileWalkthroughSpreadsheet 
+                projectId={selectedProject?.id} 
+                onOpenPhotos={handleSelectRoom}
+              />
+            </div>
+          </div>
+        );
       case 'photos':
         return <MobilePhotoManagerScreen project={selectedProject} room={selectedRoom} onNavigate={setScreen} />;
       default:
