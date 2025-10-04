@@ -149,7 +149,7 @@ const MobileWalkthroughSpreadsheet = ({
 
   // FILTERING LOGIC
   useEffect(() => {
-    if (!project) {
+    if (!actualProject) {
       setFilteredProject(null);
       return;
     }
