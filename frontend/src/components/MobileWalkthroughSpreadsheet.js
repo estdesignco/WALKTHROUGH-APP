@@ -154,7 +154,7 @@ const MobileWalkthroughSpreadsheet = ({
       return;
     }
 
-    let filtered = { ...project };
+    let filtered = { ...actualProject };
 
     if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
       filtered.rooms = project.rooms.map(room => {
