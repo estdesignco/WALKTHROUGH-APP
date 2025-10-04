@@ -8,55 +8,65 @@ function MobileHomeScreen({ onNavigate }) {
   const [syncStatus, setSyncStatus] = useState({ totalPending: 0 });
 
   return (
-    <div style={styles.screen}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>Interior Design Manager</h1>
-        <p style={styles.subtitle}>On-Site Project Management</p>
+    <div className="h-full overflow-auto p-4 bg-gradient-to-b from-black via-gray-900 to-blue-950">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">
+          Interior Design Manager
+        </h1>
+        <p className="text-gray-400 text-sm">On-Site Project Management</p>
       </div>
 
       {syncStatus.totalPending > 0 && (
-        <div style={styles.syncCard}>
-          <p style={styles.syncTitle}>📡 Pending Sync</p>
-          <p style={styles.syncText}>{syncStatus.totalPending} items pending</p>
+        <div className="bg-gradient-to-r from-amber-600/20 to-orange-600/20 border border-amber-500/30 rounded-2xl p-4 mb-6 backdrop-blur-sm">
+          <p className="font-bold text-[#D4C5A9] mb-1">📡 Pending Sync</p>
+          <p className="text-sm text-gray-300">{syncStatus.totalPending} items pending</p>
         </div>
       )}
 
-      <div style={styles.actionsGrid}>
+      <div className="grid grid-cols-2 gap-3 mb-6">
         <button
-          style={{ ...styles.actionCard, ...styles.primaryCard }}
           onClick={() => onNavigate('projects')}
+          className="col-span-2 bg-gradient-to-br from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 rounded-2xl p-6 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border border-[#D4C5A9]/30"
         >
-          <div style={styles.actionIcon}>📋</div>
-          <div style={styles.actionTitle}>Projects</div>
-          <div style={styles.actionSubtitle}>View all projects</div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse"></div>
+          <div className="relative z-10">
+            <div className="text-4xl mb-2">📋</div>
+            <div className="text-lg font-bold text-[#D4C5A9]">Projects</div>
+            <div className="text-xs text-gray-300">View all projects</div>
+          </div>
         </button>
 
-        <button style={{ ...styles.actionCard, ...styles.secondaryCard }}>
-          <div style={styles.actionIcon}>🏠</div>
-          <div style={styles.actionTitle}>Walkthrough</div>
-          <div style={styles.actionSubtitle}>On-site checklists</div>
+        <button className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-4 border border-[#D4C5A9]/20 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="text-3xl mb-2">🏠</div>
+          <div className="text-sm font-bold text-[#D4C5A9]">Walkthrough</div>
+          <div className="text-xs text-gray-400">On-site checklists</div>
         </button>
 
-        <button style={{ ...styles.actionCard, ...styles.secondaryCard }}>
-          <div style={styles.actionIcon}>📸</div>
-          <div style={styles.actionTitle}>Photos</div>
-          <div style={styles.actionSubtitle}>Manage project photos</div>
+        <button className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-4 border border-[#D4C5A9]/20 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="text-3xl mb-2">📸</div>
+          <div className="text-sm font-bold text-[#D4C5A9]">Photos</div>
+          <div className="text-xs text-gray-400">Manage photos</div>
         </button>
 
-        <button style={{ ...styles.actionCard, ...styles.secondaryCard }}>
-          <div style={styles.actionIcon}>📏</div>
-          <div style={styles.actionTitle}>Leica D5</div>
-          <div style={styles.actionSubtitle}>Laser measurements</div>
+        <button className="col-span-2 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-4 border border-[#D4C5A9]/20 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="text-3xl mb-2">📏</div>
+          <div className="text-sm font-bold text-[#D4C5A9]">Leica D5</div>
+          <div className="text-xs text-gray-400">Laser measurements</div>
         </button>
       </div>
 
-      <div style={styles.infoCard}>
-        <p style={styles.infoTitle}>✨ Features</p>
-        <p style={styles.infoText}>• Offline-first design</p>
-        <p style={styles.infoText}>• Photo capture with room organization</p>
-        <p style={styles.infoText}>• Leica D5 laser measurement integration</p>
-        <p style={styles.infoText}>• Photo annotation with measurements</p>
-        <p style={styles.infoText}>• Auto-sync when online</p>
+      <div className="bg-gradient-to-br from-gray-900/80 to-blue-900/30 rounded-2xl p-4 border border-[#D4C5A9]/20 backdrop-blur-sm">
+        <p className="font-bold text-[#D4C5A9] mb-3 text-lg">✨ Features</p>
+        <div className="space-y-2 text-sm text-gray-300">
+          <p>• Offline-first design</p>
+          <p>• Photo capture with room organization</p>
+          <p>• Leica D5 laser measurement integration</p>
+          <p>• Photo annotation with measurements</p>
+          <p>• Auto-sync when online</p>
+        </div>
       </div>
     </div>
   );
@@ -84,48 +94,46 @@ function MobileProjectListScreen({ onNavigate, onSelectProject }) {
 
   if (loading) {
     return (
-      <div style={styles.screen}>
-        <div style={styles.centerContainer}>
-          <div style={styles.loader}>Loading...</div>
-        </div>
+      <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-gray-900 to-blue-950">
+        <div className="text-[#D4C5A9] text-lg">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div style={styles.screen}>
-      <button style={styles.backButton} onClick={() => onNavigate('home')}>
+    <div className="h-full overflow-auto p-4 bg-gradient-to-b from-black via-gray-900 to-blue-950">
+      <button 
+        onClick={() => onNavigate('home')}
+        className="bg-gradient-to-r from-gray-800 to-gray-900 text-[#D4C5A9] border border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold hover:from-blue-800 hover:to-blue-900 transition-all"
+      >
         ← Back
       </button>
       
-      <div style={styles.header}>
-        <h2 style={styles.title}>Projects</h2>
-      </div>
+      <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">Projects</h2>
 
-      <div style={styles.projectList}>
+      <div className="space-y-3">
         {projects.map((project) => (
           <button
             key={project.id}
-            style={styles.projectCard}
             onClick={() => onSelectProject(project)}
+            className="w-full bg-gradient-to-br from-gray-900/80 to-blue-900/30 border border-[#D4C5A9]/30 rounded-2xl p-4 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group backdrop-blur-sm"
           >
-            <div style={styles.projectHeader}>
-              <div style={styles.projectName}>{project.name}</div>
-              <div style={styles.projectArrow}>→</div>
-            </div>
-            {project.client_info && (
-              <div style={styles.projectInfo}>
-                <div style={styles.clientName}>
-                  👤 {project.client_info.full_name}
-                </div>
-                <div style={styles.projectDetail}>
-                  📍 {project.client_info.address}
-                </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="flex justify-between items-start mb-2">
+                <div className="font-bold text-[#D4C5A9] text-lg">{project.name}</div>
+                <div className="text-[#D4C5A9] text-xl">→</div>
               </div>
-            )}
-            <div style={styles.projectFooter}>
-              <span style={styles.projectType}>{project.project_type || 'Renovation'}</span>
-              <span style={styles.roomCount}>{project.rooms?.length || 0} rooms</span>
+              {project.client_info && (
+                <div className="space-y-1 text-sm">
+                  <div className="text-gray-300">👤 {project.client_info.full_name}</div>
+                  <div className="text-gray-400">📍 {project.client_info.address}</div>
+                </div>
+              )}
+              <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-700">
+                <span className="text-xs text-[#D4C5A9] font-semibold">{project.project_type || 'Renovation'}</span>
+                <span className="text-xs text-gray-400">{project.rooms?.length || 0} rooms</span>
+              </div>
             </div>
           </button>
         ))}
@@ -139,30 +147,32 @@ function MobileWalkthroughScreen({ project, onNavigate, onSelectRoom }) {
   const rooms = project?.rooms || [];
 
   return (
-    <div style={styles.screen}>
-      <button style={styles.backButton} onClick={() => onNavigate('projects')}>
+    <div className="h-full overflow-auto p-4 bg-gradient-to-b from-black via-gray-900 to-blue-950">
+      <button 
+        onClick={() => onNavigate('projects')}
+        className="bg-gradient-to-r from-gray-800 to-gray-900 text-[#D4C5A9] border border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold hover:from-blue-800 hover:to-blue-900 transition-all"
+      >
         ← Back
       </button>
 
-      <div style={styles.header}>
-        <h2 style={styles.projectTitle}>{project?.name}</h2>
-        <p style={styles.subtitle}>Select a room to manage photos</p>
-      </div>
+      <h2 className="text-xl font-bold mb-1 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">{project?.name}</h2>
+      <p className="text-gray-400 text-sm mb-6">Select a room to manage photos</p>
 
-      <div style={styles.roomsGrid}>
+      <div className="grid grid-cols-2 gap-3">
         {rooms.map((room) => (
           <button
             key={room.id}
-            style={{ ...styles.roomCard, backgroundColor: room.color || '#1F2937' }}
             onClick={() => onSelectRoom(room)}
+            className="bg-gradient-to-br from-gray-900/80 to-blue-900/30 rounded-2xl p-4 border border-[#D4C5A9]/30 text-center transition-all duration-300 transform hover:scale-105 relative overflow-hidden group backdrop-blur-sm"
           >
-            <div style={styles.roomIcon}>🏠</div>
-            <div style={styles.roomName}>{room.name}</div>
-            <div style={styles.roomSubtitle}>
-              {room.categories?.length || 0} categories
-            </div>
-            <div style={styles.photoIndicator}>
-              <span style={styles.photoIndicatorText}>📸 Photos →</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-3xl mb-2">🏠</div>
+              <div className="font-bold text-[#D4C5A9] mb-1">{room.name}</div>
+              <div className="text-xs text-gray-400 mb-3">{room.categories?.length || 0} categories</div>
+              <div className="pt-2 border-t border-[#D4C5A9]/20">
+                <span className="text-xs text-[#D4C5A9] font-semibold">📸 Photos →</span>
+              </div>
             </div>
           </button>
         ))}
@@ -185,9 +195,7 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
   const loadPhotos = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${API_URL}/photos/by-room/${project.id}/${room.id}`
-      );
+      const response = await axios.get(`${API_URL}/photos/by-room/${project.id}/${room.id}`);
       setPhotos(response.data.photos || []);
     } catch (error) {
       console.error('Failed to load photos:', error);
@@ -202,27 +210,19 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
 
     try {
       setUploading(true);
-      
-      // Convert to base64
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64 = reader.result;
-        
-        // Upload to backend
         await axios.post(`${API_URL}/photos/upload`, {
           project_id: project.id,
           room_id: room.id,
           photo_data: base64,
           file_name: file.name,
-          metadata: {
-            timestamp: new Date().toISOString(),
-          },
+          metadata: { timestamp: new Date().toISOString() },
         });
-        
         alert('Photo uploaded successfully!');
         loadPhotos();
       };
-      
       reader.readAsDataURL(file);
     } catch (error) {
       console.error('Upload error:', error);
@@ -234,7 +234,6 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
 
   const handleDeletePhoto = async (photoId) => {
     if (!window.confirm('Delete this photo?')) return;
-    
     try {
       await axios.delete(`${API_URL}/photos/${photoId}`);
       alert('Photo deleted');
@@ -246,61 +245,65 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
   };
 
   return (
-    <div style={styles.screen}>
-      <button style={styles.backButton} onClick={() => onNavigate('walkthrough')}>
-        ← Back
-      </button>
-
-      <div style={styles.photoHeader}>
-        <div>
-          <div style={styles.projectName}>{project.name}</div>
-          <div style={styles.roomName}>📍 {room.name}</div>
-        </div>
-        <div style={styles.storageInfo}>
-          <div style={styles.storageText}>{photos.length} photos</div>
-        </div>
-      </div>
-
-      <div style={styles.actions}>
-        <label style={{ ...styles.actionButton, ...styles.primaryButton }}>
-          {uploading ? 'Uploading...' : '📷 Upload Photo'}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            style={{ display: 'none' }}
-            disabled={uploading}
-          />
-        </label>
-        
-        <button style={{ ...styles.actionButton, ...styles.secondaryButton }}>
-          📏 Measure
+    <div className="h-full overflow-auto bg-gradient-to-b from-black via-gray-900 to-blue-950">
+      <div className="p-4">
+        <button 
+          onClick={() => onNavigate('walkthrough')}
+          className="bg-gradient-to-r from-gray-800 to-gray-900 text-[#D4C5A9] border border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold hover:from-blue-800 hover:to-blue-900 transition-all"
+        >
+          ← Back
         </button>
-      </div>
 
-      <div style={styles.photoGrid}>
+        <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#D4C5A9]/20">
+          <div>
+            <div className="text-sm text-gray-400">{project.name}</div>
+            <div className="text-lg font-bold text-[#D4C5A9]">📍 {room.name}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-sm text-gray-300">{photos.length} photos</div>
+          </div>
+        </div>
+
+        <div className="flex gap-2 mb-4">
+          <label className="flex-1 bg-gradient-to-br from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 rounded-xl p-3 text-center font-bold text-white cursor-pointer transition-all duration-300 transform hover:scale-105 border border-[#D4C5A9]/30 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
+            <span className="relative z-10">{uploading ? 'Uploading...' : '📷 Upload Photo'}</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="hidden"
+              disabled={uploading}
+            />
+          </label>
+          
+          <button className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl px-4 font-bold text-[#D4C5A9] border border-[#D4C5A9]/30 hover:from-blue-800 hover:to-blue-900 transition-all">
+            📏 Measure
+          </button>
+        </div>
+
         {loading ? (
-          <div style={styles.centerContainer}>Loading photos...</div>
+          <div className="text-center py-12 text-[#D4C5A9]">Loading photos...</div>
         ) : photos.length === 0 ? (
-          <div style={styles.emptyContainer}>
-            <div style={styles.emptyIcon}>📸</div>
-            <div style={styles.emptyText}>No photos yet</div>
-            <div style={styles.emptySubtext}>Upload photos for this room</div>
+          <div className="text-center py-12 bg-gradient-to-br from-gray-900/80 to-blue-900/30 rounded-2xl border border-[#D4C5A9]/20 backdrop-blur-sm">
+            <div className="text-6xl mb-4">📸</div>
+            <div className="text-lg text-[#D4C5A9] mb-2">No photos yet</div>
+            <div className="text-sm text-gray-400">Upload photos for this room</div>
           </div>
         ) : (
-          <div style={styles.photoRow}>
+          <div className="grid grid-cols-3 gap-2">
             {photos.map((photo) => (
-              <div
+              <button
                 key={photo.id}
-                style={styles.photoItem}
                 onClick={() => setSelectedPhoto(photo)}
+                className="aspect-square rounded-lg overflow-hidden border-2 border-[#D4C5A9]/30 hover:border-[#D4C5A9] transition-all transform hover:scale-105"
               >
                 <img
                   src={photo.photo_data}
                   alt={photo.file_name}
-                  style={styles.photoImage}
+                  className="w-full h-full object-cover"
                 />
-              </div>
+              </button>
             ))}
           </div>
         )}
@@ -308,23 +311,26 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
 
       {/* Photo Modal */}
       {selectedPhoto && (
-        <div style={styles.modalContainer} onClick={() => setSelectedPhoto(null)}>
-          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <div className="max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
             <img
               src={selectedPhoto.photo_data}
               alt={selectedPhoto.file_name}
-              style={styles.modalImage}
+              className="max-w-full max-h-[70vh] rounded-2xl border-2 border-[#D4C5A9]/30"
             />
-            <div style={styles.modalActions}>
+            <div className="flex gap-3 mt-4">
               <button
-                style={{ ...styles.modalButton, ...styles.deleteButton }}
                 onClick={() => handleDeletePhoto(selectedPhoto.id)}
+                className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-bold transition-all"
               >
                 🗑️ Delete
               </button>
               <button
-                style={{ ...styles.modalButton, ...styles.closeButton }}
                 onClick={() => setSelectedPhoto(null)}
+                className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white px-6 py-3 rounded-xl font-bold transition-all"
               >
                 Close
               </button>
@@ -357,389 +363,30 @@ export default function MobileAppSimulator() {
       case 'home':
         return <MobileHomeScreen onNavigate={setScreen} />;
       case 'projects':
-        return (
-          <MobileProjectListScreen
-            onNavigate={setScreen}
-            onSelectProject={handleSelectProject}
-          />
-        );
+        return <MobileProjectListScreen onNavigate={setScreen} onSelectProject={handleSelectProject} />;
       case 'walkthrough':
-        return (
-          <MobileWalkthroughScreen
-            project={selectedProject}
-            onNavigate={setScreen}
-            onSelectRoom={handleSelectRoom}
-          />
-        );
+        return <MobileWalkthroughScreen project={selectedProject} onNavigate={setScreen} onSelectRoom={handleSelectRoom} />;
       case 'photos':
-        return (
-          <MobilePhotoManagerScreen
-            project={selectedProject}
-            room={selectedRoom}
-            onNavigate={setScreen}
-          />
-        );
+        return <MobilePhotoManagerScreen project={selectedProject} room={selectedRoom} onNavigate={setScreen} />;
       default:
         return <MobileHomeScreen onNavigate={setScreen} />;
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.phoneFrame}>
-        <div style={styles.statusBar}>
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-blue-950 flex items-center justify-center p-4">
+      <div className="w-[390px] h-[844px] bg-black rounded-[40px] overflow-hidden shadow-2xl border-8 border-gray-800 relative">
+        {/* Status Bar */}
+        <div className="h-11 bg-black flex justify-between items-center px-6 text-white text-sm">
           <span>9:41</span>
           <span>📶 📡 🔋</span>
         </div>
-        {renderScreen()}
+        
+        {/* Screen Content */}
+        <div className="h-[calc(100%-44px)] overflow-hidden">
+          {renderScreen()}
+        </div>
       </div>
     </div>
   );
 }
-
-// ===== STYLES =====
-const styles = {
-  container: {
-    minHeight: '100vh',
-    background: '#0F172A',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '20px',
-  },
-  phoneFrame: {
-    width: '390px',
-    height: '844px',
-    background: '#111827',
-    borderRadius: '40px',
-    overflow: 'hidden',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-    border: '8px solid #1F2937',
-    position: 'relative',
-  },
-  statusBar: {
-    height: '44px',
-    background: '#000',
-    color: '#fff',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '0 20px',
-    fontSize: '14px',
-  },
-  screen: {
-    height: 'calc(100% - 44px)',
-    overflow: 'auto',
-    padding: '16px',
-  },
-  header: {
-    marginBottom: '24px',
-    textAlign: 'center',
-  },
-  title: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#D4A574',
-    marginBottom: '8px',
-  },
-  subtitle: {
-    fontSize: '14px',
-    color: '#9CA3AF',
-  },
-  syncCard: {
-    background: '#F59E0B',
-    borderRadius: '12px',
-    padding: '16px',
-    marginBottom: '20px',
-  },
-  syncTitle: {
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: '8px',
-  },
-  syncText: {
-    fontSize: '14px',
-    color: '#1F2937',
-  },
-  actionsGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '12px',
-    marginBottom: '20px',
-  },
-  actionCard: {
-    borderRadius: '16px',
-    padding: '20px',
-    border: 'none',
-    cursor: 'pointer',
-    textAlign: 'center',
-  },
-  primaryCard: {
-    background: '#D4A574',
-    gridColumn: '1 / -1',
-  },
-  secondaryCard: {
-    background: '#1F2937',
-    border: '2px solid #374151',
-  },
-  actionIcon: {
-    fontSize: '32px',
-    marginBottom: '8px',
-  },
-  actionTitle: {
-    fontSize: '16px',
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: '4px',
-  },
-  actionSubtitle: {
-    fontSize: '12px',
-    color: '#9CA3AF',
-  },
-  infoCard: {
-    background: '#1F2937',
-    borderRadius: '12px',
-    padding: '16px',
-  },
-  infoTitle: {
-    fontSize: '16px',
-    fontWeight: 'bold',
-    color: '#D4A574',
-    marginBottom: '12px',
-  },
-  infoText: {
-    fontSize: '14px',
-    color: '#D1D5DB',
-    marginBottom: '8px',
-  },
-  backButton: {
-    background: '#374151',
-    color: '#D4A574',
-    border: 'none',
-    padding: '10px 16px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    marginBottom: '16px',
-    fontSize: '14px',
-    fontWeight: '600',
-  },
-  projectList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  },
-  projectCard: {
-    background: '#1F2937',
-    borderRadius: '16px',
-    padding: '16px',
-    border: '1px solid #374151',
-    cursor: 'pointer',
-    textAlign: 'left',
-  },
-  projectHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '12px',
-  },
-  projectName: {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    color: '#D4A574',
-  },
-  projectArrow: {
-    fontSize: '20px',
-    color: '#D4A574',
-  },
-  projectInfo: {
-    marginBottom: '12px',
-  },
-  clientName: {
-    fontSize: '14px',
-    color: '#D1D5DB',
-    marginBottom: '4px',
-  },
-  projectDetail: {
-    fontSize: '12px',
-    color: '#9CA3AF',
-  },
-  projectFooter: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    paddingTop: '12px',
-    borderTop: '1px solid #374151',
-  },
-  projectType: {
-    fontSize: '12px',
-    color: '#D4A574',
-    fontWeight: '600',
-  },
-  roomCount: {
-    fontSize: '12px',
-    color: '#9CA3AF',
-  },
-  projectTitle: {
-    fontSize: '20px',
-    fontWeight: 'bold',
-    color: '#D4A574',
-    marginBottom: '8px',
-  },
-  roomsGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '12px',
-  },
-  roomCard: {
-    borderRadius: '16px',
-    padding: '16px',
-    border: '1px solid #374151',
-    cursor: 'pointer',
-    textAlign: 'center',
-  },
-  roomIcon: {
-    fontSize: '32px',
-    marginBottom: '8px',
-  },
-  roomName: {
-    fontSize: '16px',
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: '4px',
-  },
-  roomSubtitle: {
-    fontSize: '12px',
-    color: '#D1D5DB',
-    marginBottom: '12px',
-  },
-  photoIndicator: {
-    paddingTop: '8px',
-    borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-  },
-  photoIndicatorText: {
-    fontSize: '12px',
-    color: '#D4A574',
-    fontWeight: '600',
-  },
-  photoHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '16px',
-    paddingBottom: '16px',
-    borderBottom: '1px solid #374151',
-  },
-  storageInfo: {
-    textAlign: 'right',
-  },
-  storageText: {
-    fontSize: '14px',
-    color: '#D1D5DB',
-  },
-  actions: {
-    display: 'flex',
-    gap: '12px',
-    marginBottom: '16px',
-  },
-  actionButton: {
-    flex: 1,
-    borderRadius: '12px',
-    padding: '12px',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  photoGrid: {
-    minHeight: '300px',
-  },
-  photoRow: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '8px',
-  },
-  photoItem: {
-    aspectRatio: '1',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    background: '#1F2937',
-    cursor: 'pointer',
-  },
-  photoImage: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  },
-  centerContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '200px',
-    color: '#9CA3AF',
-  },
-  emptyContainer: {
-    textAlign: 'center',
-    paddingTop: '60px',
-  },
-  emptyIcon: {
-    fontSize: '64px',
-    marginBottom: '16px',
-  },
-  emptyText: {
-    fontSize: '18px',
-    color: '#9CA3AF',
-    marginBottom: '8px',
-  },
-  emptySubtext: {
-    fontSize: '14px',
-    color: '#6B7280',
-  },
-  modalContainer: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(0, 0, 0, 0.9)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  modalContent: {
-    width: '90%',
-    maxWidth: '600px',
-  },
-  modalImage: {
-    width: '100%',
-    height: 'auto',
-    maxHeight: '70vh',
-    borderRadius: '12px',
-    objectFit: 'contain',
-  },
-  modalActions: {
-    display: 'flex',
-    gap: '12px',
-    marginTop: '16px',
-  },
-  modalButton: {
-    flex: 1,
-    padding: '12px',
-    borderRadius: '8px',
-    border: 'none',
-    cursor: 'pointer',
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: '14px',
-  },
-  deleteButton: {
-    background: '#EF4444',
-  },
-  closeButton: {
-    background: '#6B7280',
-  },
-  loader: {
-    fontSize: '18px',
-    color: '#D4A574',
-  },
-};
