@@ -313,6 +313,8 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
   }, [project, room]);
 
   const loadPhotos = async () => {
+    if (!project?.id || !room?.id) return;
+    
     try {
       setLoading(true);
       const response = await axios.get(`${API_URL}/photos/by-room/${project.id}/${room.id}`);
@@ -323,6 +325,22 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
       setLoading(false);
     }
   };
+
+  if (!project || !room) {
+    return (
+      <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
+        <div className="text-center">
+          <div className="text-[#D4C5A9] mb-4">No room selected</div>
+          <button 
+            onClick={() => onNavigate('walkthrough')}
+            className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-4 py-2 rounded-xl font-semibold"
+          >
+            ← Back to Spreadsheet
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleFileSelect = async (event) => {
     const file = event.target.files[0];
