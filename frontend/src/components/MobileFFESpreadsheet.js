@@ -113,39 +113,6 @@ export default function MobileFFESpreadsheet({ projectId }) {
       {/* FFE TABLE - EXACT DESKTOP STRUCTURE */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse" style={{ minWidth: '1400px' }}>
-          <thead>
-            {/* ROW 1: Brown and Purple Section Headers on TOP */}
-            <tr>
-              <td colSpan="3" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                  style={{ backgroundColor: '#8B4513' }}>
-                ADDITIONAL INFO.
-              </td>
-              <td colSpan="5" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                  style={{ backgroundColor: '#6B46C1' }}>
-                SHIPPING INFO.
-              </td>
-              <td colSpan="6" className="px-2 py-1" style={{ backgroundColor: 'transparent' }}>
-              </td>
-            </tr>
-            
-            {/* ROW 2: RED COLUMN HEADERS AT BOTTOM */}
-            <tr>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>ITEM NAME</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SKU</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>CARRIER</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>TRACKING</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>ORDER DATE</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>DELIVERY DATE</th>
-              <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>COST</th>
-            </tr>
-          </thead>
           <tbody>
             {project?.rooms?.map((room) => (
               <React.Fragment key={room.id}>
