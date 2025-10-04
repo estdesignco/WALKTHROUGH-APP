@@ -550,6 +550,38 @@ const WalkthroughSpreadsheet = ({
           loading={false}
         />
       )}
+      
+      {/* Photo Manager Modal */}
+      {showPhotoManager && selectedRoomForPhotos && (
+        <PhotoManagerModal
+          room={selectedRoomForPhotos}
+          photos={roomPhotos[selectedRoomForPhotos.id] || []}
+          onClose={() => {
+            setShowPhotoManager(false);
+            setSelectedRoomForPhotos(null);
+          }}
+          onSavePhotos={(roomId, photos) => {
+            setRoomPhotos(prev => ({
+              ...prev,
+              [roomId]: photos
+            }));
+            // TODO: Save to backend
+            console.log('📸 Photos saved for room:', roomId, photos);
+          }}
+          leicaConnected={leicaConnected}
+          onConnectLeica={async () => {
+            try {
+              // TODO: Implement Leica D5 Bluetooth connection
+              // For now, simulate connection
+              setLeicaConnected(true);
+              alert('Leica D5 Connected! (Simulated - Bluetooth integration pending)');
+            } catch (error) {
+              console.error('Failed to connect to Leica D5:', error);
+              alert('Failed to connect to Leica D5. Please try again.');
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
