@@ -108,12 +108,12 @@ const MobileFFESpreadsheet = ({
   useEffect(() => {
     console.log('🔍 Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier });
     
-    if (!project) {
+    if (!actualProject) {
       setFilteredProject(null);
       return;
     }
 
-    let filtered = { ...project };
+    let filtered = { ...actualProject };
 
     // Apply filters if any are selected
     if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus || selectedCarrier) {
