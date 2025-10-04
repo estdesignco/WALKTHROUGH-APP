@@ -14,10 +14,10 @@ export default function MobileFFESpreadsheet({ projectId }) {
   const statuses = ['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED'];
   const carriers = ['FedEx', 'UPS', 'USPS', 'DHL', 'Other'];
 
-  // EXACT SAME COLORS AS DESKTOP
+  // EXACT SAME COLORS AS DESKTOP FFE
   const getRoomColor = (roomName) => {
     const roomColors = {
-      'living room': '#DC2626',
+      'living room': '#8B5CF6',      // Purple/violet - EXACT DESKTOP MATCH
       'dining room': '#EAB308',
       'kitchen': '#F59E0B',
       'master bedroom': '#3B82F6',
@@ -33,7 +33,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
       'garage': '#374151',
       'balcony': '#7C3AED'
     };
-    return roomColors[roomName.toLowerCase()] || '#7C3AED';
+    return roomColors[roomName.toLowerCase()] || '#8B5CF6';
   };
 
   const getCategoryColor = () => '#065F46';
