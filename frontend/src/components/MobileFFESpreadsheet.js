@@ -1356,4 +1356,4 @@ const MobileFFESpreadsheet = ({
   );
 };
 
-export default ExactFFESpreadsheet;
+export default MobileFFESpreadsheet;
