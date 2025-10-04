@@ -170,8 +170,10 @@ async def scrape_fourhands_authenticated(num_products=5, max_attempts=50):
             category = str(row.get('Category', 'Furniture'))
             subcategory = str(row.get('Subcategory', ''))
             
+            attempted += 1
+            
             print(f"{'='*80}")
-            print(f"[{i+1}/{num_products}] {name}")
+            print(f"[Attempt {attempted}] {name} (Success: {success}/{num_products})")
             print(f"{'='*80}")
             print(f"  SKU: {sku}")
             print(f"  Cost: ${cost:.2f}")
