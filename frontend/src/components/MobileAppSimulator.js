@@ -48,13 +48,13 @@ function MobileHomeScreen({ onNavigate }) {
       </div>
 
       <div className="bg-gradient-to-br from-[#1a1a2a]/80 to-[#0a0a1a]/60 rounded-2xl p-4 border-2 border-[#D4C5A9]/20 backdrop-blur-sm">
-        <p className="font-bold text-[#D4C5A9] mb-3 text-lg">✨ Mobile Features</p>
+        <p className="font-bold text-[#D4C5A9] mb-3 text-lg">✨ Jobsite Features</p>
         <div className="space-y-2 text-sm text-gray-300">
-          <p>• Full walkthrough spreadsheet</p>
-          <p>• Check off items on-site</p>
+          <p>• Full Walkthrough spreadsheet</p>
+          <p>• <strong className="text-[#D4C5A9]">FF&E Bible</strong> - Your complete inventory</p>
+          <p>• Works offline with auto-sync</p>
           <p>• Photo capture by room</p>
-          <p>• Leica D5 measurements</p>
-          <p>• Works offline</p>
+          <p>• Real-time status updates</p>
         </div>
       </div>
     </div>
