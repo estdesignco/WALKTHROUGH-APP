@@ -115,9 +115,17 @@ async def scrape_fourhands_authenticated(num_products=5):
                 await inputs[1].fill(FOURHANDS_PASSWORD)
                 print(f"  ✓ Filled password")
                 
-                # Click submit button
-                await page.click('button[type="submit"], button')
-                await page.wait_for_timeout(8000)
+                # Press Enter to submit (more reliable than clicking)
+                await inputs[1].press('Enter')
+                print(f"  ✓ Pressed Enter to submit")
+                
+                # Wait for navigation or response
+                try:
+                    await page.wait_for_navigation(timeout=15000)
+                    print(f"  ✓ Navigation detected")
+                except:
+                    print(f"  ⏳ No navigation, waiting...")
+                    await page.wait_for_timeout(8000)
             else:
                 # Try by selector
                 await page.fill('input:nth-of-type(1)', FOURHANDS_USERNAME)
