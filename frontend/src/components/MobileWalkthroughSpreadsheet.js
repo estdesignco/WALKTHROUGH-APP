@@ -288,7 +288,10 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                             
                             {/* DELETE BUTTON */}
                             <td className="border border-gray-400 px-3 py-2 text-center">
-                              <button className="text-red-400 hover:text-red-300 text-xs">
+                              <button 
+                                onClick={() => handleDeleteItem(item.id)}
+                                className="text-red-400 hover:text-red-300 text-xs"
+                              >
                                 🗑️
                               </button>
                             </td>
