@@ -488,7 +488,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
                               />
                             </td>
                             
-                            {/* LINK/SCRAPE */}
+                            {/* LINK */}
                             <td className="border border-gray-400 px-2 py-2">
                               {item.link ? (
                                 <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs">
@@ -497,6 +497,16 @@ export default function MobileFFESpreadsheet({ projectId }) {
                               ) : (
                                 <span className="text-gray-500 text-xs">-</span>
                               )}
+                            </td>
+                            
+                            {/* DELETE */}
+                            <td className="border border-gray-400 px-2 py-2 text-center">
+                              <button 
+                                onClick={() => handleDeleteItem(item.id)}
+                                className="text-red-400 hover:text-red-300 text-sm font-bold"
+                              >
+                                🗑️
+                              </button>
                             </td>
                           </tr>
                         ))}
