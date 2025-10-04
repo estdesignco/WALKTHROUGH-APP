@@ -155,14 +155,44 @@ export default function MobileFFESpreadsheet({ projectId }) {
 
   return (
     <div className="w-full h-full overflow-auto" style={{ backgroundColor: '#0F172A' }}>
+      {/* OFFLINE STATUS INDICATOR */}
+      {!online && (
+        <div className="bg-orange-600 text-white px-4 py-2 text-center font-bold text-sm">
+          📴 OFFLINE MODE - Changes will sync when online
+          {pendingCount > 0 && ` (${pendingCount} pending)`}
+        </div>
+      )}
+      
+      {/* SYNC STATUS */}
+      {online && syncStatus === 'syncing' && (
+        <div className="bg-blue-600 text-white px-4 py-2 text-center font-bold text-sm">
+          🔄 Syncing...
+        </div>
+      )}
+      
+      {online && syncStatus === 'success' && (
+        <div className="bg-green-600 text-white px-4 py-2 text-center font-bold text-sm">
+          ✅ Synced successfully!
+        </div>
+      )}
+      
       {/* ADD ROOM BUTTON */}
-      <div className="p-4 border-b border-gray-700">
+      <div className="p-4 border-b border-gray-700 flex gap-2">
         <button
           onClick={() => setShowAddRoom(true)}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
         >
           ➕ ADD ROOM
         </button>
+        
+        {online && pendingCount > 0 && (
+          <button
+            onClick={performSync}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            🔄 Sync ({pendingCount})
+          </button>
+        )}
       </div>
 
       {/* FFE TABLE - EXACT DESKTOP STRUCTURE */}
