@@ -154,7 +154,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
               <React.Fragment key={room.id}>
                 {/* ROOM HEADER ROW */}
                 <tr>
-                  <td colSpan="14" 
+                  <td colSpan="13" 
                       className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                       style={{ backgroundColor: getRoomColor(room.name) }}>
                     <div className="flex justify-between items-center">
