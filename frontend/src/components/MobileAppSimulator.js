@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MobileWalkthroughSpreadsheet from './MobileWalkthroughSpreadsheet';
 import MobileFFESpreadsheet from './MobileFFESpreadsheet';
+import MobilePhotoManagement from './MobilePhotoManagement';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
