@@ -371,7 +371,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
 
       {/* FFE TABLE - EXACT DESKTOP STRUCTURE */}
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse" style={{ minWidth: '1400px' }}>
+        <table className="border-collapse" style={{ width: 'auto', minWidth: '100%' }}>
           <tbody>
             {displayProject?.rooms?.map((room) => (
               <React.Fragment key={room.id}>
