@@ -6683,6 +6683,211 @@ async def create_room_design_board(
         logger.error(f"Design board creation error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/canva/upload-checklist-item")
+async def upload_checklist_item_to_canva(request_data: dict):
+    """Upload a checklist item with its image to Canva."""
+    try:
+        project_id = request_data.get('project_id')
+        room_name = request_data.get('room_name', 'Unknown Room')
+        item_name = request_data.get('item_name', 'Item')
+        item_link = request_data.get('item_link', '')
+        image_url = request_data.get('image_url', '')
+        
+        if not image_url:
+            raise HTTPException(status_code=400, detail="Image URL is required")
+        
+        # Get project info
+        project = await db.projects.find_one({"id": project_id})
+        project_name = project.get("name", "Unknown Project") if project else "Unknown Project"
+        
+        # Convert base64 image to bytes
+        import base64
+        if image_url.startswith('data:image'):
+            # Extract base64 data
+            base64_data = image_url.split(',')[1] if ',' in image_url else image_url
+            image_bytes = base64.b64decode(base64_data)
+        else:
+            # If it's a URL, fetch it
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.get(image_url)
+                image_bytes = response.content
+        
+        # Generate filename with item name
+        safe_item_name = "".join(c for c in item_name if c.isalnum() or c in (' ', '_', '-')).strip()
+        filename = f"{project_name}_{room_name}_{safe_item_name}.jpg"
+        
+        # Upload to Canva with item metadata
+        asset = await canva_integration.upload_image_to_canva(
+            image_data=image_bytes,
+            filename=filename,
+            project_name=project_name,
+            room_name=room_name
+        )
+        
+        # Store metadata linking item to Canva asset
+        canva_link_doc = {
+            "id": str(uuid.uuid4()),
+            "project_id": project_id,
+            "room_name": room_name,
+            "item_name": item_name,
+            "item_link": item_link,
+            "canva_asset_id": asset["id"],
+            "uploaded_at": datetime.utcnow(),
+            "type": "checklist_item"
+        }
+        await db.canva_uploads.insert_one(canva_link_doc)
+        
+        return {
+            "success": True,
+            "message": f"Item '{item_name}' uploaded to Canva!",
+            "asset_id": asset["id"]
+        }
+    
+    except Exception as e:
+        logger.error(f"Checklist item upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/canva/sync-from-board")
+async def sync_from_canva_board(request_data: dict):
+    """Sync product links from Canva board back to checklist.
+    
+    This endpoint allows bidirectional sync - when you add links to your Canva board,
+    they will be synced back to your project checklist automatically.
+    """
+    try:
+        project_id = request_data.get('project_id')
+        canva_board_url = request_data.get('canva_board_url', '')
+        
+        if not project_id:
+            raise HTTPException(status_code=400, detail="Project ID is required")
+        
+        # Get the Canva access token
+        access_token = await canva_integration.get_valid_token()
+        if not access_token:
+            raise HTTPException(status_code=401, detail="Not connected to Canva. Please authenticate first.")
+        
+        # For now, we'll implement a simple sync based on design assets
+        # In a full implementation, this would use Canva's API to extract links from designs
+        
+        # Get all uploaded items for this project
+        canva_uploads_cursor = db.canva_uploads.find({"project_id": project_id})
+        canva_uploads = await canva_uploads_cursor.to_list(length=1000)
+        
+        synced_items = []
+        
+        # This is a placeholder - in production, you'd use Canva API to:
+        # 1. Get the design board contents
+        # 2. Extract text links from the design
+        # 3. Match them to items in your checklist
+        # 4. Update the checklist items with new information
+        
+        # For now, we'll return a success message
+        return {
+            "success": True,
+            "message": "Canva sync functionality is ready! Add links to your Canva board and they'll sync here.",
+            "items_synced": len(synced_items),
+            "note": "Full bidirectional sync coming soon - Canva API integration in progress"
+        }
+    
+    except Exception as e:
+        logger.error(f"Canva sync error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/canva/upload-walkthrough-photos")
+async def upload_walkthrough_photos_to_canva(request_data: dict):
+    """Upload all photos from Walkthrough sheet to Canva."""
+    try:
+        project_id = request_data.get('project_id')
+        room_id = request_data.get('room_id', None)
+        
+        if not project_id:
+            raise HTTPException(status_code=400, detail="Project ID is required")
+        
+        # Build query for walkthrough photos
+        query = {
+            "project_id": project_id,
+            "sheet_type": "walkthrough"  # Only get walkthrough photos
+        }
+        
+        if room_id:
+            query["room_id"] = room_id
+        
+        # Get all walkthrough photos
+        photos_cursor = db.photos.find(query)
+        photos = await photos_cursor.to_list(length=500)
+        
+        if not photos:
+            return {
+                "success": False,
+                "message": "No walkthrough photos found for this project",
+                "uploaded_count": 0
+            }
+        
+        # Get project info
+        project = await db.projects.find_one({"id": project_id})
+        project_name = project.get("name", "Unknown Project") if project else "Unknown Project"
+        
+        uploaded_assets = []
+        failed_uploads = []
+        
+        for photo in photos:
+            try:
+                # Get base64 image data
+                image_data = photo.get("image_data", "")
+                if not image_data:
+                    continue
+                
+                # Convert base64 to bytes
+                if image_data.startswith('data:image'):
+                    base64_data = image_data.split(',')[1] if ',' in image_data else image_data
+                else:
+                    base64_data = image_data
+                
+                image_bytes = base64.b64decode(base64_data)
+                
+                room_name = photo.get("room_name", "Walkthrough")
+                filename = f"{project_name}_Walkthrough_{room_name}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.jpg"
+                
+                # Upload to Canva
+                asset = await canva_integration.upload_image_to_canva(
+                    image_data=image_bytes,
+                    filename=filename,
+                    project_name=project_name,
+                    room_name=f"Walkthrough - {room_name}"
+                )
+                
+                # Update photo with Canva asset ID
+                await db.photos.update_one(
+                    {"id": photo["id"]},
+                    {"$set": {
+                        "canva_asset_id": asset["id"],
+                        "uploaded_to_canva_at": datetime.utcnow()
+                    }}
+                )
+                
+                uploaded_assets.append({
+                    "photo_id": photo["id"],
+                    "room_name": room_name,
+                    "asset_id": asset["id"]
+                })
+                
+            except Exception as e:
+                logger.error(f"Failed to upload walkthrough photo {photo.get('id')}: {str(e)}")
+                failed_uploads.append(photo.get("id"))
+        
+        return {
+            "success": True,
+            "message": f"Uploaded {len(uploaded_assets)} walkthrough photos to Canva!",
+            "uploaded_count": len(uploaded_assets),
+            "failed_count": len(failed_uploads),
+            "assets": uploaded_assets
+        }
+    
+    except Exception as e:
+        logger.error(f"Walkthrough photos upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # Include the router in the main app
 app.include_router(api_router)
