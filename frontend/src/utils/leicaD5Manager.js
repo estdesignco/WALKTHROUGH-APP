@@ -331,8 +331,35 @@ export class LeicaD5Manager {
   // Parse measurement data from Leica
   parseMeasurement(dataView) {
     try {
-      // Leica sends distance in millimeters as 32-bit integer (little-endian)
-      const distanceMM = dataView.getUint32(0, true);
+      // Log raw data for debugging
+      console.log('🔍 Raw data buffer length:', dataView.byteLength);
+      const rawBytes = [];
+      for (let i = 0; i < Math.min(dataView.byteLength, 20); i++) {
+        rawBytes.push(dataView.getUint8(i).toString(16).padStart(2, '0'));
+      }
+      console.log('🔍 Raw bytes (hex):', rawBytes.join(' '));
+      
+      // Try different parsing methods
+      let distanceMM;
+      
+      // Method 1: 32-bit integer little-endian (standard)
+      if (dataView.byteLength >= 4) {
+        const method1 = dataView.getUint32(0, true);
+        console.log('🔍 Method 1 (32-bit LE):', method1, 'mm =', (method1/1000).toFixed(3), 'm');
+        distanceMM = method1;
+      }
+      
+      // Method 2: 32-bit float
+      if (dataView.byteLength >= 4) {
+        const method2 = dataView.getFloat32(0, true);
+        console.log('🔍 Method 2 (32-bit Float):', method2);
+      }
+      
+      // Method 3: 16-bit integer
+      if (dataView.byteLength >= 2) {
+        const method3 = dataView.getUint16(0, true);
+        console.log('🔍 Method 3 (16-bit LE):', method3, 'mm =', (method3/1000).toFixed(3), 'm');
+      }
       
       // Convert to different units
       const distanceMeters = distanceMM / 1000;
@@ -340,7 +367,7 @@ export class LeicaD5Manager {
       const distanceFeet = distanceInches / 12;
       const distanceCM = distanceMM / 10;
 
-      return {
+      const result = {
         mm: distanceMM,
         cm: Math.round(distanceCM * 10) / 10,
         meters: Math.round(distanceMeters * 1000) / 1000,
@@ -349,6 +376,9 @@ export class LeicaD5Manager {
         feetInches: this.toFeetInches(distanceInches),
         timestamp: Date.now()
       };
+      
+      console.log('📏 Parsed measurement:', result);
+      return result;
     } catch (error) {
       console.error('❌ Failed to parse measurement:', error);
       return null;
