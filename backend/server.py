@@ -6958,6 +6958,244 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# ============================================
+# CANVA INTEGRATION ENDPOINTS
+# ============================================
+
+@api_router.get("/canva/auth")
+async def canva_auth():
+    """Initiate Canva OAuth flow."""
+    import secrets
+    state = secrets.token_urlsafe(32)
+    
+    # Store state in session (in production, use Redis or database)
+    auth_url = canva_integration.get_authorization_url(state)
+    
+    return {
+        "authorization_url": auth_url,
+        "state": state,
+        "message": "Redirect user to authorization_url"
+    }
+
+@api_router.get("/canva/callback")
+async def canva_callback(code: str, state: str):
+    """Handle Canva OAuth callback."""
+    try:
+        # Exchange code for token
+        token_data = await canva_integration.exchange_code_for_token(code)
+        
+        # Get user profile to confirm connection
+        profile = await canva_integration.get_user_profile()
+        
+        return {
+            "success": True,
+            "message": "Successfully connected to Canva!",
+            "canva_user": profile.get("display_name", "User")
+        }
+    
+    except Exception as e:
+        logger.error(f"Canva callback error: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.get("/canva/status")
+async def canva_status():
+    """Check Canva connection status."""
+    try:
+        token = await canva_integration.get_valid_token()
+        
+        if not token:
+            return {
+                "connected": False,
+                "message": "Not connected to Canva. Please authenticate."
+            }
+        
+        # Try to get profile to verify token works
+        profile = await canva_integration.get_user_profile()
+        
+        return {
+            "connected": True,
+            "canva_user": profile.get("display_name", "User"),
+            "email": profile.get("email")
+        }
+    
+    except Exception as e:
+        return {
+            "connected": False,
+            "message": f"Connection error: {str(e)}"
+        }
+
+@api_router.post("/canva/upload-photo")
+async def upload_photo_to_canva(
+    photo_id: str,
+    project_id: str
+):
+    """Upload a specific photo to Canva."""
+    try:
+        # Get photo from database
+        photo = await db.photos.find_one({"id": photo_id})
+        
+        if not photo:
+            raise HTTPException(status_code=404, detail="Photo not found")
+        
+        # Get project info for tagging
+        project = await db.projects.find_one({"id": project_id})
+        project_name = project.get("name", "Unknown Project") if project else "Unknown Project"
+        room_name = photo.get("room_name", "Unknown Room")
+        
+        # Decode base64 image
+        image_data_base64 = photo.get("image_data", "")
+        if image_data_base64.startswith("data:image"):
+            image_data_base64 = image_data_base64.split(",")[1]
+        
+        import base64
+        image_bytes = base64.b64decode(image_data_base64)
+        
+        # Generate filename
+        filename = f"{project_name}_{room_name}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.jpg"
+        
+        # Upload to Canva
+        asset = await canva_integration.upload_image_to_canva(
+            image_data=image_bytes,
+            filename=filename,
+            project_name=project_name,
+            room_name=room_name
+        )
+        
+        # Store Canva asset ID in photo document
+        await db.photos.update_one(
+            {"id": photo_id},
+            {"$set": {"canva_asset_id": asset["id"], "uploaded_to_canva_at": datetime.utcnow()}}
+        )
+        
+        return {
+            "success": True,
+            "message": f"Photo uploaded to Canva successfully!",
+            "asset_id": asset["id"],
+            "asset_name": asset["name"]
+        }
+    
+    except Exception as e:
+        logger.error(f"Canva upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/canva/upload-room-photos")
+async def upload_room_photos_to_canva(
+    project_id: str,
+    room_id: str
+):
+    """Upload all photos from a specific room to Canva."""
+    try:
+        # Get all photos for this room
+        photos_cursor = db.photos.find({
+            "project_id": project_id,
+            "room_id": room_id
+        })
+        
+        photos = await photos_cursor.to_list(length=100)
+        
+        if not photos:
+            raise HTTPException(status_code=404, detail="No photos found for this room")
+        
+        # Get project and room info
+        project = await db.projects.find_one({"id": project_id})
+        project_name = project.get("name", "Unknown Project") if project else "Unknown Project"
+        
+        # Find room name
+        room_name = "Unknown Room"
+        if project:
+            for room in project.get("rooms", []):
+                if room.get("id") == room_id:
+                    room_name = room.get("name", "Unknown Room")
+                    break
+        
+        uploaded_assets = []
+        
+        # Upload each photo
+        for photo in photos:
+            try:
+                # Decode base64 image
+                image_data_base64 = photo.get("image_data", "")
+                if image_data_base64.startswith("data:image"):
+                    image_data_base64 = image_data_base64.split(",")[1]
+                
+                import base64
+                image_bytes = base64.b64decode(image_data_base64)
+                
+                # Generate filename
+                filename = f"{project_name}_{room_name}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.jpg"
+                
+                # Upload to Canva
+                asset = await canva_integration.upload_image_to_canva(
+                    image_data=image_bytes,
+                    filename=filename,
+                    project_name=project_name,
+                    room_name=room_name
+                )
+                
+                # Update photo with Canva asset ID
+                await db.photos.update_one(
+                    {"id": photo["id"]},
+                    {"$set": {"canva_asset_id": asset["id"], "uploaded_to_canva_at": datetime.utcnow()}}
+                )
+                
+                uploaded_assets.append({
+                    "photo_id": photo["id"],
+                    "asset_id": asset["id"],
+                    "asset_name": asset["name"]
+                })
+            
+            except Exception as e:
+                logger.error(f"Failed to upload photo {photo.get('id')}: {str(e)}")
+        
+        return {
+            "success": True,
+            "message": f"Uploaded {len(uploaded_assets)} photos to Canva!",
+            "uploaded_count": len(uploaded_assets),
+            "assets": uploaded_assets
+        }
+    
+    except Exception as e:
+        logger.error(f"Bulk upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/canva/create-room-board")
+async def create_room_design_board(
+    project_id: str,
+    room_id: str
+):
+    """Create a Canva design board for a specific room."""
+    try:
+        # Get project and room info
+        project = await db.projects.find_one({"id": project_id})
+        
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        project_name = project.get("name", "Unknown Project")
+        
+        # Find room name
+        room_name = "Unknown Room"
+        for room in project.get("rooms", []):
+            if room.get("id") == room_id:
+                room_name = room.get("name", "Unknown Room")
+                break
+        
+        # Create design board
+        board_title = f"{project_name} - {room_name} Board"
+        
+        design = await canva_integration.create_design_board(title=board_title)
+        
+        return {
+            "success": True,
+            "message": f"Design board created for {room_name}!",
+            "design_id": design["design"]["id"],
+            "design_url": design["design"]["urls"]["view_url"]
+        }
+    
+    except Exception as e:
+        logger.error(f"Design board creation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
