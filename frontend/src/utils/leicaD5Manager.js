@@ -278,10 +278,32 @@ export class LeicaD5Manager {
     }
 
     try {
-      console.log('📖 Reading measurement...');
       const value = await this.measurementCharacteristic.readValue();
+      
+      // Create a hash of the raw bytes to detect changes
+      let rawHash = '';
+      for (let i = 0; i < value.byteLength; i++) {
+        rawHash += value.getUint8(i).toString(16).padStart(2, '0');
+      }
+      
+      // Only process if the value has CHANGED
+      if (rawHash === this.lastRawValue) {
+        // Same value, no new measurement
+        return null;
+      }
+      
+      console.log('🆕 NEW measurement detected! (value changed)');
+      this.lastRawValue = rawHash;
+      
       const measurement = this.parseMeasurement(value);
-      console.log('📏 Measurement read:', measurement);
+      
+      if (!measurement) {
+        console.error('❌ Failed to parse measurement');
+        return null;
+      }
+      
+      console.log('📏 NEW Measurement:', measurement.feetInches, `(${measurement.meters}m)`);
+      this.lastMeasurement = measurement;
       
       if (this.onMeasurement) {
         this.onMeasurement(measurement);
@@ -290,7 +312,7 @@ export class LeicaD5Manager {
       return measurement;
     } catch (error) {
       console.error('❌ Failed to read measurement:', error);
-      throw error;
+      return null;
     }
   }
   
