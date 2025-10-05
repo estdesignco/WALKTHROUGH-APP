@@ -96,31 +96,79 @@ export class LeicaD5Manager {
         }
       }
 
-      // Get service with timeout
-      console.log('📡 Getting Leica service...');
-      this.service = await Promise.race([
-        this.server.getPrimaryService(this.SERVICE_UUID),
+      // Get ALL services and discover the actual UUIDs
+      console.log('📡 Discovering all services...');
+      const services = await Promise.race([
+        this.server.getPrimaryServices(),
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Service discovery timeout')), 15000)
         )
       ]);
-      console.log('✅ Service obtained');
+      
+      console.log(`✅ Found ${services.length} services`);
+      
+      // Log all services and characteristics for debugging
+      for (const service of services) {
+        console.log(`📡 Service: ${service.uuid}`);
+        try {
+          const chars = await service.getCharacteristics();
+          for (const char of chars) {
+            console.log(`  📊 Characteristic: ${char.uuid} - Properties: ${char.properties.map(p => p).join(', ')}`);
+          }
+        } catch (e) {
+          console.log(`  ⚠️ Could not get characteristics: ${e.message}`);
+        }
+      }
+      
+      // Try to find the Leica-specific service, or use any available service
+      let targetService = services.find(s => s.uuid.toLowerCase() === this.SERVICE_UUID.toLowerCase());
+      
+      if (!targetService && services.length > 0) {
+        // Use first non-standard service (not generic access or device info)
+        targetService = services.find(s => 
+          !s.uuid.startsWith('0000180') && 
+          !s.uuid.startsWith('0000181')
+        );
+      }
+      
+      if (!targetService && services.length > 0) {
+        // Fall back to any service
+        targetService = services[0];
+      }
+      
+      if (!targetService) {
+        throw new Error('No usable service found on device');
+      }
+      
+      this.service = targetService;
+      console.log(`✅ Using service: ${this.service.uuid}`);
 
-      // Get characteristics with timeout
-      console.log('📊 Getting characteristics...');
-      const [measurementChar, commandChar] = await Promise.race([
-        Promise.all([
-          this.service.getCharacteristic(this.MEASUREMENT_CHAR_UUID),
-          this.service.getCharacteristic(this.COMMAND_CHAR_UUID)
-        ]),
+      // Get ALL characteristics from this service
+      console.log('📊 Getting all characteristics...');
+      const allChars = await Promise.race([
+        this.service.getCharacteristics(),
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Characteristic discovery timeout')), 15000)
         )
       ]);
       
-      this.measurementCharacteristic = measurementChar;
-      this.commandCharacteristic = commandChar;
-      console.log('✅ Characteristics obtained');
+      console.log(`✅ Found ${allChars.length} characteristics`);
+      
+      // Find writable and readable characteristics
+      this.commandCharacteristic = allChars.find(c => 
+        c.properties.write || c.properties.writeWithoutResponse
+      );
+      
+      this.measurementCharacteristic = allChars.find(c => 
+        c.properties.read || c.properties.notify
+      );
+      
+      if (this.commandCharacteristic) {
+        console.log(`✅ Command characteristic: ${this.commandCharacteristic.uuid}`);
+      }
+      if (this.measurementCharacteristic) {
+        console.log(`✅ Measurement characteristic: ${this.measurementCharacteristic.uuid}`);
+      }
 
       // Start notifications for measurements
       await this.startMeasurementNotifications();
