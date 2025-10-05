@@ -80,14 +80,20 @@ function MobileHomeScreen({ onNavigate }) {
 function ProjectMenuScreen({ project, onNavigate }) {
   return (
     <div className="h-full overflow-auto p-6 md:p-8 lg:p-12 bg-black">
-      {/* Logo Header - iPad Optimized */}
-      <div className="text-center mb-6 md:mb-8 py-3 bg-gradient-to-b from-[#1a1a1a] to-black">
-        <img 
-          src={`${process.env.PUBLIC_URL}/established-logo.png`}
-          alt="ESTABLISHED" 
-          className="mx-auto h-12 md:h-16 object-contain"
-          style={{ maxWidth: '220px' }}
-        />
+      {/* Logo Header - Black logo on gold container */}
+      <div className="text-center mb-6 md:mb-8">
+        <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#BCA888] p-0">
+          <img 
+            src={`${process.env.PUBLIC_URL}/established-logo.png`}
+            alt="ESTABLISHED" 
+            className="h-12 md:h-16 object-contain"
+            style={{ 
+              maxWidth: '220px',
+              filter: 'brightness(0)',
+              display: 'block'
+            }}
+          />
+        </div>
       </div>
       
       <div className="max-w-5xl mx-auto">
@@ -175,14 +181,20 @@ function MobileProjectListScreen({ onNavigate, onSelectProject }) {
 
   return (
     <div className="h-full overflow-auto p-6 md:p-8 lg:p-12 bg-black">
-      {/* Logo Header - iPad Optimized */}
-      <div className="text-center mb-6 md:mb-8 py-3 bg-gradient-to-b from-[#1a1a1a] to-black">
-        <img 
-          src={`${process.env.PUBLIC_URL}/established-logo.png`}
-          alt="ESTABLISHED" 
-          className="mx-auto h-12 md:h-16 object-contain"
-          style={{ maxWidth: '220px' }}
-        />
+      {/* Logo Header - Black logo on gold container */}
+      <div className="text-center mb-6 md:mb-8">
+        <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#BCA888] p-0">
+          <img 
+            src={`${process.env.PUBLIC_URL}/established-logo.png`}
+            alt="ESTABLISHED" 
+            className="h-12 md:h-16 object-contain"
+            style={{ 
+              maxWidth: '220px',
+              filter: 'brightness(0)',
+              display: 'block'
+            }}
+          />
+        </div>
       </div>
       
       <div className="max-w-5xl mx-auto">
