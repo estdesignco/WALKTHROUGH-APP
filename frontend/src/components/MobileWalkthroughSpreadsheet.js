@@ -436,12 +436,13 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                             </td>
                             
                             {/* ITEM NAME - Click to Edit */}
-                            <td className="border border-gray-400 px-3 py-2 text-white text-sm">
+                            <td className="border border-gray-400 px-3 py-2 text-white text-sm whitespace-nowrap">
                               <div 
                                 contentEditable
                                 suppressContentEditableWarning
                                 onBlur={(e) => updateItemOffline(item.id, { name: e.target.textContent })}
-                                className="font-bold outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[100px]"
+                                className="font-bold outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded"
+                                style={{ minWidth: 'max-content' }}
                               >
                                 {item.name}
                               </div>
