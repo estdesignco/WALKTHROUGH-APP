@@ -197,9 +197,14 @@ export class LeicaD5Manager {
       }
 
       // Start notifications for measurements, fall back to polling if needed
-      const notificationsStarted = await this.startMeasurementNotifications();
-      if (!notificationsStarted) {
-        console.log('💡 Falling back to polling mode (every 2 seconds)');
+      try {
+        const notificationsStarted = await this.startMeasurementNotifications();
+        if (!notificationsStarted) {
+          console.log('💡 Falling back to polling mode (every 2 seconds)');
+          this.startPolling(2000); // Poll every 2 seconds
+        }
+      } catch (notificationError) {
+        console.warn('⚠️ Notification setup failed, using polling mode:', notificationError.message);
         this.startPolling(2000); // Poll every 2 seconds
       }
 
