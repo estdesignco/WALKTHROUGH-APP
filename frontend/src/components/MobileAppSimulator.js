@@ -164,9 +164,18 @@ function MobileProjectListScreen({ onNavigate, onSelectProject }) {
 
   return (
     <div className="h-full overflow-auto p-4 bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
+      {/* Logo Header */}
+      <div className="text-center mb-4">
+        <img 
+          src="/established-logo.png" 
+          alt="Company Logo" 
+          className="mx-auto h-12 mb-3 object-contain"
+        />
+      </div>
+      
       <button 
         onClick={() => onNavigate('home')}
-        className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold hover:from-[#3a3a4a] hover:to-[#2a2a3a] transition-all"
+        className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold hover-from-[#3a3a4a] hover:to-[#2a2a3a] transition-all"
       >
         ← Back
       </button>
