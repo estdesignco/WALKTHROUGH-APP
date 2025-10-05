@@ -9,7 +9,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 // ===== HOME SCREEN =====
 function MobileHomeScreen({ onNavigate }) {
   return (
-    <div className="h-full overflow-auto p-4 bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
+    <div className="h-full overflow-auto p-4 bg-black">
       {/* Logo Header */}
       <div className="text-center mb-6">
         <img 
@@ -20,15 +20,15 @@ function MobileHomeScreen({ onNavigate }) {
         <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">
           Interior Design Manager
         </h1>
-        <p className="text-gray-400 text-sm">On-Site Project Management</p>
+        <p className="text-[#D4A574] text-sm">On-Site Project Management</p>
       </div>
 
       <div className="space-y-3 mb-6">
         <button
           onClick={() => onNavigate('projects')}
-          className="w-full bg-gradient-to-br from-[#2a2a3a] to-[#1a1a2a] hover:from-[#3a3a4a] hover:to-[#2a2a3a] rounded-2xl p-6 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4C5A9]/30"
+          className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-2xl p-6 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border border-[#D4A574]/50"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div className="relative z-10">
             <div className="text-4xl mb-2">📋</div>
             <div className="text-lg font-bold text-[#D4C5A9]">Projects</div>
@@ -36,26 +36,26 @@ function MobileHomeScreen({ onNavigate }) {
           </div>
         </button>
 
-        <div className="grid grid-cols-3 gap-2">
-          <button className="bg-gradient-to-br from-[#1a1a2a] to-[#0a0a1a] rounded-xl p-3 border-2 border-[#D4C5A9]/20">
+        <div className="grid grid-cols-3 gap-3">
+          <button className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border border-[#D4A574]/50 hover:border-[#D4A574] transition-all">
             <div className="text-2xl mb-1">📸</div>
             <div className="text-xs font-bold text-[#D4C5A9]">Photos</div>
           </button>
 
-          <button className="bg-gradient-to-br from-[#1a1a2a] to-[#0a0a1a] rounded-xl p-3 border-2 border-[#D4C5A9]/20">
+          <button className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border border-[#D4A574]/50 hover:border-[#D4A574] transition-all">
             <div className="text-2xl mb-1">📏</div>
             <div className="text-xs font-bold text-[#D4C5A9]">Measure</div>
           </button>
 
-          <button className="bg-gradient-to-br from-[#1a1a2a] to-[#0a0a1a] rounded-xl p-3 border-2 border-[#D4C5A9]/20">
+          <button className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border border-[#D4A574]/50 hover:border-[#D4A574] transition-all">
             <div className="text-2xl mb-1">🔄</div>
             <div className="text-xs font-bold text-[#D4C5A9]">Sync</div>
           </button>
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#1a1a2a]/80 to-[#0a0a1a]/60 rounded-2xl p-4 border-2 border-[#D4C5A9]/20 backdrop-blur-sm">
-        <p className="font-bold text-[#D4C5A9] mb-3 text-lg">✨ Jobsite Features</p>
+      <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-4 border border-[#D4A574]/50">
+        <p className="font-bold text-[#D4A574] mb-3 text-lg">✨ Jobsite Features</p>
         <div className="space-y-2 text-sm text-gray-300">
           <p>• Full Walkthrough spreadsheet</p>
           <p>• <strong className="text-[#D4C5A9]">FF&E Bible</strong> - Your complete inventory</p>
