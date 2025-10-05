@@ -89,22 +89,26 @@ export class LeicaD5Manager {
 
       // Connect to GATT server with extended timeout and retry
       console.log('🔗 Connecting to GATT server...');
-      let retries = 4;
+      console.log('💡 Tip: Make sure Leica D5 is ON and not connected to another device');
+      
+      let retries = 3;
       let lastError = null;
       
       while (retries > 0) {
         try {
-          // Extended timeout to 60 seconds for first connection
-          const timeout = retries === 4 ? 60000 : 30000;
+          // Simple connection with 90 second timeout
+          const timeout = 90000;
+          
+          console.log(`🔌 Attempt ${4 - retries}/3 - Please wait up to 90 seconds...`);
           
           this.server = await Promise.race([
             this.device.gatt.connect(),
             new Promise((_, reject) => 
-              setTimeout(() => reject(new Error(`Connection timeout after ${timeout/1000}s`)), timeout)
+              setTimeout(() => reject(new Error(`Connection timeout after ${timeout/1000}s - Try turning Leica OFF and ON`)), timeout)
             )
           ]);
           
-          console.log('✅ Connected to GATT server');
+          console.log('✅ Connected to GATT server successfully!');
           lastError = null;
           break;
           
@@ -114,11 +118,13 @@ export class LeicaD5Manager {
           
           if (retries === 0) {
             console.error('❌ All connection attempts failed');
-            throw new Error(`Connection failed after all retries: ${err.message}`);
+            console.error('💡 Troubleshooting: 1) Turn Leica OFF and back ON, 2) Make sure it\'s not connected to another device, 3) Move closer to Leica');
+            throw new Error(`Connection failed: ${err.message}`);
           }
           
-          console.log(`⚠️ Retry connection... (${retries} attempts left)`);
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          console.log(`⚠️ Connection failed, retrying... (${retries} attempts left)`);
+          console.log(`   Error was: ${err.message}`);
+          await new Promise(resolve => setTimeout(resolve, 5000));
         }
       }
 
