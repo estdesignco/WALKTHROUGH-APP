@@ -351,6 +351,38 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
           </div>
         ) : (
           <div className="space-y-4">
+            {/* Arrow Controls */}
+            <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-[#D4A574]/50 rounded-2xl p-4 space-y-3">
+              {/* Draw Mode Toggle */}
+              <button
+                onClick={() => setDrawMode(!drawMode)}
+                className={`w-full px-6 py-4 rounded-xl font-bold text-lg transition-all ${
+                  drawMode
+                    ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
+                    : 'bg-gradient-to-r from-gray-700 to-gray-800 text-gray-300'
+                }`}
+              >
+                {drawMode ? '✏️ Draw Mode ON - Tap to draw arrows' : '👁️ View Mode - Tap to enable drawing'}
+              </button>
+              
+              {/* Color Picker */}
+              {drawMode && (
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-[#D4A574] font-bold">Arrow Color:</span>
+                  {['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#FFFFD2'].map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setArrowColor(color)}
+                      className={`w-12 h-12 rounded-full border-4 transition-all ${
+                        arrowColor === color ? 'border-white scale-110' : 'border-gray-600 hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+            
             {/* Photo with annotations */}
             <div className="relative border border-gray-700 rounded-lg overflow-hidden">
               <div
