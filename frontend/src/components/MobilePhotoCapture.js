@@ -27,6 +27,43 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
     reader.readAsDataURL(file);
   };
 
+  // Connect to Leica D5
+  const connectLeica = async () => {
+    if (!leicaManager.isSupported()) {
+      alert('❌ Web Bluetooth not supported.\n\nPlease use:\n- Chrome on Android\n- Chrome on desktop\n\n(iOS Safari does not support Web Bluetooth)');
+      return;
+    }
+
+    try {
+      setConnecting(true);
+      const result = await leicaManager.connect();
+      
+      setLeicaConnected(true);
+      alert(`✅ Connected to ${result.deviceName}!\n\nPress the button on your Leica to take a measurement.`);
+
+      // Set up measurement callback
+      leicaManager.setOnMeasurement((measurement) => {
+        console.log('📏 Measurement received:', measurement);
+        setLastMeasurement(measurement);
+        setMeasurementText(measurement.feetInches);
+      });
+
+    } catch (error) {
+      console.error('Connection error:', error);
+      alert(`❌ Failed to connect:\n${error.message}\n\nMake sure:\n1. Leica D5 is powered on\n2. Bluetooth is enabled\n3. Device is in pairing mode`);
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  // Disconnect from Leica D5
+  const disconnectLeica = async () => {
+    await leicaManager.disconnect();
+    setLeicaConnected(false);
+    setLastMeasurement(null);
+    alert('✅ Disconnected from Leica D5');
+  };
+
   const handleCanvasClick = (event) => {
     if (!capturedPhoto) return;
 
