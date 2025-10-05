@@ -64,23 +64,38 @@ class CanvaIntegration:
             "redirect_uri": self.redirect_uri
         }
         
+        # More comprehensive browser-like headers to bypass Cloudflare
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "application/json",
-            "Accept-Language": "en-US,en;q=0.9"
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Origin": "https://www.canva.com",
+            "Referer": "https://www.canva.com/",
+            "Sec-Ch-Ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+            "Sec-Ch-Ua-Mobile": "?0",
+            "Sec-Ch-Ua-Platform": '"macOS"',
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "same-origin",
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache"
         }
         
-        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=False) as client:
             response = await client.post(
                 self.token_url,
                 data=data,
                 headers=headers
             )
             
+            logger.info(f"Token exchange response status: {response.status_code}")
+            logger.info(f"Token exchange response headers: {dict(response.headers)}")
+            
             if response.status_code != 200:
-                logger.error(f"Token exchange failed: {response.text}")
-                raise Exception(f"Failed to get access token: {response.text}")
+                logger.error(f"Token exchange failed: {response.text[:500]}")
+                raise Exception(f"Failed to get access token: Status {response.status_code}")
             
             token_data = response.json()
             
