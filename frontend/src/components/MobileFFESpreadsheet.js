@@ -455,37 +455,19 @@ export default function MobileFFESpreadsheet({ projectId }) {
                       <React.Fragment key={subcategory.id}>
                         {subcategory.items?.map((item) => (
                           <tr key={item.id} className="hover:bg-gray-800">
-                            {/* INSTALLED - Show item name - Editable */}
+                            {/* INSTALLED - Show item name - Plain Text */}
                             <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                              <input
-                                type="text"
-                                value={item.name}
-                                onChange={(e) => updateItem(item.id, { name: e.target.value })}
-                                className="w-full bg-transparent text-white font-bold text-sm border-none focus:outline-none focus:bg-gray-800 px-1 py-1 rounded"
-                              />
+                              <div className="font-bold">{item.name}</div>
                             </td>
                             
-                            {/* QTY - Editable */}
+                            {/* QTY - Plain Text */}
                             <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
-                              <input
-                                type="number"
-                                value={item.quantity || ''}
-                                onChange={(e) => updateItem(item.id, { quantity: e.target.value })}
-                                placeholder="-"
-                                className="w-full bg-transparent text-white text-sm text-center border-none focus:outline-none focus:bg-gray-800 px-1 py-1 rounded"
-                                min="1"
-                              />
+                              {item.quantity || '-'}
                             </td>
                             
-                            {/* SIZE - Editable */}
+                            {/* SIZE - Plain Text */}
                             <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                              <input
-                                type="text"
-                                value={item.size || ''}
-                                onChange={(e) => updateItem(item.id, { size: e.target.value })}
-                                placeholder="-"
-                                className="w-full bg-transparent text-white text-sm border-none focus:outline-none focus:bg-gray-800 px-1 py-1 rounded"
-                              />
+                              {item.size || '-'}
                             </td>
                             
                             {/* STATUS */}
