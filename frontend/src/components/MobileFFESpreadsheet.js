@@ -225,58 +225,62 @@ export default function MobileFFESpreadsheet({ projectId }) {
         </div>
       )}
       
-      {/* ACTION BUTTONS */}
-      <div className="p-4 border-b border-gray-700 flex flex-wrap gap-2">
-        <button
-          onClick={() => setShowAddRoom(true)}
-          className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded text-sm"
-        >
-          ➕ ROOM
-        </button>
-        
-        <button
-          onClick={() => setShowAddItem(true)}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded text-sm"
-        >
-          ➕ ITEM
-        </button>
-        
-        <button
-          onClick={() => setShowQuickAdd(true)}
-          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded text-sm"
-        >
-          ⚡ TEMPLATES
-        </button>
-        
-        <button
-          onClick={() => {
-            if (project?.rooms?.length > 0) {
-              setSelectedRoomForPhoto(project.rooms[0]);
-              setShowPhotoCapture(true);
-            } else {
-              alert('Please add a room first');
-            }
-          }}
-          className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-3 rounded text-sm"
-        >
-          📸 PHOTO
-        </button>
-        
-        <button
-          onClick={() => setShowSearch(!showSearch)}
-          className={`flex-1 ${showSearch ? 'bg-yellow-600' : 'bg-gray-600'} hover:bg-yellow-700 text-white font-bold py-2 px-3 rounded text-sm`}
-        >
-          🔍 SEARCH
-        </button>
-        
-        {online && pendingCount > 0 && (
+      {/* ACTION BUTTONS - Beautiful Muted Colors */}
+      <div className="p-4 border-b border-[#D4A574]/20 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a]">
+        <div className="grid grid-cols-3 gap-2 mb-2">
           <button
-            onClick={performSync}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded text-sm"
+            onClick={() => setShowAddRoom(true)}
+            className="bg-gradient-to-br from-[#4a7c59]/80 to-[#3a5c49]/80 hover:from-[#5a8c69] hover:to-[#4a6c59] text-white font-bold py-3 px-3 rounded-lg text-xs shadow-lg border border-[#5a8c69]/30 transition-all"
           >
-            🔄 ({pendingCount})
+            ➕ ROOM
           </button>
-        )}
+          
+          <button
+            onClick={() => setShowAddItem(true)}
+            className="bg-gradient-to-br from-[#5a7a9a]/80 to-[#4a5a7a]/80 hover:from-[#6a8aaa] hover:to-[#5a6a8a] text-white font-bold py-3 px-3 rounded-lg text-xs shadow-lg border border-[#6a8aaa]/30 transition-all"
+          >
+            ➕ ITEM
+          </button>
+          
+          <button
+            onClick={() => setShowQuickAdd(true)}
+            className="bg-gradient-to-br from-[#7a6a9a]/80 to-[#5a4a7a]/80 hover:from-[#8a7aaa] hover:to-[#6a5a8a] text-white font-bold py-3 px-3 rounded-lg text-xs shadow-lg border border-[#8a7aaa]/30 transition-all"
+          >
+            ⚡ QUICK
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            onClick={() => setShowPhotoManagement(true)}
+            className="bg-gradient-to-br from-[#D4A574]/80 to-[#B48554]/80 hover:from-[#E4B584] hover:to-[#C49564] text-black font-bold py-3 px-3 rounded-lg text-xs shadow-lg border border-[#D4A574]/50 transition-all"
+          >
+            📸 PHOTOS
+          </button>
+          
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            className={`bg-gradient-to-br ${showSearch ? 'from-[#D4C5A9]/90 to-[#B4A589]/90' : 'from-[#6a6a6a]/80 to-[#4a4a4a]/80'} hover:from-[#D4C5A9] hover:to-[#B4A589] text-${showSearch ? 'black' : 'white'} font-bold py-3 px-3 rounded-lg text-xs shadow-lg border border-[#D4C5A9]/30 transition-all`}
+          >
+            🔍 SEARCH
+          </button>
+          
+          {online && pendingCount > 0 ? (
+            <button
+              onClick={performSync}
+              className="bg-gradient-to-br from-[#9a7a9a]/80 to-[#7a5a7a]/80 hover:from-[#aa8aaa] hover:to-[#8a6a8a] text-white font-bold py-3 px-3 rounded-lg text-xs shadow-lg border border-[#aa8aaa]/30 transition-all"
+            >
+              🔄 ({pendingCount})
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowStats(true)}
+              className="bg-gradient-to-br from-[#7a8a9a]/80 to-[#5a6a7a]/80 hover:from-[#8a9aaa] hover:to-[#6a7a8a] text-white font-bold py-3 px-3 rounded-lg text-xs shadow-lg border border-[#8a9aaa]/30 transition-all"
+            >
+              📊 STATS
+            </button>
+          )}
+        </div>
       </div>
       
       {/* SEARCH & FILTER PANEL */}
