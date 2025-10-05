@@ -6,15 +6,18 @@ const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
 export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, onClose }) {
   const [capturedPhoto, setCapturedPhoto] = useState(null);
-  const [measurements, setMeasurements] = useState([]);
+  const [measurements, setMeasurements] = useState([]); // Now stores {x1, y1, x2, y2, text}
   const [notes, setNotes] = useState('');
   const [uploading, setUploading] = useState(false);
   const [measurementText, setMeasurementText] = useState('');
   const [leicaConnected, setLeicaConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [lastMeasurement, setLastMeasurement] = useState(null);
+  const [drawingArrow, setDrawingArrow] = useState(null); // {x1, y1, x2, y2} while drawing
+  const [currentMeasurement, setCurrentMeasurement] = useState(''); // Text for current arrow
   const fileInputRef = useRef(null);
   const canvasRef = useRef(null);
+  const imageRef = useRef(null);
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
