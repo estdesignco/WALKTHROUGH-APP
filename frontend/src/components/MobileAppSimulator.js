@@ -11,11 +11,12 @@ function MobileHomeScreen({ onNavigate }) {
   return (
     <div className="h-full overflow-auto p-4 bg-black">
       {/* Logo Header */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-6 py-2 bg-gradient-to-b from-[#1a1a1a] to-black">
         <img 
-          src="/established-logo.png" 
-          alt="Company Logo" 
-          className="mx-auto h-16 mb-4 object-contain"
+          src={`${process.env.PUBLIC_URL}/established-logo.png`}
+          alt="ESTABLISHED" 
+          className="mx-auto h-14 mb-3 object-contain"
+          style={{ maxWidth: '200px' }}
         />
         <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">
           Interior Design Manager
