@@ -169,6 +169,15 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
+      {/* Logo Header */}
+      <div className="text-center py-3 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border-b border-[#D4A574]/20">
+        <img 
+          src="/established-logo.png" 
+          alt="Company Logo" 
+          className="mx-auto h-10 object-contain"
+        />
+      </div>
+      
       {/* Header */}
       <div className="bg-gray-900 p-4 border-b border-gray-700">
         <div className="flex justify-between items-center mb-3">
