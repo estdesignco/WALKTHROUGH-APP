@@ -494,7 +494,15 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
                       pointerEvents: 'auto'
                     }}
                   >
-                    <div className="bg-black bg-opacity-90 text-yellow-400 px-3 py-1 rounded-lg text-base md:text-lg font-bold whitespace-nowrap shadow-lg border border-yellow-400">
+                    <div 
+                      className="bg-black bg-opacity-90 px-3 py-1 rounded-lg text-base md:text-lg font-bold whitespace-nowrap shadow-lg"
+                      style={{ 
+                        color: m.color || '#FFD700',
+                        borderWidth: '2px',
+                        borderStyle: 'solid',
+                        borderColor: m.color || '#FFD700'
+                      }}
+                    >
                       {m.text}
                       <button
                         onClick={(e) => {
