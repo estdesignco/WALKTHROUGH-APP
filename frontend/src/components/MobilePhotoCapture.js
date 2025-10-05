@@ -324,7 +324,9 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
             <div className="relative border border-gray-700 rounded-lg overflow-hidden">
               <div
                 ref={canvasRef}
-                onClick={handleCanvasClick}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
                 className="relative cursor-crosshair"
                 style={{
                   backgroundImage: `url(${capturedPhoto})`,
