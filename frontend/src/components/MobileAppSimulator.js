@@ -10,14 +10,20 @@ const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 function MobileHomeScreen({ onNavigate }) {
   return (
     <div className="h-full overflow-auto p-6 md:p-8 lg:p-12 bg-black">
-      {/* Logo Header - Larger for iPad */}
-      <div className="text-center mb-8 md:mb-12 py-4 bg-gradient-to-b from-[#1a1a1a] to-black">
-        <img 
-          src={`${process.env.PUBLIC_URL}/established-logo.png`}
-          alt="ESTABLISHED" 
-          className="mx-auto h-16 md:h-20 lg:h-24 mb-4 object-contain"
-          style={{ maxWidth: '280px' }}
-        />
+      {/* Logo Header - Black logo on gold container */}
+      <div className="text-center mb-8 md:mb-12">
+        <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#BCA888] p-0 mb-4">
+          <img 
+            src={`${process.env.PUBLIC_URL}/established-logo.png`}
+            alt="ESTABLISHED" 
+            className="h-16 md:h-20 lg:h-24 object-contain"
+            style={{ 
+              maxWidth: '280px',
+              filter: 'brightness(0)',
+              display: 'block'
+            }}
+          />
+        </div>
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-3 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">
           Interior Design Manager
         </h1>
