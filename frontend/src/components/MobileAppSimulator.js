@@ -10,7 +10,13 @@ const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 function MobileHomeScreen({ onNavigate }) {
   return (
     <div className="h-full overflow-auto p-4 bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
-      <div className="text-center mb-8">
+      {/* Logo Header */}
+      <div className="text-center mb-6">
+        <img 
+          src="/established-logo.png" 
+          alt="Company Logo" 
+          className="mx-auto h-16 mb-4 object-contain"
+        />
         <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">
           Interior Design Manager
         </h1>
