@@ -98,6 +98,15 @@ export default function MobilePhotoManagement({ projectId, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black z-50 overflow-auto">
+      {/* Logo Header */}
+      <div className="text-center py-3 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border-b border-[#D4A574]/20">
+        <img 
+          src="/established-logo.png" 
+          alt="Company Logo" 
+          className="mx-auto h-10 object-contain"
+        />
+      </div>
+      
       {/* Header */}
       <div className="bg-gray-900 p-4 border-b border-[#D4A574]/60 flex justify-between items-center sticky top-0 z-10">
         <h2 className="text-xl font-bold text-[#D4A574]">📸 PHOTO MANAGEMENT</h2>
