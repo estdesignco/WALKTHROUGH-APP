@@ -6328,6 +6328,10 @@ async def upload_photo(request: PhotoUploadRequest):
 async def get_photos_by_room(project_id: str, room_id: str):
     """Get all photos for a specific room"""
     try:
+        # Get photo folder info
+        photo_folder = await db.photo_folders.find_one({"room_id": room_id})
+        
+        # Get all photos
         photos = await db.photos.find({
             "project_id": project_id,
             "room_id": room_id
@@ -6337,10 +6341,14 @@ async def get_photos_by_room(project_id: str, room_id: str):
         for photo in photos:
             photo.pop('_id', None)
         
+        if photo_folder:
+            photo_folder.pop('_id', None)
+        
         return {
             "success": True,
             "photos": photos,
-            "count": len(photos)
+            "count": len(photos),
+            "folder": photo_folder
         }
         
     except Exception as e:
