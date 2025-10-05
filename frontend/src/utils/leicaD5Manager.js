@@ -322,10 +322,13 @@ export class LeicaD5Manager {
       clearInterval(this.pollingInterval);
     }
     
-    console.log('🔄 Starting measurement polling...');
+    console.log('🔄 Starting measurement polling (checking for changes every second)...');
+    console.log('💡 Press the measurement button on your Leica D5 to take a new reading');
+    
     this.pollingInterval = setInterval(async () => {
       try {
-        await this.readMeasurement();
+        const measurement = await this.readMeasurement();
+        // readMeasurement returns null if no change, so no spam
       } catch (error) {
         // Silently fail during polling
       }
