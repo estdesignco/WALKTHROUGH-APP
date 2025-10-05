@@ -58,18 +58,19 @@ export default function MobilePhotoManagement({ projectId, onClose }) {
     if (!leicaManager.isSupported()) {
       let message = '❌ Web Bluetooth NOT SUPPORTED\n\n';
       
-      if (browserInfo.isIOS) {
-        message += '⚠️ iOS/iPadOS DOES NOT SUPPORT Web Bluetooth\n\n';
+      if (browserInfo.isChromeOnIOS) {
+        message += '⚠️ CHROME ON iPAD USES SAFARI ENGINE\n\n';
+        message += 'Web Bluetooth does NOT work on iOS/iPadOS\n';
+        message += '(This is an Apple limitation, not a Chrome issue)\n\n';
         message += '✅ TO USE LEICA D5:\n';
-        message += '1. Use Chrome on Android tablet\n';
-        message += '2. Use Chrome on Windows laptop\n';
-        message += '3. Use Chrome on Mac desktop\n\n';
-        message += '📱 Safari on iPhone/iPad will NEVER work for Bluetooth';
+        message += '• Chrome on Android tablet\n';
+        message += '• Chrome on Windows/Mac DESKTOP\n\n';
+        message += '❌ Will NOT work on any iPad browser';
       } else if (browserInfo.isSafari) {
         message += '⚠️ Safari does NOT support Web Bluetooth\n\n';
         message += '✅ Please use Chrome or Edge browser';
       } else {
-        message += '✅ Please use:\n- Chrome on Android\n- Chrome/Edge on desktop';
+        message += '✅ Please use:\n• Chrome on Android\n• Chrome/Edge on desktop';
       }
       
       alert(message);
