@@ -10,6 +10,9 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
   const [notes, setNotes] = useState('');
   const [uploading, setUploading] = useState(false);
   const [measurementText, setMeasurementText] = useState('');
+  const [leicaConnected, setLeicaConnected] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [lastMeasurement, setLastMeasurement] = useState(null);
   const fileInputRef = useRef(null);
   const canvasRef = useRef(null);
 
