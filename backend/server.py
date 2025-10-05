@@ -6283,8 +6283,33 @@ async def upload_photo(request: PhotoUploadRequest):
             "synced": True
         }
         
-        # Store in MongoDB
+        # Store in MongoDB photos collection
         await db.photos.insert_one(photo)
+        
+        # Also add to photo folder if it exists
+        photo_folder = await db.photo_folders.find_one({"room_id": request.room_id})
+        if photo_folder:
+            await db.photo_folders.update_one(
+                {"room_id": request.room_id},
+                {
+                    "$push": {"photos": photo["id"]},
+                    "$set": {"updated_at": datetime.utcnow()}
+                }
+            )
+            logging.info(f"Photo added to folder for room {request.room_id}")
+        else:
+            # Create photo folder if it doesn't exist
+            new_folder = {
+                "id": str(uuid.uuid4()),
+                "room_id": request.room_id,
+                "project_id": request.project_id,
+                "folder_name": f"Room Photos",
+                "photos": [photo["id"]],
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.photo_folders.insert_one(new_folder)
+            logging.info(f"Created new photo folder for room {request.room_id}")
         
         logging.info(f"Photo uploaded for room {request.room_id}: {request.file_name}")
         
