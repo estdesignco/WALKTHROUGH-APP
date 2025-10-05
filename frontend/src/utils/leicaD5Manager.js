@@ -220,21 +220,83 @@ export class LeicaD5Manager {
   // Start listening for measurements
   async startMeasurementNotifications() {
     if (!this.measurementCharacteristic) {
-      throw new Error('Measurement characteristic not available');
+      console.warn('⚠️ No measurement characteristic available');
+      return false;
     }
 
     try {
+      // Check if characteristic supports notifications
+      if (!this.measurementCharacteristic.properties.notify) {
+        console.warn('⚠️ Characteristic does not support notifications, will use polling instead');
+        return false;
+      }
+
+      console.log('🔔 Starting measurement notifications...');
       await this.measurementCharacteristic.startNotifications();
-      console.log('✅ Measurement notifications started');
-
-      this.measurementCharacteristic.addEventListener(
-        'characteristicvaluechanged',
-        this.handleMeasurementChange.bind(this)
-      );
-
+      
+      this.measurementCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+        const value = event.target.value;
+        const measurement = this.parseMeasurement(value);
+        console.log('📏 Measurement received:', measurement);
+        
+        if (this.onMeasurement) {
+          this.onMeasurement(measurement);
+        }
+      });
+      
+      console.log('✅ Notifications started');
+      return true;
     } catch (error) {
       console.error('❌ Failed to start notifications:', error);
+      console.log('💡 Will fall back to polling mode');
+      return false;
+    }
+  }
+  
+  // Manually read measurement (for devices that don't support notifications)
+  async readMeasurement() {
+    if (!this.measurementCharacteristic) {
+      throw new Error('No measurement characteristic available');
+    }
+
+    try {
+      console.log('📖 Reading measurement...');
+      const value = await this.measurementCharacteristic.readValue();
+      const measurement = this.parseMeasurement(value);
+      console.log('📏 Measurement read:', measurement);
+      
+      if (this.onMeasurement) {
+        this.onMeasurement(measurement);
+      }
+      
+      return measurement;
+    } catch (error) {
+      console.error('❌ Failed to read measurement:', error);
       throw error;
+    }
+  }
+  
+  // Start polling for measurements (fallback when notifications not supported)
+  startPolling(intervalMs = 1000) {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
+    
+    console.log('🔄 Starting measurement polling...');
+    this.pollingInterval = setInterval(async () => {
+      try {
+        await this.readMeasurement();
+      } catch (error) {
+        // Silently fail during polling
+      }
+    }, intervalMs);
+  }
+  
+  stopPolling() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
+      console.log('⏹ Stopped polling');
     }
   }
 
