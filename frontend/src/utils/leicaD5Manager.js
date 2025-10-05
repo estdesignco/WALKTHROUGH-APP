@@ -341,25 +341,73 @@ export class LeicaD5Manager {
       
       let distanceMM;
       
-      // Method 1: Try ASCII string (Leica often sends as text)
-      const decoder = new TextDecoder('utf-8');
-      const asciiString = decoder.decode(dataView.buffer);
-      console.log('🔍 ASCII String:', asciiString);
+      // Try multiple parsing methods
+      let parsedSuccessfully = false;
       
-      // Try to parse as float/number from ASCII
-      const parsedFromString = parseFloat(asciiString.trim());
-      if (!isNaN(parsedFromString) && parsedFromString > 0 && parsedFromString < 100000) {
-        console.log('✅ Parsed from ASCII string:', parsedFromString, 'mm');
-        distanceMM = parsedFromString;
-      } else {
-        // Fallback: Method 2 - 32-bit integer little-endian
-        if (dataView.byteLength >= 4) {
-          distanceMM = dataView.getUint32(0, true);
-          console.log('🔍 Fallback to 32-bit LE:', distanceMM, 'mm');
-        } else if (dataView.byteLength >= 2) {
-          distanceMM = dataView.getUint16(0, true);
-          console.log('🔍 Fallback to 16-bit LE:', distanceMM, 'mm');
+      // Method 1: ASCII string
+      try {
+        const decoder = new TextDecoder('utf-8');
+        const asciiString = decoder.decode(dataView.buffer);
+        console.log('🔍 Method 1 - ASCII String:', JSON.stringify(asciiString));
+        
+        const cleaned = asciiString.replace(/[^\d.-]/g, '');
+        const parsedFromString = parseFloat(cleaned);
+        
+        if (!isNaN(parsedFromString) && parsedFromString > 0 && parsedFromString < 100000) {
+          console.log('✅ Method 1 SUCCESS:', parsedFromString, 'mm');
+          distanceMM = parsedFromString;
+          parsedSuccessfully = true;
         }
+      } catch (e) {
+        console.log('⚠️ Method 1 failed:', e.message);
+      }
+      
+      // Method 2: 32-bit float (some Leicas use this)
+      if (!parsedSuccessfully && dataView.byteLength >= 4) {
+        try {
+          const float32 = dataView.getFloat32(0, true);
+          console.log('🔍 Method 2 - 32-bit Float LE:', float32);
+          
+          if (!isNaN(float32) && float32 > 0 && float32 < 100000) {
+            console.log('✅ Method 2 SUCCESS:', float32, 'mm');
+            distanceMM = float32;
+            parsedSuccessfully = true;
+          }
+        } catch (e) {
+          console.log('⚠️ Method 2 failed:', e.message);
+        }
+      }
+      
+      // Method 3: 32-bit int (binary)
+      if (!parsedSuccessfully && dataView.byteLength >= 4) {
+        const int32 = dataView.getUint32(0, true);
+        console.log('🔍 Method 3 - 32-bit Int LE:', int32);
+        
+        // Check if it looks like millimeters (reasonable range)
+        if (int32 > 0 && int32 < 100000) {
+          console.log('✅ Method 3 SUCCESS:', int32, 'mm');
+          distanceMM = int32;
+          parsedSuccessfully = true;
+        } else {
+          console.log('⚠️ Method 3 - value out of range');
+        }
+      }
+      
+      // Method 4: Try reading just the first 2 bytes
+      if (!parsedSuccessfully && dataView.byteLength >= 2) {
+        const int16 = dataView.getUint16(0, true);
+        console.log('🔍 Method 4 - 16-bit Int LE:', int16);
+        
+        if (int16 > 0 && int16 < 100000) {
+          console.log('✅ Method 4 SUCCESS:', int16, 'mm');
+          distanceMM = int16;
+          parsedSuccessfully = true;
+        }
+      }
+      
+      if (!parsedSuccessfully) {
+        console.error('❌ ALL PARSING METHODS FAILED!');
+        return null;
       }
       
       // Convert to different units
