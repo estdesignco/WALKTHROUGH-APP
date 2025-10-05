@@ -199,7 +199,7 @@ export class LeicaD5Manager {
       // Start notifications for measurements, fall back to polling if needed
       const notificationsStarted = await this.startMeasurementNotifications();
       if (!notificationsStarted) {
-        console.log('💡 Falling back to polling mode');
+        console.log('💡 Falling back to polling mode (every 2 seconds)');
         this.startPolling(2000); // Poll every 2 seconds
       }
 
