@@ -455,19 +455,40 @@ export default function MobileFFESpreadsheet({ projectId }) {
                       <React.Fragment key={subcategory.id}>
                         {subcategory.items?.map((item) => (
                           <tr key={item.id} className="hover:bg-gray-800">
-                            {/* INSTALLED - Show item name - Plain Text */}
+                            {/* INSTALLED - Click to Edit */}
                             <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                              <div className="font-bold">{item.name}</div>
+                              <div
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => updateItem(item.id, { name: e.target.textContent })}
+                                className="font-bold outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[100px]"
+                              >
+                                {item.name}
+                              </div>
                             </td>
                             
-                            {/* QTY - Plain Text */}
+                            {/* QTY - Click to Edit */}
                             <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
-                              {item.quantity || '-'}
+                              <div
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => updateItem(item.id, { quantity: e.target.textContent })}
+                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[40px] inline-block"
+                              >
+                                {item.quantity || '-'}
+                              </div>
                             </td>
                             
-                            {/* SIZE - Plain Text */}
+                            {/* SIZE - Click to Edit */}
                             <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                              {item.size || '-'}
+                              <div
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => updateItem(item.id, { size: e.target.textContent })}
+                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[60px]"
+                              >
+                                {item.size || '-'}
+                              </div>
                             </td>
                             
                             {/* STATUS */}
