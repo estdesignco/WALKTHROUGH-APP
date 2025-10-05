@@ -9,55 +9,56 @@ const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 // ===== HOME SCREEN =====
 function MobileHomeScreen({ onNavigate }) {
   return (
-    <div className="h-full overflow-auto p-4 bg-black">
-      {/* Logo Header */}
-      <div className="text-center mb-6 py-2 bg-gradient-to-b from-[#1a1a1a] to-black">
+    <div className="h-full overflow-auto p-6 md:p-8 lg:p-12 bg-black">
+      {/* Logo Header - Larger for iPad */}
+      <div className="text-center mb-8 md:mb-12 py-4 bg-gradient-to-b from-[#1a1a1a] to-black">
         <img 
           src={`${process.env.PUBLIC_URL}/established-logo.png`}
           alt="ESTABLISHED" 
-          className="mx-auto h-14 mb-3 object-contain"
-          style={{ maxWidth: '200px' }}
+          className="mx-auto h-16 md:h-20 lg:h-24 mb-4 object-contain"
+          style={{ maxWidth: '280px' }}
         />
-        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-3 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">
           Interior Design Manager
         </h1>
-        <p className="text-[#D4A574] text-sm">On-Site Project Management</p>
+        <p className="text-[#D4A574] text-base md:text-lg">On-Site Project Management</p>
       </div>
 
-      <div className="space-y-3 mb-6">
+      {/* iPad Optimized Layout - Max width for readability */}
+      <div className="max-w-5xl mx-auto space-y-6 mb-8">
         <button
           onClick={() => onNavigate('projects')}
-          className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-2xl p-6 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border border-[#D4A574]/50"
+          className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div className="relative z-10">
-            <div className="text-4xl mb-2">📋</div>
-            <div className="text-lg font-bold text-[#D4C5A9]">Projects</div>
-            <div className="text-xs text-gray-300">View all projects & spreadsheets</div>
+            <div className="text-6xl md:text-7xl mb-4">📋</div>
+            <div className="text-2xl md:text-3xl font-bold text-[#D4C5A9] mb-2">Projects</div>
+            <div className="text-base md:text-lg text-gray-300">View all projects & spreadsheets</div>
           </div>
         </button>
 
-        <div className="grid grid-cols-3 gap-3">
-          <button className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border border-[#D4A574]/50 hover:border-[#D4A574] transition-all">
-            <div className="text-2xl mb-1">📸</div>
-            <div className="text-xs font-bold text-[#D4C5A9]">Photos</div>
+        <div className="grid grid-cols-3 gap-4 md:gap-6">
+          <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
+            <div className="text-4xl md:text-5xl mb-3">📸</div>
+            <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Photos</div>
           </button>
 
-          <button className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border border-[#D4A574]/50 hover:border-[#D4A574] transition-all">
-            <div className="text-2xl mb-1">📏</div>
-            <div className="text-xs font-bold text-[#D4C5A9]">Measure</div>
+          <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
+            <div className="text-4xl md:text-5xl mb-3">📏</div>
+            <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Measure</div>
           </button>
 
-          <button className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border border-[#D4A574]/50 hover:border-[#D4A574] transition-all">
-            <div className="text-2xl mb-1">🔄</div>
-            <div className="text-xs font-bold text-[#D4C5A9]">Sync</div>
+          <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
+            <div className="text-4xl md:text-5xl mb-3">🔄</div>
+            <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Sync</div>
           </button>
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-4 border border-[#D4A574]/50">
-        <p className="font-bold text-[#D4A574] mb-3 text-lg">✨ Jobsite Features</p>
-        <div className="space-y-2 text-sm text-gray-300">
+      <div className="max-w-5xl mx-auto bg-gradient-to-br from-gray-900 to-black rounded-3xl p-6 md:p-8 border-2 border-[#D4A574]/50 shadow-2xl">
+        <p className="font-bold text-[#D4A574] mb-4 text-xl md:text-2xl">✨ Jobsite Features</p>
+        <div className="space-y-3 text-base md:text-lg text-gray-300">
           <p>• Full Walkthrough spreadsheet</p>
           <p>• <strong className="text-[#D4C5A9]">FF&E Bible</strong> - Your complete inventory</p>
           <p>• Works offline with auto-sync</p>
