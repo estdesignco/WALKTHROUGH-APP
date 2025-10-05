@@ -178,26 +178,54 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
       // Draw image
       ctx.drawImage(img, 0, 0);
 
-      // Draw measurements
+      // Draw measurement arrows
       measurements.forEach((m) => {
-        const x = (m.x / 100) * canvas.width;
-        const y = (m.y / 100) * canvas.height;
+        const x1 = (m.x1 / 100) * canvas.width;
+        const y1 = (m.y1 / 100) * canvas.height;
+        const x2 = (m.x2 / 100) * canvas.width;
+        const y2 = (m.y2 / 100) * canvas.height;
 
-        // Draw arrow
-        ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
+        // Draw arrow line
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 4;
         ctx.beginPath();
-        ctx.arc(x, y, 8, 0, Math.PI * 2);
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        // Draw arrowhead
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        const headlen = 20;
+        
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(
+          x2 - headlen * Math.cos(angle - Math.PI / 6),
+          y2 - headlen * Math.sin(angle - Math.PI / 6)
+        );
+        ctx.lineTo(
+          x2 - headlen * Math.cos(angle + Math.PI / 6),
+          y2 - headlen * Math.sin(angle + Math.PI / 6)
+        );
+        ctx.closePath();
         ctx.fill();
 
-        // Draw text background
-        ctx.font = 'bold 24px Arial';
+        // Draw measurement text
+        const midX = (x1 + x2) / 2;
+        const midY = (y1 + y2) / 2 - 25; // Above the arrow
+        
+        ctx.font = 'bold 28px Arial';
         const textWidth = ctx.measureText(m.text).width;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(x + 15, y - 20, textWidth + 10, 30);
-
-        // Draw text
+        
+        // Text background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(midX - textWidth / 2 - 8, midY - 22, textWidth + 16, 36);
+        
+        // Text
         ctx.fillStyle = '#FFD700';
-        ctx.fillText(m.text, x + 20, y);
+        ctx.textAlign = 'center';
+        ctx.fillText(m.text, midX, midY);
       });
 
       const annotatedPhoto = canvas.toDataURL('image/jpeg', 0.8);
