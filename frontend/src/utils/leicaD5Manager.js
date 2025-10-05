@@ -339,26 +339,27 @@ export class LeicaD5Manager {
       }
       console.log('🔍 Raw bytes (hex):', rawBytes.join(' '));
       
-      // Try different parsing methods
       let distanceMM;
       
-      // Method 1: 32-bit integer little-endian (standard)
-      if (dataView.byteLength >= 4) {
-        const method1 = dataView.getUint32(0, true);
-        console.log('🔍 Method 1 (32-bit LE):', method1, 'mm =', (method1/1000).toFixed(3), 'm');
-        distanceMM = method1;
-      }
+      // Method 1: Try ASCII string (Leica often sends as text)
+      const decoder = new TextDecoder('utf-8');
+      const asciiString = decoder.decode(dataView.buffer);
+      console.log('🔍 ASCII String:', asciiString);
       
-      // Method 2: 32-bit float
-      if (dataView.byteLength >= 4) {
-        const method2 = dataView.getFloat32(0, true);
-        console.log('🔍 Method 2 (32-bit Float):', method2);
-      }
-      
-      // Method 3: 16-bit integer
-      if (dataView.byteLength >= 2) {
-        const method3 = dataView.getUint16(0, true);
-        console.log('🔍 Method 3 (16-bit LE):', method3, 'mm =', (method3/1000).toFixed(3), 'm');
+      // Try to parse as float/number from ASCII
+      const parsedFromString = parseFloat(asciiString.trim());
+      if (!isNaN(parsedFromString) && parsedFromString > 0 && parsedFromString < 100000) {
+        console.log('✅ Parsed from ASCII string:', parsedFromString, 'mm');
+        distanceMM = parsedFromString;
+      } else {
+        // Fallback: Method 2 - 32-bit integer little-endian
+        if (dataView.byteLength >= 4) {
+          distanceMM = dataView.getUint32(0, true);
+          console.log('🔍 Fallback to 32-bit LE:', distanceMM, 'mm');
+        } else if (dataView.byteLength >= 2) {
+          distanceMM = dataView.getUint16(0, true);
+          console.log('🔍 Fallback to 16-bit LE:', distanceMM, 'mm');
+        }
       }
       
       // Convert to different units
