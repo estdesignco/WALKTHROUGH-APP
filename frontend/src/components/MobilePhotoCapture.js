@@ -187,10 +187,11 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
         const y1 = (m.y1 / 100) * canvas.height;
         const x2 = (m.x2 / 100) * canvas.width;
         const y2 = (m.y2 / 100) * canvas.height;
+        const color = m.color || '#FFD700';
 
         // Draw arrow line
-        ctx.strokeStyle = '#FFD700';
-        ctx.lineWidth = 4;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 5;
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
@@ -200,7 +201,7 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
         const angle = Math.atan2(y2 - y1, x2 - x1);
         const headlen = 20;
         
-        ctx.fillStyle = '#FFD700';
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.moveTo(x2, y2);
         ctx.lineTo(
@@ -216,17 +217,17 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
 
         // Draw measurement text
         const midX = (x1 + x2) / 2;
-        const midY = (y1 + y2) / 2 - 25; // Above the arrow
+        const midY = (y1 + y2) / 2 - 30; // Above the arrow
         
-        ctx.font = 'bold 28px Arial';
+        ctx.font = 'bold 32px Arial';
         const textWidth = ctx.measureText(m.text).width;
         
         // Text background
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        ctx.fillRect(midX - textWidth / 2 - 8, midY - 22, textWidth + 16, 36);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+        ctx.fillRect(midX - textWidth / 2 - 10, midY - 26, textWidth + 20, 42);
         
         // Text
-        ctx.fillStyle = '#FFD700';
+        ctx.fillStyle = color;
         ctx.textAlign = 'center';
         ctx.fillText(m.text, midX, midY);
       });
