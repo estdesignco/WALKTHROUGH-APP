@@ -270,7 +270,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
           
           <button
             onClick={() => setShowSearch(!showSearch)}
-            className={`bg-gradient-to-br ${showSearch ? 'from-[#D4C5A9]/90 to-[#B4A589]/90' : 'from-[#6a6a6a]/80 to-[#4a4a4a]/80'} hover:from-[#D4C5A9] hover:to-[#B4A589] text-${showSearch ? 'black' : 'white'} font-bold py-4 md:py-5 lg:py-6 px-3 md:px-4 rounded-xl md:rounded-2xl text-sm md:text-base lg:text-lg shadow-lg border-2 border-[#D4C5A9]/30 transition-all"
+            className={`bg-gradient-to-br ${showSearch ? 'from-[#D4C5A9]/90 to-[#B4A589]/90 text-black' : 'from-[#6a6a6a]/80 to-[#4a4a4a]/80 text-white'} hover:from-[#D4C5A9] hover:to-[#B4A589] font-bold py-4 md:py-5 lg:py-6 px-3 md:px-4 rounded-xl md:rounded-2xl text-sm md:text-base lg:text-lg shadow-lg border-2 border-[#D4C5A9]/30 transition-all`}
           >
             🔍 SEARCH
           </button>
