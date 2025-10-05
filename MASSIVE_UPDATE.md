@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://design-wizard-17.preview.emergentagent.com/mobile-app
+Test it now: https://designtool-mobile.preview.emergentagent.com/mobile-app

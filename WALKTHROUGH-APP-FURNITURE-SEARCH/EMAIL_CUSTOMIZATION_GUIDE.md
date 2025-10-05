@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://design-wizard-17.preview.emergentagent.com/email-template.html
+https://designtool-mobile.preview.emergentagent.com/email-template.html
 
 ---
 
