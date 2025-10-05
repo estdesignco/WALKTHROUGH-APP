@@ -99,8 +99,9 @@ class TeamsIntegration:
                     json=card_payload,
                     headers={'Content-Type': 'application/json'}
                 ) as response:
-                    if response.status == 200:
-                        logging.info("Teams webhook sent successfully")
+                    # 200 and 204 are both success codes
+                    if response.status in [200, 204]:
+                        logging.info(f"✅ Teams webhook sent successfully (status {response.status})")
                         return True
                     else:
                         logging.error(f"Teams webhook failed: {response.status} {await response.text()}")
