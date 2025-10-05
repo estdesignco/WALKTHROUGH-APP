@@ -503,9 +503,16 @@ export default function MobileFFESpreadsheet({ projectId }) {
                               </select>
                             </td>
                             
-                            {/* VENDOR */}
+                            {/* VENDOR - Click to Edit */}
                             <td className="border border-gray-400 px-2 py-2 text-white text-sm">
-                              <div className="text-xs">{item.vendor || '-'}</div>
+                              <div 
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => updateItem(item.id, { vendor: e.target.textContent })}
+                                className="text-xs outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[80px]"
+                              >
+                                {item.vendor || '-'}
+                              </div>
                               {item.sku && <div className="text-xs text-gray-400">SKU: {item.sku}</div>}
                             </td>
                             
