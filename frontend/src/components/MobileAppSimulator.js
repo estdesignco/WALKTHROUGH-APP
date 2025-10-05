@@ -74,11 +74,12 @@ function ProjectMenuScreen({ project, onNavigate }) {
   return (
     <div className="h-full overflow-auto p-4 bg-black">
       {/* Logo Header */}
-      <div className="text-center mb-4">
+      <div className="text-center mb-3 py-2 bg-gradient-to-b from-[#1a1a1a] to-black">
         <img 
-          src="/established-logo.png" 
-          alt="Company Logo" 
-          className="mx-auto h-12 mb-3 object-contain"
+          src={`${process.env.PUBLIC_URL}/established-logo.png`}
+          alt="ESTABLISHED" 
+          className="mx-auto h-10 object-contain"
+          style={{ maxWidth: '160px' }}
         />
       </div>
       
@@ -166,11 +167,12 @@ function MobileProjectListScreen({ onNavigate, onSelectProject }) {
   return (
     <div className="h-full overflow-auto p-4 bg-black">
       {/* Logo Header */}
-      <div className="text-center mb-4">
+      <div className="text-center mb-3 py-2 bg-gradient-to-b from-[#1a1a1a] to-black">
         <img 
-          src="/established-logo.png" 
-          alt="Company Logo" 
-          className="mx-auto h-12 mb-3 object-contain"
+          src={`${process.env.PUBLIC_URL}/established-logo.png`}
+          alt="ESTABLISHED" 
+          className="mx-auto h-10 object-contain"
+          style={{ maxWidth: '160px' }}
         />
       </div>
       
