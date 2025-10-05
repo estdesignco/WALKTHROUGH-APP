@@ -1917,6 +1917,19 @@ async def create_room(room_data: RoomCreate):
                 for item_data in subcategory_data["items"]:
                     await db.items.insert_one(item_data)
         
+        # Create photo folder for this room
+        photo_folder = {
+            "id": str(uuid.uuid4()),
+            "room_id": room_id,
+            "project_id": room_dict["project_id"],
+            "folder_name": f"{room_dict['name']} - Photos",
+            "photos": [],
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        await db.photo_folders.insert_one(photo_folder)
+        print(f"📁 Created photo folder for room: {room_dict['name']}")
+        
         # Return the room with full structure (as expected by the frontend)
         return Room(**room_dict)
         
