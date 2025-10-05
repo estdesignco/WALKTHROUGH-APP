@@ -36,6 +36,12 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
 
     try {
       setConnecting(true);
+      
+      // Check if already paired for faster reconnection
+      if (leicaManager.isPaired()) {
+        console.log('📱 Device previously paired, reconnecting...');
+      }
+      
       const result = await leicaManager.connect();
       
       setLeicaConnected(true);
@@ -54,9 +60,11 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
       let errorMsg = `❌ Failed to connect:\n${error.message}\n\n`;
       
       if (error.message.includes('timeout')) {
-        errorMsg += `CONNECTION TIMEOUT\n\nTry these steps:\n1. Turn Leica D5 OFF and back ON\n2. Make sure it's in pairing mode\n3. Try again\n4. If still fails, restart Chrome\n\nNote: First connection can take 20-30 seconds`;
+        errorMsg += `⏱ CONNECTION TIMEOUT\n\n🔧 Quick Fixes:\n1. Turn Leica D5 OFF → Wait 3 seconds → Turn ON\n2. Move device closer (< 3 feet)\n3. Close other apps using Bluetooth\n4. Try again (may take 30-60 seconds first time)\n\n💡 Tip: Once paired, reconnection is much faster!`;
+      } else if (error.message.includes('User cancelled')) {
+        errorMsg = '⚠️ Connection cancelled by user';
       } else {
-        errorMsg += `Make sure:\n1. Leica D5 is powered ON\n2. Bluetooth is enabled\n3. Device is in pairing mode\n4. Not connected to another device\n5. Device is close (within 10 feet)`;
+        errorMsg += `📋 Checklist:\n✓ Leica D5 powered ON\n✓ Bluetooth enabled on phone/tablet\n✓ Device in pairing mode (check manual)\n✓ Not connected to another device\n✓ Within 10 feet range\n\n🔄 If issues persist, restart both devices`;
       }
       
       alert(errorMsg);
