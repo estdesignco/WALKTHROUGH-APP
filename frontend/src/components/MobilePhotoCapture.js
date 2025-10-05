@@ -180,9 +180,10 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
       {/* Logo Header */}
       <div className="text-center py-3 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border-b border-[#D4A574]/20">
         <img 
-          src="/established-logo.png" 
-          alt="Company Logo" 
+          src={`${process.env.PUBLIC_URL}/established-logo.png`}
+          alt="ESTABLISHED" 
           className="mx-auto h-10 object-contain"
+          style={{ maxWidth: '160px' }}
         />
       </div>
       
