@@ -34,53 +34,96 @@ export class LeicaD5Manager {
     try {
       console.log('🔍 Requesting Leica DISTO D5...');
       
-      // Request device with ALL possible filters
-      this.device = await navigator.bluetooth.requestDevice({
-        filters: [
-          { namePrefix: 'DISTO' }
-        ],
-        optionalServices: [this.SERVICE_UUID]
-      });
+      // If device already paired, try to reconnect
+      if (this.device && this.device.gatt) {
+        console.log('📱 Found existing device, attempting reconnect...');
+        try {
+          if (!this.device.gatt.connected) {
+            await this.device.gatt.connect();
+            console.log('✅ Reconnected to existing device');
+          }
+        } catch (err) {
+          console.log('⚠️ Reconnect failed, requesting new device...');
+          this.device = null;
+        }
+      }
+      
+      // Request new device if not already connected
+      if (!this.device) {
+        this.device = await navigator.bluetooth.requestDevice({
+          filters: [
+            { namePrefix: 'DISTO' }
+          ],
+          optionalServices: [this.SERVICE_UUID]
+        });
+        console.log('✅ Device selected:', this.device.name);
+      }
 
-      console.log('✅ Device selected:', this.device.name);
-
-      // Connect to GATT server with retry
+      // Connect to GATT server with extended timeout and retry
       console.log('🔗 Connecting to GATT server...');
-      let retries = 3;
+      let retries = 4;
+      let lastError = null;
+      
       while (retries > 0) {
         try {
+          // Extended timeout to 60 seconds for first connection
+          const timeout = retries === 4 ? 60000 : 30000;
+          
           this.server = await Promise.race([
             this.device.gatt.connect(),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Connection timeout')), 30000))
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error(`Connection timeout after ${timeout/1000}s`)), timeout)
+            )
           ]);
+          
           console.log('✅ Connected to GATT server');
+          lastError = null;
           break;
+          
         } catch (err) {
+          lastError = err;
           retries--;
-          if (retries === 0) throw err;
-          console.log(`⚠️ Retry connection... (${retries} left)`);
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          if (retries === 0) {
+            console.error('❌ All connection attempts failed');
+            throw new Error(`Connection failed after all retries: ${err.message}`);
+          }
+          
+          console.log(`⚠️ Retry connection... (${retries} attempts left)`);
+          await new Promise(resolve => setTimeout(resolve, 3000));
         }
       }
 
-      // Get service
+      // Get service with timeout
       console.log('📡 Getting Leica service...');
-      this.service = await this.server.getPrimaryService(this.SERVICE_UUID);
+      this.service = await Promise.race([
+        this.server.getPrimaryService(this.SERVICE_UUID),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Service discovery timeout')), 15000)
+        )
+      ]);
       console.log('✅ Service obtained');
 
-      // Get characteristics
-      console.log('📊 Getting measurement characteristic...');
-      this.measurementCharacteristic = await this.service.getCharacteristic(this.MEASUREMENT_CHAR_UUID);
-      console.log('✅ Measurement characteristic obtained');
-
-      console.log('📝 Getting command characteristic...');
-      this.commandCharacteristic = await this.service.getCharacteristic(this.COMMAND_CHAR_UUID);
-      console.log('✅ Command characteristic obtained');
+      // Get characteristics with timeout
+      console.log('📊 Getting characteristics...');
+      const [measurementChar, commandChar] = await Promise.race([
+        Promise.all([
+          this.service.getCharacteristic(this.MEASUREMENT_CHAR_UUID),
+          this.service.getCharacteristic(this.COMMAND_CHAR_UUID)
+        ]),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Characteristic discovery timeout')), 15000)
+        )
+      ]);
+      
+      this.measurementCharacteristic = measurementChar;
+      this.commandCharacteristic = commandChar;
+      console.log('✅ Characteristics obtained');
 
       // Start notifications for measurements
       await this.startMeasurementNotifications();
 
-      // Handle disconnection
+      // Handle disconnection with auto-reconnect
       this.device.addEventListener('gattserverdisconnected', this.onDisconnected.bind(this));
 
       return {
@@ -91,6 +134,10 @@ export class LeicaD5Manager {
 
     } catch (error) {
       console.error('❌ Connection failed:', error);
+      // Clean up on failure
+      this.device = null;
+      this.server = null;
+      this.service = null;
       throw new Error(`Failed to connect to Leica D5: ${error.message}`);
     }
   }
