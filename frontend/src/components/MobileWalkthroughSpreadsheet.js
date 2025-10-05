@@ -435,49 +435,26 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                               />
                             </td>
                             
-                            {/* ITEM NAME - Editable */}
+                            {/* ITEM NAME - Plain Text Display */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm">
-                              <input
-                                type="text"
-                                value={item.name}
-                                onChange={(e) => updateItemOffline(item.id, { name: e.target.value })}
-                                className="w-full bg-transparent text-white font-bold text-sm border-none focus:outline-none focus:bg-gray-800 px-1 py-1 rounded"
-                              />
+                              <div className="font-bold">{item.name}</div>
                               {item.vendor && <div className="text-xs text-gray-400 mt-1">{item.vendor}</div>}
                               {item.sku && <div className="text-xs text-gray-400">SKU: {item.sku}</div>}
                             </td>
                             
-                            {/* QTY - Editable */}
+                            {/* QTY - Plain Text Display */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">
-                              <input
-                                type="number"
-                                value={item.quantity || '1'}
-                                onChange={(e) => updateItemOffline(item.id, { quantity: e.target.value })}
-                                className="w-full bg-transparent text-white text-sm text-center border-none focus:outline-none focus:bg-gray-800 px-1 py-1 rounded"
-                                min="1"
-                              />
+                              {item.quantity || '1'}
                             </td>
                             
-                            {/* SIZE - Editable */}
+                            {/* SIZE - Plain Text Display */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm">
-                              <input
-                                type="text"
-                                value={item.size || ''}
-                                onChange={(e) => updateItemOffline(item.id, { size: e.target.value })}
-                                placeholder="-"
-                                className="w-full bg-transparent text-white text-sm border-none focus:outline-none focus:bg-gray-800 px-1 py-1 rounded"
-                              />
+                              {item.size || '-'}
                             </td>
                             
-                            {/* FINISH/COLOR - Editable */}
+                            {/* FINISH/COLOR - Plain Text Display */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm">
-                              <input
-                                type="text"
-                                value={item.finish_color || ''}
-                                onChange={(e) => updateItemOffline(item.id, { finish_color: e.target.value })}
-                                placeholder="-"
-                                className="w-full bg-transparent text-white text-sm border-none focus:outline-none focus:bg-gray-800 px-1 py-1 rounded"
-                              />
+                              {item.finish_color || '-'}
                             </td>
                             
                             {/* DELETE BUTTON */}
