@@ -222,11 +222,11 @@ export default function MobilePhotoManagement({ projectId, onClose }) {
                     setSelectedRoom(room);
                     setShowPhotoCapture(true);
                   }}
-                  className="p-4 border border-[#D4A574]/50 rounded-lg hover:bg-[#D4A574]/20 transition-colors bg-gradient-to-br from-gray-900 to-black"
+                  className="p-6 md:p-8 border-2 border-[#D4A574]/50 rounded-2xl md:rounded-3xl hover:bg-[#D4A574]/20 hover:border-[#D4A574] transition-all bg-gradient-to-br from-gray-900 to-black shadow-xl transform hover:scale-105"
                 >
-                  <div className="text-3xl mb-2">📁</div>
-                  <div className="text-sm text-[#D4C5A9] font-medium truncate">{room.name}</div>
-                  <div className="text-xs text-[#D4A574]">
+                  <div className="text-5xl md:text-6xl mb-3">📁</div>
+                  <div className="text-base md:text-lg lg:text-xl text-[#D4C5A9] font-bold truncate mb-2">{room.name}</div>
+                  <div className="text-sm md:text-base text-[#D4A574] font-medium">
                     {roomPhotos[room.id]?.length || 0} photos
                   </div>
                 </button>
