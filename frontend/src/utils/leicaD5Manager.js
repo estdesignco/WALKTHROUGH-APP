@@ -34,12 +34,10 @@ export class LeicaD5Manager {
     try {
       console.log('🔍 Requesting Leica DISTO D5...');
       
-      // Request device
+      // Request device with ALL possible filters
       this.device = await navigator.bluetooth.requestDevice({
         filters: [
-          { name: 'DISTO D5' },
-          { namePrefix: 'DISTO' },
-          { services: [this.SERVICE_UUID] }
+          { namePrefix: 'DISTO' }
         ],
         optionalServices: [this.SERVICE_UUID]
       });
