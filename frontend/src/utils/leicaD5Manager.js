@@ -242,13 +242,24 @@ export class LeicaD5Manager {
   // Handle disconnection
   onDisconnected() {
     console.log('⚠️ Leica D5 disconnected');
-    this.device = null;
+    // Keep device reference for reconnection, but clear server
     this.server = null;
+    this.service = null;
+    this.measurementCharacteristic = null;
+    this.commandCharacteristic = null;
+    
+    // Note: We keep this.device so we can reconnect without re-pairing
+    console.log('💡 Device reference kept for quick reconnection');
   }
 
   // Get connection status
   isConnected() {
     return this.device && this.device.gatt && this.device.gatt.connected;
+  }
+  
+  // Check if device is paired (but maybe not connected)
+  isPaired() {
+    return this.device !== null;
   }
 
   // Set measurement callback
