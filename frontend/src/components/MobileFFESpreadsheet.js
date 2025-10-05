@@ -18,6 +18,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [showPhotoCapture, setShowPhotoCapture] = useState(false);
+  const [showPhotoManagement, setShowPhotoManagement] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
