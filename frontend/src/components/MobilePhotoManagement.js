@@ -178,43 +178,43 @@ export default function MobilePhotoManagement({ projectId, onClose }) {
           {/* Measurements Added */}
           <div className="p-5 md:p-6 lg:p-8 border-2 border-[#D4A574]/50 rounded-2xl md:rounded-3xl bg-gradient-to-br from-gray-900 to-black shadow-xl">
             <div className="text-[#D4A574] text-sm md:text-base lg:text-lg mb-2">Measurements Added</div>
-            <div className="text-3xl font-bold text-[#D4C5A9]">
+            <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#D4C5A9]">
               {totalMeasurements}
             </div>
           </div>
 
           {/* Rooms Photographed */}
-          <div className="p-4 border border-[#D4A574]/50 rounded-lg bg-gradient-to-br from-gray-900 to-black">
-            <div className="text-[#D4A574] text-xs mb-1">Rooms Photographed</div>
-            <div className="text-3xl font-bold text-[#D4C5A9]">
+          <div className="p-5 md:p-6 lg:p-8 border-2 border-[#D4A574]/50 rounded-2xl md:rounded-3xl bg-gradient-to-br from-gray-900 to-black shadow-xl">
+            <div className="text-[#D4A574] text-sm md:text-base lg:text-lg mb-2">Rooms Photographed</div>
+            <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#D4C5A9]">
               {roomsPhotographed} / {totalRooms}
             </div>
           </div>
 
           {/* Leica D5 Status */}
-          <div className="p-4 border border-[#D4A574]/50 rounded-lg bg-gradient-to-br from-gray-900 to-black">
-            <div className="text-[#D4A574] text-xs mb-1">Leica D5 Status</div>
-            <div className={`text-lg font-bold ${leicaConnected ? 'text-green-400' : 'text-red-400'}`}>
+          <div className="p-5 md:p-6 lg:p-8 border-2 border-[#D4A574]/50 rounded-2xl md:rounded-3xl bg-gradient-to-br from-gray-900 to-black shadow-xl">
+            <div className="text-[#D4A574] text-sm md:text-base lg:text-lg mb-2">Leica D5 Status</div>
+            <div className={`text-xl md:text-2xl lg:text-3xl font-bold mb-3 ${leicaConnected ? 'text-green-400' : 'text-red-400'}`}>
               {leicaConnected ? '✓ Connected' : '✗ Not Connected'}
             </div>
             <button
               onClick={leicaConnected ? disconnectLeica : connectLeica}
               disabled={connecting}
-              className="mt-2 px-3 py-1 bg-[#D4A574] hover:bg-[#C49564] disabled:bg-gray-600 text-black rounded text-xs font-medium w-full"
+              className="mt-3 px-5 md:px-6 py-3 md:py-4 bg-[#D4A574] hover:bg-[#C49564] disabled:bg-gray-600 text-black rounded-xl md:rounded-2xl text-sm md:text-base lg:text-lg font-bold w-full shadow-lg"
             >
               {connecting ? 'Connecting...' : (leicaConnected ? 'Disconnect' : 'Connect Leica D5')}
             </button>
           </div>
         </div>
 
-        {/* Photos by Room */}
-        <div className="border-t border-[#D4A574]/30 pt-4">
-          <h3 className="text-lg font-bold text-[#D4A574] mb-3">📁 Photos by Room</h3>
+        {/* Photos by Room - iPad Optimized */}
+        <div className="border-t-2 border-[#D4A574]/30 pt-6 md:pt-8 max-w-5xl mx-auto">
+          <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#D4A574] mb-5 md:mb-6">📁 Photos by Room</h3>
           
           {loading ? (
-            <div className="text-center text-[#D4A574] py-8">Loading photos...</div>
+            <div className="text-center text-[#D4A574] text-xl md:text-2xl py-12">Loading photos...</div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {project?.rooms?.map(room => (
                 <button
                   key={room.id}
