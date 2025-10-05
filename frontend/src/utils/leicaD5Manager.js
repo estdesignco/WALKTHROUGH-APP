@@ -33,6 +33,10 @@ export class LeicaD5Manager {
     const isAndroid = /android/.test(userAgent);
     const isChrome = /chrome/.test(userAgent) && !/edg/.test(userAgent);
     
+    // Important: Chrome on iOS uses Safari's WebKit, so Web Bluetooth won't work
+    const isChromeOnIOS = isIOS && isChrome;
+    const isRealChrome = isChrome && !isIOS; // Real Chrome (Android/Desktop)
+    
     return {
       browser: isSafari ? 'Safari' : isChrome ? 'Chrome' : 'Other',
       platform: isIOS ? 'iOS/iPadOS' : isAndroid ? 'Android' : 'Desktop',
@@ -40,7 +44,9 @@ export class LeicaD5Manager {
       isSafari,
       isIOS,
       isAndroid,
-      isChrome
+      isChrome,
+      isChromeOnIOS,
+      isRealChrome
     };
   }
 
