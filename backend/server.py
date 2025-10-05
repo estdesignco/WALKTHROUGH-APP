@@ -6465,7 +6465,7 @@ async def canva_auth():
     }
 
 @api_router.get("/canva/callback")
-async def canva_callback(code: str, state: str):
+async def canva_callback(code: str, state: str = None):
     """Handle Canva OAuth callback."""
     try:
         # Exchange code for token
