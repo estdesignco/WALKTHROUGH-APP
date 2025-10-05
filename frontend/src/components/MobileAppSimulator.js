@@ -411,7 +411,7 @@ export default function MobileAppSimulator() {
           </div>
         );
       case 'photos':
-        return <MobilePhotoManagerScreen project={selectedProject} room={selectedRoom} onNavigate={setScreen} />;
+        return <MobilePhotoManagement projectId={selectedProject?.id} onClose={() => setScreen('project-menu')} />;
       default:
         return <MobileHomeScreen onNavigate={setScreen} />;
     }
