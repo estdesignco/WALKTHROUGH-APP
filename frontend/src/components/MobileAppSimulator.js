@@ -100,6 +100,19 @@ function ProjectMenuScreen({ project, onNavigate }) {
             <div className="mt-2 text-xs text-orange-300">💡 Works offline with auto-sync!</div>
           </div>
         </button>
+
+        <button
+          onClick={() => onNavigate('photos')}
+          className="w-full bg-gradient-to-br from-[#2a2a3a] to-[#1a1a2a] hover:from-[#3a3a4a] hover:to-[#2a2a3a] rounded-2xl p-6 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="relative z-10">
+            <div className="text-4xl mb-2">📸</div>
+            <div className="font-bold text-[#D4A574] text-lg mb-1">Photo Management</div>
+            <div className="text-xs text-gray-300">Capture photos with measurements by room</div>
+            <div className="mt-2 text-xs text-[#D4A574]">📏 Leica D5 integration</div>
+          </div>
+        </button>
       </div>
     </div>
   );
