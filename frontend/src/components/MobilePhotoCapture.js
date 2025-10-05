@@ -14,7 +14,9 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
   const [connecting, setConnecting] = useState(false);
   const [lastMeasurement, setLastMeasurement] = useState(null);
   const [drawingArrow, setDrawingArrow] = useState(null); // {x1, y1, x2, y2} while drawing
-  const [currentMeasurement, setCurrentMeasurement] = useState(''); // Text for current arrow
+  const [editingArrowIndex, setEditingArrowIndex] = useState(null); // Which arrow is being edited
+  const [arrowColor, setArrowColor] = useState('#FFD700'); // Current arrow color (gold default)
+  const [drawMode, setDrawMode] = useState(false); // Explicit draw mode
   const fileInputRef = useRef(null);
   const canvasRef = useRef(null);
   const imageRef = useRef(null);
