@@ -10,6 +10,8 @@ export class LeicaD5Manager {
     this.commandCharacteristic = null;
     this.onMeasurement = null;
     this.pollingInterval = null;
+    this.lastRawValue = null; // Track last value to detect changes
+    this.lastMeasurement = null;
     
     // Leica D5 Bluetooth UUIDs (standard DISTO protocol)
     this.SERVICE_UUID = '3ab10100-f831-4395-b29d-570977d5bf94';
