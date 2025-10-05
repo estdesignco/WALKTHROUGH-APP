@@ -370,6 +370,9 @@ export class LeicaD5Manager {
 
   // Disconnect from device
   async disconnect() {
+    // Stop polling if active
+    this.stopPolling();
+    
     if (this.device && this.device.gatt.connected) {
       await this.device.gatt.disconnect();
       console.log('✅ Disconnected from Leica D5');
