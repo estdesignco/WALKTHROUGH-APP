@@ -164,6 +164,10 @@ const App = () => {
               element={<MobileAppSimulator />}
             />
             <Route 
+              path="/canva/callback" 
+              element={<CanvaCallbackHandler />}
+            />
+            <Route 
               path="/studio" 
               element={<StudioLandingPage />}
             />
