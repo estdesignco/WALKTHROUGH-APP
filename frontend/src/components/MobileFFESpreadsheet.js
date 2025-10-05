@@ -507,12 +507,13 @@ export default function MobileFFESpreadsheet({ projectId }) {
                             </td>
                             
                             {/* VENDOR - Click to Edit */}
-                            <td className="border border-gray-400 px-2 py-2 text-white text-sm">
+                            <td className="border border-gray-400 px-2 py-2 text-white text-sm whitespace-nowrap">
                               <div 
                                 contentEditable
                                 suppressContentEditableWarning
                                 onBlur={(e) => updateItem(item.id, { vendor: e.target.textContent })}
-                                className="text-xs outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[80px]"
+                                className="text-xs outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded"
+                                style={{ minWidth: 'max-content' }}
                               >
                                 {item.vendor || '-'}
                               </div>
