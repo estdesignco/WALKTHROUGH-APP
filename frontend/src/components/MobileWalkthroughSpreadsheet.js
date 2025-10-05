@@ -451,36 +451,39 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                             </td>
                             
                             {/* QTY - Click to Edit */}
-                            <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">
+                            <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center whitespace-nowrap">
                               <div
                                 contentEditable
                                 suppressContentEditableWarning
                                 onBlur={(e) => updateItemOffline(item.id, { quantity: e.target.textContent })}
-                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[40px] inline-block"
+                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded inline-block"
+                                style={{ minWidth: 'max-content' }}
                               >
                                 {item.quantity || '1'}
                               </div>
                             </td>
                             
                             {/* SIZE - Click to Edit */}
-                            <td className="border border-gray-400 px-3 py-2 text-white text-sm">
+                            <td className="border border-gray-400 px-3 py-2 text-white text-sm whitespace-nowrap">
                               <div
                                 contentEditable
                                 suppressContentEditableWarning
                                 onBlur={(e) => updateItemOffline(item.id, { size: e.target.textContent })}
-                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[60px]"
+                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded"
+                                style={{ minWidth: 'max-content' }}
                               >
                                 {item.size || '-'}
                               </div>
                             </td>
                             
                             {/* FINISH/COLOR - Click to Edit */}
-                            <td className="border border-gray-400 px-3 py-2 text-white text-sm">
+                            <td className="border border-gray-400 px-3 py-2 text-white text-sm whitespace-nowrap">
                               <div
                                 contentEditable
                                 suppressContentEditableWarning
                                 onBlur={(e) => updateItemOffline(item.id, { finish_color: e.target.textContent })}
-                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[60px]"
+                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded"
+                                style={{ minWidth: 'max-content' }}
                               >
                                 {item.finish_color || '-'}
                               </div>
