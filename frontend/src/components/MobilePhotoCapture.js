@@ -437,6 +437,21 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
                     </marker>
                   </defs>
                   
+                  {/* Dynamic arrowhead markers for each color */}
+                  {[...new Set(measurements.map(m => m.color || '#FFD700'))].map((color) => (
+                    <marker
+                      key={`arrow-${color}`}
+                      id={`arrowhead-${color.replace('#', '')}`}
+                      markerWidth="10"
+                      markerHeight="10"
+                      refX="9"
+                      refY="3"
+                      orient="auto"
+                    >
+                      <polygon points="0 0, 10 3, 0 6" fill={color} />
+                    </marker>
+                  ))}
+                  
                   {/* Saved arrows */}
                   {measurements.map((m, index) => (
                     <line
@@ -445,9 +460,9 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
                       y1={m.y1}
                       x2={m.x2}
                       y2={m.y2}
-                      stroke="#FFD700"
-                      strokeWidth="0.4"
-                      markerEnd="url(#arrowhead-gold)"
+                      stroke={m.color || '#FFD700'}
+                      strokeWidth="0.5"
+                      markerEnd={`url(#arrowhead-${(m.color || '#FFD700').replace('#', '')})`}
                     />
                   ))}
                   
@@ -458,8 +473,8 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
                       y1={drawingArrow.y1}
                       x2={drawingArrow.x2}
                       y2={drawingArrow.y2}
-                      stroke="#FF6B6B"
-                      strokeWidth="0.4"
+                      stroke={drawingArrow.color}
+                      strokeWidth="0.5"
                       markerEnd="url(#arrowhead-red)"
                       opacity="0.8"
                     />
