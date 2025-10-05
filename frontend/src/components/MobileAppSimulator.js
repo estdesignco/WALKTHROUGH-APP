@@ -73,65 +73,67 @@ function MobileHomeScreen({ onNavigate }) {
 // ===== PROJECT MENU SCREEN =====
 function ProjectMenuScreen({ project, onNavigate }) {
   return (
-    <div className="h-full overflow-auto p-4 bg-black">
-      {/* Logo Header */}
-      <div className="text-center mb-3 py-2 bg-gradient-to-b from-[#1a1a1a] to-black">
+    <div className="h-full overflow-auto p-6 md:p-8 lg:p-12 bg-black">
+      {/* Logo Header - iPad Optimized */}
+      <div className="text-center mb-6 md:mb-8 py-3 bg-gradient-to-b from-[#1a1a1a] to-black">
         <img 
           src={`${process.env.PUBLIC_URL}/established-logo.png`}
           alt="ESTABLISHED" 
-          className="mx-auto h-10 object-contain"
-          style={{ maxWidth: '160px' }}
+          className="mx-auto h-12 md:h-16 object-contain"
+          style={{ maxWidth: '220px' }}
         />
       </div>
       
-      <button 
-        onClick={() => onNavigate('projects')}
-        className="bg-gradient-to-br from-gray-900 to-black text-[#D4C5A9] border border-[#D4A574]/50 px-4 py-2 rounded-xl mb-4 font-semibold hover:border-[#D4A574] transition-all"
-      >
-        ← Back to Projects
-      </button>
-      
-      <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">{project?.name}</h2>
-      <p className="text-[#D4A574] text-sm mb-6">Select which sheet to view</p>
-
-      <div className="space-y-3">
-        <button
-          onClick={() => onNavigate('walkthrough')}
-          className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-2xl p-6 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border border-[#D4A574]/50"
+      <div className="max-w-5xl mx-auto">
+        <button 
+          onClick={() => onNavigate('projects')}
+          className="bg-gradient-to-br from-gray-900 to-black text-[#D4C5A9] border-2 border-[#D4A574]/50 px-6 py-3 md:px-8 md:py-4 rounded-2xl mb-6 md:mb-8 font-semibold hover:border-[#D4A574] transition-all text-base md:text-lg shadow-lg"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative z-10">
-            <div className="text-4xl mb-2">📋</div>
-            <div className="font-bold text-[#D4C5A9] text-lg mb-1">Walkthrough</div>
-            <div className="text-xs text-gray-300">On-site checklist - Check off items as you inspect</div>
-          </div>
+          ← Back to Projects
         </button>
+        
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">{project?.name}</h2>
+        <p className="text-[#D4A574] text-base md:text-lg mb-8">Select which sheet to view</p>
 
-        <button
-          onClick={() => onNavigate('ffe')}
-          className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-2xl p-6 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border border-[#D4A574]/50"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative z-10">
-            <div className="text-4xl mb-2">📖</div>
-            <div className="font-bold text-[#D4C5A9] text-lg mb-1">FF&E Bible</div>
-            <div className="text-xs text-gray-300">Your complete inventory - Status, tracking, delivery info</div>
-            <div className="mt-2 text-xs text-[#D4A574]">💡 Works offline with auto-sync!</div>
-          </div>
-        </button>
+        <div className="space-y-5 md:space-y-6">
+          <button
+            onClick={() => onNavigate('walkthrough')}
+            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-5xl md:text-6xl mb-3">📋</div>
+              <div className="font-bold text-[#D4C5A9] text-2xl md:text-3xl mb-2">Walkthrough</div>
+              <div className="text-sm md:text-base text-gray-300">On-site checklist - Check off items as you inspect</div>
+            </div>
+          </button>
 
-        <button
-          onClick={() => onNavigate('photos')}
-          className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-2xl p-6 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border border-[#D4A574]/50"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative z-10">
-            <div className="text-4xl mb-2">📸</div>
-            <div className="font-bold text-[#D4A574] text-lg mb-1">Photo Management</div>
-            <div className="text-xs text-gray-300">Capture photos with measurements by room</div>
-            <div className="mt-2 text-xs text-[#D4A574]">📏 Leica D5 integration</div>
-          </div>
-        </button>
+          <button
+            onClick={() => onNavigate('ffe')}
+            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-5xl md:text-6xl mb-3">📖</div>
+              <div className="font-bold text-[#D4C5A9] text-2xl md:text-3xl mb-2">FF&E Bible</div>
+              <div className="text-sm md:text-base text-gray-300">Your complete inventory - Status, tracking, delivery info</div>
+              <div className="mt-3 text-sm md:text-base text-[#D4A574]">💡 Works offline with auto-sync!</div>
+            </div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('photos')}
+            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-5xl md:text-6xl mb-3">📸</div>
+              <div className="font-bold text-[#D4A574] text-2xl md:text-3xl mb-2">Photo Management</div>
+              <div className="text-sm md:text-base text-gray-300">Capture photos with measurements by room</div>
+              <div className="mt-3 text-sm md:text-base text-[#D4A574]">📏 Leica D5 integration</div>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   );
