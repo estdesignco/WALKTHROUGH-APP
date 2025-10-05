@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://mobilewalkthru.preview.emergentagent.com
+https://design-wizard-17.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://mobilewalkthru.preview.emergentagent.com/mobile-app
+https://design-wizard-17.preview.emergentagent.com/mobile-app
 
 ---
 

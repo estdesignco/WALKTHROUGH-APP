@@ -176,6 +176,6 @@ print(f"✅ {success}/5 products imported")
 print(f"   - Data from Excel ✓")
 print(f"   - Links to Four Hands ✓")
 print(f"   - Images from Perigold ✓")
-print(f"\nView: https://mobilewalkthru.preview.emergentagent.com/furniture-search\n")
+print(f"\nView: https://design-wizard-17.preview.emergentagent.com/furniture-search\n")
 
 client.close()
