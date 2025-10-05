@@ -196,8 +196,12 @@ export class LeicaD5Manager {
         console.log(`✅ Measurement characteristic: ${this.measurementCharacteristic.uuid}`);
       }
 
-      // Start notifications for measurements
-      await this.startMeasurementNotifications();
+      // Start notifications for measurements, fall back to polling if needed
+      const notificationsStarted = await this.startMeasurementNotifications();
+      if (!notificationsStarted) {
+        console.log('💡 Falling back to polling mode');
+        this.startPolling(2000); // Poll every 2 seconds
+      }
 
       // Handle disconnection with auto-reconnect
       this.device.addEventListener('gattserverdisconnected', this.onDisconnected.bind(this));
