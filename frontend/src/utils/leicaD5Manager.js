@@ -50,11 +50,13 @@ export class LeicaD5Manager {
       
       // Request new device if not already connected
       if (!this.device) {
+        // Request device with acceptAllDevices to discover available services
         this.device = await navigator.bluetooth.requestDevice({
           filters: [
             { namePrefix: 'DISTO' }
           ],
-          optionalServices: [this.SERVICE_UUID]
+          acceptAllDevices: false,
+          optionalServices: [this.SERVICE_UUID, 'generic_access', 'device_information']
         });
         console.log('✅ Device selected:', this.device.name);
       }
