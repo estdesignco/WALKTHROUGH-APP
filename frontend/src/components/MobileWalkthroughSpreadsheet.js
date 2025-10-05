@@ -573,6 +573,14 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
           onComplete={loadProject}
         />
       )}
+      
+      {/* PHOTO MANAGEMENT */}
+      {showPhotoManagement && (
+        <MobilePhotoManagement
+          projectId={projectId}
+          onClose={() => setShowPhotoManagement(false)}
+        />
+      )}
     </div>
   );
 }
