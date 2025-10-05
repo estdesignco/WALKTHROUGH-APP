@@ -365,110 +365,99 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
                   width: '100%'
                 }}
               >
-                {/* Measurement arrows */}
-                {measurements.map((m, index) => {
-                  const dx = m.x2 - m.x1;
-                  const dy = m.y2 - m.y1;
-                  const length = Math.sqrt(dx * dx + dy * dy);
-                  const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                {/* SVG Overlay for clean arrow rendering */}
+                <svg 
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'none',
+                    zIndex: 10
+                  }}
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <marker
+                      id="arrowhead-gold"
+                      markerWidth="10"
+                      markerHeight="10"
+                      refX="9"
+                      refY="3"
+                      orient="auto"
+                    >
+                      <polygon points="0 0, 10 3, 0 6" fill="#FFD700" />
+                    </marker>
+                    <marker
+                      id="arrowhead-red"
+                      markerWidth="10"
+                      markerHeight="10"
+                      refX="9"
+                      refY="3"
+                      orient="auto"
+                    >
+                      <polygon points="0 0, 10 3, 0 6" fill="#FF6B6B" />
+                    </marker>
+                  </defs>
                   
-                  return (
-                    <div key={index}>
-                      {/* Arrow line */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          left: `${m.x1}%`,
-                          top: `${m.y1}%`,
-                          width: `${length}%`,
-                          height: '3px',
-                          backgroundColor: '#FFD700',
-                          transformOrigin: '0 50%',
-                          transform: `rotate(${angle}deg)`,
-                          zIndex: 10
-                        }}
-                      />
-                      
-                      {/* Arrow head */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          left: `${m.x2}%`,
-                          top: `${m.y2}%`,
-                          width: '0',
-                          height: '0',
-                          borderLeft: '8px solid #FFD700',
-                          borderTop: '6px solid transparent',
-                          borderBottom: '6px solid transparent',
-                          transform: `translate(-50%, -50%) rotate(${angle}deg)`,
-                          zIndex: 10
-                        }}
-                      />
-                      
-                      {/* Measurement text */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          left: `${(m.x1 + m.x2) / 2}%`,
-                          top: `${(m.y1 + m.y2) / 2}%`,
-                          transform: 'translate(-50%, -150%)',
-                          zIndex: 20
-                        }}
-                      >
-                        <div className="bg-black bg-opacity-80 text-yellow-400 px-2 py-1 rounded text-sm whitespace-nowrap">
-                          {m.text}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeMeasurement(index);
-                            }}
-                            className="ml-2 text-red-400 hover:text-red-300"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                  {/* Saved arrows */}
+                  {measurements.map((m, index) => (
+                    <line
+                      key={index}
+                      x1={m.x1}
+                      y1={m.y1}
+                      x2={m.x2}
+                      y2={m.y2}
+                      stroke="#FFD700"
+                      strokeWidth="0.4"
+                      markerEnd="url(#arrowhead-gold)"
+                    />
+                  ))}
+                  
+                  {/* Drawing arrow */}
+                  {drawingArrow && (
+                    <line
+                      x1={drawingArrow.x1}
+                      y1={drawingArrow.y1}
+                      x2={drawingArrow.x2}
+                      y2={drawingArrow.y2}
+                      stroke="#FF6B6B"
+                      strokeWidth="0.4"
+                      markerEnd="url(#arrowhead-red)"
+                      opacity="0.8"
+                    />
+                  )}
+                </svg>
                 
-                {/* Drawing arrow (while dragging) */}
-                {drawingArrow && (
-                  <div>
-                    {/* Arrow line */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        left: `${drawingArrow.x1}%`,
-                        top: `${drawingArrow.y1}%`,
-                        width: `${Math.sqrt(Math.pow(drawingArrow.x2 - drawingArrow.x1, 2) + Math.pow(drawingArrow.y2 - drawingArrow.y1, 2))}%`,
-                        height: '3px',
-                        backgroundColor: '#FF6B6B',
-                        transformOrigin: '0 50%',
-                        transform: `rotate(${Math.atan2(drawingArrow.y2 - drawingArrow.y1, drawingArrow.x2 - drawingArrow.x1) * 180 / Math.PI}deg)`,
-                        zIndex: 15,
-                        opacity: 0.8
-                      }}
-                    />
-                    
-                    {/* Arrow head */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        left: `${drawingArrow.x2}%`,
-                        top: `${drawingArrow.y2}%`,
-                        width: '0',
-                        height: '0',
-                        borderLeft: '8px solid #FF6B6B',
-                        borderTop: '6px solid transparent',
-                        borderBottom: '6px solid transparent',
-                        transform: `translate(-50%, -50%) rotate(${Math.atan2(drawingArrow.y2 - drawingArrow.y1, drawingArrow.x2 - drawingArrow.x1) * 180 / Math.PI}deg)`,
-                        zIndex: 15,
-                        opacity: 0.8
-                      }}
-                    />
+                {/* Measurement text labels */}
+                {measurements.map((m, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      position: 'absolute',
+                      left: `${(m.x1 + m.x2) / 2}%`,
+                      top: `${(m.y1 + m.y2) / 2 - 3}%`,
+                      transform: 'translate(-50%, -100%)',
+                      zIndex: 20,
+                      pointerEvents: 'auto'
+                    }}
+                  >
+                    <div className="bg-black bg-opacity-90 text-yellow-400 px-3 py-1 rounded-lg text-base md:text-lg font-bold whitespace-nowrap shadow-lg border border-yellow-400">
+                      {m.text}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeMeasurement(index);
+                        }}
+                        className="ml-3 text-red-400 hover:text-red-300 font-bold text-lg"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
             </div>
 
