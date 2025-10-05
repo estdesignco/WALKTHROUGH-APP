@@ -124,6 +124,30 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
     }
   };
 
+  const handleSendPhotosToCanva = async () => {
+    const confirmed = window.confirm('Send all Walkthrough photos to Canva?');
+    if (!confirmed) return;
+
+    try {
+      const response = await axios.post(`${API_URL}/canva/upload-walkthrough-photos`, {
+        project_id: projectId
+      });
+
+      if (response.data.success) {
+        alert(`✅ ${response.data.message}\n\nUploaded: ${response.data.uploaded_count} photos`);
+      } else {
+        alert(`⚠️ ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error('Failed to send photos to Canva:', error);
+      if (error.response?.status === 401) {
+        alert('❌ Not connected to Canva.\n\nPlease connect to Canva first from the Checklist page on desktop.');
+      } else {
+        alert('❌ Failed to send photos to Canva. Please try again.');
+      }
+    }
+  };
+
   const toggleItemCheck = async (item) => {
     try {
       const newChecked = !item.checked;
