@@ -105,15 +105,15 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
     alert('✅ Disconnected from Leica D5');
   };
 
-  // Start drawing arrow
+  // Start drawing arrow (only in draw mode)
   const handleMouseDown = (e) => {
-    if (!capturedPhoto) return;
+    if (!capturedPhoto || !drawMode) return;
     
     const rect = e.target.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     
-    setDrawingArrow({ x1: x, y1: y, x2: x, y2: y });
+    setDrawingArrow({ x1: x, y1: y, x2: x, y2: y, color: arrowColor });
   };
   
   // Update arrow end point while dragging
@@ -143,8 +143,9 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
       if (text) {
         setMeasurements([
           ...measurements,
-          { ...drawingArrow, text }
+          { ...drawingArrow, text, color: arrowColor }
         ]);
+        // Stay in draw mode, don't exit automatically
       }
     }
     
