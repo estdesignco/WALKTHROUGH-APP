@@ -508,6 +508,10 @@ export class LeicaD5Manager {
     // Stop polling if active
     this.stopPolling();
     
+    // Clear cached values
+    this.lastRawValue = null;
+    this.lastMeasurement = null;
+    
     // Keep device reference for reconnection, but clear server
     this.server = null;
     this.service = null;
