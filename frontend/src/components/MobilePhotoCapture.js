@@ -103,21 +103,50 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
     alert('✅ Disconnected from Leica D5');
   };
 
-  const handleCanvasClick = (event) => {
+  // Start drawing arrow
+  const handleMouseDown = (e) => {
     if (!capturedPhoto) return;
-
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
-
-    if (measurementText.trim()) {
-      setMeasurements([
-        ...measurements,
-        { x, y, text: measurementText }
-      ]);
-      setMeasurementText('');
+    
+    const rect = e.target.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    setDrawingArrow({ x1: x, y1: y, x2: x, y2: y });
+  };
+  
+  // Update arrow end point while dragging
+  const handleMouseMove = (e) => {
+    if (!drawingArrow) return;
+    
+    const rect = e.target.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    setDrawingArrow({ ...drawingArrow, x2: x, y2: y });
+  };
+  
+  // Finish drawing arrow
+  const handleMouseUp = () => {
+    if (!drawingArrow) return;
+    
+    // Only save if arrow has some length
+    const dx = drawingArrow.x2 - drawingArrow.x1;
+    const dy = drawingArrow.y2 - drawingArrow.y1;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    
+    if (length > 2) { // Minimum 2% of image size
+      // Use last Leica measurement if available, otherwise ask for manual input
+      const text = lastMeasurement ? lastMeasurement.feetInches : prompt('Enter measurement:', '');
+      
+      if (text) {
+        setMeasurements([
+          ...measurements,
+          { ...drawingArrow, text }
+        ]);
+      }
     }
+    
+    setDrawingArrow(null);
   };
 
   const removeMeasurement = (index) => {
