@@ -32,6 +32,7 @@ import FinalDashboard from './components/FinalDashboard';
 import ExactDashboard from './components/ExactDashboard';
 import PerfectDashboard from './components/PerfectDashboard';
 import MobileAppSimulator from './components/MobileAppSimulator';
+import CanvaCallbackHandler from './components/CanvaCallbackHandler';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
