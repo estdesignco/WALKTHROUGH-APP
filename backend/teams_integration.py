@@ -56,34 +56,25 @@ class TeamsIntegration:
             # Determine urgency based on status
             priority = self._get_priority_for_status(new_status)
             
-            # Create Teams card payload
+            # Create simple text payload for webhookbot
+            message_text = f"""🏠 STATUS UPDATE
+
+**Project:** {project_name}
+**Room:** {room_name}  
+**Item:** {item_name}
+
+**Status Changed:** {old_status} → {new_status}
+
+**Vendor:** {vendor or 'TBD'}
+**Cost:** ${cost:,.2f} if cost > 0 else 'TBD'
+**Priority:** {priority}
+
+**Action Needed:** {self._get_action_for_status(new_status)}
+
+⏰ {datetime.now().strftime('%B %d, %Y at %I:%M %p')}"""
+            
             teams_card = {
-                "@type": "MessageCard",
-                "@context": "http://schema.org/extensions",
-                "themeColor": self._get_color_for_status(new_status),
-                "summary": todo_title,
-                "sections": [{
-                    "activityTitle": todo_title,
-                    "activitySubtitle": f"Interior Design Task - Priority: {priority}",
-                    "activityImage": "https://cdn-icons-png.flaticon.com/512/1946/1946488.png",
-                    "facts": [
-                        {"name": "Project", "value": project_name},
-                        {"name": "Room", "value": room_name},
-                        {"name": "Item", "value": item_name},
-                        {"name": "New Status", "value": new_status},
-                        {"name": "Vendor", "value": vendor or 'TBD'},
-                        {"name": "Priority", "value": priority}
-                    ],
-                    "markdown": True
-                }],
-                "potentialAction": [{
-                    "@type": "OpenUri",
-                    "name": "View Project Dashboard",
-                    "targets": [{
-                        "os": "default", 
-                        "uri": f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/project/{project_name.lower().replace(' ', '-')}/ffe"
-                    }]
-                }]
+                "text": message_text
             }
             
             # If webhook URL is configured, send to Teams
