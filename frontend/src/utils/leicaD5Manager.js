@@ -24,6 +24,25 @@ export class LeicaD5Manager {
     }
     return true;
   }
+  
+  // Get detailed browser compatibility info
+  getBrowserCompatibilityInfo() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isSafari = /safari/.test(userAgent) && !/chrome/.test(userAgent);
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    const isAndroid = /android/.test(userAgent);
+    const isChrome = /chrome/.test(userAgent) && !/edg/.test(userAgent);
+    
+    return {
+      browser: isSafari ? 'Safari' : isChrome ? 'Chrome' : 'Other',
+      platform: isIOS ? 'iOS/iPadOS' : isAndroid ? 'Android' : 'Desktop',
+      supported: navigator.bluetooth !== undefined,
+      isSafari,
+      isIOS,
+      isAndroid,
+      isChrome
+    };
+  }
 
   // Connect to Leica D5
   async connect() {
