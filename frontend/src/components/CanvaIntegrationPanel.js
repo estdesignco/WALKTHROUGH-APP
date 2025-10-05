@@ -40,11 +40,22 @@ const CanvaIntegrationPanel = ({ projectId, onSync }) => {
         `width=${width},height=${height},left=${left},top=${top}`
       );
 
+      // Check if popup was blocked
+      if (!authWindow || authWindow.closed || typeof authWindow.closed === 'undefined') {
+        alert('⚠️ Popup blocked!\n\nPlease allow popups for this site and try again.\n\nOr use this link directly:\n' + data.authorization_url);
+        return;
+      }
+
       // Poll for window close and check status
       const checkAuth = setInterval(async () => {
-        if (authWindow.closed) {
+        try {
+          if (authWindow.closed) {
+            clearInterval(checkAuth);
+            await checkCanvaStatus();
+          }
+        } catch (e) {
+          // Window might be cross-origin, ignore errors
           clearInterval(checkAuth);
-          await checkCanvaStatus();
         }
       }, 1000);
     } catch (error) {
