@@ -469,13 +469,12 @@ export default function MobileAppSimulator() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e] flex items-center justify-center p-4">
-      <div className="w-[390px] h-[844px] bg-black rounded-[40px] overflow-hidden shadow-2xl border-8 border-gray-900 relative">
-        <div className="h-11 bg-black flex justify-between items-center px-6 text-white text-sm">
-          <span>9:41</span>
-          <span>📶 📡 🔋</span>
-        </div>
-        <div className="h-[calc(100%-44px)] overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
+      {/* Full width on iPad, phone simulator on desktop */}
+      <div className="w-full h-screen md:w-full md:h-screen bg-black overflow-hidden">
+        {/* Remove status bar on larger screens, keep for mobile feel */}
+        <div className="hidden sm:block h-0"></div>
+        <div className="h-full overflow-hidden">
           {renderScreen()}
         </div>
       </div>
