@@ -1,6 +1,6 @@
 // Service Worker for Mobile App & Offline Functionality
-const CACHE_NAME = 'ffe-app-v1';
-const API_CACHE = 'ffe-api-v1';
+const CACHE_NAME = 'ffe-app-v2';
+const API_CACHE = 'ffe-api-v2';
 
 // Cache static assets
 const STATIC_ASSETS = [
