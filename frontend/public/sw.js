@@ -77,6 +77,12 @@ self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
   
+  // Bypass service worker for OAuth callbacks (Canva, etc.)
+  if (url.pathname.includes('/callback') || url.pathname.includes('/oauth')) {
+    // Let the browser handle it directly, don't intercept
+    return;
+  }
+  
   // Handle API requests
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(handleAPIRequest(request));
