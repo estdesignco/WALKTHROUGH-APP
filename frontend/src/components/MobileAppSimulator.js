@@ -156,14 +156,14 @@ function MobileProjectListScreen({ onNavigate, onSelectProject }) {
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
+      <div className="h-full flex items-center justify-center bg-black">
         <div className="text-[#D4C5A9] text-lg">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-auto p-4 bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
+    <div className="h-full overflow-auto p-4 bg-black">
       {/* Logo Header */}
       <div className="text-center mb-4">
         <img 
@@ -175,7 +175,7 @@ function MobileProjectListScreen({ onNavigate, onSelectProject }) {
       
       <button 
         onClick={() => onNavigate('home')}
-        className="bg-gradient-to-r from-[#2a2a3a] to-[#1a1a2a] text-[#D4C5A9] border-2 border-[#D4C5A9]/30 px-4 py-2 rounded-xl mb-4 font-semibold hover-from-[#3a3a4a] hover:to-[#2a2a3a] transition-all"
+        className="bg-gradient-to-br from-gray-900 to-black text-[#D4C5A9] border border-[#D4A574]/50 px-4 py-2 rounded-xl mb-4 font-semibold hover:border-[#D4A574] transition-all"
       >
         ← Back
       </button>
@@ -187,23 +187,23 @@ function MobileProjectListScreen({ onNavigate, onSelectProject }) {
           <button
             key={project.id}
             onClick={() => onSelectProject(project)}
-            className="w-full bg-gradient-to-br from-[#1a1a2a]/80 to-[#0a0a1a]/60 border-2 border-[#D4C5A9]/30 rounded-2xl p-4 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group backdrop-blur-sm"
+            className="w-full bg-gradient-to-br from-gray-900 to-black border border-[#D4A574]/50 rounded-2xl p-4 text-left transition-all duration-300 transform hover:scale-105 hover:border-[#D4A574] relative overflow-hidden group"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-2">
                 <div className="font-bold text-[#D4C5A9] text-lg">{project.name}</div>
-                <div className="text-[#D4C5A9] text-xl">→</div>
+                <div className="text-[#D4A574] text-xl">→</div>
               </div>
               {project.client_info && (
                 <div className="space-y-1 text-sm">
                   <div className="text-gray-300">👤 {project.client_info.full_name}</div>
-                  <div className="text-gray-400">📍 {project.client_info.address}</div>
+                  <div className="text-[#D4A574]">📍 {project.client_info.address}</div>
                 </div>
               )}
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-700">
+              <div className="flex justify-between items-center mt-3 pt-3 border-t border-[#D4A574]/30">
                 <span className="text-xs text-[#D4C5A9] font-semibold">{project.project_type || 'Renovation'}</span>
-                <span className="text-xs text-gray-400">{project.rooms?.length || 0} rooms</span>
+                <span className="text-xs text-[#D4A574]">{project.rooms?.length || 0} rooms</span>
               </div>
             </div>
           </button>
