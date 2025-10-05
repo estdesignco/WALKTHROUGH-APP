@@ -204,6 +204,15 @@ export default function MobileFFESpreadsheet({ projectId }) {
 
   return (
     <div className="w-full h-full overflow-auto" style={{ backgroundColor: '#0F172A' }}>
+      {/* Logo Header */}
+      <div className="text-center py-3 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border-b border-[#D4A574]/20">
+        <img 
+          src="/established-logo.png" 
+          alt="Company Logo" 
+          className="mx-auto h-10 object-contain"
+        />
+      </div>
+      
       {/* OFFLINE STATUS INDICATOR */}
       {!online && (
         <div className="bg-orange-600 text-white px-4 py-2 text-center font-bold text-sm">
