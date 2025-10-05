@@ -435,26 +435,54 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                               />
                             </td>
                             
-                            {/* ITEM NAME - Plain Text Display */}
+                            {/* ITEM NAME - Click to Edit */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm">
-                              <div className="font-bold">{item.name}</div>
+                              <div 
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => updateItemOffline(item.id, { name: e.target.textContent })}
+                                className="font-bold outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[100px]"
+                              >
+                                {item.name}
+                              </div>
                               {item.vendor && <div className="text-xs text-gray-400 mt-1">{item.vendor}</div>}
                               {item.sku && <div className="text-xs text-gray-400">SKU: {item.sku}</div>}
                             </td>
                             
-                            {/* QTY - Plain Text Display */}
+                            {/* QTY - Click to Edit */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center">
-                              {item.quantity || '1'}
+                              <div
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => updateItemOffline(item.id, { quantity: e.target.textContent })}
+                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[40px] inline-block"
+                              >
+                                {item.quantity || '1'}
+                              </div>
                             </td>
                             
-                            {/* SIZE - Plain Text Display */}
+                            {/* SIZE - Click to Edit */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm">
-                              {item.size || '-'}
+                              <div
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => updateItemOffline(item.id, { size: e.target.textContent })}
+                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[60px]"
+                              >
+                                {item.size || '-'}
+                              </div>
                             </td>
                             
-                            {/* FINISH/COLOR - Plain Text Display */}
+                            {/* FINISH/COLOR - Click to Edit */}
                             <td className="border border-gray-400 px-3 py-2 text-white text-sm">
-                              {item.finish_color || '-'}
+                              <div
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => updateItemOffline(item.id, { finish_color: e.target.textContent })}
+                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded min-w-[60px]"
+                              >
+                                {item.finish_color || '-'}
+                              </div>
                             </td>
                             
                             {/* DELETE BUTTON */}
