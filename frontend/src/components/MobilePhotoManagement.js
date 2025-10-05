@@ -153,31 +153,31 @@ export default function MobilePhotoManagement({ projectId, onClose }) {
         </div>
       </div>
       
-      {/* Header */}
-      <div className="bg-gray-900 p-4 border-b border-[#D4A574]/60 flex justify-between items-center sticky top-0 z-10">
-        <h2 className="text-xl font-bold text-[#D4A574]">📸 PHOTO MANAGEMENT</h2>
+      {/* Header - iPad Optimized */}
+      <div className="bg-gray-900 p-4 md:p-6 lg:p-8 border-b border-[#D4A574]/60 flex justify-between items-center sticky top-0 z-10">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#D4A574]">📸 PHOTO MANAGEMENT</h2>
         <button
           onClick={onClose}
-          className="text-white text-2xl hover:text-red-400"
+          className="text-white text-3xl md:text-4xl hover:text-red-400 p-2"
         >
           ✕
         </button>
       </div>
 
-      <div className="p-4">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="p-4 md:p-6 lg:p-8">
+        {/* Stats Grid - iPad Optimized */}
+        <div className="grid grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8 max-w-5xl mx-auto">
           {/* Photos Captured */}
-          <div className="p-4 border border-[#D4A574]/50 rounded-lg bg-gradient-to-br from-gray-900 to-black">
-            <div className="text-[#D4A574] text-xs mb-1">Photos Captured</div>
-            <div className="text-3xl font-bold text-[#D4C5A9]">
+          <div className="p-5 md:p-6 lg:p-8 border-2 border-[#D4A574]/50 rounded-2xl md:rounded-3xl bg-gradient-to-br from-gray-900 to-black shadow-xl">
+            <div className="text-[#D4A574] text-sm md:text-base lg:text-lg mb-2">Photos Captured</div>
+            <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#D4C5A9]">
               {totalPhotos}
             </div>
           </div>
 
           {/* Measurements Added */}
-          <div className="p-4 border border-[#D4A574]/50 rounded-lg bg-gradient-to-br from-gray-900 to-black">
-            <div className="text-[#D4A574] text-xs mb-1">Measurements Added</div>
+          <div className="p-5 md:p-6 lg:p-8 border-2 border-[#D4A574]/50 rounded-2xl md:rounded-3xl bg-gradient-to-br from-gray-900 to-black shadow-xl">
+            <div className="text-[#D4A574] text-sm md:text-base lg:text-lg mb-2">Measurements Added</div>
             <div className="text-3xl font-bold text-[#D4C5A9]">
               {totalMeasurements}
             </div>
