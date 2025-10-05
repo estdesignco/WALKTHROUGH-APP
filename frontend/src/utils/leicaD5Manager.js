@@ -387,6 +387,10 @@ export class LeicaD5Manager {
   // Handle disconnection
   onDisconnected() {
     console.log('⚠️ Leica D5 disconnected');
+    
+    // Stop polling if active
+    this.stopPolling();
+    
     // Keep device reference for reconnection, but clear server
     this.server = null;
     this.service = null;
