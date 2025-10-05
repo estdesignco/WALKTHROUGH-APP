@@ -162,58 +162,61 @@ function MobileProjectListScreen({ onNavigate, onSelectProject }) {
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center bg-black">
-        <div className="text-[#D4C5A9] text-lg">Loading...</div>
+        <div className="text-[#D4C5A9] text-xl md:text-2xl">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-auto p-4 bg-black">
-      {/* Logo Header */}
-      <div className="text-center mb-3 py-2 bg-gradient-to-b from-[#1a1a1a] to-black">
+    <div className="h-full overflow-auto p-6 md:p-8 lg:p-12 bg-black">
+      {/* Logo Header - iPad Optimized */}
+      <div className="text-center mb-6 md:mb-8 py-3 bg-gradient-to-b from-[#1a1a1a] to-black">
         <img 
           src={`${process.env.PUBLIC_URL}/established-logo.png`}
           alt="ESTABLISHED" 
-          className="mx-auto h-10 object-contain"
-          style={{ maxWidth: '160px' }}
+          className="mx-auto h-12 md:h-16 object-contain"
+          style={{ maxWidth: '220px' }}
         />
       </div>
       
-      <button 
-        onClick={() => onNavigate('home')}
-        className="bg-gradient-to-br from-gray-900 to-black text-[#D4C5A9] border border-[#D4A574]/50 px-4 py-2 rounded-xl mb-4 font-semibold hover:border-[#D4A574] transition-all"
-      >
-        ← Back
-      </button>
-      
-      <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">Projects</h2>
+      <div className="max-w-5xl mx-auto">
+        <button 
+          onClick={() => onNavigate('home')}
+          className="bg-gradient-to-br from-gray-900 to-black text-[#D4C5A9] border-2 border-[#D4A574]/50 px-6 py-3 md:px-8 md:py-4 rounded-2xl mb-6 md:mb-8 font-semibold hover:border-[#D4A574] transition-all text-base md:text-lg shadow-lg"
+        >
+          ← Back
+        </button>
+        
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 md:mb-8 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">Projects</h2>
 
-      <div className="space-y-3">
-        {projects.map((project) => (
-          <button
-            key={project.id}
-            onClick={() => onSelectProject(project)}
-            className="w-full bg-gradient-to-br from-gray-900 to-black border border-[#D4A574]/50 rounded-2xl p-4 text-left transition-all duration-300 transform hover:scale-105 hover:border-[#D4A574] relative overflow-hidden group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="flex justify-between items-start mb-2">
-                <div className="font-bold text-[#D4C5A9] text-lg">{project.name}</div>
-                <div className="text-[#D4A574] text-xl">→</div>
-              </div>
-              {project.client_info && (
-                <div className="space-y-1 text-sm">
-                  <div className="text-gray-300">👤 {project.client_info.full_name}</div>
-                  <div className="text-[#D4A574]">📍 {project.client_info.address}</div>
+        {/* iPad Grid Layout - 2 columns on larger screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6">
+          {projects.map((project) => (
+            <button
+              key={project.id}
+              onClick={() => onSelectProject(project)}
+              className="bg-gradient-to-br from-gray-900 to-black border-2 border-[#D4A574]/50 rounded-3xl p-6 md:p-8 text-left transition-all duration-300 transform hover:scale-105 hover:border-[#D4A574] relative overflow-hidden group shadow-2xl"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="font-bold text-[#D4C5A9] text-xl md:text-2xl">{project.name}</div>
+                  <div className="text-[#D4A574] text-2xl md:text-3xl">→</div>
                 </div>
-              )}
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-[#D4A574]/30">
-                <span className="text-xs text-[#D4C5A9] font-semibold">{project.project_type || 'Renovation'}</span>
-                <span className="text-xs text-[#D4A574]">{project.rooms?.length || 0} rooms</span>
+                {project.client_info && (
+                  <div className="space-y-2 text-base md:text-lg mb-4">
+                    <div className="text-gray-300">👤 {project.client_info.full_name}</div>
+                    <div className="text-[#D4A574]">📍 {project.client_info.address}</div>
+                  </div>
+                )}
+                <div className="flex justify-between items-center pt-4 border-t-2 border-[#D4A574]/30">
+                  <span className="text-sm md:text-base text-[#D4C5A9] font-semibold">{project.project_type || 'Renovation'}</span>
+                  <span className="text-sm md:text-base text-[#D4A574] font-medium">{project.rooms?.length || 0} rooms</span>
+                </div>
               </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
