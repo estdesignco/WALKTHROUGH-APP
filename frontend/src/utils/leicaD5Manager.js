@@ -44,10 +44,24 @@ export class LeicaD5Manager {
 
       console.log('✅ Device selected:', this.device.name);
 
-      // Connect to GATT server
+      // Connect to GATT server with retry
       console.log('🔗 Connecting to GATT server...');
-      this.server = await this.device.gatt.connect();
-      console.log('✅ Connected to GATT server');
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          this.server = await Promise.race([
+            this.device.gatt.connect(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Connection timeout')), 30000))
+          ]);
+          console.log('✅ Connected to GATT server');
+          break;
+        } catch (err) {
+          retries--;
+          if (retries === 0) throw err;
+          console.log(`⚠️ Retry connection... (${retries} left)`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
 
       // Get service
       console.log('📡 Getting Leica service...');
