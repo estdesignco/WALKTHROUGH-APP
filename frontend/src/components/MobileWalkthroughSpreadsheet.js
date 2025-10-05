@@ -371,7 +371,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
 
       {/* WALKTHROUGH TABLE - EXACT DESKTOP STRUCTURE */}
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse" style={{ minWidth: '800px' }}>
+        <table className="border-collapse" style={{ width: 'auto', minWidth: '100%' }}>
           <tbody>
             {displayProject?.rooms?.map((room) => (
               <React.Fragment key={room.id}>
