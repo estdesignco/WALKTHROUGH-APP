@@ -55,11 +55,27 @@ export default function MobilePhotoManagement({ projectId, onClose }) {
   const connectLeica = async () => {
     try {
       setConnecting(true);
-      await leicaManager.connect();
+      
+      // Check if already paired for faster reconnection
+      if (leicaManager.isPaired()) {
+        console.log('📱 Device previously paired, reconnecting...');
+      }
+      
+      const result = await leicaManager.connect();
       setLeicaConnected(true);
-      alert('✅ Connected to Leica D5!');
+      alert(`✅ Connected to ${result.deviceName}!\n\nReady to take measurements.`);
     } catch (error) {
-      alert(`❌ Failed to connect:\n${error.message}`);
+      let errorMsg = `❌ Failed to connect:\n${error.message}\n\n`;
+      
+      if (error.message.includes('timeout')) {
+        errorMsg += `⏱ CONNECTION TIMEOUT\n\n🔧 Quick Fixes:\n1. Turn Leica D5 OFF → Wait 3 seconds → Turn ON\n2. Move device closer (< 3 feet)\n3. Close other apps using Bluetooth\n4. Try again (may take 30-60 seconds first time)\n\n💡 Tip: Once paired, reconnection is much faster!`;
+      } else if (error.message.includes('User cancelled')) {
+        errorMsg = '⚠️ Connection cancelled by user';
+      } else {
+        errorMsg += `📋 Checklist:\n✓ Leica D5 powered ON\n✓ Bluetooth enabled\n✓ Device in pairing mode\n✓ Not connected to another device\n✓ Within 10 feet range`;
+      }
+      
+      alert(errorMsg);
     } finally {
       setConnecting(false);
     }
