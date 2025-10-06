@@ -7074,24 +7074,6 @@ async def upload_walkthrough_photos_to_canva(request_data: dict):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Mount Canva app static files
-canva_app_path = os.path.join(os.path.dirname(__file__), "../canva-checklist-app/dist")
-if os.path.exists(canva_app_path):
-    app.mount("/canva-app/static", StaticFiles(directory=canva_app_path), name="canva-app")
-    
-    @app.get("/canva-app")
-    async def serve_canva_app():
-        """Serve the Canva Live Checklist app"""
-        index_path = os.path.join(canva_app_path, "index.html")
-        if os.path.exists(index_path):
-            with open(index_path, 'r') as f:
-                html_content = f.read()
-            # Update the script src to use the correct path
-            html_content = html_content.replace('src="app.js"', 'src="/canva-app/static/app.js"')
-            return HTMLResponse(content=html_content)
-        else:
-            raise HTTPException(status_code=404, detail="Canva app not found")
-
 # Include the router in the main app
 app.include_router(api_router, prefix="/api")
 app.include_router(furniture_router)
