@@ -482,8 +482,16 @@ export const App = () => {
                                       type="checkbox"
                                       checked={item.checked || false}
                                       onChange={(e: any) => {
-                                        item.checked = e.target.checked;
-                                        updateItem(item.id, { checked: e.target.checked });
+                                        const isChecked = e.target.checked;
+                                        item.checked = isChecked;
+                                        
+                                        // Auto-set status to PICKED if checked and no status
+                                        if (isChecked && (!item.status || item.status === '')) {
+                                          item.status = 'PICKED';
+                                          updateStatus(item.id, 'PICKED');
+                                        }
+                                        
+                                        updateItem(item.id, { checked: isChecked });
                                       }}
                                       style={{
                                         width: "20px",
