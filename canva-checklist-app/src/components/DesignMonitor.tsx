@@ -87,7 +87,7 @@ export const DesignMonitor: React.FC<DesignMonitorProps> = ({ projectId, onItemD
             variant={monitoring ? "secondary" : "primary"}
             onClick={() => monitoring ? stopMonitoring() : setMonitoring(true)}
           >
-            {monitoring ? 'Stop' : 'Start'} Monitoring
+            {monitoring ? 'Stop Monitoring' : 'Start Monitoring'}
           </Button>
           <Button 
             variant="tertiary"
