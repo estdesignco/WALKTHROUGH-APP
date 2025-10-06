@@ -69,6 +69,18 @@ export const App = () => {
     }
   };
 
+  const updateItem = async (itemId: string, data: any) => {
+    try {
+      await fetch(`${BACKEND_URL}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    } catch (e) {
+      console.error('Update failed:', e);
+    }
+  };
+
   const openLink = async (url: string) => {
     if (url) await requestOpenExternalUrl({ url });
   };
