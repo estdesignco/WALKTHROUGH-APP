@@ -654,18 +654,15 @@ export const App = () => {
                     </div>
                   );
                 })}
-              </div>
-            );
-          })}
-        </Rows>
-      </div>
+              </Rows>
+            </div>
 
-      {/* BACK BUTTON */}
-      <div style={{ padding: "0 16px 20px" }}>
-        <Button variant="secondary" onClick={() => setProject(null)} stretch>
-          ← Back to Project Selection
-        </Button>
-      </div>
-    </div>
-  );
-};
+            {/* BACK BUTTON */}
+            <div style={{ padding: "0 16px 20px" }}>
+              <Button variant="secondary" onClick={() => setSelectedRoom(null)} stretch>
+                ← Back to Room Selection
+              </Button>
+            </div>
+          </div>
+        );
+      };
