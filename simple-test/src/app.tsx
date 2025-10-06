@@ -143,7 +143,7 @@ export const App = () => {
     try {
       // Scrape URL
       console.log('📡 Sending scrape request...');
-      const scrapeRes = await fetch(`${BACKEND_URL}/api/scrape`, {
+      const scrapeRes = await fetch(`${BACKEND_URL}/api/scrape-product`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: scrapingUrl.trim() })
