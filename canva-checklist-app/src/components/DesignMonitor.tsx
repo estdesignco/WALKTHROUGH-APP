@@ -115,12 +115,12 @@ export const DesignMonitor: React.FC<DesignMonitorProps> = ({ projectId, onItemD
         )}
 
         {detectedElements.length > 0 && (
-          <Box background="neutral" padding="0.75u" borderRadius="small">
-            <Rows spacing="0.5u">
+          <Box background="neutral" padding="1u" borderRadius="standard">
+            <Rows spacing="1u">
               <Text size="small" weight="bold">
                 Elements on page: {detectedElements.length}
               </Text>
-              <Text size="xsmall">
+              <Text size="small">
                 With links: {detectedElements.filter(e => e.hasLink).length}
               </Text>
             </Rows>
