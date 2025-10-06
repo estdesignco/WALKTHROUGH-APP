@@ -69,14 +69,15 @@ class CanvaIntegration:
         from urllib.parse import urlencode
         return f"{self.auth_url}?{urlencode(params)}"
     
-    async def exchange_code_for_token(self, code: str) -> Dict[str, Any]:
-        """Exchange authorization code for access token."""
+    async def exchange_code_for_token(self, code: str, code_verifier: str) -> Dict[str, Any]:
+        """Exchange authorization code for access token with PKCE."""
         data = {
             "grant_type": "authorization_code",
             "code": code,
             "client_id": self.client_id,
             "client_secret": self.client_secret,
-            "redirect_uri": self.redirect_uri
+            "redirect_uri": self.redirect_uri,
+            "code_verifier": code_verifier
         }
         
         # More comprehensive browser-like headers to bypass Cloudflare
