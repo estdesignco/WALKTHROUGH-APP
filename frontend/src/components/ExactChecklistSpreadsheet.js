@@ -973,6 +973,71 @@ const ExactChecklistSpreadsheet = ({
                     <span>{room.name.toUpperCase()}</span>
                   </div>
                   <div className="flex items-center gap-2">
+                    {/* CONNECT TO CANVA BUTTON */}
+                    <button
+                      onClick={() => {
+                        const projectId = project.id;
+                        const roomId = room.id;
+                        
+                        // Show modal with connection info
+                        const modal = document.createElement('div');
+                        modal.style.cssText = `
+                          position: fixed;
+                          top: 0;
+                          left: 0;
+                          width: 100%;
+                          height: 100%;
+                          background: rgba(0,0,0,0.9);
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          z-index: 9999;
+                        `;
+                        
+                        modal.innerHTML = `
+                          <div style="background: linear-gradient(135deg, #000 0%, #1e293b 50%, #000 100%); padding: 40px; border-radius: 16px; max-width: 600px; border: 3px solid #D4A574;">
+                            <h2 style="color: #D4A574; font-size: 24px; margin-bottom: 20px; text-align: center;">🎨 Connect "${room.name}" to Canva</h2>
+                            
+                            <div style="background: rgba(30, 41, 59, 0.8); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #B49B7E;">
+                              <p style="color: #B49B7E; margin-bottom: 10px; font-size: 14px;"><strong>Step 1: Copy Project ID</strong></p>
+                              <input type="text" readonly value="${projectId}" style="width: 100%; padding: 12px; background: #0f172a; border: 2px solid #D4A574; border-radius: 8px; color: #D4A574; font-family: monospace; font-size: 13px; margin-bottom: 10px;" onclick="this.select();">
+                              
+                              <p style="color: #B49B7E; margin-bottom: 10px; font-size: 14px; margin-top: 16px;"><strong>Step 2: Then select "${room.name}" from list</strong></p>
+                            </div>
+                            
+                            <div style="background: rgba(139, 68, 68, 0.3); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #D4A574;">
+                              <p style="color: #D4C5A9; font-size: 13px; line-height: 1.6;">
+                                <strong>📋 Instructions:</strong><br>
+                                1. Open Canva.com → Open any design<br>
+                                2. Open "Live Checklist" app from sidebar<br>
+                                3. Paste the Project ID<br>
+                                4. Click "Load Checklist"<br>
+                                5. Select "${room.name}" from the room list<br>
+                                6. Done! It will remember your choice!
+                              </p>
+                            </div>
+                            
+                            <button onclick="
+                              navigator.clipboard.writeText('${projectId}');
+                              alert('✅ Project ID copied! Now open Canva and paste it.');
+                            " style="width: 100%; padding: 14px; background: #D4A574; color: #1E293B; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; font-size: 14px;">
+                              📋 COPY PROJECT ID
+                            </button>
+                            
+                            <button onclick="this.parentElement.parentElement.remove()" style="width: 100%; padding: 14px; background: rgba(30, 41, 59, 0.8); color: #B49B7E; border: 2px solid #B49B7E; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">
+                              ✖ CLOSE
+                            </button>
+                          </div>
+                        `;
+                        
+                        document.body.appendChild(modal);
+                      }}
+                      className="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700 transition-colors font-bold"
+                      title={`Connect ${room.name} to Canva`}
+                    >
+                      🔗 CONNECT TO CANVA
+                    </button>
+                    
                     {/* CANVA PAGE-SPECIFIC IMPORT BUTTON */}
                     <button
                       onClick={() => {
