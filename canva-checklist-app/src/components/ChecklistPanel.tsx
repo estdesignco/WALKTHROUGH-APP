@@ -73,20 +73,20 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
             <Box key={room.id}>
               {/* Room Header */}
               <Box 
-                background="brandPrimary"
                 padding="1u"
                 className="room-header"
                 onClick={() => toggleRoom(room.id)}
                 style={{
                   backgroundColor: roomColor,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  color: 'white'
                 }}
               >
                 <Columns spacing="1u" alignY="center">
-                  <Text tone="inverse" weight="bold">
+                  <Title size="small">
                     {isRoomCollapsed ? '▶' : '▼'} {room.name}
-                  </Text>
-                  <Text tone="inverse" size="small">
+                  </Title>
+                  <Text>
                     ({room.categories?.reduce((sum: number, cat: any) => sum + (cat.items?.length || 0), 0)} items)
                   </Text>
                 </Columns>
