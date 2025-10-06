@@ -137,24 +137,37 @@ export const App = () => {
   const scrapeAndAdd = async () => {
     if (!scrapingUrl.trim() || !selectedRoom) return;
     
+    console.log('🔍 Starting scrape for URL:', scrapingUrl.trim());
     setLoading(true);
+    
     try {
       // Scrape URL
+      console.log('📡 Sending scrape request...');
       const scrapeRes = await fetch(`${BACKEND_URL}/api/scrape`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: scrapingUrl.trim() })
       });
       
-      if (!scrapeRes.ok) throw new Error('Scraping failed');
+      console.log('📡 Scrape response status:', scrapeRes.status);
+      
+      if (!scrapeRes.ok) {
+        const errorText = await scrapeRes.text();
+        console.error('❌ Scrape failed:', errorText);
+        throw new Error(`Scraping failed: ${scrapeRes.status} - ${errorText}`);
+      }
       
       const scrapedData = await scrapeRes.json();
-      console.log('✅ Scraped:', scrapedData);
+      console.log('✅ Scraped data:', scrapedData);
       
       // Find first subcategory to add item
       let subcategoryId = null;
+      console.log('🔍 Looking for subcategory in room:', selectedRoom.name);
+      
       for (const cat of selectedRoom.categories || []) {
+        console.log('  Category:', cat.name);
         for (const sub of cat.subcategories || []) {
+          console.log('    Subcategory:', sub.name, sub.id);
           subcategoryId = sub.id;
           break;
         }
@@ -162,9 +175,12 @@ export const App = () => {
       }
       
       if (!subcategoryId) {
-        alert('No subcategory found to add item');
+        console.error('❌ No subcategory found');
+        alert('❌ No subcategory found to add item.\n\nPlease make sure this room has at least one category with a subcategory.');
         return;
       }
+      
+      console.log('📝 Adding item to subcategory:', subcategoryId);
       
       // Add item
       const addRes = await fetch(`${BACKEND_URL}/api/items`, {
@@ -178,14 +194,22 @@ export const App = () => {
         })
       });
       
+      console.log('📡 Add item response status:', addRes.status);
+      
       if (addRes.ok) {
+        console.log('✅ Item added successfully!');
         alert('✅ Item added successfully!');
         setScrapingUrl('');
         // Reload project
         loadProject(projectId, selectedRoom.id);
+      } else {
+        const errorText = await addRes.text();
+        console.error('❌ Add item failed:', errorText);
+        throw new Error(`Failed to add item: ${addRes.status}`);
       }
     } catch (e: any) {
-      alert('❌ Error: ' + e.message);
+      console.error('❌ Error in scrapeAndAdd:', e);
+      alert('❌ Error: ' + e.message + '\n\nCheck console for details (F12)');
     } finally {
       setLoading(false);
     }
