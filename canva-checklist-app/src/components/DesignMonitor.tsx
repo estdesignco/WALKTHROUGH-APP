@@ -101,15 +101,15 @@ export const DesignMonitor: React.FC<DesignMonitorProps> = ({ projectId, onItemD
         </Columns>
 
         {monitoring && (
-          <Box background="positive" padding="0.5u" borderRadius="small">
-            <Text size="xsmall" tone="positive">
+          <Box background="neutral" padding="1u" borderRadius="standard">
+            <Text size="small">
               ✅ Monitoring active - Detecting items with links...
             </Text>
           </Box>
         )}
 
         {lastScan && (
-          <Text size="xsmall" tone="tertiary">
+          <Text size="small">
             Last scan: {lastScan.toLocaleTimeString()}
           </Text>
         )}
