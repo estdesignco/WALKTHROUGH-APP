@@ -665,16 +665,18 @@ export const App = () => {
 
                                     {/* NAME + QTY */}
                                     <div style={{ flex: 1 }}>
-                                      <Text><strong style={{ color: "#D4A574", fontSize: "14px" }}>{item.name}</strong></Text>
-                                      <Text style={{ fontSize: "11px", color: "#B49B7E" }}>
+                                      <div style={{ color: "#D4A574", fontSize: "14px", fontWeight: "bold", marginBottom: "4px" }}>
+                                        {item.name}
+                                      </div>
+                                      <div style={{ fontSize: "11px", color: "#D4A574" }}>
                                         Qty: {item.quantity || 1}
-                                      </Text>
+                                      </div>
                                     </div>
                                   </div>
 
                                   {/* ROW 2: STATUS DROPDOWN */}
                                   <div style={{ marginTop: "10px" }}>
-                                    <div style={{ fontSize: "11px", color: "#B49B7E", marginBottom: "4px" }}>STATUS:</div>
+                                    <div style={{ fontSize: "11px", color: "#D4A574", marginBottom: "4px", fontWeight: "bold" }}>STATUS:</div>
                                     <select
                                       value={item.status || ''}
                                       onChange={(e: any) => {
