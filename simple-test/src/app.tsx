@@ -207,6 +207,9 @@ export const App = () => {
   const selectRoom = (room: any) => {
     setSelectedRoom(room);
     setRoomId(room.id);
+    // Save to localStorage
+    localStorage.setItem('canva_saved_roomId', room.id);
+    console.log('✅ Room selected and saved:', room.name);
   };
 
   const openLink = async (url: string) => {
