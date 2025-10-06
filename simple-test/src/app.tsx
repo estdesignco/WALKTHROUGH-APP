@@ -488,6 +488,16 @@ export const App = () => {
             <Button variant="secondary" onClick={() => setSelectedRoom(null)}>
               ← Change Room
             </Button>
+            <Button variant="secondary" onClick={() => {
+              localStorage.removeItem('canva_saved_projectId');
+              localStorage.removeItem('canva_saved_roomId');
+              setProject(null);
+              setSelectedRoom(null);
+              setProjectId('');
+              setRoomId('');
+            }}>
+              🔄 Change Project
+            </Button>
           </div>
         </div>
       </div>
