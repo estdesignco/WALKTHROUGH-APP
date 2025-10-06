@@ -387,7 +387,7 @@ export const App = () => {
               onClick={() => selectRoom(room)}
               style={{
                 background: room.color || "#D4A574",
-                color: "#1E293B",
+                color: "#FFFFFF",
                 padding: "20px",
                 borderRadius: "12px",
                 cursor: "pointer",
@@ -396,6 +396,7 @@ export const App = () => {
                 fontSize: "18px",
                 border: "3px solid #B49B7E",
                 transition: "transform 0.2s",
+                textShadow: "2px 2px 4px rgba(0,0,0,0.8)"
               }}
               onMouseEnter={(e: any) => e.currentTarget.style.transform = "scale(1.05)"}
               onMouseLeave={(e: any) => e.currentTarget.style.transform = "scale(1)"}
