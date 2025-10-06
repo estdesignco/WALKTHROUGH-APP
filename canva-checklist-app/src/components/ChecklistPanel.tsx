@@ -191,7 +191,7 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                                         </Button>
                                       )}
                                     </Columns>
-                                  </Box>
+                                  </div>
                                 ))}
                               </Rows>
                             </Box>
