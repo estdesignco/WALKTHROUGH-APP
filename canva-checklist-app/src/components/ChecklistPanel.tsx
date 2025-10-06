@@ -1,210 +1,210 @@
-import React, { useState } from 'react';
-import { Box, Rows, Columns, Text, Button, Title } from '@canva/app-ui-kit';
-import { requestOpenExternalUrl } from '@canva/platform';
+import React from 'react';
+import { Rows, Text, Box, Columns, Button, Checkbox } from '@canva/app-ui-kit';
 
-interface ChecklistPanelProps {
-  project: any;
-  onItemCheck: (roomId: string, categoryId: string, itemId: string, checked: boolean) => void;
-  onStatusChange: (roomId: string, categoryId: string, itemId: string, status: string) => void;
+interface ChecklistItem {
+  id: string;
+  name: string;
+  link?: string;
+  image_url?: string;
+  price?: string;
+  status?: string;
+  checked?: boolean;
+  size?: string;
+  color?: string;
 }
 
-export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemCheck, onStatusChange }) => {
-  const [collapsedRooms, setCollapsedRooms] = useState<Set<string>>(new Set());
-  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+interface Category {
+  id: string;
+  name: string;
+  items: ChecklistItem[];
+}
 
-  const toggleRoom = (roomId: string) => {
-    const newCollapsed = new Set(collapsedRooms);
-    if (newCollapsed.has(roomId)) {
-      newCollapsed.delete(roomId);
-    } else {
-      newCollapsed.add(roomId);
-    }
-    setCollapsedRooms(newCollapsed);
-  };
+interface Room {
+  id: string;
+  name: string;
+  color: string;
+  categories: Category[];
+  collapsed?: boolean;
+}
 
-  const toggleCategory = (categoryId: string) => {
-    const newCollapsed = new Set(collapsedCategories);
-    if (newCollapsed.has(categoryId)) {
-      newCollapsed.delete(categoryId);
-    } else {
-      newCollapsed.add(categoryId);
-    }
-    setCollapsedCategories(newCollapsed);
-  };
+interface ChecklistPanelProps {
+  rooms: Room[];
+  onItemCheck: (roomId: string, categoryId: string, itemId: string, checked: boolean) => void;
+  onStatusChange: (roomId: string, categoryId: string, itemId: string, status: string) => void;
+  onRoomToggle: (roomId: string) => void;
+}
 
-  const handleOpenLink = async (link: string) => {
-    if (link) {
-      try {
-        await requestOpenExternalUrl({ url: link });
-      } catch (err) {
-        console.error('Failed to open link:', err);
-      }
-    }
-  };
-
+export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({
+  rooms,
+  onItemCheck,
+  onStatusChange,
+  onRoomToggle
+}) => {
   const getStatusColor = (status: string) => {
-    const statusMap: { [key: string]: string } = {
-      'PICKED': '#e3f2fd',
-      'ORDERED': '#fff3e0',
-      'SHIPPED': '#f3e5f5',
-      'DELIVERED TO RECEIVER': '#e8f5e9',
-      'DELIVERED TO JOB SITE': '#e8f5e9',
-      'INSTALLED': '#c8e6c9'
+    const statusMap: Record<string, string> = {
+      'TO BE SELECTED': '#D4A574',
+      'APPROVED': '#9ACD32',
+      'ORDERED': '#32CD32',
+      'PICKED': '#3B82F6',
+      'SHIPPED': '#4169E1',
+      'DELIVERED TO JOB SITE': '#8A2BE2',
+      'INSTALLED': '#006400'
     };
-    return statusMap[status] || '#f5f5f5';
+    return statusMap[status] || '#9CA3AF';
   };
-
-  if (!project || !project.rooms || project.rooms.length === 0) {
-    return (
-      <Box padding="2u">
-        <Text>No checklist items found.</Text>
-      </Box>
-    );
-  }
 
   return (
-    <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 120px)' }}>
-      <Rows spacing="1u">
-        {project.rooms.map((room: any) => {
-          const isRoomCollapsed = collapsedRooms.has(room.id);
-          const roomColor = room.color || '#D4A574';
-          
-          return (
-            <Box key={room.id}>
-              {/* Room Header */}
-              <div 
-                onClick={() => toggleRoom(room.id)}
-                style={{
-                  backgroundColor: roomColor,
-                  cursor: 'pointer',
-                  color: 'white',
-                  padding: '12px'
-                }}
-              >
-                <Columns spacing="1u" alignY="center">
-                  <Title size="small">
-                    {isRoomCollapsed ? '▶' : '▼'} {room.name}
-                  </Title>
-                  <Text>
-                    ({room.categories?.reduce((sum: number, cat: any) => sum + (cat.items?.length || 0), 0)} items)
-                  </Text>
-                </Columns>
-              </div>
+    <div style={{ 
+      flex: 1, 
+      overflowY: 'auto', 
+      padding: '16px',
+      backgroundColor: '#FAFAFA'
+    }}>
+      <Rows spacing="2u">
+        {rooms.map((room) => (
+          <div key={room.id} style={{ 
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            border: '1px solid #E5E7EB',
+            overflow: 'hidden',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}>
+            {/* Room Header */}
+            <div
+              onClick={() => onRoomToggle(room.id)}
+              style={{
+                backgroundColor: room.color,
+                color: 'white',
+                padding: '16px 20px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                userSelect: 'none'
+              }}
+            >
+              <Text size="medium" style={{ fontWeight: 600, color: 'white' }}>
+                {room.name.toUpperCase()}
+              </Text>
+              <span style={{ fontSize: '20px' }}>
+                {room.collapsed ? '▼' : '▲'}
+              </span>
+            </div>
 
-              {/* Room Content */}
-              {!isRoomCollapsed && room.categories && (
-                <Box padding="1u">
-                  <Rows spacing="1u">
-                    {room.categories.map((category: any) => {
-                      const isCategoryCollapsed = collapsedCategories.has(category.id);
-                      
-                      return (
-                        <Box key={category.id}>
-                          {/* Category Header */}
-                          <div 
-                            onClick={() => toggleCategory(category.id)}
+            {/* Room Content */}
+            {!room.collapsed && (
+              <div style={{ padding: '16px' }}>
+                <Rows spacing="2u">
+                  {room.categories.map((category) => (
+                    <div key={category.id}>
+                      {/* Category Header */}
+                      {category.name && (
+                        <div style={{ 
+                          padding: '8px 12px',
+                          backgroundColor: '#F9FAFB',
+                          borderRadius: '6px',
+                          marginBottom: '8px'
+                        }}>
+                          <Text size="small" style={{ fontWeight: 600 }}>
+                            {category.name}
+                          </Text>
+                        </div>
+                      )}
+
+                      {/* Items */}
+                      <Rows spacing="1u">
+                        {category.items.map((item) => (
+                          <div
+                            key={item.id}
                             style={{
-                              backgroundColor: '#e0e0e0',
-                              cursor: 'pointer',
-                              padding: '12px'
+                              padding: '12px',
+                              backgroundColor: item.checked ? '#F0FDF4' : 'white',
+                              border: '1px solid #E5E7EB',
+                              borderRadius: '8px',
+                              transition: 'all 0.2s'
                             }}
                           >
-                            <Title size="xsmall">
-                              {isCategoryCollapsed ? '▶' : '▼'} {category.name} ({category.items?.length || 0})
-                            </Title>
-                          </div>
+                            <Columns spacing="2u" alignY="center">
+                              {/* Checkbox */}
+                              <div>
+                                <Checkbox
+                                  value={item.checked || false}
+                                  onChange={(checked) => 
+                                    onItemCheck(room.id, category.id, item.id, checked)
+                                  }
+                                />
+                              </div>
 
-                          {/* Category Items */}
-                          {!isCategoryCollapsed && category.items && category.items.length > 0 && (
-                            <Box padding="1u">
-                              <Rows spacing="1u">
-                                {category.items.map((item: any) => (
-                                  <div 
-                                    key={item.id}
+                              {/* Image */}
+                              {item.image_url && (
+                                <div>
+                                  <img
+                                    src={item.image_url}
+                                    alt={item.name}
                                     style={{
-                                      borderLeft: `3px solid ${item.checked ? '#4caf50' : '#ccc'}`,
-                                      transition: 'all 0.2s',
-                                      backgroundColor: 'white',
-                                      borderRadius: '4px',
-                                      padding: '12px'
+                                      width: '60px',
+                                      height: '60px',
+                                      objectFit: 'cover',
+                                      borderRadius: '6px',
+                                      border: '1px solid #E5E7EB'
                                     }}
+                                  />
+                                </div>
+                              )}
+
+                              {/* Item Details */}
+                              <div style={{ flex: 1 }}>
+                                <Rows spacing="0.5u">
+                                  <Text size="small" style={{ fontWeight: 500 }}>
+                                    {item.name}
+                                  </Text>
+                                  
+                                  {item.price && (
+                                    <Text size="small" tone="tertiary">
+                                      💰 {item.price}
+                                    </Text>
+                                  )}
+                                  
+                                  {item.status && (
+                                    <div
+                                      style={{
+                                        display: 'inline-block',
+                                        padding: '4px 8px',
+                                        backgroundColor: getStatusColor(item.status),
+                                        color: 'white',
+                                        borderRadius: '4px',
+                                        fontSize: '11px',
+                                        fontWeight: 600
+                                      }}
+                                    >
+                                      {item.status}
+                                    </div>
+                                  )}
+                                </Rows>
+                              </div>
+
+                              {/* Link Button */}
+                              {item.link && (
+                                <div>
+                                  <Button
+                                    variant="tertiary"
+                                    onClick={() => window.open(item.link, '_blank')}
                                   >
-                                    <Columns spacing="1u" alignY="center">
-                                      {/* Checkbox */}
-                                      <input 
-                                        type="checkbox"
-                                        checked={item.checked || false}
-                                        onChange={(e) => onItemCheck(room.id, category.id, item.id, e.target.checked)}
-                                        style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                                      />
-
-                                      {/* Image */}
-                                      {item.image_url && (
-                                        <img 
-                                          src={item.image_url} 
-                                          alt={item.name}
-                                          className="item-image"
-                                          style={{
-                                            width: '40px',
-                                            height: '40px',
-                                            objectFit: 'cover',
-                                            borderRadius: '4px'
-                                          }}
-                                        />
-                                      )}
-
-                                      {/* Item Info */}
-                                      <div style={{ flex: 1 }}>
-                                        <Rows spacing="1u">
-                                          <Title size="xsmall">
-                                            {item.name}
-                                          </Title>
-                                          {item.price && (
-                                            <Text>
-                                              ${item.price}
-                                            </Text>
-                                          )}
-                                          {item.status && (
-                                            <span 
-                                              className="status-badge"
-                                              style={{
-                                                backgroundColor: getStatusColor(item.status),
-                                                padding: '2px 6px',
-                                                borderRadius: '8px',
-                                                fontSize: '10px',
-                                                display: 'inline-block'
-                                              }}
-                                            >
-                                              {item.status}
-                                            </span>
-                                          )}
-                                        </Rows>
-                                      </div>
-
-                                      {/* Link Button */}
-                                      {item.link && (
-                                        <Button 
-                                          variant="tertiary"
-                                          onClick={() => handleOpenLink(item.link)}
-                                        >
-                                          🔗
-                                        </Button>
-                                      )}
-                                    </Columns>
-                                  </div>
-                                ))}
-                              </Rows>
-                            </Box>
-                          )}
-                        </Box>
-                      );
-                    })}
-                  </Rows>
-                </Box>
-              )}
-            </Box>
-          );
-        })}
+                                    🔗 View
+                                  </Button>
+                                </div>
+                              )}
+                            </Columns>
+                          </div>
+                        ))}
+                      </Rows>
+                    </div>
+                  ))}
+                </Rows>
+              </div>
+            )}
+          </div>
+        ))}
       </Rows>
     </div>
   );
