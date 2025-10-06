@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Rows, Columns, Text, Button } from '@canva/app-ui-kit';
+import { Box, Rows, Columns, Text, Button, Title } from '@canva/app-ui-kit';
 import { requestOpenExternalUrl } from '@canva/platform';
 
 interface ChecklistPanelProps {
