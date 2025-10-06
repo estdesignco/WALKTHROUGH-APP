@@ -554,9 +554,9 @@ export const App = () => {
           </div>
           
           <div style={{ marginTop: "10px" }}>
-            <Text style={{ color: "#D4A574", fontSize: "11px" }}>
+            <div style={{ color: "#D4A574", fontSize: "11px" }}>
               💡 Single: Paste URL above | Bulk: Click Auto-Import to scan entire Canva page
-            </Text>
+            </div>
           </div>
         </Rows>
       </div>
