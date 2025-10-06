@@ -705,35 +705,35 @@ export const App = () => {
                                   {/* ROW 3: DETAILS */}
                                   <div style={{ marginTop: "10px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
                                     {item.size && (
-                                      <div style={{ fontSize: "11px", color: "#B49B7E" }}>
+                                      <div style={{ fontSize: "11px", color: "#D4A574" }}>
                                         📏 <strong>Size:</strong> {item.size}
                                       </div>
                                     )}
                                     {item.finish_color && (
-                                      <div style={{ fontSize: "11px", color: "#B49B7E" }}>
+                                      <div style={{ fontSize: "11px", color: "#D4A574" }}>
                                         🎨 <strong>Finish:</strong> {item.finish_color}
                                       </div>
                                     )}
                                     {item.sku && (
-                                      <div style={{ fontSize: "11px", color: "#B49B7E" }}>
+                                      <div style={{ fontSize: "11px", color: "#D4A574" }}>
                                         🔖 <strong>SKU:</strong> {item.sku}
                                       </div>
                                     )}
                                     {item.vendor && (
-                                      <div style={{ fontSize: "11px", color: "#B49B7E" }}>
+                                      <div style={{ fontSize: "11px", color: "#D4A574" }}>
                                         🏪 <strong>Vendor:</strong> {item.vendor}
                                       </div>
                                     )}
                                     {(item.cost || item.price) && (
-                                      <div style={{ fontSize: "11px", color: "#9ACD32" }}>
-                                        💰 <strong>${item.cost || item.price}</strong>
+                                      <div style={{ fontSize: "11px", color: "#9ACD32", fontWeight: "bold" }}>
+                                        💰 ${item.cost || item.price}
                                       </div>
                                     )}
                                   </div>
 
                                   {/* ROW 4: LINK INPUT + SCRAPE */}
                                   <div style={{ marginTop: "10px" }}>
-                                    <div style={{ fontSize: "11px", color: "#B49B7E", marginBottom: "4px" }}>PRODUCT LINK:</div>
+                                    <div style={{ fontSize: "11px", color: "#D4A574", marginBottom: "4px", fontWeight: "bold" }}>PRODUCT LINK:</div>
                                     <div style={{ display: "flex", gap: "8px" }}>
                                       <input
                                         type="text"
