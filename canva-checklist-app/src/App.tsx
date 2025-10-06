@@ -185,11 +185,11 @@ export const App: React.FC = () => {
             Connect to Project
           </Button>
           
-          <Box padding="1u" style={{ backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+          <div style={{ backgroundColor: '#f5f5f5', borderRadius: '4px', padding: '12px' }}>
             <Text>
               💡 Tip: Get your Project ID from the main app URL
             </Text>
-          </Box>
+          </div>
         </Rows>
       </Box>
     );
