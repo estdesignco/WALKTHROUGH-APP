@@ -146,7 +146,10 @@ export const App = () => {
       const scrapeRes = await fetch(`${BACKEND_URL}/api/scrape-product`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: scrapingUrl.trim() })
+        body: JSON.stringify({ 
+          url: scrapingUrl.trim(),
+          auto_clip_to_houzz: true
+        })
       });
       
       console.log('📡 Scrape response status:', scrapeRes.status);
