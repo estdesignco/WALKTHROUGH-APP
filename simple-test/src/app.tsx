@@ -29,12 +29,16 @@ export const App = () => {
 
   // REAL-TIME SYNC every 5 seconds
   React.useEffect(() => {
-    if (!project) return;
+    if (!project || !selectedRoom) return;
     const interval = setInterval(async () => {
       try {
         const res = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=checklist`);
         if (res.ok) {
-          setProject(await res.json());
+          const data = await res.json();
+          setProject(data);
+          // Update selected room
+          const room = data.rooms?.find((r: any) => r.id === selectedRoom.id);
+          if (room) setSelectedRoom(room);
           setLastSync(new Date());
         }
       } catch (e) {
@@ -42,18 +46,105 @@ export const App = () => {
       }
     }, 5000);
     return () => clearInterval(interval);
-  }, [project, projectId]);
+  }, [project, projectId, selectedRoom]);
 
-  const loadProject = async () => {
-    if (!projectId.trim()) return;
+  // Check URL params for projectId and roomId
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlProjectId = params.get('projectId');
+    const urlRoomId = params.get('roomId');
+    
+    if (urlProjectId) {
+      setProjectId(urlProjectId);
+      if (urlRoomId) {
+        setRoomId(urlRoomId);
+      }
+      loadProject(urlProjectId, urlRoomId || '');
+    }
+  }, []);
+
+  const loadProject = async (pid?: string, rid?: string) => {
+    const targetProjectId = pid || projectId.trim();
+    const targetRoomId = rid || roomId.trim();
+    
+    if (!targetProjectId) return;
+    
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/projects/${projectId.trim()}?sheet_type=checklist`);
+      const res = await fetch(`${BACKEND_URL}/api/projects/${targetProjectId}?sheet_type=checklist`);
       if (!res.ok) throw new Error(`Failed: ${res.status}`);
-      setProject(await res.json());
+      const data = await res.json();
+      setProject(data);
+      
+      // If roomId provided, select that room
+      if (targetRoomId) {
+        const room = data.rooms?.find((r: any) => r.id === targetRoomId);
+        if (room) {
+          setSelectedRoom(room);
+        } else {
+          setError(`Room not found: ${targetRoomId}`);
+        }
+      }
     } catch (e: any) {
       setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const scrapeAndAdd = async () => {
+    if (!scrapingUrl.trim() || !selectedRoom) return;
+    
+    setLoading(true);
+    try {
+      // Scrape URL
+      const scrapeRes = await fetch(`${BACKEND_URL}/api/scrape`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: scrapingUrl.trim() })
+      });
+      
+      if (!scrapeRes.ok) throw new Error('Scraping failed');
+      
+      const scrapedData = await scrapeRes.json();
+      console.log('✅ Scraped:', scrapedData);
+      
+      // Find first subcategory to add item
+      let subcategoryId = null;
+      for (const cat of selectedRoom.categories || []) {
+        for (const sub of cat.subcategories || []) {
+          subcategoryId = sub.id;
+          break;
+        }
+        if (subcategoryId) break;
+      }
+      
+      if (!subcategoryId) {
+        alert('No subcategory found to add item');
+        return;
+      }
+      
+      // Add item
+      const addRes = await fetch(`${BACKEND_URL}/api/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...scrapedData,
+          subcategory_id: subcategoryId,
+          status: '',
+          quantity: 1
+        })
+      });
+      
+      if (addRes.ok) {
+        alert('✅ Item added successfully!');
+        setScrapingUrl('');
+        // Reload project
+        loadProject(projectId, selectedRoom.id);
+      }
+    } catch (e: any) {
+      alert('❌ Error: ' + e.message);
     } finally {
       setLoading(false);
     }
