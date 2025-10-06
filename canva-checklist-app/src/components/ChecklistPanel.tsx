@@ -72,14 +72,13 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
           return (
             <Box key={room.id}>
               {/* Room Header */}
-              <Box 
-                padding="1u"
-                className="room-header"
+              <div 
                 onClick={() => toggleRoom(room.id)}
                 style={{
                   backgroundColor: roomColor,
                   cursor: 'pointer',
-                  color: 'white'
+                  color: 'white',
+                  padding: '12px'
                 }}
               >
                 <Columns spacing="1u" alignY="center">
