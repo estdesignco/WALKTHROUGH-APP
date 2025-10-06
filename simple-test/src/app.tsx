@@ -499,9 +499,9 @@ export const App = () => {
         borderBottom: "2px solid #B49B7E"
       }}>
         <Rows spacing="2u">
-          <Text style={{ color: "#D4A574", fontWeight: "bold", fontSize: "13px" }}>
+          <div style={{ color: "#D4A574", fontWeight: "bold", fontSize: "13px" }}>
             🔗 ADD SINGLE PRODUCT
-          </Text>
+          </div>
           <div style={{ display: "flex", gap: "8px" }}>
             <input
               type="text"
