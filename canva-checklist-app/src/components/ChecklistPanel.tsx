@@ -112,7 +112,7 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                             <Title size="xsmall">
                               {isCategoryCollapsed ? '▶' : '▼'} {category.name} ({category.items?.length || 0})
                             </Title>
-                          </Box>
+                          </div>
 
                           {/* Category Items */}
                           {!isCategoryCollapsed && category.items && category.items.length > 0 && (
