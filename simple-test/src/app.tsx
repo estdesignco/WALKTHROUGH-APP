@@ -286,38 +286,71 @@ export const App = () => {
                                 border: "1px solid rgba(180, 155, 126, 0.3)"
                               }}>
                                 <Rows spacing="1u">
-                                  {/* ITEM NAME & IMAGE */}
-                                  <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                                    {item.image_url && (
+                                  {/* ROW 1: CHECKBOX + IMAGE + NAME + QUANTITY */}
+                                  <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                                    {/* CHECKBOX */}
+                                    <input
+                                      type="checkbox"
+                                      checked={item.checked || false}
+                                      onChange={(e: any) => {
+                                        item.checked = e.target.checked;
+                                        updateItem(item.id, { checked: e.target.checked });
+                                      }}
+                                      style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        cursor: "pointer",
+                                        accentColor: "#D4A574"
+                                      }}
+                                    />
+
+                                    {/* IMAGE */}
+                                    {item.image_url ? (
                                       <img 
                                         src={item.image_url}
                                         alt={item.name}
                                         style={{
-                                          width: "60px",
-                                          height: "60px",
+                                          width: "50px",
+                                          height: "50px",
                                           objectFit: "cover",
                                           borderRadius: "6px",
-                                          border: "1px solid #B49B7E"
+                                          border: "1px solid #B49B7E",
+                                          cursor: "pointer"
+                                        }}
+                                        onClick={() => {
+                                          // Open in modal
+                                          alert('Image preview: ' + item.image_url);
                                         }}
                                       />
+                                    ) : (
+                                      <div style={{
+                                        width: "50px",
+                                        height: "50px",
+                                        background: "#1E293B",
+                                        borderRadius: "6px",
+                                        border: "1px solid #B49B7E",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        fontSize: "10px",
+                                        color: "#B49B7E"
+                                      }}>
+                                        No Img
+                                      </div>
                                     )}
+
+                                    {/* NAME + QTY */}
                                     <div style={{ flex: 1 }}>
-                                      <Text><strong style={{ color: "#D4A574" }}>{item.name}</strong></Text>
-                                      {item.size && (
-                                        <Text style={{ fontSize: "11px", color: "#B49B7E" }}>
-                                          Size: {item.size}
-                                        </Text>
-                                      )}
-                                      {item.finish_color && (
-                                        <Text style={{ fontSize: "11px", color: "#B49B7E" }}>
-                                          Finish: {item.finish_color}
-                                        </Text>
-                                      )}
+                                      <Text><strong style={{ color: "#D4A574", fontSize: "14px" }}>{item.name}</strong></Text>
+                                      <Text style={{ fontSize: "11px", color: "#B49B7E" }}>
+                                        Qty: {item.quantity || 1}
+                                      </Text>
                                     </div>
                                   </div>
 
-                                  {/* STATUS */}
-                                  <div style={{ marginTop: "8px" }}>
+                                  {/* ROW 2: STATUS DROPDOWN */}
+                                  <div style={{ marginTop: "10px" }}>
+                                    <div style={{ fontSize: "11px", color: "#B49B7E", marginBottom: "4px" }}>STATUS:</div>
                                     <select
                                       value={item.status || ''}
                                       onChange={(e: any) => {
@@ -326,32 +359,102 @@ export const App = () => {
                                       }}
                                       style={{
                                         width: "100%",
-                                        padding: "6px 10px",
-                                        background: getStatusColor(item.status || ''),
+                                        padding: "8px 12px",
+                                        background: item.status ? getStatusColor(item.status) : '#1E293B',
                                         color: "white",
-                                        border: "2px solid " + getStatusColor(item.status || ''),
+                                        border: "2px solid " + (item.status ? getStatusColor(item.status) : '#B49B7E'),
                                         borderRadius: "6px",
                                         fontSize: "12px",
                                         fontWeight: "bold",
                                         cursor: "pointer"
                                       }}
                                     >
-                                      <option value="">- Select Status -</option>
+                                      <option value="" style={{ background: '#1E293B' }}>- Select Status -</option>
                                       {STATUS_OPTIONS.map(s => (
-                                        <option key={s} value={s}>{s}</option>
+                                        <option key={s} value={s} style={{ background: getStatusColor(s) }}>{s}</option>
                                       ))}
                                     </select>
                                   </div>
 
-                                  {/* LINK BUTTON */}
-                                  {item.link && (
-                                    <Button
-                                      variant="secondary"
-                                      onClick={() => openLink(item.link)}
-                                      stretch
-                                    >
-                                      🔗 View Product
-                                    </Button>
+                                  {/* ROW 3: DETAILS */}
+                                  <div style={{ marginTop: "10px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                                    {item.size && (
+                                      <div style={{ fontSize: "11px", color: "#B49B7E" }}>
+                                        📏 <strong>Size:</strong> {item.size}
+                                      </div>
+                                    )}
+                                    {item.finish_color && (
+                                      <div style={{ fontSize: "11px", color: "#B49B7E" }}>
+                                        🎨 <strong>Finish:</strong> {item.finish_color}
+                                      </div>
+                                    )}
+                                    {item.sku && (
+                                      <div style={{ fontSize: "11px", color: "#B49B7E" }}>
+                                        🔖 <strong>SKU:</strong> {item.sku}
+                                      </div>
+                                    )}
+                                    {item.vendor && (
+                                      <div style={{ fontSize: "11px", color: "#B49B7E" }}>
+                                        🏪 <strong>Vendor:</strong> {item.vendor}
+                                      </div>
+                                    )}
+                                    {(item.cost || item.price) && (
+                                      <div style={{ fontSize: "11px", color: "#9ACD32" }}>
+                                        💰 <strong>${item.cost || item.price}</strong>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* ROW 4: LINK INPUT + SCRAPE */}
+                                  <div style={{ marginTop: "10px" }}>
+                                    <div style={{ fontSize: "11px", color: "#B49B7E", marginBottom: "4px" }}>PRODUCT LINK:</div>
+                                    <div style={{ display: "flex", gap: "8px" }}>
+                                      <input
+                                        type="text"
+                                        value={item.link || ''}
+                                        onChange={(e: any) => {
+                                          item.link = e.target.value;
+                                        }}
+                                        onBlur={(e: any) => {
+                                          updateItem(item.id, { link: e.target.value });
+                                        }}
+                                        placeholder="Paste product URL here"
+                                        style={{
+                                          flex: 1,
+                                          padding: "8px",
+                                          background: "rgba(15, 23, 42, 0.9)",
+                                          border: "1px solid #B49B7E",
+                                          borderRadius: "6px",
+                                          color: "#D4A574",
+                                          fontSize: "11px"
+                                        }}
+                                      />
+                                      {item.link && (
+                                        <Button
+                                          variant="tertiary"
+                                          onClick={() => openLink(item.link)}
+                                        >
+                                          🔗
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* ROW 5: REMARKS */}
+                                  {item.remarks && (
+                                    <div style={{ marginTop: "10px" }}>
+                                      <div style={{ fontSize: "11px", color: "#B49B7E", marginBottom: "4px" }}>REMARKS:</div>
+                                      <div style={{
+                                        padding: "8px",
+                                        background: "rgba(15, 23, 42, 0.7)",
+                                        border: "1px solid rgba(180, 155, 126, 0.3)",
+                                        borderRadius: "6px",
+                                        color: "#D4C5A9",
+                                        fontSize: "11px"
+                                      }}>
+                                        {item.remarks}
+                                      </div>
+                                    </div>
                                   )}
                                 </Rows>
                               </div>
