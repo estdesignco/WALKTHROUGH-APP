@@ -409,9 +409,9 @@ export const App = () => {
             <Title size="large">{project.name || "Select Room"}</Title>
           </div>
 
-          <Text style={{ textAlign: "center", color: "#B49B7E" }}>
+          <div style={{ textAlign: "center", color: "#B49B7E" }}>
             Select a room to view its checklist:
-          </Text>
+          </div>
 
           {rooms.map((room: any) => (
             <div
