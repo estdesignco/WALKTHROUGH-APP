@@ -112,6 +112,28 @@ export const App = () => {
     }
   };
 
+  const autoImportFromCanva = async () => {
+    if (!selectedRoom) return;
+    
+    setLoading(true);
+    try {
+      // NOTE: Canva's SDK doesn't expose a way to get images with links yet
+      // This would require Canva Design API access which is still in beta
+      alert('🚧 Auto-Import Feature Coming Soon!\n\nThis will scan all product links on your Canva page and import them automatically.\n\nFor now, please use:\n1. Copy/paste individual product URLs\n2. Or use "Import Page" button in main app');
+      
+      // FUTURE IMPLEMENTATION:
+      // 1. Use Canva Design API to get all elements
+      // 2. Filter elements with external URLs
+      // 3. For each URL: scrape → categorize → add to checklist
+      // 4. Use keywords in product name to match categories
+      
+    } catch (e: any) {
+      alert('❌ Error: ' + e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const scrapeAndAdd = async () => {
     if (!scrapingUrl.trim() || !selectedRoom) return;
     
