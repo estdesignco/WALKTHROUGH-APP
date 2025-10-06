@@ -32,8 +32,20 @@ class CanvaIntegration:
         self.db = self.mongo_client[os.getenv("DB_NAME", "interiorsync")]
         self.tokens_collection = self.db["canva_tokens"]
     
-    def get_authorization_url(self, state: str) -> str:
-        """Generate Canva OAuth authorization URL."""
+    def generate_pkce_pair(self) -> tuple:
+        """Generate PKCE code verifier and challenge."""
+        # Generate code verifier (43-128 characters)
+        code_verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).decode('utf-8').rstrip('=')
+        
+        # Generate code challenge (SHA256 hash of verifier)
+        code_challenge = base64.urlsafe_b64encode(
+            hashlib.sha256(code_verifier.encode('utf-8')).digest()
+        ).decode('utf-8').rstrip('=')
+        
+        return code_verifier, code_challenge
+    
+    def get_authorization_url(self, state: str, code_challenge: str) -> str:
+        """Generate Canva OAuth authorization URL with PKCE."""
         scopes = [
             "asset:read",
             "asset:write",
@@ -49,7 +61,9 @@ class CanvaIntegration:
             "client_id": self.client_id,
             "redirect_uri": self.redirect_uri,
             "scope": " ".join(scopes),
-            "state": state
+            "state": state,
+            "code_challenge": code_challenge,
+            "code_challenge_method": "S256"
         }
         
         from urllib.parse import urlencode
