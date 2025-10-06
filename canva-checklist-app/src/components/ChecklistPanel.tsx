@@ -128,9 +128,9 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({
                               {/* Checkbox */}
                               <div>
                                 <Checkbox
-                                  value={item.checked || false}
-                                  onChange={(checked) => 
-                                    onItemCheck(room.id, category.id, item.id, checked)
+                                  value={item.checked ? "checked" : "unchecked"}
+                                  onChange={(value) => 
+                                    onItemCheck(room.id, category.id, item.id, value === "checked")
                                   }
                                 />
                               </div>
