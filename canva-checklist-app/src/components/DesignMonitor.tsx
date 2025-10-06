@@ -77,22 +77,20 @@ export const DesignMonitor: React.FC<DesignMonitorProps> = ({ projectId, onItemD
   }, [monitoring]);
 
   return (
-    <Box background="secondary" padding="1u">
-      <Rows spacing="0.75u">
+    <Box padding="1u">
+      <Rows spacing="1u">
         <Columns spacing="1u" alignY="center">
-          <Text weight="bold" size="small">
+          <Title size="small">
             🔍 Design Monitor
-          </Text>
+          </Title>
           <Button 
-            variant={monitoring ? "secondary" : "primary"} 
-            size="small"
+            variant={monitoring ? "secondary" : "primary"}
             onClick={() => monitoring ? stopMonitoring() : setMonitoring(true)}
           >
             {monitoring ? 'Stop' : 'Start'} Monitoring
           </Button>
           <Button 
-            variant="tertiary" 
-            size="small"
+            variant="tertiary"
             onClick={scanDesign}
             disabled={monitoring}
           >
@@ -101,34 +99,34 @@ export const DesignMonitor: React.FC<DesignMonitorProps> = ({ projectId, onItemD
         </Columns>
 
         {monitoring && (
-          <Box background="neutral" padding="1u" borderRadius="standard">
-            <Text size="small">
+          <Box padding="1u">
+            <Text>
               ✅ Monitoring active - Detecting items with links...
             </Text>
           </Box>
         )}
 
         {lastScan && (
-          <Text size="small">
+          <Text>
             Last scan: {lastScan.toLocaleTimeString()}
           </Text>
         )}
 
         {detectedElements.length > 0 && (
-          <Box background="neutral" padding="1u" borderRadius="standard">
+          <Box padding="1u">
             <Rows spacing="1u">
-              <Text size="small" weight="bold">
+              <Title size="xsmall">
                 Elements on page: {detectedElements.length}
-              </Text>
-              <Text size="small">
+              </Title>
+              <Text>
                 With links: {detectedElements.filter(e => e.hasLink).length}
               </Text>
             </Rows>
           </Box>
         )}
 
-        <Box background="neutral" padding="1u" borderRadius="standard">
-          <Text size="xsmall">
+        <Box padding="1u">
+          <Text>
             💡 Tip: Add product images with links in Canva, and they'll be auto-detected and added to your checklist!
           </Text>
         </Box>
