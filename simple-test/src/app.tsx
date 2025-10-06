@@ -539,9 +539,9 @@ export const App = () => {
               </div>
             </div>
             <div style={{ marginBottom: "10px" }}>
-              <Text style={{ color: "#D4A574", fontSize: "12px" }}>
+              <div style={{ color: "#D4A574", fontSize: "12px" }}>
                 Scans all images with links on this Canva page, scrapes them, and adds to checklist with smart categorization
-              </Text>
+              </div>
             </div>
             <Button
               variant="secondary"
