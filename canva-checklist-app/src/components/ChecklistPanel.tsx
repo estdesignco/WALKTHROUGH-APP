@@ -179,7 +179,7 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                                             </span>
                                           )}
                                         </Rows>
-                                      </Box>
+                                      </div>
 
                                       {/* Link Button */}
                                       {item.link && (
