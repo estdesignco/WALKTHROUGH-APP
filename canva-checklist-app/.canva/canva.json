@@ -1,0 +1,9 @@
+{
+  "appId": "CHECKLIST_APP",
+  "name": "Live Checklist",
+  "version": "1.0.0",
+  "scopes": [
+    "design:content:read",
+    "design:content:write"
+  ]
+}
