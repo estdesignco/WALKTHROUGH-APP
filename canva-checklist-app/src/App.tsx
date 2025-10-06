@@ -161,9 +161,9 @@ export const App: React.FC = () => {
           <Title size="medium">Live Checklist</Title>
           
           {error && (
-            <Box padding="1u" style={{ backgroundColor: '#ffebee', borderRadius: '4px' }}>
+            <div style={{ backgroundColor: '#ffebee', borderRadius: '4px', padding: '12px' }}>
               <Text>{error}</Text>
-            </Box>
+            </div>
           )}
           
           <Text>Enter your Project ID to connect:</Text>
