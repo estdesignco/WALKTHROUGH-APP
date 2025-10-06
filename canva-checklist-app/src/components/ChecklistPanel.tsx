@@ -63,8 +63,8 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
   }
 
   return (
-    <Box className="checklist-panel" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 120px)' }}>
-      <Rows spacing="0.5u">
+    <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 120px)' }}>
+      <Rows spacing="1u">
         {project.rooms.map((room: any) => {
           const isRoomCollapsed = collapsedRooms.has(room.id);
           const roomColor = room.color || '#D4A574';
