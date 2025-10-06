@@ -8,7 +8,6 @@ import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
 import CompletePageLayout from './CompletePageLayout';
 import RoomSpecificCanvaImporter from './RoomSpecificCanvaImporter';
-import CanvaIntegrationPanel from './CanvaIntegrationPanel';
 
 const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.log("📋 Checklist Dashboard initializing...");
