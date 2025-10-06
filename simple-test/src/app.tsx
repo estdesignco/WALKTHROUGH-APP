@@ -48,18 +48,29 @@ export const App = () => {
     return () => clearInterval(interval);
   }, [project, projectId, selectedRoom]);
 
-  // Check URL params for projectId and roomId
+  // Check URL params for projectId and roomId, OR load from localStorage
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlProjectId = params.get('projectId');
     const urlRoomId = params.get('roomId');
     
-    if (urlProjectId) {
-      setProjectId(urlProjectId);
-      if (urlRoomId) {
-        setRoomId(urlRoomId);
-      }
-      loadProject(urlProjectId, urlRoomId || '');
+    // Priority: URL params > localStorage > nothing
+    let finalProjectId = urlProjectId;
+    let finalRoomId = urlRoomId;
+    
+    if (!finalProjectId) {
+      finalProjectId = localStorage.getItem('canva_saved_projectId') || '';
+    }
+    
+    if (!finalRoomId) {
+      finalRoomId = localStorage.getItem('canva_saved_roomId') || '';
+    }
+    
+    if (finalProjectId) {
+      console.log('🔄 Auto-loading saved project:', finalProjectId, 'room:', finalRoomId);
+      setProjectId(finalProjectId);
+      setRoomId(finalRoomId);
+      loadProject(finalProjectId, finalRoomId);
     }
   }, []);
 
@@ -77,12 +88,20 @@ export const App = () => {
       const data = await res.json();
       setProject(data);
       
+      // SAVE to localStorage for next time
+      localStorage.setItem('canva_saved_projectId', targetProjectId);
+      if (targetRoomId) {
+        localStorage.setItem('canva_saved_roomId', targetRoomId);
+      }
+      
       // If roomId provided, select that room
       if (targetRoomId) {
         const room = data.rooms?.find((r: any) => r.id === targetRoomId);
         if (room) {
           setSelectedRoom(room);
+          console.log('✅ Room auto-selected:', room.name);
         } else {
+          console.log('⚠️ Room not found:', targetRoomId);
           setError(`Room not found: ${targetRoomId}`);
         }
       }
