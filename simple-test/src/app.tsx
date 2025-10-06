@@ -281,7 +281,7 @@ export const App = () => {
           />
 
           <div style={{ marginTop: "12px" }}>
-            <Text>Enter Room ID (optional):</Text>
+            <Text style={{ fontSize: "11px", color: "#B49B7E" }}>(Optional - leave blank to choose from list)</Text>
           </div>
           
           <input
