@@ -169,25 +169,25 @@ export const App = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
+      
+      // If checkbox is checked, auto-set status to PICKED
+      if (data.checked === true && (!data.status || data.status === '')) {
+        await updateStatus(itemId, 'PICKED');
+      }
     } catch (e) {
       console.error('Update failed:', e);
     }
-  };
-
-  const openLink = async (url: string) => {
-    if (url) await requestOpenExternalUrl({ url });
-  };
-
-  const toggleRoom = (rid: string) => {
-    const n = new Set(collapsedRooms);
-    n.has(rid) ? n.delete(rid) : n.add(rid);
-    setCollapsedRooms(n);
   };
 
   const toggleCat = (cid: string) => {
     const n = new Set(collapsedCats);
     n.has(cid) ? n.delete(cid) : n.add(cid);
     setCollapsedCats(n);
+  };
+
+  const selectRoom = (room: any) => {
+    setSelectedRoom(room);
+    setRoomId(room.id);
   };
 
   if (loading) {
