@@ -103,8 +103,8 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                         <Box key={category.id}>
                           {/* Category Header */}
                           <Box 
-                            padding="0.75u"
-                            background="secondary"
+                            padding="1u"
+                            background="neutral"
                             className="room-header"
                             onClick={() => toggleCategory(category.id)}
                             style={{
