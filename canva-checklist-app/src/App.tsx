@@ -161,8 +161,8 @@ export const App: React.FC = () => {
           <Title size="medium">Live Checklist</Title>
           
           {error && (
-            <Box background="critical" padding="1u" borderRadius="standard">
-              <Text tone="critical">{error}</Text>
+            <Box padding="1u" style={{ backgroundColor: '#ffebee', borderRadius: '4px' }}>
+              <Text>{error}</Text>
             </Box>
           )}
           
