@@ -6484,6 +6484,28 @@ async def canva_callback(code: str, state: str = None):
         logger.error(f"Canva callback error: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
+@api_router.post("/canva/store-code")
+async def store_canva_code(request_data: dict):
+    """Store Canva authorization code for processing (bypasses Cloudflare)."""
+    try:
+        code = request_data.get('code')
+        if not code:
+            raise HTTPException(status_code=400, detail="No code provided")
+        
+        # Exchange the code immediately
+        token_data = await canva_integration.exchange_code_for_token(code)
+        
+        # Store the token
+        await canva_integration.store_token(token_data)
+        
+        return {
+            "success": True,
+            "message": "Successfully connected to Canva!"
+        }
+    except Exception as e:
+        logger.error(f"Code storage error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/canva/status")
 async def canva_status():
     """Check Canva connection status."""
