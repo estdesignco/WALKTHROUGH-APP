@@ -335,7 +335,7 @@ export const App = () => {
           />
 
           <div style={{ marginTop: "12px" }}>
-            <Text style={{ fontSize: "11px", color: "#B49B7E" }}>(Optional - leave blank to choose from list)</Text>
+            <div style={{ fontSize: "11px", color: "#B49B7E" }}>(Optional - leave blank to choose from list)</div>
           </div>
           
           <input
