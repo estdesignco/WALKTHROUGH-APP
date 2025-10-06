@@ -40,16 +40,6 @@ const MainContainer = ({
               <span>📋</span>
               <span>Spec Sheet</span>
             </button>
-            {projectId && (
-              <button 
-                onClick={openCanvaApp}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2 border border-blue-400/20"
-                style={{ color: '#F5F5DC' }}
-              >
-                <span>🎨</span>
-                <span>Open in Canva App</span>
-              </button>
-            )}
           </div>
 
           {/* Search and Controls - ZERO SPACING */}
