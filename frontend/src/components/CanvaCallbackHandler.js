@@ -51,13 +51,43 @@ const CanvaCallbackHandler = () => {
           return;
         }
 
-        setStatus('✅ Authorization successful! Saving connection...');
+        setStatus('✅ Authorization successful! Exchanging token...');
 
-        // Send code AND state to backend to store (backend will exchange token)
-        const response = await fetch(`${BACKEND_URL}/api/canva/store-code`, {
+        // Get code_verifier from backend using state
+        const verifierResponse = await fetch(`${BACKEND_URL}/api/canva/get-verifier?state=${state}`);
+        if (!verifierResponse.ok) {
+          throw new Error('Failed to retrieve code verifier');
+        }
+        const { code_verifier, client_id, client_secret, redirect_uri } = await verifierResponse.json();
+
+        // Exchange token directly from browser (bypasses Cloudflare!)
+        const tokenResponse = await fetch('https://api.canva.com/rest/v1/oauth/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            grant_type: 'authorization_code',
+            code: code,
+            client_id: client_id,
+            client_secret: client_secret,
+            redirect_uri: redirect_uri,
+            code_verifier: code_verifier
+          })
+        });
+
+        if (!tokenResponse.ok) {
+          const errorText = await tokenResponse.text();
+          throw new Error(`Token exchange failed: ${errorText}`);
+        }
+
+        const tokenData = await tokenResponse.json();
+
+        // Send token to backend to store
+        const response = await fetch(`${BACKEND_URL}/api/canva/store-token`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, state })
+          body: JSON.stringify({ token_data: tokenData, state })
         });
         
         if (response.ok) {
