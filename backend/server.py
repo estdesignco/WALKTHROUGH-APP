@@ -6847,6 +6847,136 @@ async def sync_from_canva_board(request_data: dict):
         logger.error(f"Canva sync error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/canva/add-detected-item")
+async def add_detected_item_from_canva(request_data: dict):
+    """Add a detected item from Canva design to the checklist."""
+    try:
+        project_id = request_data.get('project_id')
+        room_name = request_data.get('room_name', 'Uncategorized')
+        item_link = request_data.get('link')
+        image_url = request_data.get('image_url')
+        
+        if not project_id or not item_link:
+            raise HTTPException(status_code=400, detail="Project ID and link are required")
+        
+        # Scrape the product link to get details
+        import httpx
+        from bs4 import BeautifulSoup
+        
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            try:
+                response = await client.get(item_link, follow_redirects=True)
+                soup = BeautifulSoup(response.content, 'html.parser')
+                
+                # Extract product name
+                name = None
+                for selector in ['h1', '.product-title', '[class*="product-name"]', 'title']:
+                    elem = soup.select_one(selector)
+                    if elem:
+                        name = elem.get_text().strip()
+                        break
+                
+                if not name:
+                    name = "Product from Canva"
+                
+                # Extract price
+                price = None
+                for selector in ['.price', '[class*="price"]', '[itemprop="price"]']:
+                    elem = soup.select_one(selector)
+                    if elem:
+                        price_text = elem.get_text().strip()
+                        # Extract numeric price
+                        import re
+                        price_match = re.search(r'\$?(\d+[\d,]*\.?\d*)', price_text)
+                        if price_match:
+                            price = price_match.group(1).replace(',', '')
+                        break
+                
+                # Extract or use provided image
+                product_image = image_url
+                if not product_image:
+                    img_elem = soup.select_one('meta[property="og:image"]') or soup.select_one('.product-image img')
+                    if img_elem:
+                        product_image = img_elem.get('content') or img_elem.get('src')
+                
+            except Exception as scrape_error:
+                logger.warning(f"Scraping failed: {str(scrape_error)}, using defaults")
+                name = "Product from Canva"
+                price = None
+                product_image = image_url
+        
+        # Find or create room
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Find room by name or create new one
+        room = await db.rooms.find_one({"project_id": project_id, "name": room_name, "sheet_type": "checklist"})
+        if not room:
+            room_id = str(uuid.uuid4())
+            room = {
+                "id": room_id,
+                "project_id": project_id,
+                "name": room_name,
+                "sheet_type": "checklist",
+                "color": "#D4A574",
+                "order_index": 999
+            }
+            await db.rooms.insert_one(room)
+        else:
+            room_id = room["id"]
+        
+        # Find or create "From Canva" category
+        category = await db.categories.find_one({"room_id": room_id, "name": "From Canva"})
+        if not category:
+            category_id = str(uuid.uuid4())
+            category = {
+                "id": category_id,
+                "room_id": room_id,
+                "name": "From Canva",
+                "order_index": 999
+            }
+            await db.categories.insert_one(category)
+        else:
+            category_id = category["id"]
+        
+        # Check if item already exists (by link)
+        existing_item = await db.items.find_one({"category_id": category_id, "link": item_link})
+        if existing_item:
+            return {
+                "success": True,
+                "message": "Item already exists in checklist",
+                "item_id": existing_item["id"],
+                "duplicate": True
+            }
+        
+        # Create new item
+        item_id = str(uuid.uuid4())
+        new_item = {
+            "id": item_id,
+            "category_id": category_id,
+            "name": name[:200],  # Limit name length
+            "link": item_link,
+            "image_url": product_image,
+            "price": price,
+            "status": "PICKED",
+            "checked": True,  # Auto-check since it was added to Canva
+            "order_index": 999,
+            "source": "canva_auto_detect"
+        }
+        await db.items.insert_one(new_item)
+        
+        return {
+            "success": True,
+            "message": f"Item '{name}' added to checklist!",
+            "item_id": item_id,
+            "item": new_item
+        }
+        
+    except Exception as e:
+        logger.error(f"Error adding detected item: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/canva/upload-walkthrough-photos")
 async def upload_walkthrough_photos_to_canva(request_data: dict):
     """Upload all photos from Walkthrough sheet to Canva."""
