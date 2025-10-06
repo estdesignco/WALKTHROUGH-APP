@@ -199,14 +199,14 @@ export const App: React.FC = () => {
     <Box className="app-container">
       <Rows spacing="1u">
         {/* Header */}
-        <Box padding="2u" style={{ backgroundColor: '#D4A574' }}>
+        <div style={{ backgroundColor: '#D4A574', padding: '24px' }}>
           <Columns spacing="1u" alignY="center">
             <Title size="medium">{project.name}</Title>
             <Button variant="tertiary" onClick={() => loadProject(projectId)}>
               🔄 Refresh
             </Button>
           </Columns>
-        </Box>
+        </div>
 
         {/* Design Monitor */}
         <DesignMonitor projectId={projectId} onItemDetected={(item) => {
