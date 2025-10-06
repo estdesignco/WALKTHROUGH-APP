@@ -428,11 +428,24 @@ export const App = () => {
         padding: "16px 20px",
         borderBottom: "3px solid #B49B7E"
       }}>
-        <div style={{ color: "#1E293B", fontWeight: "bold", fontSize: "18px", marginBottom: "4px" }}>
-          {selectedRoom.name?.toUpperCase() || "ROOM"}
-        </div>
-        <div style={{ color: "#1E293B", fontSize: "11px" }}>
-          🔄 Synced: {lastSync.toLocaleTimeString()}
+        <div style={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "10px"
+        }}>
+          <div>
+            <div style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: "18px", marginBottom: "4px", textShadow: "2px 2px 4px rgba(0,0,0,0.5)" }}>
+              {selectedRoom.name?.toUpperCase() || "ROOM"}
+            </div>
+            <div style={{ color: "#FFFFFF", fontSize: "11px", textShadow: "1px 1px 2px rgba(0,0,0,0.5)" }}>
+              🔄 Synced: {lastSync.toLocaleTimeString()}
+            </div>
+          </div>
+          <Button variant="secondary" onClick={() => setSelectedRoom(null)}>
+            ← Change Room
+          </Button>
         </div>
       </div>
 
