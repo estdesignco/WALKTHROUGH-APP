@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Rows, Text, Button, Columns } from '@canva/app-ui-kit';
+import { Box, Rows, Text, Button, Columns, Title } from '@canva/app-ui-kit';
 import { openDesign } from '@canva/design';
 
 interface DesignMonitorProps {
