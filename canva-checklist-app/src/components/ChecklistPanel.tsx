@@ -94,8 +94,8 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
 
               {/* Room Content */}
               {!isRoomCollapsed && room.categories && (
-                <Box padding="0.5u" background="neutral">
-                  <Rows spacing="0.5u">
+                <Box padding="1u">
+                  <Rows spacing="1u">
                     {room.categories.map((category: any) => {
                       const isCategoryCollapsed = collapsedCategories.has(category.id);
                       
