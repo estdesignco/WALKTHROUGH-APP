@@ -22,32 +22,16 @@ export const DesignMonitor: React.FC<DesignMonitorProps> = ({ projectId, onItemD
 
   const scanDesign = async () => {
     try {
-      await openDesign({ type: "current_page" }, async (session) => {
-        const elements: DetectedElement[] = [];
-        
-        // Get all elements from the page
-        if (session.page.type === "absolute") {
-          const pageElements = session.page.elements;
-          
-          // Check each element for links
-          for (const element of pageElements) {
-            // Check if element has a link
-            // Note: This is a placeholder - actual implementation depends on Canva API
-            const hasLink = false; // Will be implemented with actual API
-            
-            elements.push({
-              id: element.id || 'unknown',
-              type: element.type || 'unknown',
-              hasLink,
-              link: undefined,
-              imageUrl: undefined
-            });
-          }
-        }
-        
-        setDetectedElements(elements);
-        setLastScan(new Date());
-      });
+      // TODO: Implement with proper Canva Design API
+      // await openDesign({ type: "current_page" }, async (session) => {
+      //   const elements: DetectedElement[] = [];
+      //   // Implementation here
+      //   setDetectedElements(elements);
+      // });
+      
+      setDetectedElements([]);
+      setLastScan(new Date());
+      console.log('Design scanning will be implemented with Canva Design API');
     } catch (err) {
       console.error('Error scanning design:', err);
     }
