@@ -89,7 +89,7 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                     ({room.categories?.reduce((sum: number, cat: any) => sum + (cat.items?.length || 0), 0)} items)
                   </Text>
                 </Columns>
-              </Box>
+              </div>
 
               {/* Room Content */}
               {!isRoomCollapsed && room.categories && (
