@@ -4,8 +4,14 @@ const MainContainer = ({
   title = "WALKTHROUGH - GREENE", 
   hideNavigation = false,
   onAddRoom,
+  projectId,
   children 
 }) => {
+  
+  const openCanvaApp = () => {
+    const canvaAppUrl = `https://canvalink.preview.emergentagent.com/canva-FINAL-20251006_232131.js?projectId=${projectId}`;
+    window.open(canvaAppUrl, '_blank', 'width=1200,height=800');
+  };
   return (
     <div className="w-full max-w-[95%] mx-auto bg-gradient-to-b from-black via-gray-900 to-black p-2 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm mx-4" style={{
       background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,20,0.9) 30%, rgba(0,0,0,0.95) 100%)',
