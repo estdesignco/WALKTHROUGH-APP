@@ -127,8 +127,8 @@ export const DesignMonitor: React.FC<DesignMonitorProps> = ({ projectId, onItemD
           </Box>
         )}
 
-        <Box background="informative" padding="0.75u" borderRadius="small">
-          <Text size="xsmall" tone="informative">
+        <Box background="neutral" padding="1u" borderRadius="standard">
+          <Text size="xsmall">
             💡 Tip: Add product images with links in Canva, and they'll be auto-detected and added to your checklist!
           </Text>
         </Box>
