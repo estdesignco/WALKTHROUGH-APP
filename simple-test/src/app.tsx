@@ -190,6 +190,10 @@ export const App = () => {
     setRoomId(room.id);
   };
 
+  const openLink = async (url: string) => {
+    if (url) await requestOpenExternalUrl({ url });
+  };
+
   if (loading) {
     return (
       <div style={{ 
