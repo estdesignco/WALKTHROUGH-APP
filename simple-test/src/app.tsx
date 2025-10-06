@@ -352,6 +352,9 @@ export const App = () => {
     );
   }
 
+  // MAIN CHECKLIST VIEW - ONE ROOM
+  const categories = selectedRoom.categories || [];
+
   return (
     <div style={{
       background: 'linear-gradient(135deg, #000000 0%, #0f172a 30%, #1e293b 70%, #000000 100%)',
@@ -362,52 +365,60 @@ export const App = () => {
       <div style={{ 
         background: "#D4A574", 
         padding: "16px 20px",
-        borderBottom: "3px solid #B49B7E",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: "10px"
+        borderBottom: "3px solid #B49B7E"
       }}>
-        <div style={{ color: "#1E293B", fontWeight: "bold", fontSize: "18px" }}>
-          {project.name || "Live Checklist"}
+        <div style={{ color: "#1E293B", fontWeight: "bold", fontSize: "18px", marginBottom: "4px" }}>
+          {selectedRoom.name?.toUpperCase() || "ROOM"}
         </div>
         <div style={{ color: "#1E293B", fontSize: "11px" }}>
           🔄 Synced: {lastSync.toLocaleTimeString()}
         </div>
       </div>
 
-      {/* ROOMS */}
+      {/* SCRAPE SECTION */}
+      <div style={{ 
+        background: "rgba(30, 41, 59, 0.9)", 
+        padding: "16px 20px",
+        borderBottom: "2px solid #B49B7E"
+      }}>
+        <Rows spacing="1u">
+          <Text style={{ color: "#D4A574", fontWeight: "bold", fontSize: "13px" }}>
+            🔗 ADD PRODUCT FROM LINK
+          </Text>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <input
+              type="text"
+              value={scrapingUrl}
+              onChange={(e: any) => setScrapingUrl(e.target.value)}
+              placeholder="Paste product URL here to scrape and add..."
+              style={{
+                flex: 1,
+                padding: "12px",
+                background: "rgba(15, 23, 42, 0.9)",
+                border: "2px solid #D4A574",
+                borderRadius: "8px",
+                color: "#D4A574",
+                fontSize: "13px"
+              }}
+            />
+            <Button
+              variant="primary"
+              onClick={scrapeAndAdd}
+              disabled={!scrapingUrl.trim() || loading}
+            >
+              SCRAPE & ADD
+            </Button>
+          </div>
+          <Text style={{ color: "#B49B7E", fontSize: "11px" }}>
+            💡 Paste any product URL and click to automatically scrape ALL info and add to checklist
+          </Text>
+        </Rows>
+      </div>
+
+      {/* CATEGORIES */}
       <div style={{ padding: "16px" }}>
         <Rows spacing="2u">
-          {rooms.map((room: any) => {
-            const isRoomCollapsed = collapsedRooms.has(room.id);
-            const categories = room.categories || [];
-            
-            return (
-              <div key={room.id}>
-                {/* ROOM HEADER */}
-                <div
-                  onClick={() => toggleRoom(room.id)}
-                  style={{
-                    background: room.color || "#D4A574",
-                    color: "#1E293B",
-                    padding: "14px 18px",
-                    cursor: "pointer",
-                    borderRadius: "8px 8px 0 0",
-                    fontWeight: "bold",
-                    fontSize: "15px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center"
-                  }}
-                >
-                  <span>{room.name?.toUpperCase() || "ROOM"}</span>
-                  <span style={{ fontSize: "18px" }}>{isRoomCollapsed ? "▼" : "▲"}</span>
-                </div>
-
-                {/* CATEGORIES */}
-                {!isRoomCollapsed && categories.map((cat: any) => {
+          {categories.map((cat: any) => {
                   const isCatCollapsed = collapsedCats.has(cat.id);
                   const subcats = cat.subcategories || [];
                   
