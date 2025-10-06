@@ -83,7 +83,7 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({
                 userSelect: 'none'
               }}
             >
-              <Text size="medium" style={{ fontWeight: 600, color: 'white' }}>
+              <Text size="medium" weight="bold">
                 {room.name.toUpperCase()}
               </Text>
               <span style={{ fontSize: '20px' }}>
