@@ -6,6 +6,8 @@ import os
 import httpx
 import json
 import base64
+import hashlib
+import secrets
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import logging
