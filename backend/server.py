@@ -6451,12 +6451,21 @@ async def get_measurements(project_id: str, room_id: str):
 
 @api_router.get("/canva/auth")
 async def canva_auth():
-    """Initiate Canva OAuth flow."""
+    """Initiate Canva OAuth flow with PKCE."""
     import secrets
     state = secrets.token_urlsafe(32)
     
-    # Store state in session (in production, use Redis or database)
-    auth_url = canva_integration.get_authorization_url(state)
+    # Generate PKCE parameters
+    code_verifier, code_challenge = canva_integration.generate_pkce_pair()
+    
+    # Store state and code_verifier in database for later use
+    await db.canva_auth_sessions.insert_one({
+        "state": state,
+        "code_verifier": code_verifier,
+        "created_at": datetime.utcnow()
+    })
+    
+    auth_url = canva_integration.get_authorization_url(state, code_challenge)
     
     return {
         "authorization_url": auth_url,
