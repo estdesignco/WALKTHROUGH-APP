@@ -419,9 +419,9 @@ export const App = () => {
         padding: "16px 20px",
         borderBottom: "2px solid #B49B7E"
       }}>
-        <Rows spacing="1u">
+        <Rows spacing="2u">
           <Text style={{ color: "#D4A574", fontWeight: "bold", fontSize: "13px" }}>
-            🔗 ADD PRODUCT FROM LINK
+            🔗 ADD SINGLE PRODUCT
           </Text>
           <div style={{ display: "flex", gap: "8px" }}>
             <input
@@ -447,8 +447,31 @@ export const App = () => {
               SCRAPE & ADD
             </Button>
           </div>
+          
+          {/* AUTO-IMPORT ALL LINKS FROM CANVA PAGE */}
+          <div style={{ 
+            marginTop: "16px", 
+            paddingTop: "16px", 
+            borderTop: "1px solid rgba(180, 155, 126, 0.3)" 
+          }}>
+            <Text style={{ color: "#9ACD32", fontWeight: "bold", fontSize: "13px", marginBottom: "8px" }}>
+              ✨ AUTO-IMPORT ALL PRODUCTS FROM CANVA PAGE
+            </Text>
+            <Text style={{ color: "#B49B7E", fontSize: "11px", marginBottom: "10px" }}>
+              Scans all images with links on this Canva page, scrapes them, and adds to checklist with smart categorization
+            </Text>
+            <Button
+              variant="secondary"
+              onClick={autoImportFromCanva}
+              disabled={loading}
+              stretch
+            >
+              🎨 AUTO-IMPORT ALL PRODUCTS
+            </Button>
+          </div>
+          
           <Text style={{ color: "#B49B7E", fontSize: "11px" }}>
-            💡 Paste any product URL and click to automatically scrape ALL info and add to checklist
+            💡 Single: Paste URL above | Bulk: Click Auto-Import to scan entire Canva page
           </Text>
         </Rows>
       </div>
