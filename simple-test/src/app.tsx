@@ -772,13 +772,13 @@ export const App = () => {
                                   {/* ROW 5: REMARKS */}
                                   {item.remarks && (
                                     <div style={{ marginTop: "10px" }}>
-                                      <div style={{ fontSize: "11px", color: "#B49B7E", marginBottom: "4px" }}>REMARKS:</div>
+                                      <div style={{ fontSize: "11px", color: "#D4A574", marginBottom: "4px", fontWeight: "bold" }}>REMARKS:</div>
                                       <div style={{
                                         padding: "8px",
                                         background: "rgba(15, 23, 42, 0.7)",
                                         border: "1px solid rgba(180, 155, 126, 0.3)",
                                         borderRadius: "6px",
-                                        color: "#D4C5A9",
+                                        color: "#D4A574",
                                         fontSize: "11px"
                                       }}>
                                         {item.remarks}
