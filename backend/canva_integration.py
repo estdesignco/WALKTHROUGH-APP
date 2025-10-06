@@ -133,6 +133,22 @@ class CanvaIntegration:
             logger.info("✅ Canva tokens stored successfully")
             return token_data
     
+    async def store_token(self, token_data: Dict[str, Any]) -> None:
+        """Store Canva OAuth tokens in database."""
+        await self.tokens_collection.update_one(
+            {"user_id": "admin"},  # Single user for now
+            {
+                "$set": {
+                    "access_token": token_data["access_token"],
+                    "refresh_token": token_data.get("refresh_token"),
+                    "expires_at": datetime.utcnow().timestamp() + token_data.get("expires_in", 3600),
+                    "updated_at": datetime.utcnow()
+                }
+            },
+            upsert=True
+        )
+        logger.info("✅ Canva tokens stored successfully")
+    
     async def get_valid_token(self) -> Optional[str]:
         """Get valid access token, refreshing if needed."""
         token_doc = await self.tokens_collection.find_one({"user_id": "admin"})
