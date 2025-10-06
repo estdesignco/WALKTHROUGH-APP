@@ -6493,38 +6493,48 @@ async def canva_callback(code: str, state: str = None):
         logger.error(f"Canva callback error: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
-@api_router.post("/canva/store-code")
-async def store_canva_code(request_data: dict):
-    """Store Canva authorization code for processing (bypasses Cloudflare)."""
+@api_router.get("/canva/get-verifier")
+async def get_canva_verifier(state: str):
+    """Get code verifier for frontend token exchange (bypasses Cloudflare)."""
     try:
-        code = request_data.get('code')
-        state = request_data.get('state')
-        
-        if not code:
-            raise HTTPException(status_code=400, detail="No code provided")
-        
         # Retrieve code_verifier from database using state
         auth_session = await db.canva_auth_sessions.find_one({"state": state})
         if not auth_session:
             raise HTTPException(status_code=400, detail="Invalid state - session not found")
         
-        code_verifier = auth_session["code_verifier"]
+        return {
+            "code_verifier": auth_session["code_verifier"],
+            "client_id": canva_integration.client_id,
+            "client_secret": canva_integration.client_secret,
+            "redirect_uri": canva_integration.redirect_uri
+        }
+    except Exception as e:
+        logger.error(f"Get verifier error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/canva/store-token")
+async def store_canva_token(request_data: dict):
+    """Store tokens received from frontend (bypasses Cloudflare)."""
+    try:
+        token_data = request_data.get('token_data')
+        state = request_data.get('state')
         
-        # Exchange the code with PKCE verifier
-        token_data = await canva_integration.exchange_code_for_token(code, code_verifier)
+        if not token_data:
+            raise HTTPException(status_code=400, detail="No token data provided")
         
         # Store the token
         await canva_integration.store_token(token_data)
         
         # Clean up auth session
-        await db.canva_auth_sessions.delete_one({"state": state})
+        if state:
+            await db.canva_auth_sessions.delete_one({"state": state})
         
         return {
             "success": True,
             "message": "Successfully connected to Canva!"
         }
     except Exception as e:
-        logger.error(f"Code storage error: {str(e)}")
+        logger.error(f"Token storage error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/canva/status")
