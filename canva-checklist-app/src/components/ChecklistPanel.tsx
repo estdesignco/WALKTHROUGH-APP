@@ -124,16 +124,16 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                                 {category.items.map((item: any) => (
                                   <Box 
                                     key={item.id} 
-                                    padding="0.75u" 
+                                    padding="1u" 
                                     background="white"
-                                    borderRadius="small"
+                                    borderRadius="standard"
                                     className="checklist-item"
                                     style={{
                                       borderLeft: `3px solid ${item.checked ? '#4caf50' : '#ccc'}`,
                                       transition: 'all 0.2s'
                                     }}
                                   >
-                                    <Columns spacing="0.75u" alignY="center">
+                                    <Columns spacing="1u" alignY="center">
                                       {/* Checkbox */}
                                       <input 
                                         type="checkbox"
