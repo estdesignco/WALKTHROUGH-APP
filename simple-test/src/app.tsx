@@ -534,9 +534,9 @@ export const App = () => {
             borderTop: "1px solid rgba(180, 155, 126, 0.3)" 
           }}>
             <div style={{ marginBottom: "8px" }}>
-              <Text style={{ color: "#9ACD32", fontWeight: "bold", fontSize: "14px" }}>
+              <div style={{ color: "#9ACD32", fontWeight: "bold", fontSize: "14px" }}>
                 ✨ AUTO-IMPORT ALL PRODUCTS FROM CANVA PAGE
-              </Text>
+              </div>
             </div>
             <div style={{ marginBottom: "10px" }}>
               <Text style={{ color: "#D4A574", fontSize: "12px" }}>
