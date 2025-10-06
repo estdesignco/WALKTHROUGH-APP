@@ -155,8 +155,8 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({
                               {/* Item Details */}
                               <div style={{ flex: 1 }}>
                                 <Rows spacing="0.5u">
-                                  <Text size="small" weight="medium">
-                                    {item.name}
+                                  <Text size="small">
+                                    <strong>{item.name}</strong>
                                   </Text>
                                   
                                   {item.price && (
