@@ -154,8 +154,8 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                                       )}
 
                                       {/* Item Info */}
-                                      <Box style={{ flex: 1 }}>
-                                        <Rows spacing="0.5u">
+                                      <div style={{ flex: 1 }}>
+                                        <Rows spacing="1u">
                                           <Title size="xsmall">
                                             {item.name}
                                           </Title>
