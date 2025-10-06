@@ -199,10 +199,10 @@ export const App: React.FC = () => {
     <Box className="app-container">
       <Rows spacing="1u">
         {/* Header */}
-        <Box background="brandPrimary" padding="1.5u">
+        <Box padding="2u" style={{ backgroundColor: '#D4A574' }}>
           <Columns spacing="1u" alignY="center">
-            <Title size="small" tone="inverse">{project.name}</Title>
-            <Button variant="tertiary" size="small" onClick={() => loadProject(projectId)}>
+            <Title size="medium">{project.name}</Title>
+            <Button variant="tertiary" onClick={() => loadProject(projectId)}>
               🔄 Refresh
             </Button>
           </Columns>
