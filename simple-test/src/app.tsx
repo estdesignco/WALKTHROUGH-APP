@@ -470,9 +470,20 @@ export const App = () => {
               🔄 Synced: {lastSync.toLocaleTimeString()}
             </div>
           </div>
-          <Button variant="secondary" onClick={() => setSelectedRoom(null)}>
-            ← Change Room
-          </Button>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <Button 
+              variant="primary" 
+              onClick={() => {
+                console.log('🔄 Manual refresh triggered');
+                loadProject(projectId, selectedRoom.id);
+              }}
+            >
+              🔄 REFRESH
+            </Button>
+            <Button variant="secondary" onClick={() => setSelectedRoom(null)}>
+              ← Change Room
+            </Button>
+          </div>
         </div>
       </div>
 
