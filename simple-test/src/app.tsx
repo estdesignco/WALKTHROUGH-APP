@@ -310,6 +310,22 @@ export const App = () => {
             Load Checklist
           </Button>
           
+          {(localStorage.getItem('canva_saved_projectId')) && (
+            <Button 
+              variant="secondary" 
+              onClick={() => {
+                localStorage.removeItem('canva_saved_projectId');
+                localStorage.removeItem('canva_saved_roomId');
+                setProjectId('');
+                setRoomId('');
+                alert('✅ Saved connection cleared!');
+              }}
+              stretch
+            >
+              🗑️ Clear Saved Connection
+            </Button>
+          )}
+          
           <div style={{ 
             background: "rgba(30, 41, 59, 0.6)", 
             padding: "16px", 
