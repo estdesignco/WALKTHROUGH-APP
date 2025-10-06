@@ -1342,6 +1342,18 @@ const ExactChecklistSpreadsheet = ({
 
                         {/* ADD CATEGORY AND ADD ITEM BUTTONS - SECTION FOOTER */}
                         <div className="mb-4 flex gap-3">
+                          <button
+                            onClick={() => {
+                              const canvaUrl = `https://www.canva.com/apps/YOUR_APP_ID?projectId=${projectId}&roomId=${room.id}`;
+                              navigator.clipboard.writeText(canvaUrl);
+                              alert(`✅ Canva link copied!\n\nOpen Canva → Your "Live Checklist" app\nOr paste this link:\n${canvaUrl}`);
+                            }}
+                            className="bg-purple-600 hover:bg-purple-500 text-[#D4C5A9] px-4 py-2 rounded text-sm font-bold"
+                            title="Copy link to open this room in Canva"
+                          >
+                            🎨 CONNECT TO CANVA
+                          </button>
+                          
                           <select 
                             onChange={(e) => {
                               if (e.target.value === 'ADD_NEW') {
