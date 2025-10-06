@@ -40,11 +40,11 @@ const CanvaCallbackHandler = () => {
 
         setStatus('✅ Authorization successful! Saving connection...');
 
-        // Send code to backend to store (backend will exchange token)
+        // Send code AND state to backend to store (backend will exchange token)
         const response = await fetch(`${BACKEND_URL}/api/canva/store-code`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code })
+          body: JSON.stringify({ code, state: received_state })
         });
         
         if (response.ok) {
