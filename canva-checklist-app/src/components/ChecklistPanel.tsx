@@ -118,8 +118,8 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
 
                           {/* Category Items */}
                           {!isCategoryCollapsed && category.items && category.items.length > 0 && (
-                            <Box padding="0.5u">
-                              <Rows spacing="0.5u">
+                            <Box padding="1u">
+                              <Rows spacing="1u">
                                 {category.items.map((item: any) => (
                                   <Box 
                                     key={item.id} 
