@@ -238,7 +238,7 @@ export const App = () => {
           )}
           
           <div style={{ marginTop: "20px" }}>
-            <Text>Enter your Project ID:</Text>
+            <Text>Enter Project ID:</Text>
           </div>
           
           <input
@@ -257,10 +257,31 @@ export const App = () => {
               fontFamily: "monospace"
             }}
           />
+
+          <div style={{ marginTop: "12px" }}>
+            <Text>Enter Room ID (optional):</Text>
+          </div>
+          
+          <input
+            type="text"
+            value={roomId}
+            onChange={(e: any) => setRoomId(e.target.value)}
+            placeholder="Leave blank to select from list"
+            style={{
+              width: "100%",
+              padding: "14px",
+              background: "rgba(15, 23, 42, 0.9)",
+              border: "2px solid #D4A574",
+              borderRadius: "8px",
+              color: "#D4A574",
+              fontSize: "14px",
+              fontFamily: "monospace"
+            }}
+          />
           
           <Button 
             variant="primary" 
-            onClick={loadProject} 
+            onClick={() => loadProject()} 
             stretch 
             disabled={!projectId.trim()}
           >
@@ -274,14 +295,62 @@ export const App = () => {
             borderLeft: "4px solid #D4A574",
             marginTop: "20px"
           }}>
-            <Text>💡 <strong>Tip:</strong> Find your Project ID in the main app URL</Text>
+            <Text>💡 <strong>Tip:</strong> Use the "Connect to Canva" button in the main app to get a direct link!</Text>
           </div>
         </Rows>
       </div>
     );
   }
 
-  const rooms = project.rooms || [];
+  // ROOM SELECTION if no room selected
+  if (!selectedRoom) {
+    const rooms = project.rooms || [];
+    
+    return (
+      <div style={{
+        background: 'linear-gradient(135deg, #000000 0%, #0f172a 30%, #1e293b 70%, #000000 100%)',
+        minHeight: "100vh",
+        padding: "24px"
+      }}>
+        <Rows spacing="2u">
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <Title size="large">{project.name || "Select Room"}</Title>
+          </div>
+
+          <Text style={{ textAlign: "center", color: "#B49B7E" }}>
+            Select a room to view its checklist:
+          </Text>
+
+          {rooms.map((room: any) => (
+            <div
+              key={room.id}
+              onClick={() => selectRoom(room)}
+              style={{
+                background: room.color || "#D4A574",
+                color: "#1E293B",
+                padding: "20px",
+                borderRadius: "12px",
+                cursor: "pointer",
+                textAlign: "center",
+                fontWeight: "bold",
+                fontSize: "18px",
+                border: "3px solid #B49B7E",
+                transition: "transform 0.2s",
+              }}
+              onMouseEnter={(e: any) => e.currentTarget.style.transform = "scale(1.05)"}
+              onMouseLeave={(e: any) => e.currentTarget.style.transform = "scale(1)"}
+            >
+              {room.name?.toUpperCase() || "ROOM"}
+            </div>
+          ))}
+
+          <Button variant="secondary" onClick={() => setProject(null)} stretch>
+            ← Change Project
+          </Button>
+        </Rows>
+      </div>
+    );
+  }
 
   return (
     <div style={{
