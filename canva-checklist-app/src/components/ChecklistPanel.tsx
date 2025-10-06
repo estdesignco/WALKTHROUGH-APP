@@ -207,6 +207,6 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
           );
         })}
       </Rows>
-    </Box>
+    </div>
   );
 };
