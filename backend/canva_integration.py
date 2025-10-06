@@ -34,8 +34,7 @@ class CanvaIntegration:
         """Generate Canva OAuth authorization URL."""
         scopes = [
             "asset:read",
-            "asset:write", 
-            "design:meta:read",
+            "asset:write",
             "design:content:read",
             "design:content:write",
             "folder:read",
