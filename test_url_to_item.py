@@ -11,7 +11,7 @@ import traceback
 async def test_url_to_item_workflow():
     """Test the complete URL to item workflow"""
     
-    base_url = "https://designtool-mobile.preview.emergentagent.com/api"
+    base_url = "https://interior-checklist.preview.emergentagent.com/api"
     fourhands_url = "https://fourhands.com/product/248606-001"
     
     try:

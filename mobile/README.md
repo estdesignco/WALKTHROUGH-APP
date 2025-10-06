@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://designtool-mobile.preview.emergentagent.com
-API_URL=https://designtool-mobile.preview.emergentagent.com/api
+BACKEND_URL=https://interior-checklist.preview.emergentagent.com
+API_URL=https://interior-checklist.preview.emergentagent.com/api
 ```
 
 ### App Configuration

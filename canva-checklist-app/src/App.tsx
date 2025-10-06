@@ -33,7 +33,7 @@ interface ChecklistItem {
   checked?: boolean;
 }
 
-const BACKEND_URL = 'https://designtool-mobile.preview.emergentagent.com';
+const BACKEND_URL = 'https://interior-checklist.preview.emergentagent.com';
 
 export const App: React.FC = () => {
   const [projectId, setProjectId] = useState<string>('');

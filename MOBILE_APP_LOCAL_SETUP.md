@@ -27,7 +27,7 @@ cd /app
 tar -czf mobile-app.tar.gz mobile/
 ```
 
-You can download: `https://designtool-mobile.preview.emergentagent.com/mobile-app.tar.gz`
+You can download: `https://interior-checklist.preview.emergentagent.com/mobile-app.tar.gz`
 
 Then extract it on your computer:
 ```bash
