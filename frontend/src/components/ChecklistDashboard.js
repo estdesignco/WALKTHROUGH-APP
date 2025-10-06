@@ -278,14 +278,6 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         itemStatuses={itemStatuses}
       />
 
-      {/* CANVA INTEGRATION PANEL */}
-      <div className="mb-6">
-        <CanvaIntegrationPanel 
-          projectId={projectId}
-          onSync={loadSimpleProject}
-        />
-      </div>
-
       {/* CHECKLIST SPREADSHEET */}
       <ExactChecklistSpreadsheet
         project={project}
