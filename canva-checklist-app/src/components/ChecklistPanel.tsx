@@ -105,8 +105,8 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({
                           borderRadius: '6px',
                           marginBottom: '8px'
                         }}>
-                          <Text size="small" weight="bold">
-                            {category.name}
+                          <Text size="small">
+                            <strong>{category.name}</strong>
                           </Text>
                         </div>
                       )}
