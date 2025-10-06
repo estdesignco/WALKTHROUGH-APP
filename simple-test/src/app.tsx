@@ -514,12 +514,16 @@ export const App = () => {
             paddingTop: "16px", 
             borderTop: "1px solid rgba(180, 155, 126, 0.3)" 
           }}>
-            <Text style={{ color: "#9ACD32", fontWeight: "bold", fontSize: "13px", marginBottom: "8px" }}>
-              ✨ AUTO-IMPORT ALL PRODUCTS FROM CANVA PAGE
-            </Text>
-            <Text style={{ color: "#B49B7E", fontSize: "11px", marginBottom: "10px" }}>
-              Scans all images with links on this Canva page, scrapes them, and adds to checklist with smart categorization
-            </Text>
+            <div style={{ marginBottom: "8px" }}>
+              <Text style={{ color: "#9ACD32", fontWeight: "bold", fontSize: "14px" }}>
+                ✨ AUTO-IMPORT ALL PRODUCTS FROM CANVA PAGE
+              </Text>
+            </div>
+            <div style={{ marginBottom: "10px" }}>
+              <Text style={{ color: "#D4A574", fontSize: "12px" }}>
+                Scans all images with links on this Canva page, scrapes them, and adds to checklist with smart categorization
+              </Text>
+            </div>
             <Button
               variant="secondary"
               onClick={autoImportFromCanva}
@@ -530,9 +534,11 @@ export const App = () => {
             </Button>
           </div>
           
-          <Text style={{ color: "#B49B7E", fontSize: "11px" }}>
-            💡 Single: Paste URL above | Bulk: Click Auto-Import to scan entire Canva page
-          </Text>
+          <div style={{ marginTop: "10px" }}>
+            <Text style={{ color: "#D4A574", fontSize: "11px" }}>
+              💡 Single: Paste URL above | Bulk: Click Auto-Import to scan entire Canva page
+            </Text>
+          </div>
         </Rows>
       </div>
 
