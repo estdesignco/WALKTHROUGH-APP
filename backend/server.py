@@ -6498,14 +6498,26 @@ async def store_canva_code(request_data: dict):
     """Store Canva authorization code for processing (bypasses Cloudflare)."""
     try:
         code = request_data.get('code')
+        state = request_data.get('state')
+        
         if not code:
             raise HTTPException(status_code=400, detail="No code provided")
         
-        # Exchange the code immediately
-        token_data = await canva_integration.exchange_code_for_token(code)
+        # Retrieve code_verifier from database using state
+        auth_session = await db.canva_auth_sessions.find_one({"state": state})
+        if not auth_session:
+            raise HTTPException(status_code=400, detail="Invalid state - session not found")
+        
+        code_verifier = auth_session["code_verifier"]
+        
+        # Exchange the code with PKCE verifier
+        token_data = await canva_integration.exchange_code_for_token(code, code_verifier)
         
         # Store the token
         await canva_integration.store_token(token_data)
+        
+        # Clean up auth session
+        await db.canva_auth_sessions.delete_one({"state": state})
         
         return {
             "success": True,
