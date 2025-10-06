@@ -1344,6 +1344,9 @@ const ExactChecklistSpreadsheet = ({
                         <div className="mb-4 flex gap-3 flex-wrap">
                           <button
                             onClick={() => {
+                              const projectId = project.id;
+                              const roomId = room.id;
+                              
                               // Show modal with connection info
                               const modal = document.createElement('div');
                               modal.style.cssText = `
@@ -1368,7 +1371,7 @@ const ExactChecklistSpreadsheet = ({
                                     <p style="color: #B49B7E; margin-bottom: 10px; font-size: 14px;"><strong>Project ID:</strong></p>
                                     <input type="text" readonly value="${projectId}" style="width: 100%; padding: 12px; background: #0f172a; border: 2px solid #D4A574; border-radius: 8px; color: #D4A574; font-family: monospace; font-size: 13px; margin-bottom: 10px;" onclick="this.select();">
                                     <p style="color: #B49B7E; margin-bottom: 10px; font-size: 14px;"><strong>Room ID:</strong></p>
-                                    <input type="text" readonly value="${room.id}" style="width: 100%; padding: 12px; background: #0f172a; border: 2px solid #D4A574; border-radius: 8px; color: #D4A574; font-family: monospace; font-size: 13px;" onclick="this.select();">
+                                    <input type="text" readonly value="${roomId}" style="width: 100%; padding: 12px; background: #0f172a; border: 2px solid #D4A574; border-radius: 8px; color: #D4A574; font-family: monospace; font-size: 13px;" onclick="this.select();">
                                   </div>
                                   
                                   <div style="background: rgba(139, 68, 68, 0.3); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #D4A574;">
@@ -1391,7 +1394,7 @@ const ExactChecklistSpreadsheet = ({
                                   </button>
                                   
                                   <button onclick="
-                                    navigator.clipboard.writeText('${room.id}');
+                                    navigator.clipboard.writeText('${roomId}');
                                     alert('✅ Room ID copied to clipboard!');
                                   " style="width: 100%; padding: 14px; background: #8B4444; color: #D4C5A9; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; font-size: 14px;">
                                     📋 COPY ROOM ID
