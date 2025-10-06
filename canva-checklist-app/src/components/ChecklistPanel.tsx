@@ -159,11 +159,11 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                                       {/* Item Info */}
                                       <Box style={{ flex: 1 }}>
                                         <Rows spacing="0.5u">
-                                          <Text size="small" weight="bold">
+                                          <Title size="xsmall">
                                             {item.name}
-                                          </Text>
+                                          </Title>
                                           {item.price && (
-                                            <Text size="small">
+                                            <Text>
                                               ${item.price}
                                             </Text>
                                           )}
@@ -187,8 +187,7 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                                       {/* Link Button */}
                                       {item.link && (
                                         <Button 
-                                          variant="tertiary" 
-                                          size="small"
+                                          variant="tertiary"
                                           onClick={() => handleOpenLink(item.link)}
                                         >
                                           🔗
