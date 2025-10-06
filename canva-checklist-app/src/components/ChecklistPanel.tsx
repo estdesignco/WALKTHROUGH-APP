@@ -104,7 +104,6 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                           {/* Category Header */}
                           <Box 
                             padding="1u"
-                            background="neutral"
                             className="room-header"
                             onClick={() => toggleCategory(category.id)}
                             style={{
@@ -112,9 +111,9 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({ project, onItemC
                               cursor: 'pointer'
                             }}
                           >
-                            <Text weight="bold" size="small">
+                            <Title size="xsmall">
                               {isCategoryCollapsed ? '▶' : '▼'} {category.name} ({category.items?.length || 0})
-                            </Text>
+                            </Title>
                           </Box>
 
                           {/* Category Items */}
