@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://interior-checklist.preview.emergentagent.com/email-template.html
+https://canvalink.preview.emergentagent.com/email-template.html
 
 ---
 

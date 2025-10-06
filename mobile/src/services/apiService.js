@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://interior-checklist.preview.emergentagent.com/api';
+const API_URL = 'https://canvalink.preview.emergentagent.com/api';
 
 // Create axios instance
 const api = axios.create({

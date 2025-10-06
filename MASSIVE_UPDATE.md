@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://interior-checklist.preview.emergentagent.com/mobile-app
+Test it now: https://canvalink.preview.emergentagent.com/mobile-app
