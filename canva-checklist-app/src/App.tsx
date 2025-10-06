@@ -328,7 +328,7 @@ export const App = () => {
         }}>
           <Columns spacing="2u" alignY="center">
             <div style={{ flex: 1 }}>
-              <Title size="small" style={{ color: 'white' }}>
+              <Title size="small">
                 {project.name || project.client_name || 'Live Checklist'}
               </Title>
             </div>
