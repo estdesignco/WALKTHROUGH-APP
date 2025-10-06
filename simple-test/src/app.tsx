@@ -18,12 +18,14 @@ const getStatusColor = (status: string) => {
 
 export const App = () => {
   const [projectId, setProjectId] = React.useState("");
+  const [roomId, setRoomId] = React.useState("");
   const [project, setProject] = React.useState<any>(null);
+  const [selectedRoom, setSelectedRoom] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [collapsedRooms, setCollapsedRooms] = React.useState<Set<string>>(new Set());
   const [collapsedCats, setCollapsedCats] = React.useState<Set<string>>(new Set());
   const [lastSync, setLastSync] = React.useState(new Date());
+  const [scrapingUrl, setScrapingUrl] = React.useState("");
 
   // REAL-TIME SYNC every 5 seconds
   React.useEffect(() => {
