@@ -23,6 +23,7 @@ const CompletePageLayout = ({
           title={title}
           hideNavigation={hideNavigation}
           onAddRoom={onAddRoom}
+          projectId={projectId}
         >
           {children}
         </MainContainer>
