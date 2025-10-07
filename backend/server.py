@@ -2462,6 +2462,397 @@ async def canva_sync_heartbeat():
         "server_time": datetime.now(timezone.utc).isoformat()
     }
 
+# ==========================================
+# PHASE 3: AUTO IMAGE UPLOAD TO CANVA
+# ==========================================
+
+@api_router.post("/canva/upload-room-images")
+async def upload_room_images_to_canva(
+    project_id: str,
+    room_id: str,
+    background_tasks: BackgroundTasks
+):
+    """
+    Upload all images from a specific room to Canva.
+    Includes walkthrough photos and item images.
+    Runs in background to avoid timeout.
+    """
+    try:
+        # Get project info
+        project_doc = await db.projects.find_one({"id": project_id})
+        if not project_doc:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Get room info
+        room_doc = await db.rooms.find_one({"id": room_id})
+        if not room_doc:
+            raise HTTPException(status_code=404, detail="Room not found")
+        
+        # Create upload job
+        upload_job = {
+            "id": str(uuid.uuid4()),
+            "project_id": project_id,
+            "project_name": project_doc["name"],
+            "room_id": room_id,
+            "room_name": room_doc["name"],
+            "status": "pending",
+            "total_images": 0,
+            "uploaded_images": 0,
+            "failed_images": 0,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "errors": []
+        }
+        
+        await db.canva_upload_jobs.insert_one(upload_job)
+        
+        # Add background task to process upload
+        background_tasks.add_task(
+            process_room_image_upload,
+            upload_job["id"],
+            project_id,
+            room_id,
+            project_doc["name"],
+            room_doc["name"]
+        )
+        
+        return {
+            "success": True,
+            "job_id": upload_job["id"],
+            "message": f"Upload started for {room_doc['name']}"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error starting upload: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/canva/upload-job/{job_id}")
+async def get_upload_job_status(job_id: str):
+    """Get status of a Canva upload job."""
+    job = await db.canva_upload_jobs.find_one({"id": job_id})
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Convert datetime to ISO string
+    if "created_at" in job and job["created_at"]:
+        job["created_at"] = job["created_at"].isoformat()
+    if "updated_at" in job and job["updated_at"]:
+        job["updated_at"] = job["updated_at"].isoformat()
+    
+    return job
+
+@api_router.post("/canva/upload-item-images")
+async def upload_item_images_to_canva(
+    item_id: str,
+    background_tasks: BackgroundTasks
+):
+    """
+    Upload all images for a specific item to Canva.
+    """
+    try:
+        # Get item
+        item_doc = await db.items.find_one({"id": item_id})
+        if not item_doc:
+            raise HTTPException(status_code=404, detail="Item not found")
+        
+        # Get project and room info for tagging
+        subcategory_doc = await db.subcategories.find_one({"id": item_doc["subcategory_id"]})
+        if not subcategory_doc:
+            raise HTTPException(status_code=404, detail="Subcategory not found")
+        
+        category_doc = await db.categories.find_one({"id": subcategory_doc["category_id"]})
+        if not category_doc:
+            raise HTTPException(status_code=404, detail="Category not found")
+        
+        room_doc = await db.rooms.find_one({"id": category_doc["room_id"]})
+        if not room_doc:
+            raise HTTPException(status_code=404, detail="Room not found")
+        
+        project_doc = await db.projects.find_one({"id": room_doc["project_id"]})
+        if not project_doc:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Create upload job
+        upload_job = {
+            "id": str(uuid.uuid4()),
+            "type": "item",
+            "item_id": item_id,
+            "item_name": item_doc["name"],
+            "project_name": project_doc["name"],
+            "room_name": room_doc["name"],
+            "status": "pending",
+            "total_images": 0,
+            "uploaded_images": 0,
+            "failed_images": 0,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "errors": []
+        }
+        
+        await db.canva_upload_jobs.insert_one(upload_job)
+        
+        # Add background task
+        background_tasks.add_task(
+            process_item_image_upload,
+            upload_job["id"],
+            item_id,
+            project_doc["name"],
+            room_doc["name"]
+        )
+        
+        return {
+            "success": True,
+            "job_id": upload_job["id"],
+            "message": f"Upload started for {item_doc['name']}"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error starting item upload: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def process_room_image_upload(
+    job_id: str,
+    project_id: str,
+    room_id: str,
+    project_name: str,
+    room_name: str
+):
+    """Background task to upload all images from a room to Canva."""
+    try:
+        # Update job status
+        await db.canva_upload_jobs.update_one(
+            {"id": job_id},
+            {"$set": {"status": "processing", "updated_at": datetime.utcnow()}}
+        )
+        
+        # Get all categories in room
+        categories = await db.categories.find({"room_id": room_id}).to_list(None)
+        category_ids = [cat["id"] for cat in categories]
+        
+        # Get all subcategories
+        subcategories = await db.subcategories.find({"category_id": {"$in": category_ids}}).to_list(None)
+        subcategory_ids = [sub["id"] for sub in subcategories]
+        
+        # Get all items
+        items = await db.items.find({"subcategory_id": {"$in": subcategory_ids}}).to_list(None)
+        
+        # Collect all images
+        images_to_upload = []
+        
+        for item in items:
+            # Main item image
+            if item.get("image_url"):
+                images_to_upload.append({
+                    "url": item["image_url"],
+                    "filename": f"{item['name']}_main",
+                    "item_name": item["name"]
+                })
+            
+            # Additional photos
+            for idx, photo in enumerate(item.get("photos", [])):
+                if isinstance(photo, dict) and photo.get("url"):
+                    images_to_upload.append({
+                        "url": photo["url"],
+                        "filename": f"{item['name']}_photo_{idx+1}",
+                        "item_name": item["name"]
+                    })
+        
+        total_images = len(images_to_upload)
+        
+        await db.canva_upload_jobs.update_one(
+            {"id": job_id},
+            {"$set": {"total_images": total_images, "updated_at": datetime.utcnow()}}
+        )
+        
+        if total_images == 0:
+            await db.canva_upload_jobs.update_one(
+                {"id": job_id},
+                {"$set": {
+                    "status": "completed",
+                    "updated_at": datetime.utcnow(),
+                    "errors": ["No images found to upload"]
+                }}
+            )
+            return
+        
+        # Upload images
+        uploaded_count = 0
+        failed_count = 0
+        errors = []
+        
+        for image_info in images_to_upload:
+            try:
+                # Download image
+                import httpx
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    response = await client.get(image_info["url"])
+                    if response.status_code == 200:
+                        image_data = response.content
+                        
+                        # Upload to Canva
+                        result = await canva_integration.upload_image_to_canva(
+                            image_data=image_data,
+                            filename=f"{image_info['filename']}.jpg",
+                            project_name=project_name,
+                            room_name=room_name
+                        )
+                        
+                        uploaded_count += 1
+                        logging.info(f"✅ Uploaded: {image_info['filename']}")
+                    else:
+                        raise Exception(f"Failed to download image: HTTP {response.status_code}")
+                        
+            except Exception as e:
+                failed_count += 1
+                error_msg = f"{image_info['filename']}: {str(e)}"
+                errors.append(error_msg)
+                logging.error(f"❌ Upload failed: {error_msg}")
+            
+            # Update progress
+            await db.canva_upload_jobs.update_one(
+                {"id": job_id},
+                {"$set": {
+                    "uploaded_images": uploaded_count,
+                    "failed_images": failed_count,
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+        
+        # Mark as completed
+        await db.canva_upload_jobs.update_one(
+            {"id": job_id},
+            {"$set": {
+                "status": "completed",
+                "updated_at": datetime.utcnow(),
+                "errors": errors
+            }}
+        )
+        
+        logging.info(f"🎉 Upload job {job_id} completed: {uploaded_count}/{total_images} successful")
+        
+    except Exception as e:
+        logging.error(f"Error in upload job {job_id}: {str(e)}")
+        await db.canva_upload_jobs.update_one(
+            {"id": job_id},
+            {"$set": {
+                "status": "failed",
+                "updated_at": datetime.utcnow(),
+                "errors": [str(e)]
+            }}
+        )
+
+async def process_item_image_upload(
+    job_id: str,
+    item_id: str,
+    project_name: str,
+    room_name: str
+):
+    """Background task to upload images for a single item."""
+    try:
+        await db.canva_upload_jobs.update_one(
+            {"id": job_id},
+            {"$set": {"status": "processing", "updated_at": datetime.utcnow()}}
+        )
+        
+        # Get item
+        item = await db.items.find_one({"id": item_id})
+        if not item:
+            raise Exception("Item not found")
+        
+        images_to_upload = []
+        
+        # Main image
+        if item.get("image_url"):
+            images_to_upload.append({
+                "url": item["image_url"],
+                "filename": f"{item['name']}_main"
+            })
+        
+        # Additional photos
+        for idx, photo in enumerate(item.get("photos", [])):
+            if isinstance(photo, dict) and photo.get("url"):
+                images_to_upload.append({
+                    "url": photo["url"],
+                    "filename": f"{item['name']}_photo_{idx+1}"
+                })
+        
+        total_images = len(images_to_upload)
+        
+        await db.canva_upload_jobs.update_one(
+            {"id": job_id},
+            {"$set": {"total_images": total_images, "updated_at": datetime.utcnow()}}
+        )
+        
+        if total_images == 0:
+            await db.canva_upload_jobs.update_one(
+                {"id": job_id},
+                {"$set": {
+                    "status": "completed",
+                    "updated_at": datetime.utcnow(),
+                    "errors": ["No images found"]
+                }}
+            )
+            return
+        
+        uploaded_count = 0
+        failed_count = 0
+        errors = []
+        
+        for image_info in images_to_upload:
+            try:
+                import httpx
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    response = await client.get(image_info["url"])
+                    if response.status_code == 200:
+                        image_data = response.content
+                        
+                        result = await canva_integration.upload_image_to_canva(
+                            image_data=image_data,
+                            filename=f"{image_info['filename']}.jpg",
+                            project_name=project_name,
+                            room_name=room_name
+                        )
+                        
+                        uploaded_count += 1
+                    else:
+                        raise Exception(f"Download failed: HTTP {response.status_code}")
+                        
+            except Exception as e:
+                failed_count += 1
+                errors.append(f"{image_info['filename']}: {str(e)}")
+            
+            await db.canva_upload_jobs.update_one(
+                {"id": job_id},
+                {"$set": {
+                    "uploaded_images": uploaded_count,
+                    "failed_images": failed_count,
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+        
+        await db.canva_upload_jobs.update_one(
+            {"id": job_id},
+            {"$set": {
+                "status": "completed",
+                "updated_at": datetime.utcnow(),
+                "errors": errors
+            }}
+        )
+        
+    except Exception as e:
+        await db.canva_upload_jobs.update_one(
+            {"id": job_id},
+            {"$set": {
+                "status": "failed",
+                "updated_at": datetime.utcnow(),
+                "errors": [str(e)]
+            }}
+        )
+
 # MISSING DELETE ENDPOINTS THAT THE FRONTEND EXPECTS
 @api_router.delete("/rooms/{room_id}")
 async def delete_room(room_id: str):
