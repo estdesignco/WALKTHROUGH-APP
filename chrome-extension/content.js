@@ -1,6 +1,13 @@
 // Content script for Canva page scanning - TRADE VENDORS ONLY
-console.log('🎨 Canva Scanner Content Script LOADED at:', new Date().toLocaleTimeString());
-console.log('📍 Current URL:', window.location.href);
+
+// Prevent double-loading
+if (window.__canvaScannerLoaded) {
+  console.log('🎨 Canva Scanner already loaded, skipping...');
+} else {
+  window.__canvaScannerLoaded = true;
+  console.log('🎨 Canva Scanner Content Script LOADED at:', new Date().toLocaleTimeString());
+  console.log('📍 Current URL:', window.location.href);
+}
 
 // Known trade vendor domains (from user's list + open to others)
 const KNOWN_TRADE_VENDORS = [
