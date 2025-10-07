@@ -133,31 +133,7 @@ export const App = () => {
     return () => clearInterval(interval);
   }, [project, projectId, selectedRoom]);
 
-  // Check URL params or localStorage on mount
-  React.useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlProjectId = urlParams.get('projectId');
-    const urlRoomId = urlParams.get('roomId');
-
-    const savedProjectId = localStorage.getItem('canva_saved_projectId');
-    const savedRoomId = localStorage.getItem('canva_saved_roomId');
-
-    const finalProjectId = urlProjectId || savedProjectId || '';
-    const finalRoomId = urlRoomId || savedRoomId || '';
-
-    if (finalProjectId) {
-      setProjectId(finalProjectId);
-      localStorage.setItem('canva_saved_projectId', finalProjectId);
-    }
-    if (finalRoomId) {
-      setRoomId(finalRoomId);
-      localStorage.setItem('canva_saved_roomId', finalRoomId);
-    }
-
-    if (finalProjectId) {
-      loadProject(finalProjectId, finalRoomId);
-    }
-  }, []);
+  // REMOVED - Now handled in state initialization above
 
   const loadProject = async (targetProjectId: string, targetRoomId?: string) => {
     setLoading(true);
