@@ -1060,6 +1060,129 @@ const ExactChecklistSpreadsheet = ({
                       🔗 CONNECT TO CANVA
                     </button>
                     
+                    {/* IMPORT FROM PDF */}
+                    <button
+                      onClick={async () => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = '.pdf';
+                        input.onchange = async (e) => {
+                          const file = e.target.files[0];
+                          if (!file) return;
+                          
+                          if (!confirm(`Import products from "${file.name}" to "${room.name}"?\n\nThis will:\n• Extract all product links from PDF\n• Scrape product details\n• Add to ${room.name}\n\nMake sure the PDF is exported from Canva with links!`)) {
+                            return;
+                          }
+                          
+                          try {
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            
+                            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/import/pdf-links?project_id=${project.id}&room_id=${room.id}`, {
+                              method: 'POST',
+                              body: formData
+                            });
+                            
+                            if (response.ok) {
+                              const result = await response.json();
+                              alert(`✅ PDF import started!\n\nJob ID: ${result.job_id}\n\nProcessing links in background...`);
+                              
+                              // Show progress modal
+                              const modal = document.createElement('div');
+                              modal.style.cssText = `
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                background: rgba(0,0,0,0.9);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                z-index: 9999;
+                              `;
+                              
+                              modal.innerHTML = `
+                                <div style="background: linear-gradient(135deg, #000 0%, #1e293b 50%, #000 100%); padding: 40px; border-radius: 16px; max-width: 500px; border: 3px solid #D4A574;">
+                                  <h2 style="color: #D4A574; font-size: 24px; margin-bottom: 20px; text-align: center;">📄 Importing from PDF</h2>
+                                  
+                                  <div id="pdf-progress-${result.job_id}" style="background: rgba(30, 41, 59, 0.8); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #B49B7E;">
+                                    <p style="color: #B49B7E; margin-bottom: 10px; text-align: center;">⏳ Extracting links...</p>
+                                    <div style="background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden; height: 30px;">
+                                      <div id="pdf-bar-${result.job_id}" style="background: linear-gradient(90deg, #D4A574, #B49B7E); height: 100%; width: 0%; transition: width 0.5s; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 12px;"></div>
+                                    </div>
+                                    <p id="pdf-status-${result.job_id}" style="color: #D4A574; margin-top: 10px; text-align: center; font-size: 14px;">Starting...</p>
+                                  </div>
+                                  
+                                  <button onclick="this.parentElement.parentElement.remove()" style="width: 100%; padding: 14px; background: rgba(30, 41, 59, 0.8); color: #B49B7E; border: 2px solid #B49B7E; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">
+                                    ✖ CLOSE (Import continues)
+                                  </button>
+                                </div>
+                              `;
+                              
+                              document.body.appendChild(modal);
+                              
+                              // Poll for progress
+                              const pollProgress = setInterval(async () => {
+                                try {
+                                  const progressRes = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/import/pdf-job/${result.job_id}`);
+                                  if (progressRes.ok) {
+                                    const job = await progressRes.json();
+                                    const progress = job.total_links > 0 ? (job.imported_items / job.total_links * 100).toFixed(0) : 0;
+                                    
+                                    const progressBar = document.getElementById(`pdf-bar-${result.job_id}`);
+                                    const statusText = document.getElementById(`pdf-status-${result.job_id}`);
+                                    
+                                    if (progressBar) {
+                                      progressBar.style.width = progress + '%';
+                                      progressBar.textContent = progress + '%';
+                                    }
+                                    
+                                    if (statusText) {
+                                      if (job.status === 'processing') {
+                                        statusText.textContent = `Found ${job.total_links} links • Imported ${job.imported_items}/${job.total_links}`;
+                                      } else if (job.status === 'completed') {
+                                        statusText.textContent = `✅ Complete! ${job.imported_items} products imported`;
+                                        if (job.failed_items > 0) {
+                                          statusText.textContent += ` (${job.failed_items} failed)`;
+                                        }
+                                        statusText.style.color = '#9ACD32';
+                                        clearInterval(pollProgress);
+                                        
+                                        // Refresh the page to show new items
+                                        setTimeout(() => {
+                                          window.location.reload();
+                                        }, 3000);
+                                      } else if (job.status === 'failed') {
+                                        statusText.textContent = '❌ Import failed';
+                                        statusText.style.color = '#ff6b6b';
+                                        clearInterval(pollProgress);
+                                      }
+                                    }
+                                  }
+                                } catch (e) {
+                                  console.error('Progress poll error:', e);
+                                }
+                              }, 2000);
+                              
+                              setTimeout(() => clearInterval(pollProgress), 300000);
+                              
+                            } else {
+                              const error = await response.json();
+                              alert(`❌ PDF import failed: ${error.detail || 'Unknown error'}`);
+                            }
+                          } catch (error) {
+                            alert(`❌ Error: ${error.message}`);
+                          }
+                        };
+                        input.click();
+                      }}
+                      className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-xs px-3 py-1 rounded transition-colors font-bold"
+                      title={`Import products from Canva PDF to ${room.name}`}
+                    >
+                      📄 IMPORT FROM PDF
+                    </button>
+                    
                     {/* UPLOAD IMAGES TO CANVA */}
                     <button
                       onClick={async () => {
