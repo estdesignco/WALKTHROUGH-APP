@@ -8411,7 +8411,7 @@ async def export_project_excel(project_id: str, sheet_type: str = "checklist"):
                     items = await db.items.find({"subcategory_id": subcategory["id"]}).to_list(None)
                     for item in items:
                         csv_lines.append(
-                            f'"{room["name"]}",{category["name"]}",{subcategory["name"]}",{item.get("name", "")}",{item.get("vendor", "")}",{item.get("cost", "")}",{item.get("status", "")}",{item.get("sku", "")}",{item.get("link", "")}"'
+                            f'"{room["name"]}","{category["name"]}","{subcategory["name"]}","{item.get("name", "")}","{item.get("vendor", "")}","{item.get("cost", "")}","{item.get("status", "")}","{item.get("sku", "")}","{item.get("link", "")}"'
                         )
         
         csv_content = "\n".join(csv_lines)
