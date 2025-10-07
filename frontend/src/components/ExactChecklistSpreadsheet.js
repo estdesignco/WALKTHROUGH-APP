@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import AddItemModal from './AddItemModal';
 import CanvaIntegrationModal from './CanvaIntegrationModal';
-import QuickAddProduct from './QuickAddProduct';
 
 const ExactChecklistSpreadsheet = ({ 
   project, 
