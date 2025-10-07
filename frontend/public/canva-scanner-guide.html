@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canva Scanner - Installation & Usage Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #0a1628 20%, #0f2847 40%, #1e3a5f 60%, #0f2847 80%, #000000 100%);
+            color: #D4A574;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.15), rgba(212, 165, 116, 0.05));
+            border-radius: 20px;
+            border: 2px solid rgba(212, 165, 116, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+        
+        h1 {
+            font-size: 48px;
+            color: #D4A574;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.9);
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            color: #B8956A;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: linear-gradient(135deg, rgba(15, 40, 71, 0.8), rgba(10, 22, 40, 0.9));
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(212, 165, 116, 0.4);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+        }
+        
+        h2 {
+            color: #D4A574;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 3px solid rgba(212, 165, 116, 0.4);
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #E8D4B8;
+            font-size: 24px;
+            margin: 25px 0 15px 0;
+            letter-spacing: 1px;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            padding: 20px 50px;
+            background: linear-gradient(135deg, #D4A574, #E8D4B8, #D4A574);
+            color: #000;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 700;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 24px rgba(212, 165, 116, 0.4);
+            border: 3px solid rgba(212, 165, 116, 0.6);
+            margin: 20px 0;
+        }
+        
+        .download-btn:hover {
+            background: linear-gradient(135deg, #E8D4B8, #F5E6D3, #E8D4B8);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 32px rgba(212, 165, 116, 0.7);
+        }
+        
+        .step {
+            background: rgba(5, 10, 20, 0.7);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #D4A574;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #D4A574;
+            color: #000;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: 700;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+        
+        .step-content {
+            display: inline-block;
+            vertical-align: top;
+            width: calc(100% - 60px);
+            color: #B8956A;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #D4A574;
+            color: #B8956A;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .feature-list li:before {
+            content: "\2713";
+            color: #9ACD32;
+            font-weight: 700;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        
+        .vendor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .vendor-badge {
+            background: rgba(212, 165, 116, 0.2);
+            color: #D4A574;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid rgba(212, 165, 116, 0.3);
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .vendor-badge:hover {
+            background: rgba(212, 165, 116, 0.3);
+            border-color: #D4A574;
+            transform: scale(1.05);
+        }
+        
+        .warning-box {
+            background: rgba(255, 165, 0, 0.1);
+            border: 2px solid rgba(255, 165, 0, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .warning-box h4 {
+            color: #FFA500;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .warning-box p {
+            color: #D4A574;
+            line-height: 1.6;
+        }
+        
+        .success-box {
+            background: rgba(154, 205, 50, 0.1);
+            border: 2px solid rgba(154, 205, 50, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .success-box h4 {
+            color: #9ACD32;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .success-box p {
+            color: #B8956A;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #9ACD32;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .screenshot-placeholder {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 100px 20px;
+            text-align: center;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px dashed rgba(212, 165, 116, 0.3);
+            color: #B8956A;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Canva Scanner Chrome Extension</h1>
+            <p class="subtitle">Automatically Import Products from Canva Boards to Your Checklist</p>
+        </div>
+        
+        <!-- DOWNLOAD SECTION -->
+        <div class="section">
+            <h2>📥 Download Extension</h2>
+            <div style="text-align: center;">
+                <a href="/canva-scanner-TRADE-SMART.zip" download class="download-btn">
+                    ⬇️ Download Canva Scanner v2.0 (Trade Smart)
+                </a>
+                <p style="margin-top: 15px; font-size: 14px; color: #B8956A;">
+                    Version 2.0 • Smart Trade Vendor Detection • Updated October 2025
+                </p>
+            </div>
+        </div>
+        
+        <!-- WHAT IS IT SECTION -->
+        <div class="section">
+            <h2>❓ What Is This?</h2>
+            <p style="color: #B8956A; line-height: 1.8; font-size: 17px; margin-bottom: 20px;">
+                The <strong style="color: #D4A574;">Canva Scanner</strong> is a powerful Chrome extension that scans your Canva design boards 
+                for product links from your trade vendors and automatically imports them into your project checklist. 
+                No more manual copying and pasting!
+            </p>
+            
+            <h3>✨ Key Features:</h3>
+            <ul class="feature-list">
+                <li><strong>Smart Trade Vendor Detection:</strong> Automatically identifies product links from 20+ known trade vendors</li>
+                <li><strong>Intelligent Product Recognition:</strong> Filters out retail sites and non-product pages</li>
+                <li><strong>Auto-Categorization:</strong> Automatically sorts items into appropriate categories (Lighting, Furniture, Decor)</li>
+                <li><strong>Room Selection:</strong> Import products directly into specific rooms</li>
+                <li><strong>One-Click Import:</strong> Scan and import all products with a single click</li>
+                <li><strong>Real-time Status Updates:</strong> See exactly what's being imported as it happens</li>
+                <li><strong>Beautiful Dark UI:</strong> Matches your app's gold and blue gradient theme</li>
+            </ul>
+        </div>
+        
+        <!-- INSTALLATION SECTION -->
+        <div class="section">
+            <h2>🛠️ Installation Guide</h2>
+            
+            <div class="step">
+                <span class="step-number">1</span>
+                <div class="step-content">
+                    <strong>Download the extension:</strong> Click the download button above to get <code>canva-scanner-TRADE-SMART.zip</code>
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">2</span>
+                <div class="step-content">
+                    <strong>Extract the ZIP file:</strong> Right-click the downloaded file and select "Extract All" (Windows) or double-click (Mac). 
+                    Remember where you extracted it!
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">3</span>
+                <div class="step-content">
+                    <strong>Open Chrome Extensions:</strong> In Google Chrome, go to <code>chrome://extensions/</code> or click the three dots menu → 
+                    More Tools → Extensions
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">4</span>
+                <div class="step-content">
+                    <strong>Enable Developer Mode:</strong> In the top-right corner, toggle on "Developer mode"
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">5</span>
+                <div class="step-content">
+                    <strong>Load the extension:</strong> Click "Load unpacked" button, then select the folder where you extracted the ZIP file
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">6</span>
+                <div class="step-content">
+                    <strong>Pin the extension:</strong> Click the puzzle piece icon in Chrome's toolbar, find "Interior Design Canva Scanner", 
+                    and click the pin icon to keep it visible
+                </div>
+            </div>
+            
+            <div class="success-box">
+                <h4>✅ Installation Complete!</h4>
+                <p>You should now see the Canva Scanner icon in your Chrome toolbar. You're ready to start scanning!</p>
+            </div>
+        </div>
+        
+        <!-- HOW TO USE SECTION -->
+        <div class="section">
+            <h2>🚀 How to Use</h2>
+            
+            <div class="step">
+                <span class="step-number">1</span>
+                <div class="step-content">
+                    <strong>Open your Canva board:</strong> Go to Canva.com and open the design board that contains your product links
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">2</span>
+                <div class="step-content">
+                    <strong>Click the extension icon:</strong> Click the Canva Scanner icon in your Chrome toolbar to open the popup
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">3</span>
+                <div class="step-content">
+                    <strong>Enter your Project ID:</strong> Copy your project ID from the main app and paste it into the "Project ID" field, 
+                    then click "Load Project"
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">4</span>
+                <div class="step-content">
+                    <strong>Select a room:</strong> Choose which room you want to import the products into from the dropdown menu
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">5</span>
+                <div class="step-content">
+                    <strong>Scan the board:</strong> Click the big gold "Scan Canva Board for Products" button
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">6</span>
+                <div class="step-content">
+                    <strong>Watch the magic happen:</strong> The extension will scan your board, find all product links, scrape product details, 
+                    and automatically add them to your checklist! You'll see real-time status updates.
+                </div>
+            </div>
+            
+            <div class="success-box">
+                <h4>🎉 Done!</h4>
+                <p>Check your project checklist in the main app - all your products should now be imported and ready to review!</p>
+            </div>
+        </div>
+        
+        <!-- SUPPORTED VENDORS SECTION -->
+        <div class="section">
+            <h2>🏪 Supported Trade Vendors</h2>
+            <p style="color: #B8956A; margin-bottom: 20px; line-height: 1.6;">
+                The scanner is optimized to detect products from these trade vendors (and will intelligently detect others):
+            </p>
+            
+            <div class="vendor-grid">
+                <div class="vendor-badge">Lounards</div>
+                <div class="vendor-badge">Bernhardt</div>
+                <div class="vendor-badge">Gabby</div>
+                <div class="vendor-badge">Visual Comfort</div>
+                <div class="vendor-badge">Lola Hug</div>
+                <div class="vendor-badge">HVL Group</div>
+                <div class="vendor-badge">Globe Views</div>
+                <div class="vendor-badge">Safavieh</div>
+                <div class="vendor-badge">Surya</div>
+                <div class="vendor-badge">Eichholtz</div>
+                <div class="vendor-badge">Have Furniture</div>
+                <div class="vendor-badge">1ow Decor</div>
+                <div class="vendor-badge">Base Liminar</div>
+                <div class="vendor-badge">Regina Andrew</div>
+                <div class="vendor-badge">Arteriors Home</div>
+                <div class="vendor-badge">Vanguard Furniture</div>
+                <div class="vendor-badge">Hinkley</div>
+                <div class="vendor-badge">Hubbardton Forge</div>
+                <div class="vendor-badge">Elegant Lighting</div>
+                <div class="vendor-badge">+ Many More!</div>
+            </div>
+            
+            <div class="warning-box" style="margin-top: 30px;">
+                <h4>⚠️ Retail Sites Are Excluded</h4>
+                <p>
+                    The scanner automatically filters out retail websites like Wayfair, Crate & Barrel, West Elm, etc. 
+                    Only your professional trade vendor links will be imported.
+                </p>
+            </div>
+        </div>
+        
+        <!-- TIPS & TRICKS SECTION -->
+        <div class="section">
+            <h2>💡 Tips & Troubleshooting</h2>
+            
+            <h3>✨ Best Practices:</h3>
+            <ul class="feature-list">
+                <li>Make sure your product images in Canva have clickable links attached</li>
+                <li>Use the full product page URLs (not homepage or category pages)</li>
+                <li>The scanner saves your project ID, so you only need to enter it once</li>
+                <li>You can scan multiple Canva boards into different rooms</li>
+                <li>Check the console output (F12 → Console) for detailed scanning information</li>
+            </ul>
+            
+            <h3>🔧 Troubleshooting:</h3>
+            
+            <div class="step">
+                <span class="step-number">?</span>
+                <div class="step-content">
+                    <strong>"No product links found":</strong>
+                    <br>Make sure you're on the actual Canva design page (not the homepage). 
+                    Verify that your images have links attached by clicking on them in Canva.
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">?</span>
+                <div class="step-content">
+                    <strong>"Content script error":</strong>
+                    <br>Refresh your Canva page and try again. Make sure you're logged into Canva.
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">?</span>
+                <div class="step-content">
+                    <strong>"Failed to scrape product":</strong>
+                    <br>The product page might be temporarily unavailable or requires login. Try the link manually first. 
+                    Some vendor sites may have anti-scraping protection.
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">?</span>
+                <div class="step-content">
+                    <strong>Products going to wrong category:</strong>
+                    <br>The auto-categorization is smart but not perfect. You can manually move items to the correct category 
+                    in the main app after import.
+                </div>
+            </div>
+        </div>
+        
+        <!-- CHANGELOG SECTION -->
+        <div class="section">
+            <h2>📝 What's New in v2.0</h2>
+            <ul class="feature-list">
+                <li>Smart trade vendor detection with 20+ pre-configured vendors</li>
+                <li>Automatic retail site exclusion (no more Wayfair/Crate & Barrel noise!)</li>
+                <li>Improved product URL pattern recognition</li>
+                <li>5 different scanning methods for maximum detection</li>
+                <li>Beautiful dark blue gradient UI matching your main app</li>
+                <li>Better error handling and status messages</li>
+                <li>Performance improvements and faster scanning</li>
+            </ul>
+        </div>
+        
+        <!-- FOOTER -->
+        <div style="text-align: center; padding: 40px 20px; color: #B8956A; opacity: 0.7;">
+            <p>Canva Scanner Chrome Extension v2.0</p>
+            <p style="margin-top: 10px; font-size: 14px;">Part of your Interior Design Management System</p>
+        </div>
+    </div>
+</body>
+</html>
