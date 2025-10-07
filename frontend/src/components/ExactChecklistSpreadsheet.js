@@ -930,13 +930,20 @@ const ExactChecklistSpreadsheet = ({
             </select>
           </div>
           
-          {/* Action Buttons - ADD ROOM, CANVA, AND TRANSFER */}
+          {/* Action Buttons - ADD ROOM, QUICK ADD, CANVA, AND TRANSFER */}
           <div className="flex gap-3">
             <button 
               onClick={onAddRoom}
               className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-[#B49B7E]"
             >
               ✥ ADD ROOM
+            </button>
+            <button 
+              onClick={() => setShowQuickAdd(!showQuickAdd)}
+              className="bg-gradient-to-r from-[#9ACD32] to-[#7FCD32] hover:from-[#7FCD32] hover:to-[#6BB832] px-6 py-2 rounded-full shadow-xl hover:shadow-green-400/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-green-300/20 text-black flex items-center gap-2"
+            >
+              <span>✨</span>
+              <span>{showQuickAdd ? 'HIDE' : 'QUICK ADD PRODUCT'}</span>
             </button>
             <button 
               onClick={() => {
