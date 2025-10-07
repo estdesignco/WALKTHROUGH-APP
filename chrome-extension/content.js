@@ -4,21 +4,39 @@ console.log('📍 Current URL:', window.location.href);
 
 // Immediately scan when loaded
 function scanPageForLinks() {
-  console.log('🔍 Starting REAL scan of page...');
+  console.log('🔍 Starting REAL scan - ALL EXTERNAL LINKS...');
   const results = [];
   
   // Get ALL text from page
   const pageText = document.body.innerText || document.body.textContent || '';
   console.log('📄 Page text length:', pageText.length);
   
-  // Scan for product URLs in text
-  const urlPattern = /https?:\/\/(www\.)?(houzz|westelm|cb2|potterybarn|crateandbarrel|wayfair|anthropologie|restorationhardware|roomandboard|article|allmodern)\.com[^\s<>"'\)]+/gi;
+  // Scan for ANY http/https URLs (not limited to specific vendors)
+  const urlPattern = /https?:\/\/[^\s<>"'\)]+/gi;
   const foundUrls = pageText.match(urlPattern) || [];
   
-  console.log('✅ Found URLs in text:', foundUrls.length);
-  foundUrls.forEach(url => console.log('  → ', url));
+  console.log('🔗 Total URLs found in text:', foundUrls.length);
   
-  foundUrls.forEach(url => {
+  // Filter out Canva's own URLs and common non-product URLs
+  const filteredUrls = foundUrls.filter(url => {
+    const lowerUrl = url.toLowerCase();
+    return !lowerUrl.includes('canva.com') &&
+           !lowerUrl.includes('google.com') &&
+           !lowerUrl.includes('facebook.com') &&
+           !lowerUrl.includes('instagram.com') &&
+           !lowerUrl.includes('youtube.com') &&
+           !lowerUrl.includes('twitter.com') &&
+           !lowerUrl.includes('linkedin.com') &&
+           !lowerUrl.includes('.js') &&
+           !lowerUrl.includes('.css') &&
+           !lowerUrl.includes('.png') &&
+           !lowerUrl.includes('.jpg') &&
+           !lowerUrl.includes('.gif');
+  });
+  
+  console.log('✅ Filtered product URLs:', filteredUrls.length);
+  filteredUrls.forEach(url => {
+    console.log('  → ', url);
     results.push({ url: url, source: 'text' });
   });
   
@@ -29,17 +47,23 @@ function scanPageForLinks() {
   let productLinkCount = 0;
   allLinks.forEach(link => {
     const href = link.href;
-    if (href && urlPattern.test(href)) {
+    if (href && 
+        !href.includes('canva.com') && 
+        !href.includes('javascript:') &&
+        !href.startsWith('#') &&
+        !href.includes('google.com') &&
+        !href.includes('facebook.com')) {
       results.push({ url: href, source: 'link' });
       productLinkCount++;
-      console.log('✅ Product link found:', href);
+      console.log('✅ External link found:', href);
     }
   });
-  console.log('🎯 Product links in <a> tags:', productLinkCount);
+  console.log('🎯 External links in <a> tags:', productLinkCount);
   
   // Remove duplicates
   const uniqueUrls = [...new Set(results.map(r => r.url))];
-  console.log('📊 TOTAL UNIQUE PRODUCT URLS:', uniqueUrls.length);
+  console.log('📊 TOTAL UNIQUE EXTERNAL URLS:', uniqueUrls.length);
+  uniqueUrls.forEach((url, i) => console.log(`  ${i+1}. ${url}`));
   
   return uniqueUrls.map(url => ({ url }));
 }
