@@ -278,7 +278,7 @@ export const App = () => {
       
     } catch (e: any) {
       console.error('Auto-import error:', e);
-      alert('❌ Error: ' + e.message);
+      alert('❌ ERROR IN AUTO-IMPORT:\n\n' + e.message + '\n\nCheck console for details (F12)');
     } finally {
       setLoading(false);
     }
