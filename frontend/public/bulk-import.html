@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Product Import - Interior Design</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #0f172a 30%, #1e293b 70%, #000000 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #D4A574;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            border: 3px solid #B49B7E;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #D4A574;
+            margin-bottom: 10px;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        .subtitle {
+            text-align: center;
+            color: #B49B7E;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .section {
+            background: rgba(15, 23, 42, 0.7);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #D4A574;
+        }
+        label {
+            display: block;
+            color: #D4A574;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid #D4A574;
+            border-radius: 8px;
+            color: #D4A574;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        textarea {
+            min-height: 200px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #D4A574, #B49B7E);
+            color: #000;
+            font-weight: bold;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #B49B7E, #A08B6F);
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.4);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .progress {
+            display: none;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 2px solid #9ACD32;
+        }
+        .progress.active {
+            display: block;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #9ACD32, #7FCD32);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            padding: 5px;
+            margin: 3px 0;
+            border-radius: 4px;
+        }
+        .log-success { color: #9ACD32; }
+        .log-error { color: #ff6b6b; }
+        .log-info { color: #D4A574; }
+        .results {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(154, 205, 50, 0.1);
+            border-radius: 12px;
+            border: 2px solid #9ACD32;
+        }
+        .results.active {
+            display: block;
+        }
+        .results h3 {
+            color: #9ACD32;
+            margin-bottom: 15px;
+        }
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Bulk Product Import</h1>
+        <div class="subtitle">Import products from your Canva boards to Interior Design Checklist</div>
+        
+        <div class="section">
+            <label>1️⃣ Enter Project ID:</label>
+            <input type="text" id="projectId" placeholder="e.g., 123e4567-e89b-12d3-a456-426614174000">
+            
+            <label>2️⃣ Select Room:</label>
+            <select id="roomSelect">
+                <option value="">-- First, enter Project ID above --</option>
+            </select>
+            <button onclick="loadRooms()" style="margin-bottom: 20px; background: linear-gradient(135deg, #4169E1, #1E90FF);">Load Rooms</button>
+        </div>
+
+        <div class="section">
+            <label>3️⃣ Paste Product URLs (one per line):</label>
+            <textarea id="urls" placeholder="https://www.houzz.com/product1
+https://www.westelm.com/product2
+https://www.cb2.com/product3"></textarea>
+            
+            <button id="importBtn" onclick="startImport()">🚀 Start Import</button>
+        </div>
+
+        <div class="progress" id="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <div class="log" id="log"></div>
+        </div>
+
+        <div class="results" id="results">
+            <h3>✅ Import Complete!</h3>
+            <div class="stat">
+                <span>Total URLs:</span>
+                <span id="totalCount">0</span>
+            </div>
+            <div class="stat">
+                <span>✓ Successful:</span>
+                <span id="successCount" style="color: #9ACD32;">0</span>
+            </div>
+            <div class="stat">
+                <span>✗ Failed:</span>
+                <span id="failCount" style="color: #ff6b6b;">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'https://canvalink.preview.emergentagent.com';
+        let projectData = null;
+
+        async function loadRooms() {
+            const projectId = document.getElementById('projectId').value.trim();
+            if (!projectId) {
+                alert('Please enter a Project ID first!');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=checklist`);
+                if (!res.ok) throw new Error('Failed to load project');
+                
+                projectData = await res.json();
+                const roomSelect = document.getElementById('roomSelect');
+                roomSelect.innerHTML = '<option value="">-- Select a room --</option>';
+                
+                (projectData.rooms || []).forEach(room => {
+                    const option = document.createElement('option');
+                    option.value = room.id;
+                    option.textContent = room.name;
+                    roomSelect.appendChild(option);
+                });
+                
+                alert(`✅ Loaded ${projectData.rooms.length} rooms!`);
+            } catch (e) {
+                alert('❌ Error loading project: ' + e.message);
+            }
+        }
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function categorizeItem(name, description = '') {
+            const text = (name + ' ' + description).toLowerCase();
+            const categories = {
+                'Lighting': ['light', 'lamp', 'chandelier', 'sconce', 'pendant', 'fixture'],
+                'Furniture': ['chair', 'sofa', 'table', 'desk', 'bed', 'dresser', 'cabinet'],
+                'Decor': ['pillow', 'rug', 'art', 'vase', 'mirror', 'frame', 'plant']
+            };
+            
+            for (const [cat, keywords] of Object.entries(categories)) {
+                if (keywords.some(kw => text.includes(kw))) return cat;
+            }
+            return 'Furniture';
+        }
+
+        async function startImport() {
+            const projectId = document.getElementById('projectId').value.trim();
+            const roomId = document.getElementById('roomSelect').value;
+            const urlsText = document.getElementById('urls').value.trim();
+
+            if (!projectId || !roomId || !urlsText) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            const urls = urlsText.split('\n').map(u => u.trim()).filter(u => u.startsWith('http'));
+            if (urls.length === 0) {
+                alert('No valid URLs found!');
+                return;
+            }
+
+            // Find selected room
+            const room = projectData.rooms.find(r => r.id === roomId);
+            if (!room) {
+                alert('Room not found!');
+                return;
+            }
+
+            // Setup UI
+            document.getElementById('importBtn').disabled = true;
+            document.getElementById('progress').classList.add('active');
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('log').innerHTML = '';
+            
+            log(`🚀 Starting import of ${urls.length} products...`, 'info');
+
+            let successCount = 0;
+            let failCount = 0;
+
+            for (let i = 0; i < urls.length; i++) {
+                const url = urls[i];
+                const progress = Math.round(((i + 1) / urls.length) * 100);
+                document.getElementById('progressFill').style.width = progress + '%';
+                document.getElementById('progressFill').textContent = progress + '%';
+
+                try {
+                    log(`Scraping: ${url}`, 'info');
+                    
+                    // Scrape
+                    const scrapeRes = await fetch(`${BACKEND_URL}/api/scrape-product`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url, auto_clip_to_houzz: true })
+                    });
+
+                    if (!scrapeRes.ok) {
+                        throw new Error(`Scrape failed: ${scrapeRes.status}`);
+                    }
+
+                    const data = await scrapeRes.json();
+                    log(`✓ Scraped: ${data.name}`, 'success');
+
+                    // Find subcategory
+                    const category = categorizeItem(data.name);
+                    let subcategoryId = null;
+
+                    for (const cat of room.categories || []) {
+                        if (cat.name.includes(category)) {
+                            if (cat.subcategories && cat.subcategories.length > 0) {
+                                subcategoryId = cat.subcategories[0].id;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Fallback to first subcategory
+                    if (!subcategoryId && room.categories && room.categories.length > 0) {
+                        for (const cat of room.categories) {
+                            if (cat.subcategories && cat.subcategories.length > 0) {
+                                subcategoryId = cat.subcategories[0].id;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!subcategoryId) {
+                        throw new Error('No subcategory found');
+                    }
+
+                    // Add item
+                    const addRes = await fetch(`${BACKEND_URL}/api/items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ...data,
+                            subcategory_id: subcategoryId,
+                            status: '',
+                            quantity: 1
+                        })
+                    });
+
+                    if (!addRes.ok) {
+                        throw new Error(`Add failed: ${addRes.status}`);
+                    }
+
+                    log(`✓ Added to checklist!`, 'success');
+                    successCount++;
+
+                } catch (e) {
+                    log(`✗ Failed: ${e.message}`, 'error');
+                    failCount++;
+                }
+
+                // Small delay to avoid overwhelming server
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            // Show results
+            document.getElementById('totalCount').textContent = urls.length;
+            document.getElementById('successCount').textContent = successCount;
+            document.getElementById('failCount').textContent = failCount;
+            document.getElementById('results').classList.add('active');
+            document.getElementById('importBtn').disabled = false;
+
+            log(`✅ Import complete! ${successCount} succeeded, ${failCount} failed.`, 'info');
+        }
+    </script>
+</body>
+</html>
