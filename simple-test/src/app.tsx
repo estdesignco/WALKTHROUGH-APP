@@ -306,10 +306,16 @@ export const App = () => {
           <Button
             variant="secondary"
             onClick={() => {
-              localStorage.removeItem('canva_saved_projectId');
-              localStorage.removeItem('canva_saved_roomId');
+              // Clear all saved data
+              localStorage.removeItem('canva_project_id');
+              localStorage.removeItem('canva_room_id');
+              localStorage.removeItem('canva_project_data');
+              localStorage.removeItem('canva_selected_room');
               setProject(null);
+              setSelectedRoom(null);
               setProjectId('');
+              setRoomId('');
+              console.log('✅ Project cleared - ready for new project');
             }}
             stretch
           >
