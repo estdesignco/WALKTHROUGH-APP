@@ -7918,6 +7918,10 @@ async def get_pdf_import_job(job_id: str):
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     
+    # Remove MongoDB _id field
+    if "_id" in job:
+        del job["_id"]
+    
     # Convert datetime to ISO string
     if "created_at" in job and job["created_at"]:
         job["created_at"] = job["created_at"].isoformat()
