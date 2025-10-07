@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canva Integration Guide</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #0f172a 30%, #1e293b 70%, #000000 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #D4A574;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            border: 3px solid #B49B7E;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #D4A574;
+            margin-bottom: 30px;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        h2 {
+            color: #D4A574;
+            margin: 30px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #D4A574;
+            font-size: 24px;
+        }
+        h3 {
+            color: #B49B7E;
+            margin: 20px 0 10px 0;
+            font-size: 18px;
+        }
+        p, li {
+            line-height: 1.8;
+            margin-bottom: 12px;
+            color: #D4C5A9;
+        }
+        .section {
+            background: rgba(15, 23, 42, 0.7);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #D4A574;
+        }
+        .feature {
+            background: rgba(154, 205, 50, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid rgba(154, 205, 50, 0.3);
+        }
+        .step {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3B82F6;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #D4A574, #B49B7E);
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 10px 10px 10px 0;
+        }
+        .button:hover {
+            background: linear-gradient(135deg, #B49B7E, #A08B6F);
+        }
+        code {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #9ACD32;
+            font-family: monospace;
+        }
+        ul {
+            margin-left: 25px;
+        }
+        .emoji {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Complete Canva Integration Guide</h1>
+
+        <div class="section">
+            <h2>✨ Overview</h2>
+            <p>Your Interior Design app now has TWO powerful Canva integrations:</p>
+            <div class="feature">
+                <h3><span class="emoji">📋</span>Canva Live Checklist</h3>
+                <p>View your checklist inside Canva while sourcing. Updates automatically every 5 seconds!</p>
+            </div>
+            <div class="feature">
+                <h3><span class="emoji">🔍</span>Chrome Extension Scanner</h3>
+                <p>One-click scan of your entire Canva mood board. Automatically scrapes and adds all products with smart categorization!</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🚀 Setup Instructions</h2>
+            
+            <h3>Part 1: Canva Live Checklist (Already Working!)</h3>
+            <div class="step">
+                <strong>Step 1:</strong> Go to your Checklist page in the main app<br>
+                <strong>Step 2:</strong> Click the <code>🎨 CANVA LIVE CHECKLIST</code> button<br>
+                <strong>Step 3:</strong> Select your room<br>
+                <strong>Step 4:</strong> Keep it open while working in Canva!
+            </div>
+            <p><strong>Features:</strong></p>
+            <ul>
+                <li>✅ Auto-refresh every 5 seconds</li>
+                <li>✅ See all items with thumbnails, prices, SKUs</li>
+                <li>✅ Update status directly from Canva</li>
+                <li>✅ Click items to open product links</li>
+                <li>✅ Collapse/expand categories</li>
+            </ul>
+
+            <h3>Part 2: Chrome Extension (Download & Install)</h3>
+            <div class="step">
+                <strong>Step 1:</strong> Download the extension:<br>
+                <a href="chrome-extension.zip" class="button">Download Chrome Extension</a><br><br>
+                
+                <strong>Step 2:</strong> Extract the ZIP file<br><br>
+                
+                <strong>Step 3:</strong> Open Chrome and go to <code>chrome://extensions/</code><br><br>
+                
+                <strong>Step 4:</strong> Enable <strong>Developer mode</strong> (toggle in top right)<br><br>
+                
+                <strong>Step 5:</strong> Click <strong>"Load unpacked"</strong><br><br>
+                
+                <strong>Step 6:</strong> Select the extracted folder<br><br>
+                
+                <strong>Step 7:</strong> You'll see the extension icon in your toolbar!
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>💼 Your Complete Workflow</h2>
+            
+            <h3>Scenario A: Starting Fresh with a New Mood Board</h3>
+            <div class="step">
+                <strong>1.</strong> Create mood board in Canva<br>
+                <strong>2.</strong> Add product images and attach links (right-click → Link)<br>
+                <strong>3.</strong> Click extension icon in Chrome<br>
+                <strong>4.</strong> Enter Project ID → Load Project → Select Room<br>
+                <strong>5.</strong> Click "Scan Canva Board"<br>
+                <strong>6.</strong> <em>BOOM!</em> All products added to checklist automatically
+            </div>
+
+            <h3>Scenario B: Importing Your Existing 3 Boards</h3>
+            <div class="step">
+                <strong>For each board:</strong><br>
+                <strong>1.</strong> Open the Canva board<br>
+                <strong>2.</strong> Make sure all images have links attached<br>
+                <strong>3.</strong> Use Chrome Extension to scan<br>
+                <strong>4.</strong> Select correct room for each board<br>
+                <strong>5.</strong> Takes 2-3 minutes per board
+            </div>
+
+            <h3>Scenario C: Daily Sourcing Workflow</h3>
+            <div class="step">
+                <strong>1.</strong> Open Canva with your mood board<br>
+                <strong>2.</strong> Click "CANVA LIVE CHECKLIST" in main app<br>
+                <strong>3.</strong> Keep checklist visible while sourcing<br>
+                <strong>4.</strong> When you find a product:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;→ Use "Add Item" in main app (scrapes great!)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;→ Add image to Canva board manually with link<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;→ OR add image to Canva first, then scan with extension<br>
+                <strong>5.</strong> Watch items appear in live checklist automatically
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Smart Categorization</h2>
+            <p>The Chrome Extension automatically categorizes products based on keywords:</p>
+            <ul>
+                <li><strong>Lighting:</strong> lamp, chandelier, sconce, pendant, fixture</li>
+                <li><strong>Furniture:</strong> chair, sofa, table, bed, dresser, cabinet</li>
+                <li><strong>Decor:</strong> pillow, rug, art, vase, mirror, plant</li>
+                <li><strong>Architectural:</strong> door, window, hardware, tile, flooring</li>
+                <li><strong>Paint:</strong> paint, wallpaper, finish, stain</li>
+            </ul>
+            <p><em>If no match, defaults to "Furniture" category. You can move items later in the main app.</em></p>
+        </div>
+
+        <div class="section">
+            <h2>✅ What's Working Now</h2>
+            <div class="feature">
+                <strong>✓ Add items via main app</strong> - Works great with scraping and thumbnails<br>
+                <strong>✓ Live checklist in Canva</strong> - Auto-updates every 5 seconds<br>
+                <strong>✓ Chrome extension scanning</strong> - Bulk import entire boards<br>
+                <strong>✓ Smart categorization</strong> - Automatically sorts by product type<br>
+                <strong>✓ Real-time sync</strong> - Changes appear instantly<br>
+                <strong>✓ Status updates</strong> - Change item status from Canva
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔮 Future Enhancements</h2>
+            <p><em>What could be added later:</em></p>
+            <ul>
+                <li>Automatic Canva image upload from checklist</li>
+                <li>Bidirectional sync (detect new images without scanning)</li>
+                <li>Native Canva app (if iframe issues resolved)</li>
+                <li>Bulk status updates</li>
+                <li>Export mood boards with checklist data</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>❓ Troubleshooting</h2>
+            
+            <h3>Chrome Extension Issues</h3>
+            <p><strong>Q: "No images with links found"</strong><br>
+            A: Make sure product images in Canva have links attached. Right-click image → Link → paste URL</p>
+            
+            <p><strong>Q: "Some products failed"</strong><br>
+            A: Check extension status log for specific errors. Some websites block scraping.</p>
+            
+            <p><strong>Q: "Wrong category"</strong><br>
+            A: Algorithm uses keywords. Manually move items in main app if needed.</p>
+
+            <h3>Live Checklist Issues</h3>
+            <p><strong>Q: "Not updating"</strong><br>
+            A: Check the "Last synced" timestamp. It updates every 5 seconds. Refresh if stuck.</p>
+            
+            <p><strong>Q: "Can't change status"</strong><br>
+            A: Make sure you're connected to internet. Changes save immediately.</p>
+        </div>
+
+        <div class="section">
+            <h2>📞 Support</h2>
+            <p>Need help? Check your main app documentation or contact support.</p>
+            <p><strong>Downloads:</strong></p>
+            <a href="chrome-extension.zip" class="button">Chrome Extension</a>
+            <a href="bulk-import.html" class="button">Bulk Import Tool</a>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #D4A574;">
+            <p style="color: #B49B7E; font-size: 14px;">
+                Built with ❤️ for streamlined interior design workflows
+            </p>
+        </div>
+    </div>
+</body>
+</html>
