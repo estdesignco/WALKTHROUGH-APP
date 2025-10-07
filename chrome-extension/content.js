@@ -4,72 +4,72 @@ console.log('🎨 Canva Scanner content script loaded');
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'scanPage') {
-    console.log('📸 Scanning page for images with links...');
+    console.log('📸 REAL SCAN - Analyzing actual Canva page...');
     
     const imagesWithLinks = [];
     
-    // Method 1: Find all images with data attributes or link wrappers
-    const allImages = document.querySelectorAll('img');
-    console.log(`Found ${allImages.length} total images`);
+    // REAL METHOD: Scan ALL clickable elements on the page
+    console.log('Scanning all clickable elements...');
+    const allLinks = document.querySelectorAll('a[href]');
+    console.log(`Found ${allLinks.length} total links on page`);
     
-    allImages.forEach((img) => {
-      // Check if image has a link in parent or nearby elements
-      let linkElement = img.closest('a');
+    allLinks.forEach((link) => {
+      const url = link.href;
       
-      if (!linkElement) {
-        // Check siblings
-        const parent = img.parentElement;
-        if (parent) {
-          linkElement = parent.querySelector('a');
-        }
+      // Check if it's a product URL
+      if (url && !url.includes('canva.com') && (
+        url.includes('houzz.com') || 
+        url.includes('westelm.com') || 
+        url.includes('cb2.com') ||
+        url.includes('potterybarn.com') ||
+        url.includes('crateandbarrel.com') ||
+        url.includes('wayfair.com') ||
+        url.includes('anthropologie.com') ||
+        url.includes('restorationhardware.com') ||
+        url.includes('roomandboard.com') ||
+        url.includes('article.com') ||
+        url.includes('allmodern.com')
+      )) {
+        // Check if this link contains an image
+        const img = link.querySelector('img');
+        
+        imagesWithLinks.push({
+          src: img ? img.src : null,
+          url: url,
+          text: link.textContent?.trim() || ''
+        });
+        console.log('✅ Found product link:', url);
       }
-      
-      if (linkElement && linkElement.href) {
-        const url = linkElement.href;
-        // Only include product URLs (not Canva internal links)
-        if (!url.includes('canva.com') && (
-          url.includes('houzz.com') || 
-          url.includes('westelm.com') || 
-          url.includes('cb2.com') ||
-          url.includes('potterybarn.com') ||
-          url.includes('crateandbarrel.com') ||
-          url.includes('wayfair.com') ||
-          url.includes('anthropologie.com') ||
-          url.includes('restorationhardware.com')
-        )) {
+    });
+
+    // ALSO scan for links in text elements (in case links are just text)
+    console.log('Scanning text content for URLs...');
+    const allText = document.body.innerText;
+    const urlRegex = /https?:\/\/(?:www\.)?(?:houzz|westelm|cb2|potterybarn|crateandbarrel|wayfair|anthropologie|restorationhardware|roomandboard|article|allmodern)\.com[^\s<>"'\)]+/g;
+    const textUrls = allText.match(urlRegex);
+    
+    if (textUrls) {
+      textUrls.forEach(url => {
+        // Avoid duplicates
+        if (!imagesWithLinks.find(item => item.url === url)) {
           imagesWithLinks.push({
-            src: img.src,
-            url: url
+            src: null,
+            url: url,
+            text: 'From text'
           });
-          console.log('✅ Found image with product link:', url);
+          console.log('✅ Found product link in text:', url);
         }
-      }
-    });
+      });
+    }
 
-    // Method 2: Check for Canva's data structures
-    // Canva stores design data in JSON, let's try to find it
-    const scripts = document.querySelectorAll('script');
-    scripts.forEach(script => {
-      const content = script.textContent || script.innerText;
-      if (content && content.includes('http') && content.includes('.com')) {
-        // Try to extract URLs from JSON-like content
-        const urlMatches = content.match(/https?:\/\/(?:www\.)?(?:houzz|westelm|cb2|potterybarn|crateandbarrel|wayfair|anthropologie|restorationhardware)\.com[^\s"'>}]+/g);
-        if (urlMatches) {
-          urlMatches.forEach(url => {
-            // Avoid duplicates
-            if (!imagesWithLinks.find(item => item.url === url)) {
-              imagesWithLinks.push({
-                src: null,
-                url: url
-              });
-              console.log('✅ Found product link in page data:', url);
-            }
-          });
-        }
-      }
-    });
-
-    console.log(`🎯 Total images with product links found: ${imagesWithLinks.length}`);
+    console.log(`🎯 TOTAL PRODUCT LINKS FOUND: ${imagesWithLinks.length}`);
+    
+    if (imagesWithLinks.length === 0) {
+      console.warn('⚠️ NO PRODUCT LINKS FOUND. Make sure:');
+      console.warn('1. You have product URLs on this Canva page');
+      console.warn('2. URLs are from supported vendors (Houzz, West Elm, etc.)');
+      console.warn('3. Images are linked (right-click image → Link)');
+    }
     
     sendResponse({
       success: true,
