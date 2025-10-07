@@ -25,25 +25,65 @@ export const App = () => {
   const [error, setError] = React.useState<string | null>(null);
   const [collapsedCats, setCollapsedCats] = React.useState<Set<string>>(new Set());
   const [lastSync, setLastSync] = React.useState(new Date());
+  const [lastSyncTimestamp, setLastSyncTimestamp] = React.useState<number>(Date.now() / 1000);
+  const [isSyncing, setIsSyncing] = React.useState(false);
+  const [syncStatus, setSyncStatus] = React.useState<'synced' | 'syncing' | 'error'>('synced');
 
-  // AUTO-REFRESH every 5 seconds
+  // BIDIRECTIONAL SYNC - Fetch only changed items every 5 seconds
   React.useEffect(() => {
     if (!project || !selectedRoom) return;
-    const interval = setInterval(async () => {
+    
+    const syncChanges = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=checklist`);
-        if (res.ok) {
-          const data = await res.json();
-          setProject(data);
-          const room = data.rooms?.find((r: any) => r.id === selectedRoom.id);
-          if (room) setSelectedRoom(room);
-          setLastSync(new Date());
-          console.log('✅ Synced at', new Date().toLocaleTimeString());
+        setIsSyncing(true);
+        setSyncStatus('syncing');
+        
+        // Fetch only items changed since last sync
+        const res = await fetch(
+          `${BACKEND_URL}/api/projects/${projectId}/changes?since=${lastSyncTimestamp}`
+        );
+        
+        if (!res.ok) throw new Error('Sync failed');
+        
+        const data = await res.json();
+        
+        // If there are changes, apply them to the current state
+        if (data.change_count > 0) {
+          console.log(`🔄 Syncing ${data.change_count} changes...`);
+          
+          // Reload project to get fresh data
+          const projectRes = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=checklist`);
+          if (projectRes.ok) {
+            const projectData = await projectRes.json();
+            setProject(projectData);
+            
+            // Update selected room
+            const room = projectData.rooms?.find((r: any) => r.id === selectedRoom.id);
+            if (room) setSelectedRoom(room);
+            
+            console.log(`✅ Applied ${data.change_count} changes`);
+          }
         }
+        
+        // Update sync timestamp
+        setLastSyncTimestamp(data.timestamp);
+        setLastSync(new Date());
+        setSyncStatus('synced');
+        
       } catch (e) {
-        console.log('Sync error:', e);
+        console.error('Sync error:', e);
+        setSyncStatus('error');
+      } finally {
+        setIsSyncing(false);
       }
-    }, 5000);
+    };
+    
+    // Initial sync
+    syncChanges();
+    
+    // Set up interval for continuous sync
+    const interval = setInterval(syncChanges, 5000);
+    
     return () => clearInterval(interval);
   }, [project, projectId, selectedRoom]);
 
