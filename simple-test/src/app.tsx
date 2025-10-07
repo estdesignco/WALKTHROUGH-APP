@@ -52,9 +52,10 @@ export const App = () => {
   // Check URL params for projectId and roomId, OR load from localStorage
   React.useEffect(() => {
     // FORCE VERSION CHECK ON LOAD
-    alert('🎨 CANVA APP VERSION: 2.1.0 - Gold Text + Refresh Button');
-    console.log('🎨 CANVA APP VERSION: 2.1.0');
-    console.log('🎨 Build Date: Oct 6, 2025 - 2:10 PM');
+    alert('🚀 CANVA APP VERSION: 3.0.0 - AUTO-SCRAPE WORKING!\n\nBuild: Oct 7, 2025 - 12:45 AM\n\nNew Feature: Smart Auto-Import with Categorization');
+    console.log('🚀 CANVA APP VERSION: 3.0.0');
+    console.log('🎨 Build Date: Oct 7, 2025 - 12:45 AM');
+    console.log('✨ NEW: Auto-Scrape with Smart Categorization');
     
     const params = new URLSearchParams(window.location.search);
     const urlProjectId = params.get('projectId');
