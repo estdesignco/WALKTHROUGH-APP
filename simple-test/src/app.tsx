@@ -17,10 +17,28 @@ const getStatusColor = (status: string) => {
 };
 
 export const App = () => {
-  const [projectId, setProjectId] = React.useState("");
-  const [roomId, setRoomId] = React.useState("");
-  const [project, setProject] = React.useState<any>(null);
-  const [selectedRoom, setSelectedRoom] = React.useState<any>(null);
+  // PERSISTENT STATE - Load from localStorage on mount
+  const [projectId, setProjectId] = React.useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlProjectId = urlParams.get('projectId');
+    if (urlProjectId) return urlProjectId;
+    return localStorage.getItem('canva_project_id') || "";
+  });
+  
+  const [roomId, setRoomId] = React.useState(() => {
+    return localStorage.getItem('canva_room_id') || "";
+  });
+  
+  const [project, setProject] = React.useState<any>(() => {
+    const saved = localStorage.getItem('canva_project_data');
+    return saved ? JSON.parse(saved) : null;
+  });
+  
+  const [selectedRoom, setSelectedRoom] = React.useState<any>(() => {
+    const saved = localStorage.getItem('canva_selected_room');
+    return saved ? JSON.parse(saved) : null;
+  });
+  
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [collapsedCats, setCollapsedCats] = React.useState<Set<string>>(new Set());
@@ -28,6 +46,34 @@ export const App = () => {
   const [lastSyncTimestamp, setLastSyncTimestamp] = React.useState<number>(Date.now() / 1000);
   const [isSyncing, setIsSyncing] = React.useState(false);
   const [syncStatus, setSyncStatus] = React.useState<'synced' | 'syncing' | 'error'>('synced');
+
+  // PERSIST TO LOCALSTORAGE whenever project data changes
+  React.useEffect(() => {
+    if (projectId) {
+      localStorage.setItem('canva_project_id', projectId);
+    }
+  }, [projectId]);
+
+  React.useEffect(() => {
+    if (project) {
+      localStorage.setItem('canva_project_data', JSON.stringify(project));
+    }
+  }, [project]);
+
+  React.useEffect(() => {
+    if (selectedRoom) {
+      localStorage.setItem('canva_selected_room', JSON.stringify(selectedRoom));
+      localStorage.setItem('canva_room_id', selectedRoom.id);
+    }
+  }, [selectedRoom]);
+
+  // AUTO-LOAD PROJECT on mount if we have a saved projectId
+  React.useEffect(() => {
+    if (projectId && !project && !loading) {
+      console.log('🔄 Auto-loading saved project:', projectId);
+      loadProject(projectId, roomId || undefined);
+    }
+  }, []); // Only run on mount
 
   // BIDIRECTIONAL SYNC - Fetch only changed items every 5 seconds
   React.useEffect(() => {
