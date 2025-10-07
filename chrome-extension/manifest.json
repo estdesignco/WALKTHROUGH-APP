@@ -5,7 +5,8 @@
   "description": "Smart trade vendor scanner - automatically imports products from Canva boards to your checklist",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "scripting"
   ],
   "host_permissions": [
     "https://www.canva.com/*",
