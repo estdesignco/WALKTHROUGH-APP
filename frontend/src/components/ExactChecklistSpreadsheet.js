@@ -965,6 +965,19 @@ const ExactChecklistSpreadsheet = ({
         </div>
       </div>
 
+      {/* QUICK ADD PRODUCT PANEL */}
+      {showQuickAdd && (
+        <div className="mb-6">
+          <QuickAddProduct 
+            projectId={project?.id}
+            onSuccess={() => {
+              onReload();
+              setShowQuickAdd(false);
+            }}
+          />
+        </div>
+      )}
+
       {/* ENHANCED CHECKLIST TABLE WITH MINIMIZE/EXPAND AND FILTERING - EXACT SAME TREATMENT AS GRAPHS */}
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
            style={{
