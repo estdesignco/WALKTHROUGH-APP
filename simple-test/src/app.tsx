@@ -255,7 +255,9 @@ export const App = () => {
           borderBottom: "2px solid #B49B7E",
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center"
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "12px"
         }}>
           <div>
             <div style={{ color: "#D4A574", fontSize: "20px", fontWeight: "bold" }}>
@@ -265,9 +267,17 @@ export const App = () => {
               🔄 Last synced: {lastSync.toLocaleTimeString()} • Auto-refresh every 5s
             </div>
           </div>
-          <Button variant="secondary" onClick={() => setSelectedRoom(null)}>
-            ← Change Room
-          </Button>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <Button variant="secondary" onClick={() => setSelectedRoom(null)}>
+              ← Change Room
+            </Button>
+            <Button 
+              variant="secondary" 
+              onClick={() => loadProject(projectId, selectedRoom?.id)}
+            >
+              🔄 Refresh Now
+            </Button>
+          </div>
         </div>
 
         {/* CATEGORIES AND ITEMS */}
