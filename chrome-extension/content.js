@@ -233,18 +233,23 @@ setTimeout(() => {
   console.log(`\n🎉 Initial scan complete: ${immediateResults.length} product links found!`);
 }, 2000);
 
-// Listen for scan requests from popup
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('📨 Message received from popup:', request);
+// Only set up listener if not already loaded
+if (!window.__canvaScannerListenerSet) {
+  window.__canvaScannerListenerSet = true;
   
-  if (request.action === 'scanPage') {
-    console.log('🚀 Executing manual scan from popup...');
-    const results = scanPageForLinks();
-    console.log('📦 Sending results to popup:', results);
-    sendResponse({ success: true, images: results });
-  }
+  // Listen for scan requests from popup
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('📨 Message received from popup:', request);
+    
+    if (request.action === 'scanPage') {
+      console.log('🚀 Executing manual scan from popup...');
+      const results = scanPageForLinks();
+      console.log('📦 Sending results to popup:', results);
+      sendResponse({ success: true, images: results });
+    }
+    
+    return true;
+  });
   
-  return true;
-});
-
-console.log('✅ Content script fully loaded and ready!');
+  console.log('✅ Content script fully loaded and ready!');
+}
