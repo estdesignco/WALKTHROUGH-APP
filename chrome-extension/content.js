@@ -225,6 +225,24 @@ function scanPageForLinks() {
   
   console.log('\n📊 SCAN COMPLETE!');
   console.log(`   Total unique product URLs found: ${results.length}`);
+  
+  // DEBUG: Show ALL URLs found (even if not product URLs)
+  if (allFoundUrls.length > 0) {
+    console.log('\n🔍 DEBUG - ALL URLs FOUND (including non-product):');
+    allFoundUrls.slice(0, 20).forEach((item, i) => {
+      console.log(`   ${i + 1}. ${item.url} [method: ${item.method}]`);
+    });
+    if (allFoundUrls.length > 20) {
+      console.log(`   ... and ${allFoundUrls.length - 20} more`);
+    }
+  } else {
+    console.log('\n⚠️ DEBUG: NO URLs found anywhere on page!');
+    console.log('   This might mean:');
+    console.log('   1. Links are not yet added to Canva images');
+    console.log('   2. Links are in a format we don\'t detect');
+    console.log('   3. Page hasn\'t fully loaded');
+  }
+  
   console.log('\n🎯 RESULTS:');
   results.forEach((item, i) => {
     console.log(`   ${i + 1}. [${item.confidence}] ${item.url}`);
