@@ -7836,6 +7836,294 @@ async def process_batch_categorization(job_id: str, item_ids: List[str]):
             }}
         )
 
+# ==========================================
+# PDF IMPORT FROM CANVA
+# ==========================================
+
+@api_router.post("/import/pdf-links")
+async def import_from_pdf(
+    file: UploadFile,
+    project_id: str,
+    room_id: str,
+    background_tasks: BackgroundTasks
+):
+    """
+    Extract product links from PDF (Canva export) and import to checklist.
+    PDF must contain clickable links.
+    """
+    try:
+        # Validate file type
+        if not file.filename.endswith('.pdf'):
+            raise HTTPException(status_code=400, detail="Only PDF files allowed")
+        
+        # Get project and room info
+        project_doc = await db.projects.find_one({"id": project_id})
+        if not project_doc:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        room_doc = await db.rooms.find_one({"id": room_id})
+        if not room_doc:
+            raise HTTPException(status_code=404, detail="Room not found")
+        
+        # Read PDF file
+        pdf_content = await file.read()
+        
+        # Create import job
+        import_job = {
+            "id": str(uuid.uuid4()),
+            "type": "pdf_import",
+            "project_id": project_id,
+            "project_name": project_doc["name"],
+            "room_id": room_id,
+            "room_name": room_doc["name"],
+            "filename": file.filename,
+            "status": "pending",
+            "total_links": 0,
+            "imported_items": 0,
+            "failed_items": 0,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "errors": []
+        }
+        
+        await db.pdf_import_jobs.insert_one(import_job)
+        
+        # Process in background
+        background_tasks.add_task(
+            process_pdf_import,
+            import_job["id"],
+            pdf_content,
+            project_id,
+            room_id,
+            project_doc["name"],
+            room_doc["name"]
+        )
+        
+        return {
+            "success": True,
+            "job_id": import_job["id"],
+            "message": f"PDF import started for {room_doc['name']}"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"PDF import error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/import/pdf-job/{job_id}")
+async def get_pdf_import_job(job_id: str):
+    """Get PDF import job status."""
+    job = await db.pdf_import_jobs.find_one({"id": job_id})
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Convert datetime to ISO string
+    if "created_at" in job and job["created_at"]:
+        job["created_at"] = job["created_at"].isoformat()
+    if "updated_at" in job and job["updated_at"]:
+        job["updated_at"] = job["updated_at"].isoformat()
+    
+    return job
+
+async def process_pdf_import(
+    job_id: str,
+    pdf_content: bytes,
+    project_id: str,
+    room_id: str,
+    project_name: str,
+    room_name: str
+):
+    """Background task to extract links from PDF and import products."""
+    try:
+        import PyPDF2
+        import io
+        import re
+        
+        await db.pdf_import_jobs.update_one(
+            {"id": job_id},
+            {"$set": {"status": "processing", "updated_at": datetime.utcnow()}}
+        )
+        
+        # Extract links from PDF
+        pdf_file = io.BytesIO(pdf_content)
+        pdf_reader = PyPDF2.PdfReader(pdf_file)
+        
+        all_links = []
+        
+        # Method 1: Extract from annotations (clickable links)
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            
+            if '/Annots' in page:
+                annotations = page['/Annots']
+                for annotation in annotations:
+                    obj = annotation.get_object()
+                    if '/A' in obj and '/URI' in obj['/A']:
+                        uri = obj['/A']['/URI']
+                        if isinstance(uri, str):
+                            all_links.append(uri)
+        
+        # Method 2: Extract from page text (URLs in text)
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            text = page.extract_text()
+            
+            # Find URLs in text
+            url_pattern = r'https?://[^\s<>"\'\\)\\]]+[^\s<>"\'\\)\\].,;:]'
+            found_urls = re.findall(url_pattern, text)
+            all_links.extend(found_urls)
+        
+        # Remove duplicates
+        all_links = list(set(all_links))
+        
+        # Filter for product links (using same logic as scanner)
+        KNOWN_TRADE_VENDORS = [
+            'lounards.com', 'bernhardt.com', 'gabby.com', 'visualcomfort.com',
+            'lolahug.com', 'hvlgroup.com', 'globeviews.com', 'safavieh.com',
+            'surya.com', 'eichholtz.com', 'havefurniture.com'
+        ]
+        
+        RETAIL_BLACKLIST = [
+            'wayfair.com', 'crateandbarrel.com', 'westelm.com',
+            'potterybarn.com', 'amazon.com', 'target.com'
+        ]
+        
+        product_links = []
+        for link in all_links:
+            lower_link = link.lower()
+            
+            # Skip Canva links
+            if 'canva.com' in lower_link:
+                continue
+            
+            # Skip retail
+            if any(retail in lower_link for retail in RETAIL_BLACKLIST):
+                continue
+            
+            # Accept known vendors or product-like URLs
+            if any(vendor in lower_link for vendor in KNOWN_TRADE_VENDORS):
+                product_links.append(link)
+            elif any(pattern in lower_link for pattern in ['/product/', '/item/', '/furniture/', '/lighting/']):
+                product_links.append(link)
+        
+        total_links = len(product_links)
+        
+        await db.pdf_import_jobs.update_one(
+            {"id": job_id},
+            {"$set": {"total_links": total_links, "updated_at": datetime.utcnow()}}
+        )
+        
+        if total_links == 0:
+            await db.pdf_import_jobs.update_one(
+                {"id": job_id},
+                {"$set": {
+                    "status": "completed",
+                    "updated_at": datetime.utcnow(),
+                    "errors": [f"No product links found in PDF. Found {len(all_links)} total links but none matched trade vendors."]
+                }}
+            )
+            return
+        
+        # Get room structure for categorization
+        categories = await db.categories.find({"room_id": room_id}).to_list(None)
+        
+        # Find first available subcategory
+        subcategory_id = None
+        for category in categories:
+            subcategories = await db.subcategories.find({"category_id": category["id"]}).to_list(None)
+            if subcategories:
+                subcategory_id = subcategories[0]["id"]
+                break
+        
+        if not subcategory_id:
+            await db.pdf_import_jobs.update_one(
+                {"id": job_id},
+                {"$set": {
+                    "status": "failed",
+                    "updated_at": datetime.utcnow(),
+                    "errors": ["No subcategory found in room"]
+                }}
+            )
+            return
+        
+        # Import each product
+        imported = 0
+        failed = 0
+        errors = []
+        
+        for link in product_links:
+            try:
+                # Scrape product
+                import httpx
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    scrape_res = await client.post(
+                        f"http://localhost:8001/api/scrape-product",
+                        json={"url": link, "auto_clip_to_houzz": True}
+                    )
+                    
+                    if scrape_res.status_code == 200:
+                        product_data = scrape_res.json()
+                        
+                        # Add to checklist
+                        await db.items.insert_one({
+                            "id": str(uuid.uuid4()),
+                            "subcategory_id": subcategory_id,
+                            "name": product_data.get("name", "Unknown Product"),
+                            "vendor": product_data.get("vendor", ""),
+                            "cost": product_data.get("cost", 0),
+                            "link": product_data.get("link", link),
+                            "sku": product_data.get("sku", ""),
+                            "image_url": product_data.get("image_url", ""),
+                            "status": "",
+                            "quantity": 1,
+                            "photos": [],
+                            "created_at": datetime.utcnow(),
+                            "updated_at": datetime.utcnow()
+                        })
+                        
+                        imported += 1
+                    else:
+                        failed += 1
+                        errors.append(f"{link}: Scrape failed (HTTP {scrape_res.status_code})")
+                        
+            except Exception as e:
+                failed += 1
+                errors.append(f"{link}: {str(e)}")
+            
+            # Update progress
+            await db.pdf_import_jobs.update_one(
+                {"id": job_id},
+                {"$set": {
+                    "imported_items": imported,
+                    "failed_items": failed,
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+        
+        # Mark complete
+        await db.pdf_import_jobs.update_one(
+            {"id": job_id},
+            {"$set": {
+                "status": "completed",
+                "updated_at": datetime.utcnow(),
+                "errors": errors
+            }}
+        )
+        
+        logging.info(f"PDF import {job_id} completed: {imported}/{total_links} successful")
+        
+    except Exception as e:
+        logging.error(f"PDF import job {job_id} error: {str(e)}")
+        await db.pdf_import_jobs.update_one(
+            {"id": job_id},
+            {"$set": {
+                "status": "failed",
+                "updated_at": datetime.utcnow(),
+                "errors": [str(e)]
+            }}
+        )
+
 
 # Include the router in the main app
 app.include_router(api_router)
