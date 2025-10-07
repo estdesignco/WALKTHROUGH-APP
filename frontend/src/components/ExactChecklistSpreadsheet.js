@@ -928,7 +928,7 @@ const ExactChecklistSpreadsheet = ({
             </select>
           </div>
           
-          {/* Action Buttons - ADD ROOM, QUICK ADD, CANVA, AND TRANSFER */}
+          {/* Action Buttons - ADD ROOM, CANVA LIVE CHECKLIST, AND TRANSFER */}
           <div className="flex gap-3">
             <button 
               onClick={onAddRoom}
@@ -937,21 +937,14 @@ const ExactChecklistSpreadsheet = ({
               ✥ ADD ROOM
             </button>
             <button 
-              onClick={() => setShowQuickAdd(!showQuickAdd)}
-              className="bg-gradient-to-r from-[#9ACD32] to-[#7FCD32] hover:from-[#7FCD32] hover:to-[#6BB832] px-6 py-2 rounded-full shadow-xl hover:shadow-green-400/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-green-300/20 text-black flex items-center gap-2"
-            >
-              <span>✨</span>
-              <span>{showQuickAdd ? 'HIDE' : 'QUICK ADD PRODUCT'}</span>
-            </button>
-            <button 
               onClick={() => {
-                const canvaAppUrl = `https://canvalink.preview.emergentagent.com/canva-FINAL-20251006_232131.js?projectId=${project?.id}`;
+                const canvaAppUrl = `https://canvalink.preview.emergentagent.com/live-checklist-v3-FIXED-INPUT.js?projectId=${project?.id}`;
                 window.open(canvaAppUrl, '_blank', 'width=1200,height=800');
               }}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-2 rounded-full shadow-xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-blue-400/20 text-white flex items-center gap-2"
             >
               <span>🎨</span>
-              <span>OPEN IN CANVA APP</span>
+              <span>CANVA LIVE CHECKLIST</span>
             </button>
             <button 
               onClick={handleTransferToFFE}
