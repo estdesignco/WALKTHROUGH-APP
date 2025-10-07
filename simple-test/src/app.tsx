@@ -151,11 +151,7 @@ export const App = () => {
     const errors: string[] = [];
     
     try {
-      // Get current page context
-      const pageContext = await getCurrentPageContext();
-      console.log('📄 Page context:', pageContext);
-      
-      // For now, we'll prompt user to paste all URLs (Canva doesn't expose links directly yet)
+      // Prompt user to paste all URLs from their Canva page
       const urlsInput = prompt(
         '🎨 PASTE ALL PRODUCT URLS FROM YOUR CANVA PAGE\n\n' +
         'Copy all product links from your Canva design and paste them here (one per line):\n\n' +
