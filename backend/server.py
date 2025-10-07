@@ -8186,15 +8186,15 @@ def fallback_categorize(item_name: str, description: str = "") -> str:
     text = (item_name + " " + description).lower()
     
     categories = {
+        'Hardware': ['knob', 'pull', 'handle', 'hinge', 'lock', 'hardware'],  # Check hardware first
+        'Art': ['painting', 'print', 'canvas', 'artwork', 'wall art'],  # Check art before decor
         'Lighting': ['light', 'lamp', 'chandelier', 'sconce', 'pendant', 'fixture', 'lantern', 'led'],
         'Furniture': ['chair', 'sofa', 'table', 'desk', 'bed', 'dresser', 'cabinet', 'bench', 'ottoman', 'couch'],
-        'Decor': ['pillow', 'rug', 'art', 'vase', 'mirror', 'frame', 'plant', 'sculpture', 'bowl', 'decorative'],
+        'Decor': ['pillow', 'rug', 'vase', 'mirror', 'frame', 'plant', 'sculpture', 'bowl', 'decorative', 'art'],
         'Window Treatments': ['curtain', 'blind', 'shade', 'drape', 'valance', 'shutter'],
         'Flooring': ['floor', 'tile', 'carpet', 'hardwood', 'vinyl', 'laminate'],
-        'Hardware': ['knob', 'pull', 'handle', 'hinge', 'lock'],
         'Plumbing Fixtures': ['faucet', 'sink', 'toilet', 'shower', 'tub', 'bathtub'],
-        'Appliances': ['refrigerator', 'oven', 'stove', 'dishwasher', 'microwave', 'washer', 'dryer'],
-        'Art': ['painting', 'print', 'canvas', 'artwork', 'sculpture', 'wall art']
+        'Appliances': ['refrigerator', 'oven', 'stove', 'dishwasher', 'microwave', 'washer', 'dryer']
     }
     
     for category, keywords in categories.items():
