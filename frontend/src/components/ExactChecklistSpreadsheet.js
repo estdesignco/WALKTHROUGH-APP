@@ -1060,6 +1060,112 @@ const ExactChecklistSpreadsheet = ({
                       🔗 CONNECT TO CANVA
                     </button>
                     
+                    {/* UPLOAD IMAGES TO CANVA */}
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Upload all images from "${room.name}" to Canva?\n\nThis will upload:\n• Item images\n• Walkthrough photos\n• Product images\n\nThey will be tagged with the project and room name in Canva.`)) {
+                          return;
+                        }
+                        
+                        try {
+                          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/canva/upload-room-images?project_id=${project.id}&room_id=${room.id}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                          });
+                          
+                          if (response.ok) {
+                            const result = await response.json();
+                            alert(`✅ Upload started!\n\nJob ID: ${result.job_id}\n\nImages will be uploaded to your Canva account in the background. Check your Canva uploads folder.`);
+                            
+                            // Show progress modal
+                            const modal = document.createElement('div');
+                            modal.style.cssText = `
+                              position: fixed;
+                              top: 0;
+                              left: 0;
+                              width: 100%;
+                              height: 100%;
+                              background: rgba(0,0,0,0.9);
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              z-index: 9999;
+                            `;
+                            
+                            modal.innerHTML = `
+                              <div style="background: linear-gradient(135deg, #000 0%, #1e293b 50%, #000 100%); padding: 40px; border-radius: 16px; max-width: 500px; border: 3px solid #D4A574;">
+                                <h2 style="color: #D4A574; font-size: 24px; margin-bottom: 20px; text-align: center;">📤 Uploading to Canva</h2>
+                                
+                                <div id="upload-progress-${result.job_id}" style="background: rgba(30, 41, 59, 0.8); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #B49B7E;">
+                                  <p style="color: #B49B7E; margin-bottom: 10px; text-align: center;">⏳ Processing...</p>
+                                  <div style="background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden; height: 30px;">
+                                    <div id="progress-bar-${result.job_id}" style="background: linear-gradient(90deg, #D4A574, #B49B7E); height: 100%; width: 0%; transition: width 0.5s; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 12px;"></div>
+                                  </div>
+                                  <p id="status-text-${result.job_id}" style="color: #D4A574; margin-top: 10px; text-align: center; font-size: 14px;">Starting upload...</p>
+                                </div>
+                                
+                                <button onclick="this.parentElement.parentElement.remove()" style="width: 100%; padding: 14px; background: rgba(30, 41, 59, 0.8); color: #B49B7E; border: 2px solid #B49B7E; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">
+                                  ✖ CLOSE (Upload continues in background)
+                                </button>
+                              </div>
+                            `;
+                            
+                            document.body.appendChild(modal);
+                            
+                            // Poll for progress
+                            const pollProgress = setInterval(async () => {
+                              try {
+                                const progressRes = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/canva/upload-job/${result.job_id}`);
+                                if (progressRes.ok) {
+                                  const job = await progressRes.json();
+                                  const progress = job.total_images > 0 ? (job.uploaded_images / job.total_images * 100).toFixed(0) : 0;
+                                  
+                                  const progressBar = document.getElementById(`progress-bar-${result.job_id}`);
+                                  const statusText = document.getElementById(`status-text-${result.job_id}`);
+                                  
+                                  if (progressBar) {
+                                    progressBar.style.width = progress + '%';
+                                    progressBar.textContent = progress + '%';
+                                  }
+                                  
+                                  if (statusText) {
+                                    statusText.textContent = `${job.uploaded_images} / ${job.total_images} images uploaded`;
+                                    
+                                    if (job.status === 'completed') {
+                                      statusText.textContent = `✅ Complete! ${job.uploaded_images} images uploaded`;
+                                      if (job.failed_images > 0) {
+                                        statusText.textContent += ` (${job.failed_images} failed)`;
+                                      }
+                                      clearInterval(pollProgress);
+                                    } else if (job.status === 'failed') {
+                                      statusText.textContent = '❌ Upload failed';
+                                      statusText.style.color = '#ff6b6b';
+                                      clearInterval(pollProgress);
+                                    }
+                                  }
+                                }
+                              } catch (e) {
+                                console.error('Progress poll error:', e);
+                              }
+                            }, 2000);
+                            
+                            // Stop polling after 5 minutes
+                            setTimeout(() => clearInterval(pollProgress), 300000);
+                            
+                          } else {
+                            const error = await response.json();
+                            alert(`❌ Upload failed: ${error.detail || 'Unknown error'}`);
+                          }
+                        } catch (error) {
+                          alert(`❌ Upload error: ${error.message}`);
+                        }
+                      }}
+                      className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] text-black text-xs px-3 py-1 rounded hover:from-[#E8D4B8] hover:to-[#D4A574] transition-colors font-bold"
+                      title={`Upload all images from ${room.name} to Canva`}
+                    >
+                      📤 UPLOAD TO CANVA
+                    </button>
+                    
                     {/* CANVA PAGE-SPECIFIC IMPORT BUTTON */}
                     <button
                       onClick={() => {
