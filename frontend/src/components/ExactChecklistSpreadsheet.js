@@ -20,6 +20,7 @@ const ExactChecklistSpreadsheet = ({
 
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
   
   // State to track checked items (for PICKED status)
   const [checkedItems, setCheckedItems] = useState(new Set());
