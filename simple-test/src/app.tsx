@@ -657,30 +657,21 @@ export const App = () => {
           <div style={{ color: "#D4A574", fontWeight: "bold", fontSize: "13px" }}>
             🔗 ADD SINGLE PRODUCT
           </div>
-          <div style={{ display: "flex", gap: "8px" }}>
-            <input
-              type="text"
+          <FormField label="">
+            <TextInput
               value={scrapingUrl}
-              onChange={(e: any) => setScrapingUrl(e.target.value)}
-              placeholder="Paste product URL here to scrape and add..."
-              style={{
-                flex: 1,
-                padding: "12px",
-                background: "rgba(15, 23, 42, 0.9)",
-                border: "2px solid #D4A574",
-                borderRadius: "8px",
-                color: "#D4A574",
-                fontSize: "13px"
-              }}
+              onChange={(value: string) => setScrapingUrl(value)}
+              placeholder="Paste product URL here (Ctrl+V or Cmd+V)"
             />
-            <Button
-              variant="primary"
-              onClick={scrapeAndAdd}
-              disabled={!scrapingUrl.trim() || loading}
-            >
-              SCRAPE & ADD
-            </Button>
-          </div>
+          </FormField>
+          <Button
+            variant="primary"
+            onClick={scrapeAndAdd}
+            disabled={!scrapingUrl.trim() || loading}
+            stretch
+          >
+            🔍 SCRAPE & ADD TO CHECKLIST
+          </Button>
           
           {/* AUTO-IMPORT ALL LINKS FROM CANVA PAGE */}
           <div style={{ 
