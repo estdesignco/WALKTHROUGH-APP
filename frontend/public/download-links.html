@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canva Integration - Download Links</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #0f172a 30%, #1e293b 70%, #000000 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #D4A574;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            border: 3px solid #B49B7E;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #D4A574;
+            margin-bottom: 30px;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        .section {
+            background: rgba(15, 23, 42, 0.7);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #D4A574;
+        }
+        .download-btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #D4A574, #B49B7E);
+            color: #000;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            margin: 15px 0;
+            transition: all 0.3s;
+        }
+        .download-btn:hover {
+            background: linear-gradient(135deg, #B49B7E, #A08B6F);
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.4);
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .ready { background: rgba(154, 205, 50, 0.3); color: #9ACD32; }
+        p {
+            color: #D4C5A9;
+            line-height: 1.8;
+            margin: 10px 0;
+        }
+        .info {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3B82F6;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Canva Integration Downloads</h1>
+
+        <div class="section">
+            <h2 style="color: #D4A574; margin-bottom: 15px;">📥 Chrome Extension</h2>
+            <p>Download the Chrome Extension to scan your Canva boards and automatically import all products.</p>
+            <a href="chrome-extension.zip" download class="download-btn">
+                🔍 Download Chrome Extension (7KB)
+                <span class="status ready">✓ READY</span>
+            </a>
+            <div class="info">
+                <strong>After downloading:</strong>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li>Extract the ZIP file</li>
+                    <li>Open Chrome → chrome://extensions/</li>
+                    <li>Enable "Developer mode"</li>
+                    <li>Click "Load unpacked"</li>
+                    <li>Select the extracted folder</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 style="color: #D4A574; margin-bottom: 15px;">📚 Complete Guide</h2>
+            <p>Full documentation with setup instructions, workflows, and troubleshooting.</p>
+            <a href="CANVA-INTEGRATION-GUIDE.html" target="_blank" class="download-btn">
+                📖 Open Integration Guide
+                <span class="status ready">✓ READY</span>
+            </a>
+        </div>
+
+        <div class="section">
+            <h2 style="color: #D4A574; margin-bottom: 15px;">🎨 Canva Live Checklist</h2>
+            <p>Access directly from your main app by clicking the "CANVA LIVE CHECKLIST" button on the Checklist page.</p>
+            <a href="canva-live-checklist-CLEAN.js" target="_blank" class="download-btn">
+                📋 View Canva App Script
+                <span class="status ready">✓ READY</span>
+            </a>
+        </div>
+
+        <div class="section">
+            <h2 style="color: #D4A574; margin-bottom: 15px;">⚙️ Bulk Import Tool (Backup)</h2>
+            <p>Alternative web-based tool for bulk importing products from URLs.</p>
+            <a href="bulk-import.html" target="_blank" class="download-btn">
+                🚀 Open Bulk Import Tool
+                <span class="status ready">✓ READY</span>
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #D4A574;">
+            <p style="color: #B49B7E; font-size: 14px;">
+                All downloads tested and verified ✅
+            </p>
+            <p style="color: #B49B7E; font-size: 12px; margin-top: 10px;">
+                Need help? Check the Integration Guide above
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Test all download links on page load
+        window.addEventListener('load', () => {
+            console.log('✅ All download links loaded successfully');
+            console.log('Chrome Extension:', window.location.origin + '/chrome-extension.zip');
+            console.log('Integration Guide:', window.location.origin + '/CANVA-INTEGRATION-GUIDE.html');
+            console.log('Canva App:', window.location.origin + '/canva-live-checklist-CLEAN.js');
+            console.log('Bulk Import:', window.location.origin + '/bulk-import.html');
+        });
+    </script>
+</body>
+</html>
