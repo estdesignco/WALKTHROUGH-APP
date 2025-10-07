@@ -68,13 +68,21 @@ document.getElementById('scanBtn').addEventListener('click', async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   
   chrome.tabs.sendMessage(tab.id, { action: 'scanPage' }, async (response) => {
+    console.log('📦 Received response from content script:', response);
+    
+    if (chrome.runtime.lastError) {
+      showStatus('❌ Error: ' + chrome.runtime.lastError.message, 'error');
+      return;
+    }
+    
     if (!response || !response.images) {
-      showStatus('❌ No images with links found on this page', 'error');
+      showStatus('❌ No response from content script. Try refreshing the Canva page.', 'error');
       return;
     }
 
     const images = response.images;
-    showStatus(`📸 Found ${images.length} images with links. Processing...`, 'info');
+    showStatus(`📸 Found ${images.length} product links! Starting import...`, 'info');
+    console.log('🎯 Product links to process:', images);
 
     let successCount = 0;
     let failCount = 0;
