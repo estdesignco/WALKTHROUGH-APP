@@ -3,7 +3,7 @@
 ## ✅ What Was Built
 
 ### 1. **Canva Live Checklist** (WORKING!)
-**URL:** `https://canvalink.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+**URL:** `https://designhub-63.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
 
 **Features:**
 - ✅ Clean, simple UI with dark gold theme
@@ -25,7 +25,7 @@
 ---
 
 ### 2. **Chrome Extension** (COMPLETE!)
-**Download:** `https://canvalink.preview.emergentagent.com/chrome-extension.zip`
+**Download:** `https://designhub-63.preview.emergentagent.com/chrome-extension.zip`
 
 **Features:**
 - ✅ Scans entire Canva boards for images with links
@@ -55,7 +55,7 @@
 ---
 
 ### 3. **Comprehensive Documentation**
-**Guide:** `https://canvalink.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+**Guide:** `https://designhub-63.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
 
 Complete visual guide with:
 - Setup instructions
@@ -205,11 +205,11 @@ Complete visual guide with:
 4. **Bulk Import Tool:** `bulk-import.html` (backup option)
 
 ### All URLs:
-- Main App: `https://canvalink.preview.emergentagent.com`
-- Live Checklist: `https://canvalink.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
-- Extension: `https://canvalink.preview.emergentagent.com/chrome-extension.zip`
-- Guide: `https://canvalink.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
-- Bulk Import: `https://canvalink.preview.emergentagent.com/bulk-import.html`
+- Main App: `https://designhub-63.preview.emergentagent.com`
+- Live Checklist: `https://designhub-63.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+- Extension: `https://designhub-63.preview.emergentagent.com/chrome-extension.zip`
+- Guide: `https://designhub-63.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+- Bulk Import: `https://designhub-63.preview.emergentagent.com/bulk-import.html`
 
 ---
 

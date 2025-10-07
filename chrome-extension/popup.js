@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://canvalink.preview.emergentagent.com';
+const BACKEND_URL = 'https://designhub-63.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

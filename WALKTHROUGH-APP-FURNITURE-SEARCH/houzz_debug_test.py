@@ -13,7 +13,7 @@ import sys
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://canvalink.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://designhub-63.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 def print_header(title):

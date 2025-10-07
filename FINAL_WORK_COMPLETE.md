@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://canvalink.preview.emergentagent.com
+https://designhub-63.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://canvalink.preview.emergentagent.com/mobile-app
+https://designhub-63.preview.emergentagent.com/mobile-app
 
 ---
 
