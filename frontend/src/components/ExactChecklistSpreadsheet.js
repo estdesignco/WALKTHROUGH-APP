@@ -938,13 +938,15 @@ const ExactChecklistSpreadsheet = ({
             </button>
             <button 
               onClick={() => {
-                const canvaAppUrl = `https://designhub-63.preview.emergentagent.com/canva-live-FINAL.js?projectId=${project?.id}`;
+                const canvaAppUrl = `https://designhub-63.preview.emergentagent.com/canva-BIDIRECTIONAL-SYNC.js?projectId=${project?.id}`;
                 window.open(canvaAppUrl, '_blank', 'width=1200,height=800');
               }}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-2 rounded-full shadow-xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-blue-400/20 text-white flex items-center gap-2"
+              title="Open Live Checklist with Real-time Sync"
             >
               <span>🎨</span>
               <span>CANVA LIVE CHECKLIST</span>
+              <span style={{ fontSize: '10px', opacity: 0.8 }}>↔ SYNC</span>
             </button>
             <button 
               onClick={() => {
