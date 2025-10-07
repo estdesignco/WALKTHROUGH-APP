@@ -2346,6 +2346,122 @@ async def delete_item(item_id: str):
     
     return {"message": "Item deleted successfully"}
 
+# ==========================================
+# BIDIRECTIONAL SYNC ENDPOINTS (Phase 2)
+# ==========================================
+
+@api_router.get("/projects/{project_id}/changes")
+async def get_project_changes(
+    project_id: str,
+    since: Optional[float] = Query(None, description="Unix timestamp of last sync")
+):
+    """
+    Get all changes to a project since a specific timestamp.
+    Used by Canva App and Main App for bidirectional sync.
+    Returns items that were created or updated since the timestamp.
+    """
+    try:
+        # Build query for items in this project
+        project_doc = await db.projects.find_one({"id": project_id})
+        if not project_doc:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Get all rooms in project
+        rooms = await db.rooms.find({"project_id": project_id}).to_list(None)
+        room_ids = [room["id"] for room in rooms]
+        
+        # Get all categories in those rooms
+        categories = await db.categories.find({"room_id": {"$in": room_ids}}).to_list(None)
+        category_ids = [cat["id"] for cat in categories]
+        
+        # Get all subcategories in those categories
+        subcategories = await db.subcategories.find({"category_id": {"$in": category_ids}}).to_list(None)
+        subcategory_ids = [sub["id"] for sub in subcategories]
+        
+        # Build query for changed items
+        query = {"subcategory_id": {"$in": subcategory_ids}}
+        
+        # If timestamp provided, only get items updated since then
+        if since is not None:
+            since_datetime = datetime.fromtimestamp(since, tz=timezone.utc)
+            query["updated_at"] = {"$gte": since_datetime}
+        
+        # Get changed items
+        items = await db.items.find(query).to_list(None)
+        
+        # Convert datetime objects to ISO strings for JSON serialization
+        for item in items:
+            if "created_at" in item and item["created_at"]:
+                item["created_at"] = item["created_at"].isoformat()
+            if "updated_at" in item and item["updated_at"]:
+                item["updated_at"] = item["updated_at"].isoformat()
+            if "order_date" in item and item["order_date"]:
+                item["order_date"] = item["order_date"].isoformat()
+            if "install_date" in item and item["install_date"]:
+                item["install_date"] = item["install_date"].isoformat()
+        
+        current_timestamp = datetime.now(timezone.utc).timestamp()
+        
+        return {
+            "project_id": project_id,
+            "changes": items,
+            "change_count": len(items),
+            "timestamp": current_timestamp,
+            "since": since
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting project changes: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.patch("/items/{item_id}/quick-update")
+async def quick_update_item(item_id: str, update_data: Dict[str, Any]):
+    """
+    Quick update endpoint for single field changes (like status toggle).
+    Used by Canva App for instant sync when checking/unchecking items.
+    """
+    try:
+        # Verify item exists
+        current_item = await db.items.find_one({"id": item_id})
+        if not current_item:
+            raise HTTPException(status_code=404, detail="Item not found")
+        
+        # Update timestamp
+        update_data["updated_at"] = datetime.utcnow()
+        
+        # Perform update
+        result = await db.items.update_one(
+            {"id": item_id},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            # Item exists but nothing changed (same value)
+            return await get_item(item_id)
+        
+        # Get updated item
+        updated_item = await get_item(item_id)
+        
+        return updated_item
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error in quick update: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/canva-sync/heartbeat")
+async def canva_sync_heartbeat():
+    """
+    Simple endpoint to verify sync connection is working.
+    Returns server timestamp for sync coordination.
+    """
+    return {
+        "status": "ok",
+        "timestamp": datetime.now(timezone.utc).timestamp(),
+        "server_time": datetime.now(timezone.utc).isoformat()
+    }
+
 # MISSING DELETE ENDPOINTS THAT THE FRONTEND EXPECTS
 @api_router.delete("/rooms/{room_id}")
 async def delete_room(room_id: str):
