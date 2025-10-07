@@ -118,22 +118,170 @@ export const App = () => {
     }
   };
 
+  const categorizeItem = (itemName: string, itemDescription: string = '') => {
+    const text = (itemName + ' ' + itemDescription).toLowerCase();
+    
+    // Category keywords
+    const categoryMap: Record<string, string[]> = {
+      'Lighting': ['light', 'lamp', 'chandelier', 'sconce', 'pendant', 'fixture', 'ceiling light', 'floor lamp', 'table lamp'],
+      'Furniture': ['chair', 'sofa', 'table', 'desk', 'bed', 'dresser', 'cabinet', 'bench', 'ottoman', 'sectional', 'couch', 'nightstand', 'console', 'bookshelf', 'armchair'],
+      'Decor': ['pillow', 'rug', 'art', 'vase', 'mirror', 'frame', 'sculpture', 'plant', 'candle', 'throw', 'cushion', 'decoration', 'decor'],
+      'Architectural': ['door', 'window', 'molding', 'trim', 'hardware', 'handle', 'knob', 'hinge', 'tile', 'flooring'],
+      'Paint': ['paint', 'wallpaper', 'finish', 'stain', 'coating']
+    };
+    
+    // Check each category
+    for (const [category, keywords] of Object.entries(categoryMap)) {
+      if (keywords.some(kw => text.includes(kw))) {
+        return category;
+      }
+    }
+    
+    return 'Furniture'; // Default category
+  };
+
   const autoImportFromCanva = async () => {
-    if (!selectedRoom) return;
+    if (!selectedRoom) {
+      alert('❌ Please select a room first!');
+      return;
+    }
     
     setLoading(true);
+    let importedCount = 0;
+    const errors: string[] = [];
+    
     try {
-      // NOTE: Canva's SDK doesn't expose a way to get images with links yet
-      // This would require Canva Design API access which is still in beta
-      alert('🚧 Auto-Import Feature Coming Soon!\n\nThis will scan all product links on your Canva page and import them automatically.\n\nFor now, please use:\n1. Copy/paste individual product URLs\n2. Or use "Import Page" button in main app');
+      // Get current page context
+      const pageContext = await getCurrentPageContext();
+      console.log('📄 Page context:', pageContext);
       
-      // FUTURE IMPLEMENTATION:
-      // 1. Use Canva Design API to get all elements
-      // 2. Filter elements with external URLs
-      // 3. For each URL: scrape → categorize → add to checklist
-      // 4. Use keywords in product name to match categories
+      // For now, we'll prompt user to paste all URLs (Canva doesn't expose links directly yet)
+      const urlsInput = prompt(
+        '🎨 PASTE ALL PRODUCT URLS FROM YOUR CANVA PAGE\n\n' +
+        'Copy all product links from your Canva design and paste them here (one per line):\n\n' +
+        'Example:\nhttps://www.houzz.com/product1\nhttps://www.westelm.com/product2\nhttps://www.cb2.com/product3'
+      );
+      
+      if (!urlsInput) {
+        setLoading(false);
+        return;
+      }
+      
+      // Parse URLs
+      const urls = urlsInput.split('\n')
+        .map(url => url.trim())
+        .filter(url => url.startsWith('http'));
+      
+      if (urls.length === 0) {
+        alert('❌ No valid URLs found!');
+        setLoading(false);
+        return;
+      }
+      
+      alert(`🔄 Found ${urls.length} URLs. Starting import...\n\nThis may take a moment. Please wait.`);
+      
+      // Process each URL
+      for (const url of urls) {
+        try {
+          console.log('🔍 Scraping:', url);
+          
+          // Scrape URL
+          const scrapeRes = await fetch(`${BACKEND_URL}/api/scrape-product`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              url: url,
+              auto_clip_to_houzz: true
+            })
+          });
+          
+          if (!scrapeRes.ok) {
+            errors.push(`Failed: ${url}`);
+            continue;
+          }
+          
+          const scrapedData = await scrapeRes.json();
+          console.log('✅ Scraped:', scrapedData.name);
+          
+          // Smart categorization
+          const suggestedCategory = categorizeItem(scrapedData.name, scrapedData.description || '');
+          console.log('🎯 Category:', suggestedCategory);
+          
+          // Find matching category and subcategory
+          let subcategoryId = null;
+          
+          for (const cat of selectedRoom.categories || []) {
+            if (cat.name.toLowerCase().includes(suggestedCategory.toLowerCase())) {
+              // Found matching category, get first subcategory
+              if (cat.subcategories && cat.subcategories.length > 0) {
+                subcategoryId = cat.subcategories[0].id;
+                console.log('✅ Matched category:', cat.name, '→', cat.subcategories[0].name);
+                break;
+              }
+            }
+          }
+          
+          // Fallback: use first available subcategory
+          if (!subcategoryId) {
+            for (const cat of selectedRoom.categories || []) {
+              if (cat.subcategories && cat.subcategories.length > 0) {
+                subcategoryId = cat.subcategories[0].id;
+                console.log('⚠️ Using fallback category:', cat.name);
+                break;
+              }
+            }
+          }
+          
+          if (!subcategoryId) {
+            errors.push(`No category for: ${scrapedData.name}`);
+            continue;
+          }
+          
+          // Add item
+          const addRes = await fetch(`${BACKEND_URL}/api/items`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...scrapedData,
+              subcategory_id: subcategoryId,
+              status: '',
+              quantity: 1
+            })
+          });
+          
+          if (addRes.ok) {
+            importedCount++;
+            console.log('✅ Added:', scrapedData.name);
+          } else {
+            errors.push(`Failed to add: ${scrapedData.name}`);
+          }
+          
+        } catch (e: any) {
+          console.error('Error processing URL:', url, e);
+          errors.push(`Error: ${url}`);
+        }
+      }
+      
+      // Show results
+      let message = `✅ Import Complete!\n\n`;
+      message += `✓ Successfully imported: ${importedCount} items\n`;
+      if (errors.length > 0) {
+        message += `✗ Failed: ${errors.length} items\n\n`;
+        message += `Errors:\n${errors.slice(0, 5).join('\n')}`;
+        if (errors.length > 5) {
+          message += `\n... and ${errors.length - 5} more`;
+        }
+      }
+      
+      alert(message);
+      
+      // Reload project
+      if (importedCount > 0) {
+        loadProject(projectId, selectedRoom.id);
+      }
       
     } catch (e: any) {
+      console.error('Auto-import error:', e);
       alert('❌ Error: ' + e.message);
     } finally {
       setLoading(false);
