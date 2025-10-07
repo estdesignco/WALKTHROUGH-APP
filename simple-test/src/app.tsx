@@ -1,5 +1,6 @@
 import { Button, Rows, Text, Title, LoadingIndicator } from "@canva/app-ui-kit";
 import { requestOpenExternalUrl } from "@canva/platform";
+import { getCurrentPageContext } from "@canva/design";
 import * as React from "react";
 import * as styles from "styles/components.css";
 
