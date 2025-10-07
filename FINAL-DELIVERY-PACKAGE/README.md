@@ -12,7 +12,8 @@ FINAL-DELIVERY-PACKAGE/
 ├── chrome-extension/
 │   └── canva-scanner-TRADE-SMART.zip (12KB)
 ├── canva-app/
-│   └── canva-BIDIRECTIONAL-SYNC.js (814KB)
+│   ├── canva-FIXED-STAYS-LOADED.js (815KB) ⭐ USE THIS ONE!
+│   └── canva-BIDIRECTIONAL-SYNC.js (814KB) [OLD VERSION]
 ├── documentation/
 │   ├── PHASE-1-COMPLETE-SUMMARY.md
 │   ├── PHASE-2-COMPLETE-SUMMARY.md
