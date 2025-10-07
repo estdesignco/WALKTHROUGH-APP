@@ -1,89 +1,243 @@
-// Content script for Canva page scanning
+// Content script for Canva page scanning - TRADE VENDORS ONLY
 console.log('🎨 Canva Scanner Content Script LOADED at:', new Date().toLocaleTimeString());
 console.log('📍 Current URL:', window.location.href);
 
-// Immediately scan when loaded
+// Known trade vendor domains (from user's list + open to others)
+const KNOWN_TRADE_VENDORS = [
+  'lounards.com',
+  'estdesignco.com',
+  'havefurniture.com',
+  'globeviews.com',
+  'bernhardt.com',
+  'lolahug.com',
+  'visualcomfort.com',
+  'hvlgroup.com',
+  'gabby.com',
+  '1owdecor.com',
+  'cre8tivecolletion.com',
+  'baseliminar.com',
+  'eichholtz.com',
+  'myshomercq.com',
+  'safavieh.com',
+  'surya.com',
+  'beekighting.com',
+  'hubbardtonforge.com',
+  'hinkley.com',
+  'elegantlighting.com',
+  'reginaandrew.com',
+  'arteriorshome.com',
+  'vanguardfurniture.com'
+];
+
+// RETAIL SITES TO EXCLUDE (the "NPC" sites user mentioned)
+const RETAIL_BLACKLIST = [
+  'wayfair.com',
+  'crateandbarrel.com',
+  'westelm.com',
+  'potterybarn.com',
+  'cb2.com',
+  'anthropologie.com',
+  'urbanoutfitters.com',
+  'target.com',
+  'amazon.com',
+  'walmart.com',
+  'overstock.com',
+  'homedepot.com',
+  'lowes.com',
+  'ikea.com',
+  'roomandboard.com'
+];
+
+// Product URL patterns that indicate it's a product page
+const PRODUCT_URL_PATTERNS = [
+  '/product/',
+  '/products/',
+  '/item/',
+  '/items/',
+  '/furniture/',
+  '/lighting/',
+  '/collection/',
+  '/collections/',
+  '/catalog/',
+  '/shop/',
+  '-p-',
+  '/pd/',
+  '/detail/',
+  '/sku/',
+  '/model/'
+];
+
+// Non-product page patterns to exclude
+const NON_PRODUCT_PATTERNS = [
+  '/login',
+  '/signin',
+  '/signup',
+  '/register',
+  '/cart',
+  '/checkout',
+  '/account',
+  '/customer/account',
+  '/dealer',
+  '/about',
+  '/contact',
+  '/home',
+  '/index',
+  '/search',
+  '/gallery'
+];
+
+function isProductUrl(url) {
+  const lowerUrl = url.toLowerCase();
+  
+  // Check if it's a retail site (EXCLUDE)
+  if (RETAIL_BLACKLIST.some(retail => lowerUrl.includes(retail))) {
+    console.log(`❌ EXCLUDED (retail): ${url}`);
+    return false;
+  }
+  
+  // Check if it matches non-product patterns (EXCLUDE)
+  if (NON_PRODUCT_PATTERNS.some(pattern => lowerUrl.includes(pattern))) {
+    console.log(`❌ EXCLUDED (non-product page): ${url}`);
+    return false;
+  }
+  
+  // Check if it's a known trade vendor (HIGH PRIORITY)
+  const isKnownVendor = KNOWN_TRADE_VENDORS.some(vendor => lowerUrl.includes(vendor));
+  
+  // Check if URL structure suggests it's a product
+  const hasProductPattern = PRODUCT_URL_PATTERNS.some(pattern => lowerUrl.includes(pattern));
+  
+  // Accept if: (known vendor) OR (has product pattern AND not retail)
+  if (isKnownVendor) {
+    console.log(`✅ ACCEPTED (known trade vendor): ${url}`);
+    return true;
+  }
+  
+  if (hasProductPattern) {
+    console.log(`✅ ACCEPTED (product URL pattern): ${url}`);
+    return true;
+  }
+  
+  console.log(`⚠️ SKIPPED (uncertain): ${url}`);
+  return false;
+}
+
 function scanPageForLinks() {
-  console.log('🔍 Starting REAL scan - ALL EXTERNAL LINKS...');
+  console.log('🔍 Starting SMART scan for TRADE VENDOR product links...');
   const results = [];
+  const seenUrls = new Set();
   
-  // Get ALL text from page
+  // METHOD 1: Scan all text content for URLs
+  console.log('\n📄 METHOD 1: Scanning page text...');
   const pageText = document.body.innerText || document.body.textContent || '';
-  console.log('📄 Page text length:', pageText.length);
-  
-  // Scan for ANY http/https URLs (not limited to specific vendors)
   const urlPattern = /https?:\/\/[^\s<>"'\)]+/gi;
   const foundUrls = pageText.match(urlPattern) || [];
+  console.log(`   Found ${foundUrls.length} total URLs in text`);
   
-  console.log('🔗 Total URLs found in text:', foundUrls.length);
-  
-  // Filter out Canva's own URLs and common non-product URLs
-  const filteredUrls = foundUrls.filter(url => {
-    const lowerUrl = url.toLowerCase();
-    return !lowerUrl.includes('canva.com') &&
-           !lowerUrl.includes('google.com') &&
-           !lowerUrl.includes('facebook.com') &&
-           !lowerUrl.includes('instagram.com') &&
-           !lowerUrl.includes('youtube.com') &&
-           !lowerUrl.includes('twitter.com') &&
-           !lowerUrl.includes('linkedin.com') &&
-           !lowerUrl.includes('.js') &&
-           !lowerUrl.includes('.css') &&
-           !lowerUrl.includes('.png') &&
-           !lowerUrl.includes('.jpg') &&
-           !lowerUrl.includes('.gif');
+  foundUrls.forEach(url => {
+    if (!url.includes('canva.com') && isProductUrl(url) && !seenUrls.has(url)) {
+      seenUrls.add(url);
+      results.push({ url, source: 'text', confidence: 'high' });
+    }
   });
   
-  console.log('✅ Filtered product URLs:', filteredUrls.length);
-  filteredUrls.forEach(url => {
-    console.log('  → ', url);
-    results.push({ url: url, source: 'text' });
-  });
-  
-  // Scan all <a> tags
+  // METHOD 2: Scan all <a> tags
+  console.log('\n🔗 METHOD 2: Scanning <a> tags...');
   const allLinks = document.querySelectorAll('a[href]');
-  console.log('🔗 Total <a> tags on page:', allLinks.length);
+  console.log(`   Found ${allLinks.length} total <a> tags`);
   
-  let productLinkCount = 0;
   allLinks.forEach(link => {
     const href = link.href;
     if (href && 
         !href.includes('canva.com') && 
-        !href.includes('javascript:') &&
+        !href.startsWith('javascript:') &&
         !href.startsWith('#') &&
-        !href.includes('google.com') &&
-        !href.includes('facebook.com')) {
-      results.push({ url: href, source: 'link' });
-      productLinkCount++;
-      console.log('✅ External link found:', href);
+        isProductUrl(href) &&
+        !seenUrls.has(href)) {
+      seenUrls.add(href);
+      results.push({ url: href, source: 'link', confidence: 'high' });
     }
   });
-  console.log('🎯 External links in <a> tags:', productLinkCount);
   
-  // Remove duplicates
-  const uniqueUrls = [...new Set(results.map(r => r.url))];
-  console.log('📊 TOTAL UNIQUE EXTERNAL URLS:', uniqueUrls.length);
-  uniqueUrls.forEach((url, i) => console.log(`  ${i+1}. ${url}`));
+  // METHOD 3: Scan for data attributes (Canva might store links here)
+  console.log('\n🎯 METHOD 3: Scanning data attributes...');
+  const elementsWithData = document.querySelectorAll('[data-href], [data-url], [data-link]');
+  console.log(`   Found ${elementsWithData.length} elements with data attributes`);
   
-  return uniqueUrls.map(url => ({ url }));
+  elementsWithData.forEach(el => {
+    const dataUrl = el.getAttribute('data-href') || el.getAttribute('data-url') || el.getAttribute('data-link');
+    if (dataUrl && isProductUrl(dataUrl) && !seenUrls.has(dataUrl)) {
+      seenUrls.add(dataUrl);
+      results.push({ url: dataUrl, source: 'data-attribute', confidence: 'medium' });
+    }
+  });
+  
+  // METHOD 4: Look inside image elements for associated links
+  console.log('\n🖼️ METHOD 4: Scanning images with clickable parents...');
+  const allImages = document.querySelectorAll('img');
+  console.log(`   Found ${allImages.length} total images`);
+  
+  allImages.forEach(img => {
+    // Check if image is inside a link
+    const parentLink = img.closest('a[href]');
+    if (parentLink && parentLink.href) {
+      const href = parentLink.href;
+      if (!href.includes('canva.com') && isProductUrl(href) && !seenUrls.has(href)) {
+        seenUrls.add(href);
+        results.push({ url: href, source: 'image-link', confidence: 'high' });
+      }
+    }
+  });
+  
+  // METHOD 5: Search for URLs in style attributes and background images
+  console.log('\n🎨 METHOD 5: Scanning inline styles...');
+  const elementsWithStyle = document.querySelectorAll('[style*="url("]');
+  console.log(`   Found ${elementsWithStyle.length} elements with background URLs`);
+  
+  elementsWithStyle.forEach(el => {
+    const style = el.getAttribute('style');
+    const urlMatches = style.match(/url\(['"]?([^'"\)]+)['"]?\)/gi);
+    if (urlMatches) {
+      urlMatches.forEach(match => {
+        const url = match.replace(/url\(['"]?([^'"\)]+)['"]?\)/, '$1');
+        if (isProductUrl(url) && !seenUrls.has(url)) {
+          seenUrls.add(url);
+          results.push({ url, source: 'style', confidence: 'low' });
+        }
+      });
+    }
+  });
+  
+  console.log('\n📊 SCAN COMPLETE!');
+  console.log(`   Total unique product URLs found: ${results.length}`);
+  console.log('\n🎯 RESULTS:');
+  results.forEach((item, i) => {
+    console.log(`   ${i + 1}. [${item.confidence}] ${item.url}`);
+    console.log(`      └─ Source: ${item.source}`);
+  });
+  
+  return results;
 }
 
-// Test scan immediately
-const immediateResults = scanPageForLinks();
-console.log('🎉 Immediate scan results:', immediateResults);
+// Test scan immediately when script loads
+setTimeout(() => {
+  console.log('\n⏰ Running initial scan after 2 second delay...');
+  const immediateResults = scanPageForLinks();
+  console.log(`\n🎉 Initial scan complete: ${immediateResults.length} product links found!`);
+}, 2000);
 
 // Listen for scan requests from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('📨 Message received:', request);
+  console.log('📨 Message received from popup:', request);
   
   if (request.action === 'scanPage') {
-    console.log('🚀 Executing scan...');
+    console.log('🚀 Executing manual scan from popup...');
     const results = scanPageForLinks();
-    console.log('📦 Sending results:', results);
+    console.log('📦 Sending results to popup:', results);
     sendResponse({ success: true, images: results });
   }
   
   return true;
 });
 
-console.log('✅ Content script ready and waiting for messages');
+console.log('✅ Content script fully loaded and ready!');
