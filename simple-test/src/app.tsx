@@ -306,7 +306,7 @@ export const App = () => {
       padding: "20px"
     }}>
       <Rows spacing="2u">
-        {/* HEADER */}
+        {/* HEADER WITH SYNC STATUS */}
         <div style={{
           background: "rgba(30, 41, 59, 0.9)",
           padding: "16px 20px",
@@ -321,22 +321,53 @@ export const App = () => {
             <div style={{ color: "#D4A574", fontSize: "20px", fontWeight: "bold" }}>
               📋 {selectedRoom.name}
             </div>
-            <div style={{ color: "#B49B7E", fontSize: "12px", marginTop: "4px" }}>
-              🔄 Last synced: {lastSync.toLocaleTimeString()} • Auto-refresh every 5s
+            <div style={{ 
+              color: "#B49B7E", 
+              fontSize: "12px", 
+              marginTop: "4px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px"
+            }}>
+              {/* Sync Status Indicator */}
+              <span style={{
+                display: "inline-block",
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                backgroundColor: syncStatus === 'synced' ? '#9ACD32' : 
+                                syncStatus === 'syncing' ? '#FFA500' : '#ff6b6b',
+                animation: syncStatus === 'syncing' ? 'pulse 1.5s infinite' : 'none'
+              }} />
+              <span>
+                {syncStatus === 'synced' && `✅ Synced ${lastSync.toLocaleTimeString()}`}
+                {syncStatus === 'syncing' && '🔄 Syncing...'}
+                {syncStatus === 'error' && '❌ Sync error'}
+              </span>
+              <span style={{ color: "#8B7355" }}>• Auto-sync every 5s</span>
             </div>
           </div>
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             <Button variant="secondary" onClick={() => setSelectedRoom(null)}>
               ← Change Room
             </Button>
             <Button 
               variant="secondary" 
               onClick={() => loadProject(projectId, selectedRoom?.id)}
+              disabled={isSyncing}
             >
               🔄 Refresh Now
             </Button>
           </div>
         </div>
+        
+        {/* Add CSS animation for pulse effect */}
+        <style>{`
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+          }
+        `}</style>
 
         {/* CATEGORIES AND ITEMS */}
         {(selectedRoom.categories || []).map((category: any) => {
