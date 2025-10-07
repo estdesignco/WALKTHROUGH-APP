@@ -928,8 +928,8 @@ const ExactChecklistSpreadsheet = ({
             </select>
           </div>
           
-          {/* Action Buttons - ADD ROOM, CANVA LIVE CHECKLIST, AND TRANSFER */}
-          <div className="flex gap-3">
+          {/* Action Buttons - ADD ROOM, CANVA LIVE CHECKLIST, SCANNER, AND TRANSFER */}
+          <div className="flex gap-3 flex-wrap">
             <button 
               onClick={onAddRoom}
               className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-[#B49B7E]"
@@ -945,6 +945,16 @@ const ExactChecklistSpreadsheet = ({
             >
               <span>🎨</span>
               <span>CANVA LIVE CHECKLIST</span>
+            </button>
+            <button 
+              onClick={() => {
+                window.open('/canva-scanner-guide.html', '_blank');
+              }}
+              className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] hover:from-[#E8D4B8] hover:to-[#D4A574] px-6 py-2 rounded-full shadow-xl hover:shadow-[#D4A574]/50 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4A574]/30 text-black flex items-center gap-2"
+              title="Download Chrome Extension to scan Canva boards"
+            >
+              <span>🔍</span>
+              <span>GET CANVA SCANNER</span>
             </button>
             <button 
               onClick={handleTransferToFFE}
