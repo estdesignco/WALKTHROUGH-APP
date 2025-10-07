@@ -156,15 +156,33 @@ export const App = () => {
 
   const updateStatus = async (itemId: string, status: string) => {
     try {
-      await fetch(`${BACKEND_URL}/api/items/${itemId}`, {
-        method: 'PUT',
+      setSyncStatus('syncing');
+      
+      // Use quick-update endpoint for instant sync
+      const res = await fetch(`${BACKEND_URL}/api/items/${itemId}/quick-update`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       });
-      // Reload to refresh
-      loadProject(projectId, selectedRoom?.id);
+      
+      if (!res.ok) throw new Error('Update failed');
+      
+      // Immediately refresh to show the change
+      const projectRes = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=checklist`);
+      if (projectRes.ok) {
+        const projectData = await projectRes.json();
+        setProject(projectData);
+        
+        const room = projectData.rooms?.find((r: any) => r.id === selectedRoom.id);
+        if (room) setSelectedRoom(room);
+      }
+      
+      setSyncStatus('synced');
+      console.log('✅ Status updated and synced');
+      
     } catch (e) {
       console.error('Update failed:', e);
+      setSyncStatus('error');
     }
   };
 
