@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Shortcuts - Interior Design Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #0a1628 20%, #0f2847 40%, #1e3a5f 60%, #0f2847 80%, #000000 100%);
+            color: #D4A574;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.15), rgba(212, 165, 116, 0.05));
+            border-radius: 20px;
+            border: 2px solid rgba(212, 165, 116, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+        
+        h1 {
+            font-size: 48px;
+            color: #D4A574;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.9);
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #B8956A;
+        }
+        
+        .section {
+            background: linear-gradient(135deg, rgba(15, 40, 71, 0.8), rgba(10, 22, 40, 0.9));
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(212, 165, 116, 0.4);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+        }
+        
+        h2 {
+            color: #D4A574;
+            font-size: 28px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(212, 165, 116, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .shortcut-key {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(212, 165, 116, 0.3);
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: #D4A574;
+            text-align: center;
+        }
+        
+        .shortcut-desc {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: #B8956A;
+            display: flex;
+            align-items: center;
+        }
+        
+        .kbd {
+            background: linear-gradient(135deg, #D4A574, #B49B7E);
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 13px;
+            margin: 0 3px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .note {
+            background: rgba(154, 205, 50, 0.1);
+            border-left: 4px solid #9ACD32;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            color: #B8956A;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⌨️ Keyboard Shortcuts</h1>
+            <p class="subtitle">Work faster with these productivity shortcuts</p>
+        </div>
+        
+        <div class="section">
+            <h2>🎨 Canva Integration</h2>
+            <div class="shortcut-grid">
+                <div class="shortcut-key">Ctrl + Shift + C</div>
+                <div class="shortcut-desc">Open Canva Live Checklist</div>
+                
+                <div class="shortcut-key">Ctrl + Shift + U</div>
+                <div class="shortcut-desc">Upload current room images to Canva</div>
+                
+                <div class="shortcut-key">Ctrl + Shift + S</div>
+                <div class="shortcut-desc">Scan Canva board (when extension is active)</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📋 Navigation</h2>
+            <div class="shortcut-grid">
+                <div class="shortcut-key">Ctrl + 1</div>
+                <div class="shortcut-desc">Go to Questionnaire</div>
+                
+                <div class="shortcut-key">Ctrl + 2</div>
+                <div class="shortcut-desc">Go to Walkthrough</div>
+                
+                <div class="shortcut-key">Ctrl + 3</div>
+                <div class="shortcut-desc">Go to Checklist</div>
+                
+                <div class="shortcut-key">Ctrl + 4</div>
+                <div class="shortcut-desc">Go to FF&E</div>
+                
+                <div class="shortcut-key">Ctrl + /</div>
+                <div class="shortcut-desc">Show this shortcuts panel</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>✏️ Editing</h2>
+            <div class="shortcut-grid">
+                <div class="shortcut-key">Ctrl + N</div>
+                <div class="shortcut-desc">Add new item (in current view)</div>
+                
+                <div class="shortcut-key">Ctrl + S</div>
+                <div class="shortcut-desc">Quick save current changes</div>
+                
+                <div class="shortcut-key">Ctrl + F</div>
+                <div class="shortcut-desc">Focus search box</div>
+                
+                <div class="shortcut-key">Escape</div>
+                <div class="shortcut-desc">Close modal/cancel operation</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 Search & Filter</h2>
+            <div class="shortcut-grid">
+                <div class="shortcut-key">Ctrl + Shift + F</div>
+                <div class="shortcut-desc">Advanced filter options</div>
+                
+                <div class="shortcut-key">Ctrl + R</div>
+                <div class="shortcut-desc">Clear all filters</div>
+                
+                <div class="shortcut-key">Alt + 1-9</div>
+                <div class="shortcut-desc">Quick filter by status</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📦 Batch Operations</h2>
+            <div class="shortcut-grid">
+                <div class="shortcut-key">Ctrl + A</div>
+                <div class="shortcut-desc">Select all items</div>
+                
+                <div class="shortcut-key">Shift + Click</div>
+                <div class="shortcut-desc">Select range of items</div>
+                
+                <div class="shortcut-key">Ctrl + Click</div>
+                <div class="shortcut-desc">Toggle individual item selection</div>
+                
+                <div class="shortcut-key">Ctrl + Shift + D</div>
+                <div class="shortcut-desc">Duplicate selected items</div>
+            </div>
+        </div>
+        
+        <div class="note">
+            <strong>💡 Pro Tip:</strong> Press <span class="kbd">Ctrl</span> + <span class="kbd">/</span> at any time to show this shortcuts panel. These shortcuts work across all views and help you work much faster!
+        </div>
+    </div>
+</body>
+</html>
