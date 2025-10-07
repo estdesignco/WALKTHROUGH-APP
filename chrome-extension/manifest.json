@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Interior Design Canva Scanner",
+  "version": "1.0.0",
+  "description": "Scan Canva boards for product images and automatically add to your checklist",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.canva.com/*",
+    "https://canvalink.preview.emergentagent.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.canva.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      width: 400px;
+      min-height: 500px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #000000 0%, #0f172a 30%, #1e293b 70%, #000000 100%);
+      color: #D4A574;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #D4A574;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+    .section {
+      background: rgba(30, 41, 59, 0.9);
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      border: 2px solid #D4A574;
+    }
+    label {
+      display: block;
+      color: #D4A574;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid #D4A574;
+      border-radius: 6px;
+      color: #D4A574;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #D4A574, #B49B7E);
+      color: #000;
+      font-weight: bold;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #B49B7E, #A08B6F);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    button.scan {
+      background: linear-gradient(135deg, #9ACD32, #7FCD32);
+    }
+    button.scan:hover {
+      background: linear-gradient(135deg, #7FCD32, #6BB832);
+    }
+    #status {
+      margin-top: 16px;
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 6px;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .status-line {
+      margin: 4px 0;
+      padding: 4px;
+    }
+    .success { color: #9ACD32; }
+    .error { color: #ff6b6b; }
+    .info { color: #D4A574; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>🎨 Canva Board Scanner</h1>
+  
+  <div class="section">
+    <label>Project ID:</label>
+    <input type="text" id="projectId" placeholder="Enter your project ID">
+    
+    <label>Room:</label>
+    <select id="roomSelect">
+      <option value="">-- Load project first --</option>
+    </select>
+    
+    <button id="loadBtn">Load Project</button>
+  </div>
+
+  <div class="section">
+    <button id="scanBtn" class="scan" disabled>🔍 Scan Canva Board</button>
+    <div style="font-size: 11px; color: #B49B7E; text-align: center; margin-top: 8px;">
+      Scans all images with links on this page
+    </div>
+  </div>
+
+  <div id="status" class="hidden"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
