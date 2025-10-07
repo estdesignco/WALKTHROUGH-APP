@@ -86,6 +86,19 @@ document.getElementById('scanBtn').addEventListener('click', async () => {
       return;
     }
     
+    // TRY TO INJECT CONTENT SCRIPT IF IT'S NOT LOADED
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content.js']
+      });
+      showStatus('✅ Scanner loaded on page', 'success');
+      // Wait a moment for script to initialize
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (injectError) {
+      console.log('Content script might already be loaded:', injectError);
+    }
+    
     chrome.tabs.sendMessage(tab.id, { action: 'scanPage' }, async (response) => {
       console.log('📦 Received response from content script:', response);
       
