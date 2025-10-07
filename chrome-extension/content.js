@@ -133,6 +133,7 @@ function scanPageForLinks() {
   console.log('🔍 Starting SMART scan for TRADE VENDOR product links...');
   const results = [];
   const seenUrls = new Set();
+  const allFoundUrls = []; // Debug: track ALL URLs found
   
   // METHOD 1: Scan all text content for URLs
   console.log('\n📄 METHOD 1: Scanning page text...');
@@ -140,6 +141,13 @@ function scanPageForLinks() {
   const urlPattern = /https?:\/\/[^\s<>"'\)]+/gi;
   const foundUrls = pageText.match(urlPattern) || [];
   console.log(`   Found ${foundUrls.length} total URLs in text`);
+  
+  // DEBUG: Log ALL URLs found (not just product ones)
+  foundUrls.forEach(url => {
+    if (!url.includes('canva.com')) {
+      allFoundUrls.push({ url, method: 'text' });
+    }
+  });
   
   foundUrls.forEach(url => {
     if (!url.includes('canva.com') && isProductUrl(url) && !seenUrls.has(url)) {
