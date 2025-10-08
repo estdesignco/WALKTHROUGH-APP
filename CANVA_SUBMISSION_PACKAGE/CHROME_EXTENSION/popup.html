@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      width: 420px;
+      min-height: 550px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      /* EXACT MATCH: Dark to blue gradient with gold text */
+      background: linear-gradient(135deg, #000000 0%, #0a1628 20%, #0f2847 40%, #1e3a5f 60%, #0f2847 80%, #000000 100%);
+      color: #D4A574;
+      padding: 0;
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, rgba(212, 165, 116, 0.15), rgba(212, 165, 116, 0.05));
+      padding: 20px;
+      text-align: center;
+      border-bottom: 2px solid rgba(212, 165, 116, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0;
+      color: #D4A574;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .subtitle {
+      font-size: 11px;
+      color: #B8956A;
+      margin-top: 6px;
+      opacity: 0.9;
+    }
+    .container {
+      padding: 20px;
+      max-height: 450px;
+      overflow-y: auto;
+    }
+    .section {
+      background: linear-gradient(135deg, rgba(15, 40, 71, 0.8), rgba(10, 22, 40, 0.9));
+      padding: 18px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      border: 2px solid rgba(212, 165, 116, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    label {
+      display: block;
+      color: #D4A574;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      background: rgba(5, 10, 20, 0.9);
+      border: 2px solid rgba(212, 165, 116, 0.5);
+      border-radius: 8px;
+      color: #D4A574;
+      font-size: 13px;
+      margin-bottom: 14px;
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #D4A574;
+      box-shadow: 0 0 12px rgba(212, 165, 116, 0.3);
+    }
+    input::placeholder {
+      color: rgba(212, 165, 116, 0.4);
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #D4A574, #C9A875, #B8956A);
+      color: #000;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+    }
+    button:hover {
+      background: linear-gradient(135deg, #B8956A, #A88860, #967850);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(212, 165, 116, 0.5);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(212, 165, 116, 0.3);
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+    button.scan {
+      background: linear-gradient(135deg, #D4A574, #E8D4B8, #D4A574);
+      font-size: 15px;
+      padding: 16px;
+      animation: pulse 2s infinite;
+    }
+    button.scan:hover:not(:disabled) {
+      background: linear-gradient(135deg, #E8D4B8, #F5E6D3, #E8D4B8);
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3); }
+      50% { box-shadow: 0 4px 20px rgba(212, 165, 116, 0.6); }
+    }
+    #status {
+      margin-top: 16px;
+      padding: 14px;
+      background: linear-gradient(135deg, rgba(5, 10, 20, 0.95), rgba(10, 22, 40, 0.9));
+      border-radius: 8px;
+      border: 2px solid rgba(212, 165, 116, 0.3);
+      font-size: 11px;
+      max-height: 180px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7);
+    }
+    .status-line {
+      margin: 3px 0;
+      padding: 4px 6px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+    .success { 
+      color: #9ACD32;
+      font-weight: 600;
+    }
+    .error { 
+      color: #ff6b6b;
+      font-weight: 600;
+    }
+    .info { 
+      color: #D4A574;
+    }
+    .warning {
+      color: #FFA500;
+    }
+    .hidden { display: none; }
+    .scan-info {
+      font-size: 10px;
+      color: #B8956A;
+      text-align: center;
+      margin-top: 10px;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 6px;
+      line-height: 1.4;
+    }
+    .vendor-badge {
+      display: inline-block;
+      background: rgba(212, 165, 116, 0.2);
+      color: #D4A574;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      margin: 2px;
+      border: 1px solid rgba(212, 165, 116, 0.3);
+    }
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(212, 165, 116, 0.5);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(212, 165, 116, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎨 Canva Board Scanner</h1>
+    <div class="subtitle">Trade Vendor Product Importer</div>
+  </div>
+  
+  <div class="container">
+    <div class="section">
+      <label>📋 Project ID:</label>
+      <input type="text" id="projectId" placeholder="Enter your project ID">
+      
+      <label>🏠 Select Room:</label>
+      <select id="roomSelect">
+        <option value="">-- Load project first --</option>
+      </select>
+      
+      <button id="loadBtn">Load Project</button>
+    </div>
+
+    <div class="section">
+      <button id="scanBtn" class="scan" disabled>
+        🔍 Scan Canva Board for Products
+      </button>
+      <div class="scan-info">
+        <strong>Smart Detection:</strong> Finds product links from your trade vendors<br>
+        <div style="margin-top: 6px;">
+          <span class="vendor-badge">Bernhardt</span>
+          <span class="vendor-badge">Gabby</span>
+          <span class="vendor-badge">Visual Comfort</span>
+          <span class="vendor-badge">+ more</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="status" class="hidden"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
