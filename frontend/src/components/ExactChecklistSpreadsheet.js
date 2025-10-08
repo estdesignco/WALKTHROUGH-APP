@@ -1627,30 +1627,21 @@ const ExactChecklistSpreadsheet = ({
                                     )}
                                   </td>
                                   
-                                  {/* LINK WITH SCRAPE BUTTON */}
-                                  <td className="border border-[#B49B7E] px-1 py-1 text-[#D4C5A9] text-sm w-32">
-                                    <div className="flex flex-col gap-1">
-                                      <input 
-                                        type="text" 
-                                        value={item.link || item.link_url || ''}
-                                        placeholder="Product URL"
-                                        className="w-full bg-transparent text-blue-400 text-xs outline-none border border-gray-600 rounded px-1"
-                                        onChange={(e) => {
-                                          // Update item link immediately for scraping
-                                          item.link = e.target.value;
-                                          item.link_url = e.target.value;
-                                        }}
-                                        onBlur={(e) => console.log('Link updated:', e.target.value)}
-                                      />
-                                      <button
-                                        onClick={() => handleScrapeProduct(item.link || item.link_url, item.id)}
-                                        className="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded"
-                                        disabled={!item.link && !item.link_url}
-                                        title="Scrape product information from URL"
+                                  {/* PRODUCT LINK - CLICKABLE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-center w-24">
+                                    {item.link ? (
+                                      <a 
+                                        href={item.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded transition-colors duration-200"
+                                        title={`Open ${item.name} in new tab`}
                                       >
-                                        SCRAPE
-                                      </button>
-                                    </div>
+                                        🔗 VIEW
+                                      </a>
+                                    ) : (
+                                      <span className="text-gray-500 text-xs">No Link</span>
+                                    )}
                                   </td>
                                   
                                   {/* REMARKS - EDITABLE */}
