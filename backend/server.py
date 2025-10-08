@@ -1657,8 +1657,8 @@ async def get_project(project_id: str, sheet_type: str = None):
             category_data["subcategories"] = []
             
             for subcategory_data in subcategories:
-                # Fetch items
-                items = await db.items.find({"subcategory_id": subcategory_data["id"]}).to_list(1000)
+                # Fetch items - sorted by created_at DESCENDING (newest first)
+                items = await db.items.find({"subcategory_id": subcategory_data["id"]}).sort("created_at", -1).to_list(1000)
                 subcategory_data["items"] = [Item(**item) for item in items]
                 
             category_data["subcategories"] = [SubCategory(**subcat) for subcat in subcategories]
