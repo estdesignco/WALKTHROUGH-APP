@@ -8090,10 +8090,12 @@ async def process_pdf_import(
                     )
                     
                     if scrape_res.status_code == 200:
-                        product_data = scrape_res.json()
+                        response = scrape_res.json()
                         
-                        # Check if scraping actually succeeded
-                        if product_data.get("success") or product_data.get("name"):
+                        # Check if scraping succeeded and extract data
+                        if response.get("success") and response.get("data"):
+                            product_data = response["data"]
+                            
                             # Add to checklist
                             await db.items.insert_one({
                                 "id": str(uuid.uuid4()),
@@ -8115,7 +8117,7 @@ async def process_pdf_import(
                             logging.info(f"✅ PDF Import: Successfully scraped {link}")
                         else:
                             failed += 1
-                            error_msg = product_data.get("error", "Unknown error")
+                            error_msg = response.get("error", "Scrape returned no data")
                             errors.append(f"{link}: {error_msg}")
                             logging.warning(f"⚠️ PDF Import: Scrape returned no data for {link}")
                     else:
