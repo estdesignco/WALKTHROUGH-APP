@@ -8092,31 +8092,45 @@ async def process_pdf_import(
                     if scrape_res.status_code == 200:
                         product_data = scrape_res.json()
                         
-                        # Add to checklist
-                        await db.items.insert_one({
-                            "id": str(uuid.uuid4()),
-                            "subcategory_id": subcategory_id,
-                            "name": product_data.get("name", "Unknown Product"),
-                            "vendor": product_data.get("vendor", ""),
-                            "cost": product_data.get("cost", 0),
-                            "link": product_data.get("link", link),
-                            "sku": product_data.get("sku", ""),
-                            "image_url": product_data.get("image_url", ""),
-                            "status": "",
-                            "quantity": 1,
-                            "photos": [],
-                            "created_at": datetime.utcnow(),
-                            "updated_at": datetime.utcnow()
-                        })
-                        
-                        imported += 1
+                        # Check if scraping actually succeeded
+                        if product_data.get("success") or product_data.get("name"):
+                            # Add to checklist
+                            await db.items.insert_one({
+                                "id": str(uuid.uuid4()),
+                                "subcategory_id": subcategory_id,
+                                "name": product_data.get("name", "Unknown Product"),
+                                "vendor": product_data.get("vendor", ""),
+                                "cost": product_data.get("cost", 0),
+                                "link": product_data.get("link", link),
+                                "sku": product_data.get("sku", ""),
+                                "image_url": product_data.get("image_url", ""),
+                                "status": "",
+                                "quantity": 1,
+                                "photos": [],
+                                "created_at": datetime.utcnow(),
+                                "updated_at": datetime.utcnow()
+                            })
+                            
+                            imported += 1
+                            logging.info(f"✅ PDF Import: Successfully scraped {link}")
+                        else:
+                            failed += 1
+                            error_msg = product_data.get("error", "Unknown error")
+                            errors.append(f"{link}: {error_msg}")
+                            logging.warning(f"⚠️ PDF Import: Scrape returned no data for {link}")
                     else:
                         failed += 1
-                        errors.append(f"{link}: Scrape failed (HTTP {scrape_res.status_code})")
+                        try:
+                            error_detail = scrape_res.json().get("detail", scrape_res.text[:100])
+                        except:
+                            error_detail = scrape_res.text[:100] if scrape_res.text else "Unknown error"
+                        errors.append(f"{link}: HTTP {scrape_res.status_code} - {error_detail}")
+                        logging.error(f"❌ PDF Import: Scrape failed for {link} (HTTP {scrape_res.status_code})")
                         
             except Exception as e:
                 failed += 1
                 errors.append(f"{link}: {str(e)}")
+                logging.error(f"❌ PDF Import: Exception scraping {link}: {str(e)}")
             
             # Update progress
             await db.pdf_import_jobs.update_one(
