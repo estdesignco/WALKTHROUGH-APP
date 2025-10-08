@@ -8081,9 +8081,9 @@ async def process_pdf_import(
         
         for link in product_links:
             try:
-                # Scrape product
+                # Scrape product with extended timeout (scraping uses Playwright/browser automation)
                 import httpx
-                async with httpx.AsyncClient(timeout=30.0) as client:
+                async with httpx.AsyncClient(timeout=300.0) as client:  # 5 minutes per product
                     scrape_res = await client.post(
                         f"http://localhost:8001/api/scrape-product",
                         json={"url": link, "auto_clip_to_houzz": True}
