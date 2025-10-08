@@ -8080,34 +8080,35 @@ async def process_pdf_import(
                 'window': ['curtain', 'drape', 'blind', 'shade', 'window treatment']
             }
             
-            # First, check for portable vs installed lighting
+            # First, check for portable vs installed lighting ONLY if it's actually a light
             is_portable_light = any(keyword in name_lower for keyword in subcategory_keywords['portable'])
             is_installed_light = any(keyword in name_lower for keyword in subcategory_keywords['installed'])
             
-            # Find lighting category
-            for cat in categories_list:
-                cat_name = cat['name'].lower()
-                
-                if 'lighting' in cat_name or 'light' in cat_name:
-                    # Get all subcategories for lighting
-                    subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+            # ONLY process lighting if we found lighting keywords
+            if is_portable_light or is_installed_light:
+                for cat in categories_list:
+                    cat_name = cat['name'].lower()
                     
-                    for subcat in subcats:
-                        subcat_name = subcat['name'].lower()
+                    if 'lighting' in cat_name or 'light' in cat_name:
+                        # Get all subcategories for lighting
+                        subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
                         
-                        # Check for portable
-                        if is_portable_light and ('portable' in subcat_name or 'lamp' in subcat_name):
-                            logging.info(f"🔍 Matched '{product_name}' -> PORTABLE lighting")
-                            return cat, subcat['id']
+                        for subcat in subcats:
+                            subcat_name = subcat['name'].lower()
+                            
+                            # Check for portable
+                            if is_portable_light and ('portable' in subcat_name or 'lamp' in subcat_name):
+                                logging.info(f"🔍 Matched '{product_name}' -> PORTABLE lighting")
+                                return cat, subcat['id']
+                            
+                            # Check for installed
+                            if is_installed_light and ('installed' in subcat_name or 'install' in subcat_name or 'fixed' in subcat_name):
+                                logging.info(f"🔍 Matched '{product_name}' -> INSTALLED lighting")
+                                return cat, subcat['id']
                         
-                        # Check for installed
-                        if is_installed_light and ('installed' in subcat_name or 'install' in subcat_name or 'fixed' in subcat_name):
-                            logging.info(f"🔍 Matched '{product_name}' -> INSTALLED lighting")
-                            return cat, subcat['id']
-                    
-                    # If lighting but no subcategory match, use first lighting subcategory
-                    if subcats:
-                        return cat, subcats[0]['id']
+                        # If lighting keywords found but no subcategory match, use first lighting subcategory
+                        if subcats:
+                            return cat, subcats[0]['id']
             
             # Check other categories
             for cat in categories_list:
