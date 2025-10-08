@@ -1568,6 +1568,7 @@ const ExactChecklistSpreadsheet = ({
                                         className="w-12 h-12 object-cover cursor-pointer hover:scale-150 transition-transform duration-200 z-10"
                                         onClick={(e) => {
                                           e.stopPropagation();
+                                          console.log('🖼️ Opening LARGE image popup - 98vw x 95vh');
                                           // Create full-size overlay with better styling
                                           const overlay = document.createElement('div');
                                           overlay.style.cssText = `
