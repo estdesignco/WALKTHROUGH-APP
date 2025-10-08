@@ -1520,6 +1520,18 @@ const ExactChecklistSpreadsheet = ({
                                     </div>
                                   </td>
                                   
+                                  {/* COST - EDITABLE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                      onBlur={(e) => console.log('Cost updated:', e.target.textContent)}
+                                    >
+                                      ${item.cost || 0}
+                                    </div>
+                                  </td>
+                                  
                                   {/* STATUS - DROPDOWN WITH FORCED COLORED CELL */}
                                   <td 
                                     className="border border-[#B49B7E] px-1 py-1 text-[#D4C5A9] text-sm"
