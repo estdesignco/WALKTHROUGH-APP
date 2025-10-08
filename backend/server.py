@@ -8131,12 +8131,24 @@ async def process_pdf_import(
                         # Check if scraping succeeded and extract data
                         if response.get("success") and response.get("data"):
                             product_data = response["data"]
+                            product_name = product_data.get("name", "Unknown Product")
+                            
+                            # Smart categorization based on product name
+                            best_category = find_best_subcategory(product_name, categories)
+                            
+                            # Get subcategory for the matched category
+                            target_subcategory_id = default_subcategory_id  # fallback
+                            if best_category:
+                                subcats = await db.subcategories.find({"category_id": best_category["id"]}).to_list(None)
+                                if subcats:
+                                    target_subcategory_id = subcats[0]["id"]
+                                    logging.info(f"📂 Categorized '{product_name}' -> {best_category['name']}")
                             
                             # Add to checklist
                             await db.items.insert_one({
                                 "id": str(uuid.uuid4()),
-                                "subcategory_id": subcategory_id,
-                                "name": product_data.get("name", "Unknown Product"),
+                                "subcategory_id": target_subcategory_id,
+                                "name": product_name,
                                 "vendor": product_data.get("vendor", ""),
                                 "cost": product_data.get("cost", 0),
                                 "link": product_data.get("link", link),
