@@ -8131,8 +8131,11 @@ async def process_pdf_import(
                         
             except Exception as e:
                 failed += 1
-                errors.append(f"{link}: {str(e)}")
-                logging.error(f"❌ PDF Import: Exception scraping {link}: {str(e)}")
+                import traceback
+                error_detail = f"{type(e).__name__}: {str(e)}" if str(e) else f"{type(e).__name__} (no message)"
+                errors.append(f"{link}: {error_detail}")
+                logging.error(f"❌ PDF Import: Exception scraping {link}: {error_detail}")
+                logging.error(f"Traceback: {traceback.format_exc()}")
             
             # Update progress
             await db.pdf_import_jobs.update_one(
