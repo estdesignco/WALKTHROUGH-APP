@@ -8105,6 +8105,8 @@ async def process_pdf_import(
                                 "cost": product_data.get("cost", 0),
                                 "link": product_data.get("link", link),
                                 "sku": product_data.get("sku", ""),
+                                "size": product_data.get("size", ""),
+                                "finish_color": product_data.get("finish_color", ""),
                                 "image_url": product_data.get("image_url", ""),
                                 "status": "",
                                 "quantity": 1,
