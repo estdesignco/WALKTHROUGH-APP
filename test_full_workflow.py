@@ -11,7 +11,7 @@ import traceback
 async def test_full_add_item_workflow():
     """Test the complete add item workflow"""
     
-    base_url = "https://designhub-63.preview.emergentagent.com/api"
+    base_url = "https://design-import-tool-1.preview.emergentagent.com/api"
     
     try:
         timeout = aiohttp.ClientTimeout(total=180)  # 3 minutes for full workflow

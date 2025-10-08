@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from frontend env
-BACKEND_URL = "https://designhub-63.preview.emergentagent.com"
+BACKEND_URL = "https://design-import-tool-1.preview.emergentagent.com"
 
 def print_header(title):
     print(f"\n{'='*60}")

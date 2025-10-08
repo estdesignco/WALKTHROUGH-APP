@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://designhub-63.preview.emergentagent.com
-API_URL=https://designhub-63.preview.emergentagent.com/api
+BACKEND_URL=https://design-import-tool-1.preview.emergentagent.com
+API_URL=https://design-import-tool-1.preview.emergentagent.com/api
 ```
 
 ### App Configuration

@@ -176,6 +176,6 @@ print(f"✅ {success}/5 products imported")
 print(f"   - Data from Excel ✓")
 print(f"   - Links to Four Hands ✓")
 print(f"   - Images from Perigold ✓")
-print(f"\nView: https://designhub-63.preview.emergentagent.com/furniture-search\n")
+print(f"\nView: https://design-import-tool-1.preview.emergentagent.com/furniture-search\n")
 
 client.close()
