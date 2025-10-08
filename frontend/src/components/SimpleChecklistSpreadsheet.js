@@ -222,14 +222,72 @@ const SimpleChecklistSpreadsheet = ({
                             />
                           </td>
                           
-                          {/* Image */}
+                          {/* Image - Clickable for full size */}
                           <td className="border border-gray-400 px-2 py-2 text-center">
                             {item.image_url ? (
                               <img 
                                 src={item.image_url} 
                                 alt={item.name} 
-                                className="w-12 h-12 object-cover rounded"
+                                className="w-12 h-12 object-cover rounded cursor-pointer hover:scale-110 transition-transform duration-200"
                                 onError={(e) => { e.target.style.display = 'none'; }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // Create full-size overlay
+                                  const overlay = document.createElement('div');
+                                  overlay.style.cssText = `
+                                    position: fixed;
+                                    top: 0;
+                                    left: 0;
+                                    width: 100%;
+                                    height: 100%;
+                                    background: rgba(0, 0, 0, 0.9);
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    z-index: 9999;
+                                    cursor: pointer;
+                                  `;
+                                  
+                                  const container = document.createElement('div');
+                                  container.style.cssText = `
+                                    max-width: 90vw;
+                                    max-height: 90vh;
+                                    padding: 20px;
+                                    text-align: center;
+                                  `;
+                                  
+                                  const img = document.createElement('img');
+                                  img.src = item.image_url;
+                                  img.alt = item.name;
+                                  img.style.cssText = `
+                                    max-width: 100%;
+                                    max-height: 85vh;
+                                    width: auto;
+                                    height: auto;
+                                    object-fit: contain;
+                                    border-radius: 8px;
+                                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+                                  `;
+                                  
+                                  const title = document.createElement('p');
+                                  title.textContent = item.name;
+                                  title.style.cssText = `
+                                    color: white;
+                                    margin-top: 15px;
+                                    font-size: 18px;
+                                    font-weight: bold;
+                                  `;
+                                  
+                                  container.appendChild(img);
+                                  container.appendChild(title);
+                                  overlay.appendChild(container);
+                                  
+                                  overlay.addEventListener('click', () => {
+                                    document.body.removeChild(overlay);
+                                  });
+                                  
+                                  document.body.appendChild(overlay);
+                                }}
                               />
                             ) : (
                               <div className="w-12 h-12 bg-gray-600 rounded flex items-center justify-center text-xs text-[#D4C5A9]">No Img</div>
