@@ -8056,40 +8056,83 @@ async def process_pdf_import(
         categories = await db.categories.find({"room_id": room_id}).to_list(None)
         
         # Helper function to find best subcategory based on product name
-        def find_best_subcategory(product_name, categories_list):
-            """Smart categorization based on product keywords"""
+        async def find_best_subcategory_smart(product_name, categories_list):
+            """Smart categorization based on product keywords - handles subcategories"""
             name_lower = product_name.lower()
             
-            # Category keywords mapping
-            category_keywords = {
-                'lighting': ['lamp', 'light', 'sconce', 'chandelier', 'fixture', 'pendant', 'ceiling fan', 'fan'],
-                'furniture': ['table', 'chair', 'sofa', 'console', 'cabinet', 'desk', 'bench', 'ottoman', 'bed', 'dresser', 'nightstand'],
-                'art': ['art', 'painting', 'print', 'frame', 'sculpture', 'wall decor'],
-                'accessories': ['vase', 'bowl', 'decor', 'accessory', 'statue', 'figurine', 'tray', 'book'],
+            # Subcategory-specific keywords
+            subcategory_keywords = {
+                # Lighting subcategories
+                'portable': ['table lamp', 'floor lamp', 'desk lamp', 'lamp'],
+                'installed': ['sconce', 'chandelier', 'pendant', 'ceiling', 'ceiling fan', 'fan', 'wall light', 'recessed', 'track light'],
+                
+                # Furniture keywords
+                'furniture': ['table', 'chair', 'sofa', 'console', 'cabinet', 'desk', 'bench', 'ottoman', 'bed', 'dresser', 'nightstand', 'media console', 'coffee table', 'end table', 'side table'],
+                
+                # Art & Accessories
+                'art': ['art', 'painting', 'print', 'frame', 'sculpture', 'wall decor', 'artwork'],
+                'accessories': ['vase', 'bowl', 'decor', 'statue', 'figurine', 'tray', 'book', 'knot'],
+                
+                # Textiles
                 'textiles': ['rug', 'pillow', 'throw', 'blanket', 'cushion', 'textile', 'fabric'],
+                
+                # Window treatments
                 'window': ['curtain', 'drape', 'blind', 'shade', 'window treatment']
             }
             
-            # Find matching category
-            best_match = None
+            # First, check for portable vs installed lighting
+            is_portable_light = any(keyword in name_lower for keyword in subcategory_keywords['portable'])
+            is_installed_light = any(keyword in name_lower for keyword in subcategory_keywords['installed'])
+            
+            # Find lighting category
             for cat in categories_list:
                 cat_name = cat['name'].lower()
                 
-                # Check if product name contains category keywords
-                for keyword_type, keywords in category_keywords.items():
-                    if any(keyword in name_lower for keyword in keywords):
-                        if keyword_type in cat_name or any(k in cat_name for k in keywords):
-                            best_match = cat
-                            break
+                if 'lighting' in cat_name or 'light' in cat_name:
+                    # Get all subcategories for lighting
+                    subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                    
+                    for subcat in subcats:
+                        subcat_name = subcat['name'].lower()
+                        
+                        # Check for portable
+                        if is_portable_light and ('portable' in subcat_name or 'lamp' in subcat_name):
+                            logging.info(f"🔍 Matched '{product_name}' -> PORTABLE lighting")
+                            return cat, subcat['id']
+                        
+                        # Check for installed
+                        if is_installed_light and ('installed' in subcat_name or 'install' in subcat_name or 'fixed' in subcat_name):
+                            logging.info(f"🔍 Matched '{product_name}' -> INSTALLED lighting")
+                            return cat, subcat['id']
+                    
+                    # If lighting but no subcategory match, use first lighting subcategory
+                    if subcats:
+                        return cat, subcats[0]['id']
+            
+            # Check other categories
+            for cat in categories_list:
+                cat_name = cat['name'].lower()
                 
-                if best_match:
-                    break
+                # Check each keyword type
+                for keyword_type, keywords in subcategory_keywords.items():
+                    if keyword_type in ['portable', 'installed']:
+                        continue  # Already handled above
+                    
+                    if any(keyword in name_lower for keyword in keywords):
+                        # Check if category name matches
+                        if keyword_type in cat_name or any(k in cat_name for k in keywords):
+                            subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                            if subcats:
+                                logging.info(f"🔍 Matched '{product_name}' -> {cat['name']}")
+                                return cat, subcats[0]['id']
             
-            # If no match found, use first category as fallback
-            if not best_match and categories_list:
-                best_match = categories_list[0]
+            # Fallback: return first category with subcategories
+            for cat in categories_list:
+                subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                if subcats:
+                    return cat, subcats[0]['id']
             
-            return best_match
+            return None, None
         
         # Get default subcategory (fallback)
         default_subcategory_id = None
