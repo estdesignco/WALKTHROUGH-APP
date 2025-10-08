@@ -250,9 +250,9 @@ const SimpleChecklistSpreadsheet = ({
                                   
                                   const container = document.createElement('div');
                                   container.style.cssText = `
-                                    max-width: 90vw;
-                                    max-height: 90vh;
-                                    padding: 20px;
+                                    max-width: 95vw;
+                                    max-height: 95vh;
+                                    padding: 15px;
                                     text-align: center;
                                   `;
                                   
@@ -260,8 +260,8 @@ const SimpleChecklistSpreadsheet = ({
                                   img.src = item.image_url;
                                   img.alt = item.name;
                                   img.style.cssText = `
-                                    max-width: 100%;
-                                    max-height: 85vh;
+                                    max-width: 95vw;
+                                    max-height: 92vh;
                                     width: auto;
                                     height: auto;
                                     object-fit: contain;
