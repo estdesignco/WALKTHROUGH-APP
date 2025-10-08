@@ -8110,22 +8110,53 @@ async def process_pdf_import(
                         if subcats:
                             return cat, subcats[0]['id']
             
-            # Check other categories
-            for cat in categories_list:
-                cat_name = cat['name'].lower()
-                
-                # Check each keyword type
-                for keyword_type, keywords in subcategory_keywords.items():
-                    if keyword_type in ['portable', 'installed']:
-                        continue  # Already handled above
-                    
-                    if any(keyword in name_lower for keyword in keywords):
-                        # Check if category name matches
-                        if keyword_type in cat_name or any(k in cat_name for k in keywords):
-                            subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
-                            if subcats:
-                                logging.info(f"🔍 Matched '{product_name}' -> {cat['name']}")
-                                return cat, subcats[0]['id']
+            # Check for Furniture
+            if any(keyword in name_lower for keyword in subcategory_keywords['furniture']):
+                for cat in categories_list:
+                    if 'furniture' in cat['name'].lower():
+                        subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                        if subcats:
+                            logging.info(f"🔍 Matched '{product_name}' -> Furniture")
+                            return cat, subcats[0]['id']
+            
+            # Check for Textiles
+            if any(keyword in name_lower for keyword in subcategory_keywords['textiles']):
+                for cat in categories_list:
+                    cat_name_lower = cat['name'].lower()
+                    if 'textile' in cat_name_lower or 'soft goods' in cat_name_lower:
+                        subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                        if subcats:
+                            logging.info(f"🔍 Matched '{product_name}' -> Textiles")
+                            return cat, subcats[0]['id']
+            
+            # Check for Art & Accessories
+            if any(keyword in name_lower for keyword in subcategory_keywords['art']):
+                for cat in categories_list:
+                    cat_name_lower = cat['name'].lower()
+                    if 'art' in cat_name_lower or 'accessories' in cat_name_lower:
+                        subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                        if subcats:
+                            logging.info(f"🔍 Matched '{product_name}' -> Art")
+                            return cat, subcats[0]['id']
+            
+            # Check for Accessories (vases, bowls, etc)
+            if any(keyword in name_lower for keyword in subcategory_keywords['accessories']):
+                for cat in categories_list:
+                    cat_name_lower = cat['name'].lower()
+                    if 'art' in cat_name_lower or 'accessories' in cat_name_lower or 'decor' in cat_name_lower:
+                        subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                        if subcats:
+                            logging.info(f"🔍 Matched '{product_name}' -> Accessories")
+                            return cat, subcats[0]['id']
+            
+            # Check for Window Treatments
+            if any(keyword in name_lower for keyword in subcategory_keywords['window']):
+                for cat in categories_list:
+                    if 'window' in cat['name'].lower():
+                        subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                        if subcats:
+                            logging.info(f"🔍 Matched '{product_name}' -> Window Treatments")
+                            return cat, subcats[0]['id']
             
             # Fallback: return first category with subcategories
             for cat in categories_list:
