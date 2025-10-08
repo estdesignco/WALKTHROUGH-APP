@@ -46,6 +46,37 @@ app = FastAPI(title="Interior Design Management System", version="1.0.0")
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Helper function to serialize MongoDB documents
+def serialize_doc(doc: Any) -> Any:
+    """Convert MongoDB document to JSON-safe format."""
+    if doc is None:
+        return None
+    
+    if isinstance(doc, list):
+        return [serialize_doc(item) for item in doc]
+    
+    if isinstance(doc, dict):
+        result = {}
+        for key, value in doc.items():
+            # Skip MongoDB _id field
+            if key == "_id":
+                continue
+            # Convert datetime to ISO string
+            if isinstance(value, datetime):
+                result[key] = value.isoformat()
+            # Recursively serialize nested dicts/lists
+            elif isinstance(value, (dict, list)):
+                result[key] = serialize_doc(value)
+            else:
+                result[key] = value
+        return result
+    
+    # Convert datetime objects
+    if isinstance(doc, datetime):
+        return doc.isoformat()
+    
+    return doc
+
 # Room color constants - MORE MUTED
 ROOM_COLORS = {
     "living room": "#7A5A8A",        # Muted purple
