@@ -245,6 +245,12 @@ const SimpleChecklistSpreadsheet = ({
                           {/* SKU */}
                           <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">{item.sku}</td>
                           
+                          {/* Size */}
+                          <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">{item.size || '-'}</td>
+                          
+                          {/* Finish/Color */}
+                          <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">{item.finish_color || '-'}</td>
+                          
                           {/* Cost */}
                           <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm">{item.cost}</td>
                           
