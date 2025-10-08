@@ -8055,15 +8055,51 @@ async def process_pdf_import(
         # Get room structure for categorization
         categories = await db.categories.find({"room_id": room_id}).to_list(None)
         
-        # Find first available subcategory
-        subcategory_id = None
+        # Helper function to find best subcategory based on product name
+        def find_best_subcategory(product_name, categories_list):
+            """Smart categorization based on product keywords"""
+            name_lower = product_name.lower()
+            
+            # Category keywords mapping
+            category_keywords = {
+                'lighting': ['lamp', 'light', 'sconce', 'chandelier', 'fixture', 'pendant', 'ceiling fan', 'fan'],
+                'furniture': ['table', 'chair', 'sofa', 'console', 'cabinet', 'desk', 'bench', 'ottoman', 'bed', 'dresser', 'nightstand'],
+                'art': ['art', 'painting', 'print', 'frame', 'sculpture', 'wall decor'],
+                'accessories': ['vase', 'bowl', 'decor', 'accessory', 'statue', 'figurine', 'tray', 'book'],
+                'textiles': ['rug', 'pillow', 'throw', 'blanket', 'cushion', 'textile', 'fabric'],
+                'window': ['curtain', 'drape', 'blind', 'shade', 'window treatment']
+            }
+            
+            # Find matching category
+            best_match = None
+            for cat in categories_list:
+                cat_name = cat['name'].lower()
+                
+                # Check if product name contains category keywords
+                for keyword_type, keywords in category_keywords.items():
+                    if any(keyword in name_lower for keyword in keywords):
+                        if keyword_type in cat_name or any(k in cat_name for k in keywords):
+                            best_match = cat
+                            break
+                
+                if best_match:
+                    break
+            
+            # If no match found, use first category as fallback
+            if not best_match and categories_list:
+                best_match = categories_list[0]
+            
+            return best_match
+        
+        # Get default subcategory (fallback)
+        default_subcategory_id = None
         for category in categories:
             subcategories = await db.subcategories.find({"category_id": category["id"]}).to_list(None)
             if subcategories:
-                subcategory_id = subcategories[0]["id"]
+                default_subcategory_id = subcategories[0]["id"]
                 break
         
-        if not subcategory_id:
+        if not default_subcategory_id:
             await db.pdf_import_jobs.update_one(
                 {"id": job_id},
                 {"$set": {
