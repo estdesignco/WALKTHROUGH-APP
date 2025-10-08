@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Canva Submission Package</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #D4A574;
+            border-radius: 16px;
+            padding: 48px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            color: #D4A574;
+            font-size: 32px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        p {
+            color: #D4C5A9;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .download-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #D4A574 0%, #B8935C 100%);
+            color: #0f172a;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 165, 116, 0.3);
+        }
+        
+        .info-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+        
+        .info-box h3 {
+            color: #D4A574;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .info-box ul {
+            color: #D4C5A9;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-left: 20px;
+        }
+        
+        .info-box li {
+            margin-bottom: 8px;
+        }
+        
+        .file-size {
+            color: #94a3b8;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 12px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Canva Submission Package</h1>
+        <p>Everything you need to submit your Interior Design Management System integration to Canva Apps Marketplace</p>
+        
+        <a href="/CANVA_SUBMISSION_PACKAGE.zip" download class="download-btn">
+            ⬇️ Download Package (ZIP)
+        </a>
+        
+        <p class="file-size">File size: ~50-60 MB (includes all dependencies)</p>
+        
+        <div class="info-box">
+            <h3>📋 Package Contents:</h3>
+            <ul>
+                <li>✅ Complete Canva App (React + TypeScript)</li>
+                <li>✅ Chrome Extension (optional tool)</li>
+                <li>✅ README.md - Overview & checklist</li>
+                <li>✅ SUBMISSION_GUIDE.md - Step-by-step process</li>
+                <li>✅ TECHNICAL_DOCS.md - Full documentation</li>
+                <li>✅ All source code & configuration files</li>
+            </ul>
+        </div>
+        
+        <div class="info-box">
+            <h3>🚀 Next Steps:</h3>
+            <ul>
+                <li>1. Extract the ZIP file</li>
+                <li>2. Read README.md first</li>
+                <li>3. Follow SUBMISSION_GUIDE.md</li>
+                <li>4. Update backend URL in app.tsx</li>
+                <li>5. Build and test the app</li>
+                <li>6. Submit to Canva!</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
