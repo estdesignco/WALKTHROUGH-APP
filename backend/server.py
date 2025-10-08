@@ -7873,14 +7873,15 @@ async def process_batch_categorization(job_id: str, item_ids: List[str]):
 
 @api_router.post("/import/pdf-links")
 async def import_from_pdf(
-    file: UploadFile,
-    project_id: str,
-    room_id: str,
-    background_tasks: BackgroundTasks
+    file: UploadFile = File(...),
+    project_id: str = Query(...),
+    room_id: str = Query(...),
+    background_tasks: BackgroundTasks = None
 ):
     """
     Extract product links from PDF (Canva export) and import to checklist.
     PDF must contain clickable links.
+    Accepts project_id and room_id as query parameters.
     """
     try:
         # Validate file type
