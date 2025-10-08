@@ -1460,6 +1460,30 @@ const ExactChecklistSpreadsheet = ({
                                           </div>
                                         </td>
                                   
+                                  {/* VENDOR - EDITABLE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                      onBlur={(e) => console.log('Vendor updated:', e.target.textContent)}
+                                    >
+                                      {item.vendor || ''}
+                                    </div>
+                                  </td>
+                                  
+                                  {/* SKU - EDITABLE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                      onBlur={(e) => console.log('SKU updated:', e.target.textContent)}
+                                    >
+                                      {item.sku || ''}
+                                    </div>
+                                  </td>
+                                  
                                   {/* QTY - EDITABLE */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm text-center">
                                     <div 
