@@ -191,7 +191,7 @@ const SimpleChecklistSpreadsheet = ({
                   <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#4A5568' }}>FINISH/COLOR</th>
                   <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#2D3748' }}>COST</th>
                   <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#4A5568' }}>STATUS</th>
-                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#2D3748' }}>SCRAPE</th>
+                  <th className="border border-gray-400 px-2 py-2 text-xs font-bold text-[#D4C5A9]" style={{ backgroundColor: '#2D3748' }}>LINK</th>
                 </tr>
               </thead>
               <tbody>
