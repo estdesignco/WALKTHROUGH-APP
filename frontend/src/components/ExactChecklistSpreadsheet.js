@@ -1586,8 +1586,8 @@ const ExactChecklistSpreadsheet = ({
                                           
                                           const container = document.createElement('div');
                                           container.style.cssText = `
-                                            max-width: 80vw;
-                                            max-height: 80vh;
+                                            max-width: 90vw;
+                                            max-height: 90vh;
                                             padding: 20px;
                                             text-align: center;
                                           `;
@@ -1597,9 +1597,12 @@ const ExactChecklistSpreadsheet = ({
                                           img.alt = item.name;
                                           img.style.cssText = `
                                             max-width: 100%;
-                                            max-height: 100%;
+                                            max-height: 85vh;
+                                            width: auto;
+                                            height: auto;
                                             object-fit: contain;
                                             border-radius: 8px;
+                                            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
                                           `;
                                           
                                           const title = document.createElement('p');
