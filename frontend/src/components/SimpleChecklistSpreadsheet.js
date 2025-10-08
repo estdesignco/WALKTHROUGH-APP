@@ -268,19 +268,21 @@ const SimpleChecklistSpreadsheet = ({
                             </select>
                           </td>
                           
-                          {/* Scrape Button */}
+                          {/* Product Link - Clickable */}
                           <td className="border border-gray-400 px-2 py-2 text-center">
-                            <button
-                              onClick={() => handleScrapeProduct(item)}
-                              disabled={!item.url}
-                              className={`px-2 py-1 text-xs rounded ${
-                                item.url 
-                                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                              }`}
-                            >
-                              🔍
-                            </button>
+                            {item.link ? (
+                              <a 
+                                href={item.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded transition-colors duration-200"
+                                title={`Open ${item.name} in new tab`}
+                              >
+                                🔗 VIEW
+                              </a>
+                            ) : (
+                              <span className="text-gray-500 text-xs">No Link</span>
+                            )}
                           </td>
                         </tr>
                       ))
