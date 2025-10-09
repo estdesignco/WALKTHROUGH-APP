@@ -299,8 +299,9 @@ export const App = () => {
               <div style={{ color: "#FCA5A5", fontSize: "14px", marginBottom: "12px" }}>
                 {fetchError}
               </div>
-              <div style={{ color: "#FCA5A5", fontSize: "12px", marginTop: "16px" }}>
+              <div style={{ color: "#FCA5A5", fontSize: "12px", marginTop: "16px", whiteSpace: 'pre-wrap' }}>
                 Backend: {BACKEND_URL}
+                {debugInfo && `\n\n${debugInfo}`}
               </div>
               <Button
                 variant="primary"
