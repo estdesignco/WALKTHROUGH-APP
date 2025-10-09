@@ -8105,6 +8105,270 @@ async def import_selected_items(
         logging.error(f"Selected items import error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+async def process_pdf_preview(
+    job_id: str,
+    pdf_content: bytes,
+    project_id: str,
+    room_id: str
+):
+    """Background task to extract and scrape items from PDF for preview (doesn't import)."""
+    try:
+        import PyPDF2
+        import io
+        import re
+        
+        await db.pdf_preview_jobs.update_one(
+            {"id": job_id},
+            {"$set": {"status": "processing", "updated_at": datetime.utcnow()}}
+        )
+        
+        # Extract links from PDF (same as import function)
+        pdf_file = io.BytesIO(pdf_content)
+        pdf_reader = PyPDF2.PdfReader(pdf_file)
+        
+        all_links = []
+        
+        # Method 1: Extract from annotations (clickable links)
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            
+            if '/Annots' in page:
+                annotations = page['/Annots']
+                for annotation in annotations:
+                    obj = annotation.get_object()
+                    if '/A' in obj and '/URI' in obj['/A']:
+                        uri = obj['/A']['/URI']
+                        if isinstance(uri, str):
+                            all_links.append(uri)
+        
+        # Method 2: Extract from page text (URLs in text)
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            text = page.extract_text()
+            
+            # Find URLs in text
+            url_pattern = r'https?://[^\s<>"\'\\)\\]]+[^\s<>"\'\\)\\].,;:]'
+            found_urls = re.findall(url_pattern, text)
+            all_links.extend(found_urls)
+        
+        # Remove duplicates
+        all_links = list(set(all_links))
+        
+        # Filter for product links
+        KNOWN_TRADE_VENDORS = [
+            'lounards.com', 'bernhardt.com', 'gabby.com', 'visualcomfort.com',
+            'lolahug.com', 'hvlgroup.com', 'globeviews.com', 'safavieh.com',
+            'surya.com', 'eichholtz.com', 'havefurniture.com'
+        ]
+        
+        RETAIL_BLACKLIST = [
+            'wayfair.com', 'crateandbarrel.com', 'westelm.com',
+            'potterybarn.com', 'amazon.com', 'target.com'
+        ]
+        
+        product_links = []
+        for link in all_links:
+            lower_link = link.lower()
+            
+            # Skip Canva links
+            if 'canva.com' in lower_link:
+                continue
+            
+            # Skip retail
+            if any(retail in lower_link for retail in RETAIL_BLACKLIST):
+                continue
+            
+            # Accept known vendors or product-like URLs
+            if any(vendor in lower_link for vendor in KNOWN_TRADE_VENDORS):
+                product_links.append(link)
+            elif any(pattern in lower_link for pattern in ['/product/', '/item/', '/furniture/', '/lighting/']):
+                product_links.append(link)
+        
+        total_links = len(product_links)
+        
+        await db.pdf_preview_jobs.update_one(
+            {"id": job_id},
+            {"$set": {"total_links": total_links, "updated_at": datetime.utcnow()}}
+        )
+        
+        if total_links == 0:
+            await db.pdf_preview_jobs.update_one(
+                {"id": job_id},
+                {"$set": {
+                    "status": "completed",
+                    "updated_at": datetime.utcnow(),
+                    "errors": [f"No product links found in PDF. Found {len(all_links)} total links but none matched trade vendors."]
+                }}
+            )
+            return
+        
+        # Get room structure for categorization
+        categories = await db.categories.find({"room_id": room_id}).to_list(None)
+        
+        # Helper function to find best subcategory (same as import function)
+        async def find_best_subcategory_smart(product_name, categories_list):
+            """Smart categorization based on product keywords - handles subcategories"""
+            name_lower = product_name.lower()
+            
+            # Subcategory-specific keywords
+            subcategory_keywords = {
+                'portable': ['table lamp', 'floor lamp', 'desk lamp', 'lamp'],
+                'installed': ['sconce', 'chandelier', 'pendant', 'ceiling', 'ceiling fan', 'fan', 'wall light', 'recessed', 'track light'],
+                'furniture': ['table', 'chair', 'sofa', 'console', 'cabinet', 'desk', 'bench', 'ottoman', 'bed', 'dresser', 'nightstand', 'media console', 'coffee table', 'end table', 'side table'],
+                'art': ['art', 'painting', 'print', 'frame', 'sculpture', 'wall decor', 'artwork'],
+                'accessories': ['vase', 'bowl', 'decor', 'statue', 'figurine', 'tray', 'book', 'knot'],
+                'textiles': ['rug', 'pillow', 'throw', 'blanket', 'cushion', 'textile', 'fabric'],
+                'window': ['curtain', 'drape', 'blind', 'shade', 'window treatment']
+            }
+            
+            # Check lighting
+            is_portable_light = any(keyword in name_lower for keyword in subcategory_keywords['portable'])
+            is_installed_light = any(keyword in name_lower for keyword in subcategory_keywords['installed'])
+            
+            if is_portable_light or is_installed_light:
+                for cat in categories_list:
+                    cat_name = cat['name'].lower()
+                    
+                    if 'lighting' in cat_name or 'light' in cat_name:
+                        subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                        
+                        for subcat in subcats:
+                            subcat_name = subcat['name'].lower()
+                            
+                            if is_portable_light and ('portable' in subcat_name or 'lamp' in subcat_name):
+                                return cat, subcat['id']
+                            
+                            if is_installed_light and ('installed' in subcat_name or 'install' in subcat_name or 'fixed' in subcat_name):
+                                return cat, subcat['id']
+                        
+                        if subcats:
+                            return cat, subcats[0]['id']
+            
+            # Check for Furniture
+            if any(keyword in name_lower for keyword in subcategory_keywords['furniture']):
+                for cat in categories_list:
+                    if 'furniture' in cat['name'].lower():
+                        subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                        if subcats:
+                            return cat, subcats[0]['id']
+            
+            # Fallback
+            for cat in categories_list:
+                subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                if subcats:
+                    return cat, subcats[0]['id']
+            
+            return None, None
+        
+        # Get default subcategory
+        default_subcategory_id = None
+        for category in categories:
+            subcategories = await db.subcategories.find({"category_id": category["id"]}).to_list(None)
+            if subcategories:
+                default_subcategory_id = subcategories[0]["id"]
+                break
+        
+        if not default_subcategory_id:
+            await db.pdf_preview_jobs.update_one(
+                {"id": job_id},
+                {"$set": {
+                    "status": "failed",
+                    "updated_at": datetime.utcnow(),
+                    "errors": ["No subcategory found in room"]
+                }}
+            )
+            return
+        
+        # Scrape each product
+        scraped_items = []
+        failed = 0
+        errors = []
+        
+        for link in product_links:
+            try:
+                # Scrape product
+                import httpx
+                async with httpx.AsyncClient(timeout=300.0) as client:
+                    scrape_res = await client.post(
+                        f"http://localhost:8001/api/scrape-product",
+                        json={"url": link, "auto_clip_to_houzz": True}
+                    )
+                    
+                    if scrape_res.status_code == 200:
+                        response = scrape_res.json()
+                        
+                        if response.get("success") and response.get("data"):
+                            product_data = response["data"]
+                            product_name = product_data.get("name", "Unknown Product")
+                            
+                            # Smart categorization
+                            best_category, target_subcategory_id = await find_best_subcategory_smart(product_name, categories)
+                            
+                            if not target_subcategory_id:
+                                target_subcategory_id = default_subcategory_id
+                            
+                            # Store scraped item data (don't import yet)
+                            item_preview = {
+                                "name": product_name,
+                                "vendor": product_data.get("vendor", ""),
+                                "cost": product_data.get("cost", 0),
+                                "link": product_data.get("link", link),
+                                "sku": product_data.get("sku", ""),
+                                "size": product_data.get("size", ""),
+                                "finish_color": product_data.get("finish_color", ""),
+                                "image_url": product_data.get("image_url", ""),
+                                "subcategory_id": target_subcategory_id,
+                                "category_name": best_category['name'] if best_category else "Default"
+                            }
+                            
+                            scraped_items.append(item_preview)
+                            logging.info(f"✅ PDF Preview: Scraped {link}")
+                        else:
+                            failed += 1
+                            error_msg = response.get("error", "Scrape returned no data")
+                            errors.append(f"{link}: {error_msg}")
+                    else:
+                        failed += 1
+                        errors.append(f"{link}: HTTP {scrape_res.status_code}")
+                        
+            except Exception as e:
+                failed += 1
+                errors.append(f"{link}: {type(e).__name__}: {str(e)}")
+            
+            # Update progress
+            await db.pdf_preview_jobs.update_one(
+                {"id": job_id},
+                {"$set": {
+                    "scraped_items": len(scraped_items),
+                    "failed_items": failed,
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+        
+        # Mark complete and store items
+        await db.pdf_preview_jobs.update_one(
+            {"id": job_id},
+            {"$set": {
+                "status": "completed",
+                "items": scraped_items,
+                "updated_at": datetime.utcnow(),
+                "errors": errors
+            }}
+        )
+        
+        logging.info(f"PDF preview {job_id} completed: {len(scraped_items)}/{total_links} successful")
+        
+    except Exception as e:
+        logging.error(f"PDF preview job {job_id} error: {str(e)}")
+        await db.pdf_preview_jobs.update_one(
+            {"id": job_id},
+            {"$set": {
+                "status": "failed",
+                "updated_at": datetime.utcnow(),
+                "errors": [str(e)]
+            }}
+        )
+
 async def process_pdf_import(
     job_id: str,
     pdf_content: bytes,
