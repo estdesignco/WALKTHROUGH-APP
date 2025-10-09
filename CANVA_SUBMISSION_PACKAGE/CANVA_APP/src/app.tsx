@@ -70,13 +70,25 @@ export const App = () => {
   // FETCH PROJECTS LIST on mount
   const [projects, setProjects] = React.useState<any[]>([]);
   const [fetchError, setFetchError] = React.useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = React.useState<string>('');
   
   React.useEffect(() => {
     // First, try to fetch projects list to test connectivity
     const testConnection = async () => {
       try {
         console.log('🔌 Testing backend connection:', BACKEND_URL);
-        const res = await fetch(`${BACKEND_URL}/api/projects`);
+        setDebugInfo('Attempting fetch to: ' + BACKEND_URL + '/api/projects');
+        
+        const res = await fetch(`${BACKEND_URL}/api/projects`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+          mode: 'cors', // Explicitly set CORS mode
+        });
+        
+        console.log('Response status:', res.status);
+        setDebugInfo(`Response received: ${res.status} ${res.statusText}`);
         
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}: ${res.statusText}`);
@@ -86,6 +98,7 @@ export const App = () => {
         console.log('✅ Backend connected! Projects:', data.length);
         setProjects(data);
         setFetchError(null);
+        setDebugInfo(`✅ Success! Found ${data.length} projects`);
         
         // Auto-load project if we have a saved ID
         if (projectId && !project && !loading) {
@@ -94,7 +107,10 @@ export const App = () => {
         }
       } catch (e: any) {
         console.error('❌ Backend connection failed:', e);
-        setFetchError(e.message || 'Failed to connect to backend');
+        const errorMsg = e.message || 'Failed to connect to backend';
+        const errorType = e.name || 'Unknown error';
+        setFetchError(`${errorType}: ${errorMsg}`);
+        setDebugInfo(`Error: ${errorType} - ${errorMsg}\n\nThis might be a CORS or CSP issue.`);
       }
     };
     
