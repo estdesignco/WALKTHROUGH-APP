@@ -67,12 +67,38 @@ export const App = () => {
     }
   }, [selectedRoom]);
 
-  // AUTO-LOAD PROJECT on mount if we have a saved projectId
+  // FETCH PROJECTS LIST on mount
+  const [projects, setProjects] = React.useState<any[]>([]);
+  const [fetchError, setFetchError] = React.useState<string | null>(null);
+  
   React.useEffect(() => {
-    if (projectId && !project && !loading) {
-      console.log('🔄 Auto-loading saved project:', projectId);
-      loadProject(projectId, roomId || undefined);
-    }
+    // First, try to fetch projects list to test connectivity
+    const testConnection = async () => {
+      try {
+        console.log('🔌 Testing backend connection:', BACKEND_URL);
+        const res = await fetch(`${BACKEND_URL}/api/projects`);
+        
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        
+        const data = await res.json();
+        console.log('✅ Backend connected! Projects:', data.length);
+        setProjects(data);
+        setFetchError(null);
+        
+        // Auto-load project if we have a saved ID
+        if (projectId && !project && !loading) {
+          console.log('🔄 Auto-loading saved project:', projectId);
+          loadProject(projectId, roomId || undefined);
+        }
+      } catch (e: any) {
+        console.error('❌ Backend connection failed:', e);
+        setFetchError(e.message || 'Failed to connect to backend');
+      }
+    };
+    
+    testConnection();
   }, []); // Only run on mount
 
   // BIDIRECTIONAL SYNC - Fetch only changed items every 5 seconds
