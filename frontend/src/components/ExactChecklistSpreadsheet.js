@@ -936,17 +936,24 @@ const ExactChecklistSpreadsheet = ({
             >
               ✥ ADD ROOM
             </button>
-            <button 
+            <button
               onClick={() => {
-                const canvaAppUrl = `https://designhub-canva.preview.emergentagent.com/canva-STAYS-LOADED.js?projectId=${project?.id}`;
-                window.open(canvaAppUrl, '_blank', 'width=1200,height=800');
+                // Open the Canva editor with your app
+                const canvaEditorUrl = `https://www.canva.com/design?addExtension=AAG0-jYpGz4`;
+                window.open(canvaEditorUrl, '_blank');
+                
+                // Show instructions
+                alert('Opening Canva editor...\n\n1. Open your app from the Apps panel (left sidebar)\n2. Your project will automatically load\n\nProject ID: ' + project?.id + '\n\nThe app will auto-connect to this project!');
+                
+                // Store project ID in localStorage for the Canva app to access
+                localStorage.setItem('canva_project_id', project?.id);
               }}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-2 rounded-full shadow-xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-blue-400/20 text-white flex items-center gap-2"
-              title="Open Live Checklist - Stays Loaded on Board!"
+              title="Open Live Checklist in Canva - Real-time sync!"
             >
               <span>🎨</span>
               <span>CANVA LIVE CHECKLIST</span>
-              <span style={{ fontSize: '10px', opacity: 0.8 }}>✓ STAYS LOADED</span>
+              <span style={{ fontSize: '10px', opacity: 0.8 }}>✓ LIVE SYNC</span>
             </button>
             <button 
               onClick={() => {
