@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://designhub-canva.preview.emergentagent.com/mobile-app
+Test it now: https://canva-checklist.preview.emergentagent.com/mobile-app

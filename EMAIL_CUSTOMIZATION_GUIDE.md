@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://designhub-canva.preview.emergentagent.com/email-template.html
+https://canva-checklist.preview.emergentagent.com/email-template.html
 
 ---
 

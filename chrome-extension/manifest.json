@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://designhub-canva.preview.emergentagent.com/*"
+    "https://canva-checklist.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

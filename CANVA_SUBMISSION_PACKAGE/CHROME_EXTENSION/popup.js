@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://designhub-canva.preview.emergentagent.com';
+const BACKEND_URL = 'https://canva-checklist.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

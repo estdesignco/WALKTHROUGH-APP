@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://designhub-canva.preview.emergentagent.com";
+const BACKEND_URL = "https://canva-checklist.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

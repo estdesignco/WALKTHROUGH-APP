@@ -99,7 +99,7 @@ const EmailTemplate = ({ clientName, projectName }) => {
                     {/* Call to Action Button */}
                     <div style={{ textAlign: 'center', marginBottom: '40px' }}>
                         <a 
-                            href="https://designhub-canva.preview.emergentagent.com/customer/questionnaire" 
+                            href="https://canva-checklist.preview.emergentagent.com/customer/questionnaire" 
                             style={{
                                 display: 'inline-block',
                                 background: 'linear-gradient(to right, #B49B7E, #A08B6F)',
