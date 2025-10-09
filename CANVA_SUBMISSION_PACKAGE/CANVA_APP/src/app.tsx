@@ -255,7 +255,7 @@ export const App = () => {
     );
   }
 
-  // NO PROJECT LOADED
+  // NO PROJECT LOADED - Show project selector
   if (!project) {
     return (
       <div style={{
@@ -267,20 +267,86 @@ export const App = () => {
           <div style={{ textAlign: "center", padding: "40px 20px" }}>
             <Title size="large">🎨 Canva Live Checklist</Title>
           </div>
-          <div style={{
-            background: "rgba(30, 41, 59, 0.9)",
-            padding: "30px",
-            borderRadius: "16px",
-            border: "2px solid #D4A574",
-            textAlign: "center"
-          }}>
-            <div style={{ color: "#D4A574", fontSize: "16px", marginBottom: "20px" }}>
-              To use this app, click the <strong>"CANVA LIVE CHECKLIST"</strong> button in your main Interior Design app.
+          
+          {/* CONNECTION STATUS */}
+          {fetchError ? (
+            <div style={{
+              background: "rgba(220, 38, 38, 0.1)",
+              padding: "30px",
+              borderRadius: "16px",
+              border: "2px solid #DC2626",
+              textAlign: "center"
+            }}>
+              <div style={{ color: "#EF4444", fontSize: "18px", fontWeight: "bold", marginBottom: "16px" }}>
+                ❌ Connection Failed
+              </div>
+              <div style={{ color: "#FCA5A5", fontSize: "14px", marginBottom: "12px" }}>
+                {fetchError}
+              </div>
+              <div style={{ color: "#FCA5A5", fontSize: "12px", marginTop: "16px" }}>
+                Backend: {BACKEND_URL}
+              </div>
+              <Button
+                variant="primary"
+                onClick={() => window.location.reload()}
+                stretch
+                style={{ marginTop: "20px" }}
+              >
+                🔄 Retry Connection
+              </Button>
             </div>
-            <div style={{ color: "#B49B7E", fontSize: "14px" }}>
-              It will automatically connect to your project and room.
+          ) : projects.length === 0 ? (
+            <div style={{
+              background: "rgba(30, 41, 59, 0.9)",
+              padding: "30px",
+              borderRadius: "16px",
+              border: "2px solid #D4A574",
+              textAlign: "center"
+            }}>
+              <LoadingIndicator size="large" />
+              <div style={{ color: "#D4A574", fontSize: "16px", marginTop: "20px" }}>
+                Connecting to backend...
+              </div>
             </div>
-          </div>
+          ) : (
+            <div style={{
+              background: "rgba(30, 41, 59, 0.9)",
+              padding: "30px",
+              borderRadius: "16px",
+              border: "2px solid #D4A574"
+            }}>
+              <div style={{ color: "#D4A574", fontSize: "18px", fontWeight: "bold", marginBottom: "20px", textAlign: "center" }}>
+                ✅ Connected! Select a project:
+              </div>
+              {projects.map((proj: any) => (
+                <div
+                  key={proj.id}
+                  onClick={() => {
+                    setProjectId(proj.id);
+                    loadProject(proj.id);
+                  }}
+                  style={{
+                    background: "#1e293b",
+                    padding: "16px",
+                    marginBottom: "12px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    border: "2px solid #D4A574",
+                    transition: "transform 0.2s"
+                  }}
+                  onMouseEnter={(e: any) => e.currentTarget.style.transform = "scale(1.02)"}
+                  onMouseLeave={(e: any) => e.currentTarget.style.transform = "scale(1)"}
+                >
+                  <div style={{ color: "#D4A574", fontSize: "16px", fontWeight: "bold" }}>
+                    {proj.name}
+                  </div>
+                  <div style={{ color: "#B49B7E", fontSize: "12px", marginTop: "4px" }}>
+                    {proj.rooms?.length || 0} rooms
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Rows>
       </div>
     );
