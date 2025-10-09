@@ -189,7 +189,11 @@ export const ChecklistPanel: React.FC<ChecklistPanelProps> = ({
                                 <div>
                                   <Button
                                     variant="tertiary"
-                                    onClick={() => window.open(item.link, '_blank')}
+                                    onClick={() => {
+                                      if (item.link) {
+                                        requestOpenExternalUrl({ url: item.link });
+                                      }
+                                    }}
                                   >
                                     🔗 View
                                   </Button>
