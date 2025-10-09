@@ -2,7 +2,7 @@ import { Button, Rows, Text, Title, LoadingIndicator } from "@canva/app-ui-kit";
 import { requestOpenExternalUrl } from "@canva/platform";
 import * as React from "react";
 
-const BACKEND = "https://design-import-tool-1.preview.emergentagent.com";
+const BACKEND = "https://designhub-canva.preview.emergentagent.com";
 const STATUSES = ['PICKED','ORDER SAMPLES','SAMPLES ARRIVED','ASK NEIL','ASK CHARLENE','ASK JALA','GET QUOTE','WAITING ON QT','READY FOR PRESENTATION'];
 
 export const App = () => {

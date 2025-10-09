@@ -1,18 +1,13 @@
 <analysis>
-The previous AI engineer diligently built several core features for the interior design application across multiple phases, directly addressing user requests. Key accomplishments include developing a functional Live Checklist Canva App with UI consistency and basic project/room navigation, implementing bidirectional synchronization, and adding image upload capabilities to Canva. A significant effort was also made to develop a Chrome Extension for scraping product links from Canva boards. However, the Chrome Extension consistently struggled with accurately identifying product links due to Canva's DOM structure and misidentification of trade vs. retail sites. The most recent focus has shifted to implementing a PDF import feature as an alternative to the struggling Chrome Extension, which itself hit a snag with MongoDB  serialization errors on the backend. The engineer is currently fixing this critical backend issue to ensure a stable product before further development.
+The previous AI engineer successfully developed core features for the interior design application. Initial work focused on a Live Checklist Canva App with UI, bidirectional synchronization, and image uploads. A Chrome Extension for scraping product links from Canva boards was also developed but proved unreliable. The engineer then shifted focus to a PDF import feature, which initially faced MongoDB  serialization errors (503 Service Unavailable) and subsequent  issues during product scraping. These backend problems were systematically resolved, leading to successful PDF import with smart categorization and item sorting. Frontend display issues, including missing columns and small image popups, were also addressed. The current phase involves getting the Live Sheet Canva App deployed and functional within Canva, which has been successfully deployed to Canva, but requires a backend URL update, which the user has requested the AI engineer to implement.
 </analysis>
 
 <product_requirements>
-The overarching goal is an advanced interior design application. Core features include customer questionnaires, a designer landing page, a contact sheet, and interactive spreadsheets for Walkthrough, Checklist (Curation), and FFE. Mobile app integration, offline capabilities, Leica D5 laser pointer integration, photo capture with annotations, and Microsoft Teams notifications are essential.
-
-Crucially, **Canva integration** is a primary requirement, encompassing:
-1.  **Live Checklist Canva App:** This in-editor app must display project checklist data (items, images, prices, links, status) organized by rooms and categories. It needs collapsing/expanding rooms, item check/uncheck (auto-setting Picked status), clickable product URLs, and image display. The app requires Auto-Detection to intelligently scrape product information from links/images within Canva designs, categorize it, and add it to the main checklist. Real-time bidirectional syncing and UI matching the main app's dark styling (black/blue gradient, gold/cream text) are critical. It must support room navigation, persist project/room IDs across views, and have a refresh mechanism.
-2.  **Chrome Extension:** Designed to scan Canva design boards for trade-specific product links and automatically import them into the main checklist with smart categorization, streamlining the sourcing process.
-3.  **PDF Import:** An alternative method to import product links from Canva boards by exporting the board as a PDF and uploading it to the application for scraping.
+The application's primary goal is to be an advanced interior design hub. It needs customer questionnaires, a designer landing page, contact management, and interactive spreadsheets (Walkthrough, Checklist, FFE) with mobile/offline capabilities, Leica D5 laser pointer integration, and Teams notifications. A crucial aspect is **Canva integration**, involving a **Live Checklist Canva App** for in-editor display and real-time bidirectional syncing of project data, items, images, prices, and links, styled to match the main app. This Canva app should support Auto-Detection for scraping product information directly. A **Chrome Extension** was also required for scraping product links from Canva design boards, and a **PDF Import** feature was introduced as an alternative to import links from exported Canva PDFs. The application must display key item details like name, vendor, SKU, size, color, cost, and a clickable link, with intelligent categorization and new items appearing at the top.
 </product_requirements>
 
 <key_technical_concepts>
--   **Backend:** FastAPI, MongoDB (), BeautifulSoup4 (for web scraping), , usage: pdfplumber [-h] [--structure | --structure-text]
+-   **Backend:** FastAPI, MongoDB (), BeautifulSoup4, , usage: pdfplumber [-h] [--structure | --structure-text]
                   [--format {csv,json,text}] [--types TYPES [TYPES ...]]
                   [--include-attrs INCLUDE_ATTRS [INCLUDE_ATTRS ...]]
                   [--exclude-attrs EXCLUDE_ATTRS [EXCLUDE_ATTRS ...]]
@@ -40,52 +35,59 @@ options:
   --laparams LAPARAMS
   --precision PRECISION
   --pages PAGES [PAGES ...]
-  --indent INDENT       Indent level for JSON pretty-printing. (for PDF parsing).
+  --indent INDENT       Indent level for JSON pretty-printing.,  (for HTTP requests), Playwright (for web scraping via a separate service, though not directly modified).
 -   **Frontend (Main App):** React.js, Tailwind CSS.
--   **Canva Integration:** Canva Apps SDK (React/TypeScript, ), Canva OAuth 2.0 (PKCE).
--   **Chrome Extension:** , ,  for DOM scanning and message passing.
--   **Data Persistence:** .
+-   **Canva Integration:** Canva Apps SDK (), Canva CLI, , webpack.
+-   **Data Persistence:** MongoDB.
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: The FastAPI backend, managing core API routes. It now includes:
-    -   : For bidirectional sync.
-    -   : For quick item status updates.
-    -   : For batch image uploads to Canva.
-    -   : For AI-powered product categorization.
-    -   : For generating Excel reports (currently problematic).
-    -   : For PDF link extraction and import.
-    -   **Changes**: Added new endpoints, updated existing ones to support  timestamps, and repeatedly fixed  serialization issues.
--   ****: Renders the main checklist.
-    -   **Changes**: Added GET CANVA SCANNER button, Upload to Canva button, and Import from PDF button.
--   ****: The core source for the Canva Live Checklist app.
-    -   **Changes**: Implemented bidirectional sync using polling, dark mode styling, project persistence via , graceful room selection, and a Clear Project button.
--   ****: Chrome extension for Canva board scraping.
-    -   ****: Defines extension permissions and scripts.
-        -   **Changes**: Updated version to  and added  permission.
-    -   ****: Injected into Canva pages for scanning.
-        -   **Changes**: Updated  list, improved scanning logic for images/links, added robust loading checks, and comprehensive debug logging.
-    -   ****: Handles popup UI and messaging with .
-        -   **Changes**: Added logic to manually inject  if not already present.
--   ****: Contains compiled Canva app versions and related assets (e.g.,  - the latest stable Canva app,  - latest Chrome Extension debug build,  - master deliverable).
--   ****: Contains Canva API integration logic.
-    -   **Changes**: The  method was leveraged for Phase 3.
--   ****: New file for keyboard shortcut integration.
+-   ****: The main FastAPI backend.
+    -   **Importance**: Handles core API logic, including project, item, and category management, PDF import processing, and product scraping.
+    -   **Changes Made**:
+        -   Added  helper to handle MongoDB  serialization errors.
+        -   Modified  to accept  and  as query parameters and improved error handling for scraping.
+        -   Increased  timeout for scraping to 5 minutes to prevent  issues.
+        -   Implemented  function for intelligent item categorization (Furniture, Lighting, Art & Accessories, Textiles) including Portable vs. Installed lighting.
+        -   Updated  to sort items by  in descending order.
+        -   Fixed Pydantic validation errors by patching  and  issues in imported product data.
+-   ****: Renders the primary checklist.
+    -   **Importance**: Central component for displaying and interacting with project items.
+    -   **Changes Made**:
+        -   Updated PDF upload to use  with query parameters.
+        -   Added  for hard refresh after PDF import.
+        -   Modified table headers and cells to display  combined, , , and a clickable .
+        -   Increased image popup size to 98vw x 95vh.
+-   ****: Another checklist component, possibly used for embedded views.
+    -   **Importance**: Provides a simplified checklist display.
+    -   **Changes Made**: Replaced 'SCRAPE' column with a clickable 'LINK' column and added the larger image popup functionality to product images.
+-   ****: A modal component for Canva integration.
+    -   **Importance**: Likely for managing specific Canva-related interactions.
+    -   **Changes Made**: Identified as calling a non-existent PDF extraction endpoint ().
+-   ****: A newly created directory for packaging the Canva App and Chrome Extension for submission and internal use.
+    -   **Importance**: Organizes all necessary files for deployment and documentation.
+    -   **Changes Made**: Created with  (containing  and ), , and various , , etc.
+-   ****: The main entry point for the Canva Live Checklist app.
+    -   **Importance**: Contains the logic for displaying the checklist within Canva and handling bidirectional sync.
+    -   **Changes Made**: Expected to be updated with the production backend URL () from the  file, replacing a  URL.
+-   ****: Environment variables for the Canva app.
+    -   **Importance**: Holds  and  for the Canva app to communicate with the backend.
+    -   **Changes Made**: Manually created/updated to include  (e.g., ) and  ().
 </code_architecture>
 
 <pending_tasks>
--   **Stabilize PDF Import Feature:** Resolve the persistent  occurring during PDF processing to ensure product links are extracted and imported correctly.
--   **Enhance Chrome Extension Scraping:** Although debug logging was added, the extension still fails to find trade vendor product links embedded in Canva designs. A more robust scraping mechanism specifically for Canva's internal data structures is needed.
--   **Implement Canva App Auto-Detection:** The Auto-Detection feature to intelligently scrape product information directly from within the Canva App via its SDK is not yet fully functional.
+-   **Configure Canva App Backend URL:** Update the  in  to the production URL.
+-   **Test Canva App Functionality:** Verify real-time sync, item display, and status updates within the Canva editor.
+-   **Submit Canva App for Review:** Complete the submission process to the Canva Apps Marketplace.
+-   **Implement Single Item Selection (Phase 2):** Add UI for extracted PDF links, allowing users to select items for import with a preview.
+-   **Further Chrome Extension Enhancement:** Although debugged, the extension still needs a more robust scraping mechanism for Canva's internal data structures.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer was actively troubleshooting a critical backend error related to the newly implemented PDF import functionality. The user had uploaded a PDF, but the backend responded with  and logs showed a . This issue, specifically concerning MongoDB's  not being JSON serializable, has been a recurring problem for the AI engineer.
-
-The AI engineer's last action was to modify  to fix this MongoDB ObjectId serialization error and then restart the backend server. The user's last question, is it fixed?, indicates that the current state is one of awaiting confirmation on this specific fix, and the system is in a state of flux with the backend having just been restarted. The PDF import feature, which was introduced as an alternative to the problematic Chrome Extension, is currently non-functional due to this error. The Chrome Extension itself, even with debugging, is still unable to correctly identify embedded product links on Canva boards.
+Immediately before this summary, the AI engineer was guiding the user through the process of deploying the Live Sheet Canva App (from ) to Canva. The user successfully created a new Apps SDK app () via the Canva CLI and built the provided app code. The app is now visible within the Canva editor, but it is not working (meaning it likely cannot connect to the backend or fetch data). The root cause is presumed to be the hardcoded  backend URL in  not being updated to the production URL. The AI engineer attempted to instruct the user to manually edit this file, but the user explicitly stated, i am NOT a code person. SO, you are gonna have to impliment code if that is what you are trying to get me to do! This indicates that the current task is for the AI engineer to programmatically make this code change.
 </current_work>
 
 <optional_next_step>
-Verify if the MongoDB  serialization fix in  has resolved the PDF import 503 error.
+Programmatically update the  in  to the production URL.
 </optional_next_step>

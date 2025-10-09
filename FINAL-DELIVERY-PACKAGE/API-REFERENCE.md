@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://design-import-tool-1.preview.emergentagent.com/api
+https://designhub-canva.preview.emergentagent.com/api
 ```
 
 ---

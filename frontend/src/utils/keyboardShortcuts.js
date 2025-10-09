@@ -33,7 +33,7 @@ export const initializeKeyboardShortcuts = () => {
       e.preventDefault();
       const projectId = getCurrentProjectId();
       if (projectId) {
-        const canvaUrl = `https://design-import-tool-1.preview.emergentagent.com/canva-BIDIRECTIONAL-SYNC.js?projectId=${projectId}`;
+        const canvaUrl = `https://designhub-canva.preview.emergentagent.com/canva-BIDIRECTIONAL-SYNC.js?projectId=${projectId}`;
         window.open(canvaUrl, '_blank', 'width=1200,height=800');
       }
       return;
