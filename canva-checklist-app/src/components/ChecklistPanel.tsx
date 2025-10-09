@@ -1,5 +1,6 @@
 import React from 'react';
 import { Rows, Text, Box, Columns, Button, Checkbox } from '@canva/app-ui-kit';
+import { requestOpenExternalUrl } from '@canva/platform';
 
 interface ChecklistItem {
   id: string;
