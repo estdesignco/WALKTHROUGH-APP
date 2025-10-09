@@ -8023,6 +8023,88 @@ async def get_pdf_import_job(job_id: str):
     # Serialize the document to JSON-safe format
     return serialize_doc(job)
 
+@api_router.get("/import/pdf-preview/{job_id}")
+async def get_pdf_preview_job(job_id: str):
+    """Get PDF preview job status and scraped items."""
+    job = await db.pdf_preview_jobs.find_one({"id": job_id})
+    if not job:
+        raise HTTPException(status_code=404, detail="Preview job not found")
+    
+    # Serialize the document to JSON-safe format
+    return serialize_doc(job)
+
+@api_router.post("/import/pdf-selected")
+async def import_selected_items(
+    preview_job_id: str = Query(...),
+    selected_item_indices: List[int] = Query(...)
+):
+    """Import only selected items from a PDF preview job."""
+    try:
+        # Get the preview job
+        preview_job = await db.pdf_preview_jobs.find_one({"id": preview_job_id})
+        if not preview_job:
+            raise HTTPException(status_code=404, detail="Preview job not found")
+        
+        if preview_job["status"] != "completed":
+            raise HTTPException(status_code=400, detail="Preview job not completed yet")
+        
+        # Get room info for categorization
+        room_id = preview_job["room_id"]
+        categories = await db.categories.find({"room_id": room_id}).to_list(None)
+        
+        # Get default subcategory
+        default_subcategory_id = None
+        for category in categories:
+            subcategories = await db.subcategories.find({"category_id": category["id"]}).to_list(None)
+            if subcategories:
+                default_subcategory_id = subcategories[0]["id"]
+                break
+        
+        if not default_subcategory_id:
+            raise HTTPException(status_code=400, detail="No subcategory found in room")
+        
+        # Get selected items
+        all_items = preview_job.get("items", [])
+        selected_items = [all_items[i] for i in selected_item_indices if i < len(all_items)]
+        
+        if not selected_items:
+            raise HTTPException(status_code=400, detail="No items selected")
+        
+        # Import each selected item
+        imported_count = 0
+        for item_data in selected_items:
+            # Use the subcategory_id that was determined during preview
+            await db.items.insert_one({
+                "id": str(uuid.uuid4()),
+                "subcategory_id": item_data.get("subcategory_id", default_subcategory_id),
+                "name": item_data.get("name", "Unknown Product"),
+                "vendor": item_data.get("vendor", ""),
+                "cost": item_data.get("cost", 0),
+                "link": item_data.get("link", ""),
+                "sku": item_data.get("sku", ""),
+                "size": item_data.get("size", ""),
+                "finish_color": item_data.get("finish_color", ""),
+                "image_url": item_data.get("image_url", ""),
+                "status": "",
+                "quantity": 1,
+                "photos": [],
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            })
+            imported_count += 1
+        
+        return {
+            "success": True,
+            "imported_count": imported_count,
+            "message": f"Successfully imported {imported_count} items"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Selected items import error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 async def process_pdf_import(
     job_id: str,
     pdf_content: bytes,
