@@ -7871,6 +7871,76 @@ async def process_batch_categorization(job_id: str, item_ids: List[str]):
 # PDF IMPORT FROM CANVA
 # ==========================================
 
+@api_router.post("/import/pdf-preview")
+async def preview_pdf_items(
+    file: UploadFile = File(...),
+    project_id: str = Query(...),
+    room_id: str = Query(...),
+    background_tasks: BackgroundTasks = None
+):
+    """
+    Extract and scrape products from PDF for preview (doesn't import yet).
+    Returns a preview job ID that can be used to get scraped items.
+    """
+    try:
+        # Validate file type
+        if not file.filename.endswith('.pdf'):
+            raise HTTPException(status_code=400, detail="Only PDF files allowed")
+        
+        # Get project and room info
+        project_doc = await db.projects.find_one({"id": project_id})
+        if not project_doc:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        room_doc = await db.rooms.find_one({"id": room_id})
+        if not room_doc:
+            raise HTTPException(status_code=404, detail="Room not found")
+        
+        # Read PDF file
+        pdf_content = await file.read()
+        
+        # Create preview job
+        preview_job = {
+            "id": str(uuid.uuid4()),
+            "type": "pdf_preview",
+            "project_id": project_id,
+            "project_name": project_doc["name"],
+            "room_id": room_id,
+            "room_name": room_doc["name"],
+            "filename": file.filename,
+            "status": "pending",
+            "total_links": 0,
+            "scraped_items": 0,
+            "failed_items": 0,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "errors": [],
+            "items": []  # Will store scraped item data
+        }
+        
+        await db.pdf_preview_jobs.insert_one(preview_job)
+        
+        # Process in background
+        background_tasks.add_task(
+            process_pdf_preview,
+            preview_job["id"],
+            pdf_content,
+            project_id,
+            room_id
+        )
+        
+        return {
+            "success": True,
+            "job_id": preview_job["id"],
+            "message": f"Extracting items from PDF for preview..."
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"PDF preview error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/import/pdf-links")
 async def import_from_pdf(
     file: UploadFile = File(...),
