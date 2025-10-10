@@ -116,32 +116,36 @@ class DeleteFunctionalityTester:
         else:
             return False
         
-        # Create category
-        category_data = {
-            "name": "Test Category",
-            "room_id": self.room_id
-        }
-        
-        success, response = self.run_test("Create Category", "POST", "categories", 201, category_data)
-        if success and response.get('id'):
-            self.category_id = response['id']
-            print(f"   📂 Category ID: {self.category_id}")
-        else:
+        # If we didn't get subcategory from room creation, create one
+        if not self.subcategory_id:
+            # Create category
+            category_data = {
+                "name": "Test Category",
+                "room_id": self.room_id
+            }
+            
+            success, response = self.run_test("Create Category", "POST", "categories", 201, category_data)
+            if success and response.get('id'):
+                self.category_id = response['id']
+                print(f"   📂 Category ID: {self.category_id}")
+            else:
+                return False
+            
+            # Create subcategory
+            subcategory_data = {
+                "name": "Test Subcategory",
+                "category_id": self.category_id
+            }
+            
+            success, response = self.run_test("Create Subcategory", "POST", "subcategories", 201, subcategory_data)
+            if success and response.get('id'):
+                self.subcategory_id = response['id']
+                print(f"   📁 Subcategory ID: {self.subcategory_id}")
+                return True
+            
             return False
         
-        # Create subcategory
-        subcategory_data = {
-            "name": "Test Subcategory",
-            "category_id": self.category_id
-        }
-        
-        success, response = self.run_test("Create Subcategory", "POST", "subcategories", 201, subcategory_data)
-        if success and response.get('id'):
-            self.subcategory_id = response['id']
-            print(f"   📁 Subcategory ID: {self.subcategory_id}")
-            return True
-        
-        return False
+        return True
 
     def test_delete_functionality(self):
         """Test the critical DELETE functionality"""
