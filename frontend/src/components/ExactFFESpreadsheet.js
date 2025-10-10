@@ -916,7 +916,7 @@ const ExactFFESpreadsheet = ({
                                                   {/* SUBCATEGORIES - Only show when category expanded */}
                                                   {isCategoryExpanded && (
                                                     <React.Fragment>
-                                                      {/* RED HEADER GOES AFTER CATEGORY - LAST IN HIERARCHY */}
+                                                      {/* SECTION HEADER - GROUPS COLUMNS */}
                                                       <tr>
                                                         <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#8B4444', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
