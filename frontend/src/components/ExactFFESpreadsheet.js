@@ -859,14 +859,10 @@ const ExactFFESpreadsheet = ({
                   return (
                     <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
                       {(provided, snapshot) => (
-                        <React.Fragment>
+                        <>
                           <tr
                             ref={provided.innerRef}
                             {...provided.draggableProps}
-                            style={{
-                              ...provided.draggableProps.style,
-                              opacity: snapshot.isDragging ? 0.8 : 1
-                            }}
                           >
                             <td colSpan="12" 
                                 className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
