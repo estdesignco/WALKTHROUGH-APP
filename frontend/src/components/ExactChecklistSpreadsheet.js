@@ -1419,7 +1419,8 @@ const ExactChecklistSpreadsheet = ({
               {isRoomExpanded && (
                 <Droppable droppableId={`categories-${room.id}`} type="CATEGORY">
                   {(provided) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                    <div>
+                      <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: 'none' }}></div>
                       {room.categories?.map((category, categoryIndex) => {
                         const isCategoryExpanded = expandedCategories[category.id];
                         
@@ -1430,10 +1431,6 @@ const ExactChecklistSpreadsheet = ({
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 className="mb-6"
-                                style={{
-                                  ...provided.draggableProps.style,
-                                  opacity: snapshot.isDragging ? 0.8 : 1
-                                }}
                               >
                                 {/* CATEGORY HEADER WITH EXPAND/COLLAPSE */}
                                 <div 
