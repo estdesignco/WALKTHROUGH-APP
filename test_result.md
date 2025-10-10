@@ -144,7 +144,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "CRITICAL FUNCTIONALITY FAILURES - User reports: 1) TRANSFER TO CHECKLIST not working - fails to move items with full room/category structure, 2) ADD CATEGORY not working properly - only adds empty categories instead of comprehensive subcategories and items, 3) ADD ROOM not working on other pages - functionality is page-specific rather than universal. User provided Google Apps Script roadmap showing proper patterns for room/category structure management, context-aware transfers, and comprehensive data population."
+  "COMPREHENSIVE TESTING REQUEST - Test ALL features of the Interior Design Management System to identify what's working and what's broken. Features to Test: 1) Item CRUD Operations (Create, Update, DELETE items - User reports trash button is broken), 2) PDF Import (Upload PDF with product links, verify links extracted and products scraped), 3) Questionnaire → Walkthrough (Submit questionnaire with selected rooms, verify rooms added to walkthrough), 4) Teams Notifications (Change item status, verify Teams webhook triggered), 5) Backend Endpoints (Test all CRUD endpoints for items, rooms, categories, subcategories). Priority: Fix the trash button (DELETE item) first, then verify all other features work."
 
 backend:
   - task: "🔥 CRITICAL HOUZZ PRO BROWSER AUTOMATION TEST"
