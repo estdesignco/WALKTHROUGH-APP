@@ -33,6 +33,86 @@ const ExactChecklistSpreadsheet = ({
   const [filteredProject, setFilteredProject] = useState(project);
   const [showCanvaModal, setShowCanvaModal] = useState(false);
 
+  // DRAG AND DROP HANDLER for rooms, categories, and subcategories
+  const handleDragEnd = async (result) => {
+    const { source, destination, type } = result;
+
+    // Dropped outside the list
+    if (!destination) return;
+
+    // No movement
+    if (source.droppableId === destination.droppableId && source.index === destination.index) {
+      return;
+    }
+
+    try {
+      if (type === 'ROOM') {
+        // Reorder rooms
+        const newRooms = Array.from(project.rooms);
+        const [removed] = newRooms.splice(source.index, 1);
+        newRooms.splice(destination.index, 0, removed);
+
+        // Update order_index for all affected rooms
+        for (let i = 0; i < newRooms.length; i++) {
+          await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${newRooms[i].id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_index: i })
+          });
+        }
+
+        if (onReload) await onReload();
+      } else if (type === 'CATEGORY') {
+        // Reorder categories within a room
+        const roomId = source.droppableId.replace('categories-', '');
+        const room = project.rooms.find(r => r.id === roomId);
+        if (!room) return;
+
+        const newCategories = Array.from(room.categories);
+        const [removed] = newCategories.splice(source.index, 1);
+        newCategories.splice(destination.index, 0, removed);
+
+        // Update order_index for all affected categories
+        for (let i = 0; i < newCategories.length; i++) {
+          await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${newCategories[i].id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_index: i })
+          });
+        }
+
+        if (onReload) await onReload();
+      } else if (type === 'SUBCATEGORY') {
+        // Reorder subcategories within a category
+        const categoryId = source.droppableId.replace('subcategories-', '');
+        let category = null;
+        for (const room of project.rooms) {
+          category = room.categories.find(c => c.id === categoryId);
+          if (category) break;
+        }
+        if (!category) return;
+
+        const newSubcategories = Array.from(category.subcategories);
+        const [removed] = newSubcategories.splice(source.index, 1);
+        newSubcategories.splice(destination.index, 0, removed);
+
+        // Update order_index for all affected subcategories
+        for (let i = 0; i < newSubcategories.length; i++) {
+          await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/subcategories/${newSubcategories[i].id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_index: i })
+          });
+        }
+
+        if (onReload) await onReload();
+      }
+    } catch (error) {
+      console.error('Drag and drop error:', error);
+      alert('Failed to reorder items');
+    }
+  };
+
   // APPLY FILTERS - ENHANCED COMBINATION FILTER LOGIC
   useEffect(() => {
     console.log('🔍 Enhanced Checklist Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus });
