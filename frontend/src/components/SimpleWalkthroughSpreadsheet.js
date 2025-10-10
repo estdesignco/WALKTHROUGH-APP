@@ -826,10 +826,6 @@ const SimpleWalkthroughSpreadsheet = ({
                   ref={provided.innerRef}
                   {...provided.draggableProps}
                   className="mb-8"
-                  style={{
-                    ...provided.draggableProps.style,
-                    opacity: snapshot.isDragging ? 0.8 : 1
-                  }}
                 >
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS FOR EACH ROOM */}
               <div className="mt-8 mb-4 px-4 py-2 text-[#F5F5DC] font-bold" style={{ 
