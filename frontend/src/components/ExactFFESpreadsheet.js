@@ -842,16 +842,15 @@ const ExactFFESpreadsheet = ({
                     {/* EMPTY HEADER FOR STRUCTURE */}
                   </thead>
 
-                  {/* TABLE BODY WITH DRAG AND DROP */}
+                  {/* TABLE BODY WITH SMOOTH DRAG AND DROP */}
                   <tbody>
                 <DragDropContext onDragEnd={handleDragEnd}>
                   <Droppable droppableId="ffe-rooms" type="room">
                     {(provided) => (
-                      <React.Fragment>
-                        <tr ref={provided.innerRef} {...provided.droppableProps}>
-                          <td colSpan="15" style={{ padding: 0, border: 'none' }}>
-                            <table className="w-full border-collapse">
-                              <tbody>
+                      <>
+                        <tr style={{ display: 'none' }} ref={provided.innerRef} {...provided.droppableProps}>
+                          <td></td>
+                        </tr>
                 {/* USE FILTERED PROJECT DATA */}
                 {(filteredProject || project).rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
