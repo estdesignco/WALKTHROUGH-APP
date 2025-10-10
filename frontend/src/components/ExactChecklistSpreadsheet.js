@@ -1423,26 +1423,43 @@ const ExactChecklistSpreadsheet = ({
               </div>
 
               {/* CATEGORIES - Only show when room expanded */}
-              {isRoomExpanded && room.categories?.map((category) => {
-                const isCategoryExpanded = expandedCategories[category.id];
-                
-                return (
-                  <div key={category.id} className="mb-6">
-                    {/* CATEGORY HEADER WITH EXPAND/COLLAPSE */}
-                    <div 
-                      className="px-4 py-2 text-[#D4C5A9] font-bold mb-2"
-                      style={{ backgroundColor: getCategoryColor() }}
-                    >
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => toggleCategoryExpansion(category.id)}
-                            className="text-[#B49B7E] hover:text-gray-200"
-                          >
-                            {isCategoryExpanded ? '▼' : '▶'}
-                          </button>
-                          <span>{category.name.toUpperCase()}</span>
-                        </div>
+              {isRoomExpanded && (
+                <Droppable droppableId={`categories-${room.id}`} type="CATEGORY">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {room.categories?.map((category, categoryIndex) => {
+                        const isCategoryExpanded = expandedCategories[category.id];
+                        
+                        return (
+                          <Draggable key={category.id} draggableId={category.id} index={categoryIndex}>
+                            {(provided, snapshot) => (
+                              <div 
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className="mb-6"
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  opacity: snapshot.isDragging ? 0.8 : 1
+                                }}
+                              >
+                                {/* CATEGORY HEADER WITH EXPAND/COLLAPSE */}
+                                <div 
+                                  className="px-4 py-2 text-[#D4C5A9] font-bold mb-2"
+                                  style={{ backgroundColor: getCategoryColor() }}
+                                >
+                                  <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-2">
+                                      <div {...provided.dragHandleProps} className="cursor-move text-[#B49B7E] hover:text-gray-200 px-1">
+                                        ⋮⋮
+                                      </div>
+                                      <button
+                                        onClick={() => toggleCategoryExpansion(category.id)}
+                                        className="text-[#B49B7E] hover:text-gray-200"
+                                      >
+                                        {isCategoryExpanded ? '▼' : '▶'}
+                                      </button>
+                                      <span>{category.name.toUpperCase()}</span>
+                                    </div>
                         <div className="flex items-center gap-2">
                           {/* ADD CATEGORY DROPDOWN - FIXED */}
                           <select 
