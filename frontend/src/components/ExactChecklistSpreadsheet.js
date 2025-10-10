@@ -1431,6 +1431,7 @@ const ExactChecklistSpreadsheet = ({
                               <div 
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
+                                {...provided.dragHandleProps}
                                 className="mb-6"
                               >
                                 {/* CATEGORY HEADER WITH EXPAND/COLLAPSE */}
@@ -1440,7 +1441,7 @@ const ExactChecklistSpreadsheet = ({
                                 >
                                   <div className="flex justify-between items-center">
                                     <div className="flex items-center gap-2">
-                                      <div {...provided.dragHandleProps} className="cursor-move text-[#B49B7E] hover:text-gray-200 px-1">
+                                      <div className="cursor-move text-[#B49B7E] hover:text-gray-200 px-1">
                                         ⋮⋮
                                       </div>
                                       <button
