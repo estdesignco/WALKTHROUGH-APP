@@ -1042,15 +1042,26 @@ const SimpleWalkthroughSpreadsheet = ({
                             ))}
                           </>
                         )}
-                      </div>
+                          </div>
+                        )}
+                      </Draggable>
                     );
                   })}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              )}
                 </div>
               )}
-            </div>
+            </Draggable>
           );
         })}
-        </div>
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </div> {/* END DARK NAVY SPREADSHEET CONTAINER */}
 
       {/* FOOTER REMOVED - ADD CATEGORY NOW IN EACH SECTION */}
