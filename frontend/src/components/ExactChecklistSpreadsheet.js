@@ -23,8 +23,17 @@ const ExactChecklistSpreadsheet = ({
   // State to track checked items (for PICKED status)
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [availableCategories, setAvailableCategories] = useState([]);
-  const [expandedRooms, setExpandedRooms] = useState({});
-  const [expandedCategories, setExpandedCategories] = useState({});
+  
+  // Load expanded states from localStorage
+  const [expandedRooms, setExpandedRooms] = useState(() => {
+    const saved = localStorage.getItem('checklist_expandedRooms');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [expandedCategories, setExpandedCategories] = useState(() => {
+    const saved = localStorage.getItem('checklist_expandedCategories');
+    return saved ? JSON.parse(saved) : {};
+  });
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
