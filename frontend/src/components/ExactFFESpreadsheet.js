@@ -901,15 +901,14 @@ const ExactFFESpreadsheet = ({
                                   </td>
                                 </tr>
 
-                                {/* ROOM CATEGORIES WITH DRAG DROP */}
+                                {/* ROOM CATEGORIES WITH SMOOTH DRAG DROP */}
                                 {isRoomExpanded && (
                                   <Droppable droppableId={`categories-${room.id}`} type="category">
                                     {(provided) => (
-                                      <React.Fragment>
-                                        <tr ref={provided.innerRef} {...provided.droppableProps}>
-                                          <td colSpan="15" style={{ padding: 0, border: 'none' }}>
-                                            <table className="w-full border-collapse">
-                                              <tbody>
+                                      <>
+                                        <tr style={{ display: 'none' }} ref={provided.innerRef} {...provided.droppableProps}>
+                                          <td></td>
+                                        </tr>
                                         {room.categories?.map((category, catIndex) => {
                                           const isCategoryExpanded = expandedCategories[category.id];
                                           console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
