@@ -1063,11 +1063,8 @@ const ExactChecklistSpreadsheet = ({
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="rooms" type="ROOM">
             {(provided) => (
-              <div 
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="w-full"
-              >
+              <div className="w-full">
+                <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: 'none' }}></div>
                 {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
                   
@@ -1078,10 +1075,6 @@ const ExactChecklistSpreadsheet = ({
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           className="mb-8"
-                          style={{
-                            ...provided.draggableProps.style,
-                            opacity: snapshot.isDragging ? 0.8 : 1
-                          }}
                         >
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS AND EXPAND/COLLAPSE */}
               <div 
