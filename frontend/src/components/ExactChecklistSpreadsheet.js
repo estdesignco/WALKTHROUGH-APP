@@ -1859,9 +1859,6 @@ const ExactChecklistSpreadsheet = ({
                   )}
                 </Droppable>
               )}
-            </div>
-          );
-        })}
                         </div>
                       )}
                     </Draggable>
