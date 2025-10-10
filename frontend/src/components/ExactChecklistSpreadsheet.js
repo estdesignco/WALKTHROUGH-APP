@@ -1069,8 +1069,7 @@ const ExactChecklistSpreadsheet = ({
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="rooms" type="ROOM">
             {(provided) => (
-              <div className="w-full">
-                <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: 'none' }}></div>
+              <div className="w-full" ref={provided.innerRef} {...provided.droppableProps}>
                 {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
                   
