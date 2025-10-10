@@ -820,8 +820,7 @@ const SimpleWalkthroughSpreadsheet = ({
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="walkthrough-rooms" type="ROOM">
             {(provided) => (
-              <div className="overflow-x-auto">
-                <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: 'none' }}></div>
+              <div className="overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
           
           {/* USE FILTERED PROJECT DATA */}
           {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
