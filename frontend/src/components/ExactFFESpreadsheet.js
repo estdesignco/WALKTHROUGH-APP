@@ -535,18 +535,26 @@ const ExactFFESpreadsheet = ({
 
   // Toggle room expansion
   const toggleRoomExpansion = (roomId) => {
-    setExpandedRooms(prev => ({
-      ...prev,
-      [roomId]: !prev[roomId]
-    }));
+    setExpandedRooms(prev => {
+      const newState = {
+        ...prev,
+        [roomId]: !prev[roomId]
+      };
+      localStorage.setItem('ffe_expandedRooms', JSON.stringify(newState));
+      return newState;
+    });
   };
 
   // Toggle category expansion
   const toggleCategoryExpansion = (categoryId) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [categoryId]: !prev[categoryId]
-    }));
+    setExpandedCategories(prev => {
+      const newState = {
+        ...prev,
+        [categoryId]: !prev[categoryId]
+      };
+      localStorage.setItem('ffe_expandedCategories', JSON.stringify(newState));
+      return newState;
+    });
   };
 
   // Handle tracking items
