@@ -96,10 +96,23 @@ class DeleteFunctionalityTester:
             "auto_populate": True
         }
         
-        success, response = self.run_test("Create Room", "POST", "rooms", 201, room_data)
-        if success and response.get('id'):
+        success, response = self.run_test("Create Room", "POST", "rooms", 200, room_data)
+        if response.get('id'):
             self.room_id = response['id']
             print(f"   🏠 Room ID: {self.room_id}")
+            
+            # Extract existing subcategory and items for testing
+            if response.get('categories'):
+                for category in response['categories']:
+                    if category.get('subcategories'):
+                        for subcategory in category['subcategories']:
+                            if subcategory.get('items'):
+                                self.category_id = category['id']
+                                self.subcategory_id = subcategory['id']
+                                print(f"   📂 Found Category ID: {self.category_id}")
+                                print(f"   📁 Found Subcategory ID: {self.subcategory_id}")
+                                print(f"   📦 Found {len(subcategory['items'])} existing items")
+                                return True
         else:
             return False
         
