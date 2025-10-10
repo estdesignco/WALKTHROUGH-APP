@@ -913,7 +913,7 @@ const ExactFFESpreadsheet = ({
                                   <Droppable droppableId={`categories-${room.id}`} type="category">
                                     {(provided) => (
                                       <>
-                                        <tr style={{ display: 'none' }} ref={provided.innerRef} {...provided.droppableProps}>
+                                        <tr ref={provided.innerRef} {...provided.droppableProps} style={{ display: 'none' }}>
                                           <td></td>
                                         </tr>
                                         {room.categories?.map((category, catIndex) => {
