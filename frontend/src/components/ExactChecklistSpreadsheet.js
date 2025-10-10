@@ -1838,7 +1838,16 @@ const ExactChecklistSpreadsheet = ({
             </div>
           );
         })}
-        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                );
+              })}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
       </div> {/* END DARK NAVY SPREADSHEET CONTAINER */}
 
       {/* Add Item Modal - FIXED */}
