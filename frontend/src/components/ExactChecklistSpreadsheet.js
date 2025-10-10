@@ -1060,12 +1060,29 @@ const ExactChecklistSpreadsheet = ({
            style={{
              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
            }}>
-        <div className="w-full">
-          {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
-          const isRoomExpanded = expandedRooms[room.id];
-          
-          return (
-            <div key={room.id} className="mb-8">
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="rooms" type="ROOM">
+            {(provided) => (
+              <div 
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="w-full"
+              >
+                {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
+                  const isRoomExpanded = expandedRooms[room.id];
+                  
+                  return (
+                    <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
+                      {(provided, snapshot) => (
+                        <div 
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className="mb-8"
+                          style={{
+                            ...provided.draggableProps.style,
+                            opacity: snapshot.isDragging ? 0.8 : 1
+                          }}
+                        >>
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS AND EXPAND/COLLAPSE */}
               <div 
                 className="px-4 py-2 text-[#D4C5A9] font-bold mb-4"
