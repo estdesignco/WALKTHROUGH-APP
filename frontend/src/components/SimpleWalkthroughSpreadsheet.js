@@ -809,14 +809,27 @@ const SimpleWalkthroughSpreadsheet = ({
            style={{
              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
            }}>
-        <div className="overflow-x-auto">
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="walkthrough-rooms" type="ROOM">
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.droppableProps} className="overflow-x-auto">
           
           {/* USE FILTERED PROJECT DATA */}
           {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
           const isRoomExpanded = expandedRooms[room.id];
           
           return (
-            <div key={room.id} className="mb-8">
+            <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
+              {(provided, snapshot) => (
+                <div 
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  className="mb-8"
+                  style={{
+                    ...provided.draggableProps.style,
+                    opacity: snapshot.isDragging ? 0.8 : 1
+                  }}
+                >
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS FOR EACH ROOM */}
               <div className="mt-8 mb-4 px-4 py-2 text-[#F5F5DC] font-bold" style={{ 
                 backgroundColor: roomColors?.[room.name.toLowerCase()] || 
@@ -824,6 +837,9 @@ const SimpleWalkthroughSpreadsheet = ({
               }}>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
+                    <div {...provided.dragHandleProps} className="cursor-move text-[#F5F5DC] hover:text-[#F5F5DC]/80 px-2">
+                      ⋮⋮
+                    </div>
                     <button
                       onClick={() => toggleRoomExpansion(room.id)}
                       className="text-[#F5F5DC] hover:text-[#F5F5DC]/80"
