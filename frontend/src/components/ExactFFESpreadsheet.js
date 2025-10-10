@@ -464,10 +464,15 @@ const ExactFFESpreadsheet = ({
 
   // Handle drag and drop for rooms and categories
   const handleDragEnd = async (result) => {
-    if (!result.destination) return;
+    console.log('🎯 FFE DRAG END CALLED!', result);
+    if (!result.destination) {
+      console.log('❌ No destination');
+      return;
+    }
 
     const { source, destination, type } = result;
 
+    console.log('🔄 FFE drag type:', type);
     if (type === 'room') {
       console.log('🔄 Reordering rooms...');
       
