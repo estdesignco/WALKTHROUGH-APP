@@ -35,17 +35,23 @@ const ExactChecklistSpreadsheet = ({
 
   // DRAG AND DROP HANDLER for rooms, categories, and subcategories
   const handleDragEnd = async (result) => {
+    console.log('🎯 CHECKLIST DRAG END CALLED!', result);
     const { source, destination, type } = result;
 
     // Dropped outside the list
-    if (!destination) return;
+    if (!destination) {
+      console.log('❌ No destination');
+      return;
+    }
 
     // No movement
     if (source.droppableId === destination.droppableId && source.index === destination.index) {
+      console.log('❌ Same position');
       return;
     }
 
     try {
+      console.log('🔄 Processing drag for type:', type);
       if (type === 'ROOM') {
         // Reorder rooms
         const newRooms = Array.from(project.rooms);
