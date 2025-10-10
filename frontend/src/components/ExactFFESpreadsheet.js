@@ -1201,7 +1201,7 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
-                                                          {/* LINK WITH SCRAPE BUTTON */}
+                                                          {/* LINK WITH CLICKABLE OPEN BUTTON AND SCRAPE */}
                                                           <td className="border border-gray-400 px-1 py-1 text-white w-32">
                                                             <div className="flex flex-col gap-1">
                                                               <input 
@@ -1216,14 +1216,27 @@ const ExactFFESpreadsheet = ({
                                                                 }}
                                                                 onBlur={(e) => console.log('Link updated:', e.target.value)}
                                                               />
-                                                              <button
-                                                                onClick={() => handleScrapeProduct(item.link || item.link_url, item.id)}
-                                                                className="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded"
-                                                                disabled={!item.link && !item.link_url}
-                                                                title="Scrape product information from URL"
-                                                              >
-                                                                SCRAPE
-                                                              </button>
+                                                              <div className="flex gap-1">
+                                                                {(item.link || item.link_url) && (
+                                                                  <a
+                                                                    href={item.link || item.link_url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded text-center font-bold"
+                                                                    title="Open product link in new tab"
+                                                                  >
+                                                                    🔗 OPEN
+                                                                  </a>
+                                                                )}
+                                                                <button
+                                                                  onClick={() => handleScrapeProduct(item.link || item.link_url, item.id)}
+                                                                  className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded"
+                                                                  disabled={!item.link && !item.link_url}
+                                                                  title="Scrape product information from URL"
+                                                                >
+                                                                  SCRAPE
+                                                                </button>
+                                                              </div>
                                                             </div>
                                                           </td>
                                                           
