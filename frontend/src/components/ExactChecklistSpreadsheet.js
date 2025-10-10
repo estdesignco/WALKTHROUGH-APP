@@ -1074,6 +1074,7 @@ const ExactChecklistSpreadsheet = ({
                         <div 
                           ref={provided.innerRef}
                           {...provided.draggableProps}
+                          {...provided.dragHandleProps}
                           className="mb-8"
                         >
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS AND EXPAND/COLLAPSE */}
@@ -1083,7 +1084,7 @@ const ExactChecklistSpreadsheet = ({
               >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <div {...provided.dragHandleProps} className="cursor-move text-[#B49B7E] hover:text-gray-200 px-2">
+                    <div className="cursor-move text-[#B49B7E] hover:text-gray-200 px-2">
                       ⋮⋮
                     </div>
                     <button
