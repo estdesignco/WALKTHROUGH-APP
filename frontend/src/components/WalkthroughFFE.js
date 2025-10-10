@@ -781,7 +781,7 @@ const WalkthroughFFE = ({
         </div>
       </div>
 
-      {/* ORIGINAL TABLE STRUCTURE - DO NOT CHANGE */}
+      {/* ORIGINAL TABLE STRUCTURE WITH DRAG AND DROP */}
       <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
         <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
           
@@ -794,28 +794,47 @@ const WalkthroughFFE = ({
 
                   {/* TABLE BODY - Keep original hierarchical structure */}
                   <tbody>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="walkthrough-rooms" type="room">
+                    {(provided) => (
+                      <React.Fragment>
+                        <tr ref={provided.innerRef} {...provided.droppableProps}>
+                          <td colSpan="6" style={{ padding: 0, border: 'none' }}>
+                            <table className="w-full border-collapse">
+                              <tbody>
                 {/* USE FILTERED PROJECT DATA */}
                 {(filteredProject || project).rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
                   console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
                   
                   return (
-                              <React.Fragment key={room.id}>
-                                {/* ROOM HEADER ROW - Full width like your screenshots */}
-                                <tr>
-                                  <td colSpan="5" 
-                                      className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
-                                      style={{ backgroundColor: getRoomColor(room.name) }}>
-                                    <div className="flex justify-between items-center">
-                                      <div className="flex items-center gap-2">
-                                        <button
-                                          onClick={() => toggleRoomExpansion(room.id)}
-                                          className="text-white hover:text-gray-200"
-                                        >
-                                          {isRoomExpanded ? '▼' : '▶'}
-                                        </button>
-                                        <span>{room.name.toUpperCase()}</span>
-                                      </div>
+                    <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
+                      {(provided, snapshot) => (
+                        <React.Fragment>
+                          <tr 
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            style={{
+                              ...provided.draggableProps.style,
+                              opacity: snapshot.isDragging ? 0.8 : 1
+                            }}
+                          >
+                            <td colSpan="5" 
+                                className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
+                                style={{ backgroundColor: getRoomColor(room.name) }}>
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                  <div {...provided.dragHandleProps} className="cursor-move text-white hover:text-gray-200 px-2">
+                                    ⋮⋮
+                                  </div>
+                                  <button
+                                    onClick={() => toggleRoomExpansion(room.id)}
+                                    className="text-white hover:text-gray-200"
+                                  >
+                                    {isRoomExpanded ? '▼' : '▶'}
+                                  </button>
+                                  <span>{room.name.toUpperCase()}</span>
+                                </div>
                                       <button
                                         onClick={() => handleDeleteRoom(room.id)}
                                         className="text-red-300 hover:text-red-100 text-lg ml-2"
