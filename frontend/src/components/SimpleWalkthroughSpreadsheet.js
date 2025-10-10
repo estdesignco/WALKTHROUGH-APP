@@ -859,7 +859,8 @@ const SimpleWalkthroughSpreadsheet = ({
               {isRoomExpanded && (
                 <Droppable droppableId={`categories-${room.id}`} type="CATEGORY">
                   {(provided) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                    <div>
+                      <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: 'none' }}></div>
                   {(room.categories || []).map((category, catIndex) => {
                     const isCategoryExpanded = expandedCategories[category.id];
                     
