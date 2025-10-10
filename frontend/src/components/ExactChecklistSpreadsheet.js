@@ -1849,9 +1849,16 @@ const ExactChecklistSpreadsheet = ({
                         </div>
                       </>
                     )}
-                  </div>
-                );
-              })}
+                              </div>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              )}
             </div>
           );
         })}
