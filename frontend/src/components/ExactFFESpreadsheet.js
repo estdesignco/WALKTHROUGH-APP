@@ -1365,11 +1365,10 @@ const ExactFFESpreadsheet = ({
                   );
                 })}
                         {provided.placeholder}
-                      </>
+                      </tbody>
                     )}
                   </Droppable>
                 </DragDropContext>
-                  </tbody>
                 </table>
             </div>
           </div>
