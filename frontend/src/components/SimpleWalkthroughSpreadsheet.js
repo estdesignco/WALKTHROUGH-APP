@@ -871,10 +871,6 @@ const SimpleWalkthroughSpreadsheet = ({
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             className="mb-4"
-                            style={{
-                              ...provided.draggableProps.style,
-                              opacity: snapshot.isDragging ? 0.8 : 1
-                            }}
                           >
                         {/* CATEGORY HEADER (GREEN) WITH EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
                         <div className="mb-4 px-4 py-2 text-[#F5F5DC] font-bold" style={{ backgroundColor: '#065F46' }}>
