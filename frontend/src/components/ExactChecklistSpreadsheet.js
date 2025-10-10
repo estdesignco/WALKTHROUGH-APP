@@ -1438,6 +1438,11 @@ const ExactChecklistSpreadsheet = ({
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className="mb-6"
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  opacity: snapshot.isDragging ? 0.8 : 1,
+                                  transform: provided.draggableProps.style?.transform || 'none'
+                                }}
                               >
                                 {/* CATEGORY HEADER WITH EXPAND/COLLAPSE */}
                                 <div 
