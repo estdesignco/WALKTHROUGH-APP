@@ -31,12 +31,20 @@ const SimpleWalkthroughSpreadsheet = ({
 
   // DRAG AND DROP HANDLER
   const handleDragEnd = async (result) => {
+    console.log('🎯 WALKTHROUGH DRAG END CALLED!', result);
     const { source, destination, type } = result;
 
-    if (!destination) return;
-    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+    if (!destination) {
+      console.log('❌ No destination');
+      return;
+    }
+    if (source.droppableId === destination.droppableId && source.index === destination.index) {
+      console.log('❌ Same position');
+      return;
+    }
 
     try {
+      console.log('🔄 Processing drag for type:', type);
       if (type === 'ROOM') {
         const newRooms = Array.from(project.rooms);
         const [removed] = newRooms.splice(source.index, 1);
