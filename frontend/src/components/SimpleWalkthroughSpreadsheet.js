@@ -858,18 +858,33 @@ const SimpleWalkthroughSpreadsheet = ({
                 </div>
               </div>
               
-              {/* CATEGORIES - ONLY SHOW WHEN EXPANDED */}
+              {/* CATEGORIES - ONLY SHOW WHEN EXPANDED WITH DRAG DROP */}
               {isRoomExpanded && (
-                <div>
+                <Droppable droppableId={`categories-${room.id}`} type="CATEGORY">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
                   {(room.categories || []).map((category, catIndex) => {
                     const isCategoryExpanded = expandedCategories[category.id];
                     
                     return (
-                      <div key={category.id} className="mb-4">
+                      <Draggable key={category.id} draggableId={category.id} index={catIndex}>
+                        {(provided, snapshot) => (
+                          <div 
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className="mb-4"
+                            style={{
+                              ...provided.draggableProps.style,
+                              opacity: snapshot.isDragging ? 0.8 : 1
+                            }}
+                          >
                         {/* CATEGORY HEADER (GREEN) WITH EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
                         <div className="mb-4 px-4 py-2 text-[#F5F5DC] font-bold" style={{ backgroundColor: '#065F46' }}>
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
+                              <div {...provided.dragHandleProps} className="cursor-move text-[#F5F5DC] hover:text-[#F5F5DC]/80 px-1">
+                                ⋮⋮
+                              </div>
                               <button
                                 onClick={() => toggleCategoryExpansion(category.id)}
                                 className="text-[#F5F5DC] hover:text-[#F5F5DC]/80"
