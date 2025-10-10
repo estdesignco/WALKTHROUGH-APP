@@ -1430,8 +1430,7 @@ const ExactChecklistSpreadsheet = ({
               {isRoomExpanded && (
                 <Droppable droppableId={`categories-${room.id}`} type="CATEGORY">
                   {(provided) => (
-                    <div>
-                      <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: 'none' }}></div>
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
                       {room.categories?.map((category, categoryIndex) => {
                         const isCategoryExpanded = expandedCategories[category.id];
                         
