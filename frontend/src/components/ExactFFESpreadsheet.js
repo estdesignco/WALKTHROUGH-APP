@@ -863,13 +863,14 @@ const ExactFFESpreadsheet = ({
                           <tr
                             ref={provided.innerRef}
                             {...provided.draggableProps}
+                            {...provided.dragHandleProps}
                           >
                             <td colSpan="12" 
                                 className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
                                 style={{ backgroundColor: getRoomColor(room.name) }}>
                               <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2">
-                                  <div {...provided.dragHandleProps} className="cursor-move text-white hover:text-gray-200 px-2">
+                                  <div className="cursor-move text-white hover:text-gray-200 px-2">
                                     ⋮⋮
                                   </div>
                                   <button
