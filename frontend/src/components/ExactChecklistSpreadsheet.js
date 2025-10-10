@@ -1082,7 +1082,7 @@ const ExactChecklistSpreadsheet = ({
                             ...provided.draggableProps.style,
                             opacity: snapshot.isDragging ? 0.8 : 1
                           }}
-                        >>
+                        >
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS AND EXPAND/COLLAPSE */}
               <div 
                 className="px-4 py-2 text-[#D4C5A9] font-bold mb-4"
