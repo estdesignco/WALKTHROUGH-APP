@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import { useParams } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
 import SimpleWalkthroughSpreadsheet from './SimpleWalkthroughSpreadsheet';
 import StatusOverview from './StatusOverview';

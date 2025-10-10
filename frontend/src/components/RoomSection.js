@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Droppable, Draggable } from '@hello-pangea/dnd';
 import { categoryAPI, itemAPI } from '../App';
 import CategorySection from './CategorySection';
 import AddCategoryModal from './AddCategoryModal';

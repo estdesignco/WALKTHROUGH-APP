@@ -240,3 +240,4 @@ mobile-app.tar.gz
 # Environment files
 *.env
 *.env.*
+frontend/build/mobile-app.tar.gz
