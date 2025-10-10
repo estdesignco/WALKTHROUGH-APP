@@ -825,6 +825,7 @@ const SimpleWalkthroughSpreadsheet = ({
                 <div 
                   ref={provided.innerRef}
                   {...provided.draggableProps}
+                  {...provided.dragHandleProps}
                   className="mb-8"
                 >
               {/* ROOM HEADER WITH DIFFERENT MUTED COLORS FOR EACH ROOM */}
@@ -834,7 +835,7 @@ const SimpleWalkthroughSpreadsheet = ({
               }}>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <div {...provided.dragHandleProps} className="cursor-move text-[#F5F5DC] hover:text-[#F5F5DC]/80 px-2">
+                    <div className="cursor-move text-[#F5F5DC] hover:text-[#F5F5DC]/80 px-2">
                       ⋮⋮
                     </div>
                     <button
