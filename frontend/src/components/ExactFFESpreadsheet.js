@@ -906,21 +906,39 @@ const ExactFFESpreadsheet = ({
                                   </td>
                                 </tr>
 
-                                {/* ROOM CATEGORIES - Only show when expanded */}
+                                {/* ROOM CATEGORIES WITH DRAG DROP */}
                                 {isRoomExpanded && (
+                                  <Droppable droppableId={`categories-${room.id}`} type="category">
+                                    {(provided) => (
                                       <React.Fragment>
+                                        <tr ref={provided.innerRef} {...provided.droppableProps}>
+                                          <td colSpan="15" style={{ padding: 0, border: 'none' }}>
+                                            <table className="w-full border-collapse">
+                                              <tbody>
                                         {room.categories?.map((category, catIndex) => {
                                           const isCategoryExpanded = expandedCategories[category.id];
                                           console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
                                           
                                           return (
-                                                <React.Fragment key={category.id}>
+                                            <Draggable key={category.id} draggableId={category.id} index={catIndex}>
+                                              {(provided, snapshot) => (
+                                                <React.Fragment>
                                                   {/* CATEGORY HEADER ROW */}
-                                                  <tr>
+                                                  <tr
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    style={{
+                                                      ...provided.draggableProps.style,
+                                                      opacity: snapshot.isDragging ? 0.8 : 1
+                                                    }}
+                                                  >
                                                     <td colSpan="14" 
                                                         className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
                                                         style={{ backgroundColor: getCategoryColor() }}>
                                                       <div className="flex items-center gap-2">
+                                                        <div {...provided.dragHandleProps} className="cursor-move text-white hover:text-gray-200 px-1">
+                                                          ⋮⋮
+                                                        </div>
                                                         <button
                                                           onClick={() => toggleCategoryExpansion(category.id)}
                                                           className="text-white hover:text-gray-200"
