@@ -1090,6 +1090,9 @@ const ExactChecklistSpreadsheet = ({
               >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
+                    <div {...provided.dragHandleProps} className="cursor-move text-[#B49B7E] hover:text-gray-200 px-2">
+                      ⋮⋮
+                    </div>
                     <button
                       onClick={() => toggleRoomExpansion(room.id)}
                       className="text-[#B49B7E] hover:text-gray-200"
