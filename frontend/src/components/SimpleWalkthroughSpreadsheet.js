@@ -871,13 +871,14 @@ const SimpleWalkthroughSpreadsheet = ({
                           <div 
                             ref={provided.innerRef}
                             {...provided.draggableProps}
+                            {...provided.dragHandleProps}
                             className="mb-4"
                           >
                         {/* CATEGORY HEADER (GREEN) WITH EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
                         <div className="mb-4 px-4 py-2 text-[#F5F5DC] font-bold" style={{ backgroundColor: '#065F46' }}>
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
-                              <div {...provided.dragHandleProps} className="cursor-move text-[#F5F5DC] hover:text-[#F5F5DC]/80 px-1">
+                              <div className="cursor-move text-[#F5F5DC] hover:text-[#F5F5DC]/80 px-1">
                                 ⋮⋮
                               </div>
                               <button
