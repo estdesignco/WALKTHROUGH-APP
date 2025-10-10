@@ -925,7 +925,7 @@ const ExactFFESpreadsheet = ({
                                                             style={{ backgroundColor: '#8B4513' }}>
                                                           ADDITIONAL INFO.
                                                         </td>
-                                                        <td colSpan="5" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                        <td colSpan="6" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#6B46C1' }}>
                                                           SHIPPING INFO.
                                                         </td>
