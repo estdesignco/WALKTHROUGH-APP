@@ -22,8 +22,17 @@ const ExactFFESpreadsheet = ({
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
-  const [expandedRooms, setExpandedRooms] = useState({});
-  const [expandedCategories, setExpandedCategories] = useState({});
+  
+  // Load expanded states from localStorage
+  const [expandedRooms, setExpandedRooms] = useState(() => {
+    const saved = localStorage.getItem('ffe_expandedRooms');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [expandedCategories, setExpandedCategories] = useState(() => {
+    const saved = localStorage.getItem('ffe_expandedCategories');
+    return saved ? JSON.parse(saved) : {};
+  });
+  
   const [expandedImage, setExpandedImage] = useState(null);  // For image modal
 
   // FILTER STATE - MAKE IT ACTUALLY WORK
