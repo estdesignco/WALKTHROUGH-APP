@@ -848,14 +848,10 @@ const ExactFFESpreadsheet = ({
                   </thead>
 
                   {/* TABLE BODY WITH SMOOTH DRAG AND DROP */}
-                  <tbody>
-                <DragDropContext onDragEnd={handleDragEnd}>
+                  <DragDropContext onDragEnd={handleDragEnd}>
                   <Droppable droppableId="ffe-rooms" type="room">
                     {(provided) => (
-                      <>
-                        <tr style={{ display: 'none' }} ref={provided.innerRef} {...provided.droppableProps}>
-                          <td></td>
-                        </tr>
+                      <tbody ref={provided.innerRef} {...provided.droppableProps}>
                 {/* USE FILTERED PROJECT DATA */}
                 {(filteredProject || project).rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
