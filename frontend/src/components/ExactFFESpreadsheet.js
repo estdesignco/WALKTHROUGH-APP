@@ -37,52 +37,6 @@ const ExactFFESpreadsheet = ({
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedCarrier, setSelectedCarrier] = useState('');
 
-  // DRAG AND DROP HANDLER
-  const handleDragEnd = async (result) => {
-    const { source, destination, type } = result;
-
-    if (!destination) return;
-    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
-
-    try {
-      if (type === 'ROOM') {
-        const newRooms = Array.from(project.rooms);
-        const [removed] = newRooms.splice(source.index, 1);
-        newRooms.splice(destination.index, 0, removed);
-
-        for (let i = 0; i < newRooms.length; i++) {
-          await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${newRooms[i].id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_index: i })
-          });
-        }
-
-        if (onReload) await onReload();
-      } else if (type === 'CATEGORY') {
-        const roomId = source.droppableId.replace('categories-', '');
-        const room = project.rooms.find(r => r.id === roomId);
-        if (!room) return;
-
-        const newCategories = Array.from(room.categories);
-        const [removed] = newCategories.splice(source.index, 1);
-        newCategories.splice(destination.index, 0, removed);
-
-        for (let i = 0; i < newCategories.length; i++) {
-          await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${newCategories[i].id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_index: i })
-          });
-        }
-
-        if (onReload) await onReload();
-      }
-    } catch (error) {
-      console.error('Drag and drop error:', error);
-    }
-  };
-
   // ACTUAL API CALLS - WITH PROPER ERROR HANDLING
   const handleStatusChange = async (itemId, newStatus) => {
     console.log('🔄 Status change request:', { itemId, newStatus });
