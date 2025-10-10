@@ -928,6 +928,11 @@ const ExactFFESpreadsheet = ({
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
+                                                    style={{
+                                                      ...provided.draggableProps.style,
+                                                      display: snapshot.isDragging ? 'table' : '',
+                                                      backgroundColor: snapshot.isDragging ? 'rgba(212, 165, 116, 0.3)' : ''
+                                                    }}
                                                   >
                                                     <td colSpan="14" 
                                                         className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
