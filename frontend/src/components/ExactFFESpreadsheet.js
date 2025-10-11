@@ -522,8 +522,7 @@ const ExactFFESpreadsheet = ({
         });
         
         if (response.ok) {
-          console.log('✅ Category order updated');
-          if (onReload) onReload();
+          console.log('✅ Category order updated - NO PAGE RELOAD');
         }
       } catch (err) {
         console.error('❌ Error updating category order:', err);
