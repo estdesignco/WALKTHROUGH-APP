@@ -498,9 +498,7 @@ const ExactFFESpreadsheet = ({
         });
         
         if (response.ok) {
-          console.log('✅ Room order updated');
-          // Reload to show changes
-          if (onReload) onReload();
+          console.log('✅ Room order updated - NO PAGE RELOAD');
         }
       } catch (err) {
         console.error('❌ Error updating room order:', err);
