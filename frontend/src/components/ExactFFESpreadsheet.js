@@ -481,52 +481,56 @@ const ExactFFESpreadsheet = ({
 
     const { source, destination, type } = result;
 
-    console.log('🔄 FFE drag type:', type);
-    if (type === 'room') {
-      console.log('🔄 Reordering rooms...');
-      
-      // Update backend room order
-      try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/reorder`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            source_index: source.index,
-            destination_index: destination.index,
-            project_id: project.id
-          })
-        });
+    try {
+      if (type === 'room') {
+        console.log('🔄 Reordering rooms...');
         
-        if (response.ok) {
-          console.log('✅ Room order updated - NO PAGE RELOAD');
-        }
-      } catch (err) {
-        console.error('❌ Error updating room order:', err);
-      }
-    }
-    
-    if (type === 'category') {
-      console.log('🔄 Reordering categories...');
-      
-      // Update backend category order  
-      try {
+        const newRooms = Array.from(project.rooms);
+        const [removed] = newRooms.splice(source.index, 1);
+        newRooms.splice(destination.index, 0, removed);
+
+        // Update visual order immediately
+        project.rooms = newRooms;
+        setFilteredProject({...project});
+
+        // Update backend silently
+        Promise.all(newRooms.map((room, i) => 
+          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${room.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_index: i })
+          })
+        ));
+
+        console.log('✅ Rooms reordered and displayed!');
+      } else if (type === 'category') {
+        console.log('🔄 Reordering categories...');
+        
         const roomId = source.droppableId.replace('categories-', '');
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/reorder`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            room_id: roomId,
-            source_index: source.index,
-            destination_index: destination.index
+        const room = project.rooms.find(r => r.id === roomId);
+        if (!room) return;
+
+        const newCategories = Array.from(room.categories);
+        const [removed] = newCategories.splice(source.index, 1);
+        newCategories.splice(destination.index, 0, removed);
+
+        // Update visual order immediately
+        room.categories = newCategories;
+        setFilteredProject({...project});
+
+        // Update backend silently
+        Promise.all(newCategories.map((category, i) => 
+          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${category.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_index: i })
           })
-        });
-        
-        if (response.ok) {
-          console.log('✅ Category order updated - NO PAGE RELOAD');
-        }
-      } catch (err) {
-        console.error('❌ Error updating category order:', err);
+        ));
+
+        console.log('✅ Categories reordered and displayed!');
       }
+    } catch (error) {
+      console.error('❌ Drag error:', error);
     }
   };
 
