@@ -55,13 +55,19 @@ const SimpleWalkthroughSpreadsheet = ({
     try {
       console.log('🔄 Processing drag for type:', type);
       if (type === 'ROOM') {
-        const newRooms = Array.from(project.rooms);
+        // Create deep copy of project
+        const updatedProject = {...project};
+        const newRooms = Array.from(updatedProject.rooms);
         const [removed] = newRooms.splice(source.index, 1);
         newRooms.splice(destination.index, 0, removed);
-
-        // Update visual order immediately
-        project.rooms = newRooms;
-        setFilteredProject({...project});
+        
+        updatedProject.rooms = newRooms;
+        
+        console.log('🔄 WALKTHROUGH: Moving room from', source.index, 'to', destination.index);
+        console.log('📦 WALKTHROUGH: New room order:', newRooms.map(r => r.name));
+        
+        // Force React to re-render
+        setFilteredProject(updatedProject);
 
         // Update backend silently
         Promise.all(newRooms.map((room, i) => 
@@ -72,7 +78,7 @@ const SimpleWalkthroughSpreadsheet = ({
           })
         ));
 
-        console.log('✅ Rooms reordered and displayed!');
+        console.log('✅ WALKTHROUGH: Rooms reordered!');
       } else if (type === 'CATEGORY') {
         const roomId = source.droppableId.replace('categories-', '');
         const room = project.rooms.find(r => r.id === roomId);
