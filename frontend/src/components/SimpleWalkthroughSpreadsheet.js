@@ -82,15 +82,20 @@ const SimpleWalkthroughSpreadsheet = ({
         const [removed] = newCategories.splice(source.index, 1);
         newCategories.splice(destination.index, 0, removed);
 
-        for (let i = 0; i < newCategories.length; i++) {
-          await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${newCategories[i].id}`, {
+        // Update visual order immediately
+        room.categories = newCategories;
+        setFilteredProject({...project});
+
+        // Update backend silently
+        Promise.all(newCategories.map((category, i) => 
+          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${category.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
-          });
-        }
+          })
+        ));
 
-        console.log('✅ Categories reordered - NO PAGE RELOAD');
+        console.log('✅ Categories reordered and displayed!');
       }
     } catch (error) {
       console.error('Drag and drop error:', error);
