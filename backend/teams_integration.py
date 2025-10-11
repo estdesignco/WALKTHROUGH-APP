@@ -148,8 +148,21 @@ class TeamsIntegration:
     
     def _get_priority_for_status(self, status: str) -> str:
         """Get priority level based on status"""
-        high_priority = ["ON HOLD", "DAMAGED", "BACKORDERED", "OUT FOR DELIVERY", "INSTALLING"]
-        medium_priority = ["PENDING APPROVAL", "ORDERED", "SHIPPED", "IN TRANSIT", "READY FOR INSTALL"]
+        high_priority = [
+            "PRESENTATION",
+            "READY FOR PRESENTATION", 
+            "ORDER SAMPLES",
+            "SHIPPED",
+            "DELIVERED TO RECEIVER",
+            "BACKORDERED",
+            "DAMAGED",
+            "RECEIVED",
+            "READY FOR INSTALL",
+            "ON HOLD",
+            "OUT FOR DELIVERY",
+            "INSTALLING"
+        ]
+        medium_priority = ["PENDING APPROVAL", "ORDERED", "IN TRANSIT", "APPROVED"]
         
         if status in high_priority:
             return "HIGH"
