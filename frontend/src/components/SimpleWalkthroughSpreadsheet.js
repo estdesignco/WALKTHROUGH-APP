@@ -67,7 +67,7 @@ const SimpleWalkthroughSpreadsheet = ({
           });
         }
 
-        if (onReload) await onReload();
+        console.log('✅ Rooms reordered - NO PAGE RELOAD');
       } else if (type === 'CATEGORY') {
         const roomId = source.droppableId.replace('categories-', '');
         const room = project.rooms.find(r => r.id === roomId);
