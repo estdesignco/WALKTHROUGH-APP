@@ -87,16 +87,16 @@ const ExactChecklistSpreadsheet = ({
         const [removed] = newCategories.splice(source.index, 1);
         newCategories.splice(destination.index, 0, removed);
 
-        // Update order_index for all affected categories
-        for (let i = 0; i < newCategories.length; i++) {
-          await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${newCategories[i].id}`, {
+        // Update backend silently
+        Promise.all(newCategories.map((category, i) => 
+          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${category.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
-          });
-        }
+          })
+        ));
 
-        if (onReload) await onReload();
+        console.log('✅ Categories reordered - NO PAGE RELOAD');
       } else if (type === 'SUBCATEGORY') {
         // Reorder subcategories within a category
         const categoryId = source.droppableId.replace('subcategories-', '');
