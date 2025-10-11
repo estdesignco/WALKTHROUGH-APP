@@ -80,17 +80,22 @@ const SimpleWalkthroughSpreadsheet = ({
 
         console.log('✅ WALKTHROUGH: Rooms reordered!');
       } else if (type === 'CATEGORY') {
+        // Create deep copy of project
+        const updatedProject = {...project};
         const roomId = source.droppableId.replace('categories-', '');
-        const room = project.rooms.find(r => r.id === roomId);
+        const room = updatedProject.rooms.find(r => r.id === roomId);
         if (!room) return;
 
         const newCategories = Array.from(room.categories);
         const [removed] = newCategories.splice(source.index, 1);
         newCategories.splice(destination.index, 0, removed);
-
-        // Update visual order immediately
+        
         room.categories = newCategories;
-        setFilteredProject({...project});
+        
+        console.log('🔄 WALKTHROUGH: Moving category from', source.index, 'to', destination.index);
+        
+        // Force React to re-render
+        setFilteredProject(updatedProject);
 
         // Update backend silently
         Promise.all(newCategories.map((category, i) => 
@@ -101,7 +106,7 @@ const SimpleWalkthroughSpreadsheet = ({
           })
         ));
 
-        console.log('✅ Categories reordered and displayed!');
+        console.log('✅ WALKTHROUGH: Categories reordered!');
       }
     } catch (error) {
       console.error('Drag and drop error:', error);
