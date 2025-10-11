@@ -91,6 +91,10 @@ const ExactChecklistSpreadsheet = ({
         const [removed] = newCategories.splice(source.index, 1);
         newCategories.splice(destination.index, 0, removed);
 
+        // Update visual order immediately
+        room.categories = newCategories;
+        setFilteredProject({...project});
+
         // Update backend silently
         Promise.all(newCategories.map((category, i) => 
           fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${category.id}`, {
@@ -100,7 +104,7 @@ const ExactChecklistSpreadsheet = ({
           })
         ));
 
-        console.log('✅ Categories reordered - NO PAGE RELOAD');
+        console.log('✅ Categories reordered and displayed!');
       } else if (type === 'SUBCATEGORY') {
         // Reorder subcategories within a category
         const categoryId = source.droppableId.replace('subcategories-', '');
