@@ -59,15 +59,20 @@ const SimpleWalkthroughSpreadsheet = ({
         const [removed] = newRooms.splice(source.index, 1);
         newRooms.splice(destination.index, 0, removed);
 
-        for (let i = 0; i < newRooms.length; i++) {
-          await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${newRooms[i].id}`, {
+        // Update visual order immediately
+        project.rooms = newRooms;
+        setFilteredProject({...project});
+
+        // Update backend silently
+        Promise.all(newRooms.map((room, i) => 
+          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${room.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
-          });
-        }
+          })
+        ));
 
-        console.log('✅ Rooms reordered - NO PAGE RELOAD');
+        console.log('✅ Rooms reordered and displayed!');
       } else if (type === 'CATEGORY') {
         const roomId = source.droppableId.replace('categories-', '');
         const room = project.rooms.find(r => r.id === roomId);
