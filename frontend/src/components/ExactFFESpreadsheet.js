@@ -483,15 +483,19 @@ const ExactFFESpreadsheet = ({
 
     try {
       if (type === 'room') {
-        console.log('🔄 Reordering rooms...');
-        
-        const newRooms = Array.from(project.rooms);
+        // Create deep copy of project
+        const updatedProject = {...project};
+        const newRooms = Array.from(updatedProject.rooms);
         const [removed] = newRooms.splice(source.index, 1);
         newRooms.splice(destination.index, 0, removed);
-
-        // Update visual order immediately
-        project.rooms = newRooms;
-        setFilteredProject({...project});
+        
+        updatedProject.rooms = newRooms;
+        
+        console.log('🔄 FFE: Moving room from', source.index, 'to', destination.index);
+        console.log('📦 FFE: New room order:', newRooms.map(r => r.name));
+        
+        // Force React to re-render
+        setFilteredProject(updatedProject);
 
         // Update backend silently
         Promise.all(newRooms.map((room, i) => 
@@ -502,7 +506,7 @@ const ExactFFESpreadsheet = ({
           })
         ));
 
-        console.log('✅ Rooms reordered and displayed!');
+        console.log('✅ FFE: Rooms reordered!');
       } else if (type === 'category') {
         console.log('🔄 Reordering categories...');
         
