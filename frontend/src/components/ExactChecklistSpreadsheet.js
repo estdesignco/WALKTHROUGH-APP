@@ -87,18 +87,22 @@ const ExactChecklistSpreadsheet = ({
 
         console.log('✅ Rooms reordered! Check if visual updated.');
       } else if (type === 'CATEGORY') {
-        // Reorder categories within a room
+        // Create deep copy of project
+        const updatedProject = {...project};
         const roomId = source.droppableId.replace('categories-', '');
-        const room = project.rooms.find(r => r.id === roomId);
+        const room = updatedProject.rooms.find(r => r.id === roomId);
         if (!room) return;
 
         const newCategories = Array.from(room.categories);
         const [removed] = newCategories.splice(source.index, 1);
         newCategories.splice(destination.index, 0, removed);
-
-        // Update visual order immediately
+        
         room.categories = newCategories;
-        setFilteredProject({...project});
+        
+        console.log('🔄 Moving category from', source.index, 'to', destination.index);
+        
+        // Force React to re-render
+        setFilteredProject(updatedProject);
 
         // Update backend silently
         Promise.all(newCategories.map((category, i) => 
@@ -109,7 +113,7 @@ const ExactChecklistSpreadsheet = ({
           })
         ));
 
-        console.log('✅ Categories reordered and displayed!');
+        console.log('✅ Categories reordered!');
       } else if (type === 'SUBCATEGORY') {
         // Reorder subcategories within a category
         const categoryId = source.droppableId.replace('subcategories-', '');
