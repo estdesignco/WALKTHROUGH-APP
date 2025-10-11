@@ -508,19 +508,22 @@ const ExactFFESpreadsheet = ({
 
         console.log('✅ FFE: Rooms reordered!');
       } else if (type === 'category') {
-        console.log('🔄 Reordering categories...');
-        
+        // Create deep copy of project
+        const updatedProject = {...project};
         const roomId = source.droppableId.replace('categories-', '');
-        const room = project.rooms.find(r => r.id === roomId);
+        const room = updatedProject.rooms.find(r => r.id === roomId);
         if (!room) return;
 
         const newCategories = Array.from(room.categories);
         const [removed] = newCategories.splice(source.index, 1);
         newCategories.splice(destination.index, 0, removed);
-
-        // Update visual order immediately
+        
         room.categories = newCategories;
-        setFilteredProject({...project});
+        
+        console.log('🔄 FFE: Moving category from', source.index, 'to', destination.index);
+        
+        // Force React to re-render
+        setFilteredProject(updatedProject);
 
         // Update backend silently
         Promise.all(newCategories.map((category, i) => 
@@ -531,7 +534,7 @@ const ExactFFESpreadsheet = ({
           })
         ));
 
-        console.log('✅ Categories reordered and displayed!');
+        console.log('✅ FFE: Categories reordered!');
       }
     } catch (error) {
       console.error('❌ Drag error:', error);
