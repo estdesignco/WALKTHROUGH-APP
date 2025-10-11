@@ -85,7 +85,7 @@ const SimpleWalkthroughSpreadsheet = ({
           });
         }
 
-        if (onReload) await onReload();
+        console.log('✅ Categories reordered - NO PAGE RELOAD');
       }
     } catch (error) {
       console.error('Drag and drop error:', error);
