@@ -67,6 +67,10 @@ const ExactChecklistSpreadsheet = ({
         const [removed] = newRooms.splice(source.index, 1);
         newRooms.splice(destination.index, 0, removed);
 
+        // Update visual order immediately
+        project.rooms = newRooms;
+        setFilteredProject({...project});
+
         // Update backend silently
         Promise.all(newRooms.map((room, i) => 
           fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${room.id}`, {
@@ -76,7 +80,7 @@ const ExactChecklistSpreadsheet = ({
           })
         ));
 
-        console.log('✅ Rooms reordered - NO PAGE RELOAD');
+        console.log('✅ Rooms reordered and displayed!');
       } else if (type === 'CATEGORY') {
         // Reorder categories within a room
         const roomId = source.droppableId.replace('categories-', '');
