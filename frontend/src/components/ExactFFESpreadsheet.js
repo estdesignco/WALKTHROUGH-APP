@@ -456,7 +456,9 @@ const ExactFFESpreadsheet = ({
             });
             
             // Reload to show new category with all items
-            window.location.reload();
+            if (onReload) {
+              onReload();
+            }
           }
         }
         
