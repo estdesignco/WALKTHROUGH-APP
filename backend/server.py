@@ -8340,8 +8340,8 @@ async def process_pdf_preview(
                         
                         if response.get("success") and response.get("data"):
                             product_data = response["data"]
-                            product_name = product_data.get("name", "Unknown Product")
-                            product_vendor = product_data.get("vendor", "")
+                            product_name = product_data.get("name") or "Unknown Product"
+                            product_vendor = product_data.get("vendor") or ""
                             
                             # Smart categorization with vendor
                             best_category, target_subcategory_id = await find_best_subcategory_smart(product_name, categories, product_vendor)
@@ -8749,8 +8749,8 @@ async def process_pdf_import(
                         # Check if scraping succeeded and extract data
                         if response.get("success") and response.get("data"):
                             product_data = response["data"]
-                            product_name = product_data.get("name", "Unknown Product")
-                            product_vendor = product_data.get("vendor", "")
+                            product_name = product_data.get("name") or "Unknown Product"
+                            product_vendor = product_data.get("vendor") or ""
                             
                             # Smart categorization based on product name and vendor (handles subcategories)
                             best_category, target_subcategory_id = await find_best_subcategory_smart(product_name, categories, product_vendor)
