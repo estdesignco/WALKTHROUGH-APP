@@ -4834,6 +4834,7 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
         
         # Launch browser with stealth settings
         executable_paths = [
+            '/pw-browsers/chromium_headless_shell-1187/chrome-linux/headless_shell',
             '/pw-browsers/chromium-1187/chrome-linux/chrome',
             '/pw-browsers/chromium-1091/chrome-linux/chrome',
             None
