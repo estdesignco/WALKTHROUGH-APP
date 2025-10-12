@@ -8075,7 +8075,7 @@ async def import_selected_items(
         if not selected_items:
             raise HTTPException(status_code=400, detail="No items selected")
         
-        # Import each selected item
+        # Import each selected item with PICKED status (as requested by user)
         imported_count = 0
         for item_data in selected_items:
             # Use the subcategory_id that was determined during preview
@@ -8090,7 +8090,7 @@ async def import_selected_items(
                 "size": item_data.get("size", ""),
                 "finish_color": item_data.get("finish_color", ""),
                 "image_url": item_data.get("image_url", ""),
-                "status": "",
+                "status": "PICKED",
                 "quantity": 1,
                 "photos": [],
                 "created_at": datetime.utcnow(),
