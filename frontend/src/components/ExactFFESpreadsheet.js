@@ -62,8 +62,8 @@ const ExactFFESpreadsheet = ({
       if (response.ok) {
         console.log('✅ Status updated successfully');
         
-        // Update local state to avoid scroll jump
-        const updatedProject = { ...filteredProject };
+        // Update local state to avoid scroll jump - create proper deep copy
+        const updatedProject = JSON.parse(JSON.stringify(filteredProject));
         let itemFound = false;
         
         updatedProject.rooms?.forEach(room => {
@@ -88,7 +88,7 @@ const ExactFFESpreadsheet = ({
             onReload();
           }
         }
-      } else {
+      } else{
         const errorData = await response.text();
         console.error('❌ Status update failed:', response.status, errorData);
         alert(`Failed to update status: ${response.status} ${response.statusText}\n${errorData}`);
