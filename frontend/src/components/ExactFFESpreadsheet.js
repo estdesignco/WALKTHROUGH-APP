@@ -255,8 +255,6 @@ const ExactFFESpreadsheet = ({
           alert(`✅ Successfully scraped: ${result.data.name || 'Product information'}`);
           if (onReload) {
             onReload();
-          } else {
-            window.location.reload();
           }
         } else {
           console.error('❌ FFE: Failed to update item with scraped data');
