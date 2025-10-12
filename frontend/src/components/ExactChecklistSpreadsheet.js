@@ -335,12 +335,32 @@ const ExactChecklistSpreadsheet = ({
       
       if (response.ok) {
         console.log('✅ Checklist status updated successfully');
-        // Use onReload instead of window.location.reload to prevent navigation issues
-        if (onReload) {
-          console.log('🔄 Calling onReload function');
-          onReload();
+        
+        // Update local state to avoid scroll jump
+        const updatedProject = { ...filteredProject };
+        let itemFound = false;
+        
+        updatedProject.rooms?.forEach(room => {
+          room.categories?.forEach(category => {
+            category.subcategories?.forEach(subcategory => {
+              subcategory.items?.forEach(item => {
+                if (item.id === itemId) {
+                  item.status = newStatus;
+                  itemFound = true;
+                  console.log('✅ Updated item status in local state:', item.name, '→', newStatus);
+                }
+              });
+            });
+          });
+        });
+        
+        if (itemFound) {
+          setFilteredProject(updatedProject);
         } else {
-          console.warn('⚠️ No onReload function provided');
+          console.warn('⚠️ Item not found in local state, calling onReload');
+          if (onReload) {
+            onReload();
+          }
         }
       } else {
         const errorData = await response.text();
