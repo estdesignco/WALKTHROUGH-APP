@@ -354,7 +354,9 @@ const ExactFFESpreadsheet = ({
       if (response.ok) {
         console.log('✅ Room deleted successfully');
         // Force reload to show updated data
-        window.location.reload();
+        if (onReload) {
+          onReload();
+        }
       } else {
         throw new Error(`HTTP ${response.status}`);
       }
