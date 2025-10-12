@@ -6630,175 +6630,175 @@ async def scrape_canva_pdf(data: dict):
 # @api_router.post("/scrape-product")
 # async def scrape_product_endpoint(scrape_data: dict):
 #     """Scrape product information from a given URL - OLD VERSION"""
-    try:
-        product_url = scrape_data.get('url', '').strip()
-        
-        if not product_url:
-            raise HTTPException(status_code=400, detail="Product URL is required")
-        
-        # Validate URL
-        if not product_url.startswith(('http://', 'https://')):
-            product_url = 'https://' + product_url
-        
-        logging.info(f"🔍 Scraping product from: {product_url}")
-        
-        # Use Playwright for dynamic content scraping
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
-            
-            try:
-                # Navigate to the page with timeout
-                await page.goto(product_url, timeout=30000)
-                await page.wait_for_timeout(3000)  # Wait for dynamic content
-                
-                # Scrape product information using various selectors
-                scraped_data = {}
-                
-                # Try to get product name
-                name_selectors = [
-                    'h1', '[data-testid="product-name"]', '.product-title', '.product-name',
-                    '[class*="title"]', '[class*="name"]', '.pdp-title'
-                ]
-                
-                for selector in name_selectors:
-                    try:
-                        name = await page.locator(selector).first.text_content(timeout=2000)
-                        if name and len(name.strip()) > 0:
-                            scraped_data['name'] = name.strip()
-                            break
-                    except:
-                        continue
-                
-                # Try to get price
-                price_selectors = [
-                    '[data-testid="price"]', '.price', '[class*="price"]', 
-                    '.product-price', '.current-price', '.sale-price'
-                ]
-                
-                for selector in price_selectors:
-                    try:
-                        price_text = await page.locator(selector).first.text_content(timeout=2000)
-                        if price_text:
-                            # Extract numeric price
-                            price_match = re.search(r'[\$£€]?([\d,]+\.?\d*)', price_text.replace(',', ''))
-                            if price_match:
-                                scraped_data['cost'] = float(price_match.group(1))
-                                break
-                    except:
-                        continue
-                
-                # Try to get SKU
-                sku_selectors = [
-                    '[data-testid="sku"]', '.sku', '[class*="sku"]', 
-                    '.product-code', '.item-number', '.model-number'
-                ]
-                
-                for selector in sku_selectors:
-                    try:
-                        sku = await page.locator(selector).first.text_content(timeout=2000)
-                        if sku and len(sku.strip()) > 0:
-                            scraped_data['sku'] = sku.strip()
-                            break
-                    except:
-                        continue
-                
-                # Try to get image
-                image_selectors = [
-                    '[data-testid="product-image"] img', '.product-image img', 
-                    '.hero-image img', '.main-image img', 'img[src*="product"]'
-                ]
-                
-                for selector in image_selectors:
-                    try:
-                        img_element = page.locator(selector).first
-                        if await img_element.count() > 0:
-                            img_src = await img_element.get_attribute('src')
-                            if img_src:
-                                # Convert relative URLs to absolute
-                                if img_src.startswith('//'):
-                                    img_src = 'https:' + img_src
-                                elif img_src.startswith('/'):
-                                    base_url = '/'.join(product_url.split('/')[:3])
-                                    img_src = base_url + img_src
-                                scraped_data['image_url'] = img_src
-                                break
-                    except:
-                        continue
-                
-                # Try to get vendor/brand from URL or page
-                try:
-                    domain = urlparse(product_url).netloc.lower()
-                    
-                    # Known vendor mappings
-                    vendor_mappings = {
-                        'visualcomfort.com': 'Visual Comfort',
-                        'fourhands.com': 'Four Hands',
-                        'westelm.com': 'West Elm',
-                        'potterybarn.com': 'Pottery Barn',
-                        'williams-sonoma.com': 'Williams Sonoma',
-                        'crateandbarrel.com': 'Crate & Barrel',
-                        'cb2.com': 'CB2',
-                        'rh.com': 'Restoration Hardware',
-                        'wayfair.com': 'Wayfair',
-                        'overstock.com': 'Overstock',
-                        'homedepot.com': 'Home Depot',
-                        'lowes.com': "Lowe's"
-                    }
-                    
-                    for domain_key, vendor_name in vendor_mappings.items():
-                        if domain_key in domain:
-                            scraped_data['vendor'] = vendor_name
-                            break
-                    
-                    # If no mapping found, use domain name
-                    if 'vendor' not in scraped_data:
-                        scraped_data['vendor'] = domain.replace('www.', '').replace('.com', '').title()
-                        
-                except:
-                    pass
-                
-                await browser.close()
-                
-                # Validate we got at least a name
-                if 'name' not in scraped_data:
-                    scraped_data['name'] = f"Product from {urlparse(product_url).netloc}"
-                
-                # Add metadata
-                scraped_data['link'] = product_url
-                scraped_data['scraped_at'] = datetime.now(timezone.utc).isoformat()
-                
-                logging.info(f"✅ Successfully scraped: {scraped_data}")
-                
-                return {
-                    "status": "success",
-                    "url": product_url,
-                    "data": scraped_data,
-                    "message": f"Successfully scraped product: {scraped_data.get('name', 'Unknown Product')}"
-                }
-                
-            except Exception as scrape_error:
-                await browser.close()
-                raise scrape_error
-                
-    except Exception as e:
-        logging.error(f"❌ Product scraping failed: {str(e)}")
-        
-        # Return partial data if scraping fails
-        fallback_data = {
-            'name': f"Product from {urlparse(product_url).netloc if product_url else 'Unknown'}",
-            'link': product_url,
-            'vendor': urlparse(product_url).netloc.replace('www.', '').replace('.com', '').title() if product_url else 'Unknown',
-            'scraped_at': datetime.now(timezone.utc).isoformat(),
-            'scrape_error': str(e)
-        }
-        
-        return {
-            "status": "partial_success",
-            "url": product_url,
-            "data": fallback_data,
-            "message": f"Partial scraping completed. Error: {str(e)[:100]}"
-        }
+#    try:
+#        product_url = scrape_data.get('url', '').strip()
+#        
+#        if not product_url:
+#            raise HTTPException(status_code=400, detail="Product URL is required")
+#        
+#        # Validate URL
+#        if not product_url.startswith(('http://', 'https://')):
+#            product_url = 'https://' + product_url
+#        
+#        logging.info(f"🔍 Scraping product from: {product_url}")
+#        
+#        # Use Playwright for dynamic content scraping
+#        async with async_playwright() as p:
+#            browser = await p.chromium.launch(headless=True)
+#            page = await browser.new_page()
+#            
+#            try:
+#                # Navigate to the page with timeout
+#                await page.goto(product_url, timeout=30000)
+#                await page.wait_for_timeout(3000)  # Wait for dynamic content
+#                
+#                # Scrape product information using various selectors
+#                scraped_data = {}
+#                
+#                # Try to get product name
+#                name_selectors = [
+#                    'h1', '[data-testid="product-name"]', '.product-title', '.product-name',
+#                    '[class*="title"]', '[class*="name"]', '.pdp-title'
+#                ]
+#                
+#                for selector in name_selectors:
+#                    try:
+#                        name = await page.locator(selector).first.text_content(timeout=2000)
+#                        if name and len(name.strip()) > 0:
+#                            scraped_data['name'] = name.strip()
+#                            break
+#                    except:
+#                        continue
+#                
+#                # Try to get price
+#                price_selectors = [
+#                    '[data-testid="price"]', '.price', '[class*="price"]', 
+#                    '.product-price', '.current-price', '.sale-price'
+#                ]
+#                
+#                for selector in price_selectors:
+#                    try:
+#                        price_text = await page.locator(selector).first.text_content(timeout=2000)
+#                        if price_text:
+#                            # Extract numeric price
+#                            price_match = re.search(r'[\$£€]?([\d,]+\.?\d*)', price_text.replace(',', ''))
+#                            if price_match:
+#                                scraped_data['cost'] = float(price_match.group(1))
+#                                break
+#                    except:
+#                        continue
+#                
+#                # Try to get SKU
+#                sku_selectors = [
+#                    '[data-testid="sku"]', '.sku', '[class*="sku"]', 
+#                    '.product-code', '.item-number', '.model-number'
+#                ]
+#                
+#                for selector in sku_selectors:
+#                    try:
+#                        sku = await page.locator(selector).first.text_content(timeout=2000)
+#                        if sku and len(sku.strip()) > 0:
+#                            scraped_data['sku'] = sku.strip()
+#                            break
+#                    except:
+#                        continue
+#                
+#                # Try to get image
+#                image_selectors = [
+#                    '[data-testid="product-image"] img', '.product-image img', 
+#                    '.hero-image img', '.main-image img', 'img[src*="product"]'
+#                ]
+#                
+#                for selector in image_selectors:
+#                    try:
+#                        img_element = page.locator(selector).first
+#                        if await img_element.count() > 0:
+#                            img_src = await img_element.get_attribute('src')
+#                            if img_src:
+#                                # Convert relative URLs to absolute
+#                                if img_src.startswith('//'):
+#                                    img_src = 'https:' + img_src
+#                                elif img_src.startswith('/'):
+#                                    base_url = '/'.join(product_url.split('/')[:3])
+#                                    img_src = base_url + img_src
+#                                scraped_data['image_url'] = img_src
+#                                break
+#                    except:
+#                        continue
+#                
+#                # Try to get vendor/brand from URL or page
+#                try:
+#                    domain = urlparse(product_url).netloc.lower()
+#                    
+#                    # Known vendor mappings
+#                    vendor_mappings = {
+#                        'visualcomfort.com': 'Visual Comfort',
+#                        'fourhands.com': 'Four Hands',
+#                        'westelm.com': 'West Elm',
+#                        'potterybarn.com': 'Pottery Barn',
+#                        'williams-sonoma.com': 'Williams Sonoma',
+#                        'crateandbarrel.com': 'Crate & Barrel',
+#                        'cb2.com': 'CB2',
+#                        'rh.com': 'Restoration Hardware',
+#                        'wayfair.com': 'Wayfair',
+#                        'overstock.com': 'Overstock',
+#                        'homedepot.com': 'Home Depot',
+#                        'lowes.com': "Lowe's"
+#                    }
+#                    
+#                    for domain_key, vendor_name in vendor_mappings.items():
+#                        if domain_key in domain:
+#                            scraped_data['vendor'] = vendor_name
+#                            break
+#                    
+#                    # If no mapping found, use domain name
+#                    if 'vendor' not in scraped_data:
+#                        scraped_data['vendor'] = domain.replace('www.', '').replace('.com', '').title()
+#                        
+#                except:
+#                    pass
+#                
+#                await browser.close()
+#                
+#                # Validate we got at least a name
+#                if 'name' not in scraped_data:
+#                    scraped_data['name'] = f"Product from {urlparse(product_url).netloc}"
+#                
+#                # Add metadata
+#                scraped_data['link'] = product_url
+#                scraped_data['scraped_at'] = datetime.now(timezone.utc).isoformat()
+#                
+#                logging.info(f"✅ Successfully scraped: {scraped_data}")
+#                
+#                return {
+#                    "status": "success",
+#                    "url": product_url,
+#                    "data": scraped_data,
+#                    "message": f"Successfully scraped product: {scraped_data.get('name', 'Unknown Product')}"
+#                }
+#                
+#            except Exception as scrape_error:
+#                await browser.close()
+#                raise scrape_error
+#                
+#    except Exception as e:
+#        logging.error(f"❌ Product scraping failed: {str(e)}")
+#        
+#        # Return partial data if scraping fails
+#        fallback_data = {
+#            'name': f"Product from {urlparse(product_url).netloc if product_url else 'Unknown'}",
+#            'link': product_url,
+#            'vendor': urlparse(product_url).netloc.replace('www.', '').replace('.com', '').title() if product_url else 'Unknown',
+#            'scraped_at': datetime.now(timezone.utc).isoformat(),
+#            'scrape_error': str(e)
+#        }
+#        
+#        return {
+#            "status": "partial_success",
+#            "url": product_url,
+#            "data": fallback_data,
+#            "message": f"Partial scraping completed. Error: {str(e)[:100]}"
+#        }
 
 # ====================================
 # MOBILE APP PHOTO MANAGEMENT ENDPOINTS
