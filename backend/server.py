@@ -8568,7 +8568,7 @@ async def process_pdf_import(
                 'installed': ['sconce', 'chandelier', 'pendant', 'ceiling', 'ceiling fan', 'fan', 'wall light', 'recessed', 'track light'],
                 
                 # Furniture keywords
-                'furniture': ['table', 'chair', 'sofa', 'console', 'cabinet', 'desk', 'bench', 'ottoman', 'bed', 'dresser', 'nightstand', 'media console', 'coffee table', 'end table', 'side table'],
+                'furniture': ['table', 'chair', 'sofa', 'console', 'cabinet', 'desk', 'bench', 'ottoman', 'pouf', 'pouffe', 'pooff', 'bed', 'dresser', 'nightstand', 'media console', 'coffee table', 'end table', 'side table', 'sectional', 'loveseat', 'armchair', 'stool', 'credenza', 'sideboard', 'bookcase', 'shelving', 'tv stand', 'media cabinet'],
                 
                 # Art & Accessories
                 'art': ['art', 'painting', 'print', 'frame', 'sculpture', 'wall decor', 'artwork'],
