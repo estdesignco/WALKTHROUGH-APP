@@ -4812,6 +4812,10 @@ async def scrape_product_advanced(data: dict):
         
         return {"success": True, "data": product_info}
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        logging.error(f"❌ SCRAPE ERROR for {url}: {str(e)}\n{error_details}")
+        print(f"❌ SCRAPE ERROR DETAILS:\n{error_details}")
         raise HTTPException(status_code=400, detail=f"Failed to scrape URL: {str(e)}")
 
 async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
