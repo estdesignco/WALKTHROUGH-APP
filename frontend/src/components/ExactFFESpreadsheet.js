@@ -61,7 +61,9 @@ const ExactFFESpreadsheet = ({
       
       if (response.ok) {
         console.log('✅ Status updated successfully, reloading...');
-        window.location.reload();
+        if (onReload) {
+          onReload();
+        }
       } else {
         const errorData = await response.text();
         console.error('❌ Status update failed:', response.status, errorData);
