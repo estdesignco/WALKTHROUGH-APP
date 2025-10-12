@@ -50,6 +50,10 @@ const ExactFFESpreadsheet = ({
   const handleStatusChange = async (itemId, newStatus) => {
     console.log('🔄 Status change request:', { itemId, newStatus });
     
+    // Save scroll position before update
+    const scrollY = window.scrollY || window.pageYOffset;
+    console.log('💾 Saving scroll position:', scrollY);
+    
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
@@ -82,13 +86,23 @@ const ExactFFESpreadsheet = ({
         
         if (itemFound) {
           setFilteredProject(updatedProject);
+          // Restore scroll position after state update
+          setTimeout(() => {
+            window.scrollTo(0, scrollY);
+            console.log('📜 Restored scroll position:', scrollY);
+          }, 0);
         } else {
           console.warn('⚠️ Item not found in local state, calling onReload');
           if (onReload) {
             onReload();
           }
+          // Restore scroll position after reload
+          setTimeout(() => {
+            window.scrollTo(0, scrollY);
+            console.log('📜 Restored scroll position after reload:', scrollY);
+          }, 100);
         }
-      } else{
+      } else {
         const errorData = await response.text();
         console.error('❌ Status update failed:', response.status, errorData);
         alert(`Failed to update status: ${response.status} ${response.statusText}\n${errorData}`);
