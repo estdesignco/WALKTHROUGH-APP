@@ -8190,13 +8190,17 @@ async def process_pdf_preview(
                 logging.info(f"⚠️ Skipped retail link: {link}")
                 continue
             
-            # Accept known vendors or product-like URLs
+            # Accept known vendors or product-like URLs (VERY PERMISSIVE - don't block new vendors)
             if any(vendor in lower_link for vendor in KNOWN_TRADE_VENDORS):
                 product_links.append(link)
                 logging.info(f"✅ Accepted known vendor: {link}")
-            elif any(pattern in lower_link for pattern in ['/product/', '/item/', '/furniture/', '/lighting/']):
+            elif any(pattern in lower_link for pattern in ['/product/', '/item/', '/furniture/', '/lighting/', '/sku/', '/p/', '/products/']):
                 product_links.append(link)
-                logging.info(f"✅ Accepted product URL: {link}")
+                logging.info(f"✅ Accepted product URL pattern: {link}")
+            elif lower_link.startswith('http') and '.' in lower_link:
+                # Accept any HTTP link that isn't explicitly blocked (permissive mode)
+                product_links.append(link)
+                logging.info(f"✅ Accepted generic link (permissive): {link}")
             else:
                 skipped_other += 1
                 logging.info(f"⚠️ Skipped (no match): {link}")
@@ -8509,13 +8513,17 @@ async def process_pdf_import(
                 logging.info(f"⚠️ Skipped retail link: {link}")
                 continue
             
-            # Accept known vendors or product-like URLs
+            # Accept known vendors or product-like URLs (VERY PERMISSIVE - don't block new vendors)
             if any(vendor in lower_link for vendor in KNOWN_TRADE_VENDORS):
                 product_links.append(link)
                 logging.info(f"✅ Accepted known vendor: {link}")
-            elif any(pattern in lower_link for pattern in ['/product/', '/item/', '/furniture/', '/lighting/']):
+            elif any(pattern in lower_link for pattern in ['/product/', '/item/', '/furniture/', '/lighting/', '/sku/', '/p/', '/products/']):
                 product_links.append(link)
-                logging.info(f"✅ Accepted product URL: {link}")
+                logging.info(f"✅ Accepted product URL pattern: {link}")
+            elif lower_link.startswith('http') and '.' in lower_link:
+                # Accept any HTTP link that isn't explicitly blocked (permissive mode)
+                product_links.append(link)
+                logging.info(f"✅ Accepted generic link (permissive): {link}")
             else:
                 skipped_other += 1
                 logging.info(f"⚠️ Skipped (no match): {link}")
