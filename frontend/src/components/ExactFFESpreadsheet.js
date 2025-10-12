@@ -381,7 +381,9 @@ const ExactFFESpreadsheet = ({
         console.log('✅ Item deleted successfully');
         alert('Item deleted successfully!');
         // Force reload to show updated data
-        window.location.reload();
+        if (onReload) {
+          onReload();
+        }
       } else {
         console.error('❌ Delete failed with status:', response.status);
         alert(`Delete failed: ${response.status}`);
