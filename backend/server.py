@@ -8562,6 +8562,17 @@ async def process_pdf_import(
             name_lower = product_name.lower()
             vendor_lower = vendor.lower()
             
+            # Vendor-based categorization (some vendors are known for specific categories)
+            textile_vendors = ['jaipur', 'loloi', 'surya', 'safavieh']
+            if any(v in vendor_lower for v in textile_vendors):
+                for cat in categories_list:
+                    cat_name_lower = cat['name'].lower()
+                    if 'textile' in cat_name_lower or 'soft goods' in cat_name_lower or 'rug' in cat_name_lower:
+                        subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                        if subcats:
+                            logging.info(f"🔍 Vendor-matched '{product_name}' ({vendor}) -> Textiles")
+                            return cat, subcats[0]['id']
+            
             # Subcategory-specific keywords
             subcategory_keywords = {
                 # Lighting subcategories
