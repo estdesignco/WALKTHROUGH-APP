@@ -8711,7 +8711,7 @@ async def process_pdf_import(
                             else:
                                 logging.info(f"📂 Categorized '{product_name}' -> {best_category['name'] if best_category else 'default'}")
                             
-                            # Add to checklist
+                            # Add to checklist with PICKED status (as requested by user)
                             await db.items.insert_one({
                                 "id": str(uuid.uuid4()),
                                 "subcategory_id": target_subcategory_id,
@@ -8723,7 +8723,7 @@ async def process_pdf_import(
                                 "size": product_data.get("size", ""),
                                 "finish_color": product_data.get("finish_color", ""),
                                 "image_url": product_data.get("image_url", ""),
-                                "status": "",
+                                "status": "PICKED",
                                 "quantity": 1,
                                 "photos": [],
                                 "created_at": datetime.utcnow(),
