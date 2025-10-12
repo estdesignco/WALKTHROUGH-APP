@@ -8556,10 +8556,11 @@ async def process_pdf_import(
         # Get room structure for categorization
         categories = await db.categories.find({"room_id": room_id}).to_list(None)
         
-        # Helper function to find best subcategory based on product name
-        async def find_best_subcategory_smart(product_name, categories_list):
-            """Smart categorization based on product keywords - handles subcategories"""
+        # Helper function to find best subcategory based on product name and vendor
+        async def find_best_subcategory_smart(product_name, categories_list, vendor=""):
+            """Smart categorization based on product keywords and vendor - handles subcategories"""
             name_lower = product_name.lower()
+            vendor_lower = vendor.lower()
             
             # Subcategory-specific keywords
             subcategory_keywords = {
