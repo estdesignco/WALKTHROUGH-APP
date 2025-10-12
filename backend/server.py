@@ -8341,9 +8341,10 @@ async def process_pdf_preview(
                         if response.get("success") and response.get("data"):
                             product_data = response["data"]
                             product_name = product_data.get("name", "Unknown Product")
+                            product_vendor = product_data.get("vendor", "")
                             
-                            # Smart categorization
-                            best_category, target_subcategory_id = await find_best_subcategory_smart(product_name, categories)
+                            # Smart categorization with vendor
+                            best_category, target_subcategory_id = await find_best_subcategory_smart(product_name, categories, product_vendor)
                             
                             if not target_subcategory_id:
                                 target_subcategory_id = default_subcategory_id
