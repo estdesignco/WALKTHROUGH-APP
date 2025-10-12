@@ -8161,9 +8161,9 @@ async def process_pdf_preview(
         
         # Filter for product links
         KNOWN_TRADE_VENDORS = [
-            'lounards.com', 'bernhardt.com', 'gabby.com', 'visualcomfort.com',
+            'fourhands.com', 'lounards.com', 'bernhardt.com', 'gabby.com', 'visualcomfort.com',
             'lolahug.com', 'hvlgroup.com', 'globeviews.com', 'safavieh.com',
-            'surya.com', 'eichholtz.com', 'havefurniture.com'
+            'surya.com', 'eichholtz.com', 'havefurniture.com', 'uttermost.com'
         ]
         
         RETAIL_BLACKLIST = [
