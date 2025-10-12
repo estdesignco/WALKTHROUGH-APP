@@ -2,7 +2,7 @@
 // This script intercepts Houzz Pro clipper data and "drops it off" at our database
 
 // Your webhook URL (replace with your actual domain)
-const WEBHOOK_URL = 'https://canva-checklist.preview.emergentagent.com/api/furniture/houzz-webhook';
+const WEBHOOK_URL = 'https://designflow-master.preview.emergentagent.com/api/furniture/houzz-webhook';
 
 // Function to intercept and forward Houzz clipper data
 function interceptHouzzClipperData() {

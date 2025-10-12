@@ -82,7 +82,7 @@ for i in range(min(20, len(df_stock))):
 total_fh = db.furniture_catalog.count_documents({"vendor": "Four Hands"})
 print(f"\n✅ Import complete!")
 print(f"📊 Total Four Hands in database: {total_fh}")
-print(f"\n🔗 View: https://canva-checklist.preview.emergentagent.com/furniture-search")
+print(f"\n🔗 View: https://designflow-master.preview.emergentagent.com/furniture-search")
 print(f"\n💡 Next: Once this works, we can:")
 print(f"   1. Scale to all {len(df_stock)} products")
 print(f"   2. Add real images (with trade login credentials)")

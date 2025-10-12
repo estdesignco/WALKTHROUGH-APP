@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://canva-checklist.preview.emergentagent.com/email-template.html
+https://designflow-master.preview.emergentagent.com/email-template.html
 
 ---
 

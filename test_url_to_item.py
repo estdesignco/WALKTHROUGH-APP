@@ -11,7 +11,7 @@ import traceback
 async def test_url_to_item_workflow():
     """Test the complete URL to item workflow"""
     
-    base_url = "https://canva-checklist.preview.emergentagent.com/api"
+    base_url = "https://designflow-master.preview.emergentagent.com/api"
     fourhands_url = "https://fourhands.com/product/248606-001"
     
     try:

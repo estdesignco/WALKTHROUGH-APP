@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://canva-checklist.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://designflow-master.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 def log_test(message, status="INFO"):

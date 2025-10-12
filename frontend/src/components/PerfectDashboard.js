@@ -56,15 +56,15 @@ const PerfectDashboard = () => {
   };
 
   const handleFullQuestionnaire = () => {
-    window.open('https://canva-checklist.preview.emergentagent.com/customer/questionnaire', '_blank');
+    window.open('https://designflow-master.preview.emergentagent.com/customer/questionnaire', '_blank');
   };
 
   const handleProjectClick = (project) => {
     // Make projects clickable - open project detail page
     if (project.id) {
-      window.open(`https://canva-checklist.preview.emergentagent.com/project/${project.id}/detail`, '_blank');
+      window.open(`https://designflow-master.preview.emergentagent.com/project/${project.id}/detail`, '_blank');
     } else {
-      window.open('https://canva-checklist.preview.emergentagent.com/project/a332f2fb-a248-41db-9c50-f028430a6261/detail', '_blank');
+      window.open('https://designflow-master.preview.emergentagent.com/project/a332f2fb-a248-41db-9c50-f028430a6261/detail', '_blank');
     }
   };
 
@@ -225,7 +225,7 @@ const PerfectDashboard = () => {
         {/* Navigation Links - with shimmer */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <a 
-            href="https://canva-checklist.preview.emergentagent.com/customer" 
+            href="https://designflow-master.preview.emergentagent.com/customer" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 p-6 rounded-xl transition-all duration-300 transform hover:scale-105 text-center block relative overflow-hidden group"
@@ -239,7 +239,7 @@ const PerfectDashboard = () => {
           </a>
           
           <a 
-            href="https://canva-checklist.preview.emergentagent.com/customer/questionnaire" 
+            href="https://designflow-master.preview.emergentagent.com/customer/questionnaire" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-green-700 to-green-800 hover:from-green-800 hover:to-green-900 p-6 rounded-xl transition-all duration-300 transform hover:scale-105 text-center block relative overflow-hidden group"
@@ -253,7 +253,7 @@ const PerfectDashboard = () => {
           </a>
           
           <a 
-            href="https://canva-checklist.preview.emergentagent.com/email-preview" 
+            href="https://designflow-master.preview.emergentagent.com/email-preview" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 p-6 rounded-xl transition-all duration-300 transform hover:scale-105 text-center block relative overflow-hidden group"
@@ -270,7 +270,7 @@ const PerfectDashboard = () => {
         {/* BIG Walkthrough and Furniture Search - with shimmer */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <a 
-            href="https://canva-checklist.preview.emergentagent.com/" 
+            href="https://designflow-master.preview.emergentagent.com/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-indigo-700 to-indigo-800 hover:from-indigo-800 hover:to-indigo-900 p-12 rounded-2xl transition-all duration-300 transform hover:scale-105 text-center block relative overflow-hidden group"
@@ -285,7 +285,7 @@ const PerfectDashboard = () => {
           </a>
           
           <a 
-            href="https://canva-checklist.preview.emergentagent.com/" 
+            href="https://designflow-master.preview.emergentagent.com/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-amber-700 to-amber-800 hover:from-amber-800 hover:to-amber-900 p-12 rounded-2xl transition-all duration-300 transform hover:scale-105 text-center block relative overflow-hidden group"
@@ -336,7 +336,7 @@ const PerfectDashboard = () => {
                   Send Email
                 </button>
                 <a
-                  href="https://canva-checklist.preview.emergentagent.com/email-preview"
+                  href="https://designflow-master.preview.emergentagent.com/email-preview"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-all duration-300 text-center font-medium"

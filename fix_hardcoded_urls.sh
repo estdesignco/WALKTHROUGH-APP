@@ -4,7 +4,7 @@
 echo "🔧 Fixing hardcoded URLs in frontend components..."
 
 # Define the old and new patterns
-OLD_URL="https://canva-checklist.preview.emergentagent.com"
+OLD_URL="https://designflow-master.preview.emergentagent.com"
 NEW_URL="\${process.env.REACT_APP_BACKEND_URL || window.location.origin}"
 
 # Find all JavaScript files with hardcoded URLs and replace them

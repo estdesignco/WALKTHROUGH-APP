@@ -160,7 +160,7 @@ async def test_gallery_api():
     
     import aiohttp
     
-    base_url = "https://canva-checklist.preview.emergentagent.com/api/furniture"
+    base_url = "https://designflow-master.preview.emergentagent.com/api/furniture"
     
     try:
         async with aiohttp.ClientSession() as session:
@@ -197,7 +197,7 @@ async def main():
         
         print(f"\n🎉 PHASE B SUCCESS!")
         print(f"\n🔗 USER TESTING:")
-        print(f"1. Go to: https://canva-checklist.preview.emergentagent.com/furniture-search")
+        print(f"1. Go to: https://designflow-master.preview.emergentagent.com/furniture-search")
         print(f"2. Search for 'Cove' or '248606-001'")
         print(f"3. Click on the Four Hands chair image")
         print(f"4. Should see GALLERY with {results['total_images']} images total")

@@ -334,7 +334,7 @@ async def scrape_uttermost_with_protection(num_products=10):
     print("="*80)
     print(f"🎉 COMPLETE!")
     print(f"✅ Successfully imported {success}/{num_products} Uttermost products")
-    print(f"🔗 View: https://canva-checklist.preview.emergentagent.com/furniture-search")
+    print(f"🔗 View: https://designflow-master.preview.emergentagent.com/furniture-search")
     print("="*80 + "\n")
     
     client.close()

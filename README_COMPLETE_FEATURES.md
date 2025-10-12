@@ -1,7 +1,7 @@
 # 🎉 Mobile Interior Design App - Complete Features List
 
 ## 📱 Live App
-**URL:** https://canva-checklist.preview.emergentagent.com/mobile-app
+**URL:** https://designflow-master.preview.emergentagent.com/mobile-app
 
 ---
 
@@ -275,7 +275,7 @@ Garage:             #374151 (Dark Gray)
 ## 🚀 QUICK START
 
 ### For Users:
-1. Open: https://canva-checklist.preview.emergentagent.com/mobile-app
+1. Open: https://designflow-master.preview.emergentagent.com/mobile-app
 2. Select a project
 3. Choose Walkthrough or FF&E
 4. Start working!

@@ -126,7 +126,7 @@ Disconnect Leica when not in use to save battery on both devices.
 
 ## 🧪 TEST IT NOW
 
-1. Open: https://canva-checklist.preview.emergentagent.com/mobile-app
+1. Open: https://designflow-master.preview.emergentagent.com/mobile-app
 2. Go to Walkthrough or FFE
 3. Click "📸 PHOTO"
 4. Click "📏 Connect Leica D5"

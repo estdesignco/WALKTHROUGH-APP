@@ -10,7 +10,7 @@ import json
 async def add_to_existing_room():
     """Add the Four Hands item to the kitchen room (which has Furniture category)"""
     
-    base_url = "https://canva-checklist.preview.emergentagent.com/api"
+    base_url = "https://designflow-master.preview.emergentagent.com/api"
     project_id = "8bb8cbf2-e691-4227-9892-d78c79d5b0a4"
     
     try:
@@ -74,7 +74,7 @@ async def add_to_existing_room():
 async def verify_item_added():
     """Verify the item was added successfully"""
     
-    base_url = "https://canva-checklist.preview.emergentagent.com/api"
+    base_url = "https://designflow-master.preview.emergentagent.com/api"
     project_id = "8bb8cbf2-e691-4227-9892-d78c79d5b0a4"
     
     try:

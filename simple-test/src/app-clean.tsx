@@ -3,7 +3,7 @@ import { requestOpenExternalUrl } from "@canva/platform";
 import * as React from "react";
 import * as styles from "styles/components.css";
 
-const BACKEND_URL = "https://canva-checklist.preview.emergentagent.com";
+const BACKEND_URL = "https://designflow-master.preview.emergentagent.com";
 
 const STATUS_OPTIONS = ['PICKED','ORDER SAMPLES','SAMPLES ARRIVED','ASK NEIL','ASK CHARLENE','ASK JALA','GET QUOTE','WAITING ON QT','READY FOR PRESENTATION'];
 

@@ -1,93 +1,57 @@
 <analysis>
-The previous AI engineer successfully developed core features for the interior design application. Initial work focused on a Live Checklist Canva App with UI, bidirectional synchronization, and image uploads. A Chrome Extension for scraping product links from Canva boards was also developed but proved unreliable. The engineer then shifted focus to a PDF import feature, which initially faced MongoDB  serialization errors (503 Service Unavailable) and subsequent  issues during product scraping. These backend problems were systematically resolved, leading to successful PDF import with smart categorization and item sorting. Frontend display issues, including missing columns and small image popups, were also addressed. The current phase involves getting the Live Sheet Canva App deployed and functional within Canva, which has been successfully deployed to Canva, but requires a backend URL update, which the user has requested the AI engineer to implement.
+The AI engineer primarily focused on debugging and implementing core features after an initial handoff. Key efforts included clarifying Canva App OAuth (determining it wasn't needed for the checklist app), then pivoting to user-requested fixes. Significant work was dedicated to implementing robust drag-and-drop functionality across the Checklist, Walkthrough, and FFE sheets, which involved resolving conflicting DND libraries, fixing visual rendering glitches, and ensuring persistent collapsed states via . The engineer also addressed an FFE spreadsheet header misalignment, made product links clickable, and verified existing functionality like PDF auto-import and Teams notifications. The current task involves updating Teams notification priority logic based on user feedback.
 </analysis>
 
 <product_requirements>
-The application's primary goal is to be an advanced interior design hub. It needs customer questionnaires, a designer landing page, contact management, and interactive spreadsheets (Walkthrough, Checklist, FFE) with mobile/offline capabilities, Leica D5 laser pointer integration, and Teams notifications. A crucial aspect is **Canva integration**, involving a **Live Checklist Canva App** for in-editor display and real-time bidirectional syncing of project data, items, images, prices, and links, styled to match the main app. This Canva app should support Auto-Detection for scraping product information directly. A **Chrome Extension** was also required for scraping product links from Canva design boards, and a **PDF Import** feature was introduced as an alternative to import links from exported Canva PDFs. The application must display key item details like name, vendor, SKU, size, color, cost, and a clickable link, with intelligent categorization and new items appearing at the top.
+The application is an advanced interior design hub to manage projects efficiently. It features a customer questionnaire (email link, beautiful UI for room/project details), which auto-fills a designer landing page and a contact sheet. Core interactive spreadsheets (Walkthrough, Checklist, FFE) need mobile/offline support, and specific features like adding/deleting rooms/items, minimizing, rearranging, taking pictures, and measurements. The Walkthrough auto-populates from the questionnaire and syncs to the Checklist. The Checklist supports item scraping from links (product name, size, color, link, image, SKU, cost), status dropdowns for a pie chart, and Teams notifications. The FFE (Furniture, Fixtures, and Equipment) spreadsheet is the bible for designers, requiring live shipping tracking, order dates, and status dropdowns. A dream feature involves scraping all furniture sites into one place. Crucially, the UI structure, colors, and core operations are king and must not be changed without explicit instruction.
 </product_requirements>
 
 <key_technical_concepts>
--   **Backend:** FastAPI, MongoDB (), BeautifulSoup4, , usage: pdfplumber [-h] [--structure | --structure-text]
-                  [--format {csv,json,text}] [--types TYPES [TYPES ...]]
-                  [--include-attrs INCLUDE_ATTRS [INCLUDE_ATTRS ...]]
-                  [--exclude-attrs EXCLUDE_ATTRS [EXCLUDE_ATTRS ...]]
-                  [--laparams LAPARAMS] [--precision PRECISION]
-                  [--pages PAGES [PAGES ...]] [--indent INDENT]
-                  [infile]
-
-positional arguments:
-  infile
-
-options:
-  -h, --help            show this help message and exit
-  --structure           Write the structure tree as JSON. All other arguments
-                        except --pages, --laparams, and --indent will be
-                        ignored
-  --structure-text      Write the structure tree as JSON including text
-                        contents. All other arguments except --pages,
-                        --laparams, and --indent will be ignored
-  --format {csv,json,text}
-  --types TYPES [TYPES ...]
-  --include-attrs INCLUDE_ATTRS [INCLUDE_ATTRS ...]
-                        Include *only* these object attributes in output.
-  --exclude-attrs EXCLUDE_ATTRS [EXCLUDE_ATTRS ...]
-                        Exclude these object attributes from output.
-  --laparams LAPARAMS
-  --precision PRECISION
-  --pages PAGES [PAGES ...]
-  --indent INDENT       Indent level for JSON pretty-printing.,  (for HTTP requests), Playwright (for web scraping via a separate service, though not directly modified).
--   **Frontend (Main App):** React.js, Tailwind CSS.
--   **Canva Integration:** Canva Apps SDK (), Canva CLI, , webpack.
--   **Data Persistence:** MongoDB.
+-   **Backend:** FastAPI, MongoDB (), BeautifulSoup4.
+-   **Frontend:** React.js, Tailwind CSS,  (for drag-and-drop), .
+-   **Integrations:** Canva Apps SDK, Microsoft Teams webhooks.
+-   **Deployment:** Kubernetes, Supervisor, CORS.
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: The main FastAPI backend.
-    -   **Importance**: Handles core API logic, including project, item, and category management, PDF import processing, and product scraping.
-    -   **Changes Made**:
-        -   Added  helper to handle MongoDB  serialization errors.
-        -   Modified  to accept  and  as query parameters and improved error handling for scraping.
-        -   Increased  timeout for scraping to 5 minutes to prevent  issues.
-        -   Implemented  function for intelligent item categorization (Furniture, Lighting, Art & Accessories, Textiles) including Portable vs. Installed lighting.
-        -   Updated  to sort items by  in descending order.
-        -   Fixed Pydantic validation errors by patching  and  issues in imported product data.
+-   ****: Main FastAPI backend, handles API routes.
+    -   **Importance**: Central API logic for project, rooms, items, and integrations.
+    -   **Changes Made**: Implemented a  endpoint (partially implemented, not integrated), verified DELETE endpoint, confirmed Teams notification calls on item status change.
+-   ****: Handles Microsoft Teams notifications.
+    -   **Importance**: Defines the logic for sending messages to Teams.
+    -   **Changes Made**: Currently being modified to adjust priority for specific status changes as requested by the user.
+-   ****: Main frontend routing and application structure.
+    -   **Importance**: Orchestrates the main UI components and navigation.
+    -   **Changes Made**: Debugged routing issues that caused the checklist to fail loading (found project ID mismatch between environments).
 -   ****: Renders the primary checklist.
-    -   **Importance**: Central component for displaying and interacting with project items.
-    -   **Changes Made**:
-        -   Updated PDF upload to use  with query parameters.
-        -   Added  for hard refresh after PDF import.
-        -   Modified table headers and cells to display  combined, , , and a clickable .
-        -   Increased image popup size to 98vw x 95vh.
--   ****: Another checklist component, possibly used for embedded views.
-    -   **Importance**: Provides a simplified checklist display.
-    -   **Changes Made**: Replaced 'SCRAPE' column with a clickable 'LINK' column and added the larger image popup functionality to product images.
--   ****: A modal component for Canva integration.
-    -   **Importance**: Likely for managing specific Canva-related interactions.
-    -   **Changes Made**: Identified as calling a non-existent PDF extraction endpoint ().
--   ****: A newly created directory for packaging the Canva App and Chrome Extension for submission and internal use.
-    -   **Importance**: Organizes all necessary files for deployment and documentation.
-    -   **Changes Made**: Created with  (containing  and ), , and various , , etc.
--   ****: The main entry point for the Canva Live Checklist app.
-    -   **Importance**: Contains the logic for displaying the checklist within Canva and handling bidirectional sync.
-    -   **Changes Made**: Expected to be updated with the production backend URL () from the  file, replacing a  URL.
--   ****: Environment variables for the Canva app.
-    -   **Importance**: Holds  and  for the Canva app to communicate with the backend.
-    -   **Changes Made**: Manually created/updated to include  (e.g., ) and  ().
+    -   **Importance**: Displays main project items with extensive features.
+    -   **Changes Made**: Implemented drag-and-drop for rooms and categories, ensured visual updates post-drag, added  for persistent collapsed states, and removed redundant  calls. Standardized DND library to .
+-   ****: The actual Walkthrough component.
+    -   **Importance**: Used for on-site item checking.
+    -   **Changes Made**: Implemented drag-and-drop for rooms and categories, ensured visual updates post-drag, added  for persistent collapsed states, and removed redundant  calls. Standardized DND library to .
+-   ****: The Furniture, Fixtures, and Equipment sheet.
+    -   **Importance**: Central for managing purchased items, shipping, and installation.
+    -   **Changes Made**: Fixed header alignment, ensured STATUS dropdown was visible, made the LINK column clickable, implemented drag-and-drop for rooms and categories, ensured visual updates post-drag, added  for persistent collapsed states, and removed redundant  calls. Standardized DND library to .
+-   ****: New component for PDF item selection.
+    -   **Importance**: Intended to provide a preview and selection UI for PDF imported items.
+    -   **Changes Made**: File created, but not yet integrated into the main flow or fully implemented.
+-   ****: Handles customer input.
+    -   **Importance**: Initial data entry point for project creation.
+    -   **Changes Made**: Confirmed existing logic for auto-populating rooms with starter items into the Walkthrough sheet upon submission.
 </code_architecture>
 
 <pending_tasks>
--   **Configure Canva App Backend URL:** Update the  in  to the production URL.
--   **Test Canva App Functionality:** Verify real-time sync, item display, and status updates within the Canva editor.
--   **Submit Canva App for Review:** Complete the submission process to the Canva Apps Marketplace.
--   **Implement Single Item Selection (Phase 2):** Add UI for extracted PDF links, allowing users to select items for import with a preview.
--   **Further Chrome Extension Enhancement:** Although debugged, the extension still needs a more robust scraping mechanism for Canva's internal data structures.
+-   **PDF Item Selection UI:** The backend  and frontend  were started but not fully integrated or confirmed by the user.
+-   **Canva App Submission:** The user needs to complete the submission process to the Canva Apps Marketplace.
+-   **Further Chrome Extension Enhancement:** (Mentioned in initial  but not addressed in trajectory).
+-   **Canva App Testing:** Verify real-time sync and item display after successful upload.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was guiding the user through the process of deploying the Live Sheet Canva App (from ) to Canva. The user successfully created a new Apps SDK app () via the Canva CLI and built the provided app code. The app is now visible within the Canva editor, but it is not working (meaning it likely cannot connect to the backend or fetch data). The root cause is presumed to be the hardcoded  backend URL in  not being updated to the production URL. The AI engineer attempted to instruct the user to manually edit this file, but the user explicitly stated, i am NOT a code person. SO, you are gonna have to impliment code if that is what you are trying to get me to do! This indicates that the current task is for the AI engineer to programmatically make this code change.
+Immediately before this summary, the AI engineer successfully addressed multiple critical frontend issues. Drag-and-drop functionality for rooms and categories has been implemented and refined on ,  (Walkthrough), and  (FFE). This involved standardizing the drag-and-drop library to , fixing JSX structure issues, ensuring visual updates, and preventing full page reloads after a drag. Additionally, the expanded/collapsed state of rooms and categories now persists across page loads using . The FFE spreadsheet header alignment has been corrected, the STATUS dropdown is visible, and the LINK column now contains a clickable button to open product URLs. The auto-population of rooms from the customer questionnaire to the walkthrough has been verified as working. The backend's Microsoft Teams notification system, which triggers on item status changes in both Checklist and FFE, has also been confirmed as fully functional. The current task involves updating the priority logic for these Teams notifications based on user-specified statuses in .
 </current_work>
 
 <optional_next_step>
-Programmatically update the  in  to the production URL.
+Modify Teams notification priority in .
 </optional_next_step>

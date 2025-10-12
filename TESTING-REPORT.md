@@ -8,7 +8,7 @@
 
 ### Test 1.1: Health Check
 ```bash
-curl https://canva-checklist.preview.emergentagent.com/api/health
+curl https://designflow-master.preview.emergentagent.com/api/health
 ```
 **Status:** ✅ PASS
 **Response:** `{"status":"healthy","timestamp":"2025-10-07T05:21:25.844634"}`
@@ -42,7 +42,7 @@ curl https://canva-checklist.preview.emergentagent.com/api/health
 **Status:** ✅ DEPLOYED
 
 ### Test 2.4: URL Accessibility
-**URL:** `https://canva-checklist.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+**URL:** `https://designflow-master.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
 **Status:** ✅ ACCESSIBLE
 
 ---
@@ -106,7 +106,7 @@ curl https://canva-checklist.preview.emergentagent.com/api/health
 **Status:** ✅ ALL DOCUMENTATION COMPLETE
 
 ### Test 5.2: Guide Accessibility
-**URL:** `https://canva-checklist.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+**URL:** `https://designflow-master.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
 **Status:** ✅ ACCESSIBLE
 
 ---

@@ -30,7 +30,7 @@ Your existing Houzz Pro clipper will work normally BUT also "drop off" data in y
 
 2. **Automatic Data Interception:**
    - Our script intercepts the clipper data
-   - Sends it to: `https://canva-checklist.preview.emergentagent.com/api/furniture/houzz-webhook`
+   - Sends it to: `https://designflow-master.preview.emergentagent.com/api/furniture/houzz-webhook`
    - Product gets saved to Houzz Pro AND your database
 
 3. **Search Your Clipped Products:**

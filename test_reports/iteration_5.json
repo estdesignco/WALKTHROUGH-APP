@@ -101,8 +101,8 @@
   },
 
   "test_environment": {
-    "frontend_url": "https://canva-checklist.preview.emergentagent.com",
-    "backend_url": "https://canva-checklist.preview.emergentagent.com/api",
+    "frontend_url": "https://designflow-master.preview.emergentagent.com",
+    "backend_url": "https://designflow-master.preview.emergentagent.com/api",
     "test_canva_url": "https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit",
     "playwright_browsers": "Installed and functional",
     "test_project": "MongoDB Recovery Test Project (EDITED)"
