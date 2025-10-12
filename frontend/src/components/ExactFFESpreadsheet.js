@@ -112,8 +112,8 @@ const ExactFFESpreadsheet = ({
       if (response.ok) {
         console.log('✅ Carrier updated successfully');
         
-        // Update local state to avoid scroll jump
-        const updatedProject = { ...filteredProject };
+        // Update local state to avoid scroll jump - create proper deep copy
+        const updatedProject = JSON.parse(JSON.stringify(filteredProject));
         let itemFound = false;
         
         updatedProject.rooms?.forEach(room => {
