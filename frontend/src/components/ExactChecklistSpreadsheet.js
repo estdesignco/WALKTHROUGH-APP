@@ -1328,9 +1328,11 @@ const ExactChecklistSpreadsheet = ({
                                         statusText.style.color = '#9ACD32';
                                         clearInterval(pollProgress);
                                         
-                                        // Refresh the page to show new items (force hard reload to bypass cache)
+                                        // Refresh the page to show new items
                                         setTimeout(() => {
-                                          window.location.reload(true);
+                                          if (onReload) {
+                                            onReload();
+                                          }
                                         }, 3000);
                                       } else if (job.status === 'failed') {
                                         statusText.textContent = '❌ Import failed';
