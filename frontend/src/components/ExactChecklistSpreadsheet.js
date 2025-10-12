@@ -902,7 +902,7 @@ const ExactChecklistSpreadsheet = ({
             finish_color: itemContext.item.finish_color || '',
             quantity: itemContext.item.quantity || 1,
             subcategory_id: subcategoryId,
-            status: '', // Set to BLANK for FFE (not APPROVED)
+            status: itemContext.item.status || '', // TRANSFER STATUS FROM CHECKLIST
             order_index: itemContext.item.order_index || 0,
             link: itemContext.item.link || '',
             image_url: itemContext.item.image_url || ''
