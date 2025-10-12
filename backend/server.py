@@ -8397,33 +8397,67 @@ async def process_pdf_import(
         pdf_file = io.BytesIO(pdf_content)
         pdf_reader = PyPDF2.PdfReader(pdf_file)
         
+        num_pages = len(pdf_reader.pages)
+        logging.info(f"📄 PDF has {num_pages} pages")
+        print(f"📄 PDF has {num_pages} pages")
+        
         all_links = []
         
         # Method 1: Extract from annotations (clickable links)
-        for page_num in range(len(pdf_reader.pages)):
+        for page_num in range(num_pages):
             page = pdf_reader.pages[page_num]
+            page_links = []
             
             if '/Annots' in page:
                 annotations = page['/Annots']
-                for annotation in annotations:
-                    obj = annotation.get_object()
-                    if '/A' in obj and '/URI' in obj['/A']:
-                        uri = obj['/A']['/URI']
-                        if isinstance(uri, str):
-                            all_links.append(uri)
+                try:
+                    # Resolve the annotations reference if needed
+                    if hasattr(annotations, 'get_object'):
+                        annotations = annotations.get_object()
+                    
+                    for annotation in annotations:
+                        try:
+                            obj = annotation.get_object()
+                            if '/A' in obj and '/URI' in obj['/A']:
+                                uri = obj['/A']['/URI']
+                                if isinstance(uri, str):
+                                    page_links.append(uri)
+                                    all_links.append(uri)
+                        except Exception as anno_error:
+                            logging.warning(f"⚠️ Could not parse annotation: {anno_error}")
+                            continue
+                    
+                    logging.info(f"📄 Page {page_num + 1}: Found {len(page_links)} clickable links")
+                    print(f"📄 Page {page_num + 1}: Found {len(page_links)} clickable links: {page_links}")
+                except Exception as e:
+                    logging.warning(f"⚠️ Error processing annotations on page {page_num + 1}: {e}")
+        
+        logging.info(f"🔗 Total clickable links found: {len(all_links)}")
+        print(f"🔗 Total clickable links from annotations: {len(all_links)}")
         
         # Method 2: Extract from page text (URLs in text)
-        for page_num in range(len(pdf_reader.pages)):
+        text_links = []
+        for page_num in range(num_pages):
             page = pdf_reader.pages[page_num]
             text = page.extract_text()
             
             # Find URLs in text
             url_pattern = r'https?://[^\s<>"\'\\)\\]]+[^\s<>"\'\\)\\].,;:]'
             found_urls = re.findall(url_pattern, text)
-            all_links.extend(found_urls)
+            text_links.extend(found_urls)
+            
+            if found_urls:
+                logging.info(f"📄 Page {page_num + 1}: Found {len(found_urls)} URLs in text")
+                print(f"📄 Page {page_num + 1}: Found {len(found_urls)} URLs in text: {found_urls[:3]}...")
+        
+        all_links.extend(text_links)
+        logging.info(f"🔗 Total links (annotations + text): {len(all_links)}")
+        print(f"🔗 Total links before deduplication: {len(all_links)}")
         
         # Remove duplicates
         all_links = list(set(all_links))
+        logging.info(f"🔗 Unique links after deduplication: {len(all_links)}")
+        print(f"🔗 Unique links: {len(all_links)}")
         
         # Filter for product links (using same logic as scanner)
         KNOWN_TRADE_VENDORS = [
