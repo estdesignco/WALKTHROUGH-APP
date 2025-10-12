@@ -8491,24 +8491,43 @@ async def process_pdf_import(
         ]
         
         product_links = []
+        skipped_canva = 0
+        skipped_retail = 0
+        skipped_other = 0
+        
         for link in all_links:
             lower_link = link.lower()
             
             # Skip Canva links
             if 'canva.com' in lower_link:
+                skipped_canva += 1
                 continue
             
             # Skip retail
             if any(retail in lower_link for retail in RETAIL_BLACKLIST):
+                skipped_retail += 1
+                logging.info(f"⚠️ Skipped retail link: {link}")
                 continue
             
             # Accept known vendors or product-like URLs
             if any(vendor in lower_link for vendor in KNOWN_TRADE_VENDORS):
                 product_links.append(link)
+                logging.info(f"✅ Accepted known vendor: {link}")
             elif any(pattern in lower_link for pattern in ['/product/', '/item/', '/furniture/', '/lighting/']):
                 product_links.append(link)
+                logging.info(f"✅ Accepted product URL: {link}")
+            else:
+                skipped_other += 1
+                logging.info(f"⚠️ Skipped (no match): {link}")
         
         total_links = len(product_links)
+        logging.info(f"📊 Link filtering results:")
+        logging.info(f"   Total extracted: {len(all_links)}")
+        logging.info(f"   Skipped Canva: {skipped_canva}")
+        logging.info(f"   Skipped retail: {skipped_retail}")
+        logging.info(f"   Skipped other: {skipped_other}")
+        logging.info(f"   ✅ Accepted product links: {total_links}")
+        print(f"📊 Final product links: {product_links}")
         
         await db.pdf_import_jobs.update_one(
             {"id": job_id},
