@@ -1607,6 +1607,10 @@ async def get_projects():
                 for subcategory_data in subcategories:
                     # Fetch items for each subcategory
                     items = await db.items.find({"subcategory_id": subcategory_data["id"]}).to_list(1000)
+                    # Fix any items with None names before validation
+                    for item in items:
+                        if not item.get("name"):
+                            item["name"] = "Unknown Product"
                     subcategory_data["items"] = [Item(**item) for item in items]
                     
                 category_data["subcategories"] = [SubCategory(**subcat) for subcat in subcategories]
