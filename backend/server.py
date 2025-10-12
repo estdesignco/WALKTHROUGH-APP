@@ -8659,11 +8659,27 @@ async def process_pdf_import(
                             logging.info(f"🔍 Matched '{product_name}' -> Window Treatments")
                             return cat, subcats[0]['id']
             
-            # Fallback: return first category with subcategories
+            # Fallback: return first category with subcategories, but prefer Furniture over Lighting
+            furniture_cat = None
+            first_cat = None
+            
             for cat in categories_list:
                 subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
                 if subcats:
-                    return cat, subcats[0]['id']
+                    if not first_cat:
+                        first_cat = (cat, subcats[0]['id'])
+                    # Prefer Furniture category as fallback
+                    if 'furniture' in cat['name'].lower():
+                        furniture_cat = (cat, subcats[0]['id'])
+                        break
+            
+            # Use furniture category if found, otherwise use first category
+            if furniture_cat:
+                logging.warning(f"⚠️ No specific match for '{product_name}', defaulting to Furniture category")
+                return furniture_cat
+            elif first_cat:
+                logging.warning(f"⚠️ No match for '{product_name}', using first available category")
+                return first_cat
             
             return None, None
         
