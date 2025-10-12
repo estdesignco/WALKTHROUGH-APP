@@ -322,8 +322,6 @@ const ExactFFESpreadsheet = ({
         // Use onReload prop instead of window.location.reload to prevent page jump
         if (onReload) {
           onReload();
-        } else {
-          window.location.reload();
         }
       } else {
         const errorData = await response.text();
