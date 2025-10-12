@@ -8235,9 +8235,21 @@ async def process_pdf_preview(
         categories = await db.categories.find({"room_id": room_id}).to_list(None)
         
         # Helper function to find best subcategory (same as import function)
-        async def find_best_subcategory_smart(product_name, categories_list):
-            """Smart categorization based on product keywords - handles subcategories"""
-            name_lower = product_name.lower()
+        async def find_best_subcategory_smart(product_name, categories_list, vendor=""):
+            """Smart categorization based on product keywords and vendor - handles subcategories"""
+            name_lower = product_name.lower() if product_name else ""
+            vendor_lower = vendor.lower() if vendor else ""
+            
+            # Vendor-based categorization (some vendors are known for specific categories)
+            textile_vendors = ['jaipur', 'loloi', 'surya', 'safavieh']
+            if any(v in vendor_lower for v in textile_vendors):
+                for cat in categories_list:
+                    cat_name_lower = cat['name'].lower()
+                    if 'textile' in cat_name_lower or 'soft goods' in cat_name_lower or 'rug' in cat_name_lower:
+                        subcats = await db.subcategories.find({"category_id": cat["id"]}).to_list(None)
+                        if subcats:
+                            logging.info(f"🔍 Vendor-matched '{product_name}' ({vendor}) -> Textiles")
+                            return cat, subcats[0]['id']
             
             # Subcategory-specific keywords
             subcategory_keywords = {
