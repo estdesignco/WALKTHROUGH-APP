@@ -321,6 +321,10 @@ const ExactChecklistSpreadsheet = ({
   const handleStatusChange = async (itemId, newStatus) => {
     console.log('🔄 Checklist status change request:', { itemId, newStatus });
     
+    // Save scroll position before update
+    const scrollY = window.scrollY || window.pageYOffset;
+    console.log('💾 Saving scroll position:', scrollY);
+    
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       console.log('🌐 Using backend URL:', backendUrl);
@@ -356,11 +360,21 @@ const ExactChecklistSpreadsheet = ({
         
         if (itemFound) {
           setFilteredProject(updatedProject);
+          // Restore scroll position after state update
+          setTimeout(() => {
+            window.scrollTo(0, scrollY);
+            console.log('📜 Restored scroll position:', scrollY);
+          }, 0);
         } else {
           console.warn('⚠️ Item not found in local state, calling onReload');
           if (onReload) {
             onReload();
           }
+          // Restore scroll position after reload
+          setTimeout(() => {
+            window.scrollTo(0, scrollY);
+            console.log('📜 Restored scroll position after reload:', scrollY);
+          }, 100);
         }
       } else {
         const errorData = await response.text();
