@@ -201,10 +201,7 @@ const App = () => {
               path="/questionnaire/:clientEmail" 
               element={<ComprehensiveQuestionnaire />}
             />
-            <Route 
-              path="/project/:projectId" 
-              element={<ProjectDetailPage />}
-            />
+            {/* IMPORTANT: More specific routes MUST come before less specific ones */}
             <Route 
               path="/project/:projectId/questionnaire" 
               element={<QuestionnaireSheet />}
@@ -232,6 +229,11 @@ const App = () => {
             <Route 
               path="/ffe/:projectId" 
               element={<FFEDashboard isOffline={isOffline} />}
+            />
+            {/* Generic project detail route - MUST be AFTER specific routes */}
+            <Route 
+              path="/project/:projectId" 
+              element={<ProjectDetailPage />}
             />
             <Route 
               path="/scraping-test" 
