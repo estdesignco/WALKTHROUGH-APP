@@ -8,6 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 import asyncio
 import re
+import base64
 import subprocess
 from urllib.parse import urljoin, urlparse
 from pathlib import Path
