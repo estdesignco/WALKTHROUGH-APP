@@ -60,9 +60,33 @@ const ExactFFESpreadsheet = ({
       console.log('📡 Status change response:', response.status, response.statusText);
       
       if (response.ok) {
-        console.log('✅ Status updated successfully, reloading...');
-        if (onReload) {
-          onReload();
+        console.log('✅ Status updated successfully');
+        
+        // Update local state to avoid scroll jump
+        const updatedProject = { ...filteredProject };
+        let itemFound = false;
+        
+        updatedProject.rooms?.forEach(room => {
+          room.categories?.forEach(category => {
+            category.subcategories?.forEach(subcategory => {
+              subcategory.items?.forEach(item => {
+                if (item.id === itemId) {
+                  item.status = newStatus;
+                  itemFound = true;
+                  console.log('✅ Updated item status in local state:', item.name, '→', newStatus);
+                }
+              });
+            });
+          });
+        });
+        
+        if (itemFound) {
+          setFilteredProject(updatedProject);
+        } else {
+          console.warn('⚠️ Item not found in local state, calling onReload');
+          if (onReload) {
+            onReload();
+          }
         }
       } else {
         const errorData = await response.text();
