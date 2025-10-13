@@ -4061,7 +4061,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 for selector in login_selectors:
                     try:
                         await page.fill(selector, credentials['username'], timeout=3000)
-                        print(f\"✅ Filled username: {credentials['username']}\")\n                        break
+                        print(f"✅ Filled username: {credentials['username']}")
+                        break
                     except:
                         continue
                 
@@ -4069,30 +4070,33 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 for selector in password_selectors:
                     try:
                         await page.fill(selector, credentials['password'], timeout=3000)
-                        print(f\"✅ Filled password\")\n                        break
+                        print(f"✅ Filled password")
+                        break
                     except:
                         continue
                 
                 # Click login button
                 login_button_selectors = [
-                    'button[type=\"submit\"]',
-                    'input[type=\"submit\"]',
-                    'button:has-text(\"Sign In\")',
-                    'button:has-text(\"Log In\")',
-                    'button:has-text(\"Login\")',
-                    'a:has-text(\"Sign In\")'
+                    'button[type="submit"]',
+                    'input[type="submit"]',
+                    'button:has-text("Sign In")',
+                    'button:has-text("Log In")',
+                    'button:has-text("Login")',
+                    'a:has-text("Sign In")'
                 ]
                 
                 for selector in login_button_selectors:
                     try:
                         await page.click(selector, timeout=3000)
-                        print(f\"✅ Clicked login button\")\n                        await page.wait_for_timeout(3000)
+                        print(f"✅ Clicked login button")
+                        await page.wait_for_timeout(3000)
                         break
                     except:
                         continue
                 
-                print(\"✅ LOGIN COMPLETE - Now scraping product page...\")\n            except Exception as login_error:
-                print(f\"⚠️ Login failed (will try scraping anyway): {login_error}\")\n        
+                print("✅ LOGIN COMPLETE - Now scraping product page...")
+            except Exception as login_error:
+                print(f"⚠️ Login failed (will try scraping anyway): {login_error}")\n        
         try:
             print(f\"🌐 NAVIGATING TO: {url}\")
             
