@@ -4105,6 +4105,9 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'reginaandrew.com': 'Regina Andrew',
                 'bernhardt.com': 'Bernhardt',
                 'loloi.com': 'Loloi Rugs',
+                'loloirugs.com': 'Loloi Rugs',
+                'jaipurliving.com': 'Jaipur Living',
+                'povison.com': 'Povison',
                 'vandh.com': 'Vandh',
                 'visualcomfort.com': 'Visual Comfort',
                 'hvlgroup.com': 'HVL Group',
@@ -4138,6 +4141,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     result['vendor'] = vendor_name
                     print(f"✅ VENDOR IDENTIFIED: {vendor_name}")
                     break
+            
+            # Fallback: extract vendor from domain name if not matched
+            if not result['vendor']:
+                vendor_name = domain.replace('www.', '').replace('.com', '').replace('.co', '').title()
+                result['vendor'] = vendor_name
+                print(f"✅ VENDOR FALLBACK: {vendor_name} (from domain)")
             
             # ===== 1. INTELLIGENT PRODUCT NAME EXTRACTION =====
             print("🔍 EXTRACTING PRODUCT NAME...")
