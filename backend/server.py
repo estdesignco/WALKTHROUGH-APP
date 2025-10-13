@@ -4113,12 +4113,21 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         except:
                             continue
                 
-                print("✅ LOGIN COMPLETE - Now scraping product page...")
+                print("✅ LOGIN COMPLETE")
+                
+                # CRITICAL: Navigate to product page AFTER login to get wholesale prices
+                print(f"🔄 RE-NAVIGATING to product page with logged-in session: {url}")
+                await page.goto(url, wait_until='networkidle', timeout=45000)
+                await page.wait_for_timeout(5000)  # Wait for wholesale prices to load
+                print("✅ Product page reloaded with wholesale session")
+                
             except Exception as login_error:
                 print(f"⚠️ Login failed (will try scraping anyway): {login_error}")
         
         try:
-            print(f"🌐 NAVIGATING TO: {url}")
+            if not credentials:
+                # Only navigate if we didn't login (if we logged in, we already navigated)
+                print(f"🌐 NAVIGATING TO: {url}")
             
             # Retry logic for blocked sites
             max_retries = 3
