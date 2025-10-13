@@ -190,7 +190,9 @@ VENDOR_CREDENTIALS = [
 
 async def store_credentials():
     client = AsyncIOMotorClient(os.environ.get('MONGO_URL'))
-    db = client.design_db
+    db_name = os.environ.get('DB_NAME', 'interiorsync')
+    db = client[db_name]
+    print(f"✅ Using database: {db_name}")
     
     # Drop existing collection and recreate
     await db.vendor_credentials.drop()
