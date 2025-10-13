@@ -83,6 +83,12 @@ self.addEventListener('fetch', event => {
     return;
   }
   
+  // CRITICAL: Don't cache HTML navigation requests - let React Router handle them
+  if (request.mode === 'navigate' || request.destination === 'document') {
+    // Network only for HTML pages - this fixes React Router refresh issue
+    return;
+  }
+  
   // Handle API requests
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(handleAPIRequest(request));
