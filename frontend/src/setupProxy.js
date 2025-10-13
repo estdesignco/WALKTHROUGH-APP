@@ -1,4 +1,9 @@
 module.exports = function(app) {
-  // This ensures all routes return index.html in development
-  // Required for React Router BrowserRouter to work on refresh
+  // Ensure React Router works on refresh
+  app.use((req, res, next) => {
+    if (!req.url.startsWith('/api') && !req.url.includes('.')) {
+      req.url = '/';
+    }
+    next();
+  });
 };
