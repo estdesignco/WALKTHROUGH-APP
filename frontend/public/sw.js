@@ -21,8 +21,11 @@ const API_ENDPOINTS = [
   '/api/vendor-types'
 ];
 
+// DISABLED SERVICE WORKER - CAUSING ROUTING ISSUES
 self.addEventListener('install', event => {
-  console.log('📱 Service Worker installing...');
+  console.log('📱 Service Worker DISABLED - skipping installation');
+  self.skipWaiting();
+  return;
   
   event.waitUntil(
     Promise.all([
