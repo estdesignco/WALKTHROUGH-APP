@@ -4143,14 +4143,17 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             await asyncio.sleep(delay)
                         
                         # Navigate with advanced wait strategy
-                    await page.goto(url, wait_until='domcontentloaded', timeout=60000)
-                    break
-                    
-                except Exception as nav_error:
-                    print(f"❌ NAVIGATION ATTEMPT {attempt + 1} FAILED: {str(nav_error)}")
-                    if attempt == max_retries - 1:
-                        raise nav_error
-                    continue
+                        await page.goto(url, wait_until='domcontentloaded', timeout=60000)
+                        break
+                        
+                    except Exception as nav_error:
+                        print(f"❌ NAVIGATION ATTEMPT {attempt + 1} FAILED: {str(nav_error)}")
+                        if attempt == max_retries - 1:
+                            raise nav_error
+                        continue
+            else:
+                # Already navigated after login, just note it
+                print("✅ Using logged-in session, product page already loaded")
             
             # Multi-stage loading strategy for modern sites
             print("⏳ WAITING FOR DYNAMIC CONTENT...")
