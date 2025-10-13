@@ -4123,7 +4123,23 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 # CRITICAL: Navigate to product page AFTER login to get wholesale prices
                 print(f"🔄 RE-NAVIGATING to product page with logged-in session: {url}")
                 await page.goto(url, wait_until='networkidle', timeout=45000)
-                await page.wait_for_timeout(5000)  # Wait for wholesale prices to load
+                
+                # Wait for wholesale content to load and try to trigger it
+                await page.wait_for_timeout(3000)
+                
+                # Try to close any popups/modals that might be blocking
+                try:
+                    await page.click('[aria-label="Close"], .modal-close, button:has-text("Close")', timeout=2000)
+                    print("✅ Closed popup")
+                except:
+                    pass
+                
+                # Scroll to trigger lazy loading of wholesale prices
+                await page.evaluate("window.scrollTo(0, document.body.scrollHeight/2)")
+                await page.wait_for_timeout(2000)
+                
+                # Wait extra time for AJAX to load wholesale pricing
+                await page.wait_for_timeout(5000)
                 print("✅ Product page reloaded with wholesale session")
                 
             except Exception as login_error:
