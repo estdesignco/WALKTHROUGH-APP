@@ -4118,6 +4118,14 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         except:
                             continue
                 
+                # VERIFY login was successful by checking for account/logout links
+                await page.wait_for_timeout(3000)
+                page_content = await page.content()
+                if 'logout' in page_content.lower() or 'account' in page_content.lower() or 'my account' in page_content.lower():
+                    print("✅ LOGIN VERIFIED - Found account/logout links")
+                else:
+                    print("⚠️ LOGIN MAY HAVE FAILED - No logout/account links found")
+                
                 print("✅ LOGIN COMPLETE")
                 
                 # CRITICAL: Navigate to product page AFTER login to get wholesale prices
