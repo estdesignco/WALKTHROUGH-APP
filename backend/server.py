@@ -4090,24 +4090,28 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         except:
                             continue
                 
-                # Click login button
-                login_button_selectors = [
-                    'button[type="submit"]',
-                    'input[type="submit"]',
-                    'button:has-text("Sign In")',
-                    'button:has-text("Log In")',
-                    'button:has-text("Login")',
-                    'a:has-text("Sign In")'
-                ]
-                
-                for selector in login_button_selectors:
-                    try:
-                        await page.click(selector, timeout=3000)
-                        print(f"✅ Clicked login button")
-                        await page.wait_for_timeout(3000)
-                        break
-                    except:
-                        continue
+                # Click login button - using wait_for_selector (PROVEN METHOD)
+                    login_button_selectors = [
+                        'button[type="submit"]',
+                        'input[type="submit"]',
+                        'button:has-text("Sign In")',
+                        'button:has-text("Log In")',
+                        'button:has-text("Login")',
+                        'button:has-text("Sign")',
+                        'a:has-text("Sign In")'
+                    ]
+                    
+                    for selector in login_button_selectors:
+                        try:
+                            btn = await page.wait_for_selector(selector, timeout=3000)
+                            if btn:
+                                print(f"🔘 Clicking login button: {selector}")
+                                await btn.click()
+                                await page.wait_for_timeout(5000)  # Wait longer for login to complete
+                                print(f"✅ Login button clicked")
+                                break
+                        except:
+                            continue
                 
                 print("✅ LOGIN COMPLETE - Now scraping product page...")
             except Exception as login_error:
