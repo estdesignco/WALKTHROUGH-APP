@@ -27,9 +27,14 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   useEffect(() => {
     if (projectId) {
       console.log('🚀 Loading project:', projectId);
+      console.log('📍 Current URL:', window.location.href);
+      console.log('📍 Pathname:', window.location.pathname);
       
       // IMMEDIATE TEST - Force load project data WITH CHECKLIST SHEET_TYPE
-      fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`)
+      const apiUrl = `${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`;
+      console.log('📞 Fetching from:', apiUrl);
+      
+      fetch(apiUrl)
         .then(response => {
           console.log('📡 Checklist Response received:', response.status);
           if (response.ok) {
@@ -48,8 +53,12 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           setError('Failed to load project: ' + err.message);
           setLoading(false);
         });
+    } else {
+      console.warn('⚠️ No projectId available!');
+      console.log('📍 useParams projectId:', paramProjectId);
+      console.log('📍 prop projectId:', propProjectId);
     }
-  }, [projectId]);
+  }, [projectId, paramProjectId, propProjectId]);
 
   const loadSimpleProject = async () => {
     try {
