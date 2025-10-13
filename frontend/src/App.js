@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { HashRouter as BrowserRouter, Routes, Route, useLocation, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import FFEDashboard from "./components/FFEDashboard";
 import ProjectList from "./components/ProjectList";
