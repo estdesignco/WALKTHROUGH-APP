@@ -4128,21 +4128,21 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             if not credentials:
                 # Only navigate if we didn't login (if we logged in, we already navigated)
                 print(f"🌐 NAVIGATING TO: {url}")
-            
-            # Retry logic for blocked sites
-            max_retries = 3
-            for attempt in range(max_retries):
-                try:
-                    print(f"🔄 ATTEMPT {attempt + 1}/{max_retries}")
-                    
-                    # Add random delay to avoid rate limiting
-                    if attempt > 0:
-                        import random
-                        delay = random.uniform(2, 5)
-                        print(f"⏱️ RETRY DELAY: {delay:.1f}s")
-                        await asyncio.sleep(delay)
-                    
-                    # Navigate with advanced wait strategy
+                
+                # Retry logic for blocked sites
+                max_retries = 3
+                for attempt in range(max_retries):
+                    try:
+                        print(f"🔄 ATTEMPT {attempt + 1}/{max_retries}")
+                        
+                        # Add random delay to avoid rate limiting
+                        if attempt > 0:
+                            import random
+                            delay = random.uniform(2, 5)
+                            print(f"⏱️ RETRY DELAY: {delay:.1f}s")
+                            await asyncio.sleep(delay)
+                        
+                        # Navigate with advanced wait strategy
                     await page.goto(url, wait_until='domcontentloaded', timeout=60000)
                     break
                     
