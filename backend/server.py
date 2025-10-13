@@ -4038,8 +4038,63 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         # Enhanced timeout settings
         page.set_default_timeout(45000)
         
+        # LOGIN if credentials are available
+        if credentials and credentials.get("username") and credentials.get("password"):
+            try:
+                print(f"🔐 LOGGING IN TO: {credentials.get('login_url', domain)}")
+                await page.goto(credentials.get('login_url', f'https://{domain}'), wait_until='networkidle')
+                await page.wait_for_timeout(2000)
+                
+                # Try common login field selectors
+                login_selectors = [
+                    'input[name="email"], input[type="email"]',
+                    'input[name="username"], input[id="username"]',
+                    'input[placeholder*="email" i], input[placeholder*="username" i]'
+                ]
+                
+                password_selectors = [
+                    'input[name="password"], input[type="password"]',
+                    'input[id="password"]'
+                ]
+                
+                # Fill username/email
+                for selector in login_selectors:
+                    try:
+                        await page.fill(selector, credentials['username'], timeout=3000)
+                        print(f\"✅ Filled username: {credentials['username']}\")\n                        break
+                    except:
+                        continue
+                
+                # Fill password
+                for selector in password_selectors:
+                    try:
+                        await page.fill(selector, credentials['password'], timeout=3000)
+                        print(f\"✅ Filled password\")\n                        break
+                    except:
+                        continue
+                
+                # Click login button
+                login_button_selectors = [
+                    'button[type=\"submit\"]',
+                    'input[type=\"submit\"]',
+                    'button:has-text(\"Sign In\")',
+                    'button:has-text(\"Log In\")',
+                    'button:has-text(\"Login\")',
+                    'a:has-text(\"Sign In\")'
+                ]
+                
+                for selector in login_button_selectors:
+                    try:
+                        await page.click(selector, timeout=3000)
+                        print(f\"✅ Clicked login button\")\n                        await page.wait_for_timeout(3000)
+                        break
+                    except:
+                        continue
+                
+                print(\"✅ LOGIN COMPLETE - Now scraping product page...\")\n            except Exception as login_error:
+                print(f\"⚠️ Login failed (will try scraping anyway): {login_error}\")\n        
         try:
-            print(f"🌐 NAVIGATING TO: {url}")
+            print(f\"🌐 NAVIGATING TO: {url}\")
             
             # Retry logic for blocked sites
             max_retries = 3
