@@ -7,6 +7,9 @@ const config = {
 };
 
 module.exports = {
+  devServer: {
+    historyApiFallback: true,
+  },
   webpack: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
