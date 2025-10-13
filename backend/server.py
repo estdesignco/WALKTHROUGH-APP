@@ -4057,23 +4057,38 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     'input[id="password"]'
                 ]
                 
-                # Fill username/email
+                # Fill username/email - using .type() with delay (PROVEN METHOD)
+                username_filled = False
                 for selector in login_selectors:
                     try:
-                        await page.fill(selector, credentials['username'], timeout=3000)
-                        print(f"✅ Filled username: {credentials['username']}")
-                        break
+                        username_input = await page.wait_for_selector(selector, timeout=5000)
+                        if username_input:
+                            print(f"📧 Found username field: {selector}")
+                            await username_input.click()
+                            await page.wait_for_timeout(500)
+                            await username_input.type(credentials['username'], delay=100)
+                            await page.wait_for_timeout(1000)
+                            username_filled = True
+                            print(f"✅ Filled username: {credentials['username']}")
+                            break
                     except:
                         continue
                 
-                # Fill password
-                for selector in password_selectors:
-                    try:
-                        await page.fill(selector, credentials['password'], timeout=3000)
-                        print(f"✅ Filled password")
-                        break
-                    except:
-                        continue
+                # Fill password - using .type() with delay (PROVEN METHOD)
+                if username_filled:
+                    for selector in password_selectors:
+                        try:
+                            password_input = await page.wait_for_selector(selector, timeout=5000)
+                            if password_input:
+                                print(f"🔑 Found password field: {selector}")
+                                await password_input.click()
+                                await page.wait_for_timeout(500)
+                                await password_input.type(credentials['password'], delay=100)
+                                await page.wait_for_timeout(1000)
+                                print(f"✅ Filled password")
+                                break
+                        except:
+                            continue
                 
                 # Click login button
                 login_button_selectors = [
