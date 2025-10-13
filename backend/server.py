@@ -4126,6 +4126,30 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 else:
                     print("⚠️ LOGIN MAY HAVE FAILED - No logout/account links found")
                 
+                # CRITICAL: Some sites (Loloi, Uttermost) have EXTRA "Trade Login" button after initial login!
+                print("🔍 Looking for Trade/Wholesale button...")
+                trade_button_selectors = [
+                    'a:has-text("Trade")',
+                    'a:has-text("Wholesale")',
+                    'button:has-text("Trade")',
+                    'a:has-text("Trade Account")',
+                    'a:has-text("Trade Login")',
+                    'a[href*="trade"]',
+                    'a[href*="wholesale"]'
+                ]
+                
+                for selector in trade_button_selectors:
+                    try:
+                        trade_btn = await page.wait_for_selector(selector, timeout=2000)
+                        if trade_btn:
+                            print(f"🎯 Found Trade button: {selector}")
+                            await trade_btn.click()
+                            await page.wait_for_timeout(3000)
+                            print("✅ Clicked Trade button - accessing wholesale portal")
+                            break
+                    except:
+                        continue
+                
                 print("✅ LOGIN COMPLETE")
                 
                 # CRITICAL: Navigate to product page AFTER login to get wholesale prices
