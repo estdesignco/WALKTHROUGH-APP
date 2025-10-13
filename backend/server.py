@@ -4138,22 +4138,27 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     'a[href*="wholesale"]'
                 ]
                 
+                trade_clicked = False
                 for selector in trade_button_selectors:
                     try:
                         trade_btn = await page.wait_for_selector(selector, timeout=2000)
                         if trade_btn:
                             print(f"🎯 Found Trade button: {selector}")
                             await trade_btn.click()
-                            await page.wait_for_timeout(3000)
-                            print("✅ Clicked Trade button - accessing wholesale portal")
+                            await page.wait_for_timeout(5000)  # Wait for trade portal to load
+                            trade_clicked = True
+                            print("✅ Clicked Trade button - now in wholesale portal")
                             break
                     except:
                         continue
                 
                 print("✅ LOGIN COMPLETE")
                 
-                # CRITICAL: Navigate to product page AFTER login to get wholesale prices
-                print(f"🔄 RE-NAVIGATING to product page with logged-in session: {url}")
+                # CRITICAL: Navigate to product page AFTER login AND trade access
+                if trade_clicked:
+                    print(f"🔄 RE-NAVIGATING to product page with TRADE session: {url}")
+                else:
+                    print(f"🔄 RE-NAVIGATING to product page with logged-in session: {url}")
                 await page.goto(url, wait_until='networkidle', timeout=45000)
                 
                 # Wait for wholesale content to load and try to trigger it
