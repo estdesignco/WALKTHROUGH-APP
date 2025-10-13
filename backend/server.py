@@ -3968,17 +3968,22 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     from urllib.parse import urlparse
     domain = urlparse(url).netloc.replace('www.', '')
     
+    print(f"🔍 Looking up credentials for domain: {domain}")
+    
     credentials = None
     try:
         # Look up credentials in database
         cred_doc = await db.vendor_credentials.find_one({"domain": domain})
+        print(f"📋 Credential doc found: {cred_doc is not None}")
         if cred_doc:
             credentials = {
                 "username": cred_doc.get("username"),
                 "password": cred_doc.get("password"),
                 "login_url": cred_doc.get("login_url")
             }
-            print(f"🔐 Found credentials for {domain}")
+            print(f"🔐 Found credentials for {domain} - Username: {credentials['username']}")
+        else:
+            print(f"❌ NO credentials found for {domain}")
     except Exception as e:
         print(f"⚠️ Could not fetch credentials: {e}")
     
