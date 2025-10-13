@@ -3962,7 +3962,26 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     - Multiple extraction strategies with fallback mechanisms
     - Comprehensive data validation and cleanup
     - Handles all modern web technologies (React, Vue, Angular, etc.)
+    - AUTHENTICATED SESSIONS: Logs into wholesale sites using stored credentials
     """
+    # Get credentials for this vendor domain
+    from urllib.parse import urlparse
+    domain = urlparse(url).netloc.replace('www.', '')
+    
+    credentials = None
+    try:
+        # Look up credentials in database
+        cred_doc = await db.vendor_credentials.find_one({"domain": domain})
+        if cred_doc:
+            credentials = {
+                "username": cred_doc.get("username"),
+                "password": cred_doc.get("password"),
+                "login_url": cred_doc.get("login_url")
+            }
+            print(f"🔐 Found credentials for {domain}")
+    except Exception as e:
+        print(f"⚠️ Could not fetch credentials: {e}")
+    
     async with async_playwright() as p:
         # Enhanced browser configuration for blocked sites
         browser_args = [
