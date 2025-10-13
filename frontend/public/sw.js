@@ -77,6 +77,8 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // SERVICE WORKER DISABLED - Let all requests through
+  return;
   const { request } = event;
   const url = new URL(request.url);
   
