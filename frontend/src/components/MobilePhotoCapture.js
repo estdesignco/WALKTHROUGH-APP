@@ -384,22 +384,22 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
               )}
             </div>
             
-            {/* Photo with annotations */}
-            <div className="relative border border-gray-700 rounded-lg overflow-hidden">
+            {/* Photo with annotations - LARGE AND PROMINENT */}
+            <div className="relative border-4 border-[#D4A574] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-900 to-black shadow-2xl">
+              <img 
+                ref={imageRef}
+                src={capturedPhoto}
+                alt="Captured photo"
+                className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
+                style={{ minHeight: '500px' }}
+              />
               <div
                 ref={canvasRef}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
-                className="relative cursor-crosshair"
-                style={{
-                  backgroundImage: `url(${capturedPhoto})`,
-                  backgroundSize: 'contain',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  minHeight: '400px',
-                  width: '100%'
-                }}
+                className="absolute inset-0 cursor-crosshair"
+                style={{ zIndex: 20 }}
               >
                 {/* SVG Overlay for clean arrow rendering */}
                 <svg 
