@@ -755,31 +755,94 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         ))}
       </div>
 
-      {/* ADD ROOM MODAL */}
+      {/* BEAUTIFUL ADD ROOM MODAL - EXACTLY LIKE YOUR SCREENSHOT */}
       {showAddRoom && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1E293B] rounded-xl p-8 max-w-md w-full border-2 border-[#D4A574]">
-            <h3 className="text-2xl font-bold text-[#D4A574] mb-6">Add New Room</h3>
-            <input
-              type="text"
-              value={newRoomName}
-              onChange={(e) => setNewRoomName(e.target.value)}
-              placeholder="Enter room name"
-              className="w-full bg-gray-700 text-white px-4 py-3 rounded-xl mb-6 text-lg"
-              onKeyPress={(e) => e.key === 'Enter' && handleAddRoom()}
-            />
-            <div className="flex gap-4">
-              <button 
-                onClick={handleAddRoom} 
-                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl font-bold text-lg"
+        <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1E293B] rounded-2xl p-8 max-w-4xl w-full border-2 border-[#D4A574] max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-3xl font-bold text-[#D4A574]">Add New Room</h3>
+              <button
+                onClick={() => setShowAddRoom(false)}
+                className="text-[#D4A574] text-3xl hover:text-red-400 font-bold"
               >
-                Add Room
+                ✕
               </button>
+            </div>
+            
+            {/* Manual Room Name Input */}
+            <div className="mb-8">
+              <label className="text-white text-lg font-bold mb-3 block">Room Name *</label>
+              <input
+                type="text"
+                value={newRoomName}
+                onChange={(e) => setNewRoomName(e.target.value)}
+                placeholder="Enter room name..."
+                className="w-full bg-gray-700 text-white px-6 py-4 rounded-xl text-xl border-2 border-gray-600 focus:border-[#D4A574] focus:outline-none"
+                onKeyPress={(e) => e.key === 'Enter' && newRoomName.trim() && handleAddRoom()}
+              />
+            </div>
+
+            {/* Quick Select Common Rooms - EXACTLY LIKE SCREENSHOT */}
+            <div className="mb-8">
+              <h4 className="text-white text-lg font-bold mb-4">Quick Select Common Rooms</h4>
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  'Living Room', 'Kitchen', 'Master Bedroom',
+                  'Bedroom 2', 'Bedroom 3', 'Bathroom', 
+                  'Master Bathroom', 'Powder Room', 'Dining Room',
+                  'Office', 'Family Room', 'Basement',
+                  'Laundry Room', 'Mudroom', 'Pantry',
+                  'Closet', 'Guest Room', 'Playroom',
+                  'Library', 'Wine Cellar', 'Garage',
+                  'Patio'
+                ].map((roomName) => (
+                  <button
+                    key={roomName}
+                    onClick={() => {
+                      setNewRoomName(roomName);
+                    }}
+                    className={`p-4 rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 ${
+                      newRoomName === roomName
+                        ? 'bg-[#D4A574] text-black border-[#D4A574]'
+                        : 'bg-gray-700 hover:bg-gray-600 text-white border-gray-600 hover:border-[#D4A574]'
+                    }`}
+                  >
+                    <div className="text-xs text-red-500 font-bold mb-1">🟥</div>
+                    {roomName}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="mb-8">
+              <label className="text-white text-lg font-bold mb-3 block">Description (Optional)</label>
+              <textarea
+                placeholder="Add any notes about this room..."
+                className="w-full bg-gray-700 text-white px-6 py-4 rounded-xl text-lg border-2 border-gray-600 focus:border-[#D4A574] focus:outline-none h-24 resize-none"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-6">
               <button 
-                onClick={() => setShowAddRoom(false)} 
-                className="flex-1 bg-gray-600 text-white px-6 py-3 rounded-xl font-bold text-lg"
+                onClick={() => setShowAddRoom(false)}
+                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-xl font-bold text-xl"
               >
                 Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  if (newRoomName.trim()) {
+                    handleAddRoom();
+                  } else {
+                    alert('Please enter a room name');
+                  }
+                }}
+                disabled={!newRoomName.trim()}
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-500 disabled:to-gray-600 text-white px-8 py-4 rounded-xl font-bold text-xl"
+              >
+                Add Room
               </button>
             </div>
           </div>
