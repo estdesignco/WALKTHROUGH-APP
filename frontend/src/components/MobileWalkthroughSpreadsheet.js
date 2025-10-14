@@ -289,8 +289,28 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
           
           {/* Spreadsheet Type Header */}
           <div className="text-center">
-            <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full">
-              <span className="text-2xl font-bold text-black tracking-wider">WALKTHROUGH SPREADSHEET</span>
+            <div className="inline-flex items-center gap-6">
+              <button
+                onClick={() => setShowAddRoom(true)}
+                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-3 rounded-full text-black font-bold text-lg shadow-xl"
+              >
+                ✥ ADD ROOM
+              </button>
+              
+              <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full">
+                <span className="text-2xl font-bold text-black tracking-wider">WALKTHROUGH SPREADSHEET</span>
+              </div>
+              
+              <button
+                onClick={() => setShowSearch(!showSearch)}
+                className={`px-8 py-3 rounded-full font-bold text-lg shadow-xl ${
+                  showSearch 
+                    ? 'bg-[#D4C5A9] text-black' 
+                    : 'bg-gray-700 hover:bg-gray-600 text-white'
+                }`}
+              >
+                🔍 SEARCH
+              </button>
             </div>
           </div>
         </div>
