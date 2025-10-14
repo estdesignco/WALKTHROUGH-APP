@@ -923,6 +923,9 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                 >
                   <div className="text-3xl mb-2">📁</div>
                   <div className="text-lg text-[#D4C5A9] font-bold">{room.name}</div>
+                  <div className="text-sm text-[#D4A574]">
+                    {roomPhotos[room.id]?.length || 0} photos
+                  </div>
                 </button>
               ))}
             </div>
