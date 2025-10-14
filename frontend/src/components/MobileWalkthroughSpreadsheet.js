@@ -288,6 +288,29 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
             </div>
           </div>
           
+          {/* PHOTO ROOM SELECTION GRID - RIGHT IN HEADER */}
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold text-[#D4A574] mb-4">📸 Select Room for Photos</h3>
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+              {displayProject?.rooms?.map((room) => (
+                <button
+                  key={room.id}
+                  onClick={() => {
+                    setSelectedRoomForPhoto(room);
+                    setShowPhotoCapture(true);
+                  }}
+                  className="p-4 border-2 border-[#D4A574]/50 rounded-xl hover:bg-[#D4A574]/20 hover:border-[#D4A574] transition-all bg-gradient-to-br from-gray-900 to-black transform hover:scale-105"
+                >
+                  <div className="text-3xl mb-2">📁</div>
+                  <div className="text-sm text-[#D4C5A9] font-bold">{room.name}</div>
+                  <div className="text-xs text-[#D4A574]">
+                    {roomPhotos[room.id]?.length || 0} photos
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+          
           {/* Spreadsheet Type Header */}
           <div className="text-center">
             <div className="inline-flex items-center gap-6">
