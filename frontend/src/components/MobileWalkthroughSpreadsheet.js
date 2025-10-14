@@ -126,15 +126,18 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         name: newRoomName,
         project_id: projectId,
         sheet_type: 'walkthrough',
-        auto_populate: true,
+        auto_populate: true, // CRITICAL - This auto-populates with all items and categories
+        comprehensive: true, // Add comprehensive structure
         color: getRoomColor(newRoomName),
         order_index: project?.rooms?.length || 0
       });
       await loadProject();
       setShowAddRoom(false);
       setNewRoomName('');
+      alert(`✅ Room "${newRoomName}" added with full categories and items!`);
     } catch (error) {
-      alert('Failed to add room');
+      console.error('Failed to add room:', error);
+      alert('Failed to add room: ' + error.message);
     }
   };
 
