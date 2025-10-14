@@ -65,37 +65,69 @@ export default function SimplePhotoCapture({ projectId, roomId, roomName, onPhot
     }
   };
 
-  // Simple arrow drawing for measurements
-  const handleImageClick = (e) => {
-    if (!capturedPhoto || !lastMeasurement) {
-      if (!lastMeasurement) {
-        alert('Take a measurement with your Leica D5 first!');
-      }
-      return;
-    }
+  // Simple arrow drawing for measurements - FIXED TO WORK PROPERLY
+  const handleImageMouseDown = (e) => {
+    if (!capturedPhoto) return;
 
     const rect = e.target.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-    if (!drawingArrow) {
-      // Start drawing arrow
-      setDrawingArrow({ x1: x, y1: y, x2: x, y2: y });
-    } else {
-      // Finish arrow with measurement
-      const newMeasurement = {
-        x1: drawingArrow.x1,
-        y1: drawingArrow.y1,
-        x2: x,
-        y2: y,
-        text: lastMeasurement.feetInches,
-        color: '#FFD700'
-      };
+    console.log('🎯 Starting arrow at:', x, y);
+    setDrawingArrow({ x1: x, y1: y, x2: x, y2: y });
+  };
+
+  const handleImageMouseMove = (e) => {
+    if (!drawingArrow) return;
+
+    const rect = e.target.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    setDrawingArrow({ ...drawingArrow, x2: x, y2: y });
+  };
+
+  const handleImageMouseUp = (e) => {
+    if (!drawingArrow) return;
+
+    const dx = drawingArrow.x2 - drawingArrow.x1;
+    const dy = drawingArrow.y2 - drawingArrow.y1;
+    const length = Math.sqrt(dx * dx + dy * dy);
+
+    console.log('🎯 Arrow length:', length);
+
+    if (length > 3) { // Minimum 3% of image size
+      // Use last Leica measurement or prompt for manual entry
+      let text = '';
+      if (lastMeasurement) {
+        text = lastMeasurement.feetInches;
+        console.log('📏 Using Leica measurement:', text);
+      } else {
+        text = prompt('Enter measurement:', '8\\'6"');
+        console.log('📝 Manual measurement entered:', text);
+      }
       
-      setMeasurements([...measurements, newMeasurement]);
-      setDrawingArrow(null);
-      setLastMeasurement(null); // Clear after use
+      if (text && text.trim()) {
+        const newMeasurement = {
+          x1: drawingArrow.x1,
+          y1: drawingArrow.y1,
+          x2: drawingArrow.x2,
+          y2: drawingArrow.y2,
+          text: text.trim(),
+          color: '#FFD700'
+        };
+        
+        console.log('✅ Adding measurement:', newMeasurement);
+        setMeasurements(prev => [...prev, newMeasurement]);
+        
+        // Clear the last measurement after use
+        setLastMeasurement(null);
+      }
+    } else {
+      console.log('❌ Arrow too short, not saving');
     }
+    
+    setDrawingArrow(null);
   };
 
   const handleSave = async () => {
