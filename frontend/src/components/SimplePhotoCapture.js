@@ -309,7 +309,10 @@ export default function SimplePhotoCapture({ projectId, roomId, roomName, onPhot
                 src={capturedPhoto}
                 alt="Photo for measurement"
                 className="max-w-full max-h-[70vh] object-contain cursor-crosshair border-4 border-[#D4A574] rounded-xl"
-                onClick={handleImageClick}
+                onMouseDown={handleImageMouseDown}
+                onMouseMove={handleImageMouseMove}
+                onMouseUp={handleImageMouseUp}
+                draggable={false}
               />
               
               {/* SVG Overlay for arrows */}
