@@ -136,6 +136,43 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
     }
   };
 
+  const handleAddCategory = async (roomId, categoryName) => {
+    try {
+      await axios.post(`${API_URL}/categories`, {
+        name: categoryName,
+        room_id: roomId,
+        project_id: projectId,
+        sheet_type: 'walkthrough'
+      });
+      await loadProject();
+    } catch (error) {
+      console.error('Failed to add category:', error);
+      alert('Failed to add category');
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId) => {
+    if (!window.confirm('Delete this category and all its items?')) return;
+    
+    try {
+      await axios.delete(`${API_URL}/categories/${categoryId}`);
+      await loadProject();
+    } catch (error) {
+      console.error('Failed to delete category:', error);
+      alert('Failed to delete category');
+    }
+  };
+
+  const handleDeleteSubcategory = async (subcategoryId) => {
+    try {
+      await axios.delete(`${API_URL}/subcategories/${subcategoryId}`);
+      await loadProject();
+    } catch (error) {
+      console.error('Failed to delete subcategory:', error);
+      alert('Failed to delete subcategory');
+    }
+  };
+
   const handleSendPhotosToCanva = async () => {
     const confirmed = window.confirm('Send all Walkthrough photos to Canva?');
     if (!confirmed) return;
