@@ -130,7 +130,7 @@ export default function SimplePhotoCapture({ projectId, roomId, roomName, onPhot
     setDrawingArrow(null);
   };
 
-  const handleSave = async () => {
+  const handleSavePhoto = async () => {
     if (!capturedPhoto) {
       alert('Please take a photo first');
       return;
@@ -138,6 +138,46 @@ export default function SimplePhotoCapture({ projectId, roomId, roomName, onPhot
 
     try {
       setUploading(true);
+      console.log('🔄 Saving photo without measurements...');
+
+      // Upload just the photo without annotations
+      await axios.post(`${API_URL}/photos/upload`, {
+        project_id: projectId,
+        room_id: roomId,
+        photo_data: capturedPhoto, // Just the original photo
+        file_name: `photo_${roomName}_${Date.now()}.jpg`,
+        metadata: {
+          room_name: roomName,
+          timestamp: new Date().toISOString(),
+          has_measurements: false
+        }
+      });
+
+      console.log('✅ Photo saved successfully!');
+      alert('✅ Photo saved successfully!');
+      
+    } catch (error) {
+      console.error('❌ Failed to save photo:', error);
+      alert('❌ Failed to save photo: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSaveMeasurements = async () => {
+    if (!capturedPhoto) {
+      alert('Please take a photo first');
+      return;
+    }
+
+    if (measurements.length === 0) {
+      alert('Please add some measurements first');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      console.log('🔄 Saving photo with measurements...');
 
       // Create canvas with annotations
       const img = new Image();
@@ -207,26 +247,28 @@ export default function SimplePhotoCapture({ projectId, roomId, roomName, onPhot
 
       const annotatedPhoto = canvas.toDataURL('image/jpeg', 0.8);
 
-      // Upload to server
+      // Upload annotated photo
       await axios.post(`${API_URL}/photos/upload`, {
         project_id: projectId,
         room_id: roomId,
         photo_data: annotatedPhoto,
-        file_name: `photo_${roomName}_${Date.now()}.jpg`,
+        file_name: `measurements_${roomName}_${Date.now()}.jpg`,
         metadata: {
           room_name: roomName,
           timestamp: new Date().toISOString(),
           measurements: measurements.map(m => m.text),
-          measurement_count: measurements.length
+          measurement_count: measurements.length,
+          has_measurements: true
         }
       });
 
-      alert('✅ Photo saved successfully!');
+      console.log('✅ Photo with measurements saved successfully!');
+      alert('✅ Photo with measurements saved successfully!');
       onPhotoAdded();
-      onClose();
+      
     } catch (error) {
-      console.error('Failed to save photo:', error);
-      alert('❌ Failed to save photo: ' + error.message);
+      console.error('❌ Failed to save measurements:', error);
+      alert('❌ Failed to save measurements: ' + error.message);
     } finally {
       setUploading(false);
     }
