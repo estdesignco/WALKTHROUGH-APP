@@ -78,15 +78,22 @@ export class LeicaD5Manager {
       
       // Request new device if not already connected
       if (!this.device) {
-        // Request device with acceptAllDevices to discover available services
+        console.log('🔍 Searching for Leica DISTO devices...');
+        // Try to find device with more flexible filtering
         this.device = await navigator.bluetooth.requestDevice({
           filters: [
-            { namePrefix: 'DISTO' }
+            { namePrefix: 'DISTO' },
+            { namePrefix: 'Leica' },
+            { namePrefix: 'D5' }
           ],
-          acceptAllDevices: false,
-          optionalServices: [this.SERVICE_UUID, 'generic_access', 'device_information']
+          optionalServices: [
+            this.SERVICE_UUID, 
+            'generic_access', 
+            'device_information',
+            'battery_service'
+          ]
         });
-        console.log('✅ Device selected:', this.device.name);
+        console.log('✅ Device selected:', this.device.name || 'Unknown Device');
       }
 
       // Connect to GATT server with extended timeout and retry
