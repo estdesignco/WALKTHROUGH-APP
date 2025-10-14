@@ -103,7 +103,7 @@ export default function SimplePhotoCapture({ projectId, roomId, roomName, onPhot
         text = lastMeasurement.feetInches;
         console.log('📏 Using Leica measurement:', text);
       } else {
-        text = prompt('Enter measurement:', '8\\'6"');
+        text = prompt('Enter measurement:', "8'6\"");
         console.log('📝 Manual measurement entered:', text);
       }
       
