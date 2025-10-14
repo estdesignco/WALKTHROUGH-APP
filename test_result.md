@@ -268,6 +268,14 @@ frontend:
     stuck_count: 0
     priority: "high"
     needs_retesting: false
+
+  - task: "📏 LEICA D5 BLUETOOTH INTEGRATION TESTING - MOBILE APP"
+    implemented: true
+    working: false
+    file: "leicaD5Manager.js, MobilePhotoManagement.js, MobilePhotoCapture.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
