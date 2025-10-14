@@ -479,22 +479,20 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
                 {measurements.map((m, index) => (
                   <div
                     key={index}
+                    className="absolute pointer-events-auto"
                     style={{
-                      position: 'absolute',
                       left: `${(m.x1 + m.x2) / 2}%`,
-                      top: `${(m.y1 + m.y2) / 2 - 3}%`,
+                      top: `${(m.y1 + m.y2) / 2 - 5}%`,
                       transform: 'translate(-50%, -100%)',
-                      zIndex: 20,
-                      pointerEvents: 'auto'
+                      zIndex: 30
                     }}
                   >
                     <div 
-                      className="bg-black bg-opacity-90 px-3 py-1 rounded-lg text-base md:text-lg font-bold whitespace-nowrap shadow-lg"
+                      className="bg-black bg-opacity-95 px-4 py-2 rounded-xl text-lg md:text-xl font-bold whitespace-nowrap shadow-2xl border-2"
                       style={{ 
                         color: m.color || '#FFD700',
-                        borderWidth: '2px',
-                        borderStyle: 'solid',
-                        borderColor: m.color || '#FFD700'
+                        borderColor: m.color || '#FFD700',
+                        boxShadow: `0 0 20px ${m.color || '#FFD700'}40`
                       }}
                     >
                       {m.text}
@@ -503,7 +501,7 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
                           e.stopPropagation();
                           removeMeasurement(index);
                         }}
-                        className="ml-3 text-red-400 hover:text-red-300 font-bold text-lg"
+                        className="ml-3 text-red-400 hover:text-red-300 font-bold text-xl"
                       >
                         ✕
                       </button>
