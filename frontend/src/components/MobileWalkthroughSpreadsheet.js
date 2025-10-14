@@ -70,7 +70,30 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
 
   useEffect(() => {
     loadProject();
+    loadAllPhotos(); // Load photo counts for header display
   }, [projectId]);
+
+  const loadAllPhotos = async () => {
+    if (!projectId) return;
+    try {
+      const response = await axios.get(`${API_URL}/projects/${projectId}?sheet_type=walkthrough`);
+      const rooms = response.data?.rooms || [];
+      
+      const photosData = {};
+      for (const room of rooms) {
+        try {
+          const photoResponse = await axios.get(`${API_URL}/photos/by-room/${projectId}/${room.id}`);
+          photosData[room.id] = photoResponse.data.photos || [];
+        } catch (err) {
+          photosData[room.id] = [];
+        }
+      }
+      
+      setRoomPhotos(photosData);
+    } catch (error) {
+      console.error('Failed to load photos:', error);
+    }
+  };
 
   // Load available categories for dropdown
   useEffect(() => {
