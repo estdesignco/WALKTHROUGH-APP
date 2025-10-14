@@ -4046,15 +4046,42 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         # LOGIN if credentials are available
         if credentials and credentials.get("username") and credentials.get("password"):
             try:
-                print(f"🔐 LOGGING IN TO: {credentials.get('login_url', domain)}")
+                print(f"🔐 STARTING LOGIN FLOW FOR: {domain}")
                 await page.goto(credentials.get('login_url', f'https://{domain}'), wait_until='networkidle')
-                await page.wait_for_timeout(2000)
+                await page.wait_for_timeout(3000)
                 
-                # Try common login field selectors
+                # STEP 1: Look for and click "Trade" button FIRST (opens modal on some sites)
+                print("🔍 Step 1: Looking for Trade/Wholesale button...")
+                trade_button_selectors = [
+                    'a:has-text("Trade")',
+                    'a:has-text("Wholesale")',
+                    'button:has-text("Trade")',
+                    'a:has-text("Trade Account")',
+                    'a:has-text("Trade Sign In")',
+                    'a[href*="trade"]',
+                    'a[href*="wholesale"]'
+                ]
+                
+                trade_modal_opened = False
+                for selector in trade_button_selectors:
+                    try:
+                        trade_btn = await page.wait_for_selector(selector, timeout=2000)
+                        if trade_btn:
+                            print(f"🎯 Found Trade button: {selector} - clicking to open modal...")
+                            await trade_btn.click()
+                            await page.wait_for_timeout(3000)  # Wait for modal to appear
+                            trade_modal_opened = True
+                            print("✅ Trade button clicked - modal should be open")
+                            break
+                    except:
+                        continue
+                
+                # STEP 2: Now fill in login fields (either in modal or main page)
+                print("🔍 Step 2: Filling in login credentials...")
                 login_selectors = [
                     'input[name="email"], input[type="email"]',
                     'input[name="username"], input[id="username"]',
-                    'input[placeholder*="email" i], input[placeholder*="username" i]'
+                    'input[placeholder*="email" i]'
                 ]
                 
                 password_selectors = [
@@ -4062,13 +4089,13 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     'input[id="password"]'
                 ]
                 
-                # Fill username/email - using .type() with delay (PROVEN METHOD)
+                # Fill username/email
                 username_filled = False
                 for selector in login_selectors:
                     try:
-                        username_input = await page.wait_for_selector(selector, timeout=5000)
+                        username_input = await page.wait_for_selector(selector, timeout=5000, state='visible')
                         if username_input:
-                            print(f"📧 Found username field: {selector}")
+                            print(f"📧 Found visible username field")
                             await username_input.click()
                             await page.wait_for_timeout(500)
                             await username_input.type(credentials['username'], delay=100)
@@ -4079,13 +4106,13 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     except:
                         continue
                 
-                # Fill password - using .type() with delay (PROVEN METHOD)
+                # Fill password
                 if username_filled:
                     for selector in password_selectors:
                         try:
-                            password_input = await page.wait_for_selector(selector, timeout=5000)
+                            password_input = await page.wait_for_selector(selector, timeout=5000, state='visible')
                             if password_input:
-                                print(f"🔑 Found password field: {selector}")
+                                print(f"🔑 Found visible password field")
                                 await password_input.click()
                                 await page.wait_for_timeout(500)
                                 await password_input.type(credentials['password'], delay=100)
@@ -4095,70 +4122,33 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         except:
                             continue
                 
-                # Click login button - using wait_for_selector (PROVEN METHOD)
-                    login_button_selectors = [
-                        'button[type="submit"]',
-                        'input[type="submit"]',
-                        'button:has-text("Sign In")',
-                        'button:has-text("Log In")',
-                        'button:has-text("Login")',
-                        'button:has-text("Sign")',
-                        'a:has-text("Sign In")'
-                    ]
-                    
-                    for selector in login_button_selectors:
-                        try:
-                            btn = await page.wait_for_selector(selector, timeout=3000)
-                            if btn:
-                                print(f"🔘 Clicking login button: {selector}")
-                                await btn.click()
-                                await page.wait_for_timeout(5000)  # Wait longer for login to complete
-                                print(f"✅ Login button clicked")
-                                break
-                        except:
-                            continue
-                
-                # VERIFY login was successful by checking for account/logout links
-                await page.wait_for_timeout(3000)
-                page_content = await page.content()
-                if 'logout' in page_content.lower() or 'account' in page_content.lower() or 'my account' in page_content.lower():
-                    print("✅ LOGIN VERIFIED - Found account/logout links")
-                else:
-                    print("⚠️ LOGIN MAY HAVE FAILED - No logout/account links found")
-                
-                # CRITICAL: Some sites (Loloi, Uttermost) have EXTRA "Trade Login" button after initial login!
-                print("🔍 Looking for Trade/Wholesale button...")
-                trade_button_selectors = [
-                    'a:has-text("Trade")',
-                    'a:has-text("Wholesale")',
-                    'button:has-text("Trade")',
-                    'a:has-text("Trade Account")',
-                    'a:has-text("Trade Login")',
-                    'a[href*="trade"]',
-                    'a[href*="wholesale"]'
+                # STEP 3: Click submit button
+                print("🔍 Step 3: Clicking submit button...")
+                login_button_selectors = [
+                    'button[type="submit"]',
+                    'input[type="submit"]',
+                    'button:has-text("SIGN IN")',
+                    'button:has-text("Sign In")',
+                    'button:has-text("Log In")',
+                    'button:has-text("Login")'
                 ]
                 
-                trade_clicked = False
-                for selector in trade_button_selectors:
+                for selector in login_button_selectors:
                     try:
-                        trade_btn = await page.wait_for_selector(selector, timeout=2000)
-                        if trade_btn:
-                            print(f"🎯 Found Trade button: {selector}")
-                            await trade_btn.click()
-                            await page.wait_for_timeout(5000)  # Wait for trade portal to load
-                            trade_clicked = True
-                            print("✅ Clicked Trade button - now in wholesale portal")
+                        btn = await page.wait_for_selector(selector, timeout=3000, state='visible')
+                        if btn:
+                            print(f"🔘 Clicking submit button")
+                            await btn.click()
+                            await page.wait_for_timeout(8000)  # Wait for login to complete and modal to close
+                            print(f"✅ Submit clicked, waiting for login to complete...")
                             break
                     except:
                         continue
                 
                 print("✅ LOGIN COMPLETE")
                 
-                # CRITICAL: Navigate to product page AFTER login AND trade access
-                if trade_clicked:
-                    print(f"🔄 RE-NAVIGATING to product page with TRADE session: {url}")
-                else:
-                    print(f"🔄 RE-NAVIGATING to product page with logged-in session: {url}")
+                # STEP 4: Navigate to product page with logged-in session
+                print(f"🔄 Navigating to product page with wholesale session: {url}")
                 await page.goto(url, wait_until='networkidle', timeout=45000)
                 
                 # Wait for wholesale content to load and try to trigger it
