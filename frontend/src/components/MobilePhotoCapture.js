@@ -322,14 +322,14 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
         </div>
       ) : (
         <div className="h-full flex flex-col relative">
-          {/* PHOTO TAKES UP ALMOST ENTIRE SCREEN */}
-          <div className="flex-1 relative bg-black flex items-center justify-center">
+          {/* PHOTO TAKES UP MOST SCREEN BUT PROPERLY SIZED */}
+          <div className="flex-1 relative bg-black flex items-center justify-center p-4">
             <img 
               ref={imageRef}
               src={capturedPhoto}
               alt="Captured photo"
-              className="max-w-full max-h-full object-contain"
-              style={{ minHeight: '80vh', minWidth: '80vw' }}
+              className="max-w-full max-h-full object-contain rounded-xl"
+              style={{ maxHeight: '60vh', maxWidth: '90vw' }}
             />
             
             {/* Touch overlay for measurements */}
