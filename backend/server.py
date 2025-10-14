@@ -2000,6 +2000,24 @@ async def create_category(category: CategoryCreate):
         logger.error(f"Error creating category: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to create category: {str(e)}")
 
+@api_router.get("/category-options")
+async def get_category_options():
+    """Get available category options for dropdown"""
+    try:
+        # Standard categories available for all projects
+        categories = [
+            "Lighting", "Furniture", "Textiles", "Art & Accessories", 
+            "Window Treatments", "Flooring", "Paint & Finishes",
+            "Hardware", "Plumbing", "Kitchen", "Bathroom", "Built-ins",
+            "Electrical", "HVAC", "Security", "Technology"
+        ]
+        
+        return categories
+        
+    except Exception as e:
+        logging.error(f"Category options error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get category options: {str(e)}")
+
 @api_router.get("/categories/available")
 async def get_available_categories():
     """Get all available category names from comprehensive structure"""
