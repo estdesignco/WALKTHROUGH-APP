@@ -295,318 +295,246 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
-      {/* Logo Header - Black logo on gold container */}
-      <div className="text-center py-3 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border-b border-[#D4A574]/20">
-        <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#BCA888] p-0">
-          <img 
-            src={`${process.env.PUBLIC_URL}/established-logo.png`}
-            alt="ESTABLISHED" 
-            className="h-10 md:h-12 object-contain"
-            style={{ 
-              maxWidth: '180px',
-              filter: 'brightness(0)',
-              display: 'block'
-            }}
+      {!capturedPhoto ? (
+        <div className="h-full flex flex-col items-center justify-center p-8">
+          <div className="text-[#D4A574] text-center mb-8">
+            <div className="text-8xl mb-6">📷</div>
+            <p className="text-2xl font-bold text-[#D4C5A9]">Capture Photo</p>
+            <p className="text-lg text-[#D4A574] mt-2">Take or select a photo to add measurements</p>
+          </div>
+          
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileSelect}
+            className="hidden"
           />
-        </div>
-      </div>
-      
-      {/* Header */}
-      <div className="bg-gray-900 p-4 border-b border-gray-700">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-white font-bold text-lg">📸 Photo Capture</h3>
+          
           <button
-            onClick={onClose}
-            className="text-white text-2xl hover:text-red-400"
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-gradient-to-br from-[#D4A574] to-[#B48554] hover:from-[#E4B584] hover:to-[#C49564] text-black px-12 py-6 rounded-2xl font-bold text-2xl shadow-2xl transform hover:scale-105 transition-all"
           >
-            ✕
+            📸 Take/Select Photo
           </button>
         </div>
-        
-        {/* Leica Connection */}
-        <div className="flex gap-2">
-          {!leicaConnected ? (
-            <button
-              onClick={connectLeica}
-              disabled={connecting}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded font-bold text-sm"
-            >
-              {connecting ? '⏳ Connecting...' : '📏 Connect Leica D5'}
-            </button>
-          ) : (
-            <>
-              <div className="flex-1 bg-green-600 text-white px-4 py-2 rounded font-bold text-sm flex items-center justify-center">
-                ✅ Leica D5 Connected
-              </div>
-              <button
-                onClick={disconnectLeica}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold text-sm"
-              >
-                Disconnect
-              </button>
-            </>
-          )}
-        </div>
-        
-        {/* Last Measurement Display */}
-        {lastMeasurement && (
-          <div className="mt-3 bg-green-900 text-green-100 px-4 py-2 rounded">
-            <div className="text-xs font-bold">Last Measurement:</div>
-            <div className="text-lg font-bold">{lastMeasurement.feetInches}</div>
-            <div className="text-xs text-green-300">
-              {lastMeasurement.meters}m • {lastMeasurement.inches}" • {lastMeasurement.cm}cm
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto p-4">
-        {!capturedPhoto ? (
-          <div className="h-full flex flex-col items-center justify-center gap-4">
-            <div className="text-gray-400 text-center mb-4">
-              <div className="text-6xl mb-4">📷</div>
-              <p className="text-lg">Capture or select a photo</p>
-            </div>
-            
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileSelect}
-              className="hidden"
+      ) : (
+        <div className="h-full flex flex-col relative">
+          {/* PHOTO TAKES UP ALMOST ENTIRE SCREEN */}
+          <div className="flex-1 relative bg-black flex items-center justify-center">
+            <img 
+              ref={imageRef}
+              src={capturedPhoto}
+              alt="Captured photo"
+              className="max-w-full max-h-full object-contain"
+              style={{ minHeight: '80vh', minWidth: '80vw' }}
             />
             
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg"
-            >
-              📸 Take/Select Photo
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* Arrow Controls */}
-            <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-[#D4A574]/50 rounded-2xl p-4 space-y-3">
-              {/* Draw Mode Toggle */}
-              <button
-                onClick={() => setDrawMode(!drawMode)}
-                className={`w-full px-6 py-4 rounded-xl font-bold text-lg transition-all ${
-                  drawMode
-                    ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
-                    : 'bg-gradient-to-r from-gray-700 to-gray-800 text-gray-300'
-                }`}
-              >
-                {drawMode ? '✏️ Draw Mode ON - Tap to draw arrows' : '👁️ View Mode - Tap to enable drawing'}
-              </button>
-              
-              {/* Color Picker */}
-              {drawMode && (
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-[#D4A574] font-bold">Arrow Color:</span>
-                  {['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#FFFFD2'].map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setArrowColor(color)}
-                      className={`w-12 h-12 rounded-full border-4 transition-all ${
-                        arrowColor === color ? 'border-white scale-110' : 'border-gray-600 hover:scale-105'
-                      }`}
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            {/* Photo with annotations - LARGE AND PROMINENT */}
-            <div className="relative border-4 border-[#D4A574] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-900 to-black shadow-2xl">
-              <img 
-                ref={imageRef}
-                src={capturedPhoto}
-                alt="Captured photo"
-                className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
-                style={{ minHeight: '500px' }}
-              />
-              <div
-                ref={canvasRef}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                className="absolute inset-0 cursor-crosshair"
-                style={{ zIndex: 20 }}
-              >
-                {/* SVG Overlay for clean arrow rendering */}
-                <svg 
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                  style={{ zIndex: 25 }}
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
-                >
-                  <defs>
-                    <marker
-                      id="arrowhead-gold"
-                      markerWidth="10"
-                      markerHeight="10"
-                      refX="9"
-                      refY="3"
-                      orient="auto"
-                    >
-                      <polygon points="0 0, 10 3, 0 6" fill="#FFD700" />
-                    </marker>
-                    <marker
-                      id="arrowhead-red"
-                      markerWidth="10"
-                      markerHeight="10"
-                      refX="9"
-                      refY="3"
-                      orient="auto"
-                    >
-                      <polygon points="0 0, 10 3, 0 6" fill="#FF6B6B" />
-                    </marker>
-                  </defs>
-                  
-                  {/* Dynamic arrowhead markers for each color */}
-                  {[...new Set(measurements.map(m => m.color || '#FFD700'))].map((color) => (
-                    <marker
-                      key={`arrow-${color}`}
-                      id={`arrowhead-${color.replace('#', '')}`}
-                      markerWidth="10"
-                      markerHeight="10"
-                      refX="9"
-                      refY="3"
-                      orient="auto"
-                    >
-                      <polygon points="0 0, 10 3, 0 6" fill={color} />
-                    </marker>
-                  ))}
-                  
-                  {/* Saved arrows */}
-                  {measurements.map((m, index) => (
-                    <line
-                      key={index}
-                      x1={m.x1}
-                      y1={m.y1}
-                      x2={m.x2}
-                      y2={m.y2}
-                      stroke={m.color || '#FFD700'}
-                      strokeWidth="0.5"
-                      markerEnd={`url(#arrowhead-${(m.color || '#FFD700').replace('#', '')})`}
-                    />
-                  ))}
-                  
-                  {/* Drawing arrow */}
-                  {drawingArrow && (
-                    <line
-                      x1={drawingArrow.x1}
-                      y1={drawingArrow.y1}
-                      x2={drawingArrow.x2}
-                      y2={drawingArrow.y2}
-                      stroke={drawingArrow.color}
-                      strokeWidth="0.5"
-                      markerEnd="url(#arrowhead-red)"
-                      opacity="0.8"
-                    />
-                  )}
-                </svg>
+            {/* Touch overlay for measurements */}
+            <div
+              ref={canvasRef}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onTouchStart={(e) => {
+                const touch = e.touches[0];
+                const rect = e.target.getBoundingClientRect();
+                const x = ((touch.clientX - rect.left) / rect.width) * 100;
+                const y = ((touch.clientY - rect.top) / rect.height) * 100;
+                setDrawingArrow({ x1: x, y1: y, x2: x, y2: y, color: arrowColor });
+              }}
+              onTouchMove={(e) => {
+                if (!drawingArrow) return;
+                const touch = e.touches[0];
+                const rect = e.target.getBoundingClientRect();
+                const x = ((touch.clientX - rect.left) / rect.width) * 100;
+                const y = ((touch.clientY - rect.top) / rect.height) * 100;
+                setDrawingArrow({ ...drawingArrow, x2: x, y2: y });
+              }}
+              onTouchEnd={() => {
+                if (!drawingArrow) return;
+                const dx = drawingArrow.x2 - drawingArrow.x1;
+                const dy = drawingArrow.y2 - drawingArrow.y1;
+                const length = Math.sqrt(dx * dx + dy * dy);
                 
-                {/* Measurement text labels */}
-                {measurements.map((m, index) => (
-                  <div
-                    key={index}
-                    className="absolute pointer-events-auto"
-                    style={{
-                      left: `${(m.x1 + m.x2) / 2}%`,
-                      top: `${(m.y1 + m.y2) / 2 - 5}%`,
-                      transform: 'translate(-50%, -100%)',
-                      zIndex: 30
-                    }}
-                  >
-                    <div 
-                      className="bg-black bg-opacity-95 px-4 py-2 rounded-xl text-lg md:text-xl font-bold whitespace-nowrap shadow-2xl border-2"
-                      style={{ 
-                        color: m.color || '#FFD700',
-                        borderColor: m.color || '#FFD700',
-                        boxShadow: `0 0 20px ${m.color || '#FFD700'}40`
-                      }}
-                    >
-                      {m.text}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeMeasurement(index);
-                        }}
-                        className="ml-3 text-red-400 hover:text-red-300 font-bold text-xl"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+                if (length > 2) {
+                  const text = lastMeasurement ? lastMeasurement.feetInches : prompt('Enter measurement:', '');
+                  if (text) {
+                    setMeasurements([...measurements, { ...drawingArrow, text, color: arrowColor }]);
+                  }
+                }
+                setDrawingArrow(null);
+              }}
+              className="absolute inset-0 cursor-crosshair"
+              style={{ zIndex: 20 }}
+            />
 
-            {/* Add Measurement */}
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <label className="text-white text-sm font-bold mb-2 block">
-                📏 Add Measurement (click on photo to place)
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={measurementText}
-                  onChange={(e) => setMeasurementText(e.target.value)}
-                  placeholder="e.g., 8'6'' or 102 inches"
-                  className="flex-1 bg-gray-700 text-white px-4 py-2 rounded"
+            {/* SVG Overlay for measurements */}
+            <svg 
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              style={{ zIndex: 25 }}
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                {[...new Set(measurements.map(m => m.color || '#FFD700'))].map((color) => (
+                  <marker
+                    key={`arrow-${color}`}
+                    id={`arrowhead-${color.replace('#', '')}`}
+                    markerWidth="10"
+                    markerHeight="10"
+                    refX="9"
+                    refY="3"
+                    orient="auto"
+                  >
+                    <polygon points="0 0, 10 3, 0 6" fill={color} />
+                  </marker>
+                ))}
+              </defs>
+              
+              {/* Measurement arrows */}
+              {measurements.map((m, index) => (
+                <line
+                  key={index}
+                  x1={m.x1}
+                  y1={m.y1}
+                  x2={m.x2}
+                  y2={m.y2}
+                  stroke={m.color || '#FFD700'}
+                  strokeWidth="0.8"
+                  markerEnd={`url(#arrowhead-${(m.color || '#FFD700').replace('#', '')})`}
                 />
-                <button
-                  onClick={() => setMeasurementText('')}
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+              ))}
+              
+              {/* Drawing arrow */}
+              {drawingArrow && (
+                <line
+                  x1={drawingArrow.x1}
+                  y1={drawingArrow.y1}
+                  x2={drawingArrow.x2}
+                  y2={drawingArrow.y2}
+                  stroke={drawingArrow.color}
+                  strokeWidth="0.8"
+                  markerEnd={`url(#arrowhead-${drawingArrow.color.replace('#', '')})`}
+                  opacity="0.8"
+                />
+              )}
+            </svg>
+            
+            {/* Measurement labels */}
+            {measurements.map((m, index) => (
+              <div
+                key={index}
+                className="absolute pointer-events-auto"
+                style={{
+                  left: `${(m.x1 + m.x2) / 2}%`,
+                  top: `${(m.y1 + m.y2) / 2 - 5}%`,
+                  transform: 'translate(-50%, -100%)',
+                  zIndex: 30
+                }}
+              >
+                <div 
+                  className="bg-black bg-opacity-95 px-4 py-2 rounded-xl text-xl font-bold whitespace-nowrap shadow-2xl border-2"
+                  style={{ 
+                    color: m.color || '#FFD700',
+                    borderColor: m.color || '#FFD700',
+                    boxShadow: `0 0 20px ${m.color || '#FFD700'}40`
+                  }}
                 >
-                  Clear
+                  {m.text}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeMeasurement(index);
+                    }}
+                    className="ml-3 text-red-400 hover:text-red-300 font-bold text-xl"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* COMPACT FLOATING CONTROLS */}
+          <button
+            onClick={() => setShowControls(!showControls)}
+            className="absolute top-4 right-4 bg-[#D4A574] hover:bg-[#C49564] text-black p-3 rounded-full font-bold text-xl shadow-2xl z-40"
+          >
+            ⚙️
+          </button>
+
+          {/* SLIDE-IN CONTROL PANEL */}
+          {showControls && (
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/95 to-transparent p-6 z-50 transform transition-all duration-300">
+              {/* Leica Status */}
+              <div className="flex items-center gap-4 mb-4">
+                <div className={`px-4 py-2 rounded-xl font-bold text-sm ${leicaConnected ? 'bg-green-600' : 'bg-gray-700'}`}>
+                  📏 Leica D5: {leicaConnected ? 'Connected' : 'Not Connected'}
+                </div>
+                <button
+                  onClick={leicaConnected ? disconnectLeica : connectLeica}
+                  disabled={connecting}
+                  className="px-4 py-2 bg-[#D4A574] hover:bg-[#C49564] disabled:bg-gray-600 text-black rounded-xl font-bold text-sm"
+                >
+                  {connecting ? 'Connecting...' : (leicaConnected ? 'Disconnect' : 'Connect')}
                 </button>
               </div>
-              <p className="text-gray-400 text-xs mt-2">
-                💡 Tip: Enter measurement, then click on the photo to place it
-              </p>
-            </div>
 
-            {/* Notes */}
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <label className="text-white text-sm font-bold mb-2 block">
-                📝 Notes
-              </label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add any notes about this photo..."
-                className="w-full bg-gray-700 text-white px-4 py-2 rounded h-24 resize-none"
-              />
-            </div>
+              {/* Last Measurement */}
+              {lastMeasurement && (
+                <div className="bg-green-900 text-green-100 px-4 py-2 rounded-xl mb-4">
+                  <div className="text-sm font-bold">Last Measurement: {lastMeasurement.feetInches}</div>
+                </div>
+              )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setCapturedPhoto(null);
-                  setMeasurements([]);
-                  setNotes('');
-                }}
-                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-lg font-bold"
-              >
-                🔄 Retake
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={uploading}
-                className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-3 rounded-lg font-bold"
-              >
-                {uploading ? '⏳ Saving...' : '✅ Save Photo'}
-              </button>
+              {/* Color Picker */}
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[#D4A574] font-bold text-sm">Arrow Color:</span>
+                {['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#F38181', '#AA96DA'].map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setArrowColor(color)}
+                    className={`w-8 h-8 rounded-full border-2 transition-all ${
+                      arrowColor === color ? 'border-white scale-110' : 'border-gray-600 hover:scale-105'
+                    }`}
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setCapturedPhoto(null);
+                    setMeasurements([]);
+                    setNotes('');
+                    setShowControls(false);
+                  }}
+                  className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-xl font-bold"
+                >
+                  🔄 Retake
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={uploading}
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-3 rounded-xl font-bold"
+                >
+                  {uploading ? '⏳ Saving...' : '✅ Save Photo'}
+                </button>
+                <button
+                  onClick={onClose}
+                  className="px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
