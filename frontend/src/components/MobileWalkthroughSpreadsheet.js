@@ -723,21 +723,27 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
       {/* ADD ROOM MODAL */}
       {showAddRoom && (
         <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold text-white mb-4">Add Room</h3>
+          <div className="bg-[#1E293B] rounded-xl p-8 max-w-md w-full border-2 border-[#D4A574]">
+            <h3 className="text-2xl font-bold text-[#D4A574] mb-6">Add New Room</h3>
             <input
               type="text"
               value={newRoomName}
               onChange={(e) => setNewRoomName(e.target.value)}
               placeholder="Enter room name"
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded mb-4"
+              className="w-full bg-gray-700 text-white px-4 py-3 rounded-xl mb-6 text-lg"
               onKeyPress={(e) => e.key === 'Enter' && handleAddRoom()}
             />
-            <div className="flex gap-2">
-              <button onClick={handleAddRoom} className="flex-1 bg-green-600 text-white px-4 py-2 rounded font-bold">
-                Add
+            <div className="flex gap-4">
+              <button 
+                onClick={handleAddRoom} 
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl font-bold text-lg"
+              >
+                Add Room
               </button>
-              <button onClick={() => setShowAddRoom(false)} className="flex-1 bg-gray-600 text-white px-4 py-2 rounded">
+              <button 
+                onClick={() => setShowAddRoom(false)} 
+                className="flex-1 bg-gray-600 text-white px-6 py-3 rounded-xl font-bold text-lg"
+              >
                 Cancel
               </button>
             </div>
