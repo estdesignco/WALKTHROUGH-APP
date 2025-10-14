@@ -3570,9 +3570,9 @@ async def update_tracking_status(tracking_data: dict):
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-@api_router.post("/photos/upload")
+@api_router.post("/photos/upload-to-item")
 async def upload_item_photo(item_id: str, photo_url: str, description: str = ""):
-    """Add photo to item"""
+    """Add photo to item (legacy endpoint)"""
     try:
         item = await db.items.find_one({"id": item_id})
         if not item:
