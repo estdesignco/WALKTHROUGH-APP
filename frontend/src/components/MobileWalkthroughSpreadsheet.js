@@ -761,7 +761,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         <MobileQuickAddTemplates
           onClose={() => setShowQuickAdd(false)}
           projectId={projectId}
-          rooms={project?.rooms || []}
+          rooms={displayProject?.rooms || []}
           onComplete={loadProject}
         />
       )}
