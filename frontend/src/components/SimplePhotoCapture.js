@@ -468,11 +468,19 @@ export default function SimplePhotoCapture({ projectId, roomId, roomName, onPhot
               </button>
               
               <button
-                onClick={handleSave}
+                onClick={handleSavePhoto}
                 disabled={uploading}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-600 disabled:to-gray-700 text-white px-8 py-4 rounded-2xl font-bold text-xl"
+              >
+                {uploading ? '⏳ Saving...' : '📷 Save Photo Only'}
+              </button>
+              
+              <button
+                onClick={handleSaveMeasurements}
+                disabled={uploading || measurements.length === 0}
                 className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white px-8 py-4 rounded-2xl font-bold text-xl"
               >
-                {uploading ? '⏳ Saving...' : '✅ Save Photo & Measurements'}
+                {uploading ? '⏳ Saving...' : `📏 Save with Measurements (${measurements.length})`}
               </button>
             </div>
           </div>
