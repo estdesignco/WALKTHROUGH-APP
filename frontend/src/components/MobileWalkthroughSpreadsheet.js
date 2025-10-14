@@ -361,16 +361,6 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         </div>
       )}
       
-      {/* SIMPLE PHOTO BUTTON - MINIMAL AT TOP */}
-      <div className="p-4 bg-[#1E293B] border-b border-[#D4A574]/30">
-        <button
-          onClick={() => setShowPhotoManagement(true)}
-          className="bg-gradient-to-br from-[#D4A574] to-[#B48554] hover:from-[#E4B584] hover:to-[#C49564] text-black px-8 py-3 rounded-xl font-bold text-lg shadow-xl"
-        >
-          📸 PHOTOS & MEASUREMENTS
-        </button>
-      </div>
-      
       {/* SEARCH & FILTER PANEL */}
       {showSearch && (
         <MobileSearchFilter 
