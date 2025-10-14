@@ -750,21 +750,9 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         <MobileAddItemModal
           onClose={() => setShowAddItem(false)}
           projectId={projectId}
-          rooms={project?.rooms || []}
+          rooms={displayProject?.rooms || []}
+          selectedSubCategoryId={selectedSubCategoryId}
           onItemAdded={loadProject}
-        />
-      )}
-      
-      {/* PHOTO CAPTURE */}
-      {showPhotoCapture && selectedRoomForPhoto && (
-        <MobilePhotoCapture
-          projectId={projectId}
-          roomId={selectedRoomForPhoto.id}
-          onPhotoAdded={loadProject}
-          onClose={() => {
-            setShowPhotoCapture(false);
-            setSelectedRoomForPhoto(null);
-          }}
         />
       )}
       
