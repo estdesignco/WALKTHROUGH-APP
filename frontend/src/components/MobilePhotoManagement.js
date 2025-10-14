@@ -215,22 +215,70 @@ export default function MobilePhotoManagement({ projectId, onClose }) {
           {loading ? (
             <div className="text-center text-[#D4A574] text-xl md:text-2xl py-12">Loading photos...</div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="space-y-8">
               {project?.rooms?.map(room => (
-                <button
-                  key={room.id}
-                  onClick={() => {
-                    setSelectedRoom(room);
-                    setShowPhotoCapture(true);
-                  }}
-                  className="p-6 md:p-8 border-2 border-[#D4A574]/50 rounded-2xl md:rounded-3xl hover:bg-[#D4A574]/20 hover:border-[#D4A574] transition-all bg-gradient-to-br from-gray-900 to-black shadow-xl transform hover:scale-105"
-                >
-                  <div className="text-5xl md:text-6xl mb-3">📁</div>
-                  <div className="text-base md:text-lg lg:text-xl text-[#D4C5A9] font-bold truncate mb-2">{room.name}</div>
-                  <div className="text-sm md:text-base text-[#D4A574] font-medium">
-                    {roomPhotos[room.id]?.length || 0} photos
+                <div key={room.id} className="border-2 border-[#D4A574]/50 rounded-2xl p-6 bg-gradient-to-br from-gray-900 to-black">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-xl font-bold text-[#D4C5A9]">{room.name}</h4>
+                    <div className="text-[#D4A574] font-medium">
+                      {roomPhotos[room.id]?.length || 0} photos
+                    </div>
                   </div>
-                </button>
+                  
+                  {(roomPhotos[room.id]?.length || 0) === 0 ? (
+                    <div className="text-center py-8 border-2 border-dashed border-[#D4A574]/30 rounded-xl">
+                      <div className="text-4xl mb-2">📷</div>
+                      <div className="text-[#D4A574] mb-4">No photos yet</div>
+                      <button
+                        onClick={() => {
+                          setSelectedRoom(room);
+                          setShowPhotoCapture(true);
+                        }}
+                        className="px-4 py-2 bg-[#D4A574] hover:bg-[#C49564] text-black rounded-xl font-bold"
+                      >
+                        Take Photo
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Photo Grid */}
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
+                        {roomPhotos[room.id]?.map((photo, index) => (
+                          <div
+                            key={photo.id || index}
+                            className="aspect-square border-2 border-[#D4A574]/30 rounded-xl overflow-hidden hover:border-[#D4A574] transition-all cursor-pointer"
+                            onClick={() => setSelectedPhoto(photo)}
+                          >
+                            <img 
+                              src={photo.photo_data} 
+                              alt={photo.file_name || `Photo ${index + 1}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                console.error('Photo failed to load:', photo.id, photo.file_name);
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                            <div className="w-full h-full bg-gray-700 hidden items-center justify-center text-white text-sm">
+                              Error loading photo
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Add Photo Button */}
+                      <button
+                        onClick={() => {
+                          setSelectedRoom(room);
+                          setShowPhotoCapture(true);
+                        }}
+                        className="w-full py-3 border-2 border-dashed border-[#D4A574]/50 rounded-xl text-[#D4A574] hover:border-[#D4A574] hover:bg-[#D4A574]/10 transition-all font-bold"
+                      >
+                        + Add Photo
+                      </button>
+                    </>
+                  )}
+                </div>
               ))}
             </div>
           )}
