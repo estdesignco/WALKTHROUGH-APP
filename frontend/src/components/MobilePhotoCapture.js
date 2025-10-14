@@ -37,16 +37,17 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
     const browserInfo = leicaManager.getBrowserCompatibilityInfo();
     
     if (!leicaManager.isSupported()) {
-      let message = '❌ Web Bluetooth NOT SUPPORTED\n\n';
+      let message = '❌ WEB BLUETOOTH NOT SUPPORTED\n\n';
       
       if (browserInfo.isChromeOnIOS) {
         message += '⚠️ CHROME ON iPAD USES SAFARI ENGINE\n\n';
         message += 'Web Bluetooth does NOT work on iOS/iPadOS\n';
         message += '(This is an Apple limitation, not a Chrome issue)\n\n';
         message += '✅ TO USE LEICA D5:\n';
-        message += '• Chrome on Android tablet\n';
-        message += '• Chrome on Windows/Mac DESKTOP\n\n';
-        message += '❌ Will NOT work on any iPad browser';
+        message += '• Use Chrome on Android tablet/phone\n';
+        message += '• Use Chrome on Windows/Mac desktop\n\n';
+        message += '❌ Will NOT work on ANY iPad browser\n';
+        message += '❌ Will NOT work on Safari on any device';
       } else if (browserInfo.isSafari) {
         message += '⚠️ Safari does NOT support Web Bluetooth\n\n';
         message += '✅ Please use Chrome or Edge browser';
@@ -61,34 +62,68 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
     try {
       setConnecting(true);
       
-      // Check if already paired for faster reconnection
-      if (leicaManager.isPaired()) {
-        console.log('📱 Device previously paired, reconnecting...');
-      }
+      console.log('🔍 Starting Leica D5 connection process...');
       
+      // Simple connection without complex retry logic first
       const result = await leicaManager.connect();
       
       setLeicaConnected(true);
-      alert(`✅ Connected to ${result.deviceName}!\n\nPress the button on your Leica to take a measurement.`);
+      alert(`✅ CONNECTED TO LEICA D5!\n\nDevice: ${result.deviceName}\n\nPress the measurement button on your Leica to take readings.`);
 
       // Set up measurement callback
       leicaManager.setOnMeasurement((measurement) => {
-        console.log('📏 Measurement received:', measurement);
+        console.log('📏 NEW MEASUREMENT FROM LEICA:', measurement);
         setLastMeasurement(measurement);
         setMeasurementText(measurement.feetInches);
+        
+        // Show visual feedback
+        const notification = document.createElement('div');
+        notification.innerHTML = `
+          <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                      background: linear-gradient(135deg, #4ade80, #22c55e); 
+                      color: white; padding: 20px; border-radius: 12px; 
+                      z-index: 9999; font-weight: bold; font-size: 18px;
+                      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5);">
+            📏 NEW MEASUREMENT: ${measurement.feetInches}
+          </div>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => document.body.removeChild(notification), 3000);
       });
 
     } catch (error) {
-      console.error('Connection error:', error);
+      console.error('❌ Leica connection error:', error);
       
-      let errorMsg = `❌ Failed to connect:\n${error.message}\n\n`;
+      let errorMsg = `❌ FAILED TO CONNECT TO LEICA D5\n\n`;
       
-      if (error.message.includes('timeout')) {
-        errorMsg += `⏱ CONNECTION TIMEOUT\n\n🔧 Quick Fixes:\n1. Turn Leica D5 OFF → Wait 3 seconds → Turn ON\n2. Move device closer (< 3 feet)\n3. Close other apps using Bluetooth\n4. Try again (may take 30-60 seconds first time)\n\n💡 Tip: Once paired, reconnection is much faster!`;
-      } else if (error.message.includes('User cancelled')) {
-        errorMsg = '⚠️ Connection cancelled by user';
+      if (error.message.includes('User cancelled')) {
+        errorMsg = '⚠️ Connection cancelled by user.\n\nTip: Make sure to select your DISTO device when prompted.';
+      } else if (error.message.includes('timeout')) {
+        errorMsg += `⏱ CONNECTION TIMEOUT\n\n`;
+        errorMsg += `🔧 Quick Fixes:\n`;
+        errorMsg += `1. Turn Leica D5 OFF → Wait 5 seconds → Turn ON\n`;
+        errorMsg += `2. Move device closer (< 5 feet from your device)\n`;
+        errorMsg += `3. Make sure no other device is connected to the Leica\n`;
+        errorMsg += `4. Try again (first connection may take 30-90 seconds)\n\n`;
+        errorMsg += `💡 Once paired successfully, reconnection is much faster!`;
+      } else if (error.message.includes('not found') || error.message.includes('No device')) {
+        errorMsg += `🔍 DEVICE NOT FOUND\n\n`;
+        errorMsg += `📋 Checklist:\n`;
+        errorMsg += `✓ Leica D5 is powered ON\n`;
+        errorMsg += `✓ Leica is in pairing mode (check manual)\n`;
+        errorMsg += `✓ Leica is not connected to another device\n`;
+        errorMsg += `✓ You're within 10 feet of the Leica\n`;
+        errorMsg += `✓ Your device's Bluetooth is enabled\n\n`;
+        errorMsg += `🔄 If still not working, restart both devices`;
       } else {
-        errorMsg += `📋 Checklist:\n✓ Leica D5 powered ON\n✓ Bluetooth enabled on phone/tablet\n✓ Device in pairing mode (check manual)\n✓ Not connected to another device\n✓ Within 10 feet range\n\n🔄 If issues persist, restart both devices`;
+        errorMsg += `Error: ${error.message}\n\n`;
+        errorMsg += `📋 General Troubleshooting:\n`;
+        errorMsg += `✓ Leica D5 powered ON and ready\n`;
+        errorMsg += `✓ Bluetooth enabled on your device\n`;
+        errorMsg += `✓ No other device connected to Leica\n`;
+        errorMsg += `✓ Within 10 feet range\n`;
+        errorMsg += `✓ Using Chrome browser (not Safari)\n\n`;
+        errorMsg += `🆘 If problems persist, try restarting both devices`;
       }
       
       alert(errorMsg);
