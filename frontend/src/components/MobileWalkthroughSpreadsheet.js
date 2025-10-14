@@ -778,15 +778,49 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         />
       )}
       
-      {/* SIMPLE PHOTO MANAGEMENT */}
+      {/* SIMPLE PHOTO MANAGEMENT WITH ROOM SELECTION */}
       {showPhotoManagement && (
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          <div className="bg-[#1E293B] p-4 border-b-2 border-[#D4A574]">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-2xl font-bold text-[#D4A574]">📸 Select Room for Photos</h3>
+              <button
+                onClick={() => setShowPhotoManagement(false)}
+                className="text-[#D4A574] text-3xl hover:text-red-400"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {displayProject?.rooms?.map((room) => (
+                <button
+                  key={room.id}
+                  onClick={() => {
+                    setSelectedRoomForPhoto(room);
+                    setShowPhotoCapture(true);
+                    setShowPhotoManagement(false);
+                  }}
+                  className="p-4 border-2 border-[#D4A574]/50 rounded-xl hover:bg-[#D4A574]/20 hover:border-[#D4A574] transition-all bg-gradient-to-br from-gray-900 to-black"
+                  style={{ backgroundColor: getRoomColor(room.name, 0) + '20' }}
+                >
+                  <div className="text-3xl mb-2">📁</div>
+                  <div className="text-lg text-[#D4C5A9] font-bold">{room.name}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* SIMPLE PHOTO CAPTURE */}
+      {showPhotoCapture && selectedRoomForPhoto && (
         <SimplePhotoCapture
           projectId={projectId}
-          roomId={selectedRoomForPhoto?.id || (project?.rooms?.[0]?.id)}
-          roomName={selectedRoomForPhoto?.name || (project?.rooms?.[0]?.name) || 'Room'}
+          roomId={selectedRoomForPhoto.id}
+          roomName={selectedRoomForPhoto.name}
           onPhotoAdded={loadProject}
           onClose={() => {
-            setShowPhotoManagement(false);
+            setShowPhotoCapture(false);
             setSelectedRoomForPhoto(null);
           }}
         />
