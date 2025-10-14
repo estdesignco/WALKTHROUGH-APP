@@ -70,6 +70,19 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
     loadProject();
   }, [projectId]);
 
+  // Load available categories for dropdown
+  useEffect(() => {
+    const loadAvailableCategories = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/category-options`);
+        setAvailableCategories(response.data || []);
+      } catch (error) {
+        console.error('Failed to load available categories:', error);
+      }
+    };
+    loadAvailableCategories();
+  }, []);
+
   const loadProject = async () => {
     try {
       setLoading(true);
