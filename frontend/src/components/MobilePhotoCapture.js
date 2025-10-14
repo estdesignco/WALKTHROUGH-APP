@@ -403,15 +403,8 @@ export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, on
               >
                 {/* SVG Overlay for clean arrow rendering */}
                 <svg 
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    pointerEvents: 'none',
-                    zIndex: 10
-                  }}
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  style={{ zIndex: 25 }}
                   viewBox="0 0 100 100"
                   preserveAspectRatio="none"
                 >
