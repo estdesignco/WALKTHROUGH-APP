@@ -110,7 +110,7 @@ async def test_pricing_api():
     
     import aiohttp
     
-    base_url = "https://designflow-master.preview.emergentagent.com/api/furniture"
+    base_url = "https://designhub-74.preview.emergentagent.com/api/furniture"
     
     try:
         async with aiohttp.ClientSession() as session:

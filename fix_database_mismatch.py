@@ -256,7 +256,7 @@ async def test_api_after_fix():
     
     import aiohttp
     
-    base_url = "https://designflow-master.preview.emergentagent.com/api"
+    base_url = "https://designhub-74.preview.emergentagent.com/api"
     
     try:
         async with aiohttp.ClientSession() as session:
@@ -293,7 +293,7 @@ async def main():
         
         print(f"\n🎉 SUCCESS! Database fixed and tested")
         print(f"\n🔗 NEXT STEPS:")
-        print(f"1. Refresh: https://designflow-master.preview.emergentagent.com/furniture-search")
+        print(f"1. Refresh: https://designhub-74.preview.emergentagent.com/furniture-search")
         print(f"2. Product count should now show {count} instead of 17")
         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
         print(f"4. Test all filters and functionality")

@@ -215,7 +215,7 @@ async def import_fourhands_from_houzz(num_products=10):
     
     print(f"\n{'='*80}")
     print(f"✅ {success}/{num_products} products imported with HIGH QUALITY images!")
-    print(f"View: https://designflow-master.preview.emergentagent.com/furniture-search\n")
+    print(f"View: https://designhub-74.preview.emergentagent.com/furniture-search\n")
     
     client.close()
 

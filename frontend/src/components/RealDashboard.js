@@ -56,14 +56,14 @@ const RealDashboard = () => {
   };
 
   const handleFullQuestionnaire = () => {
-    window.open('https://designflow-master.preview.emergentagent.com/customer/questionnaire', '_blank');
+    window.open('https://designhub-74.preview.emergentagent.com/customer/questionnaire', '_blank');
   };
 
   const handleProjectClick = (project) => {
     if (project.id) {
-      window.open(`https://designflow-master.preview.emergentagent.com/project/${project.id}/detail`, '_blank');
+      window.open(`https://designhub-74.preview.emergentagent.com/project/${project.id}/detail`, '_blank');
     } else {
-      window.open('https://designflow-master.preview.emergentagent.com/project/a332f2fb-a248-41db-9c50-f028430a6261/detail', '_blank');
+      window.open('https://designhub-74.preview.emergentagent.com/project/a332f2fb-a248-41db-9c50-f028430a6261/detail', '_blank');
     }
   };
 
@@ -184,7 +184,7 @@ const RealDashboard = () => {
         {/* Navigation Links */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 max-w-6xl">
           <a 
-            href="https://designflow-master.preview.emergentagent.com/customer" 
+            href="https://designhub-74.preview.emergentagent.com/customer" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-black/60 border border-white/20 rounded-2xl p-6 hover:bg-black/70 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm text-center"
@@ -195,7 +195,7 @@ const RealDashboard = () => {
           </a>
           
           <a 
-            href="https://designflow-master.preview.emergentagent.com/customer/questionnaire" 
+            href="https://designhub-74.preview.emergentagent.com/customer/questionnaire" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-black/60 border border-white/20 rounded-2xl p-6 hover:bg-black/70 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm text-center"
@@ -206,7 +206,7 @@ const RealDashboard = () => {
           </a>
           
           <a 
-            href="https://designflow-master.preview.emergentagent.com/email-preview" 
+            href="https://designhub-74.preview.emergentagent.com/email-preview" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-black/60 border border-white/20 rounded-2xl p-6 hover:bg-black/70 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm text-center"
@@ -220,7 +220,7 @@ const RealDashboard = () => {
         {/* BIG Walkthrough and Furniture Search */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 max-w-4xl w-full">
           <a 
-            href="https://designflow-master.preview.emergentagent.com/" 
+            href="https://designhub-74.preview.emergentagent.com/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-black/60 border border-white/20 rounded-2xl p-12 hover:bg-black/70 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm text-center"
@@ -232,7 +232,7 @@ const RealDashboard = () => {
           </a>
           
           <a 
-            href="https://designflow-master.preview.emergentagent.com/" 
+            href="https://designhub-74.preview.emergentagent.com/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-black/60 border border-white/20 rounded-2xl p-12 hover:bg-black/70 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm text-center"
@@ -278,7 +278,7 @@ const RealDashboard = () => {
                 Send Email
               </button>
               <a
-                href="https://designflow-master.preview.emergentagent.com/email-preview"
+                href="https://designhub-74.preview.emergentagent.com/email-preview"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-all duration-300 text-center"

@@ -11,7 +11,7 @@
 - ✅ Added "Refresh Now" button for manual sync
 - ✅ Auto-refresh still works every 5 seconds
 
-**New URL:** `https://designflow-master.preview.emergentagent.com/canva-live-FINAL.js?projectId=designhub-63`
+**New URL:** `https://designhub-74.preview.emergentagent.com/canva-live-FINAL.js?projectId=designhub-63`
 
 **How to use:**
 1. Click "CANVA LIVE CHECKLIST" button in main app
@@ -76,7 +76,7 @@ Focus on the workflow that works:
 Since automated scanning doesn't work reliably with Canva's structure:
 
 ### Option A: Use Bulk Import Tool
-1. Open: `https://designflow-master.preview.emergentagent.com/bulk-import.html`
+1. Open: `https://designhub-74.preview.emergentagent.com/bulk-import.html`
 2. Copy all product URLs from your Canva board
 3. Paste into tool
 4. Select room

@@ -14,7 +14,7 @@ async def comprehensive_status_check():
     print("🚀 ULTIMATE FURNITURE SYSTEM - FINAL STATUS CHECK")
     print("=" * 80)
     
-    base_url = "https://designflow-master.preview.emergentagent.com/api/furniture"
+    base_url = "https://designhub-74.preview.emergentagent.com/api/furniture"
     
     try:
         async with aiohttp.ClientSession() as session:
@@ -108,7 +108,7 @@ async def comprehensive_status_check():
     print(f"\n{'='*80}")
     print(f"🎆 ULTIMATE FURNITURE SYSTEM STATUS COMPLETE")
     print(f"\n🔗 USER TESTING CHECKLIST:")
-    print(f"1. Go to: https://designflow-master.preview.emergentagent.com/furniture-search")
+    print(f"1. Go to: https://designhub-74.preview.emergentagent.com/furniture-search")
     print(f"2. Notice larger product images and enhanced interface")
     print(f"3. Search for 'Cove' or 'chair' - should find products")
     print(f"4. Click on a product IMAGE (not VIEW button) to open gallery")

@@ -54,7 +54,7 @@ if __name__ == "__main__":
     if success:
         print(f"\n🎉 ENHANCED GALLERY INTEGRATION COMPLETE!")
         print(f"\n📱 TEST THE ENHANCEMENTS:")
-        print(f"1. Go to: https://designflow-master.preview.emergentagent.com/furniture-search")
+        print(f"1. Go to: https://designhub-74.preview.emergentagent.com/furniture-search")
         print(f"2. Notice larger product images")
         print(f"3. Click on any product image (not VIEW button)")
         print(f"4. Gallery should open with zoom/navigation")

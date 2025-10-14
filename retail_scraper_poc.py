@@ -236,6 +236,6 @@ print(f"🎉 PROOF OF CONCEPT COMPLETE!")
 print(f"{'='*70}")
 print(f"✅ Success: {success}/5")
 print(f"\nIf this works, we can scale to thousands!")
-print(f"View: https://designflow-master.preview.emergentagent.com/furniture-search\n")
+print(f"View: https://designhub-74.preview.emergentagent.com/furniture-search\n")
 
 client.close()

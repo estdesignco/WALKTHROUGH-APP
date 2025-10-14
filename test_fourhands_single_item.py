@@ -12,7 +12,7 @@ async def test_fourhands_scraping():
     """Test scraping the Four Hands product URL directly"""
     
     # Test the scraping endpoint first
-    scrape_url = "https://designflow-master.preview.emergentagent.com/api/scrape-product"
+    scrape_url = "https://designhub-74.preview.emergentagent.com/api/scrape-product"
     fourhands_url = "https://fourhands.com/product/248606-001"
     
     async with aiohttp.ClientSession() as session:
@@ -49,8 +49,8 @@ async def test_add_item_endpoint():
     """Test the add item endpoint that should include scraping + Houzz Pro integration"""
     
     # First get projects to find a test project
-    projects_url = "https://designflow-master.preview.emergentagent.com/api/projects"
-    add_item_url = "https://designflow-master.preview.emergentagent.com/api/add-item"
+    projects_url = "https://designhub-74.preview.emergentagent.com/api/projects"
+    add_item_url = "https://designhub-74.preview.emergentagent.com/api/add-item"
     fourhands_url = "https://fourhands.com/product/248606-001"
     
     async with aiohttp.ClientSession() as session:
@@ -64,7 +64,7 @@ async def test_add_item_endpoint():
                 if not projects_result or len(projects_result) == 0:
                     print("❌ No projects found. Creating a test project first...")
                     # Create a test project
-                    create_project_url = "https://designflow-master.preview.emergentagent.com/api/projects"
+                    create_project_url = "https://designhub-74.preview.emergentagent.com/api/projects"
                     project_data = {
                         "name": "Test Four Hands Project",
                         "client_name": "Test Client",

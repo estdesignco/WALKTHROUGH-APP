@@ -10,7 +10,7 @@ import json
 async def check_specific_project():
     """Check the exact project where we added our item"""
     
-    base_url = "https://designflow-master.preview.emergentagent.com/api"
+    base_url = "https://designhub-74.preview.emergentagent.com/api"
     target_project_id = "8bb8cbf2-e691-4227-9892-d78c79d5b0a4"  # From our test
     
     try:

@@ -1,7 +1,7 @@
 import React from 'react';
 
 const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
-    const questionnaireUrl = `${process.env.REACT_APP_FRONTEND_URL || 'https://designflow-master.preview.emergentagent.com'}/customer/questionnaire/${questionnaireLinkId}`;
+    const questionnaireUrl = `${process.env.REACT_APP_FRONTEND_URL || 'https://designhub-74.preview.emergentagent.com'}/customer/questionnaire/${questionnaireLinkId}`;
 
     return (
         <div style={{
@@ -176,7 +176,7 @@ const EmailTemplate = ({ clientName, questionnaireLinkId }) => {
 
 // Export both the component and the HTML string version for email sending
 export const generateEmailHTML = (clientName, questionnaireLinkId) => {
-    const questionnaireUrl = `${process.env.REACT_APP_FRONTEND_URL || 'https://designflow-master.preview.emergentagent.com'}/customer/questionnaire/${questionnaireLinkId}`;
+    const questionnaireUrl = `${process.env.REACT_APP_FRONTEND_URL || 'https://designhub-74.preview.emergentagent.com'}/customer/questionnaire/${questionnaireLinkId}`;
     
     return `
     <!DOCTYPE html>

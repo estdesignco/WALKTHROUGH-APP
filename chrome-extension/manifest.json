@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://designflow-master.preview.emergentagent.com/*"
+    "https://designhub-74.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

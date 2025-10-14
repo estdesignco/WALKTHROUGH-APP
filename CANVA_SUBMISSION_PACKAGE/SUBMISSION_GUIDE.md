@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://designflow-master.preview.emergentagent.com";
+const BACKEND_URL = "https://designhub-74.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

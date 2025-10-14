@@ -109,7 +109,7 @@ const BeautifulDashboard = () => {
           
           {/* STUDIO LANDING PAGE - This should link to the customer questionnaire */}
           <a
-            href="https://designflow-master.preview.emergentagent.com/customer/questionnaire"
+            href="https://designhub-74.preview.emergentagent.com/customer/questionnaire"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-gray-700 hover:bg-gray-600 text-white px-8 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2 shadow-lg"
@@ -121,7 +121,7 @@ const BeautifulDashboard = () => {
         {/* BIGGER Walkthrough and Furniture Search */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <a 
-            href="https://designflow-master.preview.emergentagent.com/" 
+            href="https://designhub-74.preview.emergentagent.com/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-indigo-700/80 to-indigo-800/80 hover:from-indigo-800/80 hover:to-indigo-900/80 p-12 rounded-2xl transition-all duration-300 transform hover:scale-105 text-center block backdrop-blur-sm border border-white/10"
@@ -133,7 +133,7 @@ const BeautifulDashboard = () => {
           </a>
           
           <a 
-            href="https://designflow-master.preview.emergentagent.com/" 
+            href="https://designhub-74.preview.emergentagent.com/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-amber-700/80 to-amber-800/80 hover:from-amber-800/80 hover:to-amber-900/80 p-12 rounded-2xl transition-all duration-300 transform hover:scale-105 text-center block backdrop-blur-sm border border-white/10"
@@ -231,7 +231,7 @@ const BeautifulDashboard = () => {
                 Send Email
               </button>
               <a
-                href="https://designflow-master.preview.emergentagent.com/email-preview"
+                href="https://designhub-74.preview.emergentagent.com/email-preview"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-all duration-300 text-center font-medium"

@@ -74,7 +74,7 @@ const CorrectDashboard = () => {
               + New Client
             </button>
             <a 
-              href="https://designflow-master.preview.emergentagent.com/customer/questionnaire" 
+              href="https://designhub-74.preview.emergentagent.com/customer/questionnaire" 
               target="_blank" 
               rel="noopener noreferrer"
               className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-full font-medium transition-all duration-300"
@@ -87,7 +87,7 @@ const CorrectDashboard = () => {
         {/* All Navigation Links - KEEPING ALL THE ORIGINAL LINKS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           <a 
-            href="https://designflow-master.preview.emergentagent.com/studio" 
+            href="https://designhub-74.preview.emergentagent.com/studio" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 p-8 rounded-xl transition-all duration-300 transform hover:scale-105 text-center block"
@@ -98,7 +98,7 @@ const CorrectDashboard = () => {
           </a>
           
           <a 
-            href="https://designflow-master.preview.emergentagent.com/customer/questionnaire" 
+            href="https://designhub-74.preview.emergentagent.com/customer/questionnaire" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-green-700 to-green-800 hover:from-green-800 hover:to-green-900 p-8 rounded-xl transition-all duration-300 transform hover:scale-105 text-center block"
@@ -109,7 +109,7 @@ const CorrectDashboard = () => {
           </a>
           
           <a 
-            href="https://designflow-master.preview.emergentagent.com/email-preview" 
+            href="https://designhub-74.preview.emergentagent.com/email-preview" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 p-8 rounded-xl transition-all duration-300 transform hover:scale-105 text-center block"
@@ -123,7 +123,7 @@ const CorrectDashboard = () => {
         {/* BIG Walkthrough and Furniture Search */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <a 
-            href="https://designflow-master.preview.emergentagent.com/" 
+            href="https://designhub-74.preview.emergentagent.com/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-indigo-700 to-indigo-800 hover:from-indigo-800 hover:to-indigo-900 p-12 rounded-2xl transition-all duration-300 transform hover:scale-105 text-center block"
@@ -135,7 +135,7 @@ const CorrectDashboard = () => {
           </a>
           
           <a 
-            href="https://designflow-master.preview.emergentagent.com/" 
+            href="https://designhub-74.preview.emergentagent.com/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-amber-700 to-amber-800 hover:from-amber-800 hover:to-amber-900 p-12 rounded-2xl transition-all duration-300 transform hover:scale-105 text-center block"
@@ -150,7 +150,7 @@ const CorrectDashboard = () => {
         {/* Additional Links - Project Detail */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <a 
-            href="https://designflow-master.preview.emergentagent.com/project/a332f2fb-a248-41db-9c50-f028430a6261/detail" 
+            href="https://designhub-74.preview.emergentagent.com/project/a332f2fb-a248-41db-9c50-f028430a6261/detail" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-gradient-to-br from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 p-8 rounded-xl transition-all duration-300 transform hover:scale-105 text-center block"
@@ -204,7 +204,7 @@ const CorrectDashboard = () => {
                 Send Email
               </button>
               <a
-                href="https://designflow-master.preview.emergentagent.com/email-preview"
+                href="https://designhub-74.preview.emergentagent.com/email-preview"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-all duration-300 text-center font-medium"
