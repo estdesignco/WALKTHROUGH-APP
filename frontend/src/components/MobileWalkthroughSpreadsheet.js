@@ -778,11 +778,17 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         />
       )}
       
-      {/* PHOTO MANAGEMENT */}
+      {/* SIMPLE PHOTO MANAGEMENT */}
       {showPhotoManagement && (
-        <MobilePhotoManagement
+        <SimplePhotoCapture
           projectId={projectId}
-          onClose={() => setShowPhotoManagement(false)}
+          roomId={selectedRoomForPhoto?.id || (project?.rooms?.[0]?.id)}
+          roomName={selectedRoomForPhoto?.name || (project?.rooms?.[0]?.name) || 'Room'}
+          onPhotoAdded={loadProject}
+          onClose={() => {
+            setShowPhotoManagement(false);
+            setSelectedRoomForPhoto(null);
+          }}
         />
       )}
     </div>
