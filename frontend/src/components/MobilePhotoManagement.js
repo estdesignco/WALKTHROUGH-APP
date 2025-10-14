@@ -12,6 +12,7 @@ export default function MobilePhotoManagement({ projectId, onClose }) {
   const [connecting, setConnecting] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [showPhotoCapture, setShowPhotoCapture] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
