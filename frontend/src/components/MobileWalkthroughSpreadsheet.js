@@ -502,6 +502,16 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                               {subcategory.name.toUpperCase()}
                               <button
                                 onClick={() => {
+                                  setSelectedSubCategoryId(subcategory.id);
+                                  setShowAddItem(true);
+                                }}
+                                className="ml-2 bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-bold"
+                                title={`Add item to ${subcategory.name}`}
+                              >
+                                + ADD ITEM
+                              </button>
+                              <button
+                                onClick={() => {
                                   if (window.confirm(`Delete subcategory "${subcategory.name}" and all its items?`)) {
                                     handleDeleteSubcategory(subcategory.id);
                                   }
