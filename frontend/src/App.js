@@ -149,135 +149,145 @@ const App = () => {
   return (
     <div className="App min-h-screen bg-gray-900">
       <BrowserRouter>
-        <Navigation 
-          currentProject={currentProject} 
-          isOffline={isOffline}
-        />
-        
-        <main className="container mx-auto px-4 py-6">
-          <Routes>
-            <Route 
-              path="/" 
-              element={<MainDashboard />}
-            />
-            <Route 
-              path="/mobile-app" 
-              element={<MobileAppSimulator />}
-            />
-            <Route 
-              path="/canva/callback" 
-              element={<CanvaCallbackHandler />}
-            />
-            <Route 
-              path="/studio" 
-              element={<StudioLandingPage />}
-            />
-            <Route 
-              path="/customer/questionnaire" 
-              element={<CustomerfacingQuestionnaire />}
-            />
-            <Route 
-              path="/customer" 
-              element={<CustomerLandingPage />}
-            />
-            <Route 
-              path="/projects" 
-              element={
-                <ProjectList 
-                  onSelectProject={setCurrentProject}
+        {/* Mobile app gets full screen without navigation */}
+        <Routes>
+          <Route 
+            path="/mobile-app" 
+            element={<MobileAppSimulator />}
+          />
+          <Route 
+            path="*" 
+            element={
+              <>
+                <Navigation 
+                  currentProject={currentProject} 
                   isOffline={isOffline}
                 />
-              }
-            />
-            <Route 
-              path="/questionnaire/new" 
-              element={<ComprehensiveQuestionnaire />}
-            />
-            <Route 
-              path="/questionnaire/demo" 
-              element={<ComprehensiveQuestionnaire />}
-            />
-            <Route 
-              path="/questionnaire/:clientEmail" 
-              element={<ComprehensiveQuestionnaire />}
-            />
-            {/* IMPORTANT: More specific routes MUST come before less specific ones */}
-            <Route 
-              path="/project/:projectId/questionnaire" 
-              element={<QuestionnaireSheet />}
-            />
-            <Route 
-              path="/project/:projectId/walkthrough" 
-              element={<WalkthroughDashboard isOffline={isOffline} />}
-            />
-            <Route 
-              path="/walkthrough/:projectId" 
-              element={<WalkthroughDashboard isOffline={isOffline} />}
-            />
-            <Route 
-              path="/project/:projectId/checklist" 
-              element={<ChecklistDashboard isOffline={isOffline} />}
-            />
-            <Route 
-              path="/checklist/:projectId" 
-              element={<ChecklistDashboard isOffline={isOffline} />}
-            />
-            <Route 
-              path="/project/:projectId/ffe" 
-              element={<FFEDashboardWrapper />}
-            />
-            <Route 
-              path="/ffe/:projectId" 
-              element={<FFEDashboard isOffline={isOffline} />}
-            />
-            {/* Generic project detail route - MUST be AFTER specific routes */}
-            <Route 
-              path="/project/:projectId" 
-              element={<ProjectDetailPage />}
-            />
-            <Route 
-              path="/scraping-test" 
-              element={<ScrapingTestPage />}
-            />
-            <Route 
-              path="/advanced-features" 
-              element={<AdvancedFeaturesDashboard />}
-            />
-            <Route 
-              path="/email-preview" 
-              element={<EmailPreview />}
-            />
-            <Route 
-              path="/furniture-search" 
-              element={<UnifiedFurnitureSearch currentProject={currentProject} />}
-            />
-            <Route 
-              path="/furniture-catalog" 
-              element={<UnifiedFurnitureSearch currentProject={currentProject} />}
-            />
-            <Route 
-              path="/workflow-dashboard" 
-              element={<WorkflowDashboard />}
-            />
-            {/* Customer-facing routes */}
-            <Route 
-              path="/customer/questionnaire" 
-              element={<CustomerfacingQuestionnaire />}
-            />
-            <Route 
-              path="/customer/project/:projectId" 
-              element={<CustomerfacingProjectDetailPage />}
-            />
-            <Route 
-              path="/questionnaire" 
-              element={<CustomerfacingQuestionnaire />}
-            />
-            <Route 
-              path="/project/:projectId/detail" 
-              element={<CustomerfacingProjectDetailPage />}
-            />
-          </Routes>
-        </main>
+                
+                <main className="container mx-auto px-4 py-6">
+                  <Routes>
+                    <Route 
+                      path="/" 
+                      element={<MainDashboard />}
+                    />
+                    <Route 
+                      path="/canva/callback" 
+                      element={<CanvaCallbackHandler />}
+                    />
+                    <Route 
+                      path="/studio" 
+                      element={<StudioLandingPage />}
+                    />
+                    <Route 
+                      path="/customer/questionnaire" 
+                      element={<CustomerfacingQuestionnaire />}
+                    />
+                    <Route 
+                      path="/customer" 
+                      element={<CustomerLandingPage />}
+                    />
+                    <Route 
+                      path="/projects" 
+                      element={
+                        <ProjectList 
+                          onSelectProject={setCurrentProject}
+                          isOffline={isOffline}
+                        />
+                      }
+                    />
+                    <Route 
+                      path="/questionnaire/new" 
+                      element={<ComprehensiveQuestionnaire />}
+                    />
+                    <Route 
+                      path="/questionnaire/demo" 
+                      element={<ComprehensiveQuestionnaire />}
+                    />
+                    <Route 
+                      path="/questionnaire/:clientEmail" 
+                      element={<ComprehensiveQuestionnaire />}
+                    />
+                    {/* IMPORTANT: More specific routes MUST come before less specific ones */}
+                    <Route 
+                      path="/project/:projectId/questionnaire" 
+                      element={<QuestionnaireSheet />}
+                    />
+                    <Route 
+                      path="/project/:projectId/walkthrough" 
+                      element={<WalkthroughDashboard isOffline={isOffline} />}
+                    />
+                    <Route 
+                      path="/walkthrough/:projectId" 
+                      element={<WalkthroughDashboard isOffline={isOffline} />}
+                    />
+                    <Route 
+                      path="/project/:projectId/checklist" 
+                      element={<ChecklistDashboard isOffline={isOffline} />}
+                    />
+                    <Route 
+                      path="/checklist/:projectId" 
+                      element={<ChecklistDashboard isOffline={isOffline} />}
+                    />
+                    <Route 
+                      path="/project/:projectId/ffe" 
+                      element={<FFEDashboardWrapper />}
+                    />
+                    <Route 
+                      path="/ffe/:projectId" 
+                      element={<FFEDashboard isOffline={isOffline} />}
+                    />
+                    {/* Generic project detail route - MUST be AFTER specific routes */}
+                    <Route 
+                      path="/project/:projectId" 
+                      element={<ProjectDetailPage />}
+                    />
+                    <Route 
+                      path="/scraping-test" 
+                      element={<ScrapingTestPage />}
+                    />
+                    <Route 
+                      path="/advanced-features" 
+                      element={<AdvancedFeaturesDashboard />}
+                    />
+                    <Route 
+                      path="/email-preview" 
+                      element={<EmailPreview />}
+                    />
+                    <Route 
+                      path="/furniture-search" 
+                      element={<UnifiedFurnitureSearch currentProject={currentProject} />}
+                    />
+                    <Route 
+                      path="/furniture-catalog" 
+                      element={<UnifiedFurnitureSearch currentProject={currentProject} />}
+                    />
+                    <Route 
+                      path="/workflow-dashboard" 
+                      element={<WorkflowDashboard />}
+                    />
+                    {/* Customer-facing routes */}
+                    <Route 
+                      path="/customer/questionnaire" 
+                      element={<CustomerfacingQuestionnaire />}
+                    />
+                    <Route 
+                      path="/customer/project/:projectId" 
+                      element={<CustomerfacingProjectDetailPage />}
+                    />
+                    <Route 
+                      path="/questionnaire" 
+                      element={<CustomerfacingQuestionnaire />}
+                    />
+                    <Route 
+                      path="/project/:projectId/detail" 
+                      element={<CustomerfacingProjectDetailPage />}
+                    />
+                  </Routes>
+                </main>
+              </>
+            }
+          />
+        </Routes>
       </BrowserRouter>
     </div>
   );
