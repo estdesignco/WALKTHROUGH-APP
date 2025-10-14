@@ -420,145 +420,289 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         </div>
       )}
 
-      {/* WALKTHROUGH TABLE - EXACT DESKTOP STRUCTURE */}
+      {/* WALKTHROUGH TABLE - EXACT DESKTOP STRUCTURE FOR 13" IPAD */}
       <div className="overflow-x-auto">
-        <table className="border-collapse" style={{ width: 'auto', minWidth: '100%', tableLayout: 'auto' }}>
-          <tbody>
-            {displayProject?.rooms?.map((room) => (
-              <React.Fragment key={room.id}>
-                {/* ROOM HEADER ROW */}
-                <tr>
-                  <td colSpan="6" 
-                      className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
-                      style={{ backgroundColor: getRoomColor(room.name) }}>
+        {displayProject?.rooms?.map((room) => (
+          <React.Fragment key={room.id}>
+            {/* ROOM HEADER - Exact like desktop */}
+            <div className="mb-6">
+              <div 
+                className="border border-[#B49B7E] p-3 font-bold text-[#D4C5A9] text-lg shadow-lg shadow-[#B49B7E]/10"
+                style={{ backgroundColor: getRoomColor(room.name) }}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => toggleRoom(room.id)} className="text-[#D4C5A9] text-xl">
+                      {expandedRooms[room.id] ? '▼' : '▶'}
+                    </button>
+                    <span className="text-xl font-bold">{room.name.toUpperCase()}</span>
+                  </div>
+                  <div className="text-sm text-[#D4C5A9]">
+                    {room.categories?.length || 0} categories
+                  </div>
+                </div>
+              </div>
+
+              {/* CATEGORIES - Show when room expanded */}
+              {expandedRooms[room.id] && room.categories?.map((category) => (
+                <div key={category.id} className="mt-4">
+                  {/* CATEGORY HEADER - Exact like desktop */}
+                  <div 
+                    className="border border-[#B49B7E] p-2 font-bold text-[#D4C5A9] shadow-lg shadow-[#B49B7E]/10"
+                    style={{ backgroundColor: getCategoryColor() }}
+                  >
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
-                        <button onClick={() => toggleRoom(room.id)} className="text-white">
-                          {expandedRooms[room.id] ? '▼' : '▶'}
+                        <button onClick={() => toggleCategory(category.id)} className="text-[#D4C5A9]">
+                          {expandedCategories[category.id] ? '▼' : '▶'}
                         </button>
-                        <span>{room.name.toUpperCase()}</span>
+                        <span className="font-bold">{category.name.toUpperCase()}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <select
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              handleAddCategory(room.id, e.target.value);
+                              e.target.value = '';
+                            }
+                          }}
+                          className="bg-green-600 text-[#B49B7E] text-xs px-2 py-1 rounded border-none"
+                        >
+                          <option value="">+ Add Category</option>
+                          {availableCategories.map(categoryName => (
+                            <option key={categoryName} value={categoryName}>
+                              {categoryName}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={() => handleDeleteCategory(category.id)}
+                          className="text-red-300 hover:text-red-100 text-lg"
+                          title="Delete Category"
+                        >
+                          🗑️
+                        </button>
                       </div>
                     </div>
-                  </td>
-                </tr>
+                  </div>
 
-                {/* CATEGORIES - Show when room expanded */}
-                {expandedRooms[room.id] && room.categories?.map((category) => (
-                  <React.Fragment key={category.id}>
-                    {/* CATEGORY HEADER ROW */}
-                    <tr>
-                      <td colSpan="6"
-                          className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
-                          style={{ backgroundColor: getCategoryColor() }}>
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => toggleCategory(category.id)} className="text-white">
-                            {expandedCategories[category.id] ? '▼' : '▶'}
-                          </button>
-                          <span>{category.name.toUpperCase()}</span>
-                        </div>
-                      </td>
-                    </tr>
-
-                    {/* HEADERS - Show when category expanded (BELOW category header) */}
-                    {expandedCategories[category.id] && (
-                      <tr>
-                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8b7355' }}>✓</th>
-                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>ITEM NAME</th>
-                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
-                        <th className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
-                      </tr>
-                    )}
-
-                    {/* ITEMS - Show when category expanded */}
-                    {expandedCategories[category.id] && category.subcategories?.map((subcategory) => (
-                      <React.Fragment key={subcategory.id}>
-                        {subcategory.items?.map((item) => (
-                          <tr key={item.id} className="hover:bg-gray-800">
-                            {/* CHECKBOX */}
-                            <td className="border border-gray-400 px-3 py-2 text-center">
-                              <input
-                                type="checkbox"
-                                checked={item.checked || false}
-                                onChange={() => toggleItemCheck(item)}
-                                className="w-5 h-5 cursor-pointer"
-                              />
-                            </td>
-                            
-                            {/* ITEM NAME - Click to Edit */}
-                            <td className="border border-gray-400 px-3 py-2 text-white text-sm whitespace-nowrap">
-                              <div 
-                                contentEditable
-                                suppressContentEditableWarning
-                                onBlur={(e) => updateItemOffline(item.id, { name: e.target.textContent })}
-                                className="font-bold outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded"
-                                style={{ minWidth: 'max-content' }}
-                              >
-                                {item.name}
-                              </div>
-                              {item.vendor && <div className="text-xs text-gray-400 mt-1">{item.vendor}</div>}
-                              {item.sku && <div className="text-xs text-gray-400">SKU: {item.sku}</div>}
-                            </td>
-                            
-                            {/* QTY - Click to Edit */}
-                            <td className="border border-gray-400 px-3 py-2 text-white text-sm text-center whitespace-nowrap">
-                              <div
-                                contentEditable
-                                suppressContentEditableWarning
-                                onBlur={(e) => updateItemOffline(item.id, { quantity: e.target.textContent })}
-                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded inline-block"
-                                style={{ minWidth: 'max-content' }}
-                              >
-                                {item.quantity || '1'}
-                              </div>
-                            </td>
-                            
-                            {/* SIZE - Click to Edit */}
-                            <td className="border border-gray-400 px-3 py-2 text-white text-sm whitespace-nowrap">
-                              <div
-                                contentEditable
-                                suppressContentEditableWarning
-                                onBlur={(e) => updateItemOffline(item.id, { size: e.target.textContent })}
-                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded"
-                                style={{ minWidth: 'max-content' }}
-                              >
-                                {item.size || '-'}
-                              </div>
-                            </td>
-                            
-                            {/* FINISH/COLOR - Click to Edit */}
-                            <td className="border border-gray-400 px-3 py-2 text-white text-sm whitespace-nowrap">
-                              <div
-                                contentEditable
-                                suppressContentEditableWarning
-                                onBlur={(e) => updateItemOffline(item.id, { finish_color: e.target.textContent })}
-                                className="outline-none focus:bg-gray-800 focus:ring-1 focus:ring-blue-500 px-1 py-1 rounded"
-                                style={{ minWidth: 'max-content' }}
-                              >
-                                {item.finish_color || '-'}
-                              </div>
-                            </td>
-                            
-                            {/* DELETE BUTTON */}
-                            <td className="border border-gray-400 px-3 py-2 text-center">
-                              <button 
-                                onClick={() => handleDeleteItem(item.id)}
-                                className="text-red-400 hover:text-red-300 text-xs"
+                  {/* SUBCATEGORIES - Show when category expanded - EXACT DESKTOP TABLE */}
+                  {expandedCategories[category.id] && category.subcategories?.map((subcategory) => (
+                    <React.Fragment key={subcategory.id || subcategory.name}>
+                      <table className="w-full border-collapse border border-[#B49B7E] mb-4 mt-2 shadow-lg shadow-[#B49B7E]/10">
+                        <thead>
+                          <tr>
+                            <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#D4C5A9] w-8 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>✓</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#D4C5A9] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>
+                              {subcategory.name.toUpperCase()}
+                              <button
+                                onClick={() => {
+                                  if (window.confirm(`Delete subcategory "${subcategory.name}" and all its items?`)) {
+                                    handleDeleteSubcategory(subcategory.id);
+                                  }
+                                }}
+                                className="ml-2 text-[#B49B7E] hover:text-red-200 text-xs"
+                                title={`Delete ${subcategory.name} subcategory`}
                               >
                                 🗑️
                               </button>
-                            </td>
+                            </th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] w-16 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>QTY</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>COST</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>STATUS</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] w-20 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] w-24 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>PRODUCT LINK</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>REMARKS</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#B49B7E] w-12 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
                           </tr>
-                        ))}
-                      </React.Fragment>
-                    ))}
-                  </React.Fragment>
-                ))}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+                        </thead>
+                        <tbody>
+                          {/* ITEMS UNDER THIS SUBCATEGORY - Exact like desktop */}
+                          {subcategory.items?.map((item, itemIndex) => (
+                            <tr key={item.id} style={{ 
+                              background: itemIndex % 2 === 0 
+                                ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                            }}>
+                              {/* CHECKBOX - AUTO SET TO PICKED */}
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
+                                <input 
+                                  type="checkbox" 
+                                  className="w-4 h-4 cursor-pointer" 
+                                  checked={item.status === 'PICKED'}
+                                  onChange={async (e) => {
+                                    const newStatus = e.target.checked ? 'PICKED' : '';
+                                    await updateItemOffline(item.id, { status: newStatus });
+                                    
+                                    // Update local state immediately
+                                    setProject(prevProject => {
+                                      const updatedProject = JSON.parse(JSON.stringify(prevProject));
+                                      updatedProject.rooms = updatedProject.rooms.map(r => ({
+                                        ...r,
+                                        categories: r.categories.map(c => ({
+                                          ...c,
+                                          subcategories: c.subcategories.map(s => ({
+                                            ...s,
+                                            items: s.items.map(i => 
+                                              i.id === item.id ? { ...i, status: newStatus } : i
+                                            )
+                                          }))
+                                        }))
+                                      }));
+                                      return updatedProject;
+                                    });
+                                  }}
+                                />
+                              </td>
+                              
+                              {/* ITEM NAME - EDITABLE */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div 
+                                  contentEditable={true}
+                                  suppressContentEditableWarning={true}
+                                  className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                  onBlur={(e) => updateItemOffline(item.id, { name: e.target.textContent })}
+                                >
+                                  {item.name}
+                                </div>
+                              </td>
+                              
+                              {/* VENDOR/SKU - EDITABLE */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div 
+                                  contentEditable={true}
+                                  suppressContentEditableWarning={true}
+                                  className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                  onBlur={(e) => updateItemOffline(item.id, { vendor: e.target.textContent })}
+                                >
+                                  {item.vendor ? `${item.vendor}${item.sku ? ` / ${item.sku}` : ''}` : item.sku || ''}
+                                </div>
+                              </td>
+                              
+                              {/* QTY - EDITABLE */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm text-center">
+                                <div 
+                                  contentEditable={true}
+                                  suppressContentEditableWarning={true}
+                                  className="w-full bg-transparent text-[#B49B7E] text-sm text-center outline-none"
+                                  onBlur={(e) => updateItemOffline(item.id, { quantity: e.target.textContent })}
+                                >
+                                  {item.quantity || ''}
+                                </div>
+                              </td>
+                              
+                              {/* SIZE - EDITABLE */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div 
+                                  contentEditable={true}
+                                  suppressContentEditableWarning={true}
+                                  className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                  onBlur={(e) => updateItemOffline(item.id, { size: e.target.textContent })}
+                                >
+                                  {item.size || ''}
+                                </div>
+                              </td>
+                              
+                              {/* FINISH/COLOR - EDITABLE */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div 
+                                  contentEditable={true}
+                                  suppressContentEditableWarning={true}
+                                  className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                  onBlur={(e) => updateItemOffline(item.id, { finish_color: e.target.textContent })}
+                                >
+                                  {item.finish_color || ''}
+                                </div>
+                              </td>
+                              
+                              {/* COST - EDITABLE */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div 
+                                  contentEditable={true}
+                                  suppressContentEditableWarning={true}
+                                  className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                  onBlur={(e) => updateItemOffline(item.id, { cost: e.target.textContent })}
+                                >
+                                  {item.cost || ''}
+                                </div>
+                              </td>
+                              
+                              {/* STATUS - DROPDOWN */}
+                              <td className="border border-[#B49B7E] px-1 py-1">
+                                <select
+                                  value={item.status || ''}
+                                  onChange={(e) => updateItemOffline(item.id, { status: e.target.value })}
+                                  className="w-full bg-gray-700 text-[#B49B7E] text-xs px-1 py-1 rounded border-none"
+                                >
+                                  <option value="">Select Status</option>
+                                  <option value="PICKED">PICKED</option>
+                                  <option value="TO BE PICKED">TO BE PICKED</option>
+                                  <option value="ORDER SAMPLES">ORDER SAMPLES</option>
+                                  <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
+                                  <option value="ASK NEIL">ASK NEIL</option>
+                                  <option value="ASK CHARLENE">ASK CHARLENE</option>
+                                  <option value="ASK JALA">ASK JALA</option>
+                                  <option value="GET QUOTE">GET QUOTE</option>
+                                  <option value="WAITING ON QT">WAITING ON QT</option>
+                                  <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
+                                </select>
+                              </td>
+                              
+                              {/* IMAGE */}
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center w-20">
+                                {item.image_url ? (
+                                  <img src={item.image_url} alt={item.name} className="w-12 h-12 object-cover rounded" />
+                                ) : (
+                                  <div className="w-12 h-12 bg-gray-700 rounded flex items-center justify-center text-xs text-[#B49B7E]">No Image</div>
+                                )}
+                              </td>
+                              
+                              {/* PRODUCT LINK */}
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center w-24">
+                                {item.link ? (
+                                  <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-[#D4A574] text-xs hover:underline">
+                                    🔗 View
+                                  </a>
+                                ) : (
+                                  <span className="text-gray-500 text-xs">-</span>
+                                )}
+                              </td>
+                              
+                              {/* REMARKS - EDITABLE */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div 
+                                  contentEditable={true}
+                                  suppressContentEditableWarning={true}
+                                  className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                  onBlur={(e) => updateItemOffline(item.id, { notes: e.target.textContent })}
+                                >
+                                  {item.notes || ''}
+                                </div>
+                              </td>
+                              
+                              {/* DELETE BUTTON */}
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center w-12">
+                                <button 
+                                  onClick={() => handleDeleteItem(item.id)}
+                                  className="text-red-400 hover:text-red-300 text-sm font-bold"
+                                >
+                                  🗑️
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </React.Fragment>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </React.Fragment>
+        ))}
       </div>
 
       {/* ADD ROOM MODAL */}
