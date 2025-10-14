@@ -285,6 +285,46 @@ export default function MobilePhotoManagement({ projectId, onClose }) {
           )}
         </div>
       </div>
+
+      {/* Full-size photo modal */}
+      {selectedPhoto && (
+        <div 
+          className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4" 
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <div className="max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
+            <img 
+              src={selectedPhoto.photo_data} 
+              alt={selectedPhoto.file_name} 
+              className="max-w-full max-h-[90vh] rounded-2xl border-2 border-[#D4A574]/50"
+            />
+            <div className="flex gap-3 mt-4 justify-center">
+              <button
+                onClick={async () => {
+                  if (window.confirm('Delete this photo?')) {
+                    try {
+                      await axios.delete(`${API_URL}/photos/${selectedPhoto.id}`);
+                      setSelectedPhoto(null);
+                      loadAllPhotos(); // Reload photos
+                    } catch (error) {
+                      alert('Failed to delete photo');
+                    }
+                  }
+                }}
+                className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-bold"
+              >
+                🗑️ Delete
+              </button>
+              <button 
+                onClick={() => setSelectedPhoto(null)} 
+                className="px-6 py-3 bg-gradient-to-r from-[#D4A574] to-[#B48554] hover:from-[#E4B584] hover:to-[#C49564] text-black rounded-xl font-bold"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
