@@ -525,67 +525,111 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
         )}
       </div>
 
-      {/* SIMPLE PHOTO EDITOR */}
+      {/* ADVANCED PHOTO EDITOR WITH ALL FEATURES */}
       {selectedPhoto && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          {/* MINIMAL HEADER */}
           <div className="bg-[#1E293B] p-4 border-b-2 border-[#D4A574] flex justify-between items-center">
-            <h3 className="text-2xl font-bold text-[#D4A574]">📏 Add Measurements</h3>
+            <h3 className="text-2xl font-bold text-[#D4A574]">📏 {activeRoom.name} Measurements</h3>
             <button onClick={() => setSelectedPhoto(null)} className="text-[#D4A574] text-3xl">✕</button>
           </div>
 
-          {/* SIMPLE MEASUREMENT CONTROLS */}
+          {/* MEASUREMENT CONTROLS - COMPACT AT TOP */}
           <div className="bg-[#0F172A] p-4 border-b border-[#D4A574]/30">
-            <div className="flex gap-4">
-              {leicaConnected && (
+            <div className="flex gap-3 items-center flex-wrap">
+              {/* Leica Controls */}
+              <div className="flex gap-2">
+                {leicaConnected && (
+                  <button
+                    onClick={() => {
+                      const measurement = prompt('Your Leica shows measurement. Enter it here:', '10\'4');
+                      if (measurement) {
+                        alert('✅ Ready to place: ' + measurement + '\nDraw arrow on photo now!');
+                        window.pendingMeasurement = measurement;
+                      }
+                    }}
+                    className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl font-bold"
+                  >
+                    📏 GET LEICA
+                  </button>
+                )}
+                
                 <button
                   onClick={() => {
-                    const measurement = prompt('Your Leica shows 10\'4. Enter this measurement:', '10\'4');
+                    const measurement = prompt('Enter measurement manually:', '8\'6');
                     if (measurement) {
-                      alert('Click on photo to place this measurement: ' + measurement);
-                      // Store measurement for next arrow
+                      alert('✅ Ready to place: ' + measurement + '\nDraw arrow on photo now!');
                       window.pendingMeasurement = measurement;
                     }
                   }}
-                  className="px-6 py-3 bg-yellow-500 text-black rounded-xl font-bold"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold"
                 >
-                  📏 USE LEICA MEASUREMENT
+                  📝 MANUAL
                 </button>
-              )}
-              
-              <button
-                onClick={() => {
-                  const measurement = prompt('Enter measurement manually:', '8\'6');
-                  if (measurement) {
-                    alert('Click on photo to place this measurement: ' + measurement);
-                    window.pendingMeasurement = measurement;
-                  }
-                }}
-                className="px-6 py-3 bg-blue-500 text-white rounded-xl font-bold"
-              >
-                📝 MANUAL MEASUREMENT
-              </button>
-              
-              <button
-                onClick={() => setMeasurements([])}
-                className="px-6 py-3 bg-red-500 text-white rounded-xl font-bold"
-              >
-                🗑️ Clear All
-              </button>
+              </div>
+
+              {/* Arrow Color Picker */}
+              <div className="flex gap-2 items-center">
+                <span className="text-[#D4A574] font-bold text-sm">Arrow Color:</span>
+                {[
+                  { color: '#FFD700', name: 'Gold' },
+                  { color: '#FF6B6B', name: 'Red' },
+                  { color: '#4ECDC4', name: 'Teal' },
+                  { color: '#95E1D3', name: 'Mint' },
+                  { color: '#F38181', name: 'Pink' },
+                  { color: '#AA96DA', name: 'Purple' },
+                  { color: '#FCBAD3', name: 'Rose' },
+                  { color: '#FFFFD2', name: 'Cream' }
+                ].map((colorOption) => (
+                  <button
+                    key={colorOption.color}
+                    onClick={() => {
+                      window.selectedArrowColor = colorOption.color;
+                      alert('✅ Arrow color set to ' + colorOption.name);
+                    }}
+                    className="w-8 h-8 rounded-full border-2 border-white hover:scale-110 transition-all"
+                    style={{ backgroundColor: colorOption.color }}
+                    title={colorOption.name}
+                  />
+                ))}
+              </div>
+
+              {/* Quick Actions */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setMeasurements([]);
+                    window.pendingMeasurement = null;
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white rounded-xl font-bold"
+                >
+                  🗑️ Clear All
+                </button>
+                
+                <div className="text-[#D4C5A9] px-4 py-2 bg-gray-800 rounded-xl font-bold">
+                  {measurements.length} arrows
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* PHOTO WITH ARROWS */}
-          <div className="flex-1 p-4 flex items-center justify-center bg-black">
-            <div className="relative">
+          {/* LARGE PHOTO - TAKES UP MOST OF SCREEN */}
+          <div className="flex-1 p-6 flex items-center justify-center bg-black">
+            <div className="relative max-w-full max-h-full">
               <img 
                 src={selectedPhoto.photo_data}
                 alt={selectedPhoto.file_name}
-                className="max-w-full max-h-[60vh] object-contain border-4 border-[#D4A574] rounded-xl cursor-crosshair"
+                className="max-w-full max-h-[75vh] object-contain border-4 border-[#D4A574] rounded-2xl cursor-crosshair shadow-2xl"
+                style={{ minWidth: '60vw', minHeight: '50vh' }}
                 onMouseDown={(e) => {
                   const rect = e.target.getBoundingClientRect();
                   const x = ((e.clientX - rect.left) / rect.width) * 100;
                   const y = ((e.clientY - rect.top) / rect.height) * 100;
-                  setDrawingArrow({ x1: x, y1: y, x2: x, y2: y });
+                  console.log('🎯 Starting arrow at:', x, y);
+                  setDrawingArrow({ 
+                    x1: x, y1: y, x2: x, y2: y, 
+                    color: window.selectedArrowColor || '#FFD700' 
+                  });
                 }}
                 onMouseMove={(e) => {
                   if (!drawingArrow) return;
@@ -601,98 +645,285 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                   const length = Math.sqrt(dx * dx + dy * dy);
                   
                   if (length > 3) {
-                    const text = window.pendingMeasurement || prompt('Enter measurement:', '8\'6');
-                    if (text) {
+                    const text = window.pendingMeasurement || prompt('Enter measurement:', "8'6");
+                    if (text && text.trim()) {
                       setMeasurements(prev => [...prev, {
                         ...drawingArrow,
-                        text: text,
-                        color: '#FFD700'
+                        text: text.trim(),
+                        color: drawingArrow.color
+                      }]);
+                      window.pendingMeasurement = null;
+                      console.log('✅ Arrow created with measurement:', text);
+                    }
+                  } else {
+                    console.log('❌ Arrow too short, not saving');
+                  }
+                  setDrawingArrow(null);
+                }}
+                onTouchStart={(e) => {
+                  const touch = e.touches[0];
+                  const rect = e.target.getBoundingClientRect();
+                  const x = ((touch.clientX - rect.left) / rect.width) * 100;
+                  const y = ((touch.clientY - rect.top) / rect.height) * 100;
+                  setDrawingArrow({ 
+                    x1: x, y1: y, x2: x, y2: y, 
+                    color: window.selectedArrowColor || '#FFD700' 
+                  });
+                }}
+                onTouchMove={(e) => {
+                  if (!drawingArrow) return;
+                  const touch = e.touches[0];
+                  const rect = e.target.getBoundingClientRect();
+                  const x = ((touch.clientX - rect.left) / rect.width) * 100;
+                  const y = ((touch.clientY - rect.top) / rect.height) * 100;
+                  setDrawingArrow({ ...drawingArrow, x2: x, y2: y });
+                }}
+                onTouchEnd={() => {
+                  if (!drawingArrow) return;
+                  const dx = drawingArrow.x2 - drawingArrow.x1;
+                  const dy = drawingArrow.y2 - drawingArrow.y1;
+                  const length = Math.sqrt(dx * dx + dy * dy);
+                  
+                  if (length > 3) {
+                    const text = window.pendingMeasurement || prompt('Enter measurement:', "8'6");
+                    if (text && text.trim()) {
+                      setMeasurements(prev => [...prev, {
+                        ...drawingArrow,
+                        text: text.trim(),
+                        color: drawingArrow.color
                       }]);
                       window.pendingMeasurement = null;
                     }
                   }
                   setDrawingArrow(null);
                 }}
+                draggable={false}
               />
               
-              {/* ARROWS */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+              {/* ENHANCED SVG ARROWS WITH COLORS */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <defs>
-                  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
-                    <polygon points="0 0, 8 3, 0 6" fill="#FFD700" />
-                  </marker>
+                  {/* Dynamic markers for each color */}
+                  {[...new Set([...measurements.map(m => m.color), drawingArrow?.color].filter(Boolean))].map(color => (
+                    <marker key={color} id={`arrow-${color.replace('#', '')}`} markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                      <polygon points="0 0, 10 3, 0 6" fill={color} />
+                    </marker>
+                  ))}
                 </defs>
                 
+                {/* Measurement arrows with colors */}
                 {measurements.map((m, index) => (
                   <line
                     key={index}
                     x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2}
-                    stroke="#FFD700" strokeWidth="1.5"
-                    markerEnd="url(#arrowhead)"
+                    stroke={m.color} strokeWidth="2"
+                    markerEnd={`url(#arrow-${m.color.replace('#', '')})`}
                   />
                 ))}
                 
+                {/* Drawing arrow */}
                 {drawingArrow && (
                   <line
                     x1={drawingArrow.x1} y1={drawingArrow.y1} x2={drawingArrow.x2} y2={drawingArrow.y2}
-                    stroke="#FF6B6B" strokeWidth="1.5" opacity="0.8"
+                    stroke={drawingArrow.color} strokeWidth="2" opacity="0.8"
                   />
                 )}
               </svg>
               
+              {/* ENHANCED MEASUREMENT LABELS */}
               {measurements.map((m, index) => (
                 <div
                   key={index}
-                  className="absolute text-xs font-bold bg-black bg-opacity-90 px-2 py-1 rounded border border-[#FFD700] text-[#FFD700] cursor-pointer"
+                  className="absolute cursor-pointer"
                   style={{
                     left: `${(m.x1 + m.x2) / 2}%`,
-                    top: `${(m.y1 + m.y2) / 2 - 3}%`,
+                    top: `${(m.y1 + m.y2) / 2 - 4}%`,
                     transform: 'translate(-50%, -100%)',
                     zIndex: 20
                   }}
                   onClick={() => {
-                    const newText = prompt('Edit measurement:', m.text);
-                    if (newText) {
-                      setMeasurements(prev => prev.map((arrow, i) => 
-                        i === index ? { ...arrow, text: newText } : arrow
-                      ));
+                    const options = [
+                      'Edit measurement text',
+                      'Change arrow color', 
+                      'Delete this arrow',
+                      'Move arrow position'
+                    ];
+                    const choice = prompt('Choose action:\n1. ' + options.join('\n2. '));
+                    
+                    if (choice === '1') {
+                      const newText = prompt('Edit measurement:', m.text);
+                      if (newText) {
+                        setMeasurements(prev => prev.map((arrow, i) => 
+                          i === index ? { ...arrow, text: newText } : arrow
+                        ));
+                      }
+                    } else if (choice === '2') {
+                      const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#F38181', '#AA96DA'];
+                      const colorChoice = prompt('Choose color:\n1. Gold\n2. Red\n3. Teal\n4. Mint\n5. Pink\n6. Purple');
+                      if (colorChoice && colors[colorChoice - 1]) {
+                        setMeasurements(prev => prev.map((arrow, i) => 
+                          i === index ? { ...arrow, color: colors[colorChoice - 1] } : arrow
+                        ));
+                      }
+                    } else if (choice === '3') {
+                      setMeasurements(measurements.filter((_, i) => i !== index));
                     }
                   }}
                 >
-                  {m.text}
+                  <div 
+                    className="bg-black bg-opacity-95 px-3 py-2 rounded-xl text-lg font-bold border-2 shadow-2xl"
+                    style={{ 
+                      color: m.color,
+                      borderColor: m.color,
+                      boxShadow: `0 0 20px ${m.color}40`
+                    }}
+                  >
+                    {m.text}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMeasurements(measurements.filter((_, i) => i !== index));
+                      }}
+                      className="ml-2 text-red-400 hover:text-red-300 font-bold"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* SAVE BUTTON */}
+          {/* ENHANCED SAVE CONTROLS */}
           <div className="bg-[#1E293B] p-4 border-t-2 border-[#D4A574]">
-            <button
-              onClick={async () => {
-                if (measurements.length === 0) {
-                  alert('No measurements to save');
-                  return;
-                }
+            <div className="flex gap-4">
+              <button
+                onClick={async () => {
+                  if (measurements.length === 0) {
+                    alert('Add some measurements first!');
+                    return;
+                  }
                 
-                try {
-                  setUploading(true);
-                  // Simple save - just save the measurements data
-                  alert(`Saving ${measurements.length} measurements...`);
-                  await loadAllPhotos();
+                  try {
+                    setUploading(true);
+                    
+                    // Create annotated photo with all arrows
+                    const img = new Image();
+                    img.src = selectedPhoto.photo_data;
+                    
+                    await new Promise((resolve) => {
+                      img.onload = resolve;
+                    });
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+
+                    // Draw image
+                    ctx.drawImage(img, 0, 0);
+
+                    // Draw all measurement arrows
+                    measurements.forEach((m) => {
+                      const x1 = (m.x1 / 100) * canvas.width;
+                      const y1 = (m.y1 / 100) * canvas.height;
+                      const x2 = (m.x2 / 100) * canvas.width;
+                      const y2 = (m.y2 / 100) * canvas.height;
+
+                      // Draw arrow line with color
+                      ctx.strokeStyle = m.color;
+                      ctx.lineWidth = 8;
+                      ctx.beginPath();
+                      ctx.moveTo(x1, y1);
+                      ctx.lineTo(x2, y2);
+                      ctx.stroke();
+
+                      // Draw arrowhead
+                      const angle = Math.atan2(y2 - y1, x2 - x1);
+                      const headlen = 30;
+                      
+                      ctx.fillStyle = m.color;
+                      ctx.beginPath();
+                      ctx.moveTo(x2, y2);
+                      ctx.lineTo(
+                        x2 - headlen * Math.cos(angle - Math.PI / 6),
+                        y2 - headlen * Math.sin(angle - Math.PI / 6)
+                      );
+                      ctx.lineTo(
+                        x2 - headlen * Math.cos(angle + Math.PI / 6),
+                        y2 - headlen * Math.sin(angle + Math.PI / 6)
+                      );
+                      ctx.closePath();
+                      ctx.fill();
+
+                      // Draw measurement text with color
+                      const midX = (x1 + x2) / 2;
+                      const midY = (y1 + y2) / 2 - 40;
+                      
+                      ctx.font = 'bold 42px Arial';
+                      const textWidth = ctx.measureText(m.text).width;
+                      
+                      // Text background
+                      ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                      ctx.fillRect(midX - textWidth / 2 - 15, midY - 30, textWidth + 30, 50);
+                      
+                      // Text with color
+                      ctx.fillStyle = m.color;
+                      ctx.textAlign = 'center';
+                      ctx.fillText(m.text, midX, midY);
+                      
+                      // Border around text
+                      ctx.strokeStyle = m.color;
+                      ctx.lineWidth = 3;
+                      ctx.strokeRect(midX - textWidth / 2 - 15, midY - 30, textWidth + 30, 50);
+                    });
+
+                    const annotatedPhoto = canvas.toDataURL('image/jpeg', 0.9);
+
+                    // Save annotated photo
+                    await axios.post(`${API_URL}/photos/upload`, {
+                      project_id: projectId,
+                      room_id: activeRoom.id,
+                      photo_data: annotatedPhoto,
+                      file_name: `measurements_${activeRoom.name}_${Date.now()}.jpg`,
+                      metadata: {
+                        room_name: activeRoom.name,
+                        timestamp: new Date().toISOString(),
+                        measurements: measurements.map(m => ({ text: m.text, color: m.color })),
+                        measurement_count: measurements.length,
+                        has_measurements: true,
+                        original_photo_id: selectedPhoto.id
+                      }
+                    });
+                    
+                    alert(`✅ Photo saved with ${measurements.length} colored measurements!`);
+                    await loadAllPhotos();
+                    setSelectedPhoto(null);
+                    setMeasurements([]);
+                    
+                  } catch (error) {
+                    alert('Save failed: ' + error.message);
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
+                disabled={uploading || measurements.length === 0}
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white px-8 py-4 rounded-2xl font-bold text-xl"
+              >
+                {uploading ? '⏳ Saving...' : `💾 Save Photo with ${measurements.length} Measurements`}
+              </button>
+              
+              <button
+                onClick={() => {
+                  // Save just the original photo without measurements
+                  alert('Original photo already saved when you took it!');
                   setSelectedPhoto(null);
-                  setMeasurements([]);
-                  alert('Measurements saved!');
-                } catch (error) {
-                  alert('Save failed: ' + error.message);
-                } finally {
-                  setUploading(false);
-                }
-              }}
-              disabled={uploading || measurements.length === 0}
-              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-8 py-4 rounded-xl font-bold text-xl"
-            >
-              {uploading ? 'Saving...' : `Save ${measurements.length} Measurements`}
-            </button>
+                }}
+                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold"
+              >
+                📷 Close (Keep Original)
+              </button>
+            </div>
           </div>
         </div>
       )}
