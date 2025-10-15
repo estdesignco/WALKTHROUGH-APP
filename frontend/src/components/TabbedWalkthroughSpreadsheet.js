@@ -360,7 +360,14 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   ? 'border-[#D4A574] text-[#D4A574] bg-[#D4A574]/10'
                   : 'border-transparent text-[#B49B7E] hover:text-[#D4C5A9] hover:bg-[#D4A574]/5'
               }`}
-              style={{ backgroundColor: activeRoomTab === index ? getRoomColor(room.name) + '20' : 'transparent' }}
+              style={{ 
+                backgroundColor: activeRoomTab === index 
+                  ? getRoomColor(room.name) + '40' 
+                  : 'transparent',
+                borderTopColor: getRoomColor(room.name),
+                borderTopWidth: '4px',
+                borderTopStyle: 'solid'
+              }}
             >
               {room.name}
               <div className="text-xs">
