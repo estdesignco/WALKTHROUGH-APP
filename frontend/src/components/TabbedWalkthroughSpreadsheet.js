@@ -1049,17 +1049,6 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                         📝 EDIT
                       </button>
                       
-                      {/* Move arrow */}
-                      <button
-                        onClick={() => {
-                          alert(`To move Arrow ${index + 1}:\\n1. Click and drag the arrow line\\n2. Position where you want\\n3. Release to place`);
-                          // TODO: Implement drag functionality
-                        }}
-                        className="px-2 py-1 bg-green-500 hover:bg-green-400 text-white rounded text-xs font-bold"
-                      >
-                        🔄 MOVE
-                      </button>
-                      
                       {/* Delete THIS arrow */}
                       <button
                         onClick={() => {
