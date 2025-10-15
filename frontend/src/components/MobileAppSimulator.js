@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MobileWalkthroughSpreadsheet from './MobileWalkthroughSpreadsheet';
 import TabbedWalkthroughSpreadsheet from './TabbedWalkthroughSpreadsheet';
+import WorkingTabbedWalkthrough from './WorkingTabbedWalkthrough';
 import MobileFFESpreadsheet from './MobileFFESpreadsheet';
 import MobilePhotoManagement from './MobilePhotoManagement';
 
