@@ -956,109 +956,33 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 )}
               </svg>
               
-              {/* Measurement labels WITH INDIVIDUAL CONTROLS */}
+              {/* Measurement labels - MINIMAL, JUST TEXT */}
               {measurements.map((m, index) => (
                 <div
                   key={index}
-                  className="absolute pointer-events-auto"
+                  className="absolute pointer-events-auto cursor-pointer"
                   style={{
                     left: `${(m.x1 + m.x2) / 2}%`,
-                    top: `${(m.y1 + m.y2) / 2 - 8}%`,
+                    top: `${(m.y1 + m.y2) / 2 - 4}%`,
                     transform: 'translate(-50%, -100%)',
                     zIndex: 20
                   }}
+                  onClick={() => {
+                    const manualMeasurement = prompt(`Enter measurement for Arrow ${index + 1}:`, m.text || "8'6\"");
+                    if (manualMeasurement && manualMeasurement.trim()) {
+                      setMeasurements(prev => prev.map((arrow, i) => 
+                        i === index 
+                          ? { ...arrow, text: manualMeasurement.trim() }
+                          : arrow
+                      ));
+                    }
+                  }}
                 >
-                  {/* ARROW CONTROL PANEL */}
-                  <div className="bg-black bg-opacity-95 p-3 rounded-xl border-2 border-[#FFD700] shadow-2xl">
-                    {/* Measurement Display */}
-                    <div className="text-center mb-3">
-                      <div className="text-xl font-bold text-[#FFD700] mb-1">
-                        {m.text || 'No Measurement'}
-                      </div>
-                    </div>
-                    
-                    {/* Control Buttons for THIS Arrow */}
-                    <div className="flex gap-2">
-                      {/* Get Leica Measurement for THIS arrow - BETTER DEBUGGING */}
-                      {leicaConnected && (
-                        <button
-                          onClick={async () => {
-                            console.log(`📏 Getting Leica measurement for arrow ${index}...`);
-                            
-                            try {
-                              // Use enhanced reading method with better debugging
-                              console.log('📏 Using enhanced Leica reading...');
-                              const measurement = await leicaManager.readMeasurementEnhanced();
-                              
-                              if (!measurement) {
-                                console.log('🔍 Step 2: No cached measurement, trying to poll...');
-                                
-                                // Start polling for new measurements
-                                leicaManager.startPolling(500); // Check every 500ms
-                                
-                                alert('📏 TAKING MEASUREMENT\\n\\n1. Press measurement button on your Leica D5 now\\n2. Wait for measurement to appear on Leica screen\\n3. Click OK when ready');
-                                
-                                // Give user time to take measurement
-                                await new Promise(resolve => setTimeout(resolve, 2000));
-                                
-                                // Try to read again
-                                measurement = await leicaManager.readMeasurement();
-                                
-                                leicaManager.stopPolling();
-                              }
-                              
-                              if (measurement) {
-                                console.log('✅ Measurement found:', measurement.feetInches);
-                                // Update THIS specific arrow's measurement
-                                setMeasurements(prev => prev.map((arrow, i) => 
-                                  i === index 
-                                    ? { ...arrow, text: measurement.feetInches }
-                                    : arrow
-                                ));
-                                alert(`✅ Arrow ${index + 1} measurement: ${measurement.feetInches}`);
-                              } else {
-                                console.log('❌ Still no measurement found');
-                                alert('❌ No measurement found.\\n\\nTroubleshooting:\\n1. Make sure you pressed the button on Leica\\n2. Check Leica screen shows a measurement\\n3. Try the MANUAL button instead');
-                              }
-                            } catch (error) {
-                              console.error('❌ Leica read error:', error);
-                              alert('❌ Leica read failed: ' + error.message);
-                            }
-                          }}
-                          className="px-2 py-1 bg-yellow-500 hover:bg-yellow-400 text-black rounded text-xs font-bold"
-                        >
-                          📏 LEICA
-                        </button>
-                      )}
-                      
-                      {/* Manual measurement for THIS arrow */}
-                      <button
-                        onClick={() => {
-                          const manualMeasurement = prompt(`Enter measurement for Arrow ${index + 1}:`, m.text || "8'6\"");
-                          if (manualMeasurement && manualMeasurement.trim()) {
-                            // Update THIS specific arrow's measurement
-                            setMeasurements(prev => prev.map((arrow, i) => 
-                              i === index 
-                                ? { ...arrow, text: manualMeasurement.trim() }
-                                : arrow
-                            ));
-                          }
-                        }}
-                        className="px-2 py-1 bg-blue-500 hover:bg-blue-400 text-white rounded text-xs font-bold"
-                      >
-                        📝 EDIT
-                      </button>
-                      
-                      {/* Delete THIS arrow */}
-                      <button
-                        onClick={() => {
-                          setMeasurements(measurements.filter((_, i) => i !== index));
-                        }}
-                        className="px-2 py-1 bg-red-500 hover:bg-red-400 text-white rounded text-xs font-bold"
-                      >
-                        ✕
-                      </button>
-                    </div>
+                  <div 
+                    className="bg-black bg-opacity-90 px-2 py-1 rounded text-sm font-bold border border-[#FFD700]"
+                    style={{ color: '#FFD700' }}
+                  >
+                    {m.text || 'Click to measure'}
                   </div>
                 </div>
               ))}
