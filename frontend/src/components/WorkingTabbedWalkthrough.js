@@ -710,7 +710,7 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                   ))}
                 </defs>
                 
-                {/* Measurement arrows - SIMPLE AND WORKING */}
+                {/* SIMPLE WORKING ARROWS */}
                 {measurements.map((m, index) => (
                   <g key={index}>
                     <line
@@ -719,17 +719,114 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                       markerEnd={`url(#arrow-${m.color.replace('#', '')})`}
                       className="cursor-pointer"
                       onClick={() => {
+                        console.log('🎯 Arrow clicked:', index);
                         setEditingArrow(editingArrow === index ? null : index);
-                        console.log('Selected arrow for editing:', index);
                       }}
                     />
                     
-                    {/* Show handles when editing THIS arrow */}
+                    {/* WORKING DRAG HANDLES - Only show when selected */}
                     {editingArrow === index && (
                       <>
-                        <circle cx={m.x1} cy={m.y1} r="1.5" fill={m.color} stroke="white" strokeWidth="0.3" className="cursor-move" />
-                        <circle cx={m.x2} cy={m.y2} r="1.5" fill={m.color} stroke="white" strokeWidth="0.3" className="cursor-move" />
-                        <circle cx={(m.x1 + m.x2) / 2} cy={(m.y1 + m.y2) / 2} r="2" fill="white" stroke={m.color} strokeWidth="0.5" className="cursor-move" />
+                        {/* Start handle */}
+                        <circle 
+                          cx={m.x1} cy={m.y1} r="1.5" 
+                          fill="white" stroke={m.color} strokeWidth="0.5"
+                          className="cursor-move"
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            console.log('🎯 Dragging start handle for arrow', index);
+                            
+                            const startDrag = (event) => {
+                              const rect = e.target.closest('svg').getBoundingClientRect();
+                              const x = ((event.clientX - rect.left) / rect.width) * 100;
+                              const y = ((event.clientY - rect.top) / rect.height) * 100;
+                              
+                              setMeasurements(prev => prev.map((arrow, i) => 
+                                i === index ? { ...arrow, x1: x, y1: y } : arrow
+                              ));
+                            };
+                            
+                            const stopDrag = () => {
+                              console.log('✅ Finished dragging start handle');
+                              document.removeEventListener('mousemove', startDrag);
+                              document.removeEventListener('mouseup', stopDrag);
+                            };
+                            
+                            document.addEventListener('mousemove', startDrag);
+                            document.addEventListener('mouseup', stopDrag);
+                          }}
+                        />
+                        
+                        {/* End handle */}
+                        <circle 
+                          cx={m.x2} cy={m.y2} r="1.5" 
+                          fill="white" stroke={m.color} strokeWidth="0.5"
+                          className="cursor-move"
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            console.log('🎯 Dragging end handle for arrow', index);
+                            
+                            const startDrag = (event) => {
+                              const rect = e.target.closest('svg').getBoundingClientRect();
+                              const x = ((event.clientX - rect.left) / rect.width) * 100;
+                              const y = ((event.clientY - rect.top) / rect.height) * 100;
+                              
+                              setMeasurements(prev => prev.map((arrow, i) => 
+                                i === index ? { ...arrow, x2: x, y2: y } : arrow
+                              ));
+                            };
+                            
+                            const stopDrag = () => {
+                              console.log('✅ Finished dragging end handle');
+                              document.removeEventListener('mousemove', startDrag);
+                              document.removeEventListener('mouseup', stopDrag);
+                            };
+                            
+                            document.addEventListener('mousemove', startDrag);
+                            document.addEventListener('mouseup', stopDrag);
+                          }}
+                        />
+                        
+                        {/* Center handle - move whole arrow */}
+                        <circle 
+                          cx={(m.x1 + m.x2) / 2} cy={(m.y1 + m.y2) / 2} r="2" 
+                          fill={m.color} stroke="white" strokeWidth="0.5"
+                          className="cursor-move"
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            console.log('🎯 Moving entire arrow', index);
+                            
+                            const centerX = (m.x1 + m.x2) / 2;
+                            const centerY = (m.y1 + m.y2) / 2;
+                            const arrowWidth = m.x2 - m.x1;
+                            const arrowHeight = m.y2 - m.y1;
+                            
+                            const startDrag = (event) => {
+                              const rect = e.target.closest('svg').getBoundingClientRect();
+                              const newCenterX = ((event.clientX - rect.left) / rect.width) * 100;
+                              const newCenterY = ((event.clientY - rect.top) / rect.height) * 100;
+                              
+                              setMeasurements(prev => prev.map((arrow, i) => 
+                                i === index ? {
+                                  ...arrow,
+                                  x1: newCenterX - arrowWidth / 2,
+                                  y1: newCenterY - arrowHeight / 2,
+                                  x2: newCenterX + arrowWidth / 2,
+                                  y2: newCenterY + arrowHeight / 2
+                                } : arrow
+                              ));
+                            };
+                            
+                            const stopDrag = () => {
+                              console.log('✅ Finished moving arrow');
+                              document.removeEventListener('mousemove', startDrag);
+                              document.removeEventListener('mouseup', stopDrag);
+                            };
+                            
+                            document.addEventListener('mousemove', startDrag);
+                            document.addEventListener('mouseup', stopDrag);
+                          }}
+                        />
                       </>
                     )}
                   </g>
