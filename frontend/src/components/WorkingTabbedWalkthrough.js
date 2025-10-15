@@ -609,8 +609,32 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                   🗑️ Clear All
                 </button>
                 
+                <button
+                  onClick={() => setPhotoZoom(prev => Math.min(prev + 0.5, 3))}
+                  className="px-3 py-2 bg-gray-700 text-white rounded-xl font-bold"
+                >
+                  🔍+ Zoom In
+                </button>
+                
+                <button
+                  onClick={() => setPhotoZoom(prev => Math.max(prev - 0.5, 0.5))}
+                  className="px-3 py-2 bg-gray-700 text-white rounded-xl font-bold"
+                >
+                  🔍- Zoom Out
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setPhotoZoom(1);
+                    setPhotoPan({ x: 0, y: 0 });
+                  }}
+                  className="px-3 py-2 bg-gray-700 text-white rounded-xl font-bold"
+                >
+                  🎯 Reset View
+                </button>
+                
                 <div className="text-[#D4C5A9] px-4 py-2 bg-gray-800 rounded-xl font-bold">
-                  {measurements.length} arrows
+                  {measurements.length} arrows • {Math.round(photoZoom * 100)}% zoom
                 </div>
               </div>
             </div>
