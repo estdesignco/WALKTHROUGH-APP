@@ -42,7 +42,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
     loadProjectFromCache
   } = useOfflineSync(projectId);
 
-  // EXACT SAME ROOM COLORS AS DESKTOP CHECKLIST
+  // EXACT SAME ROOM COLORS AS DESKTOP CHECKLIST - PERFECT MATCH
   const getRoomColor = (roomName, index = 0) => {
     const mutedColors = [
       '#8B5A6B',  // Muted rose
@@ -57,6 +57,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
       '#8B6B5A'   // Muted tan
     ];
     
+    // Use room name hash for consistent color per room - EXACT DESKTOP LOGIC
     let hash = 0;
     for (let i = 0; i < roomName.length; i++) {
       hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
