@@ -875,16 +875,23 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 preserveAspectRatio="none"
               >
                 <defs>
-                  <marker
-                    id="arrowhead-edit"
-                    markerWidth="8"
-                    markerHeight="8"
-                    refX="7"
-                    refY="3"
-                    orient="auto"
-                  >
-                    <polygon points="0 0, 8 3, 0 6" fill="#FFD700" />
-                  </marker>
+                  {/* Create arrowhead markers for each color */}
+                  {[
+                    '#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3',
+                    '#F38181', '#AA96DA', '#FCBAD3', '#FFFFD2'
+                  ].map((color) => (
+                    <marker
+                      key={color}
+                      id={`arrowhead-${color.replace('#', '')}`}
+                      markerWidth="8"
+                      markerHeight="8"
+                      refX="7"
+                      refY="3"
+                      orient="auto"
+                    >
+                      <polygon points="0 0, 8 3, 0 6" fill={color} />
+                    </marker>
+                  ))}
                 </defs>
                 
                 {/* Measurement arrows - DRAGGABLE */}
@@ -895,9 +902,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     y1={m.y1}
                     x2={m.x2}
                     y2={m.y2}
-                    stroke="#FFD700"
+                    stroke={m.color || '#FFD700'}
                     strokeWidth="1.5"
-                    markerEnd="url(#arrowhead-edit)"
+                    markerEnd={`url(#arrowhead-${(m.color || '#FFD700').replace('#', '')})`}
                     className="cursor-move"
                     onMouseDown={(e) => {
                       e.preventDefault();
