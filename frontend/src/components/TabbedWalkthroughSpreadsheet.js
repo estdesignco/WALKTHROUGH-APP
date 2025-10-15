@@ -734,31 +734,48 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   {leicaConnected ? 'Disconnect' : 'Connect Leica D5'}
                 </button>
                 
-                {/* CLEAR MEASUREMENT TRIGGER BUTTON */}
+                {/* CLEAR MEASUREMENT WORKFLOW */}
                 {leicaConnected && (
-                  <button
-                    onClick={async () => {
-                      console.log('🎯 MANUAL TRIGGER: Taking Leica measurement...');
-                      try {
-                        // Try to trigger measurement on device
-                        await leicaManager.triggerMeasurement();
-                        alert('📏 Measurement triggered! Check Leica display.');
-                      } catch (error) {
-                        console.log('⚠️ Trigger failed, using read method...');
-                        // Fallback to reading current measurement
-                        const measurement = await leicaManager.readMeasurement();
-                        if (measurement) {
-                          setLastMeasurement(measurement);
-                          alert(`📏 Measurement read: ${measurement.feetInches}`);
-                        } else {
-                          alert('❌ No measurement available. Press button on Leica first.');
+                  <div className="flex gap-2">
+                    <button
+                      onClick={async () => {
+                        console.log('🎯 READING MEASUREMENT FROM LEICA...');
+                        try {
+                          // Simple read - just get what's on the Leica screen
+                          const measurement = await leicaManager.readMeasurement();
+                          if (measurement) {
+                            setLastMeasurement(measurement);
+                            console.log('✅ Measurement retrieved:', measurement.feetInches);
+                            alert(`📏 Measurement ready: ${measurement.feetInches}\\n\\nNow draw arrow on photo to place it.`);
+                          } else {
+                            alert('❌ No measurement found. Press measurement button on Leica first, then try again.');
+                          }
+                        } catch (error) {
+                          console.error('❌ Read measurement failed:', error);
+                          alert('❌ Failed to read measurement. Make sure Leica D5 is connected and has a measurement displayed.');
                         }
-                      }
-                    }}
-                    className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black rounded-xl font-bold text-lg"
-                  >
-                    📏 GET MEASUREMENT
-                  </button>
+                      }}
+                      className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black rounded-xl font-bold text-lg"
+                    >
+                      📏 READ LEICA MEASUREMENT
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        const manualMeasurement = prompt('Enter manual measurement:', '8\\'6\"');
+                        if (manualMeasurement && manualMeasurement.trim()) {
+                          setLastMeasurement({
+                            feetInches: manualMeasurement.trim(),
+                            manual: true
+                          });
+                          alert(`📝 Manual measurement ready: ${manualMeasurement}\\n\\nNow draw arrow on photo to place it.`);
+                        }
+                      }}
+                      className="px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-bold"
+                    >
+                      📝 MANUAL
+                    </button>
+                  </div>
                 )}
               </div>
               
