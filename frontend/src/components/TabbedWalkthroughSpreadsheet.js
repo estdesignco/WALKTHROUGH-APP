@@ -28,6 +28,8 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
   const [lastMeasurement, setLastMeasurement] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [dragginArrow, setDraggingArrow] = useState(null); // Track which arrow is being dragged
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 }); // Offset from arrow center
   
   const displayProject = project;
   
