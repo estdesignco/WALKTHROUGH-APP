@@ -1005,8 +1005,11 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   }}
                 >
                   <div 
-                    className="bg-black bg-opacity-90 px-2 py-1 rounded text-sm font-bold border border-[#FFD700]"
-                    style={{ color: '#FFD700' }}
+                    className="bg-black bg-opacity-90 px-2 py-1 rounded text-sm font-bold border"
+                    style={{ 
+                      color: m.color || '#FFD700',
+                      borderColor: m.color || '#FFD700'
+                    }}
                   >
                     {m.text || 'Click to measure'}
                   </div>
