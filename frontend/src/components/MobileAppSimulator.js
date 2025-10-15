@@ -445,7 +445,7 @@ export default function MobileAppSimulator() {
               ← Back
             </button>
             <div className="flex-1 overflow-hidden">
-              <TabbedWalkthroughSpreadsheet projectId={selectedProject?.id} />
+              <WorkingTabbedWalkthrough projectId={selectedProject?.id} />
             </div>
           </div>
         );
