@@ -480,6 +480,20 @@ export default function MobileAppSimulator() {
         );
       case 'photos':
         return <MobilePhotoManagement projectId={selectedProject?.id} onClose={() => setScreen('project-menu')} />;
+      case 'measurements-files':
+        return (
+          <div className="h-full flex flex-col">
+            <button 
+              onClick={() => setScreen('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-hidden">
+              <MeasurementsAndFilesPage projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
       default:
         return <MobileHomeScreen onNavigate={setScreen} />;
     }
