@@ -725,12 +725,39 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 >
                   {leicaConnected ? 'Disconnect' : 'Connect Leica D5'}
                 </button>
+                
+                {/* CLEAR MEASUREMENT TRIGGER BUTTON */}
+                {leicaConnected && (
+                  <button
+                    onClick={async () => {
+                      console.log('🎯 MANUAL TRIGGER: Taking Leica measurement...');
+                      try {
+                        // Try to trigger measurement on device
+                        await leicaManager.triggerMeasurement();
+                        alert('📏 Measurement triggered! Check Leica display.');
+                      } catch (error) {
+                        console.log('⚠️ Trigger failed, using read method...');
+                        // Fallback to reading current measurement
+                        const measurement = await leicaManager.readMeasurement();
+                        if (measurement) {
+                          setLastMeasurement(measurement);
+                          alert(`📏 Measurement read: ${measurement.feetInches}`);
+                        } else {
+                          alert('❌ No measurement available. Press button on Leica first.');
+                        }
+                      }
+                    }}
+                    className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black rounded-xl font-bold text-lg"
+                  >
+                    📏 GET MEASUREMENT
+                  </button>
+                )}
               </div>
               
               {lastMeasurement && (
                 <div className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-xl">
                   <div className="text-lg font-bold">📏 {lastMeasurement.feetInches}</div>
-                  <div className="text-sm">Click photo to place arrow</div>
+                  <div className="text-sm">Ready to place on photo</div>
                 </div>
               )}
             </div>
