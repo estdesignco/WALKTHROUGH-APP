@@ -815,14 +815,14 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                 />
               </svg>
               
-              {/* ENHANCED MEASUREMENT LABELS */}
+              {/* SMALL MEASUREMENT LABELS - DON'T BLOCK PHOTO */}
               {measurements.map((m, index) => (
                 <div
                   key={index}
                   className="absolute cursor-pointer"
                   style={{
                     left: `${(m.x1 + m.x2) / 2}%`,
-                    top: `${(m.y1 + m.y2) / 2 - 4}%`,
+                    top: `${(m.y1 + m.y2) / 2 - 2}%`,
                     transform: 'translate(-50%, -100%)',
                     zIndex: 20
                   }}
@@ -830,8 +830,7 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                     const options = [
                       'Edit measurement text',
                       'Change arrow color', 
-                      'Delete this arrow',
-                      'Move arrow position'
+                      'Delete this arrow'
                     ];
                     const choice = prompt('Choose action:\n1. ' + options.join('\n2. '));
                     
@@ -843,8 +842,9 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                         ));
                       }
                     } else if (choice === '2') {
-                      const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#F38181', '#AA96DA'];
-                      const colorChoice = prompt('Choose color:\n1. Gold\n2. Red\n3. Teal\n4. Mint\n5. Pink\n6. Purple');
+                      const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#FFFFD2'];
+                      const colorNames = ['Gold', 'Red', 'Teal', 'Mint', 'Pink', 'Purple', 'Rose', 'Cream'];
+                      const colorChoice = prompt('Choose color:\n1. Gold\n2. Red\n3. Teal\n4. Mint\n5. Pink\n6. Purple\n7. Rose\n8. Cream');
                       if (colorChoice && colors[colorChoice - 1]) {
                         setMeasurements(prev => prev.map((arrow, i) => 
                           i === index ? { ...arrow, color: colors[colorChoice - 1] } : arrow
@@ -856,11 +856,11 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                   }}
                 >
                   <div 
-                    className="bg-black bg-opacity-95 px-3 py-2 rounded-xl text-lg font-bold border-2 shadow-2xl"
+                    className="bg-black bg-opacity-90 px-2 py-1 rounded text-xs font-bold border"
                     style={{ 
                       color: m.color,
                       borderColor: m.color,
-                      boxShadow: `0 0 20px ${m.color}40`
+                      minWidth: 'max-content'
                     }}
                   >
                     {m.text}
@@ -869,7 +869,7 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                         e.stopPropagation();
                         setMeasurements(measurements.filter((_, i) => i !== index));
                       }}
-                      className="ml-2 text-red-400 hover:text-red-300 font-bold"
+                      className="ml-1 text-red-400 hover:text-red-300 text-xs"
                     >
                       ✕
                     </button>
