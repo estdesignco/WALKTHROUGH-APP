@@ -917,14 +917,36 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     
                     {/* Control Buttons for THIS Arrow */}
                     <div className="flex gap-2">
-                      {/* Get Leica Measurement for THIS arrow */}
+                      {/* Get Leica Measurement for THIS arrow - BETTER DEBUGGING */}
                       {leicaConnected && (
                         <button
                           onClick={async () => {
                             console.log(`📏 Getting Leica measurement for arrow ${index}...`);
+                            
                             try {
-                              const measurement = await leicaManager.readMeasurement();
+                              // First try to read any available measurement
+                              console.log('🔍 Step 1: Reading current measurement...');
+                              let measurement = await leicaManager.readMeasurement();
+                              
+                              if (!measurement) {
+                                console.log('🔍 Step 2: No cached measurement, trying to poll...');
+                                
+                                // Start polling for new measurements
+                                leicaManager.startPolling(500); // Check every 500ms
+                                
+                                alert('📏 TAKING MEASUREMENT\\n\\n1. Press measurement button on your Leica D5 now\\n2. Wait for measurement to appear on Leica screen\\n3. Click OK when ready');
+                                
+                                // Give user time to take measurement
+                                await new Promise(resolve => setTimeout(resolve, 2000));
+                                
+                                // Try to read again
+                                measurement = await leicaManager.readMeasurement();
+                                
+                                leicaManager.stopPolling();
+                              }
+                              
                               if (measurement) {
+                                console.log('✅ Measurement found:', measurement.feetInches);
                                 // Update THIS specific arrow's measurement
                                 setMeasurements(prev => prev.map((arrow, i) => 
                                   i === index 
@@ -933,10 +955,12 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                                 ));
                                 alert(`✅ Arrow ${index + 1} measurement: ${measurement.feetInches}`);
                               } else {
-                                alert('❌ No measurement found. Press Leica button first.');
+                                console.log('❌ Still no measurement found');
+                                alert('❌ No measurement found.\\n\\nTroubleshooting:\\n1. Make sure you pressed the button on Leica\\n2. Check Leica screen shows a measurement\\n3. Try the MANUAL button instead');
                               }
                             } catch (error) {
-                              alert('❌ Failed to read Leica measurement');
+                              console.error('❌ Leica read error:', error);
+                              alert('❌ Leica read failed: ' + error.message);
                             }
                           }}
                           className="px-2 py-1 bg-yellow-500 hover:bg-yellow-400 text-black rounded text-xs font-bold"
