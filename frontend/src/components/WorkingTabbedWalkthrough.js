@@ -700,10 +700,9 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                 draggable={false}
               />
               
-              {/* WORKING DRAGGABLE ARROWS */}
+              {/* SUPER SIMPLE WORKING ARROWS */}
               <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ zIndex: 10 }}>
                 <defs>
-                  {/* Smaller markers for each color */}
                   {[...new Set([...measurements.map(m => m.color), drawingArrow?.color].filter(Boolean))].map(color => (
                     <marker key={color} id={`arrow-${color.replace('#', '')}`} markerWidth="6" markerHeight="6" refX="5" refY="2" orient="auto">
                       <polygon points="0 0, 6 2, 0 4" fill={color} />
@@ -711,7 +710,7 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                   ))}
                 </defs>
                 
-                {/* SIMPLE WORKING ARROWS */}
+                {/* Arrows */}
                 {measurements.map((m, index) => (
                   <g key={index}>
                     <line
@@ -719,125 +718,81 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                       stroke={m.color} strokeWidth="0.8"
                       markerEnd={`url(#arrow-${m.color.replace('#', '')})`}
                       className="cursor-pointer"
-                      onClick={() => {
-                        console.log('🎯 Arrow clicked:', index);
-                        setEditingArrow(editingArrow === index ? null : index);
-                      }}
+                      onClick={() => setEditingArrow(editingArrow === index ? null : index)}
                     />
                     
-                    {/* WORKING DRAG HANDLES - Only show when selected */}
+                    {/* Simple drag handles when selected */}
                     {editingArrow === index && (
                       <>
-                        {/* Start handle */}
                         <circle 
                           cx={m.x1} cy={m.y1} r="1.5" 
                           fill="white" stroke={m.color} strokeWidth="0.5"
                           className="cursor-move"
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                            console.log('🎯 Dragging start handle for arrow', index);
-                            
-                            const startDrag = (event) => {
-                              const rect = e.target.closest('svg').getBoundingClientRect();
-                              const x = ((event.clientX - rect.left) / rect.width) * 100;
-                              const y = ((event.clientY - rect.top) / rect.height) * 100;
-                              
-                              setMeasurements(prev => prev.map((arrow, i) => 
-                                i === index ? { ...arrow, x1: x, y1: y } : arrow
-                              ));
-                            };
-                            
-                            const stopDrag = () => {
-                              console.log('✅ Finished dragging start handle');
-                              document.removeEventListener('mousemove', startDrag);
-                              document.removeEventListener('mouseup', stopDrag);
-                            };
-                            
-                            document.addEventListener('mousemove', startDrag);
-                            document.addEventListener('mouseup', stopDrag);
-                          }}
+                          onMouseDown={() => setDragging({ arrowIndex: index, handle: 'start' })}
                         />
-                        
-                        {/* End handle */}
                         <circle 
                           cx={m.x2} cy={m.y2} r="1.5" 
                           fill="white" stroke={m.color} strokeWidth="0.5"
                           className="cursor-move"
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                            console.log('🎯 Dragging end handle for arrow', index);
-                            
-                            const startDrag = (event) => {
-                              const rect = e.target.closest('svg').getBoundingClientRect();
-                              const x = ((event.clientX - rect.left) / rect.width) * 100;
-                              const y = ((event.clientY - rect.top) / rect.height) * 100;
-                              
-                              setMeasurements(prev => prev.map((arrow, i) => 
-                                i === index ? { ...arrow, x2: x, y2: y } : arrow
-                              ));
-                            };
-                            
-                            const stopDrag = () => {
-                              console.log('✅ Finished dragging end handle');
-                              document.removeEventListener('mousemove', startDrag);
-                              document.removeEventListener('mouseup', stopDrag);
-                            };
-                            
-                            document.addEventListener('mousemove', startDrag);
-                            document.addEventListener('mouseup', stopDrag);
-                          }}
+                          onMouseDown={() => setDragging({ arrowIndex: index, handle: 'end' })}
                         />
-                        
-                        {/* Center handle - move whole arrow */}
                         <circle 
                           cx={(m.x1 + m.x2) / 2} cy={(m.y1 + m.y2) / 2} r="2" 
                           fill={m.color} stroke="white" strokeWidth="0.5"
                           className="cursor-move"
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                            console.log('🎯 Moving entire arrow', index);
-                            
-                            const centerX = (m.x1 + m.x2) / 2;
-                            const centerY = (m.y1 + m.y2) / 2;
-                            const arrowWidth = m.x2 - m.x1;
-                            const arrowHeight = m.y2 - m.y1;
-                            
-                            const startDrag = (event) => {
-                              const rect = e.target.closest('svg').getBoundingClientRect();
-                              const newCenterX = ((event.clientX - rect.left) / rect.width) * 100;
-                              const newCenterY = ((event.clientY - rect.top) / rect.height) * 100;
-                              
-                              setMeasurements(prev => prev.map((arrow, i) => 
-                                i === index ? {
-                                  ...arrow,
-                                  x1: newCenterX - arrowWidth / 2,
-                                  y1: newCenterY - arrowHeight / 2,
-                                  x2: newCenterX + arrowWidth / 2,
-                                  y2: newCenterY + arrowHeight / 2
-                                } : arrow
-                              ));
-                            };
-                            
-                            const stopDrag = () => {
-                              console.log('✅ Finished moving arrow');
-                              document.removeEventListener('mousemove', startDrag);
-                              document.removeEventListener('mouseup', stopDrag);
-                            };
-                            
-                            document.addEventListener('mousemove', startDrag);
-                            document.addEventListener('mouseup', stopDrag);
-                          }}
+                          onMouseDown={() => setDragging({ arrowIndex: index, handle: 'move' })}
                         />
                       </>
                     )}
                   </g>
                 ))}
                 
-                {/* Drawing arrow - smaller */}
                 {drawingArrow && (
                   <line
                     x1={drawingArrow.x1} y1={drawingArrow.y1} x2={drawingArrow.x2} y2={drawingArrow.y2}
                     stroke={drawingArrow.color} strokeWidth="0.8" opacity="0.8"
+                  />
+                )}
+                
+                {/* Mouse handler for dragging */}
+                {dragging && (
+                  <rect
+                    width="100" height="100" fill="transparent"
+                    onMouseMove={(e) => {
+                      const rect = e.target.getBoundingClientRect();
+                      const x = ((e.clientX - rect.left) / rect.width) * 100;
+                      const y = ((e.clientY - rect.top) / rect.height) * 100;
+                      
+                      const { arrowIndex, handle } = dragging;
+                      
+                      setMeasurements(prev => prev.map((arrow, i) => {
+                        if (i !== arrowIndex) return arrow;
+                        
+                        if (handle === 'start') {
+                          return { ...arrow, x1: x, y1: y };
+                        } else if (handle === 'end') {
+                          return { ...arrow, x2: x, y2: y };
+                        } else if (handle === 'move') {
+                          const centerX = (arrow.x1 + arrow.x2) / 2;
+                          const centerY = (arrow.y1 + arrow.y2) / 2;
+                          const deltaX = x - centerX;
+                          const deltaY = y - centerY;
+                          return {
+                            ...arrow,
+                            x1: arrow.x1 + deltaX,
+                            y1: arrow.y1 + deltaY,
+                            x2: arrow.x2 + deltaX,
+                            y2: arrow.y2 + deltaY
+                          };
+                        }
+                        return arrow;
+                      }));
+                    }}
+                    onMouseUp={() => {
+                      console.log('✅ Finished dragging');
+                      setDragging(null);
+                    }}
+                    style={{ cursor: dragging ? 'move' : 'default' }}
                   />
                 )}
               </svg>
