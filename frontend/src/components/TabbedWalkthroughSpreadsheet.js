@@ -826,29 +826,20 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   const length = Math.sqrt(dx * dx + dy * dy);
                   
                   if (length > 3) {
-                    let text = '';
-                    if (lastMeasurement) {
-                      text = lastMeasurement.feetInches;
-                      console.log('📏 Using Leica measurement:', text);
-                    } else {
-                      text = prompt('Enter measurement:', "8'6\"");
-                      console.log('📝 Manual measurement entered:', text);
-                    }
+                    // Create arrow with blank measurement - user will fill it with buttons
+                    const newMeasurement = {
+                      x1: drawingArrow.x1,
+                      y1: drawingArrow.y1,
+                      x2: drawingArrow.x2,
+                      y2: drawingArrow.y2,
+                      text: '', // Start blank - user fills with Leica/Manual buttons
+                      color: '#FFD700'
+                    };
                     
-                    if (text && text.trim()) {
-                      const newMeasurement = {
-                        x1: drawingArrow.x1,
-                        y1: drawingArrow.y1,
-                        x2: drawingArrow.x2,
-                        y2: drawingArrow.y2,
-                        text: text.trim(),
-                        color: '#FFD700'
-                      };
-                      
-                      console.log('✅ Adding measurement:', newMeasurement);
-                      setMeasurements(prev => [...prev, newMeasurement]);
-                      setLastMeasurement(null);
-                    }
+                    console.log('✅ Arrow created - ready for measurement');
+                    setMeasurements(prev => [...prev, newMeasurement]);
+                  } else {
+                    console.log('❌ Arrow too short');
                   }
                   setDrawingArrow(null);
                 }}
