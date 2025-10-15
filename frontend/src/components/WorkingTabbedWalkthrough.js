@@ -22,6 +22,9 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
   const [drawingArrow, setDrawingArrow] = useState(null);
   const [leicaConnected, setLeicaConnected] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [editingArrow, setEditingArrow] = useState(null); // Which arrow is being edited
+  const [photoZoom, setPhotoZoom] = useState(1); // Photo zoom level
+  const [photoPan, setPhotoPan] = useState({ x: 0, y: 0 }); // Photo pan position
   
   // Offline sync
   const { online, updateItemOffline } = useOfflineSync(projectId);
