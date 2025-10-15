@@ -986,9 +986,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                             console.log(`📏 Getting Leica measurement for arrow ${index}...`);
                             
                             try {
-                              // First try to read any available measurement
-                              console.log('🔍 Step 1: Reading current measurement...');
-                              let measurement = await leicaManager.readMeasurement();
+                              // Use enhanced reading method with better debugging
+                              console.log('📏 Using enhanced Leica reading...');
+                              const measurement = await leicaManager.readMeasurementEnhanced();
                               
                               if (!measurement) {
                                 console.log('🔍 Step 2: No cached measurement, trying to poll...');
