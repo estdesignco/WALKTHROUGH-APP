@@ -990,128 +990,85 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
             </div>
           </div>
 
-          {/* ACTION BUTTONS FOR EDITING */}
-          <div className="bg-[#1E293B] p-4 border-t-2 border-[#D4A574]">
-            <div className="flex gap-4">
-              <button
-                onClick={() => {
-                  if (measurements.length > 0) {
-                    setMeasurements([]);
-                    alert('✅ All measurements cleared');
-                  }
-                }}
-                className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold"
-              >
-                🗑️ Clear All
-              </button>
+          {/* ARROW EDITING PANEL - APPEARS WHEN ARROW CLICKED */}
+          {editingArrow !== null && (
+            <div className="absolute bottom-0 left-0 right-0 bg-[#1E293B] p-4 border-t-4 border-[#D4A574] z-30">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-xl font-bold text-[#D4A574]">📏 Edit Arrow {editingArrow + 1}</h4>
+                <button
+                  onClick={() => setEditingArrow(null)}
+                  className="text-[#D4A574] text-2xl hover:text-red-400"
+                >
+                  ✕
+                </button>
+              </div>
               
-              <button
-                onClick={async () => {
-                  if (measurements.length === 0) {
-                    alert('No measurements to save');
-                    return;
-                  }
-                  
-                  try {
-                    setUploading(true);
-                    
-                    // Create annotated version
-                    const img = new Image();
-                    img.src = selectedPhoto.photo_data;
-                    
-                    await new Promise((resolve) => {
-                      img.onload = resolve;
-                    });
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-
-                    // Draw image
-                    ctx.drawImage(img, 0, 0);
-
-                    // Draw arrows
-                    measurements.forEach((m) => {
-                      const x1 = (m.x1 / 100) * canvas.width;
-                      const y1 = (m.y1 / 100) * canvas.height;
-                      const x2 = (m.x2 / 100) * canvas.width;
-                      const y2 = (m.y2 / 100) * canvas.height;
-
-                      ctx.strokeStyle = '#FFD700';
-                      ctx.lineWidth = 8;
-                      ctx.beginPath();
-                      ctx.moveTo(x1, y1);
-                      ctx.lineTo(x2, y2);
-                      ctx.stroke();
-
-                      const angle = Math.atan2(y2 - y1, x2 - x1);
-                      const headlen = 30;
-                      
-                      ctx.fillStyle = '#FFD700';
-                      ctx.beginPath();
-                      ctx.moveTo(x2, y2);
-                      ctx.lineTo(
-                        x2 - headlen * Math.cos(angle - Math.PI / 6),
-                        y2 - headlen * Math.sin(angle - Math.PI / 6)
-                      );
-                      ctx.lineTo(
-                        x2 - headlen * Math.cos(angle + Math.PI / 6),
-                        y2 - headlen * Math.sin(angle + Math.PI / 6)
-                      );
-                      ctx.closePath();
-                      ctx.fill();
-
-                      const midX = (x1 + x2) / 2;
-                      const midY = (y1 + y2) / 2 - 40;
-                      
-                      ctx.font = 'bold 32px Arial';
-                      const textWidth = ctx.measureText(m.text).width;
-                      
-                      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-                      ctx.fillRect(midX - textWidth / 2 - 10, midY - 25, textWidth + 20, 40);
-                      
-                      ctx.fillStyle = '#FFD700';
-                      ctx.textAlign = 'center';
-                      ctx.fillText(m.text, midX, midY);
-                    });
-
-                    const annotatedPhoto = canvas.toDataURL('image/jpeg', 0.8);
-
-                    // Save updated photo
-                    await axios.post(`${API_URL}/photos/upload`, {
-                      project_id: projectId,
-                      room_id: activeRoom.id,
-                      photo_data: annotatedPhoto,
-                      file_name: `edited_${selectedPhoto.file_name}`,
-                      metadata: {
-                        room_name: activeRoom.name,
-                        timestamp: new Date().toISOString(),
-                        measurements: measurements.map(m => m.text),
-                        measurement_count: measurements.length,
-                        has_measurements: true,
-                        original_photo_id: selectedPhoto.id
+              <div className="flex gap-3">
+                {/* Get Leica Measurement */}
+                {leicaConnected && (
+                  <button
+                    onClick={async () => {
+                      console.log(`📏 Getting Leica measurement for arrow ${editingArrow}...`);
+                      try {
+                        // IMPROVED: Check if there's already a recent measurement
+                        console.log('🔍 Checking for recent Leica measurement...');
+                        const measurement = await leicaManager.readMeasurement();
+                        
+                        if (measurement) {
+                          console.log('✅ Found measurement:', measurement.feetInches);
+                          // Update THIS specific arrow's measurement
+                          setMeasurements(prev => prev.map((arrow, i) => 
+                            i === editingArrow 
+                              ? { ...arrow, text: measurement.feetInches }
+                              : arrow
+                          ));
+                          alert(`✅ Measurement applied: ${measurement.feetInches}`);
+                          setEditingArrow(null);
+                        } else {
+                          alert('❌ No measurement found.\\n\\nPlease:\\n1. Point Leica at object\\n2. Press Leica button\\n3. Wait for result\\n4. Try again\\n\\nTip: Leica was reading "5mm" - try measuring something larger!');
+                        }
+                      } catch (error) {
+                        console.error('❌ Leica read error:', error);
+                        alert('❌ Leica read failed: ' + error.message);
                       }
-                    });
-                    
-                    alert('✅ Measurements saved!');
-                    await loadAllPhotos();
-                    setSelectedPhoto(null);
-                    setMeasurements([]);
-                    
-                  } catch (error) {
-                    alert('❌ Failed to save: ' + error.message);
-                  } finally {
-                    setUploading(false);
-                  }
-                }}
-                disabled={uploading || measurements.length === 0}
-                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-500 disabled:to-gray-600 text-white px-6 py-3 rounded-xl font-bold"
-              >
-                {uploading ? '⏳ Saving...' : `📏 Save Measurements (${measurements.length})`}
-              </button>
+                    }}
+                    className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black rounded-xl font-bold"
+                  >
+                    📏 GET LEICA MEASUREMENT
+                  </button>
+                )}
+                
+                {/* Manual measurement */}
+                <button
+                  onClick={() => {
+                    const manualMeasurement = prompt(`Enter measurement for Arrow ${editingArrow + 1}:`, measurements[editingArrow]?.text || "8'6\"");
+                    if (manualMeasurement && manualMeasurement.trim()) {
+                      setMeasurements(prev => prev.map((arrow, i) => 
+                        i === editingArrow 
+                          ? { ...arrow, text: manualMeasurement.trim() }
+                          : arrow
+                      ));
+                      setEditingArrow(null);
+                    }
+                  }}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-bold"
+                >
+                  📝 MANUAL ENTRY
+                </button>
+                
+                {/* Delete arrow */}
+                <button
+                  onClick={() => {
+                    setMeasurements(measurements.filter((_, i) => i !== editingArrow));
+                    setEditingArrow(null);
+                  }}
+                  className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-bold"
+                >
+                  🗑️ DELETE ARROW
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
