@@ -6,6 +6,7 @@ import TabbedFFESpreadsheet from './TabbedFFESpreadsheet';
 import WorkingTabbedWalkthrough from './WorkingTabbedWalkthrough';
 import MobileFFESpreadsheet from './MobileFFESpreadsheet';
 import MobilePhotoManagement from './MobilePhotoManagement';
+import MeasurementsAndFilesPage from './MeasurementsAndFilesPage';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
