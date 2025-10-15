@@ -716,9 +716,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
             </div>
           </div>
 
-          {/* LEICA CONNECTION BAR */}
+          {/* LEICA CONNECTION BAR WITH COLOR PICKER */}
           <div className="bg-[#0F172A] p-3 border-b border-[#D4A574]/30">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
                 <div className={`px-4 py-2 rounded-xl font-bold text-sm ${
                   leicaConnected ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'
@@ -781,6 +781,32 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     </button>
                   </div>
                 )}
+              </div>
+              
+              {/* ARROW COLOR PICKER - NEW FEATURE */}
+              <div className="flex gap-2 items-center">
+                <span className="text-[#D4A574] font-bold text-sm">Next Arrow Color:</span>
+                {[
+                  { color: '#FFD700', name: 'Gold' },
+                  { color: '#FF6B6B', name: 'Red' },
+                  { color: '#4ECDC4', name: 'Teal' },
+                  { color: '#95E1D3', name: 'Mint' },
+                  { color: '#F38181', name: 'Pink' },
+                  { color: '#AA96DA', name: 'Purple' },
+                  { color: '#FCBAD3', name: 'Rose' },
+                  { color: '#FFFFD2', name: 'Cream' }
+                ].map((colorOption) => (
+                  <button
+                    key={colorOption.color}
+                    onClick={() => {
+                      window.selectedArrowColor = colorOption.color;
+                      alert(`✅ Next arrow will be ${colorOption.name}`);
+                    }}
+                    className="w-8 h-8 rounded-full border-2 border-white hover:scale-110 transition-all"
+                    style={{ backgroundColor: colorOption.color }}
+                    title={colorOption.name}
+                  />
+                ))}
               </div>
               
               {lastMeasurement && (
