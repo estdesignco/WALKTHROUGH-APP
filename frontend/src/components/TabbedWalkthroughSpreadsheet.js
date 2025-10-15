@@ -819,64 +819,69 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
             </div>
           </div>
 
-          {/* LARGE PHOTO FOR EDITING */}
-          <div className="flex-1 p-4 flex items-center justify-center bg-black">
-            <div className="relative">
+          {/* MUCH LARGER PHOTO WITH MOVABLE ARROWS */}
+          <div className="flex-1 p-2 flex items-center justify-center bg-black">
+            <div className="relative w-full h-full flex items-center justify-center">
               <img 
                 src={selectedPhoto.photo_data}
                 alt={selectedPhoto.file_name}
-                className="max-w-full max-h-[60vh] object-contain cursor-crosshair border-4 border-[#D4A574] rounded-xl"
+                className="max-w-full max-h-[85vh] object-contain border-2 border-[#D4A574] rounded-xl cursor-crosshair"
+                style={{ minWidth: '80vw', minHeight: '70vh' }}
                 onMouseDown={(e) => {
+                  // Only create new arrows if not editing existing ones
+                  if (editingArrow !== null) return;
+                  
                   const rect = e.target.getBoundingClientRect();
                   const x = ((e.clientX - rect.left) / rect.width) * 100;
                   const y = ((e.clientY - rect.top) / rect.height) * 100;
                   console.log('🎯 Starting arrow at:', x, y);
-                  setDrawingArrow({ x1: x, y1: y, x2: x, y2: y });
+                  
+                  const selectedColor = window.selectedArrowColor || '#FFD700';
+                  setDrawingArrow({ 
+                    x1: x, y1: y, x2: x, y2: y, 
+                    color: selectedColor 
+                  });
                 }}
                 onMouseMove={(e) => {
-                  if (!drawingArrow) return;
+                  if (!drawingArrow || editingArrow !== null) return;
                   const rect = e.target.getBoundingClientRect();
                   const x = ((e.clientX - rect.left) / rect.width) * 100;
                   const y = ((e.clientY - rect.top) / rect.height) * 100;
                   setDrawingArrow({ ...drawingArrow, x2: x, y2: y });
                 }}
                 onMouseUp={() => {
-                  if (!drawingArrow) return;
+                  if (!drawingArrow || editingArrow !== null) return;
                   const dx = drawingArrow.x2 - drawingArrow.x1;
                   const dy = drawingArrow.y2 - drawingArrow.y1;
                   const length = Math.sqrt(dx * dx + dy * dy);
                   
                   if (length > 3) {
-                    // Create arrow with selected color or default gold
-                    const selectedColor = window.selectedArrowColor || '#FFD700';
-                    const newMeasurement = {
-                      x1: drawingArrow.x1,
-                      y1: drawingArrow.y1,
-                      x2: drawingArrow.x2,
-                      y2: drawingArrow.y2,
-                      text: '', // Start blank - user fills with Leica/Manual buttons
-                      color: selectedColor
-                    };
-                    
-                    console.log('✅ Arrow created with color:', selectedColor);
-                    setMeasurements(prev => [...prev, newMeasurement]);
-                  } else {
-                    console.log('❌ Arrow too short');
+                    const text = lastMeasurement?.feetInches || measurementText || prompt('Enter measurement:', "8'6");
+                    if (text && text.trim()) {
+                      const newMeasurement = {
+                        x1: drawingArrow.x1,
+                        y1: drawingArrow.y1,
+                        x2: drawingArrow.x2,
+                        y2: drawingArrow.y2,
+                        text: text.trim(),
+                        color: drawingArrow.color
+                      };
+                      
+                      console.log('✅ Arrow created with measurement:', text);
+                      setMeasurements(prev => [...prev, newMeasurement]);
+                      setLastMeasurement(null); // Clear after use
+                      setMeasurementText('');
+                    }
                   }
                   setDrawingArrow(null);
                 }}
                 draggable={false}
               />
               
-              {/* SVG Overlay for arrows */}
-              <svg 
-                className="absolute inset-0 w-full h-full pointer-events-none"
-                style={{ zIndex: 10 }}
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-              >
+              {/* ULTRA-THIN DRAGGABLE ARROWS */}
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ zIndex: 10 }}>
                 <defs>
-                  {/* Create arrowhead markers for each color */}
+                  {/* Ultra-thin arrowheads for each color */}
                   {[
                     '#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3',
                     '#F38181', '#AA96DA', '#FCBAD3', '#FFFFD2'
@@ -884,101 +889,132 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     <marker
                       key={color}
                       id={`arrowhead-${color.replace('#', '')}`}
-                      markerWidth="8"
-                      markerHeight="8"
-                      refX="7"
-                      refY="3"
+                      markerWidth="4"
+                      markerHeight="4"
+                      refX="3"
+                      refY="1.5"
                       orient="auto"
                     >
-                      <polygon points="0 0, 8 3, 0 6" fill={color} />
+                      <polygon points="0 0, 4 1.5, 0 3" fill={color} />
                     </marker>
                   ))}
                 </defs>
                 
-                {/* Measurement arrows - DRAGGABLE */}
+                {/* ULTRA-THIN measurement arrows - FULLY DRAGGABLE */}
                 {measurements.map((m, index) => (
-                  <line
-                    key={index}
-                    x1={m.x1}
-                    y1={m.y1}
-                    x2={m.x2}
-                    y2={m.y2}
-                    stroke={m.color || '#FFD700'}
-                    strokeWidth="1.5"
-                    markerEnd={`url(#arrowhead-${(m.color || '#FFD700').replace('#', '')})`}
-                    className="cursor-move"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      console.log(`🎯 Starting to drag arrow ${index}`);
-                      setDraggingArrow(index);
-                      
-                      // Calculate offset from arrow center
-                      const rect = e.target.closest('svg').getBoundingClientRect();
-                      const centerX = ((m.x1 + m.x2) / 2 / 100) * rect.width;
-                      const centerY = ((m.y1 + m.y2) / 2 / 100) * rect.height;
-                      
-                      setDragOffset({
-                        x: e.clientX - rect.left - centerX,
-                        y: e.clientY - rect.top - centerY
-                      });
-                    }}
-                    style={{ pointerEvents: 'auto' }}
-                  />
+                  <g key={index}>
+                    <line
+                      x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2}
+                      stroke={m.color || '#FFD700'} strokeWidth="0.3"
+                      markerEnd={`url(#arrowhead-${(m.color || '#FFD700').replace('#', '')})`}
+                      className="cursor-move"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        console.log('🎯 Starting to move arrow', index);
+                        setEditingArrow(index);
+                        
+                        const rect = e.target.closest('svg').getBoundingClientRect();
+                        const startX = e.clientX;
+                        const startY = e.clientY;
+                        const initialArrow = { ...m };
+                        
+                        const moveArrow = (event) => {
+                          const deltaX = ((event.clientX - startX) / rect.width) * 100;
+                          const deltaY = ((event.clientY - startY) / rect.height) * 100;
+                          
+                          setMeasurements(prev => prev.map((arrow, i) => 
+                            i === index ? {
+                              ...arrow,
+                              x1: initialArrow.x1 + deltaX,
+                              y1: initialArrow.y1 + deltaY,
+                              x2: initialArrow.x2 + deltaX,
+                              y2: initialArrow.y2 + deltaY
+                            } : arrow
+                          ));
+                        };
+                        
+                        const stopMove = () => {
+                          console.log('✅ Finished moving arrow');
+                          document.removeEventListener('mousemove', moveArrow);
+                          document.removeEventListener('mouseup', stopMove);
+                          setEditingArrow(null);
+                        };
+                        
+                        document.addEventListener('mousemove', moveArrow);
+                        document.addEventListener('mouseup', stopMove);
+                      }}
+                    />
+                    
+                    {/* Stretch handles - only show when selected */}
+                    {editingArrow === index && (
+                      <>
+                        {/* Start point handle */}
+                        <circle
+                          cx={m.x1} cy={m.y1} r="0.8"
+                          fill="white" stroke={m.color} strokeWidth="0.2"
+                          className="cursor-nw-resize"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const rect = e.target.closest('svg').getBoundingClientRect();
+                            const stretchStart = (event) => {
+                              const x = ((event.clientX - rect.left) / rect.width) * 100;
+                              const y = ((event.clientY - rect.top) / rect.height) * 100;
+                              
+                              setMeasurements(prev => prev.map((arrow, i) => 
+                                i === index ? { ...arrow, x1: x, y1: y } : arrow
+                              ));
+                            };
+                            
+                            const stopStretch = () => {
+                              document.removeEventListener('mousemove', stretchStart);
+                              document.removeEventListener('mouseup', stopStretch);
+                            };
+                            
+                            document.addEventListener('mousemove', stretchStart);
+                            document.addEventListener('mouseup', stopStretch);
+                          }}
+                        />
+                        
+                        {/* End point handle */}
+                        <circle
+                          cx={m.x2} cy={m.y2} r="0.8"
+                          fill="white" stroke={m.color} strokeWidth="0.2"
+                          className="cursor-nw-resize"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const rect = e.target.closest('svg').getBoundingClientRect();
+                            const stretchEnd = (event) => {
+                              const x = ((event.clientX - rect.left) / rect.width) * 100;
+                              const y = ((event.clientY - rect.top) / rect.height) * 100;
+                              
+                              setMeasurements(prev => prev.map((arrow, i) => 
+                                i === index ? { ...arrow, x2: x, y2: y } : arrow
+                              ));
+                            };
+                            
+                            const stopStretch = () => {
+                              document.removeEventListener('mousemove', stretchEnd);
+                              document.removeEventListener('mouseup', stopStretch);
+                            };
+                            
+                            document.addEventListener('mousemove', stretchEnd);
+                            document.addEventListener('mouseup', stopStretch);
+                          }}
+                        />
+                      </>
+                    )}
+                  </g>
                 ))}
                 
-                {/* Global mouse handlers for dragging */}
-                {dragginArrow !== null && (
-                  <rect
-                    x="0"
-                    y="0"
-                    width="100"
-                    height="100"
-                    fill="transparent"
-                    style={{ pointerEvents: 'auto' }}
-                    onMouseMove={(e) => {
-                      if (dragginArrow === null) return;
-                      
-                      const rect = e.target.closest('svg').getBoundingClientRect();
-                      const newCenterX = ((e.clientX - rect.left - dragOffset.x) / rect.width) * 100;
-                      const newCenterY = ((e.clientY - rect.top - dragOffset.y) / rect.height) * 100;
-                      
-                      // Calculate arrow length to maintain it
-                      const currentArrow = measurements[dragginArrow];
-                      const currentLength = Math.sqrt(
-                        Math.pow(currentArrow.x2 - currentArrow.x1, 2) + 
-                        Math.pow(currentArrow.y2 - currentArrow.y1, 2)
-                      );
-                      const angle = Math.atan2(currentArrow.y2 - currentArrow.y1, currentArrow.x2 - currentArrow.x1);
-                      
-                      // Update arrow position
-                      setMeasurements(prev => prev.map((arrow, i) => 
-                        i === dragginArrow ? {
-                          ...arrow,
-                          x1: newCenterX - (currentLength * Math.cos(angle)) / 2,
-                          y1: newCenterY - (currentLength * Math.sin(angle)) / 2,
-                          x2: newCenterX + (currentLength * Math.cos(angle)) / 2,
-                          y2: newCenterY + (currentLength * Math.sin(angle)) / 2
-                        } : arrow
-                      ));
-                    }}
-                    onMouseUp={() => {
-                      console.log(`✅ Finished dragging arrow ${dragginArrow}`);
-                      setDraggingArrow(null);
-                      setDragOffset({ x: 0, y: 0 });
-                    }}
-                  />
-                )}
-                
-                {/* Drawing arrow */}
+                {/* Ultra-thin drawing arrow */}
                 {drawingArrow && (
                   <line
-                    x1={drawingArrow.x1}
-                    y1={drawingArrow.y1}
-                    x2={drawingArrow.x2}
-                    y2={drawingArrow.y2}
-                    stroke="#FF6B6B"
-                    strokeWidth="1.2"
-                    opacity="0.8"
+                    x1={drawingArrow.x1} y1={drawingArrow.y1} x2={drawingArrow.x2} y2={drawingArrow.y2}
+                    stroke={drawingArrow.color} strokeWidth="0.3" opacity="0.8"
                   />
                 )}
               </svg>
