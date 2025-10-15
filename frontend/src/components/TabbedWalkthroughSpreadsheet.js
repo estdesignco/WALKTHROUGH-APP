@@ -903,31 +903,96 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 )}
               </svg>
               
-              {/* Measurement labels */}
+              {/* Measurement labels WITH INDIVIDUAL CONTROLS */}
               {measurements.map((m, index) => (
                 <div
                   key={index}
                   className="absolute pointer-events-auto"
                   style={{
                     left: `${(m.x1 + m.x2) / 2}%`,
-                    top: `${(m.y1 + m.y2) / 2 - 6}%`,
+                    top: `${(m.y1 + m.y2) / 2 - 8}%`,
                     transform: 'translate(-50%, -100%)',
                     zIndex: 20
                   }}
                 >
-                  <div 
-                    className="bg-black bg-opacity-95 px-3 py-2 rounded-xl text-xl font-bold whitespace-nowrap shadow-2xl border-2 border-[#FFD700]"
-                    style={{ color: '#FFD700' }}
-                  >
-                    {m.text}
-                    <button
-                      onClick={() => {
-                        setMeasurements(measurements.filter((_, i) => i !== index));
-                      }}
-                      className="ml-2 text-red-400 hover:text-red-300 font-bold text-lg"
-                    >
-                      ✕
-                    </button>
+                  {/* ARROW CONTROL PANEL */}
+                  <div className="bg-black bg-opacity-95 p-3 rounded-xl border-2 border-[#FFD700] shadow-2xl">
+                    {/* Measurement Display */}
+                    <div className="text-center mb-3">
+                      <div className="text-xl font-bold text-[#FFD700] mb-1">
+                        {m.text || 'No Measurement'}
+                      </div>
+                    </div>
+                    
+                    {/* Control Buttons for THIS Arrow */}
+                    <div className="flex gap-2">
+                      {/* Get Leica Measurement for THIS arrow */}
+                      {leicaConnected && (
+                        <button
+                          onClick={async () => {
+                            console.log(`📏 Getting Leica measurement for arrow ${index}...`);
+                            try {
+                              const measurement = await leicaManager.readMeasurement();
+                              if (measurement) {
+                                // Update THIS specific arrow's measurement
+                                setMeasurements(prev => prev.map((arrow, i) => 
+                                  i === index 
+                                    ? { ...arrow, text: measurement.feetInches }
+                                    : arrow
+                                ));
+                                alert(`✅ Arrow ${index + 1} measurement: ${measurement.feetInches}`);
+                              } else {
+                                alert('❌ No measurement found. Press Leica button first.');
+                              }
+                            } catch (error) {
+                              alert('❌ Failed to read Leica measurement');
+                            }
+                          }}
+                          className="px-2 py-1 bg-yellow-500 hover:bg-yellow-400 text-black rounded text-xs font-bold"
+                        >
+                          📏 LEICA
+                        </button>
+                      )}
+                      
+                      {/* Manual measurement for THIS arrow */}
+                      <button
+                        onClick={() => {
+                          const manualMeasurement = prompt(`Enter measurement for Arrow ${index + 1}:`, m.text || "8'6\"");
+                          if (manualMeasurement && manualMeasurement.trim()) {
+                            // Update THIS specific arrow's measurement
+                            setMeasurements(prev => prev.map((arrow, i) => 
+                              i === index 
+                                ? { ...arrow, text: manualMeasurement.trim() }
+                                : arrow
+                            ));
+                          }
+                        }}
+                        className="px-2 py-1 bg-blue-500 hover:bg-blue-400 text-white rounded text-xs font-bold"
+                      >
+                        📝 EDIT
+                      </button>
+                      
+                      {/* Move arrow */}
+                      <button
+                        onClick={() => {
+                          alert(`To move Arrow ${index + 1}:\\n1. Click and drag the arrow line\\n2. Position where you want\\n3. Release to place`);
+                          // TODO: Implement drag functionality
+                        }}
+                        className="px-2 py-1 bg-green-500 hover:bg-green-400 text-white rounded text-xs font-bold"
+                      >
+                        🔄 MOVE
+                      </button>
+                      
+                      {/* Delete THIS arrow */}
+                      <button
+                        onClick={() => {
+                          setMeasurements(measurements.filter((_, i) => i !== index));
+                        }}
+                        className="px-2 py-1 bg-red-500 hover:bg-red-400 text-white rounded text-xs font-bold"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
