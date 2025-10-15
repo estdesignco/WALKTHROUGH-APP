@@ -1019,25 +1019,33 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 )}
               </svg>
               
-              {/* TINY TRANSPARENT TEXT LABELS */}
+              {/* Measurement labels - MINIMAL, JUST TEXT */}
               {measurements.map((m, index) => (
                 <div
                   key={index}
-                  className="absolute cursor-pointer"
+                  className="absolute pointer-events-auto cursor-pointer"
                   style={{
                     left: `${(m.x1 + m.x2) / 2}%`,
-                    top: `${(m.y1 + m.y2) / 2 - 1}%`,
+                    top: `${(m.y1 + m.y2) / 2 - 4}%`,
                     transform: 'translate(-50%, -100%)',
                     zIndex: 20
                   }}
-                  onClick={() => setEditingArrow(editingArrow === index ? null : index)}
+                  onClick={() => {
+                    const manualMeasurement = prompt(`Enter measurement for Arrow ${index + 1}:`, m.text || "8'6\"");
+                    if (manualMeasurement && manualMeasurement.trim()) {
+                      setMeasurements(prev => prev.map((arrow, i) => 
+                        i === index 
+                          ? { ...arrow, text: manualMeasurement.trim() }
+                          : arrow
+                      ));
+                    }
+                  }}
                 >
                   <div 
-                    className="bg-black bg-opacity-60 px-1 py-0.5 rounded text-xs font-bold border-none"
+                    className="bg-black bg-opacity-90 px-2 py-1 rounded text-sm font-bold border"
                     style={{ 
                       color: m.color || '#FFD700',
-                      minWidth: 'max-content',
-                      fontSize: '10px'
+                      borderColor: m.color || '#FFD700'
                     }}
                   >
                     {m.text || 'Click to measure'}
