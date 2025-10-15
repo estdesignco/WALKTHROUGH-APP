@@ -738,25 +738,31 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   {leicaConnected ? 'Disconnect' : 'Connect Leica D5'}
                 </button>
                 
-                {/* CLEAR MEASUREMENT WORKFLOW */}
+                {/* SIMPLE MEASUREMENT BUTTONS */}
                 {leicaConnected && (
                   <div className="flex gap-2">
                     <button
                       onClick={async () => {
-                        console.log('🎯 READING MEASUREMENT FROM LEICA...');
+                        console.log('🎯 CHECKING FOR LEICA MEASUREMENT...');
+                        
+                        // Show instructions first
+                        if (!confirm('STEP 1: Point your Leica D5 at something\\nSTEP 2: Press the measurement button on your Leica\\nSTEP 3: Click OK when you see measurement on Leica screen\\n\\nReady to read measurement?')) {
+                          return;
+                        }
+                        
                         try {
-                          // Simple read - just get what's on the Leica screen
+                          // Read whatever measurement is currently on the Leica
                           const measurement = await leicaManager.readMeasurement();
                           if (measurement) {
                             setLastMeasurement(measurement);
                             console.log('✅ Measurement retrieved:', measurement.feetInches);
-                            alert(`📏 Measurement ready: ${measurement.feetInches}\\n\\nNow draw arrow on photo to place it.`);
+                            alert(`📏 SUCCESS! Measurement: ${measurement.feetInches}\\n\\nNow click and drag on photo to place arrow.`);
                           } else {
-                            alert('❌ No measurement found. Press measurement button on Leica first, then try again.');
+                            alert('❌ No measurement found.\\n\\nPlease:\\n1. Point Leica at something\\n2. Press measurement button on Leica\\n3. Wait for result on Leica screen\\n4. Try again');
                           }
                         } catch (error) {
                           console.error('❌ Read measurement failed:', error);
-                          alert('❌ Failed to read measurement. Make sure Leica D5 is connected and has a measurement displayed.');
+                          alert('❌ Failed to read measurement.\\n\\nTroubleshooting:\\n1. Make sure Leica D5 is connected\\n2. Take a measurement with Leica first\\n3. Try clicking button again\\n\\nOr use MANUAL button instead.');
                         }
                       }}
                       className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black rounded-xl font-bold text-lg"
@@ -772,7 +778,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                             feetInches: manualMeasurement.trim(),
                             manual: true
                           });
-                          alert(`📝 Manual measurement ready: ${manualMeasurement}\\n\\nNow draw arrow on photo to place it.`);
+                          alert(`📝 Manual measurement ready: ${manualMeasurement}\\n\\nNow click and drag on photo to place arrow.`);
                         }
                       }}
                       className="px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-bold"
