@@ -1016,13 +1016,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                           alert(`✅ Measurement applied: ${measurement.feetInches}`);
                           setEditingArrow(null);
                         } else {
-                          alert(`❌ No current measurement found.
-
-Please:
-1. Point Leica at object
-2. Press measurement button on Leica  
-3. Wait for measurement to show on Leica screen
-4. Try this button again immediately`);
+                          alert('❌ No current measurement found. Press measurement button on Leica first, then try again.');
                         }
                       } catch (error) {
                         console.error('❌ Leica read error:', error);
