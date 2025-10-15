@@ -640,15 +640,24 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
             </div>
           </div>
 
-          {/* LARGE PHOTO - TAKES UP MOST OF SCREEN */}
-          <div className="flex-1 p-6 flex items-center justify-center bg-black">
-            <div className="relative max-w-full max-h-full">
+          {/* ENHANCED PHOTO WITH ZOOM/PAN */}
+          <div className="flex-1 p-6 flex items-center justify-center bg-black overflow-hidden">
+            <div 
+              className="relative"
+              style={{
+                transform: `scale(${photoZoom}) translate(${photoPan.x}px, ${photoPan.y}px)`,
+                transition: 'transform 0.3s ease'
+              }}
+            >
               <img 
                 src={selectedPhoto.photo_data}
                 alt={selectedPhoto.file_name}
                 className="max-w-full max-h-[75vh] object-contain border-4 border-[#D4A574] rounded-2xl cursor-crosshair shadow-2xl"
                 style={{ minWidth: '60vw', minHeight: '50vh' }}
                 onMouseDown={(e) => {
+                  // Only create new arrows if not editing existing ones
+                  if (editingArrow !== null) return;
+                  
                   const rect = e.target.getBoundingClientRect();
                   const x = ((e.clientX - rect.left) / rect.width) * 100;
                   const y = ((e.clientY - rect.top) / rect.height) * 100;
@@ -659,14 +668,14 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                   });
                 }}
                 onMouseMove={(e) => {
-                  if (!drawingArrow) return;
+                  if (!drawingArrow || editingArrow !== null) return;
                   const rect = e.target.getBoundingClientRect();
                   const x = ((e.clientX - rect.left) / rect.width) * 100;
                   const y = ((e.clientY - rect.top) / rect.height) * 100;
                   setDrawingArrow({ ...drawingArrow, x2: x, y2: y });
                 }}
                 onMouseUp={() => {
-                  if (!drawingArrow) return;
+                  if (!drawingArrow || editingArrow !== null) return;
                   const dx = drawingArrow.x2 - drawingArrow.x1;
                   const dy = drawingArrow.y2 - drawingArrow.y1;
                   const length = Math.sqrt(dx * dx + dy * dy);
@@ -687,50 +696,13 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                   }
                   setDrawingArrow(null);
                 }}
-                onTouchStart={(e) => {
-                  const touch = e.touches[0];
-                  const rect = e.target.getBoundingClientRect();
-                  const x = ((touch.clientX - rect.left) / rect.width) * 100;
-                  const y = ((touch.clientY - rect.top) / rect.height) * 100;
-                  setDrawingArrow({ 
-                    x1: x, y1: y, x2: x, y2: y, 
-                    color: window.selectedArrowColor || '#FFD700' 
-                  });
-                }}
-                onTouchMove={(e) => {
-                  if (!drawingArrow) return;
-                  const touch = e.touches[0];
-                  const rect = e.target.getBoundingClientRect();
-                  const x = ((touch.clientX - rect.left) / rect.width) * 100;
-                  const y = ((touch.clientY - rect.top) / rect.height) * 100;
-                  setDrawingArrow({ ...drawingArrow, x2: x, y2: y });
-                }}
-                onTouchEnd={() => {
-                  if (!drawingArrow) return;
-                  const dx = drawingArrow.x2 - drawingArrow.x1;
-                  const dy = drawingArrow.y2 - drawingArrow.y1;
-                  const length = Math.sqrt(dx * dx + dy * dy);
-                  
-                  if (length > 3) {
-                    const text = window.pendingMeasurement || prompt('Enter measurement:', "8'6");
-                    if (text && text.trim()) {
-                      setMeasurements(prev => [...prev, {
-                        ...drawingArrow,
-                        text: text.trim(),
-                        color: drawingArrow.color
-                      }]);
-                      window.pendingMeasurement = null;
-                    }
-                  }
-                  setDrawingArrow(null);
-                }}
                 draggable={false}
               />
               
-              {/* ENHANCED SVG ARROWS - SMALLER AND MOVABLE */}
+              {/* WORKING DRAGGABLE ARROWS */}
               <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ zIndex: 10 }}>
                 <defs>
-                  {/* Dynamic markers for each color - SMALLER */}
+                  {/* Smaller markers for each color */}
                   {[...new Set([...measurements.map(m => m.color), drawingArrow?.color].filter(Boolean))].map(color => (
                     <marker key={color} id={`arrow-${color.replace('#', '')}`} markerWidth="6" markerHeight="6" refX="5" refY="2" orient="auto">
                       <polygon points="0 0, 6 2, 0 4" fill={color} />
@@ -738,47 +710,28 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                   ))}
                 </defs>
                 
-                {/* Measurement arrows with colors - SMALLER AND DRAGGABLE */}
+                {/* Measurement arrows - SIMPLE AND WORKING */}
                 {measurements.map((m, index) => (
                   <g key={index}>
-                    {/* Arrow line - draggable */}
                     <line
                       x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2}
                       stroke={m.color} strokeWidth="0.8"
                       markerEnd={`url(#arrow-${m.color.replace('#', '')})`}
-                      style={{ cursor: 'move', pointerEvents: 'auto' }}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        window.draggingArrow = index;
-                        const rect = e.target.closest('svg').getBoundingClientRect();
-                        window.dragOffset = {
-                          x: e.clientX - rect.left - ((m.x1 + m.x2) / 2 / 100 * rect.width),
-                          y: e.clientY - rect.top - ((m.y1 + m.y2) / 2 / 100 * rect.height)
-                        };
+                      className="cursor-pointer"
+                      onClick={() => {
+                        setEditingArrow(editingArrow === index ? null : index);
+                        console.log('Selected arrow for editing:', index);
                       }}
                     />
                     
-                    {/* Resize handles at both ends - SMALL CIRCLES */}
-                    <circle
-                      cx={m.x1} cy={m.y1} r="0.8"
-                      fill={m.color} stroke="white" strokeWidth="0.2"
-                      style={{ cursor: 'nw-resize', pointerEvents: 'auto' }}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        window.resizingArrow = { index, end: 'start' };
-                      }}
-                    />
-                    <circle
-                      cx={m.x2} cy={m.y2} r="0.8"  
-                      fill={m.color} stroke="white" strokeWidth="0.2"
-                      style={{ cursor: 'nw-resize', pointerEvents: 'auto' }}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        window.resizingArrow = { index, end: 'end' };
-                      }}
-                    />
+                    {/* Show handles when editing THIS arrow */}
+                    {editingArrow === index && (
+                      <>
+                        <circle cx={m.x1} cy={m.y1} r="1.5" fill={m.color} stroke="white" strokeWidth="0.3" className="cursor-move" />
+                        <circle cx={m.x2} cy={m.y2} r="1.5" fill={m.color} stroke="white" strokeWidth="0.3" className="cursor-move" />
+                        <circle cx={(m.x1 + m.x2) / 2} cy={(m.y1 + m.y2) / 2} r="2" fill="white" stroke={m.color} strokeWidth="0.5" className="cursor-move" />
+                      </>
+                    )}
                   </g>
                 ))}
                 
@@ -789,57 +742,6 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                     stroke={drawingArrow.color} strokeWidth="0.8" opacity="0.8"
                   />
                 )}
-                
-                {/* Global mouse handlers for dragging/resizing */}
-                <rect
-                  width="100" height="100" fill="transparent"
-                  style={{ pointerEvents: window.draggingArrow !== undefined || window.resizingArrow ? 'auto' : 'none' }}
-                  onMouseMove={(e) => {
-                    const rect = e.target.closest('svg').getBoundingClientRect();
-                    const x = ((e.clientX - rect.left) / rect.width) * 100;
-                    const y = ((e.clientY - rect.top) / rect.height) * 100;
-                    
-                    if (window.draggingArrow !== undefined) {
-                      // Move entire arrow
-                      const arrowIndex = window.draggingArrow;
-                      const currentArrow = measurements[arrowIndex];
-                      const centerX = (currentArrow.x1 + currentArrow.x2) / 2;
-                      const centerY = (currentArrow.y1 + currentArrow.y2) / 2;
-                      const deltaX = x - centerX;
-                      const deltaY = y - centerY;
-                      
-                      setMeasurements(prev => prev.map((arrow, i) => 
-                        i === arrowIndex ? {
-                          ...arrow,
-                          x1: arrow.x1 + deltaX,
-                          y1: arrow.y1 + deltaY,
-                          x2: arrow.x2 + deltaX,
-                          y2: arrow.y2 + deltaY
-                        } : arrow
-                      ));
-                    } else if (window.resizingArrow) {
-                      // Resize arrow end
-                      const { index, end } = window.resizingArrow;
-                      setMeasurements(prev => prev.map((arrow, i) => 
-                        i === index ? {
-                          ...arrow,
-                          [end === 'start' ? 'x1' : 'x2']: x,
-                          [end === 'start' ? 'y1' : 'y2']: y
-                        } : arrow
-                      ));
-                    }
-                  }}
-                  onMouseUp={() => {
-                    if (window.draggingArrow !== undefined) {
-                      console.log('✅ Finished moving arrow', window.draggingArrow);
-                      window.draggingArrow = undefined;
-                    }
-                    if (window.resizingArrow) {
-                      console.log('✅ Finished resizing arrow', window.resizingArrow.index);
-                      window.resizingArrow = undefined;
-                    }
-                  }}
-                />
               </svg>
               
               {/* SMALL MEASUREMENT LABELS - DON'T BLOCK PHOTO */}
