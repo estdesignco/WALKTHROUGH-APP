@@ -1055,83 +1055,141 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
             </div>
           </div>
 
-          {/* ARROW EDITING PANEL - APPEARS WHEN ARROW CLICKED */}
-          {editingArrow !== null && (
-            <div className="absolute bottom-0 left-0 right-0 bg-[#1E293B] p-4 border-t-4 border-[#D4A574] z-30">
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="text-xl font-bold text-[#D4A574]">📏 Edit Arrow {editingArrow + 1}</h4>
-                <button
-                  onClick={() => setEditingArrow(null)}
-                  className="text-[#D4A574] text-2xl hover:text-red-400"
-                >
-                  ✕
-                </button>
-              </div>
-              
-              <div className="flex gap-3">
-                {/* Get Leica Measurement */}
-                {leicaConnected && (
+          {/* BOTTOM ACTION BAR - ALWAYS VISIBLE */}
+          <div className="bg-[#1E293B] p-4 border-t-4 border-[#D4A574]">
+            <div className="flex gap-3 justify-center">
+              {editingArrow !== null ? (
+                <>
+                  {/* EDITING MODE */}
+                  <div className="flex gap-3 items-center">
+                    <span className="text-xl font-bold text-[#D4A574]">📏 Edit Arrow {editingArrow + 1}</span>
+                    
+                    {leicaConnected && (
+                      <button
+                        onClick={async () => {
+                          console.log(`📏 Getting Leica measurement for arrow ${editingArrow}...`);
+                          try {
+                            const measurement = await leicaManager.readCurrentMeasurement();
+                            if (measurement) {
+                              setMeasurements(prev => prev.map((arrow, i) => 
+                                i === editingArrow ? { ...arrow, text: measurement.feetInches } : arrow
+                              ));
+                              alert('✅ Measurement applied: ' + measurement.feetInches);
+                              setEditingArrow(null);
+                            } else {
+                              alert('❌ No measurement found. Press Leica button first.');
+                            }
+                          } catch (error) {
+                            console.error('Leica read error:', error);
+                            alert('❌ Leica read failed: ' + error.message);
+                          }
+                        }}
+                        className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black rounded-xl font-bold"
+                      >
+                        📏 LEICA
+                      </button>
+                    )}
+                    
+                    <button
+                      onClick={() => {
+                        const manualMeasurement = prompt(`Enter measurement for Arrow ${editingArrow + 1}:`, measurements[editingArrow]?.text || "8'6\"");
+                        if (manualMeasurement && manualMeasurement.trim()) {
+                          setMeasurements(prev => prev.map((arrow, i) => 
+                            i === editingArrow ? { ...arrow, text: manualMeasurement.trim() } : arrow
+                          ));
+                          setEditingArrow(null);
+                        }
+                      }}
+                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-bold"
+                    >
+                      📝 MANUAL
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        setMeasurements(measurements.filter((_, i) => i !== editingArrow));
+                        setEditingArrow(null);
+                      }}
+                      className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-bold"
+                    >
+                      🗑️ DELETE
+                    </button>
+                    
+                    <button
+                      onClick={() => setEditingArrow(null)}
+                      className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-bold"
+                    >
+                      DONE
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* NORMAL MODE - SAVE PHOTO */}
                   <button
                     onClick={async () => {
-                      console.log(`📏 Getting Leica measurement for arrow ${editingArrow}...`);
+                      if (measurements.length === 0) {
+                        alert('⚠️ No measurements added yet. Add at least one measurement before saving.');
+                        return;
+                      }
+                      
+                      setUploading(true);
                       try {
-                        console.log('Reading current measurement from Leica...');
-                        const measurement = await leicaManager.readCurrentMeasurement();
+                        // Save photo with measurements as metadata
+                        const response = await axios.post(`${API_URL}/photos/upload-to-item`, {
+                          project_id: projectId,
+                          room_id: activeRoom.id,
+                          photo_data: selectedPhoto.photo_data,
+                          file_name: `measured_${selectedPhoto.file_name}`,
+                          metadata: {
+                            room_name: activeRoom.name,
+                            timestamp: new Date().toISOString(),
+                            has_measurements: true,
+                            measurement_count: measurements.length,
+                            measurements: measurements
+                          }
+                        });
                         
-                        if (measurement) {
-                          console.log('Found measurement:', measurement.feetInches);
-                          setMeasurements(prev => prev.map((arrow, i) => 
-                            i === editingArrow 
-                              ? { ...arrow, text: measurement.feetInches }
-                              : arrow
-                          ));
-                          alert('Measurement applied: ' + measurement.feetInches);
-                          setEditingArrow(null);
-                        } else {
-                          alert('No measurement found. Press Leica button first, then try again.');
-                        }
+                        console.log('✅ Photo with measurements saved:', response.data);
+                        alert(`✅ Photo saved with ${measurements.length} measurements!`);
+                        
+                        // Close modal and refresh
+                        setSelectedPhoto(null);
+                        setMeasurements([]);
+                        setDrawingArrow(null);
+                        await loadAllPhotos();
+                        
                       } catch (error) {
-                        console.error('Leica read error:', error);
-                        alert('Leica read failed: ' + error.message);
+                        console.error('❌ Failed to save photo:', error);
+                        alert('❌ Failed to save photo: ' + error.message);
+                      } finally {
+                        setUploading(false);
                       }
                     }}
-                    className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black rounded-xl font-bold"
+                    disabled={uploading || measurements.length === 0}
+                    className={`px-8 py-4 rounded-xl font-bold text-xl ${
+                      uploading || measurements.length === 0
+                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
+                    }`}
                   >
-                    📏 GET LEICA MEASUREMENT
+                    {uploading ? '💾 Saving...' : `💾 SAVE ${measurements.length} MEASUREMENTS`}
                   </button>
-                )}
-                
-                {/* Manual measurement */}
-                <button
-                  onClick={() => {
-                    const manualMeasurement = prompt(`Enter measurement for Arrow ${editingArrow + 1}:`, measurements[editingArrow]?.text || "8'6\"");
-                    if (manualMeasurement && manualMeasurement.trim()) {
-                      setMeasurements(prev => prev.map((arrow, i) => 
-                        i === editingArrow 
-                          ? { ...arrow, text: manualMeasurement.trim() }
-                          : arrow
-                      ));
-                      setEditingArrow(null);
-                    }
-                  }}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-bold"
-                >
-                  📝 MANUAL ENTRY
-                </button>
-                
-                {/* Delete arrow */}
-                <button
-                  onClick={() => {
-                    setMeasurements(measurements.filter((_, i) => i !== editingArrow));
-                    setEditingArrow(null);
-                  }}
-                  className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-bold"
-                >
-                  🗑️ DELETE ARROW
-                </button>
-              </div>
+                  
+                  <button
+                    onClick={() => {
+                      setSelectedPhoto(null);
+                      setMeasurements([]);
+                      setDrawingArrow(null);
+                    }}
+                    className="px-8 py-4 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-bold text-xl"
+                  >
+                    ✕ CLOSE
+                  </button>
+                </>
+              )}
             </div>
-          )}
+          </div>
         </div>
       )}
 
