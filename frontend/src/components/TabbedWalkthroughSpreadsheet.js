@@ -42,27 +42,35 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
     loadProjectFromCache
   } = useOfflineSync(projectId);
 
-  // EXACT SAME ROOM COLORS AS DESKTOP CHECKLIST - PERFECT MATCH
-  const getRoomColor = (roomName, index = 0) => {
-    const mutedColors = [
-      '#8B5A6B',  // Muted rose
-      '#6B7C93',  // Muted blue
-      '#7A8B5A',  // Muted olive
-      '#9B6B8B',  // Muted purple
-      '#8B7A5A',  // Muted brown
-      '#5A8B7A',  // Muted teal
-      '#8B5A7A',  // Muted mauve
-      '#7A5A8B',  // Muted violet
-      '#5A7A8B',  // Muted slate
-      '#8B6B5A'   // Muted tan
-    ];
+  // EXACT SAME COLORS AS DESKTOP - VIBRANT COLORS FROM FFESpreadsheet.js
+  const getRoomColor = (roomName) => {
+    const exactColors = {
+      'living room': '#8E4EC6',      // Purple - EXACT DESKTOP MATCH
+      'kitchen': '#059669',          // Teal - EXACT DESKTOP MATCH  
+      'master bedroom': '#DC2626',   // Red - EXACT DESKTOP MATCH
+      'bedroom 2': '#D97706',        // Orange - EXACT DESKTOP MATCH
+      'bedroom 3': '#7C3AED',        // Purple - EXACT DESKTOP MATCH
+      'bathroom': '#0284C7',         // Blue - EXACT DESKTOP MATCH
+      'master bathroom': '#BE185D',  // Pink - EXACT DESKTOP MATCH
+      'powder room': '#047857',      // Dark green - EXACT DESKTOP MATCH
+      'dining room': '#B91C1C',      // Dark red - EXACT DESKTOP MATCH
+      'office': '#7C2D12',           // Brown - EXACT DESKTOP MATCH
+      'family room': '#581C87',      // Dark purple - EXACT DESKTOP MATCH
+      'basement': '#92400E',         // Dark orange - EXACT DESKTOP MATCH
+      'laundry room': '#1E40AF',     // Dark blue - EXACT DESKTOP MATCH
+      'mudroom': '#166534',          // Forest green - EXACT DESKTOP MATCH
+      'pantry': '#A21CAF',           // Magenta - EXACT DESKTOP MATCH
+      'closet': '#0F766E',           // Teal green - EXACT DESKTOP MATCH
+      'guest room': '#BE123C',       // Rose - EXACT DESKTOP MATCH
+      'playroom': '#6366F1',         // Indigo - EXACT DESKTOP MATCH
+      'library': '#7C3AED',          // Violet - EXACT DESKTOP MATCH
+      'wine cellar': '#4338CA',      // Dark indigo - EXACT DESKTOP MATCH
+      'garage': '#6B7280',           // Gray - EXACT DESKTOP MATCH
+      'patio': '#65A30D',            // Lime - EXACT DESKTOP MATCH
+      'foyer': '#8E4EC6'             // Purple (same as living room) - ADDED
+    };
     
-    // Use room name hash for consistent color per room - EXACT DESKTOP LOGIC
-    let hash = 0;
-    for (let i = 0; i < roomName.length; i++) {
-      hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return mutedColors[Math.abs(hash) % mutedColors.length];
+    return exactColors[roomName.toLowerCase()] || '#7C3AED'; // Default purple
   };
 
   const getCategoryColor = () => '#065F46';
