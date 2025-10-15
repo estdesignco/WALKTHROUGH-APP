@@ -191,6 +191,33 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
     }
   };
 
+  const handleAddBlankItem = async (subcategoryId) => {
+    try {
+      console.log('➕ Adding blank item to subcategory:', subcategoryId);
+      
+      // Create a blank item that can be filled in
+      await axios.post(`${API_URL}/items`, {
+        name: 'New Item',
+        vendor: '',
+        sku: '',
+        quantity: '1',
+        size: '',
+        finish_color: '',
+        cost: '',
+        status: '',
+        notes: '',
+        subcategory_id: subcategoryId,
+        order_index: 0
+      });
+      
+      console.log('✅ Blank item added successfully');
+      await loadProject();
+    } catch (error) {
+      console.error('Failed to add blank item:', error);
+      alert('Failed to add item: ' + error.message);
+    }
+  };
+
   // SIMPLE PHOTO CAPTURE
   const handleTakePhoto = () => {
     const input = document.createElement('input');
