@@ -42,35 +42,39 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
     loadProjectFromCache
   } = useOfflineSync(projectId);
 
-  // EXACT SAME COLORS AS DESKTOP - VIBRANT COLORS FROM FFESpreadsheet.js
+  // EXACT SAME COLORS AS DESKTOP FFE - ALL UNIQUE COLORS
   const getRoomColor = (roomName) => {
     const exactColors = {
-      'living room': '#8E4EC6',      // Purple - EXACT DESKTOP MATCH
-      'kitchen': '#059669',          // Teal - EXACT DESKTOP MATCH  
-      'master bedroom': '#DC2626',   // Red - EXACT DESKTOP MATCH
-      'bedroom 2': '#D97706',        // Orange - EXACT DESKTOP MATCH
-      'bedroom 3': '#7C3AED',        // Purple - EXACT DESKTOP MATCH
-      'bathroom': '#0284C7',         // Blue - EXACT DESKTOP MATCH
-      'master bathroom': '#BE185D',  // Pink - EXACT DESKTOP MATCH
-      'powder room': '#047857',      // Dark green - EXACT DESKTOP MATCH
-      'dining room': '#B91C1C',      // Dark red - EXACT DESKTOP MATCH
-      'office': '#7C2D12',           // Brown - EXACT DESKTOP MATCH
-      'family room': '#581C87',      // Dark purple - EXACT DESKTOP MATCH
-      'basement': '#92400E',         // Dark orange - EXACT DESKTOP MATCH
-      'laundry room': '#1E40AF',     // Dark blue - EXACT DESKTOP MATCH
-      'mudroom': '#166534',          // Forest green - EXACT DESKTOP MATCH
-      'pantry': '#A21CAF',           // Magenta - EXACT DESKTOP MATCH
-      'closet': '#0F766E',           // Teal green - EXACT DESKTOP MATCH
-      'guest room': '#BE123C',       // Rose - EXACT DESKTOP MATCH
-      'playroom': '#6366F1',         // Indigo - EXACT DESKTOP MATCH
-      'library': '#7C3AED',          // Violet - EXACT DESKTOP MATCH
-      'wine cellar': '#4338CA',      // Dark indigo - EXACT DESKTOP MATCH
-      'garage': '#6B7280',           // Gray - EXACT DESKTOP MATCH
-      'patio': '#65A30D',            // Lime - EXACT DESKTOP MATCH
-      'foyer': '#8E4EC6'             // Purple (same as living room) - ADDED
+      'living room': '#7C3AED',      // Purple - EXACT DESKTOP
+      'dining room': '#DC2626',      // Red - EXACT DESKTOP  
+      'kitchen': '#EA580C',          // Orange - EXACT DESKTOP
+      'primary bedroom': '#059669',  // Green - EXACT DESKTOP
+      'master bedroom': '#059669',   // Green - EXACT DESKTOP
+      'bedroom 2': '#3B82F6',        // Blue - UNIQUE
+      'bedroom 3': '#8B5CF6',        // Violet - UNIQUE
+      'bathroom': '#2563EB',         // Blue - EXACT DESKTOP
+      'primary bathroom': '#2563EB', // Blue - EXACT DESKTOP
+      'master bathroom': '#0EA5E9',  // Sky Blue - UNIQUE
+      'powder room': '#7C2D12',      // Brown - EXACT DESKTOP
+      'guest room': '#BE185D',       // Pink - EXACT DESKTOP
+      'office': '#6366F1',           // Indigo - EXACT DESKTOP
+      'laundry room': '#16A34A',     // Green - EXACT DESKTOP
+      'mudroom': '#0891B2',          // Cyan - EXACT DESKTOP
+      'family room': '#CA8A04',      // Yellow - EXACT DESKTOP
+      'basement': '#6B7280',         // Gray - EXACT DESKTOP
+      'attic storage': '#78716C',    // Stone - EXACT DESKTOP
+      'garage': '#374151',           // Gray-800 - EXACT DESKTOP
+      'balcony': '#7C3AED',          // Purple - EXACT DESKTOP
+      'pantry': '#A21CAF',           // Magenta - UNIQUE
+      'closet': '#0F766E',           // Teal - UNIQUE
+      'playroom': '#F59E0B',         // Amber - UNIQUE
+      'library': '#8B5CF6',          // Violet - UNIQUE
+      'wine cellar': '#4338CA',      // Dark Blue - UNIQUE
+      'patio': '#65A30D',            // Lime - UNIQUE
+      'foyer': '#EC4899'             // Pink - UNIQUE (NOT same as living room)
     };
     
-    return exactColors[roomName.toLowerCase()] || '#7C3AED'; // Default purple
+    return exactColors[roomName.toLowerCase()] || '#7C3AED';
   };
 
   const getCategoryColor = () => '#065F46';
