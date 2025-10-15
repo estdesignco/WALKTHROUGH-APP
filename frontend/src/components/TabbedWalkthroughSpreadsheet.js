@@ -685,24 +685,311 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
         )}
       </div>
 
-      {/* PHOTO VIEWER MODAL */}
+      {/* PHOTO EDITOR MODAL - EDIT EXISTING PHOTOS */}
       {selectedPhoto && (
-        <div 
-          className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4" 
-          onClick={() => setSelectedPhoto(null)}
-        >
-          <div className="max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
-            <img 
-              src={selectedPhoto.photo_data} 
-              alt={selectedPhoto.file_name} 
-              className="max-w-full max-h-[90vh] rounded-2xl border-2 border-[#D4A574]/50"
-            />
-            <div className="flex gap-3 mt-4 justify-center">
-              <button
-                onClick={() => setSelectedPhoto(null)} 
-                className="px-6 py-3 bg-gradient-to-r from-[#D4A574] to-[#B48554] hover:from-[#E4B584] hover:to-[#C49564] text-black rounded-xl font-bold"
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          <div className="bg-[#1E293B] p-4 border-b-2 border-[#D4A574]">
+            <div className="flex justify-between items-center">
+              <h3 className="text-2xl font-bold text-[#D4A574]">📏 Edit Measurements</h3>
+              <div className="flex items-center gap-4">
+                <div className="text-[#D4C5A9] font-bold">
+                  {measurements.length} measurements
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedPhoto(null);
+                    setMeasurements([]);
+                    setDrawingArrow(null);
+                  }}
+                  className="text-[#D4A574] text-3xl hover:text-red-400"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* LEICA CONNECTION BAR */}
+          <div className="bg-[#0F172A] p-3 border-b border-[#D4A574]/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className={`px-4 py-2 rounded-xl font-bold text-sm ${
+                  leicaConnected ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'
+                }`}>
+                  📏 Leica D5: {leicaConnected ? 'Connected' : 'Not Connected'}
+                </div>
+                <button
+                  onClick={leicaConnected ? () => leicaManager.disconnect() : connectLeica}
+                  className="px-4 py-2 bg-[#D4A574] hover:bg-[#C49564] text-black rounded-xl font-bold text-sm"
+                >
+                  {leicaConnected ? 'Disconnect' : 'Connect Leica D5'}
+                </button>
+              </div>
+              
+              {lastMeasurement && (
+                <div className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-xl">
+                  <div className="text-lg font-bold">📏 {lastMeasurement.feetInches}</div>
+                  <div className="text-sm">Click photo to place arrow</div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* LARGE PHOTO FOR EDITING */}
+          <div className="flex-1 p-4 flex items-center justify-center bg-black">
+            <div className="relative">
+              <img 
+                src={selectedPhoto.photo_data}
+                alt={selectedPhoto.file_name}
+                className="max-w-full max-h-[60vh] object-contain cursor-crosshair border-4 border-[#D4A574] rounded-xl"
+                onMouseDown={(e) => {
+                  const rect = e.target.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * 100;
+                  const y = ((e.clientY - rect.top) / rect.height) * 100;
+                  console.log('🎯 Starting arrow at:', x, y);
+                  setDrawingArrow({ x1: x, y1: y, x2: x, y2: y });
+                }}
+                onMouseMove={(e) => {
+                  if (!drawingArrow) return;
+                  const rect = e.target.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * 100;
+                  const y = ((e.clientY - rect.top) / rect.height) * 100;
+                  setDrawingArrow({ ...drawingArrow, x2: x, y2: y });
+                }}
+                onMouseUp={() => {
+                  if (!drawingArrow) return;
+                  const dx = drawingArrow.x2 - drawingArrow.x1;
+                  const dy = drawingArrow.y2 - drawingArrow.y1;
+                  const length = Math.sqrt(dx * dx + dy * dy);
+                  
+                  if (length > 3) {
+                    let text = '';
+                    if (lastMeasurement) {
+                      text = lastMeasurement.feetInches;
+                      console.log('📏 Using Leica measurement:', text);
+                    } else {
+                      text = prompt('Enter measurement:', "8'6\"");
+                      console.log('📝 Manual measurement entered:', text);
+                    }
+                    
+                    if (text && text.trim()) {
+                      const newMeasurement = {
+                        x1: drawingArrow.x1,
+                        y1: drawingArrow.y1,
+                        x2: drawingArrow.x2,
+                        y2: drawingArrow.y2,
+                        text: text.trim(),
+                        color: '#FFD700'
+                      };
+                      
+                      console.log('✅ Adding measurement:', newMeasurement);
+                      setMeasurements(prev => [...prev, newMeasurement]);
+                      setLastMeasurement(null);
+                    }
+                  }
+                  setDrawingArrow(null);
+                }}
+                draggable={false}
+              />
+              
+              {/* SVG Overlay for arrows */}
+              <svg 
+                className="absolute inset-0 w-full h-full pointer-events-none"
+                style={{ zIndex: 10 }}
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
               >
-                Close
+                <defs>
+                  <marker
+                    id="arrowhead-edit"
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="7"
+                    refY="3"
+                    orient="auto"
+                  >
+                    <polygon points="0 0, 8 3, 0 6" fill="#FFD700" />
+                  </marker>
+                </defs>
+                
+                {/* Measurement arrows */}
+                {measurements.map((m, index) => (
+                  <line
+                    key={index}
+                    x1={m.x1}
+                    y1={m.y1}
+                    x2={m.x2}
+                    y2={m.y2}
+                    stroke="#FFD700"
+                    strokeWidth="1.2"
+                    markerEnd="url(#arrowhead-edit)"
+                  />
+                ))}
+                
+                {/* Drawing arrow */}
+                {drawingArrow && (
+                  <line
+                    x1={drawingArrow.x1}
+                    y1={drawingArrow.y1}
+                    x2={drawingArrow.x2}
+                    y2={drawingArrow.y2}
+                    stroke="#FF6B6B"
+                    strokeWidth="1.2"
+                    opacity="0.8"
+                  />
+                )}
+              </svg>
+              
+              {/* Measurement labels */}
+              {measurements.map((m, index) => (
+                <div
+                  key={index}
+                  className="absolute pointer-events-auto"
+                  style={{
+                    left: `${(m.x1 + m.x2) / 2}%`,
+                    top: `${(m.y1 + m.y2) / 2 - 6}%`,
+                    transform: 'translate(-50%, -100%)',
+                    zIndex: 20
+                  }}
+                >
+                  <div 
+                    className="bg-black bg-opacity-95 px-3 py-2 rounded-xl text-xl font-bold whitespace-nowrap shadow-2xl border-2 border-[#FFD700]"
+                    style={{ color: '#FFD700' }}
+                  >
+                    {m.text}
+                    <button
+                      onClick={() => {
+                        setMeasurements(measurements.filter((_, i) => i !== index));
+                      }}
+                      className="ml-2 text-red-400 hover:text-red-300 font-bold text-lg"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ACTION BUTTONS FOR EDITING */}
+          <div className="bg-[#1E293B] p-4 border-t-2 border-[#D4A574]">
+            <div className="flex gap-4">
+              <button
+                onClick={() => {
+                  if (measurements.length > 0) {
+                    setMeasurements([]);
+                    alert('✅ All measurements cleared');
+                  }
+                }}
+                className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold"
+              >
+                🗑️ Clear All
+              </button>
+              
+              <button
+                onClick={async () => {
+                  if (measurements.length === 0) {
+                    alert('No measurements to save');
+                    return;
+                  }
+                  
+                  try {
+                    setUploading(true);
+                    
+                    // Create annotated version
+                    const img = new Image();
+                    img.src = selectedPhoto.photo_data;
+                    
+                    await new Promise((resolve) => {
+                      img.onload = resolve;
+                    });
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+
+                    // Draw image
+                    ctx.drawImage(img, 0, 0);
+
+                    // Draw arrows
+                    measurements.forEach((m) => {
+                      const x1 = (m.x1 / 100) * canvas.width;
+                      const y1 = (m.y1 / 100) * canvas.height;
+                      const x2 = (m.x2 / 100) * canvas.width;
+                      const y2 = (m.y2 / 100) * canvas.height;
+
+                      ctx.strokeStyle = '#FFD700';
+                      ctx.lineWidth = 8;
+                      ctx.beginPath();
+                      ctx.moveTo(x1, y1);
+                      ctx.lineTo(x2, y2);
+                      ctx.stroke();
+
+                      const angle = Math.atan2(y2 - y1, x2 - x1);
+                      const headlen = 30;
+                      
+                      ctx.fillStyle = '#FFD700';
+                      ctx.beginPath();
+                      ctx.moveTo(x2, y2);
+                      ctx.lineTo(
+                        x2 - headlen * Math.cos(angle - Math.PI / 6),
+                        y2 - headlen * Math.sin(angle - Math.PI / 6)
+                      );
+                      ctx.lineTo(
+                        x2 - headlen * Math.cos(angle + Math.PI / 6),
+                        y2 - headlen * Math.sin(angle + Math.PI / 6)
+                      );
+                      ctx.closePath();
+                      ctx.fill();
+
+                      const midX = (x1 + x2) / 2;
+                      const midY = (y1 + y2) / 2 - 40;
+                      
+                      ctx.font = 'bold 32px Arial';
+                      const textWidth = ctx.measureText(m.text).width;
+                      
+                      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                      ctx.fillRect(midX - textWidth / 2 - 10, midY - 25, textWidth + 20, 40);
+                      
+                      ctx.fillStyle = '#FFD700';
+                      ctx.textAlign = 'center';
+                      ctx.fillText(m.text, midX, midY);
+                    });
+
+                    const annotatedPhoto = canvas.toDataURL('image/jpeg', 0.8);
+
+                    // Save updated photo
+                    await axios.post(`${API_URL}/photos/upload`, {
+                      project_id: projectId,
+                      room_id: activeRoom.id,
+                      photo_data: annotatedPhoto,
+                      file_name: `edited_${selectedPhoto.file_name}`,
+                      metadata: {
+                        room_name: activeRoom.name,
+                        timestamp: new Date().toISOString(),
+                        measurements: measurements.map(m => m.text),
+                        measurement_count: measurements.length,
+                        has_measurements: true,
+                        original_photo_id: selectedPhoto.id
+                      }
+                    });
+                    
+                    alert('✅ Measurements saved!');
+                    await loadAllPhotos();
+                    setSelectedPhoto(null);
+                    setMeasurements([]);
+                    
+                  } catch (error) {
+                    alert('❌ Failed to save: ' + error.message);
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
+                disabled={uploading || measurements.length === 0}
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-500 disabled:to-gray-600 text-white px-6 py-3 rounded-xl font-bold"
+              >
+                {uploading ? '⏳ Saving...' : `📏 Save Measurements (${measurements.length})`}
               </button>
             </div>
           </div>
