@@ -700,34 +700,119 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                 draggable={false}
               />
               
-              {/* ENHANCED SVG ARROWS WITH COLORS */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+              {/* ENHANCED SVG ARROWS - SMALLER AND MOVABLE */}
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ zIndex: 10 }}>
                 <defs>
-                  {/* Dynamic markers for each color */}
+                  {/* Dynamic markers for each color - SMALLER */}
                   {[...new Set([...measurements.map(m => m.color), drawingArrow?.color].filter(Boolean))].map(color => (
-                    <marker key={color} id={`arrow-${color.replace('#', '')}`} markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                      <polygon points="0 0, 10 3, 0 6" fill={color} />
+                    <marker key={color} id={`arrow-${color.replace('#', '')}`} markerWidth="6" markerHeight="6" refX="5" refY="2" orient="auto">
+                      <polygon points="0 0, 6 2, 0 4" fill={color} />
                     </marker>
                   ))}
                 </defs>
                 
-                {/* Measurement arrows with colors */}
+                {/* Measurement arrows with colors - SMALLER AND DRAGGABLE */}
                 {measurements.map((m, index) => (
-                  <line
-                    key={index}
-                    x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2}
-                    stroke={m.color} strokeWidth="2"
-                    markerEnd={`url(#arrow-${m.color.replace('#', '')})`}
-                  />
+                  <g key={index}>
+                    {/* Arrow line - draggable */}
+                    <line
+                      x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2}
+                      stroke={m.color} strokeWidth="0.8"
+                      markerEnd={`url(#arrow-${m.color.replace('#', '')})`}
+                      style={{ cursor: 'move', pointerEvents: 'auto' }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        window.draggingArrow = index;
+                        const rect = e.target.closest('svg').getBoundingClientRect();
+                        window.dragOffset = {
+                          x: e.clientX - rect.left - ((m.x1 + m.x2) / 2 / 100 * rect.width),
+                          y: e.clientY - rect.top - ((m.y1 + m.y2) / 2 / 100 * rect.height)
+                        };
+                      }}
+                    />
+                    
+                    {/* Resize handles at both ends - SMALL CIRCLES */}
+                    <circle
+                      cx={m.x1} cy={m.y1} r="0.8"
+                      fill={m.color} stroke="white" strokeWidth="0.2"
+                      style={{ cursor: 'nw-resize', pointerEvents: 'auto' }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.resizingArrow = { index, end: 'start' };
+                      }}
+                    />
+                    <circle
+                      cx={m.x2} cy={m.y2} r="0.8"  
+                      fill={m.color} stroke="white" strokeWidth="0.2"
+                      style={{ cursor: 'nw-resize', pointerEvents: 'auto' }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.resizingArrow = { index, end: 'end' };
+                      }}
+                    />
+                  </g>
                 ))}
                 
-                {/* Drawing arrow */}
+                {/* Drawing arrow - smaller */}
                 {drawingArrow && (
                   <line
                     x1={drawingArrow.x1} y1={drawingArrow.y1} x2={drawingArrow.x2} y2={drawingArrow.y2}
-                    stroke={drawingArrow.color} strokeWidth="2" opacity="0.8"
+                    stroke={drawingArrow.color} strokeWidth="0.8" opacity="0.8"
                   />
                 )}
+                
+                {/* Global mouse handlers for dragging/resizing */}
+                <rect
+                  width="100" height="100" fill="transparent"
+                  style={{ pointerEvents: window.draggingArrow !== undefined || window.resizingArrow ? 'auto' : 'none' }}
+                  onMouseMove={(e) => {
+                    const rect = e.target.closest('svg').getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    
+                    if (window.draggingArrow !== undefined) {
+                      // Move entire arrow
+                      const arrowIndex = window.draggingArrow;
+                      const currentArrow = measurements[arrowIndex];
+                      const centerX = (currentArrow.x1 + currentArrow.x2) / 2;
+                      const centerY = (currentArrow.y1 + currentArrow.y2) / 2;
+                      const deltaX = x - centerX;
+                      const deltaY = y - centerY;
+                      
+                      setMeasurements(prev => prev.map((arrow, i) => 
+                        i === arrowIndex ? {
+                          ...arrow,
+                          x1: arrow.x1 + deltaX,
+                          y1: arrow.y1 + deltaY,
+                          x2: arrow.x2 + deltaX,
+                          y2: arrow.y2 + deltaY
+                        } : arrow
+                      ));
+                    } else if (window.resizingArrow) {
+                      // Resize arrow end
+                      const { index, end } = window.resizingArrow;
+                      setMeasurements(prev => prev.map((arrow, i) => 
+                        i === index ? {
+                          ...arrow,
+                          [end === 'start' ? 'x1' : 'x2']: x,
+                          [end === 'start' ? 'y1' : 'y2']: y
+                        } : arrow
+                      ));
+                    }
+                  }}
+                  onMouseUp={() => {
+                    if (window.draggingArrow !== undefined) {
+                      console.log('✅ Finished moving arrow', window.draggingArrow);
+                      window.draggingArrow = undefined;
+                    }
+                    if (window.resizingArrow) {
+                      console.log('✅ Finished resizing arrow', window.resizingArrow.index);
+                      window.resizingArrow = undefined;
+                    }
+                  }}
+                />
               </svg>
               
               {/* ENHANCED MEASUREMENT LABELS */}
