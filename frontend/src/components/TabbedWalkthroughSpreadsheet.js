@@ -846,17 +846,18 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   const length = Math.sqrt(dx * dx + dy * dy);
                   
                   if (length > 3) {
-                    // Create arrow with blank measurement - user will fill it with buttons
+                    // Create arrow with selected color or default gold
+                    const selectedColor = window.selectedArrowColor || '#FFD700';
                     const newMeasurement = {
                       x1: drawingArrow.x1,
                       y1: drawingArrow.y1,
                       x2: drawingArrow.x2,
                       y2: drawingArrow.y2,
                       text: '', // Start blank - user fills with Leica/Manual buttons
-                      color: '#FFD700'
+                      color: selectedColor
                     };
                     
-                    console.log('✅ Arrow created - ready for measurement');
+                    console.log('✅ Arrow created with color:', selectedColor);
                     setMeasurements(prev => [...prev, newMeasurement]);
                   } else {
                     console.log('❌ Arrow too short');
