@@ -466,12 +466,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                             <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#D4C5A9] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>
                               {subcategory.name.toUpperCase()}
                               <button
-                                onClick={() => {
-                                  setSelectedSubCategoryId(subcategory.id);
-                                  setShowAddItem(true);
-                                }}
+                                onClick={() => handleAddBlankItem(subcategory.id)}
                                 className="ml-2 bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-bold"
-                                title={`Add item to ${subcategory.name}`}
+                                title={`Add blank item to ${subcategory.name}`}
                               >
                                 + ADD ITEM
                               </button>
