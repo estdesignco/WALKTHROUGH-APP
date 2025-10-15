@@ -7093,6 +7093,29 @@ async def get_photos_by_room(project_id: str, room_id: str):
         logging.error(f"Get photos error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get photos: {str(e)}")
 
+@api_router.get("/photos/project/{project_id}")
+async def get_all_photos_for_project(project_id: str):
+    """Get all photos for an entire project"""
+    try:
+        # Get all photos for this project
+        photos = await db.photos.find({
+            "project_id": project_id
+        }).sort("uploaded_at", -1).to_list(length=None)
+        
+        # Remove MongoDB _id field
+        for photo in photos:
+            photo.pop('_id', None)
+        
+        return {
+            "success": True,
+            "photos": photos,
+            "count": len(photos)
+        }
+        
+    except Exception as e:
+        logging.error(f"Get project photos error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get photos: {str(e)}")
+
 @api_router.delete("/photos/{photo_id}")
 async def delete_photo(photo_id: str):
     """Delete a photo"""
