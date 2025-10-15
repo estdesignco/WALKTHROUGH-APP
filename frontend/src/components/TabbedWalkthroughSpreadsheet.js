@@ -762,7 +762,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     
                     <button
                       onClick={() => {
-                        const manualMeasurement = prompt('Enter manual measurement:', '8\\'6\"');
+                        const manualMeasurement = prompt('Enter manual measurement:', "8'6\"");
                         if (manualMeasurement && manualMeasurement.trim()) {
                           setLastMeasurement({
                             feetInches: manualMeasurement.trim(),
