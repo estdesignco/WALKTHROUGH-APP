@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://designhub-74.preview.emergentagent.com/api
+https://designmate-3.preview.emergentagent.com/api
 ```
 
 ---

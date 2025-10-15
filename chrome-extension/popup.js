@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://designhub-74.preview.emergentagent.com';
+const BACKEND_URL = 'https://designmate-3.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings
