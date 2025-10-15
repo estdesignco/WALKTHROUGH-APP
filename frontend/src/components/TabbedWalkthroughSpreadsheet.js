@@ -1010,12 +1010,12 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     onClick={async () => {
                       console.log(`📏 Getting Leica measurement for arrow ${editingArrow}...`);
                       try {
-                        // IMPROVED: Check if there's already a recent measurement
-                        console.log('🔍 Checking for recent Leica measurement...');
-                        const measurement = await leicaManager.readMeasurement();
+                        console.log('🔄 Reading CURRENT measurement from Leica (not cache)...');
+                        // Use fresh reading method to get current measurement
+                        const measurement = await leicaManager.readCurrentMeasurement();
                         
                         if (measurement) {
-                          console.log('✅ Found measurement:', measurement.feetInches);
+                          console.log('✅ Current measurement found:', measurement.feetInches);
                           // Update THIS specific arrow's measurement
                           setMeasurements(prev => prev.map((arrow, i) => 
                             i === editingArrow 
@@ -1025,7 +1025,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                           alert(`✅ Measurement applied: ${measurement.feetInches}`);
                           setEditingArrow(null);
                         } else {
-                          alert('❌ No measurement found.\\n\\nPlease:\\n1. Point Leica at object\\n2. Press Leica button\\n3. Wait for result\\n4. Try again\\n\\nTip: Leica was reading "5mm" - try measuring something larger!');
+                          alert('❌ No current measurement found.\\n\\nPlease:\\n1. Point Leica at object\\n2. Press measurement button on Leica\\n3. Wait for "10\\'4" to show on Leica screen\\n4. Try this button again immediately');
                         }
                       } catch (error) {
                         console.error('❌ Leica read error:', error);
