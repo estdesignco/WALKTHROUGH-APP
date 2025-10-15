@@ -149,6 +149,19 @@ function ProjectMenuScreen({ project, onNavigate }) {
               <div className="mt-3 text-sm md:text-base text-[#D4A574]">📏 Leica D5 integration</div>
             </div>
           </button>
+
+          <button
+            onClick={() => onNavigate('measurements-files')}
+            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-5xl md:text-6xl mb-3">📐</div>
+              <div className="font-bold text-[#FFD700] text-2xl md:text-3xl mb-2">Measurements & Files</div>
+              <div className="text-sm md:text-base text-gray-300">View all measured photos and project files</div>
+              <div className="mt-3 text-sm md:text-base text-[#D4A574]">✨ Export to Canva & Desktop</div>
+            </div>
+          </button>
         </div>
       </div>
     </div>
