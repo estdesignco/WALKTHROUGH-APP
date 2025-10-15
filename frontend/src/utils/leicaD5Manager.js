@@ -278,72 +278,53 @@ export class LeicaD5Manager {
     }
   }
   
-  // Enhanced measurement reading with multiple methods
-  async readMeasurementEnhanced() {
+  // Force fresh measurement reading - no cache
+  async readCurrentMeasurement() {
     if (!this.measurementCharacteristic) {
-      throw new Error('No measurement characteristic available - device may not be properly connected');
+      throw new Error('Measurement characteristic not available');
     }
 
-    console.log('📏 Enhanced measurement reading starting...');
-    
     try {
-      // Method 1: Try to read the characteristic value
-      console.log('🔍 Method 1: Reading characteristic value...');
+      console.log('🔄 FORCING FRESH MEASUREMENT READ...');
+      
+      // Clear any cached values first
+      this.lastRawValue = null;
+      this.lastMeasurement = null;
+      
+      // Stop any polling to avoid interference
+      this.stopPolling();
+      
+      // Force a fresh read from the device
       const value = await this.measurementCharacteristic.readValue();
       
-      if (value && value.byteLength > 0) {
-        console.log(`✅ Method 1: Got ${value.byteLength} bytes of data`);
-        
-        // Log all bytes for debugging
-        const bytes = [];
-        for (let i = 0; i < value.byteLength; i++) {
-          bytes.push(value.getUint8(i).toString(16).padStart(2, '0'));
-        }
-        console.log('🔍 Raw bytes (hex):', bytes.join(' '));
-        
-        const measurement = this.parseMeasurement(value);
-        if (measurement) {
-          console.log('✅ Measurement parsed successfully:', measurement.feetInches);
-          return measurement;
-        }
+      if (!value || value.byteLength === 0) {
+        console.log('❌ No data received from Leica');
+        return null;
       }
       
-      // Method 2: Try to force a notification update
-      console.log('🔍 Method 2: Forcing notification check...');
-      if (this.measurementCharacteristic.properties.notify) {
-        try {
-          await this.measurementCharacteristic.startNotifications();
-          console.log('🔔 Notifications restarted');
-          
-          // Wait a bit for any pending notifications
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Try reading again
-          const value2 = await this.measurementCharacteristic.readValue();
-          if (value2 && value2.byteLength > 0) {
-            const measurement2 = this.parseMeasurement(value2);
-            if (measurement2) {
-              console.log('✅ Method 2: Measurement found after notification restart');
-              return measurement2;
-            }
-          }
-        } catch (notifError) {
-          console.log('⚠️ Method 2: Notification restart failed:', notifError.message);
-        }
-      }
+      console.log(`📊 Fresh data: ${value.byteLength} bytes`);
       
-      // Method 3: Check if there's a cached measurement
-      console.log('🔍 Method 3: Checking cached measurement...');
-      if (this.lastMeasurement) {
-        console.log('✅ Method 3: Using cached measurement');
-        return this.lastMeasurement;
+      // Log raw bytes
+      const bytes = [];
+      for (let i = 0; i < value.byteLength; i++) {
+        bytes.push(value.getUint8(i).toString(16).padStart(2, '0'));
       }
+      console.log('🔍 Fresh raw bytes:', bytes.join(' '));
       
-      console.log('❌ All methods failed - no measurement available');
-      return null;
+      // Force re-parse without cache check
+      const measurement = this.parseMeasurement(value);
+      
+      if (measurement) {
+        console.log('✅ FRESH MEASUREMENT:', measurement.feetInches);
+        this.lastMeasurement = measurement;
+        return measurement;
+      } else {
+        console.log('❌ Failed to parse fresh measurement');
+        return null;
+      }
       
     } catch (error) {
-      console.error('❌ Enhanced read failed:', error);
+      console.error('❌ Fresh measurement read failed:', error);
       throw error;
     }
   }
