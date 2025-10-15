@@ -1001,26 +1001,24 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     onClick={async () => {
                       console.log(`📏 Getting Leica measurement for arrow ${editingArrow}...`);
                       try {
-                        console.log('🔄 Reading CURRENT measurement from Leica (not cache)...');
-                        // Use fresh reading method to get current measurement
+                        console.log('Reading current measurement from Leica...');
                         const measurement = await leicaManager.readCurrentMeasurement();
                         
                         if (measurement) {
-                          console.log('✅ Current measurement found:', measurement.feetInches);
-                          // Update THIS specific arrow's measurement
+                          console.log('Found measurement:', measurement.feetInches);
                           setMeasurements(prev => prev.map((arrow, i) => 
                             i === editingArrow 
                               ? { ...arrow, text: measurement.feetInches }
                               : arrow
                           ));
-                          alert(`✅ Measurement applied: ${measurement.feetInches}`);
+                          alert('Measurement applied: ' + measurement.feetInches);
                           setEditingArrow(null);
                         } else {
-                          alert('❌ No current measurement found. Press measurement button on Leica first, then try again.');
+                          alert('No measurement found. Press Leica button first, then try again.');
                         }
                       } catch (error) {
-                        console.error('❌ Leica read error:', error);
-                        alert('❌ Leica read failed: ' + error.message);
+                        console.error('Leica read error:', error);
+                        alert('Leica read failed: ' + error.message);
                       }
                     }}
                     className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black rounded-xl font-bold"
