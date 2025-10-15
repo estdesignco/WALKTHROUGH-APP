@@ -879,9 +879,10 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
             </div>
           </div>
 
-          {/* ENHANCED SAVE CONTROLS */}
+          {/* ENHANCED SAVE & EXPORT CONTROLS */}
           <div className="bg-[#1E293B] p-4 border-t-2 border-[#D4A574]">
-            <div className="flex gap-4">
+            <div className="grid grid-cols-3 gap-4">
+              {/* Save to Room */}
               <button
                 onClick={async () => {
                   if (measurements.length === 0) {
@@ -892,7 +893,7 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                   try {
                     setUploading(true);
                     
-                    // Create annotated photo with all arrows
+                    // Create annotated photo
                     const img = new Image();
                     img.src = selectedPhoto.photo_data;
                     
@@ -908,24 +909,24 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                     // Draw image
                     ctx.drawImage(img, 0, 0);
 
-                    // Draw all measurement arrows
+                    // Draw smaller, refined arrows
                     measurements.forEach((m) => {
                       const x1 = (m.x1 / 100) * canvas.width;
                       const y1 = (m.y1 / 100) * canvas.height;
                       const x2 = (m.x2 / 100) * canvas.width;
                       const y2 = (m.y2 / 100) * canvas.height;
 
-                      // Draw arrow line with color
+                      // Draw arrow line - thinner
                       ctx.strokeStyle = m.color;
-                      ctx.lineWidth = 8;
+                      ctx.lineWidth = 4; // Reduced from 8
                       ctx.beginPath();
                       ctx.moveTo(x1, y1);
                       ctx.lineTo(x2, y2);
                       ctx.stroke();
 
-                      // Draw arrowhead
+                      // Draw smaller arrowhead
                       const angle = Math.atan2(y2 - y1, x2 - x1);
-                      const headlen = 30;
+                      const headlen = 20; // Reduced from 30
                       
                       ctx.fillStyle = m.color;
                       ctx.beginPath();
@@ -941,31 +942,31 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                       ctx.closePath();
                       ctx.fill();
 
-                      // Draw measurement text with color
+                      // Draw smaller text
                       const midX = (x1 + x2) / 2;
-                      const midY = (y1 + y2) / 2 - 40;
+                      const midY = (y1 + y2) / 2 - 25; // Reduced offset
                       
-                      ctx.font = 'bold 42px Arial';
+                      ctx.font = 'bold 28px Arial'; // Reduced from 42px
                       const textWidth = ctx.measureText(m.text).width;
                       
-                      // Text background
-                      ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
-                      ctx.fillRect(midX - textWidth / 2 - 15, midY - 30, textWidth + 30, 50);
+                      // Smaller text background
+                      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                      ctx.fillRect(midX - textWidth / 2 - 8, midY - 20, textWidth + 16, 35);
                       
                       // Text with color
                       ctx.fillStyle = m.color;
                       ctx.textAlign = 'center';
                       ctx.fillText(m.text, midX, midY);
                       
-                      // Border around text
+                      // Thinner border around text
                       ctx.strokeStyle = m.color;
-                      ctx.lineWidth = 3;
-                      ctx.strokeRect(midX - textWidth / 2 - 15, midY - 30, textWidth + 30, 50);
+                      ctx.lineWidth = 2; // Reduced from 3
+                      ctx.strokeRect(midX - textWidth / 2 - 8, midY - 20, textWidth + 16, 35);
                     });
 
                     const annotatedPhoto = canvas.toDataURL('image/jpeg', 0.9);
 
-                    // Save annotated photo
+                    // Save to room folder
                     await axios.post(`${API_URL}/photos/upload`, {
                       project_id: projectId,
                       room_id: activeRoom.id,
@@ -981,10 +982,8 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                       }
                     });
                     
-                    alert(`✅ Photo saved with ${measurements.length} colored measurements!`);
+                    alert(`✅ Photo saved to ${activeRoom.name} folder with ${measurements.length} measurements!`);
                     await loadAllPhotos();
-                    setSelectedPhoto(null);
-                    setMeasurements([]);
                     
                   } catch (error) {
                     alert('Save failed: ' + error.message);
@@ -993,22 +992,79 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
                   }
                 }}
                 disabled={uploading || measurements.length === 0}
-                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white px-8 py-4 rounded-2xl font-bold text-xl"
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white px-4 py-3 rounded-2xl font-bold"
               >
-                {uploading ? '⏳ Saving...' : `💾 Save Photo with ${measurements.length} Measurements`}
+                {uploading ? '⏳ Saving...' : `💾 Save to Room (${measurements.length})`}
               </button>
               
+              {/* Export to Desktop */}
               <button
-                onClick={() => {
-                  // Save just the original photo without measurements
-                  alert('Original photo already saved when you took it!');
-                  setSelectedPhoto(null);
+                onClick={async () => {
+                  if (measurements.length === 0) {
+                    alert('Add measurements first!');
+                    return;
+                  }
+                  
+                  try {
+                    // Export photo with measurements to desktop app
+                    await axios.post(`${API_URL}/photos/export-to-desktop`, {
+                      project_id: projectId,
+                      room_id: activeRoom.id,
+                      photo_id: selectedPhoto.id,
+                      measurements: measurements
+                    });
+                    
+                    alert('✅ Photo exported to Desktop App! Check the main project.');
+                  } catch (error) {
+                    alert('Desktop export failed: ' + error.message);
+                  }
                 }}
-                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold"
+                disabled={measurements.length === 0}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-600 disabled:to-gray-700 text-white px-4 py-3 rounded-2xl font-bold"
               >
-                📷 Close (Keep Original)
+                🗺 Export to Desktop
+              </button>
+              
+              {/* Export to Canva */}
+              <button
+                onClick={async () => {
+                  if (measurements.length === 0) {
+                    alert('Add measurements first!');
+                    return;
+                  }
+                  
+                  try {
+                    // Export photo with measurements to Canva
+                    await axios.post(`${API_URL}/canva/upload-measurement-photo`, {
+                      project_id: projectId,
+                      room_id: activeRoom.id,
+                      room_name: activeRoom.name,
+                      photo_data: selectedPhoto.photo_data,
+                      measurements: measurements
+                    });
+                    
+                    alert('✅ Photo exported to Canva! Check your Canva uploads folder.');
+                  } catch (error) {
+                    alert('Canva export failed: ' + error.message);
+                  }
+                }}
+                disabled={measurements.length === 0}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:from-gray-600 disabled:to-gray-700 text-white px-4 py-3 rounded-2xl font-bold"
+              >
+                🎨 Export to Canva
               </button>
             </div>
+            
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setSelectedPhoto(null);
+                setMeasurements([]);
+              }}
+              className="w-full mt-4 bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-2xl font-bold"
+            >
+              ✕ Close Editor
+            </button>
           </div>
         </div>
       )}
