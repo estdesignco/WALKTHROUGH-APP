@@ -868,7 +868,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   </marker>
                 </defs>
                 
-                {/* Measurement arrows */}
+                {/* Measurement arrows - DRAGGABLE */}
                 {measurements.map((m, index) => (
                   <line
                     key={index}
@@ -877,10 +877,70 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     x2={m.x2}
                     y2={m.y2}
                     stroke="#FFD700"
-                    strokeWidth="1.2"
+                    strokeWidth="1.5"
                     markerEnd="url(#arrowhead-edit)"
+                    className="cursor-move"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      console.log(`🎯 Starting to drag arrow ${index}`);
+                      setDraggingArrow(index);
+                      
+                      // Calculate offset from arrow center
+                      const rect = e.target.closest('svg').getBoundingClientRect();
+                      const centerX = ((m.x1 + m.x2) / 2 / 100) * rect.width;
+                      const centerY = ((m.y1 + m.y2) / 2 / 100) * rect.height;
+                      
+                      setDragOffset({
+                        x: e.clientX - rect.left - centerX,
+                        y: e.clientY - rect.top - centerY
+                      });
+                    }}
+                    style={{ pointerEvents: 'auto' }}
                   />
                 ))}
+                
+                {/* Global mouse handlers for dragging */}
+                {dragginArrow !== null && (
+                  <rect
+                    x="0"
+                    y="0"
+                    width="100"
+                    height="100"
+                    fill="transparent"
+                    style={{ pointerEvents: 'auto' }}
+                    onMouseMove={(e) => {
+                      if (dragginArrow === null) return;
+                      
+                      const rect = e.target.closest('svg').getBoundingClientRect();
+                      const newCenterX = ((e.clientX - rect.left - dragOffset.x) / rect.width) * 100;
+                      const newCenterY = ((e.clientY - rect.top - dragOffset.y) / rect.height) * 100;
+                      
+                      // Calculate arrow length to maintain it
+                      const currentArrow = measurements[dragginArrow];
+                      const currentLength = Math.sqrt(
+                        Math.pow(currentArrow.x2 - currentArrow.x1, 2) + 
+                        Math.pow(currentArrow.y2 - currentArrow.y1, 2)
+                      );
+                      const angle = Math.atan2(currentArrow.y2 - currentArrow.y1, currentArrow.x2 - currentArrow.x1);
+                      
+                      // Update arrow position
+                      setMeasurements(prev => prev.map((arrow, i) => 
+                        i === dragginArrow ? {
+                          ...arrow,
+                          x1: newCenterX - (currentLength * Math.cos(angle)) / 2,
+                          y1: newCenterY - (currentLength * Math.sin(angle)) / 2,
+                          x2: newCenterX + (currentLength * Math.cos(angle)) / 2,
+                          y2: newCenterY + (currentLength * Math.sin(angle)) / 2
+                        } : arrow
+                      ));
+                    }}
+                    onMouseUp={() => {
+                      console.log(`✅ Finished dragging arrow ${dragginArrow}`);
+                      setDraggingArrow(null);
+                      setDragOffset({ x: 0, y: 0 });
+                    }}
+                  />
+                )}
                 
                 {/* Drawing arrow */}
                 {drawingArrow && (
