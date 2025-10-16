@@ -74,6 +74,22 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
     }
   };
   
+  // Duplicate arrow function
+  const handleDuplicateArrow = (index) => {
+    const arrow = measurements[index];
+    const duplicated = {
+      ...arrow,
+      x1: arrow.x1 + 5, // Offset slightly
+      y1: arrow.y1 + 5,
+      x2: arrow.x2 + 5,
+      y2: arrow.y2 + 5
+    };
+    const newMeasurements = [...measurements, duplicated];
+    setMeasurements(newMeasurements);
+    addToHistory(newMeasurements);
+    console.log('📋 Arrow duplicated');
+  };
+  
   // Auto-save function
   const performAutoSave = async () => {
     if (!selectedPhoto || measurements.length === 0) return;
