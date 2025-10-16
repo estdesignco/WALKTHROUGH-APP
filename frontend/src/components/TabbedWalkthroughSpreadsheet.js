@@ -660,7 +660,16 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   <div
                     key={photo.id || index}
                     className="relative border-2 border-[#D4A574]/50 rounded-xl overflow-hidden hover:border-[#D4A574] transition-all cursor-pointer group"
-                    onClick={() => setSelectedPhoto(photo)}
+                    onClick={() => {
+                      setSelectedPhoto(photo);
+                      // Load existing measurements if photo has them
+                      if (photo.metadata?.measurements && Array.isArray(photo.metadata.measurements)) {
+                        setMeasurements(photo.metadata.measurements);
+                        console.log('✅ Loaded existing measurements:', photo.metadata.measurements.length);
+                      } else {
+                        setMeasurements([]);
+                      }
+                    }}
                   >
                     <img 
                       src={photo.photo_data} 
