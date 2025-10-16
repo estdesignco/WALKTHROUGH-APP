@@ -305,31 +305,31 @@ export default function MeasurementsAndFilesPage({ projectId }) {
               </div>
               
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {photos.map((photo, index) => (
-                <div
-                  key={photo.id || index}
-                  className="relative border-2 border-[#D4A574]/50 rounded-xl overflow-hidden hover:border-[#D4A574] transition-all cursor-pointer group shadow-xl"
-                  onClick={() => {
-                    setSelectedPhoto(photo);
-                    setShowPhotoDetail(true);
-                  }}
-                >
-                  <img 
-                    src={photo.photo_data} 
-                    alt={photo.file_name}
-                    className="w-full h-40 object-cover"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 bg-black bg-opacity-90 text-white text-xs p-2">
-                    <div className="text-[#FFD700] font-bold">📏 {photo.metadata?.measurement_count || 0} measurements</div>
-                    <div className="text-gray-300 truncate">{photo.metadata?.room_name || 'Unknown'}</div>
+                {photos.map((photo, index) => (
+                  <div
+                    key={photo.id || index}
+                    className="relative border-2 border-[#D4A574]/50 rounded-xl overflow-hidden hover:border-[#D4A574] transition-all cursor-pointer group shadow-xl"
+                    onClick={() => {
+                      setSelectedPhoto(photo);
+                      setShowPhotoDetail(true);
+                    }}
+                  >
+                    <img 
+                      src={photo.photo_data} 
+                      alt={photo.file_name}
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 bg-black bg-opacity-90 text-white text-xs p-2">
+                      <div className="text-[#FFD700] font-bold">📏 {photo.metadata?.measurement_count || 0} measurements</div>
+                      <div className="text-gray-300 truncate">{photo.metadata?.room_name || 'Unknown'}</div>
+                    </div>
+                    
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-[#D4A574]/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="text-white font-bold text-lg">👁️ VIEW</div>
+                    </div>
                   </div>
-                  
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-[#D4A574]/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="text-white font-bold text-lg">👁️ VIEW</div>
-                  </div>
-                </div>
-              ))}
+                ))}
               </div>
             </>
           )}
