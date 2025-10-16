@@ -86,8 +86,92 @@ export default function MeasurementsAndFilesPage({ projectId }) {
   };
 
   const exportToCanva = async (photo) => {
-    // TODO: Implement Canva export
-    alert('🎨 Canva export coming soon!\n\nThis feature will export your measured photos directly to Canva boards.');
+    try {
+      // Create a canvas element to render the photo with arrows
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Load the image
+      const img = new Image();
+      img.src = photo.photo_data;
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+      
+      // Set canvas size to image size
+      canvas.width = img.width;
+      canvas.height = img.height;
+      
+      // Draw the image
+      ctx.drawImage(img, 0, 0);
+      
+      // Draw arrows if measurements exist
+      if (photo.metadata?.measurements && Array.isArray(photo.metadata.measurements)) {
+        photo.metadata.measurements.forEach((m) => {
+          const x1 = (m.x1 / 100) * canvas.width;
+          const y1 = (m.y1 / 100) * canvas.height;
+          const x2 = (m.x2 / 100) * canvas.width;
+          const y2 = (m.y2 / 100) * canvas.height;
+          
+          // Draw arrow line
+          ctx.strokeStyle = m.color || '#FFD700';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+          
+          // Draw arrowhead
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+          const headLength = 15;
+          ctx.beginPath();
+          ctx.moveTo(x2, y2);
+          ctx.lineTo(
+            x2 - headLength * Math.cos(angle - Math.PI / 6),
+            y2 - headLength * Math.sin(angle - Math.PI / 6)
+          );
+          ctx.lineTo(
+            x2 - headLength * Math.cos(angle + Math.PI / 6),
+            y2 - headLength * Math.sin(angle + Math.PI / 6)
+          );
+          ctx.closePath();
+          ctx.fillStyle = m.color || '#FFD700';
+          ctx.fill();
+          
+          // Draw measurement text
+          const textX = (x1 + x2) / 2;
+          const textY = (y1 + y2) / 2 - 10;
+          ctx.font = 'bold 16px Arial';
+          ctx.fillStyle = '#000000';
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 4;
+          ctx.strokeText(m.text || '', textX, textY);
+          ctx.fillStyle = m.color || '#FFD700';
+          ctx.fillText(m.text || '', textX, textY);
+        });
+      }
+      
+      // Convert canvas to blob
+      canvas.toBlob(async (blob) => {
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `canva_export_${photo.file_name || 'measurement'}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        alert('✅ Photo exported! You can now upload this to Canva.\n\n📋 The image has been downloaded with all measurements baked in.');
+      }, 'image/png');
+      
+    } catch (error) {
+      console.error('Canva export failed:', error);
+      alert('❌ Export failed: ' + error.message);
+    }
   };
 
   const downloadPhoto = (photo) => {
