@@ -1333,7 +1333,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 {drawingArrow && (
                   <line
                     x1={drawingArrow.x1} y1={drawingArrow.y1} x2={drawingArrow.x2} y2={drawingArrow.y2}
-                    stroke={drawingArrow.color} strokeWidth="0.3" opacity="0.8"
+                    stroke={drawingArrow.color} strokeWidth={arrowThickness.toString()} opacity="0.8"
                   />
                 )}
               </svg>
