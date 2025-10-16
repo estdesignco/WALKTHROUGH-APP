@@ -1167,7 +1167,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                       setUploading(true);
                       try {
                         // Save photo with measurements as metadata
-                        const response = await axios.post(`${API_URL}/photos/upload-to-item`, {
+                        const response = await axios.post(`${API_URL}/photos/upload`, {
                           project_id: projectId,
                           room_id: activeRoom.id,
                           photo_data: selectedPhoto.photo_data,
