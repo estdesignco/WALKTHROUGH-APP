@@ -1001,7 +1001,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
             <div 
               className="relative inline-block"
               style={{
-                transform: `scale(${photoZoom}) translate(${photoPan.x}px, ${photoPan.y}px)`,
+                transform: `scale(${photoZoom}) translate(${photoPan.x}px, ${photoPan.y}px) rotate(${photoRotation}deg)`,
                 transition: 'transform 0.1s ease-out'
               }}
             >
