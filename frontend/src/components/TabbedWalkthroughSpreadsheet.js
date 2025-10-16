@@ -862,8 +862,14 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
           </div>
 
           {/* MUCH LARGER PHOTO WITH MOVABLE ARROWS */}
-          <div className="flex-1 p-2 flex items-center justify-center bg-black">
-            <div className="relative inline-block">
+          <div className="flex-1 p-2 flex items-center justify-center bg-black overflow-hidden">
+            <div 
+              className="relative inline-block"
+              style={{
+                transform: `scale(${photoZoom}) translate(${photoPan.x}px, ${photoPan.y}px)`,
+                transition: 'transform 0.1s ease-out'
+              }}
+            >
               <img 
                 id="measurement-photo"
                 src={selectedPhoto.photo_data}
