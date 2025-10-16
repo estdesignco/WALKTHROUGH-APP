@@ -1337,66 +1337,89 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
               ) : (
                 <>
                   {/* NORMAL MODE - SAVE PHOTO */}
-                  <button
-                    onClick={async () => {
-                      if (measurements.length === 0) {
-                        alert('⚠️ No measurements added yet. Add at least one measurement before saving.');
-                        return;
-                      }
-                      
-                      setUploading(true);
-                      try {
-                        // Save photo with measurements as metadata
-                        const response = await axios.post(`${API_URL}/photos/upload`, {
-                          project_id: projectId,
-                          room_id: activeRoom.id,
-                          photo_data: selectedPhoto.photo_data,
-                          file_name: `measured_${selectedPhoto.file_name}`,
-                          metadata: {
-                            room_name: activeRoom.name,
-                            timestamp: new Date().toISOString(),
-                            has_measurements: true,
-                            measurement_count: measurements.length,
-                            measurements: measurements
+                  <div className="flex flex-col gap-3 w-full">
+                    {/* Notes Field */}
+                    <div className="flex items-center gap-3">
+                      <label className="text-[#D4A574] font-bold text-sm whitespace-nowrap">📝 Photo Notes:</label>
+                      <input
+                        type="text"
+                        value={photoNotes}
+                        onChange={(e) => setPhotoNotes(e.target.value)}
+                        placeholder="Add notes about this photo..."
+                        className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-xl border-2 border-gray-600 focus:border-[#D4A574] focus:outline-none"
+                      />
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 justify-center">
+                      <button
+                        onClick={async () => {
+                          if (measurements.length === 0) {
+                            alert('⚠️ No measurements added yet. Add at least one measurement before saving.');
+                            return;
                           }
-                        });
-                        
-                        console.log('✅ Photo with measurements saved:', response.data);
-                        alert(`✅ Photo saved with ${measurements.length} measurements!`);
-                        
-                        // Close modal and refresh
-                        setSelectedPhoto(null);
-                        setMeasurements([]);
-                        setDrawingArrow(null);
-                        await loadAllPhotos();
-                        
-                      } catch (error) {
-                        console.error('❌ Failed to save photo:', error);
-                        alert('❌ Failed to save photo: ' + error.message);
-                      } finally {
-                        setUploading(false);
-                      }
-                    }}
-                    disabled={uploading || measurements.length === 0}
-                    className={`px-8 py-4 rounded-xl font-bold text-xl ${
-                      uploading || measurements.length === 0
-                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
-                    }`}
-                  >
-                    {uploading ? '💾 Saving...' : `💾 SAVE ${measurements.length} MEASUREMENTS`}
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      setSelectedPhoto(null);
-                      setMeasurements([]);
-                      setDrawingArrow(null);
-                    }}
-                    className="px-8 py-4 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-bold text-xl"
-                  >
-                    ✕ CLOSE
-                  </button>
+                          
+                          setUploading(true);
+                          try {
+                            // Save photo with measurements as metadata
+                            const response = await axios.post(`${API_URL}/photos/upload`, {
+                              project_id: projectId,
+                              room_id: activeRoom.id,
+                              photo_data: selectedPhoto.photo_data,
+                              file_name: `measured_${selectedPhoto.file_name}`,
+                              metadata: {
+                                room_name: activeRoom.name,
+                                timestamp: new Date().toISOString(),
+                                has_measurements: true,
+                                measurement_count: measurements.length,
+                                measurements: measurements,
+                                notes: photoNotes,
+                                rotation: photoRotation
+                              }
+                            });
+                            
+                            console.log('✅ Photo with measurements saved:', response.data);
+                            alert(`✅ Photo saved with ${measurements.length} measurements!`);
+                            
+                            // Close modal and refresh
+                            setSelectedPhoto(null);
+                            setMeasurements([]);
+                            setDrawingArrow(null);
+                            setPhotoNotes('');
+                            setPhotoRotation(0);
+                            await loadAllPhotos();
+                            
+                          } catch (error) {
+                            console.error('❌ Failed to save photo:', error);
+                            alert('❌ Failed to save photo: ' + error.message);
+                          } finally {
+                            setUploading(false);
+                          }
+                        }}
+                        disabled={uploading || measurements.length === 0}
+                        className={`px-8 py-4 rounded-xl font-bold text-xl ${
+                          uploading || measurements.length === 0
+                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
+                        }`}
+                      >
+                        {uploading ? '💾 Saving...' : `💾 SAVE ${measurements.length} MEASUREMENTS`}
+                      </button>
+                      
+                      <button
+                        onClick={() => {
+                          setSelectedPhoto(null);
+                          setMeasurements([]);
+                          setDrawingArrow(null);
+                          setPhotoNotes('');
+                          setPhotoRotation(0);
+                        }}
+                        className="px-8 py-4 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-bold text-xl"
+                      >
+                        ✕ CLOSE
+                      </button>
+                    </div>
+                  </div>
                 </>
               )}
             </div>
