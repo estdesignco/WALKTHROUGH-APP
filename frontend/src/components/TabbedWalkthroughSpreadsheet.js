@@ -934,24 +934,25 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
       {/* PHOTO EDITOR MODAL - EDIT EXISTING PHOTOS */}
       {selectedPhoto && !compareMode && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
-          <div className="bg-[#1E293B] p-4 border-b-2 border-[#D4A574]">
+          {/* EXACT DESKTOP HEADER STYLE */}
+          <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 border-b-4 border-[#D4A574] shadow-2xl">
             <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-bold text-[#D4A574]">📏 Edit Measurements</h3>
-              <div className="flex items-center gap-4">
-                <div className="text-[#D4C5A9] font-bold">
-                  {measurements.length} measurements
+              <div>
+                <h3 className="text-3xl font-bold text-[#D4A574] mb-1">📏 Edit Measurements</h3>
+                <div className="text-lg text-[#D4C5A9]">
+                  {selectedPhoto.metadata?.room_name || 'Photo'} • {measurements.length} measurements
                 </div>
-                <button
-                  onClick={() => {
-                    setSelectedPhoto(null);
-                    setMeasurements([]);
-                    setDrawingArrow(null);
-                  }}
-                  className="text-[#D4A574] text-3xl hover:text-red-400"
-                >
-                  ✕
-                </button>
               </div>
+              <button
+                onClick={() => {
+                  setSelectedPhoto(null);
+                  setMeasurements([]);
+                  setDrawingArrow(null);
+                }}
+                className="text-[#D4A574] text-4xl hover:text-red-400"
+              >
+                ✕
+              </button>
             </div>
           </div>
 
