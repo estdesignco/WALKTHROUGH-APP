@@ -875,30 +875,29 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     className="relative border-2 border-[#D4A574]/50 rounded-xl overflow-hidden hover:border-[#D4A574] transition-all cursor-pointer group"
                     onClick={() => {
                       if (compareMode) {
-                        // In compare mode, select second photo
                         if (!comparePhoto) {
                           setComparePhoto(photo);
                           alert('✅ First photo selected. Now click another photo to compare.');
                         } else if (comparePhoto.id !== photo.id) {
-                          // Open compare view
                           setSelectedPhoto(photo);
                         }
                       } else {
-                        // Normal mode - edit measurements
                         setSelectedPhoto(photo);
                         if (photo.metadata?.measurements && Array.isArray(photo.metadata.measurements)) {
                           setMeasurements(photo.metadata.measurements);
                           console.log('✅ Loaded existing measurements:', photo.metadata.measurements.length);
                         } else {
-                          setMeasurements([]);\n                        }
+                          setMeasurements([]);
+                        }
                       }
                     }}
                     onContextMenu={(e) => {
-                      // Right-click to start compare
                       e.preventDefault();
-                      if (!compareMode) {\n                        setCompareMode(true);
+                      if (!compareMode) {
+                        setCompareMode(true);
                         setComparePhoto(photo);
-                        alert('📊 Compare Mode activated! Click another photo to view side-by-side.');\n                      }
+                        alert('📊 Compare Mode activated! Click another photo to view side-by-side.');
+                      }
                     }}
                   >
                     <img 
