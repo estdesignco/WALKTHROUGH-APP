@@ -1188,7 +1188,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     type="text"
                     value={calcInput}
                     onChange={(e) => setCalcInput(e.target.value)}
-                    placeholder="e.g., 3 × 8'6\" or 12'3\" + 5'9\""
+                    placeholder="e.g., 3 × 8'6&quot; or 12'3&quot; + 5'9&quot;"
                     className="w-full bg-gray-700 text-white px-3 py-2 rounded border-2 border-gray-600 focus:border-[#D4A574] focus:outline-none"
                   />
                   
