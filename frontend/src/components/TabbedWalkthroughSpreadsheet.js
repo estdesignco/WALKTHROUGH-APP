@@ -911,7 +911,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
       </div>
 
       {/* PHOTO EDITOR MODAL - EDIT EXISTING PHOTOS */}
-      {selectedPhoto && (
+      {selectedPhoto && !compareMode && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
           <div className="bg-[#1E293B] p-4 border-b-2 border-[#D4A574]">
             <div className="flex justify-between items-center">
