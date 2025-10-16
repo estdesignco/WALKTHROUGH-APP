@@ -1016,6 +1016,89 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
             </div>
           </div>
 
+          {/* ADVANCED CONTROLS PANEL - TOGGLE */}
+          <div className="bg-[#0F172A] border-b border-[#D4A574]/30">
+            <button
+              onClick={() => setShowAdvancedControls(!showAdvancedControls)}
+              className="w-full px-4 py-2 text-[#D4A574] hover:bg-[#1E293B] font-bold text-sm flex items-center justify-center gap-2"
+            >
+              {showAdvancedControls ? '▲' : '▼'} Advanced Controls
+            </button>
+            
+            {showAdvancedControls && (
+              <div className="p-4 bg-[#1E293B] border-t border-[#D4A574]/30">
+                <div className="grid grid-cols-3 gap-6">
+                  {/* Brightness Control */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[#D4A574] font-bold text-sm">☀️ Brightness: {photoBrightness}%</label>
+                    <input
+                      type="range"
+                      min="25"
+                      max="200"
+                      value={photoBrightness}
+                      onChange={(e) => setPhotoBrightness(Number(e.target.value))}
+                      className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, #D4A574 0%, #D4A574 ${(photoBrightness - 25) / 1.75}%, #374151 ${(photoBrightness - 25) / 1.75}%, #374151 100%)`
+                      }}
+                    />
+                    <button
+                      onClick={() => setPhotoBrightness(100)}
+                      className="text-xs text-gray-400 hover:text-white"
+                    >
+                      Reset
+                    </button>
+                  </div>
+
+                  {/* Contrast Control */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[#D4A574] font-bold text-sm">🎨 Contrast: {photoContrast}%</label>
+                    <input
+                      type="range"
+                      min="25"
+                      max="200"
+                      value={photoContrast}
+                      onChange={(e) => setPhotoContrast(Number(e.target.value))}
+                      className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, #D4A574 0%, #D4A574 ${(photoContrast - 25) / 1.75}%, #374151 ${(photoContrast - 25) / 1.75}%, #374151 100%)`
+                      }}
+                    />
+                    <button
+                      onClick={() => setPhotoContrast(100)}
+                      className="text-xs text-gray-400 hover:text-white"
+                    >
+                      Reset
+                    </button>
+                  </div>
+
+                  {/* Arrow Thickness Control */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[#D4A574] font-bold text-sm">📏 Arrow Width: {arrowThickness.toFixed(1)}px</label>
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="1.5"
+                      step="0.1"
+                      value={arrowThickness}
+                      onChange={(e) => setArrowThickness(Number(e.target.value))}
+                      className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, #D4A574 0%, #D4A574 ${((arrowThickness - 0.1) / 1.4) * 100}%, #374151 ${((arrowThickness - 0.1) / 1.4) * 100}%, #374151 100%)`
+                      }}
+                    />
+                    <button
+                      onClick={() => setArrowThickness(0.3)}
+                      className="text-xs text-gray-400 hover:text-white"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* MUCH LARGER PHOTO WITH MOVABLE ARROWS */}
           <div className="flex-1 p-2 flex items-center justify-center bg-black overflow-hidden">
             <div 
