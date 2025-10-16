@@ -890,11 +890,12 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
               
               {/* ULTRA-THIN DRAGGABLE ARROWS - NOW MATCHES IMAGE EXACTLY */}
               <svg 
-                className="absolute top-0 left-0 pointer-events-none" 
+                className="absolute top-0 left-0" 
                 style={{ 
                   width: '100%', 
                   height: '100%',
-                  zIndex: 10
+                  zIndex: 10,
+                  pointerEvents: 'none'
                 }} 
                 viewBox="0 0 100 100" 
                 preserveAspectRatio="none"
