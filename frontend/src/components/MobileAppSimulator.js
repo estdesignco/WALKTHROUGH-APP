@@ -138,6 +138,19 @@ function ProjectMenuScreen({ project, onNavigate }) {
           </button>
 
           <button
+            onClick={() => onNavigate('measurements-files')}
+            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#FFD700]/50 shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FFD700]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-5xl md:text-6xl mb-3">📐</div>
+              <div className="font-bold text-[#FFD700] text-2xl md:text-3xl mb-2">Measurements</div>
+              <div className="text-sm md:text-base text-gray-300">All photos with measurements organized by room</div>
+              <div className="mt-3 text-sm md:text-base text-[#FFD700]">📸 Export to Canva & PDF reports</div>
+            </div>
+          </button>
+
+          <button
             onClick={() => onNavigate('photos')}
             className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
           >
