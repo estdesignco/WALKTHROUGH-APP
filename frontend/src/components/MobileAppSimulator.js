@@ -36,8 +36,6 @@ function MobileHomeScreen({ onNavigate }) {
         </div>
       </div>
 
-      </div>
-
       {/* CONTENT - iPad Optimized Layout */}
       <div className="p-6 md:p-8 lg:p-12">
         <div className="max-w-5xl mx-auto space-y-6 mb-8">
