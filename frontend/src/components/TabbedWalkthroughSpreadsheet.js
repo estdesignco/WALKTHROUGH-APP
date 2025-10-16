@@ -1213,7 +1213,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     <line
                       x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2}
                       stroke={m.color || '#FFD700'} 
-                      strokeWidth={editingArrow === index ? "0.6" : "0.3"}
+                      strokeWidth={editingArrow === index ? (arrowThickness * 2).toString() : arrowThickness.toString()}
                       markerEnd={`url(#arrowhead-${(m.color || '#FFD700').replace('#', '')})`}
                       className="cursor-move"
                       style={{ pointerEvents: 'auto' }}
