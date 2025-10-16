@@ -36,8 +36,11 @@ function MobileHomeScreen({ onNavigate }) {
         </div>
       </div>
 
-      {/* iPad Optimized Layout - Max width for readability */}
-      <div className="max-w-5xl mx-auto space-y-6 mb-8">
+      </div>
+
+      {/* CONTENT - iPad Optimized Layout */}
+      <div className="p-6 md:p-8 lg:p-12">
+        <div className="max-w-5xl mx-auto space-y-6 mb-8">
         <button
           onClick={() => onNavigate('projects')}
           className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
