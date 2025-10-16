@@ -330,11 +330,12 @@ export default function MeasurementsAndFilesPage({ projectId }) {
                   </div>
                 </div>
               ))}
-            </div>
+              </div>
+            </>
           )}
         </div>
 
-        {/* OTHER FILES SECTION (Future) */}
+        {/* OTHER FILES SECTION (Future) */
         <div>
           <h2 className="text-3xl font-bold text-[#D4A574] mb-4 flex items-center gap-3">
             <span>📄</span>
