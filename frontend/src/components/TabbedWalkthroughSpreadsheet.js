@@ -1748,7 +1748,33 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
         </div>
       )}
 
-      {/* ADD ROOM MODAL */}
+      {/* SIDE-BY-SIDE COMPARE MODAL */}
+      {compareMode && selectedPhoto && comparePhoto && (
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          <div className="bg-[#1E293B] p-4 border-b-2 border-[#D4A574]">
+            <div className="flex justify-between items-center">
+              <h3 className="text-2xl font-bold text-[#D4A574]">📊 Side-by-Side Compare</h3>
+              <button
+                onClick={() => {
+                  setCompareMode(false);
+                  setSelectedPhoto(null);
+                  setComparePhoto(null);
+                }}
+                className="text-[#D4A574] text-3xl hover:text-red-400"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+          
+          <div className="flex-1 flex gap-4 p-4 bg-black">
+            {/* First Photo */}
+            <div className="flex-1 flex flex-col">
+              <div className="bg-[#1E293B] px-4 py-2 rounded-t-xl">
+                <h4 className="text-[#D4A574] font-bold">Photo 1</h4>
+                <p className="text-sm text-gray-300\">{comparePhoto.metadata?.room_name || 'Photo'} - {comparePhoto.metadata?.measurement_count || 0} measurements</p>
+              </div>
+              <div className=\"relative flex-1 flex items-center justify-center bg-gray-900 rounded-b-xl border-2 border-[#D4A574]\">\n                <img src={comparePhoto.photo_data} alt=\"Compare 1\" className=\"max-w-full max-h-full object-contain\" />\n              </div>\n            </div>\n            \n            {/* Second Photo */}\n            <div className=\"flex-1 flex flex-col\">\n              <div className=\"bg-[#1E293B] px-4 py-2 rounded-t-xl\">\n                <h4 className=\"text-[#D4A574] font-bold\">Photo 2</h4>\n                <p className=\"text-sm text-gray-300\">{selectedPhoto.metadata?.room_name || 'Photo'} - {selectedPhoto.metadata?.measurement_count || 0} measurements</p>\n              </div>\n              <div className=\"relative flex-1 flex items-center justify-center bg-gray-900 rounded-b-xl border-2 border-[#D4A574]\">\n                <img src={selectedPhoto.photo_data} alt=\"Compare 2\" className=\"max-w-full max-h-full object-contain\" />\n              </div>\n            </div>\n          </div>\n          \n          <div className=\"bg-[#1E293B] p-4 border-t-4 border-[#D4A574]\">\n            <div className=\"flex gap-3 justify-center\">\n              <button\n                onClick={() => {\n                  const temp = selectedPhoto;\n                  setSelectedPhoto(comparePhoto);\n                  setComparePhoto(temp);\n                }}\n                className=\"px-8 py-3 bg-[#D4A574] hover:bg-[#C49564] text-black rounded-xl font-bold text-lg\"\n              >\n                \ud83d\udd04 SWAP\n              </button>\n              <button\n                onClick={() => {\n                  setCompareMode(false);\n                  setSelectedPhoto(null);\n                  setComparePhoto(null);\n                }}\n                className=\"px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-bold text-lg\"\n              >\n                \u2715 CLOSE\n              </button>\n            </div>\n          </div>\n        </div>\n      )}\n\n      {/* ADD ROOM MODAL */}
       {showAddRoom && (
         <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
           <div className="bg-[#1E293B] rounded-2xl p-8 max-w-4xl w-full border-2 border-[#D4A574] max-h-[90vh] overflow-y-auto">
