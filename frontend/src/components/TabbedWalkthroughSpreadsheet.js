@@ -764,6 +764,61 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   >
                     📸 Take Photo
                   </button>
+                  
+                  <label className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-xl font-bold text-lg cursor-pointer flex items-center gap-2">
+                    📤 Upload Multiple
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const files = Array.from(e.target.files);
+                        if (files.length === 0) return;
+                        
+                        console.log(`📤 Uploading ${files.length} photos...`);
+                        let successCount = 0;
+                        
+                        for (const file of files) {
+                          try {
+                            const reader = new FileReader();
+                            await new Promise((resolve, reject) => {
+                              reader.onload = async (event) => {
+                                try {
+                                  await axios.post(`${API_URL}/photos/upload`, {
+                                    project_id: projectId,
+                                    room_id: activeRoom.id,
+                                    photo_data: event.target.result,
+                                    file_name: file.name,
+                                    metadata: {
+                                      room_name: activeRoom.name,
+                                      timestamp: new Date().toISOString(),
+                                      has_measurements: false,
+                                      batch_upload: true
+                                    }
+                                  });
+                                  successCount++;
+                                  resolve();
+                                } catch (error) {
+                                  console.error('Error uploading:', file.name, error);
+                                  reject(error);
+                                }
+                              };
+                              reader.onerror = reject;
+                              reader.readAsDataURL(file);
+                            });
+                          } catch (error) {
+                            console.error('Failed to upload:', file.name);
+                          }
+                        }
+                        
+                        alert(`✅ Successfully uploaded ${successCount} of ${files.length} photos!`);
+                        await loadAllPhotos();
+                        e.target.value = ''; // Reset input
+                      }}
+                    />
+                  </label>
+                  
                   {leicaConnected && lastMeasurement && (
                     <div className="bg-green-600 text-white px-4 py-2 rounded-xl font-bold">
                       📏 {lastMeasurement.feetInches}
