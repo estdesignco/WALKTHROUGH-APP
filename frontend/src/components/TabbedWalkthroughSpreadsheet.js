@@ -922,7 +922,12 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                       };
                       
                       console.log('✅ Arrow created with measurement:', text);
-                      setMeasurements(prev => [...prev, newMeasurement]);
+                      
+                      // Add to history for undo/redo
+                      const newMeasurements = [...measurements, newMeasurement];
+                      setMeasurements(newMeasurements);
+                      addToHistory(newMeasurements);
+                      
                       setLastMeasurement(null); // Clear after use
                       setMeasurementText('');
                     }
