@@ -830,12 +830,13 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
 
           {/* MUCH LARGER PHOTO WITH MOVABLE ARROWS */}
           <div className="flex-1 p-2 flex items-center justify-center bg-black">
-            <div className="relative w-full h-full flex items-center justify-center">
+            <div className="relative inline-block">
               <img 
+                id="measurement-photo"
                 src={selectedPhoto.photo_data}
                 alt={selectedPhoto.file_name}
-                className="max-w-full max-h-[85vh] object-contain border-2 border-[#D4A574] rounded-xl cursor-crosshair"
-                style={{ minWidth: '80vw', minHeight: '70vh' }}
+                className="max-w-full max-h-[85vh] border-2 border-[#D4A574] rounded-xl cursor-crosshair"
+                style={{ minWidth: '80vw', minHeight: '70vh', display: 'block' }}
                 onMouseDown={(e) => {
                   // Only create new arrows if not editing existing ones
                   if (editingArrow !== null) return;
@@ -887,8 +888,17 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 draggable={false}
               />
               
-              {/* ULTRA-THIN DRAGGABLE ARROWS */}
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ zIndex: 10 }}>
+              {/* ULTRA-THIN DRAGGABLE ARROWS - NOW MATCHES IMAGE EXACTLY */}
+              <svg 
+                className="absolute top-0 left-0 pointer-events-none" 
+                style={{ 
+                  width: '100%', 
+                  height: '100%',
+                  zIndex: 10
+                }} 
+                viewBox="0 0 100 100" 
+                preserveAspectRatio="none"
+              >
                 <defs>
                   {/* Ultra-thin arrowheads for each color */}
                   {[
