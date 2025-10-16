@@ -8,30 +8,15 @@ root.render(
     <App />
 );
 
-// Register service worker for offline functionality and mobile app features
+// UNREGISTER service worker to prevent redirect issues
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(registration => {
-        console.log('📱 Service Worker registered successfully:', registration.scope);
-        
-        // Listen for updates
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('🔄 New version available - refresh to update');
-              // Show update notification to user
-              if (window.confirm('New version available. Refresh to update?')) {
-                window.location.reload();
-              }
-            }
-          });
-        });
-      })
-      .catch(error => {
-        console.log('❌ Service Worker registration failed:', error);
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      registrations.forEach(registration => {
+        registration.unregister();
+        console.log('🗑️ Service Worker unregistered');
       });
+    });
   });
 }
 
