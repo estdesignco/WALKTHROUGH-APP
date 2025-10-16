@@ -39,35 +39,36 @@ function MobileHomeScreen({ onNavigate }) {
       {/* CONTENT - iPad Optimized Layout */}
       <div className="p-6 md:p-8 lg:p-12">
         <div className="max-w-5xl mx-auto space-y-6 mb-8">
-        <button
-          onClick={() => onNavigate('projects')}
-          className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative z-10">
-            <div className="text-6xl md:text-7xl mb-4">📋</div>
-            <div className="text-2xl md:text-3xl font-bold text-[#D4C5A9] mb-2">Projects</div>
-            <div className="text-base md:text-lg text-gray-300">View all projects & spreadsheets</div>
+          <button
+            onClick={() => onNavigate('projects')}
+            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-6xl md:text-7xl mb-4">📋</div>
+              <div className="text-2xl md:text-3xl font-bold text-[#D4C5A9] mb-2">Projects</div>
+              <div className="text-base md:text-lg text-gray-300">View all projects & spreadsheets</div>
+            </div>
+          </button>
+
+          <div className="grid grid-cols-3 gap-4 md:gap-6">
+            <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
+              <div className="text-4xl md:text-5xl mb-3">📸</div>
+              <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Photos</div>
+            </button>
+
+            <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
+              <div className="text-4xl md:text-5xl mb-3">📏</div>
+              <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Measure</div>
+            </button>
+
+            <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
+              <div className="text-4xl md:text-5xl mb-3">🔄</div>
+              <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Sync</div>
+            </button>
           </div>
-        </button>
-
-        <div className="grid grid-cols-3 gap-4 md:gap-6">
-          <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
-            <div className="text-4xl md:text-5xl mb-3">📸</div>
-            <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Photos</div>
-          </button>
-
-          <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
-            <div className="text-4xl md:text-5xl mb-3">📏</div>
-            <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Measure</div>
-          </button>
-
-          <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
-            <div className="text-4xl md:text-5xl mb-3">🔄</div>
-            <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Sync</div>
-          </button>
         </div>
-        
+
         <div className="max-w-5xl mx-auto bg-gradient-to-br from-gray-900 to-black rounded-3xl p-6 md:p-8 border-2 border-[#D4A574]/50 shadow-2xl">
           <p className="font-bold text-[#D4A574] mb-4 text-xl md:text-2xl">✨ Jobsite Features</p>
           <div className="space-y-3 text-base md:text-lg text-gray-300">
