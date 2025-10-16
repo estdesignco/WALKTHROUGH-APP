@@ -32,6 +32,8 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 }); // Offset from arrow center
   const [editingArrow, setEditingArrow] = useState(null); // Track which arrow is being edited
   const [measurementText, setMeasurementText] = useState(''); // Current measurement text
+  const [photoZoom, setPhotoZoom] = useState(1); // Photo zoom level
+  const [photoPan, setPhotoPan] = useState({ x: 0, y: 0 }); // Photo pan position
   
   const displayProject = project;
   
