@@ -1335,6 +1335,18 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 draggable={false}
               />
               
+              {/* RULE OF THIRDS GRID OVERLAY */}
+              {showGrid && (
+                <svg className="absolute top-0 left-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
+                  {/* Vertical lines */}
+                  <line x1="33.33%" y1="0" x2="33.33%" y2="100%" stroke="#FFD700" strokeWidth="1" opacity="0.5" strokeDasharray="5,5" />
+                  <line x1="66.66%" y1="0" x2="66.66%" y2="100%" stroke="#FFD700" strokeWidth="1" opacity="0.5" strokeDasharray="5,5" />
+                  {/* Horizontal lines */}
+                  <line x1="0" y1="33.33%" x2="100%" y2="33.33%" stroke="#FFD700" strokeWidth="1" opacity="0.5" strokeDasharray="5,5" />
+                  <line x1="0" y1="66.66%" x2="100%" y2="66.66%" stroke="#FFD700" strokeWidth="1" opacity="0.5" strokeDasharray="5,5" />
+                </svg>
+              )}
+              
               {/* ULTRA-THIN DRAGGABLE ARROWS - NOW MATCHES IMAGE EXACTLY */}
               <svg 
                 className="absolute top-0 left-0" 
