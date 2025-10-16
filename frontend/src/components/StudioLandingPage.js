@@ -148,6 +148,14 @@ const StudioLandingPage = () => {
               <span>+</span>
               <span>Full Questionnaire</span>
             </button>
+            
+            <button
+              onClick={() => navigate('/measurements-all')}
+              className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
+            >
+              <span>\ud83d\udcd0</span>
+              <span>Measurements</span>
+            </button>
           </div>
         </div>
 
