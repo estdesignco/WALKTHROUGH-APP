@@ -921,12 +921,13 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 
                 {/* ULTRA-THIN measurement arrows - FULLY DRAGGABLE */}
                 {measurements.map((m, index) => (
-                  <g key={index}>
+                  <g key={index} style={{ pointerEvents: 'auto' }}>
                     <line
                       x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2}
                       stroke={m.color || '#FFD700'} strokeWidth="0.3"
                       markerEnd={`url(#arrowhead-${(m.color || '#FFD700').replace('#', '')})`}
                       className="cursor-move"
+                      style={{ pointerEvents: 'auto' }}
                       onMouseDown={(e) => {
                         e.preventDefault();
                         console.log('🎯 Starting to move arrow', index);
