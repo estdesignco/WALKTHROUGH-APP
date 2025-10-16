@@ -1169,7 +1169,80 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
           </div>
 
           {/* MUCH LARGER PHOTO WITH MOVABLE ARROWS */}
-          <div className="flex-1 p-2 flex items-center justify-center bg-black overflow-hidden">
+          <div className="flex-1 p-2 flex items-center justify-center bg-black overflow-hidden relative">
+            {/* CALCULATOR POPUP */}
+            {showCalculator && (
+              <div className="absolute top-4 right-4 bg-[#1E293B] border-2 border-[#D4A574] rounded-xl p-4 shadow-2xl z-50 w-80">
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-[#D4A574] font-bold">🧮 Measurement Calculator</h4>
+                  <button
+                    onClick={() => setShowCalculator(false)}
+                    className="text-[#D4A574] hover:text-red-400 text-xl"
+                  >
+                    ✕
+                  </button>
+                </div>
+                
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={calcInput}
+                    onChange={(e) => setCalcInput(e.target.value)}
+                    placeholder="e.g., 3 × 8'6\" or 12'3\" + 5'9\""
+                    className="w-full bg-gray-700 text-white px-3 py-2 rounded border-2 border-gray-600 focus:border-[#D4A574] focus:outline-none"
+                  />
+                  
+                  <button
+                    onClick={() => {
+                      try {
+                        // Parse feet/inches and calculate
+                        let expression = calcInput;
+                        
+                        // Convert feet-inches to decimal feet
+                        const feetInchPattern = /(\d+)'(\d+)"/g;
+                        expression = expression.replace(feetInchPattern, (match, feet, inches) => {
+                          return (parseFloat(feet) + parseFloat(inches) / 12).toString();
+                        });
+                        
+                        // Replace × with *
+                        expression = expression.replace(/×/g, '*');
+                        
+                        // Evaluate
+                        const result = eval(expression);
+                        
+                        // Convert back to feet-inches
+                        const totalFeet = Math.floor(result);
+                        const inches = Math.round((result - totalFeet) * 12);
+                        
+                        const resultStr = `${totalFeet}'${inches}"`;
+                        setCalcResult(resultStr);
+                        setLastMeasurement({ feetInches: resultStr, manual: true });
+                        
+                      } catch (error) {
+                        setCalcResult('Error: Invalid expression');
+                      }
+                    }}
+                    className="w-full bg-gradient-to-r from-[#D4A574] to-[#B48554] hover:from-[#E4B584] hover:to-[#C49564] text-black px-4 py-2 rounded-xl font-bold"
+                  >
+                    Calculate
+                  </button>
+                  
+                  {calcResult && (
+                    <div className="bg-green-600 text-white px-3 py-2 rounded-xl font-bold text-center">
+                      Result: {calcResult}
+                    </div>
+                  )}
+                  
+                  <div className="text-xs text-gray-400">
+                    <p className="font-bold mb-1">Examples:</p>
+                    <p>• 3 × 8'6" (multiply)</p>
+                    <p>• 12'3" + 5'9" (add)</p>
+                    <p>• 20'0" - 3'4" (subtract)</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div 
               className="relative inline-block"
               style={{
