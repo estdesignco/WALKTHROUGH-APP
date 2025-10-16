@@ -920,6 +920,45 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 >
                   Reset
                 </button>
+                
+                <div className="w-px h-8 bg-[#D4A574]"></div>
+                
+                {/* Rotation Control */}
+                <button
+                  onClick={() => setPhotoRotation((photoRotation + 90) % 360)}
+                  className="px-4 py-2 bg-[#D4A574] hover:bg-[#C49564] text-black rounded-lg font-bold text-lg"
+                  title="Rotate 90°"
+                >
+                  🔄
+                </button>
+                
+                <div className="w-px h-8 bg-[#D4A574]"></div>
+                
+                {/* Undo/Redo Controls */}
+                <button
+                  onClick={handleUndo}
+                  disabled={historyIndex <= 0}
+                  className={`px-4 py-2 rounded-lg font-bold text-lg ${
+                    historyIndex <= 0 
+                      ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                      : 'bg-[#D4A574] hover:bg-[#C49564] text-black'
+                  }`}
+                  title="Undo"
+                >
+                  ↶
+                </button>
+                <button
+                  onClick={handleRedo}
+                  disabled={historyIndex >= measurementHistory.length - 1}
+                  className={`px-4 py-2 rounded-lg font-bold text-lg ${
+                    historyIndex >= measurementHistory.length - 1
+                      ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                      : 'bg-[#D4A574] hover:bg-[#C49564] text-black'
+                  }`}
+                  title="Redo"
+                >
+                  ↷
+                </button>
               </div>
               
               {/* RIGHT SIDE - Arrow Color Picker */}
