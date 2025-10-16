@@ -43,6 +43,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
   const [photoContrast, setPhotoContrast] = useState(100); // Contrast %
   const [arrowThickness, setArrowThickness] = useState(0.3); // Arrow stroke width
   const [showAdvancedControls, setShowAdvancedControls] = useState(false); // Toggle advanced panel
+  const [showCalculator, setShowCalculator] = useState(false); // Toggle calculator
+  const [calcInput, setCalcInput] = useState(''); // Calculator input
+  const [calcResult, setCalcResult] = useState(''); // Calculator result
   
   const displayProject = project;
   
