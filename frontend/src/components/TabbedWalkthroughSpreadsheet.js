@@ -39,6 +39,10 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
   const [measurementHistory, setMeasurementHistory] = useState([]); // Undo/redo history
   const [historyIndex, setHistoryIndex] = useState(-1); // Current position in history
   const [autoSaveInterval, setAutoSaveInterval] = useState(null); // Auto-save timer
+  const [photoBrightness, setPhotoBrightness] = useState(100); // Brightness %
+  const [photoContrast, setPhotoContrast] = useState(100); // Contrast %
+  const [arrowThickness, setArrowThickness] = useState(0.3); // Arrow stroke width
+  const [showAdvancedControls, setShowAdvancedControls] = useState(false); // Toggle advanced panel
   
   const displayProject = project;
   
