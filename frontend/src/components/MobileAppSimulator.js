@@ -13,25 +13,27 @@ const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 // ===== HOME SCREEN =====
 function MobileHomeScreen({ onNavigate }) {
   return (
-    <div className="h-full overflow-auto p-6 md:p-8 lg:p-12 bg-black">
-      {/* Logo Header - Black logo on gold container */}
-      <div className="text-center mb-8 md:mb-12">
-        <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#BCA888] p-0 mb-4">
-          <img 
-            src={`${process.env.PUBLIC_URL}/established-logo.png`}
-            alt="ESTABLISHED" 
-            className="h-16 md:h-20 lg:h-24 object-contain"
-            style={{ 
-              maxWidth: '280px',
-              filter: 'brightness(0)',
-              display: 'block'
-            }}
-          />
+    <div className="h-full overflow-auto bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0F172A]">
+      {/* EXACT DESKTOP HEADER STYLE */}
+      <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 md:p-8 border-b-4 border-[#D4A574] shadow-2xl">
+        <div className="text-center mb-6">
+          <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#BCA888] p-0 mb-4">
+            <img 
+              src={`${process.env.PUBLIC_URL}/established-logo.png`}
+              alt="ESTABLISHED" 
+              className="h-16 md:h-20 lg:h-24 object-contain"
+              style={{ 
+                maxWidth: '280px',
+                filter: 'brightness(0)',
+                display: 'block'
+              }}
+            />
+          </div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#D4A574] mb-3">
+            Interior Design Manager
+          </h1>
+          <p className="text-[#D4C5A9] text-lg md:text-xl">On-Site Project Management</p>
         </div>
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-3 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">
-          Interior Design Manager
-        </h1>
-        <p className="text-[#D4A574] text-base md:text-lg">On-Site Project Management</p>
       </div>
 
       {/* iPad Optimized Layout - Max width for readability */}
