@@ -71,14 +71,17 @@ function MobileHomeScreen({ onNavigate }) {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto bg-gradient-to-br from-gray-900 to-black rounded-3xl p-6 md:p-8 border-2 border-[#D4A574]/50 shadow-2xl">
-        <p className="font-bold text-[#D4A574] mb-4 text-xl md:text-2xl">✨ Jobsite Features</p>
-        <div className="space-y-3 text-base md:text-lg text-gray-300">
-          <p>• Full Walkthrough spreadsheet</p>
-          <p>• <strong className="text-[#D4C5A9]">FF&E Bible</strong> - Your complete inventory</p>
-          <p>• Works offline with auto-sync</p>
-          <p>• Photo capture by room</p>
-          <p>• Real-time status updates</p>
+        </div>
+
+        <div className="max-w-5xl mx-auto bg-gradient-to-br from-gray-900 to-black rounded-3xl p-6 md:p-8 border-2 border-[#D4A574]/50 shadow-2xl">
+          <p className="font-bold text-[#D4A574] mb-4 text-xl md:text-2xl">✨ Jobsite Features</p>
+          <div className="space-y-3 text-base md:text-lg text-gray-300">
+            <p>• Full Walkthrough spreadsheet</p>
+            <p>• <strong className="text-[#D4C5A9]">FF&E Bible</strong> - Your complete inventory</p>
+            <p>• Works offline with auto-sync</p>
+            <p>• Photo capture by room</p>
+            <p>• Real-time status updates</p>
+          </div>
         </div>
       </div>
     </div>
