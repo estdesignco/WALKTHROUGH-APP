@@ -238,7 +238,73 @@ export default function MeasurementsAndFilesPage({ projectId }) {
               <div className="text-lg text-[#B49B7E]">Take photos with measurements in the Walkthrough section</div>
             </div>
           ) : (
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <>
+              {/* Bulk Actions */}
+              <div className="flex gap-3 mb-4">
+                <button
+                  onClick={async () => {
+                    if (!confirm(`Export all ${photos.length} photos as ZIP?`)) return;
+                    
+                    alert('📦 Preparing bulk export...\n\nThis will download shortly.');
+                    
+                    // For now, download photos one by one
+                    // In production, you'd create a ZIP file
+                    for (let i = 0; i < photos.length; i++) {
+                      const photo = photos[i];
+                      await exportToCanva(photo);
+                      await new Promise(resolve => setTimeout(resolve, 500)); // Delay between downloads
+                    }
+                    
+                    alert(`✅ Exported ${photos.length} photos!`);
+                  }}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-bold"
+                >
+                  📦 BULK EXPORT ALL
+                </button>
+                
+                <button
+                  onClick={async () => {
+                    alert('📄 Generating PDF report...');
+                    
+                    // Simple PDF generation - opens print dialog
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write('<html><head><title>Measurement Report</title>');
+                    printWindow.document.write('<style>body { font-family: Arial; padding: 20px; } h1 { color: #D4A574; } img { max-width: 100%; margin: 20px 0; } .measurement { background: #f0f0f0; padding: 10px; margin: 5px 0; border-left: 3px solid #D4A574; }</style>');
+                    printWindow.document.write('</head><body>');
+                    printWindow.document.write('<h1>📏 Measurement Report</h1>');
+                    printWindow.document.write(`<p>Project: ${projectId}</p>`);
+                    printWindow.document.write(`<p>Total Photos: ${photos.length}</p>`);
+                    printWindow.document.write('<hr>');
+                    
+                    photos.forEach((photo, index) => {
+                      printWindow.document.write(`<h2>Photo ${index + 1}: ${photo.metadata?.room_name || 'Unknown Room'}</h2>`);
+                      printWindow.document.write(`<img src="${photo.photo_data}" />`);
+                      printWindow.document.write(`<p><strong>Measurements (${photo.metadata?.measurement_count || 0}):</strong></p>`);
+                      if (photo.metadata?.measurements) {
+                        photo.metadata.measurements.forEach((m, i) => {
+                          printWindow.document.write(`<div class="measurement">${i + 1}. ${m.text}</div>`);
+                        });
+                      }
+                      if (photo.metadata?.notes) {
+                        printWindow.document.write(`<p><strong>Notes:</strong> ${photo.metadata.notes}</p>`);
+                      }
+                      printWindow.document.write('<hr>');
+                    });
+                    
+                    printWindow.document.write('</body></html>');
+                    printWindow.document.close();
+                    
+                    setTimeout(() => {
+                      printWindow.print();
+                    }, 500);
+                  }}
+                  className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-bold"
+                >
+                  📄 PDF REPORT
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {photos.map((photo, index) => (
                 <div
                   key={photo.id || index}
