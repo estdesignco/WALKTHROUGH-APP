@@ -835,8 +835,8 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 id="measurement-photo"
                 src={selectedPhoto.photo_data}
                 alt={selectedPhoto.file_name}
-                className="max-w-full max-h-[85vh] border-2 border-[#D4A574] rounded-xl cursor-crosshair"
-                style={{ minWidth: '80vw', minHeight: '70vh', display: 'block' }}
+                className="max-w-full max-h-[75vh] border-2 border-[#D4A574] rounded-xl cursor-crosshair"
+                style={{ minWidth: '60vw', minHeight: '50vh', display: 'block' }}
                 onMouseDown={(e) => {
                   // Only create new arrows if not editing existing ones
                   if (editingArrow !== null) return;
