@@ -764,6 +764,18 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-2xl font-bold text-[#D4A574]">📸 {activeRoom.name} Photos</h3>
                 <div className="flex gap-4">
+                  {compareMode && (
+                    <button
+                      onClick={() => {
+                        setCompareMode(false);
+                        setComparePhoto(null);
+                      }}
+                      className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold text-lg"
+                    >
+                      ✕ Exit Compare
+                    </button>
+                  )}
+                  
                   <button
                     onClick={handleTakePhoto}
                     className="bg-gradient-to-r from-[#D4A574] to-[#B48554] hover:from-[#E4B584] hover:to-[#C49564] text-black px-6 py-3 rounded-xl font-bold text-lg"
