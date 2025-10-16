@@ -928,10 +928,20 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                       markerEnd={`url(#arrowhead-${(m.color || '#FFD700').replace('#', '')})`}
                       className="cursor-move"
                       style={{ pointerEvents: 'auto' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('🎯 Arrow clicked, selecting for edit:', index);
+                        setEditingArrow(index);
+                      }}
                       onMouseDown={(e) => {
+                        // Only start dragging if already selected
+                        if (editingArrow !== index) {
+                          e.preventDefault();
+                          return;
+                        }
+                        
                         e.preventDefault();
                         console.log('🎯 Starting to move arrow', index);
-                        setEditingArrow(index);
                         
                         const rect = e.target.closest('svg').getBoundingClientRect();
                         const startX = e.clientX;
@@ -957,7 +967,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                           console.log('✅ Finished moving arrow');
                           document.removeEventListener('mousemove', moveArrow);
                           document.removeEventListener('mouseup', stopMove);
-                          setEditingArrow(null);
+                          // Don't clear editingArrow - keep it selected
                         };
                         
                         document.addEventListener('mousemove', moveArrow);
