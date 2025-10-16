@@ -1235,9 +1235,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   
                   <div className="text-xs text-gray-400">
                     <p className="font-bold mb-1">Examples:</p>
-                    <p>• 3 × 8'6" (multiply)</p>
-                    <p>• 12'3" + 5'9" (add)</p>
-                    <p>• 20'0" - 3'4" (subtract)</p>
+                    <p>• 3 × 8'6&quot; (multiply)</p>
+                    <p>• 12'3&quot; + 5'9&quot; (add)</p>
+                    <p>• 20'0&quot; - 3'4&quot; (subtract)</p>
                   </div>
                 </div>
               </div>
