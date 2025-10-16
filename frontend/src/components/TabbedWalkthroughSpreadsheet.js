@@ -46,6 +46,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
   const [showCalculator, setShowCalculator] = useState(false); // Toggle calculator
   const [calcInput, setCalcInput] = useState(''); // Calculator input
   const [calcResult, setCalcResult] = useState(''); // Calculator result
+  const [showGrid, setShowGrid] = useState(false); // Grid overlay toggle
+  const [compareMode, setCompareMode] = useState(false); // Side-by-side compare mode
+  const [comparePhoto, setComparePhoto] = useState(null); // Second photo for comparison
   
   const displayProject = project;
   
