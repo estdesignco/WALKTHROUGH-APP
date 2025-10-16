@@ -1318,7 +1318,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     
                     <button
                       onClick={() => {
-                        setMeasurements(measurements.filter((_, i) => i !== editingArrow));
+                        const newMeasurements = measurements.filter((_, i) => i !== editingArrow);
+                        setMeasurements(newMeasurements);
+                        addToHistory(newMeasurements);
                         setEditingArrow(null);
                       }}
                       className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-bold"
