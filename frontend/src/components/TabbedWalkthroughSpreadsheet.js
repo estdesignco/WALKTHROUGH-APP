@@ -778,12 +778,27 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   
                   <button
                     onClick={() => {
-                      // Sort photos by timestamp and show in timeline
                       const sorted = [...(roomPhotos[activeRoom.id] || [])].sort((a, b) => {
                         const timeA = new Date(a.metadata?.timestamp || 0).getTime();
                         const timeB = new Date(b.metadata?.timestamp || 0).getTime();
                         return timeA - timeB;
-                      });\n                      \n                      let timeline = `\ud83d\udcc5 PHOTO TIMELINE - ${activeRoom.name}\\n\\n`;\n                      sorted.forEach((p, i) => {\n                        const time = new Date(p.metadata?.timestamp || 0).toLocaleString();\n                        const measurements = p.metadata?.measurement_count || 0;\n                        timeline += `${i + 1}. ${time}${measurements > 0 ? ` - \ud83d\udccf ${measurements} measurements` : ''}\\n`;\n                      });\n                      \n                      alert(timeline);\n                    }}\n                    className=\"bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white px-6 py-3 rounded-xl font-bold text-lg\"\n                  >\n                    \ud83d\udcc5 Timeline\n                  </button>\n                  \n                  <button
+                      });
+                      
+                      let timeline = `📅 PHOTO TIMELINE - ${activeRoom.name}\n\n`;
+                      sorted.forEach((p, i) => {
+                        const time = new Date(p.metadata?.timestamp || 0).toLocaleString();
+                        const measurements = p.metadata?.measurement_count || 0;
+                        timeline += `${i + 1}. ${time}${measurements > 0 ? ` - 📏 ${measurements} measurements` : ''}\n`;
+                      });
+                      
+                      alert(timeline);
+                    }}
+                    className="bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white px-6 py-3 rounded-xl font-bold text-lg"
+                  >
+                    📅 Timeline
+                  </button>
+                  
+                  <button
                     onClick={handleTakePhoto}
                     className="bg-gradient-to-r from-[#D4A574] to-[#B48554] hover:from-[#E4B584] hover:to-[#C49564] text-black px-6 py-3 rounded-xl font-bold text-lg"
                   >
