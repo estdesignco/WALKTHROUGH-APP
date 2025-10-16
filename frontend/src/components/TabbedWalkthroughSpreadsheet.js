@@ -731,6 +731,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
           {/* LEICA CONNECTION BAR WITH COLOR PICKER */}
           <div className="bg-[#0F172A] p-3 border-b border-[#D4A574]/30">
             <div className="flex items-center justify-between flex-wrap gap-4">
+              {/* LEFT SIDE - Leica Controls */}
               <div className="flex items-center gap-4">
                 <div className={`px-4 py-2 rounded-xl font-bold text-sm ${
                   leicaConnected ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'
@@ -795,7 +796,37 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 )}
               </div>
               
-              {/* ARROW COLOR PICKER - NEW FEATURE */}
+              {/* CENTER - Zoom Controls */}
+              <div className="flex items-center gap-3 bg-[#1E293B] px-4 py-2 rounded-xl border-2 border-[#D4A574]">
+                <span className="text-[#D4A574] font-bold text-sm">Zoom:</span>
+                <button
+                  onClick={() => setPhotoZoom(Math.max(0.5, photoZoom - 0.25))}
+                  className="px-4 py-2 bg-[#D4A574] hover:bg-[#C49564] text-black rounded-lg font-bold text-lg"
+                  title="Zoom Out"
+                >
+                  🔍−
+                </button>
+                <span className="text-white font-bold min-w-[60px] text-center">{Math.round(photoZoom * 100)}%</span>
+                <button
+                  onClick={() => setPhotoZoom(Math.min(3, photoZoom + 0.25))}
+                  className="px-4 py-2 bg-[#D4A574] hover:bg-[#C49564] text-black rounded-lg font-bold text-lg"
+                  title="Zoom In"
+                >
+                  🔍+
+                </button>
+                <button
+                  onClick={() => {
+                    setPhotoZoom(1);
+                    setPhotoPan({ x: 0, y: 0 });
+                  }}
+                  className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-bold text-sm"
+                  title="Reset View"
+                >
+                  Reset
+                </button>
+              </div>
+              
+              {/* RIGHT SIDE - Arrow Color Picker */}
               <div className="flex gap-2 items-center">
                 <span className="text-[#D4A574] font-bold text-sm">Next Arrow Color:</span>
                 {[
