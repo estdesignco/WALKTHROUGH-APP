@@ -572,6 +572,11 @@ export default function ProjectDetailPage() {
                 <FFEDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading FF&E...</div> },
+        { name: "Measurements", icon: Aperture, component: project ? (
+            <div className="measurements-content">
+                <MeasurementsAndFilesPage projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading measurements...</div> },
     ];
 
     if (isLoading) {
