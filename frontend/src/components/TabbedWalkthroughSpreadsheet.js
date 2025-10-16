@@ -34,6 +34,11 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
   const [measurementText, setMeasurementText] = useState(''); // Current measurement text
   const [photoZoom, setPhotoZoom] = useState(1); // Photo zoom level
   const [photoPan, setPhotoPan] = useState({ x: 0, y: 0 }); // Photo pan position
+  const [photoRotation, setPhotoRotation] = useState(0); // Photo rotation in degrees
+  const [photoNotes, setPhotoNotes] = useState(''); // Notes for current photo
+  const [measurementHistory, setMeasurementHistory] = useState([]); // Undo/redo history
+  const [historyIndex, setHistoryIndex] = useState(-1); // Current position in history
+  const [autoSaveInterval, setAutoSaveInterval] = useState(null); // Auto-save timer
   
   const displayProject = project;
   
