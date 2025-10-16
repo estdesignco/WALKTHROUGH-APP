@@ -42,6 +42,97 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
   
   const displayProject = project;
   
+  // Helper function to add measurement state to history
+  const addToHistory = (newMeasurements) => {
+    const newHistory = measurementHistory.slice(0, historyIndex + 1);
+    newHistory.push([...newMeasurements]);
+    setMeasurementHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  };
+  
+  // Undo function
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setMeasurements(measurementHistory[newIndex]);
+      console.log('⬅️ Undo:', measurementHistory[newIndex]);
+    }
+  };
+  
+  // Redo function
+  const handleRedo = () => {
+    if (historyIndex < measurementHistory.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setMeasurements(measurementHistory[newIndex]);
+      console.log('➡️ Redo:', measurementHistory[newIndex]);
+    }
+  };
+  
+  // Auto-save function
+  const performAutoSave = async () => {
+    if (!selectedPhoto || measurements.length === 0) return;
+    
+    try {
+      console.log('💾 Auto-saving...');
+      await axios.post(`${API_URL}/photos/upload`, {
+        project_id: projectId,
+        room_id: activeRoom.id,
+        photo_data: selectedPhoto.photo_data,
+        file_name: `autosave_${selectedPhoto.file_name}`,
+        metadata: {
+          room_name: activeRoom.name,
+          timestamp: new Date().toISOString(),
+          has_measurements: true,
+          measurement_count: measurements.length,
+          measurements: measurements,
+          notes: photoNotes,
+          rotation: photoRotation,
+          auto_saved: true
+        }
+      });
+      console.log('✅ Auto-save successful');
+    } catch (error) {
+      console.error('❌ Auto-save failed:', error);
+    }
+  };
+  
+  // Setup auto-save interval when photo is selected
+  useEffect(() => {
+    if (selectedPhoto && measurements.length > 0) {
+      // Clear any existing interval
+      if (autoSaveInterval) {
+        clearInterval(autoSaveInterval);
+      }
+      
+      // Setup new auto-save every 2 minutes
+      const interval = setInterval(performAutoSave, 120000); // 120000ms = 2 minutes
+      setAutoSaveInterval(interval);
+      
+      return () => {
+        if (interval) clearInterval(interval);
+      };
+    }
+  }, [selectedPhoto, measurements, photoNotes, photoRotation]);
+  
+  // Load photo metadata when selecting a photo
+  useEffect(() => {
+    if (selectedPhoto) {
+      setPhotoRotation(selectedPhoto.metadata?.rotation || 0);
+      setPhotoNotes(selectedPhoto.metadata?.notes || '');
+      
+      // Initialize history with loaded measurements
+      if (selectedPhoto.metadata?.measurements && Array.isArray(selectedPhoto.metadata.measurements)) {
+        setMeasurementHistory([selectedPhoto.metadata.measurements]);
+        setHistoryIndex(0);
+      } else {
+        setMeasurementHistory([[]]);
+        setHistoryIndex(0);
+      }
+    }
+  }, [selectedPhoto?.id]);
+  
   // Offline sync hook
   const {
     online,
