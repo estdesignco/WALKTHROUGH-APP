@@ -19,13 +19,20 @@ const Project = {
 
 export default function ProjectDetailPage() {
     const { projectId } = useParams();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
     const [project, setProject] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState(searchParams.get('tab') || "Questionnaire");
     const [isEditing, setIsEditing] = useState(false);
     const [editedProject, setEditedProject] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
+    
+    // Update URL when tab changes
+    const handleTabChange = (tabName) => {
+        setActiveTab(tabName);
+        setSearchParams({ tab: tabName });
+    };
 
     useEffect(() => {
         const fetchProject = async () => {
