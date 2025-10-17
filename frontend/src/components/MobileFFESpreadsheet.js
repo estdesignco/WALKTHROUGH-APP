@@ -374,11 +374,15 @@ export default function MobileFFESpreadsheet({ projectId }) {
           <tbody>
             {displayProject?.rooms?.map((room) => (
               <React.Fragment key={room.id}>
-                {/* ROOM HEADER ROW */}
+                {/* ROOM HEADER ROW - SOLID COLOR WITH SHIMMER */}
                 <tr>
                   <td colSpan="15" 
-                      className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
-                      style={{ backgroundColor: getRoomColor(room.name) }}>
+                      className="border-2 border-[#D4A574] px-3 py-2 text-white text-sm font-bold rounded-lg"
+                      style={{ 
+                        backgroundColor: getRoomColor(room.name),
+                        boxShadow: `0 0 30px ${getRoomColor(room.name)}70, inset 0 0 60px rgba(255, 255, 255, 0.1), inset 0 0 100px rgba(0, 0, 0, 0.4)`,
+                        textShadow: '0 2px 6px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.3)'
+                      }}>
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <button onClick={() => toggleRoom(room.id)} className="text-white">
