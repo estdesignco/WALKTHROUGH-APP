@@ -1501,10 +1501,14 @@ const ExactChecklistSpreadsheet = ({
                                   transform: provided.draggableProps.style?.transform || 'none'
                                 }}
                               >
-                                {/* CATEGORY HEADER WITH EXPAND/COLLAPSE */}
+                                {/* CATEGORY HEADER - DARK SHIMMER WITH GREEN ACCENT */}
                                 <div 
-                                  className="px-4 py-2 text-[#D4C5A9] font-bold mb-2"
-                                  style={{ backgroundColor: getCategoryColor() }}
+                                  className="px-4 py-2 text-[#D4C5A9] font-bold mb-2 border-2 border-[#D4A574] rounded-lg overflow-hidden"
+                                  style={{ 
+                                    background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+                                    borderTop: `4px solid ${getCategoryColor()}`,
+                                    boxShadow: `0 0 20px ${getCategoryColor()}40, 0 -3px 12px ${getCategoryColor()}30, inset 0 0 35px rgba(212, 165, 116, 0.06)`
+                                  }}
                                 >
                                   <div className="flex justify-between items-center">
                                     <div className="flex items-center gap-2">
