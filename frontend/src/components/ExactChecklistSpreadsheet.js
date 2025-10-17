@@ -1133,10 +1133,14 @@ const ExactChecklistSpreadsheet = ({
                             transform: provided.draggableProps.style?.transform || 'none'
                           }}
                         >
-              {/* ROOM HEADER WITH DIFFERENT MUTED COLORS AND EXPAND/COLLAPSE */}
+              {/* ROOM HEADER - LUXURY SHIMMER TREATMENT */}
               <div 
-                className="px-4 py-2 text-[#D4C5A9] font-bold mb-4"
-                style={{ backgroundColor: getRoomColor(room.name, roomIndex) }}
+                className="px-4 py-3 text-[#D4C5A9] font-bold mb-4 border-2 border-[#B49B7E] rounded-lg overflow-hidden"
+                style={{ 
+                  background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+                  borderTop: `4px solid ${getRoomColor(room.name)}`,
+                  boxShadow: `0 0 20px ${getRoomColor(room.name)}40, 0 -3px 12px ${getRoomColor(room.name)}30, inset 0 0 30px ${getRoomColor(room.name)}06`
+                }}
               >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
