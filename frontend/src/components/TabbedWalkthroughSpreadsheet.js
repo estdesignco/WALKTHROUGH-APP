@@ -480,8 +480,10 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
         </div>
       </div>
 
-      {/* ROOM TABS - OPTIMIZED FOR 13" IPAD */}
-      <div className="bg-[#1E293B] border-b-2 border-[#D4A574] overflow-x-auto">
+      {/* ROOM TABS - WITH ENHANCED SHIMMER */}
+      <div className="bg-[#1E293B] border-b-2 border-[#D4A574] overflow-x-auto" style={{
+        boxShadow: 'inset 0 0 40px rgba(212, 165, 116, 0.08)'
+      }}>
         <div className="flex">
           {project.rooms.map((room, index) => (
             <button
@@ -490,7 +492,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
               className={`px-6 py-4 font-bold text-lg border-b-4 transition-all min-w-max relative overflow-hidden ${
                 activeRoomTab === index
                   ? 'text-[#D4A574]'
-                  : 'border-transparent text-[#B49B7E] hover:text-[#D4C5A9]'
+                  : 'text-[#D4C5A9] hover:text-[#D4A574]'
               }`}
               style={{ 
                 background: activeRoomTab === index 
@@ -498,11 +500,13 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   : 'linear-gradient(135deg, rgba(15,15,25,0.95) 0%, rgba(45,45,55,0.9) 30%, rgba(25,25,35,0.95) 70%, rgba(15,15,25,0.95) 100%)',
                 borderTop: `4px solid ${getRoomColor(room.name)}`,
                 borderBottom: activeRoomTab === index ? '4px solid #D4A574' : '4px solid transparent',
-                boxShadow: activeRoomTab === index ? `0 -2px 10px ${getRoomColor(room.name)}50` : 'none'
+                boxShadow: activeRoomTab === index 
+                  ? `0 -2px 15px ${getRoomColor(room.name)}60, inset 0 0 30px ${getRoomColor(room.name)}08` 
+                  : `0 -2px 6px ${getRoomColor(room.name)}30, inset 0 0 15px ${getRoomColor(room.name)}04`
               }}
             >
               {room.name}
-              <div className="text-xs">
+              <div className="text-xs text-[#B49B7E]">
                 {roomPhotos[room.id]?.length || 0} photos
               </div>
             </button>
