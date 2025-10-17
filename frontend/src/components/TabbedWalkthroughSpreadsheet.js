@@ -487,18 +487,18 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
             <button
               key={room.id}
               onClick={() => setActiveRoomTab(index)}
-              className={`px-6 py-4 font-bold text-lg border-b-4 transition-all min-w-max ${
+              className={`px-6 py-4 font-bold text-lg border-b-4 transition-all min-w-max relative overflow-hidden ${
                 activeRoomTab === index
-                  ? 'border-[#D4A574] text-[#D4A574] bg-[#D4A574]/10'
-                  : 'border-transparent text-[#B49B7E] hover:text-[#D4C5A9] hover:bg-[#D4A574]/5'
+                  ? 'text-[#D4A574]'
+                  : 'border-transparent text-[#B49B7E] hover:text-[#D4C5A9]'
               }`}
               style={{ 
-                backgroundColor: activeRoomTab === index 
-                  ? getRoomColor(room.name) + '40' 
-                  : 'transparent',
-                borderTopColor: getRoomColor(room.name),
-                borderTopWidth: '4px',
-                borderTopStyle: 'solid'
+                background: activeRoomTab === index 
+                  ? 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
+                  : 'linear-gradient(135deg, rgba(15,15,25,0.95) 0%, rgba(45,45,55,0.9) 30%, rgba(25,25,35,0.95) 70%, rgba(15,15,25,0.95) 100%)',
+                borderTop: `4px solid ${getRoomColor(room.name)}`,
+                borderBottom: activeRoomTab === index ? '4px solid #D4A574' : '4px solid transparent',
+                boxShadow: activeRoomTab === index ? `0 -2px 10px ${getRoomColor(room.name)}50` : 'none'
               }}
             >
               {room.name}
