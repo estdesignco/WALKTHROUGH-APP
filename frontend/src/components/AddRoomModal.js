@@ -91,27 +91,29 @@ const AddRoomModal = ({ onClose, onSubmit, roomColors }) => {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Quick Select Common Rooms
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {commonRooms.map((room) => (
-                  <button
-                    key={room}
-                    type="button"
-                    onClick={() => handleQuickSelect(room)}
-                    className={`text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      formData.name === room
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <div 
-                        className="w-3 h-3 rounded"
-                        style={{ backgroundColor: roomColors[room.toLowerCase()] || '#B22222' }}
-                      ></div>
-                      <span>{room}</span>
-                    </div>
-                  </button>
-                ))}
+              <div className="grid grid-cols-3 gap-3">
+                {commonRooms.map((room) => {
+                  const roomColor = getRoomColor(room);
+                  return (
+                    <button
+                      key={room}
+                      type="button"
+                      onClick={() => handleQuickSelect(room)}
+                      className={`p-3 rounded-xl border-2 font-bold text-sm transition-all ${
+                        formData.name === room
+                          ? 'text-white border-white'
+                          : 'text-white border-gray-600 hover:border-white'
+                      }`}
+                      style={{ 
+                        backgroundColor: formData.name === room ? roomColor : `${roomColor}DD`,
+                        boxShadow: formData.name === room ? `0 0 15px ${roomColor}` : 'none'
+                      }}
+                    >
+                      <div className="w-5 h-5 rounded-full border-2 border-white mb-1 mx-auto" style={{ backgroundColor: roomColor }}></div>
+                      {room}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
