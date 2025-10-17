@@ -1846,21 +1846,28 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                   'Laundry Room', 'Mudroom', 'Pantry',
                   'Closet', 'Guest Room', 'Playroom',
                   'Library', 'Wine Cellar', 'Garage',
-                  'Patio'
-                ].map((roomName) => (
-                  <button
-                    key={roomName}
-                    onClick={() => setNewRoomName(roomName)}
-                    className={`p-4 rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 ${
-                      newRoomName === roomName
-                        ? 'bg-[#D4A574] text-black border-[#D4A574]'
-                        : 'bg-gray-700 hover:bg-gray-600 text-white border-gray-600 hover:border-[#D4A574]'
-                    }`}
-                  >
-                    <div className="text-xs text-red-500 font-bold mb-1">🟥</div>
-                    {roomName}
-                  </button>
-                ))}
+                  'Patio', 'Balcony', 'Foyer'
+                ].map((roomName) => {
+                  const roomColor = getRoomColor(roomName);
+                  return (
+                    <button
+                      key={roomName}
+                      onClick={() => setNewRoomName(roomName)}
+                      className={`p-4 rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 ${
+                        newRoomName === roomName
+                          ? 'text-white border-white'
+                          : 'text-white border-gray-600 hover:border-white'
+                      }`}
+                      style={{ 
+                        backgroundColor: newRoomName === roomName ? roomColor : `${roomColor}CC`,
+                        boxShadow: newRoomName === roomName ? `0 0 20px ${roomColor}` : 'none'
+                      }}
+                    >
+                      <div className="w-6 h-6 rounded-full border-2 border-white mb-2 mx-auto" style={{ backgroundColor: roomColor }}></div>
+                      {roomName}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
