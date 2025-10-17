@@ -44,17 +44,6 @@ export default function MeasurementsAndFilesPage({ projectId }) {
     }
   };
 
-  const getRoomColor = (roomName) => {
-    const roomColors = {
-      'living room': '#7C3AED', 'dining room': '#DC2626', 'kitchen': '#EA580C',
-      'primary bedroom': '#059669', 'master bedroom': '#059669',
-      'primary bathroom': '#2563EB', 'bathroom': '#2563EB', 'master bathroom': '#2563EB',
-      'powder room': '#7C2D12', 'guest room': '#BE185D', 'office': '#6366F1',
-      'laundry room': '#16A34A', 'mudroom': '#0891B2', 'family room': '#CA8A04', 'basement': '#6B7280'
-    };
-    return roomColors[roomName.toLowerCase()] || '#7C3AED';
-  };
-
   const exportToCanva = async (photo) => {
     try {
       const canvas = document.createElement('canvas');
