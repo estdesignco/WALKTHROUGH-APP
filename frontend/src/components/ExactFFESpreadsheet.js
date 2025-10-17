@@ -943,11 +943,12 @@ const ExactFFESpreadsheet = ({
                             }}
                           >
                             <td colSpan="12" 
-                                className="border-2 border-[#D4A574] px-3 py-3 text-white text-sm font-bold rounded-lg"
+                                className="border-2 border-[#D4A574] px-3 py-3 text-[#D4C5A9] text-sm font-bold rounded-lg"
                                 style={{ 
-                                  backgroundColor: getRoomColor(room.name),
-                                  boxShadow: `0 0 25px ${getRoomColor(room.name)}60, inset 0 0 40px rgba(255, 255, 255, 0.08), inset 0 0 80px rgba(0, 0, 0, 0.3)`,
-                                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.2)'
+                                  background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+                                  borderTop: `4px solid ${getRoomColor(room.name)}`,
+                                  boxShadow: `0 0 25px ${getRoomColor(room.name)}50, 0 -3px 15px ${getRoomColor(room.name)}40, inset 0 0 40px rgba(212, 165, 116, 0.06)`,
+                                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
                                 }}>
                               <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2">
