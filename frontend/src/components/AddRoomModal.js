@@ -126,13 +126,16 @@ const AddRoomModal = ({ onClose, onSubmit, roomColors }) => {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-[#D4C5A9] mb-2">
                 Description (Optional)
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none resize-none"
+                className="w-full px-4 py-3 rounded-lg border-2 border-[#B49B7E] focus:border-[#D4A574] focus:outline-none resize-none text-[#D4C5A9]"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
+                }}
                 rows="3"
                 placeholder="Add any notes about this room..."
               />
@@ -140,18 +143,21 @@ const AddRoomModal = ({ onClose, onSubmit, roomColors }) => {
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t border-gray-700 flex justify-end space-x-4">
+          <div className="p-6 border-t-2 border-[#D4A574] flex justify-end space-x-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 text-gray-400 hover:text-white transition-colors"
+              className="px-6 py-2 text-[#D4C5A9] hover:text-[#D4A574] transition-colors"
               disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-yellow-600 hover:bg-yellow-700 text-black px-6 py-2 rounded-lg transition-colors font-medium disabled:opacity-50"
+              className="px-6 py-2 rounded-lg transition-colors font-medium disabled:opacity-50 border-2 border-[#D4A574] text-[#D4A574] hover:bg-[#D4A574] hover:text-black"
+              style={{
+                background: loading || !formData.name.trim() ? 'rgba(212, 165, 116, 0.1)' : 'linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,0.85) 50%, rgba(0,0,0,0.9) 100%)'
+              }}
               disabled={loading || !formData.name.trim()}
             >
               {loading ? 'Creating...' : 'Create Room'}
