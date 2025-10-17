@@ -1853,26 +1853,16 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     <button
                       key={roomName}
                       onClick={() => setNewRoomName(roomName)}
-                      className={`rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 overflow-hidden ${
-                        newRoomName === roomName
-                          ? 'border-white'
-                          : 'border-gray-600 hover:border-[#D4A574]'
+                      className={`p-4 rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 text-white overflow-hidden ${
+                        newRoomName === roomName ? 'border-[#D4A574]' : 'border-gray-600 hover:border-[#D4A574]'
                       }`}
                       style={{ 
-                        background: newRoomName === roomName 
-                          ? `linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,0.85) 100%)`
-                          : `linear-gradient(135deg, rgba(15,15,25,0.9) 0%, rgba(45,45,55,0.85) 100%)`,
+                        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+                        borderTop: `4px solid ${roomColor}`,
+                        boxShadow: newRoomName === roomName ? `0 0 20px ${roomColor}80, 0 -2px 10px ${roomColor}50` : `0 -2px 5px ${roomColor}30`
                       }}
                     >
-                      {/* Color bar at top */}
-                      <div 
-                        className="h-2 w-full mb-2" 
-                        style={{ 
-                          backgroundColor: roomColor,
-                          boxShadow: `0 2px 8px ${roomColor}80`
-                        }}
-                      ></div>
-                      <div className="px-3 pb-3 text-white">{roomName}</div>
+                      {roomName}
                     </button>
                   );
                 })}
