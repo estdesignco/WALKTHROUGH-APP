@@ -1853,18 +1853,26 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     <button
                       key={roomName}
                       onClick={() => setNewRoomName(roomName)}
-                      className={`p-4 rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 ${
+                      className={`rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 overflow-hidden ${
                         newRoomName === roomName
-                          ? 'text-white border-white'
-                          : 'text-white border-gray-600 hover:border-white'
+                          ? 'border-white'
+                          : 'border-gray-600 hover:border-[#D4A574]'
                       }`}
                       style={{ 
-                        backgroundColor: newRoomName === roomName ? roomColor : `${roomColor}CC`,
-                        boxShadow: newRoomName === roomName ? `0 0 20px ${roomColor}` : 'none'
+                        background: newRoomName === roomName 
+                          ? `linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,0.85) 100%)`
+                          : `linear-gradient(135deg, rgba(15,15,25,0.9) 0%, rgba(45,45,55,0.85) 100%)`,
                       }}
                     >
-                      <div className="w-6 h-6 rounded-full border-2 border-white mb-2 mx-auto" style={{ backgroundColor: roomColor }}></div>
-                      {roomName}
+                      {/* Color bar at top */}
+                      <div 
+                        className="h-2 w-full mb-2" 
+                        style={{ 
+                          backgroundColor: roomColor,
+                          boxShadow: `0 2px 8px ${roomColor}80`
+                        }}
+                      ></div>
+                      <div className="px-3 pb-3 text-white">{roomName}</div>
                     </button>
                   );
                 })}
