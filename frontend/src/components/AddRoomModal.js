@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getRoomColor } from '../utils/roomColors';
 
 const AddRoomModal = ({ onClose, onSubmit, roomColors }) => {
   const [formData, setFormData] = useState({
