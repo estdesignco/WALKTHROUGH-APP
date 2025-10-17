@@ -972,10 +972,11 @@ const ExactFFESpreadsheet = ({
                                       </button>
                                     </div>
                                   </td>
-                                  <td className="border-2 border-[#D4A574] px-2 py-2 text-center rounded-lg"
+                                  <td className="border-2 border-[#D4A574] px-2 py-2 text-center rounded-lg text-[#D4C5A9]"
                                       style={{ 
-                                        backgroundColor: getRoomColor(room.name),
-                                        boxShadow: `0 0 15px ${getRoomColor(room.name)}40, inset 0 0 30px rgba(255, 255, 255, 0.06)`
+                                        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+                                        borderTop: `4px solid ${getRoomColor(room.name)}`,
+                                        boxShadow: `0 0 15px ${getRoomColor(room.name)}40, inset 0 0 30px rgba(212, 165, 116, 0.04)`
                                       }}>
                                     <button
                                       onClick={() => handleAddRoom()}
