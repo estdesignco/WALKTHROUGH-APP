@@ -13,7 +13,7 @@ const AddRoomModal = ({ onClose, onSubmit, roomColors }) => {
     'Bathroom', 'Master Bathroom', 'Powder Room', 'Dining Room', 'Office',
     'Family Room', 'Basement', 'Laundry Room', 'Mudroom', 'Pantry',
     'Closet', 'Guest Room', 'Playroom', 'Library', 'Wine Cellar',
-    'Garage', 'Patio'
+    'Garage', 'Patio', 'Balcony', 'Foyer', 'Hallway'
   ];
 
   const handleSubmit = async (e) => {
