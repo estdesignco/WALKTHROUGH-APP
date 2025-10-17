@@ -397,11 +397,15 @@ export default function MobileFFESpreadsheet({ projectId }) {
                 {/* CATEGORIES */}
                 {expandedRooms[room.id] && room.categories?.map((category) => (
                   <React.Fragment key={category.id}>
-                    {/* CATEGORY HEADER ROW */}
+                    {/* CATEGORY HEADER ROW - SOLID GREEN WITH SHIMMER */}
                     <tr>
                       <td colSpan="15"
-                          className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
-                          style={{ backgroundColor: getCategoryColor() }}>
+                          className="border-2 border-[#D4A574] px-4 py-2 text-white text-sm font-bold rounded-lg"
+                          style={{ 
+                            backgroundColor: getCategoryColor(),
+                            boxShadow: `0 0 25px ${getCategoryColor()}60, inset 0 0 50px rgba(255, 255, 255, 0.1), inset 0 0 90px rgba(0, 0, 0, 0.4)`,
+                            textShadow: '0 2px 6px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 255, 255, 0.3)'
+                          }}>
                         <div className="flex items-center gap-2">
                           <button onClick={() => toggleCategory(category.id)} className="text-white">
                             {expandedCategories[category.id] ? '▼' : '▶'}
