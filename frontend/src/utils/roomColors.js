@@ -1,42 +1,42 @@
-// MASTER ROOM COLOR PALETTE - Used across ENTIRE app
-// DO NOT modify without updating ALL components
+// MASTER ROOM COLOR PALETTE - MUTED TONES FOR DARK THEME
+// Used across ENTIRE app - Mobile & Desktop
 
 export const ROOM_COLORS = {
-  'living room': '#7C3AED',      // Purple
-  'dining room': '#DC2626',      // Red
-  'kitchen': '#EA580C',          // Orange  
-  'primary bedroom': '#059669',  // Emerald Green
-  'master bedroom': '#059669',   // Emerald Green (same as primary)
-  'bedroom 2': '#10B981',        // Light Green
-  'bedroom 3': '#14B8A6',        // Teal
-  'primary bathroom': '#2563EB', // Blue
-  'bathroom': '#2563EB',         // Blue (same as primary)
-  'master bathroom': '#2563EB',  // Blue (same as primary)
-  'powder room': '#7C2D12',      // Brown
-  'guest room': '#BE185D',       // Pink
-  'office': '#6366F1',           // Indigo
-  'family room': '#CA8A04',      // Yellow/Gold
-  'laundry room': '#16A34A',     // Forest Green
-  'mudroom': '#0891B2',          // Cyan
-  'basement': '#6B7280',         // Gray
-  'attic storage': '#78716C',    // Stone
-  'garage': '#374151',           // Dark Gray
-  'pantry': '#F59E0B',           // Amber
-  'closet': '#8B5CF6',           // Violet
-  'playroom': '#EC4899',         // Hot Pink
-  'library': '#0EA5E9',          // Sky Blue
-  'wine cellar': '#9333EA',      // Purple
-  'patio': '#EF4444',            // Bright Red
-  'balcony': '#F97316',          // Orange Red
-  'foyer': '#A855F7',            // Light Purple
-  'hallway': '#22D3EE',          // Bright Cyan
-  'gym': '#84CC16',              // Lime
-  'media room': '#6366F1',       // Indigo
-  'sunroom': '#FBBF24',          // Bright Yellow
+  'living room': '#7A5A8A',        // Muted purple
+  'dining room': '#A84444',        // Muted red
+  'kitchen': '#C97335',            // Muted orange  
+  'primary bedroom': '#4A8B6A',    // Muted emerald
+  'master bedroom': '#4A8B6A',     // Muted emerald (same as primary)
+  'bedroom 2': '#5A9A7A',          // Muted green
+  'bedroom 3': '#5A8A8A',          // Muted teal
+  'primary bathroom': '#4A6AB8',   // Muted blue
+  'bathroom': '#4A6AB8',           // Muted blue (same as primary)
+  'master bathroom': '#4A6AB8',    // Muted blue (same as primary)
+  'powder room': '#7A5544',        // Muted brown
+  'guest room': '#9A5A7A',         // Muted pink
+  'office': '#5A5A9A',             // Muted indigo
+  'family room': '#AA8A44',        // Muted gold
+  'laundry room': '#5A8A5A',       // Muted forest green
+  'mudroom': '#4A7A8A',            // Muted cyan
+  'basement': '#6A6A6A',           // Muted gray
+  'attic storage': '#7A7A6A',      // Muted stone
+  'garage': '#5A5A5A',             // Dark gray
+  'pantry': '#BA8A44',             // Muted amber
+  'closet': '#7A5A9A',             // Muted violet
+  'playroom': '#B85A8A',           // Muted hot pink
+  'library': '#4A8AAA',            // Muted sky blue
+  'wine cellar': '#8A5AAA',        // Muted deep purple
+  'patio': '#BA5A5A',              // Muted bright red
+  'balcony': '#CA6A44',            // Muted orange red
+  'foyer': '#9A6AAA',              // Muted light purple
+  'hallway': '#4A9AAA',            // Muted bright cyan
+  'gym': '#7A9A5A',                // Muted lime
+  'media room': '#6A6AAA',         // Muted indigo
+  'sunroom': '#CAA544',            // Muted bright yellow
 };
 
 export const getRoomColor = (roomName) => {
-  return ROOM_COLORS[roomName.toLowerCase()] || '#7C3AED';
+  return ROOM_COLORS[roomName.toLowerCase()] || '#7A5A8A';
 };
 
 export const getCategoryColor = () => '#065F46';
