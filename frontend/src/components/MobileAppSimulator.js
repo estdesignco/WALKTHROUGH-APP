@@ -430,42 +430,54 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
 export default function MobileAppSimulator() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [screen, setScreen] = useState(searchParams.get('screen') || 'home');
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(() => {
+    const saved = localStorage.getItem('mobileAppProject');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [selectedRoom, setSelectedRoom] = useState(null);
   
+  // Restore screen from URL on load
+  useEffect(() => {
+    const urlScreen = searchParams.get('screen');
+    if (urlScreen) {
+      setScreen(urlScreen);
+    }
+  }, []);
+  
   // Update URL when screen changes
-  const handleNavigate = (screenName, data) => {
-    if (data?.project) setSelectedProject(data.project);
+  const handleNavigate = (screenName) => {
     setScreen(screenName);
     setSearchParams({ screen: screenName });
   };
 
   const handleSelectProject = async (project) => {
+    // Save project to localStorage
+    localStorage.setItem('mobileAppProject', JSON.stringify(project));
+    
     // Load full project with walkthrough data
     try {
       const walkthroughResponse = await axios.get(`${API_URL}/projects/${project.id}?sheet_type=walkthrough`);
       const ffeResponse = await axios.get(`${API_URL}/projects/${project.id}?sheet_type=ffe`);
       
-      setSelectedProject({
+      const fullProject = {
         ...project,
         walkthroughData: walkthroughResponse.data,
         ffeData: ffeResponse.data
-      });
+      };
+      
+      setSelectedProject(fullProject);
+      localStorage.setItem('mobileAppProject', JSON.stringify(fullProject));
     } catch (error) {
       console.error('Failed to load project details:', error);
       setSelectedProject(project);
+      localStorage.setItem('mobileAppProject', JSON.stringify(project));
     }
-    setScreen('project-menu');
+    handleNavigate('project-menu');
   };
 
   const handleSelectRoom = (room) => {
     setSelectedRoom(room);
-    setScreen('photos');
-  };
-
-  const handleNavigate = (screenName, data) => {
-    if (data?.project) setSelectedProject(data.project);
-    setScreen(screenName);
+    handleNavigate('photos');
   };
 
   const renderScreen = () => {
