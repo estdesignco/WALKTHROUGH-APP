@@ -436,11 +436,15 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
 
   return (
     <div className="w-full h-full flex flex-col" style={{ backgroundColor: '#0F172A' }}>
-      {/* EXACT DESKTOP HEADER */}
-      <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 border-b-4 border-[#D4A574] shadow-2xl">
+      {/* EXACT DESKTOP HEADER - WITH ENHANCED SHIMMER */}
+      <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 border-b-4 border-[#D4A574] shadow-2xl" style={{
+        boxShadow: '0 4px 20px rgba(212, 165, 116, 0.3), inset 0 0 60px rgba(212, 165, 116, 0.05)'
+      }}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-6">
-            <h1 className="text-5xl font-bold text-[#D4A574] mb-2 tracking-wide">
+            <h1 className="text-5xl font-bold text-[#D4A574] mb-2 tracking-wide" style={{
+              textShadow: '0 0 20px rgba(212, 165, 116, 0.4), 0 0 40px rgba(212, 165, 116, 0.2)'
+            }}>
               {displayProject?.name || 'PROJECT NAME'}
             </h1>
             <div className="text-xl text-[#D4C5A9] font-medium">
@@ -460,7 +464,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 ✥ ADD ROOM
               </button>
               
-              <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full">
+              <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full" style={{
+                boxShadow: '0 0 30px rgba(212, 165, 116, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)'
+              }}>
                 <span className="text-2xl font-bold text-black tracking-wider">WALKTHROUGH SPREADSHEET</span>
               </div>
               
@@ -470,7 +476,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                 className={`px-8 py-3 rounded-full font-bold text-lg shadow-xl ${
                   leicaConnected 
                     ? 'bg-green-600 text-white' 
-                    : 'bg-gray-700 hover:bg-gray-600 text-white'
+                    : 'bg-gray-700 hover:bg-gray-600 text-[#D4C5A9]'
                 }`}
               >
                 📏 {leicaConnected ? 'Leica Connected' : 'Connect Leica'}
