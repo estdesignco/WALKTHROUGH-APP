@@ -99,17 +99,15 @@ const AddRoomModal = ({ onClose, onSubmit, roomColors }) => {
                       key={room}
                       type="button"
                       onClick={() => handleQuickSelect(room)}
-                      className={`p-3 rounded-xl border-2 font-bold text-sm transition-all ${
-                        formData.name === room
-                          ? 'text-white border-white'
-                          : 'text-white border-gray-600 hover:border-white'
+                      className={`p-3 rounded-xl border-2 font-bold text-sm transition-all text-white overflow-hidden ${
+                        formData.name === room ? 'border-[#D4A574]' : 'border-gray-600 hover:border-[#D4A574]'
                       }`}
                       style={{ 
-                        backgroundColor: formData.name === room ? roomColor : `${roomColor}DD`,
-                        boxShadow: formData.name === room ? `0 0 15px ${roomColor}` : 'none'
+                        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+                        borderTop: `4px solid ${roomColor}`,
+                        boxShadow: formData.name === room ? `0 0 15px ${roomColor}80, 0 -2px 8px ${roomColor}50` : `0 -2px 4px ${roomColor}30`
                       }}
                     >
-                      <div className="w-5 h-5 rounded-full border-2 border-white mb-1 mx-auto" style={{ backgroundColor: roomColor }}></div>
                       {room}
                     </button>
                   );
