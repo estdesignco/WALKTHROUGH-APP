@@ -621,7 +621,7 @@ export default function ProjectDetailPage() {
                         return (
                             <button
                                 key={tab.name}
-                                onClick={() => setActiveTab(tab.name)}
+                                onClick={() => handleTabChange(tab.name)}
                                 className={`${
                                     activeTab === tab.name
                                         ? 'border-stone-400 text-[#D4C5A9]'
