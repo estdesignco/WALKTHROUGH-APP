@@ -427,9 +427,17 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
 
 // ===== MAIN APP =====
 export default function MobileAppSimulator() {
-  const [screen, setScreen] = useState('home');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [screen, setScreen] = useState(searchParams.get('screen') || 'home');
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  
+  // Update URL when screen changes
+  const handleNavigate = (screenName, data) => {
+    if (data?.project) setSelectedProject(data.project);
+    setScreen(screenName);
+    setSearchParams({ screen: screenName });
+  };
 
   const handleSelectProject = async (project) => {
     // Load full project with walkthrough data
