@@ -171,34 +171,6 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
     loadProjectFromCache
   } = useOfflineSync(projectId);
 
-  // EXACT DESKTOP COLORS - NO MODIFICATIONS - COPY FROM ExactFFESpreadsheet.js
-  const getRoomColor = (roomName) => {
-    const roomColors = {
-      'living room': '#7C3AED',      // Purple
-      'dining room': '#DC2626',      // Red
-      'kitchen': '#EA580C',          // Orange  
-      'primary bedroom': '#059669',  // Green
-      'master bedroom': '#059669',   // Green - same as primary
-      'primary bathroom': '#2563EB', // Blue
-      'bathroom': '#2563EB',         // Blue - same as primary
-      'master bathroom': '#2563EB',  // Blue - same as primary
-      'powder room': '#7C2D12',      // Brown
-      'guest room': '#BE185D',       // Pink
-      'office': '#6366F1',           // Indigo
-      'laundry room': '#16A34A',     // Green
-      'mudroom': '#0891B2',          // Cyan
-      'family room': '#CA8A04',      // Yellow
-      'basement': '#6B7280',         // Gray
-      'attic storage': '#78716C',    // Stone
-      'garage': '#374151',           // Gray-800
-      'balcony': '#7C3AED',          // Purple
-      'foyer': '#7C3AED'             // Purple - same as living room/balcony
-    };
-    return roomColors[roomName.toLowerCase()] || '#7C3AED';
-  };
-
-  const getCategoryColor = () => '#065F46';
-
   useEffect(() => {
     loadProject();
     loadAllPhotos();
