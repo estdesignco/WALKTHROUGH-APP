@@ -483,16 +483,16 @@ export default function MobileAppSimulator() {
   const renderScreen = () => {
     switch (screen) {
       case 'home':
-        return <MobileHomeScreen onNavigate={setScreen} />;
+        return <MobileHomeScreen onNavigate={handleNavigate} />;
       case 'projects':
-        return <MobileProjectListScreen onNavigate={setScreen} onSelectProject={handleSelectProject} />;
+        return <MobileProjectListScreen onNavigate={handleNavigate} onSelectProject={handleSelectProject} />;
       case 'project-menu':
-        return <ProjectMenuScreen project={selectedProject} onNavigate={setScreen} />;
+        return <ProjectMenuScreen project={selectedProject} onNavigate={handleNavigate} />;
       case 'walkthrough':
         return (
           <div className="h-full flex flex-col">
             <button 
-              onClick={() => setScreen('project-menu')}
+              onClick={() => handleNavigate('project-menu')}
               className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
             >
               ← Back
@@ -506,7 +506,7 @@ export default function MobileAppSimulator() {
         return (
           <div className="h-full flex flex-col">
             <button 
-              onClick={() => setScreen('project-menu')}
+              onClick={() => handleNavigate('project-menu')}
               className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
             >
               ← Back
@@ -517,12 +517,12 @@ export default function MobileAppSimulator() {
           </div>
         );
       case 'photos':
-        return <MobilePhotoManagement projectId={selectedProject?.id} onClose={() => setScreen('project-menu')} />;
+        return <MobilePhotoManagement projectId={selectedProject?.id} onClose={() => handleNavigate('project-menu')} />;
       case 'measurements-files':
         return (
           <div className="h-full flex flex-col">
             <button 
-              onClick={() => setScreen('project-menu')}
+              onClick={() => handleNavigate('project-menu')}
               className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
             >
               ← Back
@@ -533,7 +533,7 @@ export default function MobileAppSimulator() {
           </div>
         );
       default:
-        return <MobileHomeScreen onNavigate={setScreen} />;
+        return <MobileHomeScreen onNavigate={handleNavigate} />;
     }
   };
 
