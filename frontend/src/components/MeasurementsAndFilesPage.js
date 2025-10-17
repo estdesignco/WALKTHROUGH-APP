@@ -131,8 +131,9 @@ export default function MeasurementsAndFilesPage({ projectId }) {
           
           return (
             <div key={room.id} className="mb-6">
+              {/* ROOM HEADER - DARK SHIMMER WITH COLOR ACCENT */}
               <div 
-                className="px-4 py-3 text-[#D4C5A9] font-bold cursor-pointer border-2 border-[#D4A574] rounded-lg shadow-lg" 
+                className="px-4 py-3 text-[#D4C5A9] font-bold cursor-pointer border-2 border-[#D4A574] rounded-lg shadow-lg overflow-hidden" 
                 style={{ 
                   background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
                   borderTop: `4px solid ${roomColor}`,
