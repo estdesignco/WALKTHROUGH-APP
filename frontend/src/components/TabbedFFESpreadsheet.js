@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useOfflineSync } from '../hooks/useOfflineSync';
 import { exportProjectToCSV, exportProjectSummary, calculateProjectStats } from '../utils/exportUtils';
 import { leicaManager } from '../utils/leicaD5Manager';
+import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
