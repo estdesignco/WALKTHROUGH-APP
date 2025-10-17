@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import AddItemModal from './AddItemModal';
 import CanvaIntegrationModal from './CanvaIntegrationModal';
+import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 
 const ExactChecklistSpreadsheet = ({ 
   project, 
