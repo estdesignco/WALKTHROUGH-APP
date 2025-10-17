@@ -1812,7 +1812,10 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
       )}\n\n      {/* ADD ROOM MODAL */}
       {showAddRoom && (
         <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1E293B] rounded-2xl p-8 max-w-4xl w-full border-2 border-[#D4A574] max-h-[90vh] overflow-y-auto">
+          <div className="rounded-2xl p-8 max-w-4xl w-full border-2 border-[#D4A574] max-h-[90vh] overflow-y-auto" style={{
+            background: 'linear-gradient(135deg, rgba(0,0,0,0.98) 0%, rgba(30,30,30,0.95) 20%, rgba(15,15,25,0.98) 40%, rgba(30,30,30,0.95) 60%, rgba(15,15,25,0.98) 80%, rgba(0,0,0,0.98) 100%)',
+            boxShadow: '0 0 60px rgba(212, 165, 116, 0.3), inset 0 0 80px rgba(212, 165, 116, 0.05)'
+          }}>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-3xl font-bold text-[#D4A574]">Add New Room</h3>
               <button
@@ -1824,19 +1827,22 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
             </div>
             
             <div className="mb-8">
-              <label className="text-white text-lg font-bold mb-3 block">Room Name *</label>
+              <label className="text-[#D4C5A9] text-lg font-bold mb-3 block">Room Name *</label>
               <input
                 type="text"
                 value={newRoomName}
                 onChange={(e) => setNewRoomName(e.target.value)}
                 placeholder="Enter room name..."
-                className="w-full bg-gray-700 text-white px-6 py-4 rounded-xl text-xl border-2 border-gray-600 focus:border-[#D4A574] focus:outline-none"
+                className="w-full bg-gray-900 text-[#D4C5A9] px-6 py-4 rounded-xl text-xl border-2 border-[#B49B7E] focus:border-[#D4A574] focus:outline-none"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
+                }}
                 onKeyPress={(e) => e.key === 'Enter' && newRoomName.trim() && handleAddRoom()}
               />
             </div>
 
             <div className="mb-8">
-              <h4 className="text-white text-lg font-bold mb-4">Quick Select Common Rooms</h4>
+              <h4 className="text-[#D4C5A9] text-lg font-bold mb-4">Quick Select Common Rooms</h4>
               <div className="grid grid-cols-3 gap-4">
                 {[
                   'Living Room', 'Kitchen', 'Master Bedroom',
@@ -1853,13 +1859,15 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                     <button
                       key={roomName}
                       onClick={() => setNewRoomName(roomName)}
-                      className={`p-4 rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 text-white overflow-hidden ${
-                        newRoomName === roomName ? 'border-[#D4A574]' : 'border-gray-600 hover:border-[#D4A574]'
+                      className={`p-4 rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 overflow-hidden ${
+                        newRoomName === roomName ? 'border-[#D4A574] text-[#D4A574]' : 'border-[#B49B7E] hover:border-[#D4A574] text-[#D4C5A9]'
                       }`}
                       style={{ 
                         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
                         borderTop: `4px solid ${roomColor}`,
-                        boxShadow: newRoomName === roomName ? `0 0 20px ${roomColor}80, 0 -2px 10px ${roomColor}50` : `0 -2px 5px ${roomColor}30`
+                        boxShadow: newRoomName === roomName 
+                          ? `0 0 25px ${roomColor}90, 0 -3px 15px ${roomColor}60, inset 0 0 30px ${roomColor}10` 
+                          : `0 -2px 8px ${roomColor}40, inset 0 0 20px ${roomColor}05`
                       }}
                     >
                       {roomName}
