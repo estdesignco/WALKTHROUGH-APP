@@ -971,8 +971,11 @@ const ExactFFESpreadsheet = ({
                                       </button>
                                     </div>
                                   </td>
-                                  <td className="border border-gray-400 px-2 py-2 text-center"
-                                      style={{ backgroundColor: getRoomColor(room.name) }}>
+                                  <td className="border-2 border-[#D4A574] px-2 py-2 text-center rounded-lg"
+                                      style={{ 
+                                        backgroundColor: getRoomColor(room.name),
+                                        boxShadow: `0 0 15px ${getRoomColor(room.name)}40, inset 0 0 30px rgba(255, 255, 255, 0.06)`
+                                      }}>
                                     <button
                                       onClick={() => handleAddRoom()}
                                       className="text-green-300 hover:text-green-100 text-sm font-bold"
