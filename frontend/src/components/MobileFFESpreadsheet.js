@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useOfflineSync } from '../hooks/useOfflineSync';
 import MobileAddItemModal from './MobileAddItemModal';
+import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 import MobilePhotoCapture from './MobilePhotoCapture';
 import MobileSearchFilter from './MobileSearchFilter';
 import MobileQuickAddTemplates from './MobileQuickAddTemplates';
