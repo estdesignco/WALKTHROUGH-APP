@@ -131,7 +131,15 @@ export default function MeasurementsAndFilesPage({ projectId }) {
           
           return (
             <div key={room.id} className="mb-6">
-              <div className="px-4 py-3 text-white font-bold cursor-pointer border-2 border-[#B49B7E] shadow-lg" style={{ backgroundColor: roomColor }} onClick={() => setExpandedRooms(prev => ({ ...prev, [room.id]: !prev[room.id] }))}>
+              <div 
+                className="px-4 py-3 text-white font-bold cursor-pointer border-2 border-[#D4A574] rounded-lg shadow-lg" 
+                style={{ 
+                  backgroundColor: roomColor,
+                  boxShadow: `0 0 25px ${roomColor}60, inset 0 0 40px rgba(255, 255, 255, 0.08), inset 0 0 80px rgba(0, 0, 0, 0.3)`,
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.2)'
+                }} 
+                onClick={() => setExpandedRooms(prev => ({ ...prev, [room.id]: !prev[room.id] }))}
+              >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
                     <span>{expandedRooms[room.id] ? '▼' : '▶'}</span>
