@@ -1082,9 +1082,21 @@ const ExactFFESpreadsheet = ({
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>SIZE</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>FINISH/COLOR</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>COST/PRICE</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>IMAGE</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                                    boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>FINISH/COLOR</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                                    boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>COST/PRICE</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                                    boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>IMAGE</td>
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>ORDER DATE</td>
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS/ORDER#</td>
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>EST. DATES</td>
