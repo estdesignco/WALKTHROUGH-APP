@@ -10,7 +10,11 @@ const MainHeader = ({
       {/* TOP HEADER */}
       <div className="mb-1 pt-2"> {/* Much tighter spacing */}
         <div className="text-center mb-1"> {/* Much tighter spacing */}
-          <h1 className="text-4xl font-bold text-white mb-1" style={{ color: '#8b7355' }}>GREENE</h1> {/* Much tighter */}
+          <h1 className="text-4xl font-bold text-white mb-1 px-4 py-2 rounded-lg inline-block" style={{ 
+            background: 'linear-gradient(135deg, #8b7355FF 0%, #8b7355AA 20%, #8b7355 40%, #8b7355AA 80%, #8b7355FF 100%)',
+            boxShadow: '0 0 30px #8b735560, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.4)',
+            textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.35)'
+          }}>GREENE</h1> {/* Much tighter */}
           <p style={{ color: '#F5F5DC', opacity: '0.8' }}>Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
         </div>
 
