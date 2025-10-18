@@ -277,36 +277,6 @@ const ExactChecklistSpreadsheet = ({
 
   const getCategoryColor = () => '#065F46';  // Dark green for categories
 
-  // Status colors mapping for checklist - COMPREHENSIVE FFE STATUS COLORS
-  const getStatusColor = (status) => {
-    const statusColors = {
-      '': '#6B7280',                        // Gray for blank/default
-      'TO BE SELECTED': '#64748B',          // Slate gray
-      'RESEARCHING': '#3B82F6',             // Blue
-      'PENDING APPROVAL': '#F59E0B',        // Amber
-      'APPROVED': '#10B981',                // Green
-      'ORDERED': '#14B8A6',                 // Teal
-      'PICKED': '#FFD700',                  // Gold
-      'CONFIRMED': '#22C55E',               // Light green
-      'IN PRODUCTION': '#F97316',           // Orange
-      'SHIPPED': '#0EA5E9',                 // Sky blue
-      'IN TRANSIT': '#6366F1',              // Indigo
-      'OUT FOR DELIVERY': '#2563EB',        // Blue
-      'DELIVERED TO RECEIVER': '#8B5CF6',   // Purple
-      'DELIVERED TO JOB SITE': '#A855F7',   // Purple
-      'RECEIVED': '#9333EA',                // Purple
-      'READY FOR INSTALL': '#059669',       // Emerald
-      'INSTALLING': '#16A34A',              // Green
-      'INSTALLED': '#65A30D',               // Lime
-      'ON HOLD': '#DC2626',                 // Red
-      'BACKORDERED': '#B91C1C',             // Dark red
-      'DAMAGED': '#991B1B',                 // Darker red
-      'RETURNED': '#BE123C',                // Rose
-      'CANCELLED': '#7F1D1D'                // Very dark red
-    };
-    return statusColors[status] || '#6B7280'; // Default gray
-  };
-
   // Handle status change with improved error handling
   const handleStatusChange = async (itemId, newStatus) => {
     console.log('🔄 Checklist status change request:', { itemId, newStatus });
