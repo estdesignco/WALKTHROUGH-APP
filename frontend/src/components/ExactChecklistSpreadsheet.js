@@ -1056,18 +1056,28 @@ const ExactChecklistSpreadsheet = ({
               className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
             >
               <option value="">All Status</option>
+              <option value="TO BE SELECTED">TO BE SELECTED</option>
+              <option value="RESEARCHING">RESEARCHING</option>
+              <option value="PENDING APPROVAL">PENDING APPROVAL</option>
+              <option value="APPROVED">APPROVED</option>
+              <option value="ORDERED">ORDERED</option>
               <option value="PICKED">PICKED</option>
-              <option value="ORDER SAMPLES">ORDER SAMPLES</option>
-              <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
-              <option value="ASK NEIL">ASK NEIL</option>
-              <option value="ASK CHARLENE">ASK CHARLENE</option>
-              <option value="ASK JALA">ASK JALA</option>
-              <option value="GET QUOTE">GET QUOTE</option>
-              <option value="WAITING ON QT">WAITING ON QT</option>
-              <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
-              <option value="GET QUOTE">GET QUOTE</option>
-              <option value="WAITING ON QT">WAITING ON QT</option>
-              <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
+              <option value="CONFIRMED">CONFIRMED</option>
+              <option value="IN PRODUCTION">IN PRODUCTION</option>
+              <option value="SHIPPED">SHIPPED</option>
+              <option value="IN TRANSIT">IN TRANSIT</option>
+              <option value="OUT FOR DELIVERY">OUT FOR DELIVERY</option>
+              <option value="DELIVERED TO RECEIVER">DELIVERED TO RECEIVER</option>
+              <option value="DELIVERED TO JOB SITE">DELIVERED TO JOB SITE</option>
+              <option value="RECEIVED">RECEIVED</option>
+              <option value="READY FOR INSTALL">READY FOR INSTALL</option>
+              <option value="INSTALLING">INSTALLING</option>
+              <option value="INSTALLED">INSTALLED</option>
+              <option value="ON HOLD">ON HOLD</option>
+              <option value="BACKORDERED">BACKORDERED</option>
+              <option value="DAMAGED">DAMAGED</option>
+              <option value="RETURNED">RETURNED</option>
+              <option value="CANCELLED">CANCELLED</option>
             </select>
           </div>
           
