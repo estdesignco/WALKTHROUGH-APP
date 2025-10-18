@@ -1062,10 +1062,26 @@ const ExactFFESpreadsheet = ({
                                                       
                                                       {/* MAIN RED HEADER ROW - PERFECTLY ALIGNED WITH DATA COLUMNS */}
                                                       <tr>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>INSTALLED</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>VENDOR/SKU</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>QTY</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>SIZE</td>
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>FINISH/COLOR</td>
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>COST/PRICE</td>
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>IMAGE</td>
@@ -1075,8 +1091,16 @@ const ExactFFESpreadsheet = ({
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>INSTALL/SHIP TO</td>
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>TRACKING/CARRIER</td>
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>NOTES</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>DELETE</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>LINK</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>DELETE</td>
                                                       </tr>
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
