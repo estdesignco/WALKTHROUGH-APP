@@ -1,10 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
 const MainHeader = ({ 
   projectId, 
-  activeTab = 'walkthrough', // 'walkthrough', 'checklist', 'ffe'
+  activeTab = 'walkthrough',
   hideNavigation = false 
 }) => {
+  const [project, setProject] = useState(null);
+  
+  useEffect(() => {
+    if (projectId) {
+      axios.get(`${API_URL}/projects/${projectId}`)
+        .then(response => setProject(response.data))
+        .catch(err => console.error('Error loading project:', err));
+    }
+  }, [projectId]);
+  
+  const clientLastName = project?.client_info?.full_name?.split(' ').pop() || 'GREENE';
+  const clientFullInfo = project?.client_info 
+    ? `${project.client_info.full_name} - ${project.client_info.address}` 
+    : 'Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506';
+  
   return (
     <div className="max-w-full mx-auto bg-gradient-to-b from-black via-gray-900 to-black min-h-screen">
       {/* TOP HEADER */}
