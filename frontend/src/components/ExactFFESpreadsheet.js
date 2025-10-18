@@ -765,7 +765,11 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
+              }}
             >
               <option value="">All Rooms</option>
               {project.rooms.map(room => (
@@ -776,7 +780,11 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
+              }}
             >
               <option value="">All Categories</option>
               {availableCategories.map(category => (
@@ -787,7 +795,11 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
+              }}
             >
               <option value="">All Vendors</option>
               <option value="Visual Comfort">Visual Comfort</option>
@@ -803,7 +815,11 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
+              }}
             >
               <option value="">All Status</option>
               <option value="TO BE SELECTED">TO BE SELECTED</option>
@@ -833,7 +849,11 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedCarrier}
               onChange={(e) => setSelectedCarrier(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
+              }}
             >
               <option value="">All Carriers</option>
               <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
