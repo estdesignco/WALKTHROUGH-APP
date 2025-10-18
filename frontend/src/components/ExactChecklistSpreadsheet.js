@@ -1781,19 +1781,16 @@ const ExactChecklistSpreadsheet = ({
                                       }}
                                       onChange={(e) => handleStatusChange(item.id, e.target.value)}
                                     >
-                                      <option value=""></option>
-                                      <option value="PICKED">PICKED</option>
-                                      <option value="ORDER SAMPLES">ORDER SAMPLES</option>
-                                      <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
-                                      <option value="ASK NEIL">ASK NEIL</option>
-                                      <option value="ASK CHARLENE">ASK CHARLENE</option>
-                                      <option value="ASK JALA">ASK JALA</option>
-                                      <option value="GET QUOTE">GET QUOTE</option>
-                                      <option value="WAITING ON QT">WAITING ON QT</option>
-                                      <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
-                                      <option value="GET QUOTE" style={{ backgroundColor: '#06B6D4', color: 'white' }}>GET QUOTE</option>
-                                      <option value="WAITING ON QT" style={{ backgroundColor: '#F97316', color: 'white' }}>WAITING ON QT</option>
-                                      <option value="READY FOR PRESENTATION" style={{ backgroundColor: '#84CC16', color: 'white' }}>READY FOR PRESENTATION</option>
+                                      <option value="" style={{ background: 'linear-gradient(135deg, #6B7280FF 0%, #6B7280AA 50%, #6B7280FF 100%)', color: 'white' }}>—</option>
+                                      <option value="PICKED" style={{ background: 'linear-gradient(135deg, #3B82F6FF 0%, #3B82F6AA 50%, #3B82F6FF 100%)', color: 'white' }}>🔵 PICKED</option>
+                                      <option value="ORDER SAMPLES" style={{ background: 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)', color: 'white' }}>🟢 ORDER SAMPLES</option>
+                                      <option value="SAMPLES ARRIVED" style={{ background: 'linear-gradient(135deg, #8B5CF6FF 0%, #8B5CF6AA 50%, #8B5CF6FF 100%)', color: 'white' }}>🟣 SAMPLES ARRIVED</option>
+                                      <option value="ASK NEIL" style={{ background: 'linear-gradient(135deg, #F59E0BFF 0%, #F59E0BAA 50%, #F59E0BFF 100%)', color: 'white' }}>🟡 ASK NEIL</option>
+                                      <option value="ASK CHARLENE" style={{ background: 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)', color: 'white' }}>🔴 ASK CHARLENE</option>
+                                      <option value="ASK JALA" style={{ background: 'linear-gradient(135deg, #EC4899FF 0%, #EC4899AA 50%, #EC4899FF 100%)', color: 'white' }}>🩷 ASK JALA</option>
+                                      <option value="GET QUOTE" style={{ background: 'linear-gradient(135deg, #06B6D4FF 0%, #06B6D4AA 50%, #06B6D4FF 100%)', color: 'white' }}>🔷 GET QUOTE</option>
+                                      <option value="WAITING ON QT" style={{ background: 'linear-gradient(135deg, #F97316FF 0%, #F97316AA 50%, #F97316FF 100%)', color: 'white' }}>🟠 WAITING ON QT</option>
+                                      <option value="READY FOR PRESENTATION" style={{ background: 'linear-gradient(135deg, #84CC16FF 0%, #84CC16AA 50%, #84CC16FF 100%)', color: 'white' }}>🟢 READY FOR PRESENTATION</option>
                                     </select>
                                   </td>
                                   
