@@ -116,10 +116,17 @@ export default function MeasurementsAndFilesPage({ projectId }) {
 
   return (
     <div className="w-full h-full flex flex-col" style={{ backgroundColor: '#0F172A' }}>
-      <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 border-b-4 border-[#D4A574] shadow-2xl">
+      <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 border-b-4 border-[#D4A574] shadow-2xl" style={{
+        boxShadow: '0 4px 30px rgba(212, 165, 116, 0.4), inset 0 0 80px rgba(212, 165, 116, 0.08)'
+      }}>
         <div className="max-w-7xl mx-auto"><div className="text-center">
-          <h1 className="text-5xl font-bold text-[#D4A574] mb-4 tracking-wide">📐 MEASUREMENTS & FILES</h1>
-          <p className="text-xl text-[#D4C5A9] mb-4">All photos with measurements organized by room</p>
+          <h1 className="text-5xl font-bold text-[#D4A574] mb-4 tracking-wide inline-block px-6 py-3 rounded-lg" style={{
+            background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
+            boxShadow: '0 0 35px #D4A57480, inset 0 0 60px rgba(255, 255, 255, 0.16), inset 0 0 100px rgba(0, 0, 0, 0.5)',
+            textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.2)',
+            color: 'white'
+          }}>📐 MEASUREMENTS & FILES</h1>
+          <p className="text-xl text-[#D4C5A9] mb-4 mt-4">All photos with measurements organized by room</p>
         </div></div>
       </div>
 
