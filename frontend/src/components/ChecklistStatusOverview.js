@@ -97,7 +97,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
   const totalPicked = Object.values(checklistBreakdown).reduce((sum, status) => 
     sum + (status.count || 0), 0);
 
-  // Prepare data for Status Overview pie chart
+  // Prepare data for Status Overview pie chart with shimmer
   const statusPieData = {
     labels: Object.keys(checklistBreakdown).filter(status => checklistBreakdown[status].count > 0),
     datasets: [
@@ -108,9 +108,18 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
         backgroundColor: Object.keys(checklistBreakdown)
           .filter(status => checklistBreakdown[status].count > 0)
           .map(status => checklistBreakdown[status].color),
-        borderWidth: 0,
-        hoverBorderWidth: 2,
-        hoverBorderColor: '#ffffff'
+        borderWidth: 3,
+        borderColor: Object.keys(checklistBreakdown)
+          .filter(status => checklistBreakdown[status].count > 0)
+          .map(status => '#D4A574'),
+        hoverBorderWidth: 4,
+        hoverBorderColor: '#FFD700',
+        shadowOffsetX: 0,
+        shadowOffsetY: 0,
+        shadowBlur: 15,
+        shadowColor: Object.keys(checklistBreakdown)
+          .filter(status => checklistBreakdown[status].count > 0)
+          .map(status => checklistBreakdown[status].color + '80')
       }
     ]
   };
