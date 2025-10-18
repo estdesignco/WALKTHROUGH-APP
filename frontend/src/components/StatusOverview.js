@@ -71,14 +71,17 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         backgroundColor: Object.keys(statusBreakdown)
           .filter(status => statusBreakdown[status] > 0)
           .map(status => getStatusColor(status)),
-        borderWidth: 0,
-        hoverBorderWidth: 2,
-        hoverBorderColor: '#ffffff'
+        borderWidth: 3,
+        borderColor: Object.keys(statusBreakdown)
+          .filter(status => statusBreakdown[status] > 0)
+          .map(status => '#D4A574'),
+        hoverBorderWidth: 4,
+        hoverBorderColor: '#FFD700'
       }
     ]
   };
 
-  // Prepare data for Carrier pie chart
+  // Prepare data for Carrier pie chart with shimmer
   const carrierPieData = {
     labels: Object.keys(carrierBreakdown).filter(carrier => carrierBreakdown[carrier] > 0),
     datasets: [
