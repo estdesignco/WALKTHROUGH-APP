@@ -752,7 +752,7 @@ const ExactFFESpreadsheet = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border-2 border-[#D4A574] text-white focus:outline-none placeholder-[#D4C5A9]/70"
+              className="w-full px-4 py-2 rounded-lg border border-[#B49B7E] text-white focus:outline-none placeholder-[#D4C5A9]/70"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 30px rgba(212, 165, 116, 0.08)'
@@ -765,7 +765,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
@@ -780,7 +780,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
@@ -795,7 +795,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
@@ -815,7 +815,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
@@ -849,7 +849,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedCarrier}
               onChange={(e) => setSelectedCarrier(e.target.value)}
-              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
@@ -938,7 +938,7 @@ const ExactFFESpreadsheet = ({
                             }}
                           >
                             <td colSpan="12" 
-                                className="border-2 border-[#D4A574] px-3 py-3 text-white text-sm font-bold rounded-lg"
+                                className="border border-[#B49B7E] px-3 py-3 text-white text-sm font-bold rounded-lg"
                                 style={{ 
                                   background: `linear-gradient(135deg, ${getRoomColor(room.name)}FF 0%, ${getRoomColor(room.name)}AA 20%, ${getRoomColor(room.name)} 40%, ${getRoomColor(room.name)}AA 80%, ${getRoomColor(room.name)}FF 100%)`,
                                   boxShadow: `0 0 35px ${getRoomColor(room.name)}80, 0 0 55px ${getRoomColor(room.name)}40, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3)`,
@@ -966,7 +966,7 @@ const ExactFFESpreadsheet = ({
                                       </button>
                                     </div>
                                   </td>
-                                  <td className="border-2 border-[#D4A574] px-2 py-2 text-center rounded-lg text-[#D4C5A9]"
+                                  <td className="border border-[#B49B7E] px-2 py-2 text-center rounded-lg text-[#D4C5A9]"
                                       style={{ 
                                         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                                         borderTop: `4px solid ${getRoomColor(room.name)}`,
@@ -1010,7 +1010,7 @@ const ExactFFESpreadsheet = ({
                                                     }}
                                                   >
                                                     <td colSpan="14" 
-                                                        className="border-2 border-[#D4A574] px-4 py-2 text-white text-sm font-bold rounded-lg"
+                                                        className="border border-[#B49B7E] px-4 py-2 text-white text-sm font-bold rounded-lg"
                                                         style={{ 
                                                           background: `linear-gradient(135deg, ${getCategoryColor()} 0%, ${getCategoryColor()}DD 50%, ${getCategoryColor()} 100%)`,
                                                           boxShadow: `0 0 22px ${getCategoryColor()}55, inset 0 0 45px rgba(255, 255, 255, 0.12), inset 0 0 85px rgba(0, 0, 0, 0.4)`,
@@ -1039,7 +1039,7 @@ const ExactFFESpreadsheet = ({
                                                         <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#8B4444', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
                                                         </td>
-                                                        <td colSpan="3" className="border-2 border-[#D4A574] px-2 py-1 text-xs font-bold text-white text-center rounded" 
+                                                        <td colSpan="3" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center rounded" 
                                                             style={{ 
                                                               background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
                                                               boxShadow: '0 0 25px #8B451360, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
@@ -1047,7 +1047,7 @@ const ExactFFESpreadsheet = ({
                                                             }}>
                                                           ADDITIONAL INFO.
                                                         </td>
-                                                        <td colSpan="6" className="border-2 border-[#D4A574] px-2 py-1 text-xs font-bold text-white text-center rounded" 
+                                                        <td colSpan="6" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center rounded" 
                                                             style={{ 
                                                               background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
                                                               boxShadow: '0 0 25px #6B46C160, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
