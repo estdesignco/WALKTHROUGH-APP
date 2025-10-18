@@ -1184,8 +1184,11 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
-                                                          {/* Order Status/Order Number (STACKED VERTICALLY) */}
-                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm">
+                                                          {/* Order Status/Order Number (STACKED VERTICALLY) - COLORED BY STATUS */}
+                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm" style={{
+                                                            background: item.status ? `linear-gradient(135deg, ${getStatusColor(item.status)}FF 0%, ${getStatusColor(item.status)}AA 20%, ${getStatusColor(item.status)} 40%, ${getStatusColor(item.status)}AA 80%, ${getStatusColor(item.status)}FF 100%)` : 'transparent',
+                                                            boxShadow: item.status ? `0 0 15px ${getStatusColor(item.status)}40, inset 0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)` : 'none'
+                                                          }}>
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <select 
