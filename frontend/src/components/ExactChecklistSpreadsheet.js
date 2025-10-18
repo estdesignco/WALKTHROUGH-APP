@@ -1133,13 +1133,13 @@ const ExactChecklistSpreadsheet = ({
                             transform: provided.draggableProps.style?.transform || 'none'
                           }}
                         >
-              {/* ROOM HEADER - ENHANCED GRADIENT WITH MORE SHIMMER */}
+              {/* ROOM HEADER - STRONG GRADIENT WITH ENHANCED SHIMMER */}
               <div 
                 className="px-4 py-3 text-white font-bold mb-4 border-2 border-[#D4A574] rounded-lg overflow-hidden"
                 style={{ 
-                  background: `linear-gradient(135deg, ${getRoomColor(room.name)}EE 0%, ${getRoomColor(room.name)} 25%, ${getRoomColor(room.name)}CC 50%, ${getRoomColor(room.name)} 75%, ${getRoomColor(room.name)}EE 100%)`,
-                  boxShadow: `0 0 30px ${getRoomColor(room.name)}70, 0 0 50px ${getRoomColor(room.name)}30, inset 0 0 60px rgba(255, 255, 255, 0.14), inset 0 0 100px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)`,
-                  textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.35), 0 0 25px rgba(255, 255, 255, 0.15)'
+                  background: `linear-gradient(135deg, ${getRoomColor(room.name)}FF 0%, ${getRoomColor(room.name)}AA 20%, ${getRoomColor(room.name)} 40%, ${getRoomColor(room.name)}AA 80%, ${getRoomColor(room.name)}FF 100%)`,
+                  boxShadow: `0 0 35px ${getRoomColor(room.name)}80, 0 0 55px ${getRoomColor(room.name)}40, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3)`,
+                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2)'
                 }}
               >
                 <div className="flex justify-between items-center">
