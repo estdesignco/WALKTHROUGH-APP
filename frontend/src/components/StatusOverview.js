@@ -312,25 +312,37 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         <div>
           <div className="grid grid-cols-2 gap-3">
             {/* Total Items */}
-            <div className="bg-gray-700 rounded-lg p-4 text-center">
+            <div className="rounded-lg p-4 text-center border-2 border-[#D4A574]" style={{
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+              boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 40px rgba(212, 165, 116, 0.08)'
+            }}>
               <div className="text-2xl font-bold text-[#D4C5A9]">{totalItems}</div>
               <div className="text-sm text-[#D4A574]">Total Items</div>
             </div>
             
             {/* Delivered */}
-            <div className="bg-gray-700 rounded-lg p-4 text-center">
+            <div className="rounded-lg p-4 text-center border-2 border-[#D4A574]" style={{
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+              boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 40px rgba(212, 165, 116, 0.08)'
+            }}>
               <div className="text-2xl font-bold text-green-400">{getCompletedItems()}</div>
               <div className="text-sm text-[#D4A574]">Delivered</div>
             </div>
             
             {/* In Transit */}
-            <div className="bg-gray-700 rounded-lg p-4 text-center">
+            <div className="rounded-lg p-4 text-center border-2 border-[#D4A574]" style={{
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+              boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 40px rgba(212, 165, 116, 0.08)'
+            }}>
               <div className="text-2xl font-bold text-orange-400">{getInTransitItems()}</div>
               <div className="text-sm text-[#D4A574]">In Transit</div>
             </div>
             
             {/* On Hold */}
-            <div className="bg-gray-700 rounded-lg p-4 text-center">
+            <div className="rounded-lg p-4 text-center border-2 border-[#D4A574]" style={{
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+              boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 40px rgba(212, 165, 116, 0.08)'
+            }}>
               <div className="text-2xl font-bold text-red-400">{statusBreakdown['ON HOLD'] || 0}</div>
               <div className="text-sm text-[#D4A574]">On Hold</div>
             </div>
