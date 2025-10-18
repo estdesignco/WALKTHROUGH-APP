@@ -528,13 +528,13 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
             <div className="p-4">
               {activeRoom.categories?.map((category) => (
                 <div key={category.id} className="mb-6">
-                  {/* CATEGORY HEADER - SOLID GREEN WITH ENHANCED SHIMMER */}
+                  {/* CATEGORY HEADER - GREEN GRADIENT WITH BALANCED SHIMMER */}
                   <div 
                     className="border-2 border-[#D4A574] p-3 font-bold text-white shadow-lg cursor-pointer rounded-lg overflow-hidden"
                     style={{ 
-                      backgroundColor: getCategoryColor(),
-                      boxShadow: `0 0 35px ${getCategoryColor()}80, 0 0 50px ${getCategoryColor()}40, inset 0 0 70px rgba(255, 255, 255, 0.15), inset 0 0 110px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
-                      textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 18px rgba(255, 255, 255, 0.4), 0 0 28px rgba(255, 255, 255, 0.2)'
+                      background: `linear-gradient(135deg, ${getCategoryColor()} 0%, ${getCategoryColor()}DD 50%, ${getCategoryColor()} 100%)`,
+                      boxShadow: `0 0 22px ${getCategoryColor()}55, inset 0 0 45px rgba(255, 255, 255, 0.12), inset 0 0 85px rgba(0, 0, 0, 0.4)`,
+                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 14px rgba(255, 255, 255, 0.3)'
                     }}
                     onClick={() => toggleCategory(category.id)}
                   >
