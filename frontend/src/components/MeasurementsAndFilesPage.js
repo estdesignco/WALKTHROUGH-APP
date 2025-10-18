@@ -131,13 +131,13 @@ export default function MeasurementsAndFilesPage({ projectId }) {
           
           return (
             <div key={room.id} className="mb-6">
-              {/* ROOM HEADER - SOLID COLOR WITH SHIMMER */}
+              {/* ROOM HEADER - SOLID COLOR WITH ENHANCED SHIMMER */}
               <div 
                 className="px-4 py-3 text-white font-bold cursor-pointer border-2 border-[#D4A574] rounded-lg shadow-lg overflow-hidden" 
                 style={{ 
                   backgroundColor: roomColor,
-                  boxShadow: `0 0 30px ${roomColor}70, inset 0 0 60px rgba(255, 255, 255, 0.1), inset 0 0 100px rgba(0, 0, 0, 0.4)`,
-                  textShadow: '0 2px 6px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.3)'
+                  boxShadow: `0 0 40px ${roomColor}90, 0 0 60px ${roomColor}50, inset 0 0 80px rgba(255, 255, 255, 0.15), inset 0 0 120px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
+                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2)'
                 }} 
                 onClick={() => setExpandedRooms(prev => ({ ...prev, [room.id]: !prev[room.id] }))}
               >
