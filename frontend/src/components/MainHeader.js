@@ -33,8 +33,16 @@ const MainHeader = ({
           </>
         )}
 
-        {/* LOGO BANNER */}
-        <div className="rounded-lg mb-1" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}> {/* Tight spacing */}
+        {/* LOGO BANNER - WITH SHIMMER */}
+        <div className="rounded-lg mb-1 border-2 border-[#D4A574]" style={{ 
+          background: 'linear-gradient(135deg, #8b7355FF 0%, #8b7355 25%, #8b7355CC 50%, #8b7355 75%, #8b7355FF 100%)', 
+          padding: '8px 0', 
+          width: '100%', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          boxShadow: '0 0 35px #8b735560, 0 0 50px #8b735530, inset 0 0 60px rgba(255, 255, 255, 0.12), inset 0 0 100px rgba(0, 0, 0, 0.4)'
+        }}> {/* Tight spacing */}
           <img 
             src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png"
             alt="Established Design Co. Logo" 
