@@ -12,36 +12,6 @@ import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemStatuses }) => {
-  // Status colors for pie chart and breakdown - ALL UNIQUE
-  const getStatusColor = (status) => {
-    const colors = {
-      '': '#6B7280',                        // Gray for blank/default
-      'TO BE SELECTED': '#64748B',          // Slate gray (UNIQUE)
-      'RESEARCHING': '#3B82F6',             // Blue
-      'PENDING APPROVAL': '#F59E0B',        // Amber
-      'APPROVED': '#10B981',                // Green
-      'ORDERED': '#14B8A6',                 // Teal (UNIQUE)
-      'PICKED': '#FFD700',                  // Gold
-      'CONFIRMED': '#22C55E',               // Light green (UNIQUE)
-      'IN PRODUCTION': '#F97316',           // Orange
-      'SHIPPED': '#0EA5E9',                 // Sky blue (UNIQUE)
-      'IN TRANSIT': '#6366F1',              // Indigo (UNIQUE)
-      'OUT FOR DELIVERY': '#2563EB',        // Blue (UNIQUE shade)
-      'DELIVERED TO RECEIVER': '#8B5CF6',   // Purple
-      'DELIVERED TO JOB SITE': '#A855F7',   // Light purple (UNIQUE)
-      'RECEIVED': '#9333EA',                // Purple (UNIQUE shade)
-      'READY FOR INSTALL': '#059669',       // Emerald (UNIQUE)
-      'INSTALLING': '#16A34A',              // Forest green (UNIQUE)
-      'INSTALLED': '#65A30D',               // Lime (UNIQUE)
-      'ON HOLD': '#DC2626',                 // Red
-      'BACKORDERED': '#B91C1C',             // Dark red (UNIQUE)
-      'DAMAGED': '#991B1B',                 // Darker red (UNIQUE)
-      'RETURNED': '#BE123C',                // Rose (UNIQUE)
-      'CANCELLED': '#7F1D1D'                // Very dark red (UNIQUE)
-    };
-    return colors[status] || '#6B7280';
-  };
-
   const getCarrierColor = (carrier) => {
     const colors = {
       'FedEx': '#FF6600',           // FedEx Orange
