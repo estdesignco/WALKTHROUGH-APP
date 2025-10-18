@@ -765,7 +765,7 @@ const SimpleWalkthroughSpreadsheet = ({
     <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
       
       {/* ENHANCED FILTER SECTION - EXACT SAME TREATMENT AS GRAPHS */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border-2 border-[#D4A574]/20 mb-6" 
            style={{
              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
            }}>
@@ -872,7 +872,7 @@ const SimpleWalkthroughSpreadsheet = ({
       </div>
       
       {/* DYNAMIC SPREADSHEET WITH REAL DATA - EXACT SAME TREATMENT AS GRAPHS */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border-2 border-[#D4A574]/20 mb-6" 
            style={{
              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
            }}>
@@ -985,31 +985,31 @@ const SimpleWalkthroughSpreadsheet = ({
                             {category.subcategories?.map((subcategory) => (
                               <React.Fragment key={subcategory.id || subcategory.name}>
                                 {/* TABLE WITH SUBCATEGORY NAME IN HEADER - MATCHING CHECKLIST */}
-                                <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10">
+                                <table className="w-full border-collapse border-2 border-[#D4A574] mb-4 shadow-lg shadow-[#B49B7E]/10">
                                   <thead>
                                     <tr>
-                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-6 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8b7355' }}>✓</th>
-                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border-2 border-[#D4A574] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-6 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8b7355' }}>✓</th>
+                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>{subcategory.name.toUpperCase()}</th>
-                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-16 shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-16 shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>QTY</th>
-                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>SIZE</th>
-                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>FINISH/COLOR</th>
-                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-12 shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border-2 border-[#D4A574] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-12 shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
@@ -1020,7 +1020,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                     {/* ITEMS FOR THIS SUBCATEGORY */}
                                     {(subcategory.items || []).map((item, itemIndex) => (
                                     <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-gradient-to-r from-black/80 to-gray-900/80' : 'bg-gradient-to-r from-gray-900/60 to-black/60'}>
-                                      <td className="border border-[#B49B7E]/20 px-1 py-1 text-center w-6">
+                                      <td className="border-2 border-[#D4A574]/20 px-1 py-1 text-center w-6">
                                         <input 
                                           type="checkbox" 
                                           className="w-6 h-6 cursor-pointer" 
@@ -1036,7 +1036,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                           }}
                                         />
                                       </td>
-                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
+                                      <td className="border-2 border-[#D4A574]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
@@ -1047,7 +1047,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.name}
                                         </div>
                                       </td>
-                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm text-center w-16" style={{ color: '#F5F5DC' }}>
+                                      <td className="border-2 border-[#D4A574]/20 px-2 py-1 text-sm text-center w-16" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
@@ -1058,7 +1058,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.quantity || 1}
                                         </div>
                                       </td>
-                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
+                                      <td className="border-2 border-[#D4A574]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
@@ -1069,7 +1069,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.size || ''}
                                         </div>
                                       </td>
-                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
+                                      <td className="border-2 border-[#D4A574]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
                                           suppressContentEditableWarning={true}
@@ -1080,7 +1080,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.finish_color || ''}
                                         </div>
                                       </td>
-                                      <td className="border border-[#B49B7E]/20 px-1 py-1 text-center w-12">
+                                      <td className="border-2 border-[#D4A574]/20 px-1 py-1 text-center w-12">
                                         <button 
                                           onClick={() => handleDeleteItem(item.id)}
                                           className="text-red-400 hover:text-red-300 text-xs"
