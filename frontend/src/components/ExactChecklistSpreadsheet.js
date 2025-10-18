@@ -1501,12 +1501,13 @@ const ExactChecklistSpreadsheet = ({
                                 }}
                               >
                                 {/* CATEGORY HEADER - DARK SHIMMER WITH GREEN ACCENT */}
+                                {/* CATEGORY HEADER - SOLID GREEN WITH SHIMMER */}
                                 <div 
-                                  className="px-4 py-2 text-[#D4C5A9] font-bold mb-2 border-2 border-[#D4A574] rounded-lg overflow-hidden"
+                                  className="px-4 py-2 text-white font-bold mb-2 border-2 border-[#D4A574] rounded-lg overflow-hidden"
                                   style={{ 
-                                    background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
-                                    borderTop: `4px solid ${getCategoryColor()}`,
-                                    boxShadow: `0 0 20px ${getCategoryColor()}40, 0 -3px 12px ${getCategoryColor()}30, inset 0 0 35px rgba(212, 165, 116, 0.06)`
+                                    backgroundColor: getCategoryColor(),
+                                    boxShadow: `0 0 25px ${getCategoryColor()}60, inset 0 0 50px rgba(255, 255, 255, 0.1), inset 0 0 90px rgba(0, 0, 0, 0.4)`,
+                                    textShadow: '0 2px 6px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}
                                 >
                                   <div className="flex justify-between items-center">
