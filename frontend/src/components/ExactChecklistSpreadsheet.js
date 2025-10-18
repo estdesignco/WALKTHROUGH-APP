@@ -1010,7 +1010,11 @@ const ExactChecklistSpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
+              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
+              }}
             >
               <option value="">All Rooms</option>
               {(project?.rooms || []).map(room => (
@@ -1021,7 +1025,11 @@ const ExactChecklistSpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
+              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
+              }}
             >
               <option value="">All Categories</option>
               <option value="Lighting">Lighting</option>
@@ -1034,7 +1042,11 @@ const ExactChecklistSpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
+              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
+              }}
             >
               <option value="">All Vendors</option>
               {(vendorTypes || []).map(vendor => (
@@ -1045,7 +1057,11 @@ const ExactChecklistSpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none"
+              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
+              }}
             >
               <option value="">All Status</option>
               <option value="PICKED">PICKED</option>
