@@ -6,6 +6,7 @@ import {
   Legend
 } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
+import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
