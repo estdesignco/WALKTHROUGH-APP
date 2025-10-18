@@ -989,11 +989,31 @@ const SimpleWalkthroughSpreadsheet = ({
                                   <thead>
                                     <tr>
                                       <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-6 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8b7355' }}>✓</th>
-                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>{subcategory.name.toUpperCase()}</th>
-                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-16 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>FINISH/COLOR</th>
-                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-12 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8B4444' }}>DELETE</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>{subcategory.name.toUpperCase()}</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-16 shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>QTY</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>SIZE</th>
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>FINISH/COLOR</th>
+                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-12 shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>DELETE</th>
                                     </tr>
                                   </thead>
                                   <tbody>
