@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 
 const SimpleWalkthroughSpreadsheet = ({ 
   project, 
