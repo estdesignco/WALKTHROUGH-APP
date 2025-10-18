@@ -1778,12 +1778,12 @@ const ExactChecklistSpreadsheet = ({
                                     </div>
                                   </td>
                                   
-                                  {/* STATUS - DROPDOWN WITH FORCED COLORED CELL */}
+                                  {/* STATUS - DROPDOWN WITH GRADIENT SHIMMER CELL */}
                                   <td 
-                                    className="border border-[#B49B7E] px-1 py-1 text-[#D4C5A9] text-sm"
+                                    className="border border-[#B49B7E] px-1 py-1 text-white text-sm"
                                     style={{ 
-                                      backgroundColor: getStatusColor(item.status || '') + ' !important',
-                                      background: getStatusColor(item.status || ''),
+                                      background: item.status ? `linear-gradient(135deg, ${getStatusColor(item.status)}FF 0%, ${getStatusColor(item.status)}AA 20%, ${getStatusColor(item.status)} 40%, ${getStatusColor(item.status)}AA 80%, ${getStatusColor(item.status)}FF 100%)` : 'transparent',
+                                      boxShadow: item.status ? `0 0 15px ${getStatusColor(item.status)}40, inset 0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)` : 'none',
                                       minWidth: '120px'
                                     }}
                                   >
