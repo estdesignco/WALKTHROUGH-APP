@@ -169,7 +169,11 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">Status Breakdown</h3>
+        <h3 className="text-lg font-semibold mb-4 border-b-2 border-[#D4A574] pb-2 text-white rounded-lg px-3 py-2" style={{ 
+          background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
+          boxShadow: '0 0 25px #D4A57460, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.4)',
+          textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
+        }}>Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
@@ -184,8 +188,11 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
               <div key={status} className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: statusData.color }}
+                    className="w-3 h-3 rounded-full border border-[#D4A574]" 
+                    style={{ 
+                      background: `linear-gradient(135deg, ${statusData.color}FF 0%, ${statusData.color}AA 50%, ${statusData.color}FF 100%)`,
+                      boxShadow: `0 0 8px ${statusData.color}60, inset 0 0 4px rgba(255, 255, 255, 0.2)`
+                    }}
                   ></div>
                   <span className="text-sm text-[#D4A574]">{status}</span>
                 </div>
@@ -194,7 +201,8 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
                     <div
                       className="h-2 rounded-full transition-all duration-300"
                       style={{
-                        backgroundColor: statusData.color,
+                        background: `linear-gradient(90deg, ${statusData.color}FF 0%, ${statusData.color}AA 50%, ${statusData.color}FF 100%)`,
+                        boxShadow: `0 0 6px ${statusData.color}40`,
                         width: `${percentage}%`
                       }}
                     />
