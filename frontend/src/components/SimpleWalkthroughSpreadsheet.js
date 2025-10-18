@@ -950,8 +950,12 @@ const SimpleWalkthroughSpreadsheet = ({
                               transform: provided.draggableProps.style?.transform || 'none'
                             }}
                           >
-                        {/* CATEGORY HEADER (GREEN) WITH EXPAND/COLLAPSE - EXACTLY LIKE OTHER SHEETS */}
-                        <div className="mb-4 px-4 py-2 text-[#F5F5DC] font-bold" style={{ backgroundColor: '#065F46' }}>
+                        {/* CATEGORY HEADER - GREEN GRADIENT WITH SHIMMER */}
+                        <div className="mb-4 px-4 py-2 text-white font-bold border-2 border-[#D4A574] rounded-lg overflow-hidden" style={{ 
+                          background: `linear-gradient(135deg, ${getCategoryColor()}FF 0%, ${getCategoryColor()}AA 20%, ${getCategoryColor()} 40%, ${getCategoryColor()}AA 80%, ${getCategoryColor()}FF 100%)`,
+                          boxShadow: `0 0 28px ${getCategoryColor()}65, 0 0 45px ${getCategoryColor()}25, inset 0 0 55px rgba(255, 255, 255, 0.14), inset 0 0 95px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)`,
+                          textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
+                        }}>
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
                               <div className="cursor-move text-[#F5F5DC] hover:text-[#F5F5DC]/80 px-1">
