@@ -863,7 +863,7 @@ const SimpleWalkthroughSpreadsheet = ({
             </button>
             <button 
               onClick={handleTransferToChecklist}
-              className="bg-gradient-to-r from-[#8B7355] to-[#6B5B4B] hover:from-[#7A6749] hover:to-[#5A4F40] px-6 py-2 rounded-full shadow-xl hover:shadow-[#8B7355]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#A08B6F]/20 text-[#F5F5DC]"
+              className="bg-gradient-to-r from-[#8B7355] to-[#6B5B4B] hover:from-[#7A6749] hover:to-[#5A4F40] px-6 py-2 rounded-full shadow-xl hover:shadow-[#8B7355]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#A08B6F]/20 text-white"
             >
               → TRANSFER TO CHECKLIST
             </button>
@@ -907,12 +907,12 @@ const SimpleWalkthroughSpreadsheet = ({
               }}>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <div className="cursor-move text-[#F5F5DC] hover:text-[#F5F5DC]/80 px-2">
+                    <div className="cursor-move text-white hover:text-white/80 px-2">
                       ⋮⋮
                     </div>
                     <button
                       onClick={() => toggleRoomExpansion(room.id)}
-                      className="text-[#F5F5DC] hover:text-[#F5F5DC]/80"
+                      className="text-white hover:text-white/80"
                     >
                       {isRoomExpanded ? '▼' : '▶'}
                     </button>
@@ -958,12 +958,12 @@ const SimpleWalkthroughSpreadsheet = ({
                         }}>
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
-                              <div className="cursor-move text-[#F5F5DC] hover:text-[#F5F5DC]/80 px-1">
+                              <div className="cursor-move text-white hover:text-white/80 px-1">
                                 ⋮⋮
                               </div>
                               <button
                                 onClick={() => toggleCategoryExpansion(category.id)}
-                                className="text-[#F5F5DC] hover:text-[#F5F5DC]/80"
+                                className="text-white hover:text-white/80"
                               >
                                 {isCategoryExpanded ? '▼' : '▶'}
                               </button>
@@ -988,28 +988,28 @@ const SimpleWalkthroughSpreadsheet = ({
                                 <table className="w-full border-collapse border-2 border-[#D4A574] mb-4 shadow-lg shadow-[#B49B7E]/10">
                                   <thead>
                                     <tr>
-                                      <th className="border-2 border-[#D4A574] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-6 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8b7355' }}>✓</th>
-                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border-2 border-[#D4A574] px-1 py-2 text-xs font-bold text-white w-6 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8b7355' }}>✓</th>
+                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>{subcategory.name.toUpperCase()}</th>
-                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-[#F5F5DC] w-16 shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white w-16 shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>QTY</th>
-                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>SIZE</th>
-                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-[#F5F5DC] shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>FINISH/COLOR</th>
-                                      <th className="border-2 border-[#D4A574] px-1 py-2 text-xs font-bold text-[#F5F5DC] w-12 shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border-2 border-[#D4A574] px-1 py-2 text-xs font-bold text-white w-12 shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
