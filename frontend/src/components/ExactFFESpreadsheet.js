@@ -912,7 +912,7 @@ const ExactFFESpreadsheet = ({
         <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
           
           <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
-            <table className="w-full border-collapse border border-gray-400">
+            <table className="w-full border-collapse border border-[#B49B7E]">
                   
                   <thead>
                     {/* EMPTY HEADER FOR STRUCTURE */}
@@ -1044,11 +1044,11 @@ const ExactFFESpreadsheet = ({
                                                         <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#8B4444', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
                                                         </td>
-                                                        <td colSpan="3" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                        <td colSpan="3" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#8B4513' }}>
                                                           ADDITIONAL INFO.
                                                         </td>
-                                                        <td colSpan="6" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                        <td colSpan="6" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#6B46C1' }}>
                                                           SHIPPING INFO.
                                                         </td>
@@ -1059,21 +1059,21 @@ const ExactFFESpreadsheet = ({
                                                       
                                                       {/* MAIN RED HEADER ROW - PERFECTLY ALIGNED WITH DATA COLUMNS */}
                                                       <tr>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>FINISH/COLOR</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>COST/PRICE</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>IMAGE</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>ORDER DATE</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS/ORDER#</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>EST. DATES</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>INSTALL/SHIP TO</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>TRACKING/CARRIER</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>NOTES</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK</td>
-                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>DELETE</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR/SKU</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>FINISH/COLOR</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>COST/PRICE</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>IMAGE</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>ORDER DATE</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS/ORDER#</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>EST. DATES</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>INSTALL/SHIP TO</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>TRACKING/CARRIER</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>NOTES</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>DELETE</td>
                                                       </tr>
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
@@ -1091,7 +1091,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* VENDOR/SKU - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
@@ -1103,7 +1103,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* QTY - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-center text-white">
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
@@ -1115,7 +1115,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* SIZE - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
@@ -1127,7 +1127,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* FINISH/Color - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
@@ -1139,7 +1139,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Cost/Price - EDITABLE INLINE */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
@@ -1151,7 +1151,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Image - SCRAPED AUTOMATICALLY - CLICKABLE TO EXPAND */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-center text-white">
                                                             {item.image_url ? (
                                                               <img 
                                                                 src={item.image_url} 
@@ -1168,7 +1168,7 @@ const ExactFFESpreadsheet = ({
                                                           {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
                                                           
                                                           {/* Order Date (ALONE) */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
                                                             <input 
                                                               type="date" 
                                                               className="w-full bg-transparent border-none text-white text-sm"
@@ -1177,7 +1177,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Order Status/Order Number (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
+                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm">
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <select 
@@ -1226,7 +1226,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Estimated Ship Date/Estimated Delivery Date (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
+                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm">
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <input 
@@ -1246,7 +1246,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Install Date/Ship To (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
+                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm">
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <input 
@@ -1275,7 +1275,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Tracking/Carrier (STACKED VERTICALLY) */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
+                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm">
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <input 
@@ -1319,7 +1319,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* NOTES */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
                                                             <input 
                                                               type="text" 
                                                               placeholder="Notes"
@@ -1329,7 +1329,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* LINK WITH CLICKABLE OPEN BUTTON AND SCRAPE */}
-                                                          <td className="border border-gray-400 px-1 py-1 text-white w-32">
+                                                          <td className="border border-[#B49B7E] px-1 py-1 text-white w-32">
                                                             <div className="flex flex-col gap-1">
                                                               <input 
                                                                 type="text" 
@@ -1368,7 +1368,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* ACTIONS - DELETE INSTALLED */}
-                                                          <td className="border border-gray-400 px-2 py-2 text-center">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-center">
                                                             <button 
                                                               onClick={() => handleDeleteItem(item.id)}
                                                               className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
@@ -1383,7 +1383,7 @@ const ExactFFESpreadsheet = ({
                                                       
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
                                                       <tr>
-                                                        <td colSpan="7" className="border border-gray-400 px-6 py-2 bg-slate-900">
+                                                        <td colSpan="7" className="border border-[#B49B7E] px-6 py-2 bg-slate-900">
                                                           <div className="flex justify-start items-center space-x-4">
                                                             {/* Add Item Button - GOLD/AMBER COLOR */}
                                                             <button
