@@ -8,15 +8,26 @@ root.render(
     <App />
 );
 
-// UNREGISTER service worker to prevent redirect issues
+// AGGRESSIVELY UNREGISTER service worker and clear all caches
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    // Unregister all service workers
     navigator.serviceWorker.getRegistrations().then(registrations => {
       registrations.forEach(registration => {
         registration.unregister();
         console.log('🗑️ Service Worker unregistered');
       });
     });
+    
+    // Clear all caches
+    if ('caches' in window) {
+      caches.keys().then(cacheNames => {
+        cacheNames.forEach(cacheName => {
+          caches.delete(cacheName);
+          console.log('🗑️ Cache deleted:', cacheName);
+        });
+      });
+    }
   });
 }
 
