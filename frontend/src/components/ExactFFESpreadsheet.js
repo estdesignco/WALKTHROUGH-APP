@@ -1044,12 +1044,20 @@ const ExactFFESpreadsheet = ({
                                                         <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
                                                             style={{ backgroundColor: '#8B4444', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
                                                         </td>
-                                                        <td colSpan="3" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#8B4513' }}>
+                                                        <td colSpan="3" className="border-2 border-[#D4A574] px-2 py-1 text-xs font-bold text-white text-center rounded" 
+                                                            style={{ 
+                                                              background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                                                              boxShadow: '0 0 25px #8B451360, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
+                                                              textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
+                                                            }}>
                                                           ADDITIONAL INFO.
                                                         </td>
-                                                        <td colSpan="6" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#6B46C1' }}>
+                                                        <td colSpan="6" className="border-2 border-[#D4A574] px-2 py-1 text-xs font-bold text-white text-center rounded" 
+                                                            style={{ 
+                                                              background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                                                              boxShadow: '0 0 25px #6B46C160, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
+                                                              textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
+                                                            }}>
                                                           SHIPPING INFO.
                                                         </td>
                                                         <td colSpan="2" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
