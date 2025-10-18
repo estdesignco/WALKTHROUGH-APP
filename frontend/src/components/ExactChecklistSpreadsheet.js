@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import AddItemModal from './AddItemModal';
 import CanvaIntegrationModal from './CanvaIntegrationModal';
 import { getRoomColor, getCategoryColor } from '../utils/roomColors';
+import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 
 const ExactChecklistSpreadsheet = ({ 
   project, 
