@@ -528,13 +528,13 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
             <div className="p-4">
               {activeRoom.categories?.map((category) => (
                 <div key={category.id} className="mb-6">
-                  {/* CATEGORY HEADER - SOLID GREEN WITH SHIMMER */}
+                  {/* CATEGORY HEADER - SOLID GREEN WITH ENHANCED SHIMMER */}
                   <div 
                     className="border-2 border-[#D4A574] p-3 font-bold text-white shadow-lg cursor-pointer rounded-lg overflow-hidden"
                     style={{ 
                       backgroundColor: getCategoryColor(),
-                      boxShadow: `0 0 25px ${getCategoryColor()}60, inset 0 0 50px rgba(255, 255, 255, 0.1), inset 0 0 90px rgba(0, 0, 0, 0.4)`,
-                      textShadow: '0 2px 6px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 255, 255, 0.3)'
+                      boxShadow: `0 0 35px ${getCategoryColor()}80, 0 0 50px ${getCategoryColor()}40, inset 0 0 70px rgba(255, 255, 255, 0.15), inset 0 0 110px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
+                      textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 18px rgba(255, 255, 255, 0.4), 0 0 28px rgba(255, 255, 255, 0.2)'
                     }}
                     onClick={() => toggleCategory(category.id)}
                   >
