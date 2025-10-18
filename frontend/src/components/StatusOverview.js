@@ -92,9 +92,12 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         backgroundColor: Object.keys(carrierBreakdown)
           .filter(carrier => carrierBreakdown[carrier] > 0)
           .map(carrier => getCarrierColor(carrier)),
-        borderWidth: 0,
-        hoverBorderWidth: 2,
-        hoverBorderColor: '#ffffff'
+        borderWidth: 3,
+        borderColor: Object.keys(carrierBreakdown)
+          .filter(carrier => carrierBreakdown[carrier] > 0)
+          .map(carrier => '#D4A574'),
+        hoverBorderWidth: 4,
+        hoverBorderColor: '#FFD700'
       }
     ]
   };
