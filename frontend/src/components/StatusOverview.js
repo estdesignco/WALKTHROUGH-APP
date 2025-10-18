@@ -200,8 +200,11 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
               <div key={status} className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: getStatusColor(status) }}
+                    className="w-3 h-3 rounded-full border border-[#D4A574]" 
+                    style={{ 
+                      background: `linear-gradient(135deg, ${getStatusColor(status)}FF 0%, ${getStatusColor(status)}AA 50%, ${getStatusColor(status)}FF 100%)`,
+                      boxShadow: `0 0 8px ${getStatusColor(status)}60, inset 0 0 4px rgba(255, 255, 255, 0.2)`
+                    }}
                   ></div>
                   <span className="text-sm text-[#D4C5A9]">{status}</span>
                 </div>
@@ -210,7 +213,8 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                     <div
                       className="h-2 rounded-full transition-all duration-300"
                       style={{
-                        backgroundColor: getStatusColor(status),
+                        background: `linear-gradient(90deg, ${getStatusColor(status)}FF 0%, ${getStatusColor(status)}AA 50%, ${getStatusColor(status)}FF 100%)`,
+                        boxShadow: `0 0 6px ${getStatusColor(status)}40`,
                         width: `${percentage}%`
                       }}
                     />
