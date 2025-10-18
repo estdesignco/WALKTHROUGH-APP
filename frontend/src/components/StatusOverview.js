@@ -239,7 +239,11 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#D4A574' }}>Shipping Information</h3>
+        <h3 className="text-lg font-semibold mb-4 border-b-2 border-[#D4A574] pb-2 text-white rounded-lg px-3 py-2" style={{ 
+          background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
+          boxShadow: '0 0 25px #D4A57460, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.4)',
+          textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
+        }}>Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
