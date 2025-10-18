@@ -33,8 +33,8 @@ const MainHeader = ({
             boxShadow: '0 0 40px #8b735570, 0 0 60px #8b735530, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3)',
             textShadow: '0 3px 10px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 255, 255, 0.45), 0 0 40px rgba(255, 255, 255, 0.25)',
             color: 'white'
-          }}>GREENE</h1> {/* Much tighter */}
-          <p style={{ color: '#F5F5DC', opacity: '0.8' }}>Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
+          }}>{clientLastName}</h1> {/* Much tighter */}
+          <p style={{ color: '#F5F5DC', opacity: '0.8' }}>{clientFullInfo}</p>
         </div>
 
         {!hideNavigation && (
