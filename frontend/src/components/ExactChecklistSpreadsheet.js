@@ -1064,7 +1064,11 @@ const ExactChecklistSpreadsheet = ({
           <div className="flex gap-3 flex-wrap">
             <button 
               onClick={onAddRoom}
-              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-[#B49B7E]"
+              className="px-6 py-2 rounded-full shadow-xl hover:shadow-[#D4A574]/40 transition-all duration-300 transform hover:scale-105 tracking-wide font-bold text-black border-2 border-[#D4A574]"
+              style={{
+                background: 'linear-gradient(135deg, #D4A574 0%, #B49B7E 50%, #D4A574 100%)',
+                boxShadow: '0 0 20px rgba(212, 165, 116, 0.4), inset 0 0 30px rgba(255, 255, 255, 0.15), inset 0 0 50px rgba(0, 0, 0, 0.2)'
+              }}
             >
               ✥ ADD ROOM
             </button>
