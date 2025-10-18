@@ -208,8 +208,8 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                   <div 
                     className="w-3 h-3 rounded-full border border-[#D4A574]" 
                     style={{ 
-                      background: `linear-gradient(135deg, ${getStatusColor(status)}FF 0%, ${getStatusColor(status)}AA 50%, ${getStatusColor(status)}FF 100%)`,
-                      boxShadow: `0 0 8px ${getStatusColor(status)}60, inset 0 0 4px rgba(255, 255, 255, 0.2)`
+                      background: `linear-gradient(135deg, ${getStatusColor(status)}FF 0%, ${getStatusColor(status)}AA 20%, ${getStatusColor(status)} 40%, ${getStatusColor(status)}AA 80%, ${getStatusColor(status)}FF 100%)`,
+                      boxShadow: `0 0 25px ${getStatusColor(status)}60, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.4)`
                     }}
                   ></div>
                   <span className="text-sm text-[#D4C5A9]">{status}</span>
@@ -219,8 +219,8 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                     <div
                       className="h-2 rounded-full transition-all duration-300"
                       style={{
-                        background: `linear-gradient(90deg, ${getStatusColor(status)}FF 0%, ${getStatusColor(status)}AA 50%, ${getStatusColor(status)}FF 100%)`,
-                        boxShadow: `0 0 6px ${getStatusColor(status)}40`,
+                        background: `linear-gradient(90deg, ${getStatusColor(status)}FF 0%, ${getStatusColor(status)}AA 20%, ${getStatusColor(status)} 40%, ${getStatusColor(status)}AA 80%, ${getStatusColor(status)}FF 100%)`,
+                        boxShadow: `0 0 25px ${getStatusColor(status)}40, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.4)`,
                         width: `${percentage}%`
                       }}
                     />
