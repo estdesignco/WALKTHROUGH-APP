@@ -33,6 +33,14 @@ export default function ProjectDetailPage() {
         setActiveTab(tabName);
         setSearchParams({ tab: tabName });
     };
+    
+    // Sync activeTab with URL params on load/refresh
+    useEffect(() => {
+        const urlTab = searchParams.get('tab');
+        if (urlTab && urlTab !== activeTab) {
+            setActiveTab(urlTab);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         const fetchProject = async () => {
