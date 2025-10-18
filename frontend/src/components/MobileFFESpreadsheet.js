@@ -397,14 +397,14 @@ export default function MobileFFESpreadsheet({ projectId }) {
                 {/* CATEGORIES */}
                 {expandedRooms[room.id] && room.categories?.map((category) => (
                   <React.Fragment key={category.id}>
-                    {/* CATEGORY HEADER ROW - SOLID GREEN WITH ENHANCED SHIMMER */}
+                    {/* CATEGORY HEADER ROW - GREEN GRADIENT WITH BALANCED SHIMMER */}
                     <tr>
                       <td colSpan="15"
                           className="border-2 border-[#D4A574] px-4 py-2 text-white text-sm font-bold rounded-lg"
                           style={{ 
-                            backgroundColor: getCategoryColor(),
-                            boxShadow: `0 0 35px ${getCategoryColor()}80, 0 0 50px ${getCategoryColor()}40, inset 0 0 70px rgba(255, 255, 255, 0.15), inset 0 0 110px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
-                            textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 18px rgba(255, 255, 255, 0.4), 0 0 28px rgba(255, 255, 255, 0.2)'
+                            background: `linear-gradient(135deg, ${getCategoryColor()} 0%, ${getCategoryColor()}DD 50%, ${getCategoryColor()} 100%)`,
+                            boxShadow: `0 0 22px ${getCategoryColor()}55, inset 0 0 45px rgba(255, 255, 255, 0.12), inset 0 0 85px rgba(0, 0, 0, 0.4)`,
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 14px rgba(255, 255, 255, 0.3)'
                           }}>
                         <div className="flex items-center gap-2">
                           <button onClick={() => toggleCategory(category.id)} className="text-white">
