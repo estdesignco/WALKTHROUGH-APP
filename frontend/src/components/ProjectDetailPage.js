@@ -630,11 +630,18 @@ export default function ProjectDetailPage() {
                             <button
                                 key={tab.name}
                                 onClick={() => handleTabChange(tab.name)}
-                                className={`${
+                                className={`whitespace-nowrap py-3 px-6 border-b-4 font-bold text-base flex items-center space-x-2 rounded-t-lg transition-all ${
                                     activeTab === tab.name
-                                        ? 'border-stone-400 text-[#D4C5A9]'
-                                        : 'border-transparent text-[#D4C5A9] hover:text-[#D4C5A9] hover:border-stone-300'
-                                } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2`}
+                                        ? 'text-[#D4A574] border-[#D4A574]'
+                                        : 'border-transparent text-[#D4C5A9] hover:text-[#D4A574] hover:border-[#B49B7E]'
+                                }`}
+                                style={activeTab === tab.name ? {
+                                  background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+                                  boxShadow: '0 0 20px rgba(212, 165, 116, 0.4), inset 0 0 35px rgba(212, 165, 116, 0.08)',
+                                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.6), 0 0 12px rgba(212, 165, 116, 0.5)'
+                                } : {
+                                  background: 'linear-gradient(135deg, rgba(15,15,25,0.8) 0%, rgba(35,35,45,0.7) 50%, rgba(15,15,25,0.8) 100%)'
+                                }}
                             >
                                 <Icon className="w-4 h-4" />
                                 <span>{tab.name}</span>
