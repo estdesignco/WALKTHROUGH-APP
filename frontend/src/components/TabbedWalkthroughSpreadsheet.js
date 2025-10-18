@@ -581,7 +581,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId }) {
                       <table className="w-full border-collapse border border-[#B49B7E] mb-4 mt-2 shadow-lg shadow-[#B49B7E]/10">
                         <thead>
                           <tr>
-                            <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-[#D4C5A9] w-8 shadow-inner shadow-[#B49B7E]/20" style={{ 
+                            <th className="border-2 border-[#D4A574] px-1 py-2 text-xs font-bold text-white w-8 rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
