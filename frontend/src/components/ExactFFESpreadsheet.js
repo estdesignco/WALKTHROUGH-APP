@@ -1285,8 +1285,11 @@ const ExactFFESpreadsheet = ({
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* Tracking/Carrier (STACKED VERTICALLY) */}
-                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm">
+                                                          {/* Tracking/Carrier (STACKED VERTICALLY) - COLORED BY CARRIER */}
+                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm" style={{
+                                                            background: item.carrier ? `linear-gradient(135deg, ${getCarrierColor(item.carrier)}FF 0%, ${getCarrierColor(item.carrier)}AA 20%, ${getCarrierColor(item.carrier)} 40%, ${getCarrierColor(item.carrier)}AA 80%, ${getCarrierColor(item.carrier)}FF 100%)` : 'transparent',
+                                                            boxShadow: item.carrier ? `0 0 15px ${getCarrierColor(item.carrier)}40, inset 0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)` : 'none'
+                                                          }}>
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <input 
