@@ -1091,7 +1091,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* VENDOR/SKU - EDITABLE INLINE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
@@ -1115,7 +1115,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* SIZE - EDITABLE INLINE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
@@ -1127,7 +1127,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* FINISH/Color - EDITABLE INLINE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
@@ -1139,7 +1139,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Cost/Price - EDITABLE INLINE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
                                                             <div 
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
@@ -1168,7 +1168,7 @@ const ExactFFESpreadsheet = ({
                                                           {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
                                                           
                                                           {/* Order Date (ALONE) */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
                                                             <input 
                                                               type="date" 
                                                               className="w-full bg-transparent border-none text-white text-sm"
@@ -1319,7 +1319,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* NOTES */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-white">
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
                                                             <input 
                                                               type="text" 
                                                               placeholder="Notes"
