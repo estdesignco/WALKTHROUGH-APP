@@ -1200,29 +1200,29 @@ const ExactFFESpreadsheet = ({
                                                                     handleStatusChange(item.id, newStatus);
                                                                   }}
                                                                 >
-                                                                  <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>—</option>
-                                                                  <option value="TO BE SELECTED" style={{ backgroundColor: '#6B7280', color: 'white' }}>🔵 TO BE SELECTED</option>
-                                                                  <option value="RESEARCHING" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 RESEARCHING</option>
-                                                                  <option value="PENDING APPROVAL" style={{ backgroundColor: '#F59E0B', color: 'white' }}>🟡 PENDING APPROVAL</option>
-                                                                  <option value="APPROVED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 APPROVED</option>
-                                                                  <option value="ORDERED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 ORDERED</option>
-                                                                  <option value="PICKED" style={{ backgroundColor: '#FFD700', color: 'black' }}>🟡 PICKED</option>
-                                                                  <option value="CONFIRMED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 CONFIRMED</option>
-                                                                  <option value="IN PRODUCTION" style={{ backgroundColor: '#F97316', color: 'white' }}>🟠 IN PRODUCTION</option>
-                                                                  <option value="SHIPPED" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 SHIPPED</option>
-                                                                  <option value="IN TRANSIT" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 IN TRANSIT</option>
-                                                                  <option value="OUT FOR DELIVERY" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 OUT FOR DELIVERY</option>
-                                                                  <option value="DELIVERED TO RECEIVER" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 DELIVERED TO RECEIVER</option>
-                                                                  <option value="DELIVERED TO JOB SITE" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 DELIVERED TO JOB SITE</option>
-                                                                  <option value="RECEIVED" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 RECEIVED</option>
-                                                                  <option value="READY FOR INSTALL" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 READY FOR INSTALL</option>
-                                                                  <option value="INSTALLING" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 INSTALLING</option>
-                                                                  <option value="INSTALLED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 INSTALLED</option>
-                                                                  <option value="ON HOLD" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 ON HOLD</option>
-                                                                  <option value="BACKORDERED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 BACKORDERED</option>
-                                                                  <option value="DAMAGED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 DAMAGED</option>
-                                                                  <option value="RETURNED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 RETURNED</option>
-                                                                  <option value="CANCELLED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 CANCELLED</option>
+                                                                  <option value="" style={{ background: 'linear-gradient(135deg, #6B7280FF 0%, #6B7280AA 50%, #6B7280FF 100%)', color: 'white' }}>—</option>
+                                                                  <option value="TO BE SELECTED" style={{ background: 'linear-gradient(135deg, #6B7280FF 0%, #6B7280AA 50%, #6B7280FF 100%)', color: 'white' }}>🔵 TO BE SELECTED</option>
+                                                                  <option value="RESEARCHING" style={{ background: 'linear-gradient(135deg, #3B82F6FF 0%, #3B82F6AA 50%, #3B82F6FF 100%)', color: 'white' }}>🔵 RESEARCHING</option>
+                                                                  <option value="PENDING APPROVAL" style={{ background: 'linear-gradient(135deg, #F59E0BFF 0%, #F59E0BAA 50%, #F59E0BFF 100%)', color: 'white' }}>🟡 PENDING APPROVAL</option>
+                                                                  <option value="APPROVED" style={{ background: 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)', color: 'white' }}>🟢 APPROVED</option>
+                                                                  <option value="ORDERED" style={{ background: 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)', color: 'white' }}>🟢 ORDERED</option>
+                                                                  <option value="PICKED" style={{ background: 'linear-gradient(135deg, #FFD700FF 0%, #FFD700AA 50%, #FFD700FF 100%)', color: 'black' }}>🟡 PICKED</option>
+                                                                  <option value="CONFIRMED" style={{ background: 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)', color: 'white' }}>🟢 CONFIRMED</option>
+                                                                  <option value="IN PRODUCTION" style={{ background: 'linear-gradient(135deg, #F97316FF 0%, #F97316AA 50%, #F97316FF 100%)', color: 'white' }}>🟠 IN PRODUCTION</option>
+                                                                  <option value="SHIPPED" style={{ background: 'linear-gradient(135deg, #3B82F6FF 0%, #3B82F6AA 50%, #3B82F6FF 100%)', color: 'white' }}>🔵 SHIPPED</option>
+                                                                  <option value="IN TRANSIT" style={{ background: 'linear-gradient(135deg, #3B82F6FF 0%, #3B82F6AA 50%, #3B82F6FF 100%)', color: 'white' }}>🔵 IN TRANSIT</option>
+                                                                  <option value="OUT FOR DELIVERY" style={{ background: 'linear-gradient(135deg, #3B82F6FF 0%, #3B82F6AA 50%, #3B82F6FF 100%)', color: 'white' }}>🔵 OUT FOR DELIVERY</option>
+                                                                  <option value="DELIVERED TO RECEIVER" style={{ background: 'linear-gradient(135deg, #8B5CF6FF 0%, #8B5CF6AA 50%, #8B5CF6FF 100%)', color: 'white' }}>🟣 DELIVERED TO RECEIVER</option>
+                                                                  <option value="DELIVERED TO JOB SITE" style={{ background: 'linear-gradient(135deg, #8B5CF6FF 0%, #8B5CF6AA 50%, #8B5CF6FF 100%)', color: 'white' }}>🟣 DELIVERED TO JOB SITE</option>
+                                                                  <option value="RECEIVED" style={{ background: 'linear-gradient(135deg, #8B5CF6FF 0%, #8B5CF6AA 50%, #8B5CF6FF 100%)', color: 'white' }}>🟣 RECEIVED</option>
+                                                                  <option value="READY FOR INSTALL" style={{ background: 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)', color: 'white' }}>🟢 READY FOR INSTALL</option>
+                                                                  <option value="INSTALLING" style={{ background: 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)', color: 'white' }}>🟢 INSTALLING</option>
+                                                                  <option value="INSTALLED" style={{ background: 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)', color: 'white' }}>🟢 INSTALLED</option>
+                                                                  <option value="ON HOLD" style={{ background: 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)', color: 'white' }}>🔴 ON HOLD</option>
+                                                                  <option value="BACKORDERED" style={{ background: 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)', color: 'white' }}>🔴 BACKORDERED</option>
+                                                                  <option value="DAMAGED" style={{ background: 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)', color: 'white' }}>🔴 DAMAGED</option>
+                                                                  <option value="RETURNED" style={{ background: 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)', color: 'white' }}>🔴 RETURNED</option>
+                                                                  <option value="CANCELLED" style={{ background: 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)', color: 'white' }}>🔴 CANCELLED</option>
                                                                 </select>
                                                               </div>
                                                               <div className="h-6">
