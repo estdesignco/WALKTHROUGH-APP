@@ -951,9 +951,9 @@ const SimpleWalkthroughSpreadsheet = ({
                             }}
                           >
                         {/* CATEGORY HEADER - GREEN GRADIENT WITH SHIMMER */}
-                        <div className="mb-4 px-4 py-2 text-white font-bold border border-[#B49B7E] rounded-lg overflow-hidden" style={{ 
+                        <div className="mb-4 px-4 py-2 text-white font-bold border border-[#B49B7E]" style={{ 
                           background: `linear-gradient(135deg, ${getCategoryColor()}FF 0%, ${getCategoryColor()}AA 20%, ${getCategoryColor()} 40%, ${getCategoryColor()}AA 80%, ${getCategoryColor()}FF 100%)`,
-                          boxShadow: `0 0 28px ${getCategoryColor()}65, 0 0 45px ${getCategoryColor()}25, inset 0 0 55px rgba(255, 255, 255, 0.14), inset 0 0 95px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)`,
+                          boxShadow: `0 0 28px ${getCategoryColor()}65, inset 0 0 55px rgba(255, 255, 255, 0.14), inset 0 0 95px rgba(0, 0, 0, 0.45)`,
                           textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
                         }}>
                           <div className="flex justify-between items-center">
