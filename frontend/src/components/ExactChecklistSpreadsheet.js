@@ -1500,14 +1500,13 @@ const ExactChecklistSpreadsheet = ({
                                   transform: provided.draggableProps.style?.transform || 'none'
                                 }}
                               >
-                                {/* CATEGORY HEADER - DARK SHIMMER WITH GREEN ACCENT */}
-                                {/* CATEGORY HEADER - SOLID GREEN WITH SHIMMER */}
+                                {/* CATEGORY HEADER - GREEN GRADIENT WITH MORE SHIMMER */}
                                 <div 
                                   className="px-4 py-2 text-white font-bold mb-2 border-2 border-[#D4A574] rounded-lg overflow-hidden"
                                   style={{ 
-                                    backgroundColor: getCategoryColor(),
-                                    boxShadow: `0 0 25px ${getCategoryColor()}60, inset 0 0 50px rgba(255, 255, 255, 0.1), inset 0 0 90px rgba(0, 0, 0, 0.4)`,
-                                    textShadow: '0 2px 6px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                    background: `linear-gradient(135deg, ${getCategoryColor()}EE 0%, ${getCategoryColor()} 25%, ${getCategoryColor()}CC 50%, ${getCategoryColor()} 75%, ${getCategoryColor()}EE 100%)`,
+                                    boxShadow: `0 0 28px ${getCategoryColor()}65, 0 0 45px ${getCategoryColor()}25, inset 0 0 55px rgba(255, 255, 255, 0.14), inset 0 0 95px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)`,
+                                    textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
                                   }}
                                 >
                                   <div className="flex justify-between items-center">
