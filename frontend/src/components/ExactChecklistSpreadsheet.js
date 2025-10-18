@@ -997,7 +997,7 @@ const ExactChecklistSpreadsheet = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border-2 border-[#D4A574] text-white focus:outline-none placeholder-[#D4C5A9]/70"
+              className="w-full px-4 py-2 rounded-lg border border-[#B49B7E] text-white focus:outline-none placeholder-[#D4C5A9]/70"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 30px rgba(212, 165, 116, 0.08)'
@@ -1010,7 +1010,7 @@ const ExactChecklistSpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
@@ -1025,7 +1025,7 @@ const ExactChecklistSpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
@@ -1042,7 +1042,7 @@ const ExactChecklistSpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
@@ -1057,7 +1057,7 @@ const ExactChecklistSpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded-lg border-2 border-[#D4A574] text-[#D4C5A9] focus:outline-none"
+              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
@@ -1080,7 +1080,7 @@ const ExactChecklistSpreadsheet = ({
           <div className="flex gap-3 flex-wrap">
             <button 
               onClick={onAddRoom}
-              className="px-6 py-2 rounded-full shadow-xl hover:shadow-[#D4A574]/40 transition-all duration-300 transform hover:scale-105 tracking-wide font-bold text-black border-2 border-[#D4A574]"
+              className="px-6 py-2 rounded-full shadow-xl hover:shadow-[#D4A574]/40 transition-all duration-300 transform hover:scale-105 tracking-wide font-bold text-black border border-[#B49B7E]"
               style={{
                 background: 'linear-gradient(135deg, #D4A574 0%, #B49B7E 50%, #D4A574 100%)',
                 boxShadow: '0 0 20px rgba(212, 165, 116, 0.4), inset 0 0 30px rgba(255, 255, 255, 0.15), inset 0 0 50px rgba(0, 0, 0, 0.2)'
@@ -1155,7 +1155,7 @@ const ExactChecklistSpreadsheet = ({
                         >
               {/* ROOM HEADER - STRONG GRADIENT WITH ENHANCED SHIMMER */}
               <div 
-                className="px-4 py-3 text-white font-bold mb-4 border-2 border-[#D4A574] rounded-lg overflow-hidden"
+                className="px-4 py-3 text-white font-bold mb-4 border border-[#B49B7E] rounded-lg overflow-hidden"
                 style={{ 
                   background: `linear-gradient(135deg, ${getRoomColor(room.name)}FF 0%, ${getRoomColor(room.name)}AA 20%, ${getRoomColor(room.name)} 40%, ${getRoomColor(room.name)}AA 80%, ${getRoomColor(room.name)}FF 100%)`,
                   boxShadow: `0 0 35px ${getRoomColor(room.name)}80, 0 0 55px ${getRoomColor(room.name)}40, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3)`,
@@ -1522,7 +1522,7 @@ const ExactChecklistSpreadsheet = ({
                               >
                                 {/* CATEGORY HEADER - GREEN GRADIENT WITH MORE SHIMMER */}
                                 <div 
-                                  className="px-4 py-2 text-white font-bold mb-2 border-2 border-[#D4A574] rounded-lg overflow-hidden"
+                                  className="px-4 py-2 text-white font-bold mb-2 border border-[#B49B7E] rounded-lg overflow-hidden"
                                   style={{ 
                                     background: `linear-gradient(135deg, ${getCategoryColor()}EE 0%, ${getCategoryColor()} 25%, ${getCategoryColor()}CC 50%, ${getCategoryColor()} 75%, ${getCategoryColor()}EE 100%)`,
                                     boxShadow: `0 0 28px ${getCategoryColor()}65, 0 0 45px ${getCategoryColor()}25, inset 0 0 55px rgba(255, 255, 255, 0.14), inset 0 0 95px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)`,
@@ -1581,12 +1581,12 @@ const ExactChecklistSpreadsheet = ({
                             <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10">
                               <thead>
                                 <tr>
-                                  <th className="border-2 border-[#D4A574] px-1 py-2 text-xs font-bold text-white w-8 rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-8 rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>✓</th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
@@ -1604,52 +1604,52 @@ const ExactChecklistSpreadsheet = ({
                                       🗑️
                                     </button>
                                   </th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>VENDOR/SKU</th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white w-16 rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16 rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>QTY</th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>SIZE</th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>FINISH/COLOR</th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>COST</th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>STATUS</th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white w-20 rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-20 rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>IMAGE</th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white w-24 rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-24 rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>PRODUCT LINK</th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>REMARKS</th>
-                                  <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white w-12 rounded" style={{ 
+                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-12 rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
