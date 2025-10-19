@@ -248,16 +248,6 @@ export default function TabbedFFESpreadsheet({ projectId }) {
         </div>
       </div>
 
-      {/* STATUS OVERVIEW - SAME AS DESKTOP */}
-      {project && (
-        <StatusOverview
-          totalItems={calculateProjectStats(project)?.totalItems || 0}
-          statusBreakdown={calculateProjectStats(project)?.statusBreakdown || {}}
-          carrierBreakdown={calculateProjectStats(project)?.carrierBreakdown || {}}
-          itemStatuses={statuses}
-        />
-      )}
-
       {/* ROOM TABS - SAME AS WORKING VERSION */}
       <div className="bg-[#1E293B] border-b-2 border-[#D4A574] overflow-x-auto">
         <div className="flex">
@@ -286,6 +276,18 @@ export default function TabbedFFESpreadsheet({ projectId }) {
 
       {/* FFE ROOM CONTENT */}
       <div className="flex-1 overflow-auto">
+        {/* STATUS OVERVIEW - COMPACT */}
+        {project && activeRoom && (
+          <div className="p-4 border-b-2 border-[#D4A574]">
+            <StatusOverview
+              totalItems={calculateProjectStats(project)?.totalItems || 0}
+              statusBreakdown={calculateProjectStats(project)?.statusBreakdown || {}}
+              carrierBreakdown={calculateProjectStats(project)?.carrierBreakdown || {}}
+              itemStatuses={statuses}
+            />
+          </div>
+        )}
+        
         {activeRoom && (
           <div>
             {/* FFE TABLE - EXACT DESKTOP STRUCTURE */}
