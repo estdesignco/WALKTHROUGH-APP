@@ -314,7 +314,18 @@ export default function TabbedFFESpreadsheet({ projectId }) {
                     style={{ backgroundColor: getCategoryColor() }}
                     onClick={() => toggleCategory(category.id)}
                   >
-                    <span>{expandedCategories[category.id] ? '▼' : '▶'} {category.name.toUpperCase()}</span>
+                    <div className="flex justify-between items-center">
+                      <span>{expandedCategories[category.id] ? '▼' : '▶'} {category.name.toUpperCase()}</span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          alert('Add item to ' + category.name);
+                        }}
+                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-bold text-xs"
+                      >
+                        + ADD ITEM
+                      </button>
+                    </div>
                   </div>
 
                   {expandedCategories[category.id] && category.subcategories?.map((subcategory) => (
