@@ -435,6 +435,55 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
 
   const activeRoom = project.rooms[activeRoomTab];
 
+  // Calculate FFE stats for StatusOverview
+  const getTotalItems = () => {
+    if (!project || !project.rooms) return 0;
+    return project.rooms.reduce((total, room) => 
+      total + (room.categories || []).reduce((catTotal, category) => 
+        catTotal + (category.subcategories || []).reduce((subTotal, subcategory) =>
+          subTotal + (subcategory.items || []).length, 0
+        ), 0
+      ), 0
+    );
+  };
+
+  const getStatusBreakdown = () => {
+    const breakdown = {};
+    if (!project || !project.rooms) return breakdown;
+    
+    project.rooms.forEach(room => {
+      (room.categories || []).forEach(category => {
+        (category.subcategories || []).forEach(subcategory => {
+          (subcategory.items || []).forEach(item => {
+            const status = item.status || 'TO BE SELECTED';
+            breakdown[status] = (breakdown[status] || 0) + 1;
+          });
+        });
+      });
+    });
+    
+    return breakdown;
+  };
+
+  const getCarrierBreakdown = () => {
+    const carriers = {};
+    if (!project || !project.rooms) return carriers;
+    
+    project.rooms.forEach(room => {
+      (room.categories || []).forEach(category => {
+        (category.subcategories || []).forEach(subcategory => {
+          (subcategory.items || []).forEach(item => {
+            if (item.carrier) {
+              carriers[item.carrier] = (carriers[item.carrier] || 0) + 1;
+            }
+          });
+        });
+      });
+    });
+    
+    return carriers;
+  };
+
   return (
     <div className="w-full h-full flex flex-col" style={{ backgroundColor: '#0F172A' }}>
       {/* EXACT DESKTOP HEADER - WITH ENHANCED SHIMMER */}
