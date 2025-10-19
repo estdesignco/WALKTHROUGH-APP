@@ -14,11 +14,8 @@ const MainContainer = ({
       
       {/* Page Title - NO SPACING */}
       <div className="text-center mb-1">
-        <h2 className="text-3xl font-light tracking-wide mb-0 px-6 py-3 rounded-lg inline-block border-2 border-[#D4A574]" style={{
-          background: 'linear-gradient(135deg, #B49B7EFF 0%, #B49B7EAA 20%, #B49B7E 40%, #B49B7EAA 80%, #B49B7EFF 100%)',
-          boxShadow: '0 0 30px #B49B7E60, inset 0 0 55px rgba(255, 255, 255, 0.14), inset 0 0 90px rgba(0, 0, 0, 0.45)',
-          textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 18px rgba(255, 255, 255, 0.35)',
-          color: 'white'
+        <h2 className="text-3xl font-light tracking-wide mb-0 border border-[#B49B7E]/20 px-4 py-2 rounded-lg" style={{
+          color: '#B49B7E'
         }}>{title}</h2>
         <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E]/20 to-transparent mx-auto"></div>
       </div>
