@@ -790,35 +790,59 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                                 <input type="date" defaultValue={item.order_date || ''} onBlur={(e) => updateItemOffline(item.id, { order_date: e.target.value })} className="bg-transparent text-[#B49B7E] text-xs w-full" />
                               </td>
                               <td className="border border-[#B49B7E] px-1 py-1">
-                                <select defaultValue={item.status || ''} onChange={(e) => updateItemOffline(item.id, { status: e.target.value })} className="bg-gray-800 text-white text-xs w-full mb-1">
-                                  <option value="">--</option>
-                                  <option value="READY FOR INSTALL">✓ READY FOR INSTALL</option>
-                                  <option value="BACKORDERED">★ BACKORDERED</option>
-                                  <option value="PICKED">★ PICKED</option>
-                                  <option value="RESEARCHING">▲ RESEARCHING</option>
-                                  <option value="APPROVED">▲ APPROVED</option>
-                                </select>
-                                <input type="text" placeholder="Order #" className="bg-transparent text-[#B49B7E] text-xs w-full" />
+                                <div className="flex flex-col h-full">
+                                  <div className="h-6 mb-1">
+                                    <select defaultValue={item.status || ''} onChange={(e) => updateItemOffline(item.id, { status: e.target.value })} className="w-full h-full bg-gray-800 text-white text-xs border-none p-0">
+                                      <option value="">--</option>
+                                      <option value="READY FOR INSTALL">✓ READY FOR INSTALL</option>
+                                      <option value="BACKORDERED">★ BACKORDERED</option>
+                                      <option value="PICKED">★ PICKED</option>
+                                      <option value="RESEARCHING">▲ RESEARCHING</option>
+                                      <option value="APPROVED">▲ APPROVED</option>
+                                    </select>
+                                  </div>
+                                  <div className="h-6">
+                                    <input type="text" placeholder="Order #" className="w-full h-full bg-transparent border-none text-[#B49B7E] text-xs p-0" />
+                                  </div>
+                                </div>
                               </td>
                               <td className="border border-[#B49B7E] px-1 py-1">
-                                <input type="date" className="bg-transparent text-white text-xs w-full mb-1" />
-                                <input type="date" className="bg-transparent text-white text-xs w-full" />
+                                <div className="flex flex-col h-full">
+                                  <div className="h-6 mb-1">
+                                    <input type="date" className="w-full h-full bg-transparent border-none text-white text-xs p-0" />
+                                  </div>
+                                  <div className="h-6">
+                                    <input type="date" className="w-full h-full bg-transparent border-none text-white text-xs p-0" />
+                                  </div>
+                                </div>
                               </td>
                               <td className="border border-[#B49B7E] px-1 py-1">
-                                <input type="date" className="bg-transparent text-white text-xs w-full mb-1" />
-                                <select className="bg-gray-800 text-white text-xs w-full">
-                                  <option value="">Ship To...</option>
-                                  <option value="CLIENT HOME">CLIENT HOME</option>
-                                  <option value="JOB SITE">JOB SITE</option>
-                                </select>
+                                <div className="flex flex-col h-full">
+                                  <div className="h-6 mb-1">
+                                    <input type="date" className="w-full h-full bg-transparent border-none text-white text-xs p-0" />
+                                  </div>
+                                  <div className="h-6">
+                                    <select className="w-full h-full bg-gray-800 border-none text-white text-xs p-0">
+                                      <option value="">Ship To...</option>
+                                      <option value="CLIENT HOME">CLIENT HOME</option>
+                                      <option value="JOB SITE">JOB SITE</option>
+                                    </select>
+                                  </div>
+                                </div>
                               </td>
                               <td className="border border-[#B49B7E] px-1 py-1">
-                                <input type="text" placeholder="Live Tracking #" className="bg-transparent text-white text-xs w-full mb-1" />
-                                <select className="bg-gray-800 text-white text-xs w-full">
-                                  <option value="">--</option>
-                                  <option value="FedEx Ground">FedEx Ground</option>
-                                  <option value="UPS">UPS</option>
-                                </select>
+                                <div className="flex flex-col h-full">
+                                  <div className="h-6 mb-1">
+                                    <input type="text" placeholder="Live Tracking #" className="w-full h-full bg-transparent border-none text-white text-xs p-0" />
+                                  </div>
+                                  <div className="h-6">
+                                    <select className="w-full h-full bg-gray-800 border-none text-white text-xs p-0">
+                                      <option value="">--</option>
+                                      <option value="FedEx Ground">FedEx Ground</option>
+                                      <option value="UPS">UPS</option>
+                                    </select>
+                                  </div>
+                                </div>
                               </td>
                               <td className="border border-[#B49B7E] px-2 py-1">
                                 <textarea className="bg-transparent text-[#B49B7E] text-xs w-full" rows="2" placeholder="Notes"></textarea>
