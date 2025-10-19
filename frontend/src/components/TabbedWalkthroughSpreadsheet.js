@@ -649,16 +649,6 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                                   {item.name}
                                 </div>
                               </td>
-                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
-                                <div 
-                                  contentEditable={true}
-                                  suppressContentEditableWarning={true}
-                                  className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
-                                  onBlur={(e) => updateItemOffline(item.id, { vendor: e.target.textContent })}
-                                >
-                                  {item.vendor ? `${item.vendor}${item.sku ? ` / ${item.sku}` : ''}` : item.sku || ''}
-                                </div>
-                              </td>
                               <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm text-center">
                                 <div 
                                   contentEditable={true}
@@ -687,61 +677,6 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                                   onBlur={(e) => updateItemOffline(item.id, { finish_color: e.target.textContent })}
                                 >
                                   {item.finish_color || ''}
-                                </div>
-                              </td>
-                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
-                                <div 
-                                  contentEditable={true}
-                                  suppressContentEditableWarning={true}
-                                  className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
-                                  onBlur={(e) => updateItemOffline(item.id, { cost: e.target.textContent })}
-                                >
-                                  {item.cost || ''}
-                                </div>
-                              </td>
-                              <td className="border border-[#B49B7E] px-1 py-1">
-                                <select
-                                  value={item.status || ''}
-                                  onChange={(e) => updateItemOffline(item.id, { status: e.target.value })}
-                                  className="w-full bg-gray-700 text-[#B49B7E] text-xs px-1 py-1 rounded border-none"
-                                >
-                                  <option value="">Select Status</option>
-                                  <option value="PICKED">PICKED</option>
-                                  <option value="TO BE PICKED">TO BE PICKED</option>
-                                  <option value="ORDER SAMPLES">ORDER SAMPLES</option>
-                                  <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
-                                  <option value="ASK NEIL">ASK NEIL</option>
-                                  <option value="ASK CHARLENE">ASK CHARLENE</option>
-                                  <option value="ASK JALA">ASK JALA</option>
-                                  <option value="GET QUOTE">GET QUOTE</option>
-                                  <option value="WAITING ON QT">WAITING ON QT</option>
-                                  <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
-                                </select>
-                              </td>
-                              <td className="border border-[#B49B7E] px-1 py-1 text-center w-20">
-                                {item.image_url ? (
-                                  <img src={item.image_url} alt={item.name} className="w-12 h-12 object-cover rounded" />
-                                ) : (
-                                  <div className="w-12 h-12 bg-gray-700 rounded flex items-center justify-center text-xs text-[#B49B7E]">No Image</div>
-                                )}
-                              </td>
-                              <td className="border border-[#B49B7E] px-1 py-1 text-center w-24">
-                                {item.link ? (
-                                  <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-[#D4A574] text-xs hover:underline">
-                                    🔗 View
-                                  </a>
-                                ) : (
-                                  <span className="text-gray-500 text-xs">-</span>
-                                )}
-                              </td>
-                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
-                                <div 
-                                  contentEditable={true}
-                                  suppressContentEditableWarning={true}
-                                  className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
-                                  onBlur={(e) => updateItemOffline(item.id, { notes: e.target.textContent })}
-                                >
-                                  {item.notes || ''}
                                 </div>
                               </td>
                               <td className="border border-[#B49B7E] px-1 py-1 text-center w-12">
