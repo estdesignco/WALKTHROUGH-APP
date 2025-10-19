@@ -142,6 +142,21 @@ export default function ToDoList({ projectId }) {
                     onChange={() => toggleTodo(todo.id, todo.completed)}
                     className="w-5 h-5 cursor-pointer"
                   />
+                  <span 
+                    className="px-3 py-1 rounded-full text-xs font-bold border"
+                    style={{
+                      background: todo.priority === 'High' 
+                        ? 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)'
+                        : todo.priority === 'Low'
+                        ? 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)'
+                        : 'linear-gradient(135deg, #F59E0BFF 0%, #F59E0BAA 50%, #F59E0BFF 100%)',
+                      borderColor: todo.priority === 'High' ? '#EF4444' : todo.priority === 'Low' ? '#10B981' : '#F59E0B',
+                      color: 'white',
+                      boxShadow: `0 0 10px ${todo.priority === 'High' ? '#EF444450' : todo.priority === 'Low' ? '#10B98150' : '#F59E0B50'}`
+                    }}
+                  >
+                    {todo.priority === 'High' ? '🔴' : todo.priority === 'Low' ? '🟢' : '🟡'} {todo.priority}
+                  </span>
                   <span className={`text-lg ${todo.completed ? 'line-through text-[#10B981]' : 'text-[#D4C5A9]'}`}>
                     {todo.text}
                   </span>
