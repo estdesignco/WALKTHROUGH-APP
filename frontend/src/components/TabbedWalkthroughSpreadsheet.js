@@ -583,72 +583,38 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                       <table className="w-full border-collapse border border-[#B49B7E] mb-4 mt-2 shadow-lg shadow-[#B49B7E]/10">
                         <thead>
                           <tr>
-                            <th className="border-2 border-[#D4A574] px-1 py-2 text-xs font-bold text-white w-8 rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
+                            <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-8" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>✓</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-[#D4C5A9] shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>
                               {subcategory.name.toUpperCase()}
-                              <button
-                                onClick={() => handleAddBlankItem(subcategory.id)}
-                                className="ml-2 bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-bold"
-                                title={`Add blank item to ${subcategory.name}`}
-                              >
+                              <button onClick={() => handleAddBlankItem(subcategory.id)} className="ml-2 bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-bold">
                                 + ADD ITEM
                               </button>
                             </th>
-                            <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>VENDOR/SKU</th>
-                            <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white w-16 shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>QTY</th>
-                            <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>SIZE</th>
-                            <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>FINISH/COLOR</th>
-                            <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>COST</th>
-                            <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>STATUS</th>
-                            <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white w-20 shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>IMAGE</th>
-                            <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white w-24 shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>PRODUCT LINK</th>
-                            <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>REMARKS</th>
-                            <th className="border-2 border-[#D4A574] px-2 py-2 text-xs font-bold text-white w-12 shadow-inner shadow-[#B49B7E]/20" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-12" style={{ 
+                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>DELETE</th>
