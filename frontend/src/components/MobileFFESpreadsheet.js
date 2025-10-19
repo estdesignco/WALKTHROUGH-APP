@@ -685,6 +685,6 @@ export default function MobileFFESpreadsheet({ projectId }) {
           onClose={() => setShowPhotoManagement(false)}
         />
       )}
-    </div>
+      </div>
   );
 }
