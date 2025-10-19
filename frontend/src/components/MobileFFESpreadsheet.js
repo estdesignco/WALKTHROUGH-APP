@@ -618,6 +618,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
           </tbody>
         </table>
       </div>
+      </div>
 
       {/* ADD ROOM MODAL */}
       {showAddRoom && (
