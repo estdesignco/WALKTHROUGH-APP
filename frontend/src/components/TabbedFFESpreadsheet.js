@@ -446,58 +446,90 @@ export default function TabbedFFESpreadsheet({ projectId }) {
                                 ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                                 : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
                             }}>
-                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
-                                <div contentEditable suppressContentEditableWarning
-                                     onBlur={(e) => updateItemOffline(item.id, { name: e.target.textContent })}
-                                     className="outline-none">{item.name}</div>
+                              {/* 1. CHECKBOX */}
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
+                                <input type="checkbox" className="w-4 h-4" />
                               </td>
+                              
+                              {/* 2. INSTALLED (NAME) */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning onBlur={(e) => updateItemOffline(item.id, { name: e.target.textContent })} className="outline-none">{item.name}</div>
+                              </td>
+                              
+                              {/* 3. QTY */}
                               <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm text-center">
-                                <div contentEditable suppressContentEditableWarning
-                                     onBlur={(e) => updateItemOffline(item.id, { quantity: e.target.textContent })}
-                                     className="outline-none">{item.quantity || '-'}</div>
+                                <div contentEditable suppressContentEditableWarning onBlur={(e) => updateItemOffline(item.id, { quantity: e.target.textContent })} className="outline-none">{item.quantity || '-'}</div>
                               </td>
+                              
+                              {/* 4. SIZE */}
                               <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
-                                <div contentEditable suppressContentEditableWarning
-                                     onBlur={(e) => updateItemOffline(item.id, { size: e.target.textContent })}
-                                     className="outline-none">{item.size || '-'}</div>
+                                <div contentEditable suppressContentEditableWarning onBlur={(e) => updateItemOffline(item.id, { size: e.target.textContent })} className="outline-none">{item.size || '-'}</div>
                               </td>
+                              
+                              {/* 5. FINISH/COLOR */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning onBlur={(e) => updateItemOffline(item.id, { finish_color: e.target.textContent })} className="outline-none">{item.finish_color || '-'}</div>
+                              </td>
+                              
+                              {/* 6. COST/PRICE */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning onBlur={(e) => updateItemOffline(item.id, { cost: e.target.textContent })} className="outline-none">${item.cost || '0'}</div>
+                              </td>
+                              
+                              {/* 7. IMAGE */}
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center">
+                                {item.image_url ? <img src={item.image_url} alt={item.name} className="w-12 h-12 object-cover rounded" /> : <div className="w-12 h-12 bg-gray-700 rounded flex items-center justify-center text-xs">No Img</div>}
+                              </td>
+                              
+                              {/* 8. ORDER DATE */}
+                              <td className="border border-[#B49B7E] px-1 py-1">
+                                <input type="date" value={item.order_date || ''} onChange={(e) => updateItemOffline(item.id, { order_date: e.target.value })} className="w-full bg-gray-700 text-white text-xs border-none" />
+                              </td>
+                              
+                              {/* 9. STATUS/ORDER# */}
                               <td className="border border-[#B49B7E] px-1 py-1" style={{
                                 background: item.status ? `linear-gradient(135deg, ${getStatusColor(item.status)}FF 0%, ${getStatusColor(item.status)}AA 20%, ${getStatusColor(item.status)} 40%, ${getStatusColor(item.status)}AA 80%, ${getStatusColor(item.status)}FF 100%)` : 'transparent',
                                 boxShadow: item.status ? `0 0 15px ${getStatusColor(item.status)}40, inset 0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)` : 'none'
                               }}>
-                                <select value={item.status || ''} onChange={(e) => updateItemOffline(item.id, { status: e.target.value })}
-                                        className="w-full bg-transparent text-white text-xs px-1 py-1 rounded border-none">
+                                <select value={item.status || ''} onChange={(e) => updateItemOffline(item.id, { status: e.target.value })} className="w-full bg-transparent text-white text-xs px-1 py-1 rounded border-none">
                                   <option value="">Select</option>
                                   {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                                 </select>
                               </td>
-                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
-                                <div contentEditable suppressContentEditableWarning
-                                     onBlur={(e) => updateItemOffline(item.id, { vendor: e.target.textContent })}
-                                     className="outline-none">{item.vendor || '-'}</div>
+                              
+                              {/* 10. EST. DATES */}
+                              <td className="border border-[#B49B7E] px-1 py-1 text-[#B49B7E] text-xs">
+                                <div contentEditable suppressContentEditableWarning className="outline-none">{item.est_dates || '-'}</div>
                               </td>
+                              
+                              {/* 11. INSTALL/SHIP TO */}
+                              <td className="border border-[#B49B7E] px-1 py-1 text-[#B49B7E] text-xs">
+                                <div contentEditable suppressContentEditableWarning className="outline-none">{item.ship_to || '-'}</div>
+                              </td>
+                              
+                              {/* 12. TRACKING/CARRIER */}
+                              <td className="border border-[#B49B7E] px-1 py-1 text-[#B49B7E] text-xs">
+                                <select value={item.carrier || ''} onChange={(e) => updateItemOffline(item.id, { carrier: e.target.value })} className="w-full bg-gray-700 text-white text-xs">
+                                  <option value="">-</option>
+                                  {carriers.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                              </td>
+                              
+                              {/* 13. NOTES */}
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-xs">
+                                <div contentEditable suppressContentEditableWarning onBlur={(e) => updateItemOffline(item.id, { notes: e.target.textContent })} className="outline-none">{item.notes || '-'}</div>
+                              </td>
+                              
+                              {/* 14. LINK */}
                               <td className="border border-[#B49B7E] px-1 py-1 text-center">
-                                {item.image_url ? (
-                                  <img src={item.image_url} alt={item.name} className="w-12 h-12 object-cover rounded" />
-                                ) : (
-                                  <div className="w-12 h-12 bg-gray-700 rounded flex items-center justify-center text-xs">No Img</div>
-                                )}
+                                {item.link ? <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-[#D4A574] text-xs">View</a> : <span className="text-gray-500 text-xs">-</span>}
                               </td>
+                              
+                              {/* 15. DELETE */}
                               <td className="border border-[#B49B7E] px-1 py-1 text-center">
-                                {item.link ? (
-                                  <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-[#D4A574] text-xs">View</a>
-                                ) : (
-                                  <span className="text-gray-500 text-xs">-</span>
-                                )}
+                                <button onClick={() => handleDeleteItem(item.id)} className="text-red-400 text-sm">🗑️</button>
                               </td>
-                              <td className="border border-[#B49B7E] px-1 py-1">
-                                <input type="date" value={item.order_date || ''} onChange={(e) => updateItemOffline(item.id, { order_date: e.target.value })}
-                                       className="w-full bg-gray-700 text-white text-xs border-none" />
-                              </td>
-                              <td className="border border-[#B49B7E] px-1 py-1">
-                                <div className="flex flex-col gap-1">
-                                  <select value={item.status || ''} onChange={(e) => updateItemOffline(item.id, { status: e.target.value })}
-                                          className="w-full bg-gray-700 text-white text-xs px-1 py-1 rounded">
+                            </tr>
                                     <option value="">Status</option>
                                     {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                                   </select>
