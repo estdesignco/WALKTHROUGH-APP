@@ -582,7 +582,179 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                     <React.Fragment key={subcategory.id}>
                       {sheetType === 'ffe' ? (
                         // FFE TABLE - 15 COLUMNS
-                        <div>FFE TABLE PLACEHOLDER</div>
+                      <table className="w-full border-collapse border border-[#B49B7E] mb-4 mt-2 shadow-lg shadow-[#B49B7E]/10">
+                        <thead>
+                          <tr>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                              boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>INSTALLED</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                              boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>VENDOR/SKU</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                              boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>QTY</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                              boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>SIZE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                              boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>FINISH/COLOR</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                              boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>COST</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                              boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>IMAGE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                              boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>ORDER DATE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                              boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>STATUS</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                              boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>ETA</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                              boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>SHIP TO</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                              boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>TRACKING</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                              boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>NOTES</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                              background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                              boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>LINK</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-12" style={{ 
+                              background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                              boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                              textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                            }}>DELETE</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {subcategory.items?.map((item, itemIndex) => (
+                            <tr key={item.id} style={{ 
+                              background: itemIndex % 2 === 0 
+                                ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                            }}>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning className="outline-none" onBlur={(e) => updateItemOffline(item.id, { name: e.target.textContent })}>
+                                  {item.name}
+                                </div>
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning className="outline-none" onBlur={(e) => updateItemOffline(item.id, { vendor: e.target.textContent })}>
+                                  {item.vendor || ''}
+                                </div>
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm text-center">
+                                <div contentEditable suppressContentEditableWarning className="outline-none" onBlur={(e) => updateItemOffline(item.id, { quantity: e.target.textContent })}>
+                                  {item.quantity || ''}
+                                </div>
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning className="outline-none" onBlur={(e) => updateItemOffline(item.id, { size: e.target.textContent })}>
+                                  {item.size || ''}
+                                </div>
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning className="outline-none" onBlur={(e) => updateItemOffline(item.id, { finish_color: e.target.textContent })}>
+                                  {item.finish_color || ''}
+                                </div>
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning className="outline-none" onBlur={(e) => updateItemOffline(item.id, { cost: e.target.textContent })}>
+                                  {item.cost ? `$${item.cost}` : ''}
+                                </div>
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-center">
+                                {item.image_url ? (
+                                  <img src={item.image_url} alt={item.name} className="w-12 h-12 object-cover rounded" />
+                                ) : (
+                                  <span className="text-gray-500 text-xs">No image</span>
+                                )}
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <input type="date" defaultValue={item.order_date || ''} onBlur={(e) => updateItemOffline(item.id, { order_date: e.target.value })} className="bg-transparent text-[#B49B7E] text-sm w-full" />
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <select defaultValue={item.status || ''} onChange={(e) => updateItemOffline(item.id, { status: e.target.value })} className="bg-gray-800 text-[#B49B7E] text-xs w-full">
+                                  <option value="">--</option>
+                                  <option value="TO BE SELECTED">TO BE SELECTED</option>
+                                  <option value="ORDERED">ORDERED</option>
+                                  <option value="IN PRODUCTION">IN PRODUCTION</option>
+                                  <option value="SHIPPED">SHIPPED</option>
+                                  <option value="DELIVERED">DELIVERED</option>
+                                  <option value="READY FOR INSTALL">READY FOR INSTALL</option>
+                                  <option value="INSTALLED">INSTALLED</option>
+                                </select>
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <input type="date" defaultValue={item.eta || ''} onBlur={(e) => updateItemOffline(item.id, { eta: e.target.value })} className="bg-transparent text-[#B49B7E] text-sm w-full" />
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning className="outline-none" onBlur={(e) => updateItemOffline(item.id, { ship_to: e.target.textContent })}>
+                                  {item.ship_to || ''}
+                                </div>
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning className="outline-none" onBlur={(e) => updateItemOffline(item.id, { tracking_number: e.target.textContent })}>
+                                  {item.tracking_number || ''}
+                                </div>
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                <div contentEditable suppressContentEditableWarning className="outline-none" onBlur={(e) => updateItemOffline(item.id, { notes: e.target.textContent })}>
+                                  {item.notes || ''}
+                                </div>
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                {item.link ? (
+                                  <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-xs">View</a>
+                                ) : (
+                                  <span className="text-gray-500 text-xs">--</span>
+                                )}
+                              </td>
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center w-12">
+                                <button onClick={() => handleDeleteItem(item.id)} className="text-red-400 hover:text-red-300 text-sm font-bold">
+                                  🗑️
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                       ) : (
                         // WALKTHROUGH TABLE - 6 COLUMNS
                       <table className="w-full border-collapse border border-[#B49B7E] mb-4 mt-2 shadow-lg shadow-[#B49B7E]/10">
