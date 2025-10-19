@@ -214,94 +214,91 @@ export default function TabbedFFESpreadsheet({ projectId }) {
   const activeRoom = project.rooms[activeRoomTab];
 
   return (
-    <div className="w-full h-full flex flex-col" style={{ backgroundColor: '#0F172A' }}>
-      {/* TOP SECTION - FIXED/STICKY */}
-      <div className="flex-shrink-0">
-        {/* HEADER */}
-        <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 border-b-4 border-[#D4A574]">
-          <div className="text-center mb-6">
-            <h1 className="text-4xl font-bold text-[#D4A574] mb-2">{project?.name}</h1>
-            <div className="text-lg text-[#D4C5A9]">
-              {project?.client_info?.full_name} • {project?.client_info?.address}
-            </div>
+    <div className="w-full h-full overflow-auto" style={{ backgroundColor: '#0F172A' }}>
+      {/* HEADER */}
+      <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 border-b-4 border-[#D4A574]">
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-bold text-[#D4A574] mb-2">{project?.name}</h1>
+          <div className="text-lg text-[#D4C5A9]">
+            {project?.client_info?.full_name} • {project?.client_info?.address}
           </div>
-          
-          <div className="text-center">
-            <div className="inline-flex items-center gap-6">
-              <button
-                onClick={() => setShowAddRoom(true)}
-                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] px-8 py-3 rounded-full text-black font-bold"
-              >
-                ADD ROOM
-              </button>
-              
-              <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full">
-                <span className="text-xl font-bold text-black">FF&E SPREADSHEET</span>
+        </div>
+        
+        <div className="text-center">
+          <div className="inline-flex items-center gap-6">
+            <button
+              onClick={() => setShowAddRoom(true)}
+              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] px-8 py-3 rounded-full text-black font-bold"
+            >
+              ADD ROOM
+            </button>
+            
+            <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full">
+              <span className="text-xl font-bold text-black">FF&E SPREADSHEET</span>
+            </div>
+            
+            {!online && (
+              <div className="bg-orange-600 text-white px-6 py-3 rounded-full font-bold">
+                📴 OFFLINE MODE
               </div>
-              
-              {!online && (
-                <div className="bg-orange-600 text-white px-6 py-3 rounded-full font-bold">
-                  📴 OFFLINE MODE
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* SEARCH BAR */}
-        <div className="bg-[#1E293B] p-3 border-b border-[#D4A574]">
-          <input
-            type="text"
-            placeholder="Search Items, Vendors, SKUs..."
-            className="w-full px-4 py-2 rounded-lg border border-[#D4A574] text-white focus:outline-none placeholder-[#D4C5A9]/70"
-            style={{
-              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
-              boxShadow: '0 0 15px rgba(212, 165, 116, 0.2)'
-            }}
-          />
-        </div>
-
-        {/* STATUS OVERVIEW - COMPACT */}
-        {project && (
-          <div className="bg-[#0F172A] border-b border-[#D4A574] overflow-y-auto" style={{ maxHeight: '180px' }}>
-            <StatusOverview
-              totalItems={calculateProjectStats(project)?.totalItems || 0}
-              statusBreakdown={calculateProjectStats(project)?.statusBreakdown || {}}
-              carrierBreakdown={calculateProjectStats(project)?.carrierBreakdown || {}}
-              itemStatuses={statuses}
-            />
-          </div>
-        )}
-
-        {/* ROOM TABS */}
-        <div className="bg-[#1E293B] border-b-2 border-[#D4A574] overflow-x-auto">
-          <div className="flex">
-            {project.rooms.map((room, index) => (
-              <button
-                key={room.id}
-                onClick={() => setActiveRoomTab(index)}
-                className={`px-6 py-4 font-bold border-b-4 min-w-max ${
-                  activeRoomTab === index
-                    ? 'border-[#D4A574] text-[#D4A574]'
-                    : 'border-transparent text-[#B49B7E]'
-                }`}
-                style={{ 
-                  backgroundColor: activeRoomTab === index ? getRoomColor(room.name) + '40' : 'transparent',
-                  borderTopColor: getRoomColor(room.name),
-                  borderTopWidth: '4px',
-                  borderTopStyle: 'solid'
-                }}
-              >
-                {room.name}
-                <div className="text-xs">{roomPhotos[room.id]?.length || 0} photos</div>
-              </button>
-            ))}
+            )}
           </div>
         </div>
       </div>
 
-      {/* SCROLLABLE SPREADSHEET */}
-      <div className="flex-1 overflow-auto">
+      {/* SEARCH BAR */}
+      <div className="bg-[#1E293B] p-3 border-b border-[#D4A574]">
+        <input
+          type="text"
+          placeholder="Search Items, Vendors, SKUs..."
+          className="w-full px-4 py-2 rounded-lg border border-[#D4A574] text-white focus:outline-none placeholder-[#D4C5A9]/70"
+          style={{
+            background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+            boxShadow: '0 0 15px rgba(212, 165, 116, 0.2)'
+          }}
+        />
+      </div>
+
+      {/* STATUS OVERVIEW - NO SEPARATE SCROLL */}
+      {project && (
+        <div className="bg-[#0F172A] border-b border-[#D4A574]">
+          <StatusOverview
+            totalItems={calculateProjectStats(project)?.totalItems || 0}
+            statusBreakdown={calculateProjectStats(project)?.statusBreakdown || {}}
+            carrierBreakdown={calculateProjectStats(project)?.carrierBreakdown || {}}
+            itemStatuses={statuses}
+          />
+        </div>
+      )}
+
+      {/* ROOM TABS */}
+      <div className="bg-[#1E293B] border-b-2 border-[#D4A574] overflow-x-auto">
+        <div className="flex">
+          {project.rooms.map((room, index) => (
+            <button
+              key={room.id}
+              onClick={() => setActiveRoomTab(index)}
+              className={`px-6 py-4 font-bold border-b-4 min-w-max ${
+                activeRoomTab === index
+                  ? 'border-[#D4A574] text-[#D4A574]'
+                  : 'border-transparent text-[#B49B7E]'
+              }`}
+              style={{ 
+                backgroundColor: activeRoomTab === index ? getRoomColor(room.name) + '40' : 'transparent',
+                borderTopColor: getRoomColor(room.name),
+                borderTopWidth: '4px',
+                borderTopStyle: 'solid'
+              }}
+            >
+              {room.name}
+              <div className="text-xs">{roomPhotos[room.id]?.length || 0} photos</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* SPREADSHEET TABLE */}
+      <div>
         {activeRoom && (
           <div>
             {/* FFE TABLE - EXACT DESKTOP STRUCTURE */}
