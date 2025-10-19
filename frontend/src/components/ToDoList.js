@@ -31,10 +31,12 @@ export default function ToDoList({ projectId }) {
       await axios.post(`${API_URL}/todos`, {
         project_id: projectId,
         text: newTodo.trim(),
+        priority: newPriority,
         completed: false
       });
       
       setNewTodo('');
+      setNewPriority('Medium');
       await loadTodos();
       alert('✅ To-Do added! Teams notification sent.');
     } catch (error) {
