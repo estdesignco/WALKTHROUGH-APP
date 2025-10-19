@@ -511,7 +511,7 @@ export default function MobileAppSimulator() {
               ← Back
             </button>
             <div className="flex-1 overflow-hidden">
-              <TabbedFFESpreadsheet projectId={selectedProject?.id} />
+              <MobileFFESpreadsheet projectId={selectedProject?.id} />
             </div>
           </div>
         );
