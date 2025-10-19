@@ -220,13 +220,6 @@ export default function MobileFFESpreadsheet({ projectId }) {
       </div>
       
       <div className="flex-1 overflow-auto p-4">
-              className="bg-gradient-to-br from-[#7a8a9a]/80 to-[#5a6a7a]/80 hover:from-[#8a9aaa] hover:to-[#6a7a8a] text-white font-bold py-3 px-3 rounded-lg text-xs shadow-lg border border-[#8a9aaa]/30 transition-all"
-            >
-              📊 STATS
-            </button>
-          )}
-        </div>
-      </div>
       
       {/* SEARCH & FILTER PANEL */}
       {showSearch && (
