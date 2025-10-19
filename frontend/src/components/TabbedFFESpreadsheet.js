@@ -530,6 +530,11 @@ export default function TabbedFFESpreadsheet({ projectId }) {
                                 <button onClick={() => handleDeleteItem(item.id)} className="text-red-400 text-sm">🗑️</button>
                               </td>
                             </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </React.Fragment>
+                  ))}
                                     <option value="">Status</option>
                                     {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                                   </select>
