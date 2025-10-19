@@ -696,6 +696,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                           ))}
                         </tbody>
                       </table>
+                      )}
                     </React.Fragment>
                   ))}
                 </div>
