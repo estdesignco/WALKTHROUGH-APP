@@ -5,6 +5,7 @@ import MobileWalkthroughSpreadsheet from './MobileWalkthroughSpreadsheet';
 import TabbedWalkthroughSpreadsheet from './TabbedWalkthroughSpreadsheet';
 import TabbedFFESpreadsheet from './TabbedFFESpreadsheet';
 import WorkingTabbedWalkthrough from './WorkingTabbedWalkthrough';
+import MobileFFESpreadsheet from './MobileFFESpreadsheet';
 import MobilePhotoManagement from './MobilePhotoManagement';
 import MeasurementsAndFilesPage from './MeasurementsAndFilesPage';
 
