@@ -178,6 +178,20 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
     loadAvailableCategories();
   }, [projectId]);
 
+  // Auto-expand all categories when project loads
+  useEffect(() => {
+    if (project?.rooms) {
+      const allExpanded = {};
+      project.rooms.forEach(room => {
+        room.categories?.forEach(category => {
+          allExpanded[category.id] = true;
+        });
+      });
+      setExpandedCategories(allExpanded);
+      console.log('✅ Auto-expanded all categories:', Object.keys(allExpanded).length);
+    }
+  }, [project?.rooms]);
+
   const loadProject = async () => {
     try {
       setLoading(true);
