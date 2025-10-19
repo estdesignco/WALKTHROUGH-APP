@@ -28,12 +28,7 @@ const MainHeader = ({
       {/* TOP HEADER */}
       <div className="mb-1 pt-2"> {/* Much tighter spacing */}
         <div className="text-center mb-1"> {/* Much tighter spacing */}
-          <h1 className="text-5xl font-bold mb-2 px-6 py-3 rounded-lg inline-block border-2 border-[#D4A574]" style={{ 
-            background: 'linear-gradient(135deg, #8b7355FF 0%, #8b7355AA 20%, #8b7355 40%, #8b7355AA 80%, #8b7355FF 100%)',
-            boxShadow: '0 0 40px #8b735570, 0 0 60px #8b735530, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3)',
-            textShadow: '0 3px 10px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 255, 255, 0.45), 0 0 40px rgba(255, 255, 255, 0.25)',
-            color: 'white'
-          }}>{clientLastName}</h1> {/* Much tighter */}
+          <h1 className="text-4xl font-bold text-white mb-1" style={{ color: '#8b7355' }}>{clientLastName}</h1>
           <p style={{ color: '#F5F5DC', opacity: '0.8' }}>{clientFullInfo}</p>
         </div>
 
