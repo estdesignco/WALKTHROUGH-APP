@@ -5,6 +5,7 @@ import MobileAddItemModal from './MobileAddItemModal';
 import { exportProjectToCSV, exportProjectSummary, calculateProjectStats } from '../utils/exportUtils';
 import { leicaManager } from '../utils/leicaD5Manager';
 import { getRoomColor, getCategoryColor, ROOM_COLORS } from '../utils/roomColors';
+import StatusOverview from './StatusOverview';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
