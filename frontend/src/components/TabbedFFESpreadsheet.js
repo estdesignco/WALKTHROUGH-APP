@@ -535,7 +535,8 @@ export default function TabbedFFESpreadsheet({ projectId }) {
                       </table>
                     </React.Fragment>
                   ))}
-                                    <option value="">Status</option>
+                </div>
+              )}
                                     {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                                   </select>
                                   <input type="text" placeholder="Order #" value={item.order_number || ''}
