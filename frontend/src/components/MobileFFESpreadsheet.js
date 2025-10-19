@@ -180,46 +180,46 @@ export default function MobileFFESpreadsheet({ projectId }) {
   }
 
   return (
-    <div className="w-full h-full overflow-auto" style={{ backgroundColor: '#0F172A' }}>
-      {/* Logo Header - Black logo on gold container */}
-      <div className="text-center py-3 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border-b border-[#D4A574]/20">
-        <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#BCA888] p-0">
-          <img 
-            src={`${process.env.PUBLIC_URL}/established-logo.png`}
-            alt="ESTABLISHED" 
-            className="h-10 md:h-12 object-contain"
-            style={{ 
-              maxWidth: '180px',
-              filter: 'brightness(0)',
-              display: 'block'
-            }}
-          />
+    <div className="w-full h-full flex flex-col" style={{ backgroundColor: '#0F172A' }}>
+      {/* EXACT DESKTOP HEADER */}
+      <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 border-b-4 border-[#D4A574] shadow-2xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-6">
+            <h1 className="text-5xl font-bold text-[#D4A574] mb-2 tracking-wide">
+              {displayProject?.name || 'PROJECT NAME'}
+            </h1>
+            <div className="text-xl text-[#D4C5A9] font-medium">
+              {displayProject?.client_info?.full_name || 'Client Name'} • {displayProject?.client_info?.address || 'Address'}
+            </div>
+            <div className="text-lg text-[#B49B7E] mt-2">
+              {displayProject?.client_info?.phone || ''} • {displayProject?.client_info?.email || ''}
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <div className="inline-flex items-center gap-6">
+              <button
+                onClick={() => setShowAddRoom(true)}
+                className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-3 rounded-full text-black font-bold text-lg shadow-xl"
+              >
+                ✥ ADD ROOM
+              </button>
+              
+              <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full">
+                <span className="text-2xl font-bold text-black tracking-wider">FF&E SPREADSHEET</span>
+              </div>
+              
+              {!online && (
+                <div className="bg-orange-600 text-white px-6 py-3 rounded-full font-bold">
+                  📴 OFFLINE MODE
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       
-      {/* OFFLINE STATUS INDICATOR */}
-      {!online && (
-        <div className="bg-orange-600 text-white px-4 py-2 text-center font-bold text-sm">
-          📴 OFFLINE MODE - Changes will sync when online
-          {pendingCount > 0 && ` (${pendingCount} pending)`}
-        </div>
-      )}
-      
-      {/* SYNC STATUS */}
-      {online && syncStatus === 'syncing' && (
-        <div className="bg-blue-600 text-white px-4 py-2 text-center font-bold text-sm">
-          🔄 Syncing...
-        </div>
-      )}
-      
-      {online && syncStatus === 'success' && (
-        <div className="bg-green-600 text-white px-4 py-2 text-center font-bold text-sm">
-          ✅ Synced successfully!
-        </div>
-      )}
-      
-      {/* ACTION BUTTONS - iPad Optimized */}
-      <div className="p-4 md:p-6 lg:p-8 border-b border-[#D4A574]/20 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a]">
+      <div className="flex-1 overflow-auto">
         <div className="grid grid-cols-3 gap-3 md:gap-4 mb-3 md:mb-4">
           <button
             onClick={() => setShowAddRoom(true)}
