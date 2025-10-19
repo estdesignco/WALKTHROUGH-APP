@@ -292,38 +292,112 @@ export default function TabbedFFESpreadsheet({ projectId }) {
 
                   {expandedCategories[category.id] && category.subcategories?.map((subcategory) => (
                     <React.Fragment key={subcategory.id}>
-                      {/* FFE HEADERS - COMPLEX LIKE DESKTOP */}
+                      {/* FFE HEADERS - EXACTLY LIKE DESKTOP */}
                       <table className="w-full border-collapse border border-[#B49B7E] mb-4 mt-2">
                         <thead>
                           {/* Row 1: Section Headers */}
                           <tr>
                             <td colSpan="4" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" 
-                                style={{ backgroundColor: '#8B4444' }}></td>
+                                style={{ 
+                                  background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                  boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
+                                }}></td>
                             <td colSpan="3" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" 
-                                style={{ backgroundColor: '#8B4513' }}>ADDITIONAL INFO.</td>
-                            <td colSpan="5" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" 
-                                style={{ backgroundColor: '#6B46C1' }}>SHIPPING INFO.</td>
-                            <td colSpan="3" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" 
-                                style={{ backgroundColor: '#8B4444' }}></td>
+                                style={{ 
+                                  background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                                  boxShadow: '0 0 25px #8B451360, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
+                                  textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
+                                }}>ADDITIONAL INFO.</td>
+                            <td colSpan="6" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" 
+                                style={{ 
+                                  background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                                  boxShadow: '0 0 25px #6B46C160, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
+                                  textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
+                                }}>SHIPPING INFO.</td>
+                            <td colSpan="2" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" 
+                                style={{ 
+                                  background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                  boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
+                                }}></td>
                           </tr>
                           
-                          {/* Row 2: Column Headers */}
+                          {/* Row 2: Column Headers - EXACT DESKTOP */}
                           <tr>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>INSTALLED</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>QTY</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>SIZE</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>VENDOR</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>IMAGE</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>ORDER DATE</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>STATUS/ORDER#</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>EST DATES</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>INSTALL/SHIP TO</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>TRACKING/CARRIER</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>NOTES</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4444' }}>LINK</th>
-                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#DC2626' }}>DELETE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-8" style={{ 
+                                background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>✓</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>{subcategory.name.toUpperCase()}</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>QTY</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>SIZE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                                boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>FINISH/COLOR</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                                boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>COST/PRICE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
+                                boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>IMAGE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                                boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>ORDER DATE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                                boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>STATUS/ORDER#</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                                boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>EST. DATES</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                                boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>INSTALL/SHIP TO</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                                boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>TRACKING/CARRIER</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                                boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>NOTES</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ 
+                                background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
+                                boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>LINK</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-12" style={{ 
+                                background: 'linear-gradient(135deg, #DC2626FF 0%, #DC2626AA 20%, #DC2626 40%, #DC2626AA 80%, #DC2626FF 100%)',
+                                boxShadow: '0 0 20px #DC262650, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                              }}>DELETE</th>
                           </tr>
                         </thead>
                         <tbody>
