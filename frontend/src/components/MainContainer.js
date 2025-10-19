@@ -15,6 +15,8 @@ const MainContainer = ({
       {/* Page Title - NO SPACING */}
       <div className="text-center mb-1">
         <h2 className="text-3xl font-light tracking-wide mb-0 border border-[#B49B7E]/20 px-4 py-2 rounded-lg" style={{
+          background: 'linear-gradient(135deg, rgba(180,155,126,0.3) 0%, rgba(180,155,126,0.2) 50%, rgba(180,155,126,0.3) 100%)',
+          boxShadow: '0 0 15px rgba(180,155,126,0.2), inset 0 0 30px rgba(212, 165, 116, 0.06)',
           color: '#B49B7E'
         }}>{title}</h2>
         <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E]/20 to-transparent mx-auto"></div>
