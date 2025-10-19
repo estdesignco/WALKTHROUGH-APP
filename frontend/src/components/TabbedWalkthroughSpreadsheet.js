@@ -952,7 +952,6 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                   ))}
                 </div>
               ))}
-            </div>
 
             {/* PHOTO SECTION AT BOTTOM OF EACH ROOM */}
             <div className="bg-[#1E293B] p-6 border-t-4 border-[#D4A574] mt-8">
