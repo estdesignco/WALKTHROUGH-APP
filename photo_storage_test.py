@@ -13,7 +13,7 @@ import pymongo
 from pymongo import MongoClient
 
 # Configuration
-BACKEND_URL = "https://designmate-3.preview.emergentagent.com/api"
+BACKEND_URL = "https://designflow-hub.preview.emergentagent.com/api"
 MONGO_URL = "mongodb://localhost:27017"
 DB_NAME = "interiorsync"
 

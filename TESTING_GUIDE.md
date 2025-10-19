@@ -6,7 +6,7 @@
 
 ## 📱 ACCESS THE APP
 
-**Live URL:** https://designmate-3.preview.emergentagent.com/mobile-app
+**Live URL:** https://designflow-hub.preview.emergentagent.com/mobile-app
 
 ---
 
@@ -483,7 +483,7 @@ After testing, grade each area:
 
 ## 🚀 READY TO TEST!
 
-**Start here:** https://designmate-3.preview.emergentagent.com/mobile-app
+**Start here:** https://designflow-hub.preview.emergentagent.com/mobile-app
 
 **Estimated time:** 30-60 minutes for full testing
 
