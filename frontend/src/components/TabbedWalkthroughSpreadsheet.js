@@ -180,7 +180,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
   const loadProject = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/projects/${projectId}?sheet_type=walkthrough`);
+      const response = await axios.get(`${API_URL}/projects/${projectId}?sheet_type=${sheetType}`);
       setProject(response.data);
       
       // Set first room as active tab
@@ -197,7 +197,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
   const loadAllPhotos = async () => {
     if (!projectId) return;
     try {
-      const response = await axios.get(`${API_URL}/projects/${projectId}?sheet_type=walkthrough`);
+      const response = await axios.get(`${API_URL}/projects/${projectId}?sheet_type=${sheetType}`);
       const rooms = response.data?.rooms || [];
       
       const photosData = {};
