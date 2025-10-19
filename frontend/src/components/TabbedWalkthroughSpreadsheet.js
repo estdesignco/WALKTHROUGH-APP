@@ -499,7 +499,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
   };
 
   return (
-    <div className="w-full h-full flex flex-col" style={{ backgroundColor: '#0F172A' }}>
+    <div className="w-full h-full" style={{ backgroundColor: '#0F172A', overflow: 'auto' }}>
       {/* EXACT DESKTOP HEADER - WITH ENHANCED SHIMMER */}
       <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 border-b-4 border-[#D4A574] shadow-2xl" style={{
         boxShadow: '0 4px 20px rgba(212, 165, 116, 0.3), inset 0 0 60px rgba(212, 165, 116, 0.05)'
@@ -598,13 +598,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
         </div>
       </div>
 
-      {/* ACTIVE ROOM CONTENT */}
-      <div className="flex-1 overflow-auto">
-        {activeRoom && (
-          <div>
-            {/* SPREADSHEET FOR ACTIVE ROOM - EXACT DESKTOP LAYOUT */}
-            <div className="p-4">
-              {activeRoom.categories?.map((category) => (
+      {/* ACTIVE ROOM CONTENT - SIMPLE SCROLLABLE */}
+      <div className="p-4">
+        {activeRoom && activeRoom.categories?.map((category) => (
                 <div key={category.id} className="mb-6">
                   {/* CATEGORY HEADER - GREEN GRADIENT WITH BALANCED SHIMMER */}
                   <div 
