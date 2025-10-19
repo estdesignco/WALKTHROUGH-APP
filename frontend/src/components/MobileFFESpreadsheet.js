@@ -219,55 +219,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
         </div>
       </div>
       
-      <div className="flex-1 overflow-auto">
-        <div className="grid grid-cols-3 gap-3 md:gap-4 mb-3 md:mb-4">
-          <button
-            onClick={() => setShowAddRoom(true)}
-            className="bg-gradient-to-br from-[#4a7c59]/80 to-[#3a5c49]/80 hover:from-[#5a8c69] hover:to-[#4a6c59] text-white font-bold py-4 md:py-5 lg:py-6 px-3 md:px-4 rounded-xl md:rounded-2xl text-sm md:text-base lg:text-lg shadow-lg border-2 border-[#5a8c69]/30 transition-all"
-          >
-            ➕ ROOM
-          </button>
-          
-          <button
-            onClick={() => setShowAddItem(true)}
-            className="bg-gradient-to-br from-[#5a7a9a]/80 to-[#4a5a7a]/80 hover:from-[#6a8aaa] hover:to-[#5a6a8a] text-white font-bold py-4 md:py-5 lg:py-6 px-3 md:px-4 rounded-xl md:rounded-2xl text-sm md:text-base lg:text-lg shadow-lg border-2 border-[#6a8aaa]/30 transition-all"
-          >
-            ➕ ITEM
-          </button>
-          
-          <button
-            onClick={() => setShowQuickAdd(true)}
-            className="bg-gradient-to-br from-[#7a6a9a]/80 to-[#5a4a7a]/80 hover:from-[#8a7aaa] hover:to-[#6a5a8a] text-white font-bold py-4 md:py-5 lg:py-6 px-3 md:px-4 rounded-xl md:rounded-2xl text-sm md:text-base lg:text-lg shadow-lg border-2 border-[#8a7aaa]/30 transition-all"
-          >
-            ⚡ QUICK
-          </button>
-        </div>
-        
-        <div className="grid grid-cols-3 gap-3 md:gap-4">
-          <button
-            onClick={() => setShowPhotoManagement(true)}
-            className="bg-gradient-to-br from-[#D4A574]/80 to-[#B48554]/80 hover:from-[#E4B584] hover:to-[#C49564] text-black font-bold py-4 md:py-5 lg:py-6 px-3 md:px-4 rounded-xl md:rounded-2xl text-sm md:text-base lg:text-lg shadow-lg border-2 border-[#D4A574]/50 transition-all"
-          >
-            📸 PHOTOS
-          </button>
-          
-          <button
-            onClick={() => setShowSearch(!showSearch)}
-            className={`bg-gradient-to-br ${showSearch ? 'from-[#D4C5A9]/90 to-[#B4A589]/90 text-black' : 'from-[#6a6a6a]/80 to-[#4a4a4a]/80 text-white'} hover:from-[#D4C5A9] hover:to-[#B4A589] font-bold py-4 md:py-5 lg:py-6 px-3 md:px-4 rounded-xl md:rounded-2xl text-sm md:text-base lg:text-lg shadow-lg border-2 border-[#D4C5A9]/30 transition-all`}
-          >
-            🔍 SEARCH
-          </button>
-          
-          {online && pendingCount > 0 ? (
-            <button
-              onClick={performSync}
-              className="bg-gradient-to-br from-[#9a7a9a]/80 to-[#7a5a7a]/80 hover:from-[#aa8aaa] hover:to-[#8a6a8a] text-white font-bold py-3 px-3 rounded-lg text-xs shadow-lg border border-[#aa8aaa]/30 transition-all"
-            >
-              🔄 ({pendingCount})
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowStats(true)}
+      <div className="flex-1 overflow-auto p-4">
               className="bg-gradient-to-br from-[#7a8a9a]/80 to-[#5a6a7a]/80 hover:from-[#8a9aaa] hover:to-[#6a7a8a] text-white font-bold py-3 px-3 rounded-lg text-xs shadow-lg border border-[#8a9aaa]/30 transition-all"
             >
               📊 STATS
