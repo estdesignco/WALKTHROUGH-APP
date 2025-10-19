@@ -305,7 +305,12 @@ export default function TabbedFFESpreadsheet({ projectId }) {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          alert('Add item to ' + category.name);
+                          const firstSubcategory = category.subcategories?.[0];
+                          if (firstSubcategory) {
+                            handleAddBlankItem(firstSubcategory.id);
+                          } else {
+                            alert('No subcategory found');
+                          }
                         }}
                         className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-bold text-xs"
                       >
