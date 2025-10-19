@@ -7157,6 +7157,7 @@ async def create_todo(todo: dict):
             "id": str(uuid.uuid4()),
             "project_id": todo.get("project_id"),
             "text": todo.get("text"),
+            "priority": todo.get("priority", "Medium"),
             "completed": False,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
