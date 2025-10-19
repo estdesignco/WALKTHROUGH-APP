@@ -538,6 +538,18 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
         </div>
       </div>
 
+      {/* STATUS OVERVIEW - ONLY FOR FFE */}
+      {sheetType === 'ffe' && (
+        <div className="px-4 py-4">
+          <StatusOverview
+            totalItems={getTotalItems()}
+            statusBreakdown={getStatusBreakdown()}
+            carrierBreakdown={getCarrierBreakdown()}
+            itemStatuses={['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED', 'INSTALLED']}
+          />
+        </div>
+      )}
+
       {/* ROOM TABS - WITH ENHANCED SHIMMER */}
       <div className="bg-[#1E293B] border-b-2 border-[#D4A574] overflow-x-auto" style={{
         boxShadow: 'inset 0 0 40px rgba(212, 165, 116, 0.08)'
