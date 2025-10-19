@@ -250,30 +250,16 @@ export default function TabbedFFESpreadsheet({ projectId }) {
 
       {/* SEARCH & FILTERS */}
       <div className="bg-[#1E293B] p-4 border-b-2 border-[#D4A574]">
-        <div className="flex gap-3 flex-wrap">
-          <input
-            type="text"
-            placeholder="Search Items, Vendors, SKUs..."
-            className="flex-1 px-4 py-2 rounded-lg border-2 border-[#D4A574] text-white focus:outline-none placeholder-[#D4C5A9]/70"
-            style={{
-              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
-              boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 30px rgba(212, 165, 116, 0.08)'
-            }}
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Search Items, Vendors, SKUs..."
+          className="w-full px-4 py-2 rounded-lg border-2 border-[#D4A574] text-white focus:outline-none placeholder-[#D4C5A9]/70"
+          style={{
+            background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
+            boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 30px rgba(212, 165, 116, 0.08)'
+          }}
+        />
       </div>
-
-      {/* STATUS OVERVIEW - COMPACT */}
-      {project && (
-        <div className="bg-[#0F172A] border-b-2 border-[#D4A574]">
-          <StatusOverview
-            totalItems={calculateProjectStats(project)?.totalItems || 0}
-            statusBreakdown={calculateProjectStats(project)?.statusBreakdown || {}}
-            carrierBreakdown={calculateProjectStats(project)?.carrierBreakdown || {}}
-            itemStatuses={statuses}
-          />
-        </div>
-      )}
 
       {/* ROOM TABS */}
       <div className="bg-[#1E293B] border-b-2 border-[#D4A574] overflow-x-auto">
