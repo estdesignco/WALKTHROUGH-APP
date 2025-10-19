@@ -4,6 +4,8 @@ import { useOfflineSync } from '../hooks/useOfflineSync';
 import { exportProjectToCSV, exportProjectSummary, calculateProjectStats } from '../utils/exportUtils';
 import { leicaManager } from '../utils/leicaD5Manager';
 import { getRoomColor, getCategoryColor } from '../utils/roomColors';
+import { getStatusColor } from '../utils/statusColors';
+import StatusOverview from './StatusOverview';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
