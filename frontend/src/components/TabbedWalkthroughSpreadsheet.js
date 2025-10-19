@@ -848,8 +848,10 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                                 <textarea className="bg-transparent text-[#B49B7E] text-xs w-full" rows="2" placeholder="Notes"></textarea>
                               </td>
                               <td className="border border-[#B49B7E] px-1 py-1">
-                                <input type="text" placeholder="Product URL" className="bg-transparent text-blue-400 text-xs w-full mb-1" />
-                                <button className="bg-green-600 text-white text-xs px-2 py-1 rounded w-full">SCRAPE</button>
+                                <div className="flex flex-col h-full gap-1">
+                                  <input type="text" placeholder="Product URL" className="w-full bg-transparent border border-gray-600 text-blue-400 text-xs px-1 rounded" />
+                                  <button className="w-full bg-green-600 text-white text-xs px-2 py-1 rounded">SCRAPE</button>
+                                </div>
                               </td>
                               <td className="border border-[#B49B7E] px-1 py-1 text-center">
                                 <button onClick={() => handleDeleteItem(item.id)} className="text-red-400 hover:text-red-300 text-sm font-bold">🗑️</button>
