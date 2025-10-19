@@ -7170,10 +7170,12 @@ async def create_todo(todo: dict):
             project_name = project.get("name", "Unknown") if project else "Unknown"
             await notify_status_change(
                 project_name=project_name,
-                item_name=f"New To-Do: {todo.get('text')}",
+                item_name=f"To-Do Added",
                 old_status="",
-                new_status="ADDED",
-                user="System"
+                new_status=todo.get('text')[:50],
+                room_name="To-Do List",
+                vendor="",
+                cost=0.0
             )
         except Exception as notify_error:
             logging.error(f"Teams notification failed: {str(notify_error)}")
