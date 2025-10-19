@@ -8,7 +8,7 @@ import { getRoomColor, getCategoryColor, ROOM_COLORS } from '../utils/roomColors
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
-export default function TabbedWalkthroughSpreadsheet({ projectId }) {
+export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'walkthrough' }) {
   const [project, setProject] = useState(null);
   const [activeRoomTab, setActiveRoomTab] = useState(0);
   const [expandedCategories, setExpandedCategories] = useState({});
