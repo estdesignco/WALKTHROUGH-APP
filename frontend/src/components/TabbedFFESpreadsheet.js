@@ -537,6 +537,10 @@ export default function TabbedFFESpreadsheet({ projectId }) {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        )}
+      </div>
                                     {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                                   </select>
                                   <input type="text" placeholder="Order #" value={item.order_number || ''}
