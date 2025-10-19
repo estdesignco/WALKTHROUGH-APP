@@ -7136,6 +7136,82 @@ async def delete_photo(photo_id: str):
         logging.error(f"Delete photo error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to delete photo: {str(e)}")
 
+# ===== TO-DO LIST ENDPOINTS =====
+@api_router.get("/todos/{project_id}")
+async def get_todos(project_id: str):
+    """Get all to-dos for a project"""
+    try:
+        todos = await db.todos.find({"project_id": project_id}).sort("created_at", -1).to_list(length=None)
+        for todo in todos:
+            todo.pop('_id', None)
+        return {"success": True, "todos": todos}
+    except Exception as e:
+        logging.error(f"Get todos error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/todos")
+async def create_todo(todo: dict):
+    """Create a new to-do item"""
+    try:
+        new_todo = {
+            "id": str(uuid.uuid4()),
+            "project_id": todo.get("project_id"),
+            "text": todo.get("text"),
+            "completed": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.todos.insert_one(new_todo)
+        new_todo.pop('_id', None)
+        
+        # Send Teams notification
+        try:
+            project = await db.projects.find_one({"id": todo.get("project_id")})
+            project_name = project.get("name", "Unknown") if project else "Unknown"
+            await notify_status_change(
+                project_name=project_name,
+                item_name=f"New To-Do: {todo.get('text')}",
+                old_status="",
+                new_status="ADDED",
+                user="System"
+            )
+        except Exception as notify_error:
+            logging.error(f"Teams notification failed: {str(notify_error)}")
+        
+        return {"success": True, "todo": new_todo}
+    except Exception as e:
+        logging.error(f"Create todo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/todos/{todo_id}")
+async def update_todo(todo_id: str, update: dict):
+    """Update a to-do item"""
+    try:
+        result = await db.todos.update_one(
+            {"id": todo_id},
+            {"$set": update}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="To-do not found")
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Update todo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/todos/{todo_id}")
+async def delete_todo(todo_id: str):
+    """Delete a to-do item"""
+    try:
+        result = await db.todos.delete_one({"id": todo_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="To-do not found")
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Delete todo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+        logging.error(f"Delete photo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete photo: {str(e)}")
+
 # ====================================
 # LEICA D5 MEASUREMENT ENDPOINTS
 # ====================================
