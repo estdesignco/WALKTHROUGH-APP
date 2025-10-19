@@ -1120,6 +1120,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                 </button>
               </div>
             </div>
+            )}
         )}
       </div>
 
