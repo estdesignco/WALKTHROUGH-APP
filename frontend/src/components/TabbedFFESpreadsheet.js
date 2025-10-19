@@ -249,12 +249,14 @@ export default function TabbedFFESpreadsheet({ projectId }) {
       </div>
 
       {/* STATUS OVERVIEW - SAME AS DESKTOP */}
-      <StatusOverview
-        totalItems={calculateProjectStats(project).totalItems}
-        statusBreakdown={Object.entries(calculateProjectStats(project).statusBreakdown).reduce((acc, [key, val]) => ({...acc, [key]: val}), {})}
-        carrierBreakdown={Object.entries(calculateProjectStats(project).carrierBreakdown || {}).reduce((acc, [key, val]) => ({...acc, [key]: val}), {})}
-        itemStatuses={statuses}
-      />
+      {project && (
+        <StatusOverview
+          totalItems={calculateProjectStats(project)?.totalItems || 0}
+          statusBreakdown={calculateProjectStats(project)?.statusBreakdown || {}}
+          carrierBreakdown={calculateProjectStats(project)?.carrierBreakdown || {}}
+          itemStatuses={statuses}
+        />
+      )}
 
       {/* ROOM TABS - SAME AS WORKING VERSION */}
       <div className="bg-[#1E293B] border-b-2 border-[#D4A574] overflow-x-auto">
