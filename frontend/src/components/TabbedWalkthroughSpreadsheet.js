@@ -467,7 +467,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
               <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full" style={{
                 boxShadow: '0 0 30px rgba(212, 165, 116, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)'
               }}>
-                <span className="text-2xl font-bold text-black tracking-wider">WALKTHROUGH SPREADSHEET</span>
+                <span className="text-2xl font-bold text-black tracking-wider">
+                  {sheetType === 'ffe' ? 'FF&E SPREADSHEET' : 'WALKTHROUGH SPREADSHEET'}
+                </span>
               </div>
               
               <button
