@@ -6,6 +6,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 export default function ToDoList({ projectId }) {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
+  const [newPriority, setNewPriority] = useState('Medium');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
