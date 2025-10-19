@@ -594,6 +594,11 @@ export default function ProjectDetailPage() {
                 <MeasurementsAndFilesPage projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading measurements...</div> },
+        { name: "To Do", icon: ListTodo, component: project ? (
+            <div className="todo-content">
+                <ToDoList projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading to-do list...</div> },
     ];
 
     if (isLoading) {
