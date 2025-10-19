@@ -952,8 +952,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                   ))}
                 </div>
               ))}
-
-            {/* PHOTO SECTION AT BOTTOM OF EACH ROOM */}
+            {activeRoom && (
             <div className="bg-[#1E293B] p-6 border-t-4 border-[#D4A574] mt-8">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-2xl font-bold text-[#D4A574]">📸 {activeRoom.name} Photos</h3>
