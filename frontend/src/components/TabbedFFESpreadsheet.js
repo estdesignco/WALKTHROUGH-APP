@@ -261,9 +261,9 @@ export default function TabbedFFESpreadsheet({ projectId }) {
         />
       </div>
 
-      {/* STATUS OVERVIEW - COMPACT WITH MAX HEIGHT */}
+      {/* STATUS OVERVIEW - VERY COMPACT */}
       {project && (
-        <div className="bg-[#0F172A] border-b border-[#D4A574] overflow-y-auto" style={{ maxHeight: '300px' }}>
+        <div className="bg-[#0F172A] border-b border-[#D4A574] overflow-y-auto flex-shrink-0" style={{ maxHeight: '200px' }}>
           <StatusOverview
             totalItems={calculateProjectStats(project)?.totalItems || 0}
             statusBreakdown={calculateProjectStats(project)?.statusBreakdown || {}}
