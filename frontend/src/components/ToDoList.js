@@ -74,6 +74,24 @@ export default function ToDoList({ projectId }) {
         <div className="mb-6">
           <h2 className="text-3xl font-bold text-[#D4A574] mb-4">📋 To-Do List</h2>
           <div className="flex gap-3">
+            <select
+              value={newPriority}
+              onChange={(e) => setNewPriority(e.target.value)}
+              className="px-4 py-3 rounded-lg border-2 text-white focus:outline-none font-bold"
+              style={{
+                background: newPriority === 'High' 
+                  ? 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)'
+                  : newPriority === 'Low'
+                  ? 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)'
+                  : 'linear-gradient(135deg, #F59E0BFF 0%, #F59E0BAA 50%, #F59E0BFF 100%)',
+                borderColor: newPriority === 'High' ? '#EF4444' : newPriority === 'Low' ? '#10B981' : '#F59E0B',
+                boxShadow: `0 0 15px ${newPriority === 'High' ? '#EF444450' : newPriority === 'Low' ? '#10B98150' : '#F59E0B50'}`
+              }}
+            >
+              <option value="High">🔴 High</option>
+              <option value="Medium">🟡 Medium</option>
+              <option value="Low">🟢 Low</option>
+            </select>
             <input
               type="text"
               value={newTodo}
