@@ -923,16 +923,29 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                                   </div>
                                 </div>
                               </td>
-                              <td className="border border-[#B49B7E] px-1 py-1">
+                              <td className="border border-[#B49B7E] px-1 py-1" style={{
+                                background: item.carrier ? `linear-gradient(135deg, ${getCarrierColor(item.carrier)}FF 0%, ${getCarrierColor(item.carrier)}AA 20%, ${getCarrierColor(item.carrier)} 40%, ${getCarrierColor(item.carrier)}AA 80%, ${getCarrierColor(item.carrier)}FF 100%)` : 'transparent',
+                                boxShadow: item.carrier ? `0 0 15px ${getCarrierColor(item.carrier)}40, inset 0 0 30px rgba(255, 255, 255, 0.1)` : 'none'
+                              }}>
                                 <div className="flex flex-col h-full">
                                   <div className="h-6 mb-1">
-                                    <input type="text" placeholder="Live Tracking #" className="w-full h-full bg-transparent border-none text-white text-xs p-0" />
+                                    <input type="text" defaultValue={item.tracking_number || ''} placeholder="Live Tracking #" onBlur={(e) => updateItemOffline(item.id, { tracking_number: e.target.value })} className="w-full h-full bg-transparent border-none text-white text-xs p-0" />
                                   </div>
                                   <div className="h-6">
-                                    <select className="w-full h-full bg-gray-800 border-none text-white text-xs p-0">
-                                      <option value="">--</option>
+                                    <select value={item.carrier || ''} onChange={(e) => updateItemOffline(item.id, { carrier: e.target.value })} className="w-full h-full bg-transparent border-none text-white text-xs p-0">
+                                      <option value="">—</option>
+                                      <option value="FedEx">FedEx</option>
                                       <option value="FedEx Ground">FedEx Ground</option>
+                                      <option value="FedEx Express">FedEx Express</option>
                                       <option value="UPS">UPS</option>
+                                      <option value="UPS Ground">UPS Ground</option>
+                                      <option value="UPS Express">UPS Express</option>
+                                      <option value="USPS">USPS</option>
+                                      <option value="DHL">DHL</option>
+                                      <option value="Brooks">Brooks</option>
+                                      <option value="Zenith">Zenith</option>
+                                      <option value="Sunbelt">Sunbelt</option>
+                                      <option value="R+L Carriers">R+L Carriers</option>
                                     </select>
                                   </div>
                                 </div>
