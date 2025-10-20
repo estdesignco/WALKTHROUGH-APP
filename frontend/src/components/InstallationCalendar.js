@@ -486,11 +486,14 @@ const InstallationCalendar = ({ projectId }) => {
       <div className="rounded-2xl border border-[#D4A574]/60 overflow-hidden" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <div className="p-6 border-b border-[#D4A574]/60 flex items-center gap-4">
-          <AlertCircle className="w-8 h-8 text-red-400" />
+        <div className="p-6 border-b border-[#D4A574]/60 flex items-center gap-4" style={{
+          background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 50%, #8B4444FF 100%)',
+          boxShadow: '0 0 20px #8B444440'
+        }}>
+          <AlertCircle className="w-8 h-8 text-white" />
           <div>
-            <h3 className="text-2xl font-bold text-[#D4A574]">⚠️ Critical Path Items</h3>
-            <p className="text-sm text-[#B49B7E]">Items that could delay your installation</p>
+            <h3 className="text-2xl font-bold text-white">⚠️ Critical Path Items</h3>
+            <p className="text-sm text-white/80">Items that could delay your installation</p>
           </div>
         </div>
         
