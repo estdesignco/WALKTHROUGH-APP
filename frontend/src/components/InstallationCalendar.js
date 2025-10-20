@@ -224,8 +224,8 @@ const InstallationCalendar = ({ projectId }) => {
       {/* PREDICTED DATES */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="rounded-2xl p-8 border border-[#D4A574]/60" style={{
-          background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 50%, #6B46C1FF 100%)',
-          boxShadow: '0 0 30px #6B46C160'
+          background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 50%, #8B4513FF 100%)',
+          boxShadow: '0 0 30px #8B451360, inset 0 0 50px rgba(255, 255, 255, 0.12)'
         }}>
           <div className="flex items-center gap-4 mb-4">
             <TrendingUp className="w-12 h-12 text-white" />
@@ -246,8 +246,8 @@ const InstallationCalendar = ({ projectId }) => {
         </div>
 
         <div className="rounded-2xl p-8 border border-[#D4A574]/60" style={{
-          background: 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)',
-          boxShadow: '0 0 30px #10B98160'
+          background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 50%, #6B46C1FF 100%)',
+          boxShadow: '0 0 30px #6B46C160, inset 0 0 50px rgba(255, 255, 255, 0.12)'
         }}>
           <div className="flex items-center gap-4 mb-4">
             <Calendar className="w-12 h-12 text-white" />
