@@ -712,16 +712,13 @@ const DesignToolsDashboard = ({ projectId }) => {
                 </a>
               </div>
             </div>
-            <div className="bg-white p-4" style={{ minHeight: '400px' }}>
-              <a 
-                data-pin-do="embedBoard" 
-                data-pin-board-width="100%" 
-                data-pin-scale-height="400" 
-                data-pin-scale-width="100%"
-                href={pinterestBoardUrl}
-              ></a>
-              <script async defer src="//assets.pinterest.com/js/pinit.js"></script>
-            </div>
+            <iframe 
+              src={pinterestBoardUrl}
+              width="100%" 
+              height="600" 
+              style={{ border: 'none' }}
+              title="Pinterest Board"
+            ></iframe>
           </div>
         )}
         
