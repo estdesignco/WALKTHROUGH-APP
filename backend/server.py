@@ -9455,20 +9455,21 @@ async def generate_electrician_sheet(project_id: str):
         html = f"""<!DOCTYPE html><html><head><title>Electrician Sheet</title>
         <style>
             @media print {{ @page {{ margin: 0.5in; }} }}
-            body {{ font-family: Arial; margin: 20px; background: white; }}
-            h1 {{ color: #8B4513; border-bottom: 3px solid #D4A574; padding-bottom: 10px; }}
-            .item {{ page-break-inside: avoid; margin-bottom: 30px; border: 2px solid #D4A574; padding: 15px; }}
-            .item-header {{ background: #8B4513; color: white; padding: 10px; margin: -15px -15px 10px -15px; }}
+            body {{ font-family: 'Century Gothic', Arial, sans-serif; margin: 20px; background: white; color: black; }}
+            h1 {{ color: black; border-bottom: 3px solid black; padding-bottom: 10px; font-weight: bold; }}
+            h2 {{ color: black; }}
+            .item {{ page-break-inside: avoid; margin-bottom: 30px; border: 2px solid black; padding: 15px; }}
+            .item-header {{ background: black; color: white; padding: 10px; margin: -15px -15px 10px -15px; font-weight: bold; }}
             .spec-row {{ display: flex; margin-bottom: 5px; }}
-            .spec-label {{ font-weight: bold; width: 150px; color: #8B4513; }}
-            .spec-value {{ flex: 1; }}
-            img {{ max-width: 200px; max-height: 200px; }}
-            .notes-box {{ background: #FFF9E6; border: 2px dashed #D4A574; padding: 10px; margin-top: 10px; min-height: 60px; }}
+            .spec-label {{ font-weight: bold; width: 150px; color: black; }}
+            .spec-value {{ flex: 1; color: black; }}
+            img {{ max-width: 200px; max-height: 200px; border: 1px solid black; }}
+            .notes-box {{ background: white; border: 2px dashed black; padding: 10px; margin-top: 10px; min-height: 60px; }}
         </style></head><body>
         <h1>⚡ ELECTRICIAN INSTALLATION SHEET</h1>
         <h2>{project.get('name', 'Project')} - {project.get('client_info', {}).get('full_name', '')}</h2>
         <p><strong>Total Lighting Items:</strong> {len(lighting_items)}</p>
-        <hr style="border: 1px solid #D4A574; margin: 20px 0;">
+        <hr style="border: 1px solid black; margin: 20px 0;">
         {items_html}
         </body></html>"""
         
