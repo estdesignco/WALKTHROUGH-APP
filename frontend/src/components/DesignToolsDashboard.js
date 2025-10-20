@@ -244,6 +244,21 @@ const DesignToolsDashboard = ({ projectId }) => {
     }
   };
 
+  const saveWholeHomeData = async () => {
+    try {
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      await fetch(`${BACKEND_URL}/api/design-data/${projectId}/whole-home`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(wholeHomeData)
+      });
+      alert('✅ Whole home data saved!');
+    } catch (error) {
+      console.error('Error saving whole home data:', error);
+      alert('Failed to save whole home data');
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-12 text-[#D4C5A9]">Loading design tools...</div>;
   }
