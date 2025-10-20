@@ -449,8 +449,8 @@ const InstallationCalendar = ({ projectId }) => {
           <div className="absolute top-1/2 left-0 right-0 h-3 bg-gray-800 rounded-full transform -translate-y-1/2" style={{ boxShadow: 'inset 0 0 10px rgba(0,0,0,0.8)' }}></div>
           <div className="absolute top-1/2 left-0 h-3 rounded-full transform -translate-y-1/2" style={{ 
             width: `${Math.min(((statusSummary.delivered + statusSummary.ready_for_install + statusSummary.installed) / statusSummary.total * 100), 100)}%`,
-            background: 'linear-gradient(to right, #8B4513, #6B46C1, #D4A574)',
-            boxShadow: '0 0 15px #6B46C160'
+            background: 'linear-gradient(to right, #8B4513, #4A3A6A, #D4A574)',
+            boxShadow: '0 0 15px #4A3A6A60'
           }}></div>
           
           {/* Milestones */}
