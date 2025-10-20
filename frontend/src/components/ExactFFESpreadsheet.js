@@ -1256,6 +1256,50 @@ const ExactFFESpreadsheet = ({
                                                             )}
                                                           </td>
                                                           
+                                                          {/* STOCK STATUS - Dropdown */}
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm">
+                                                            <select 
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Stock status changed:', e.target.value)}
+                                                            >
+                                                              <option value="">—</option>
+                                                              <option value="IN STOCK" style={{ backgroundColor: '#10B981', color: 'white' }}>✅ IN STOCK</option>
+                                                              <option value="LOW STOCK" style={{ backgroundColor: '#F59E0B', color: 'white' }}>⚠️ LOW STOCK</option>
+                                                              <option value="OUT OF STOCK" style={{ backgroundColor: '#EF4444', color: 'white' }}>❌ OUT OF STOCK</option>
+                                                              <option value="BACKORDERED" style={{ backgroundColor: '#DC2626', color: 'white' }}>⏳ BACKORDERED</option>
+                                                              <option value="DISCONTINUED" style={{ backgroundColor: '#991B1B', color: 'white' }}>🚫 DISCONTINUED</option>
+                                                            </select>
+                                                          </td>
+                                                          
+                                                          {/* STOCK QTY - Number input */}
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4A574]">
+                                                            <input 
+                                                              type="number" 
+                                                              placeholder="Qty"
+                                                              className="w-full bg-transparent border-none text-[#D4A574] text-sm text-center outline-none"
+                                                              onChange={(e) => console.log('Stock qty changed:', e.target.value)}
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* RESTOCK DATE - Date picker */}
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm">
+                                                            <input 
+                                                              type="date" 
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onChange={(e) => console.log('Restock date changed:', e.target.value)}
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* LEAD TIME - Number input */}
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4A574]">
+                                                            <input 
+                                                              type="number" 
+                                                              placeholder="8"
+                                                              className="w-full bg-transparent border-none text-[#D4A574] text-sm text-center outline-none"
+                                                              onChange={(e) => console.log('Lead time changed:', e.target.value)}
+                                                            />
+                                                          </td>
+                                                          
                                                           {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
                                                           
                                                           {/* Order Date (ALONE) */}
