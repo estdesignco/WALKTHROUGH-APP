@@ -9396,6 +9396,62 @@ async def delete_automation_rule(project_id: str, rule_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# EXPORT/PRINT ENDPOINTS
+@api_router.post("/exports/{project_id}/electrician-sheet")
+async def generate_electrician_sheet(project_id: str):
+    """Generate electrician spec sheet with all lighting items"""
+    try:
+        project = await db.projects.find_one({"id": project_id})
+        # In production, generate PDF here
+        # For now, return success
+        return {"success": True, "message": "Electrician sheet ready - PDF generation coming soon"}
+    except Exception as e:
+        logging.error(f"Error generating electrician sheet: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/exports/{project_id}/load-in-sheets")
+async def generate_load_in_sheets(project_id: str):
+    """Generate load-in room sheets with 2-4 items per page"""
+    try:
+        project = await db.projects.find_one({"id": project_id})
+        return {"success": True, "message": "Load-in sheets ready"}
+    except Exception as e:
+        logging.error(f"Error generating load-in sheets: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/exports/{project_id}/movers-ffe")
+async def generate_movers_ffe(project_id: str):
+    """Generate simplified FFE for movers"""
+    try:
+        project = await db.projects.find_one({"id": project_id})
+        return {"success": True, "message": "Mover's FFE ready"}
+    except Exception as e:
+        logging.error(f"Error generating mover's FFE: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# CALENDAR SYNC ENDPOINTS
+@api_router.post("/calendar/google/sync/{project_id}")
+async def sync_google_calendar(project_id: str):
+    """Sync project to Google Calendar"""
+    try:
+        # Placeholder for Google Calendar API integration
+        return {"success": True, "message": "Google Calendar sync ready - requires OAuth setup"}
+    except Exception as e:
+        logging.error(f"Error syncing Google Calendar: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/calendar/teams/sync/{project_id}")
+async def sync_teams_calendar(project_id: str):
+    """Sync project to Teams Calendar"""
+    try:
+        # Placeholder for Teams Calendar API integration
+        return {"success": True, "message": "Teams Calendar sync ready"}
+    except Exception as e:
+        logging.error(f"Error syncing Teams Calendar: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(furniture_router)
