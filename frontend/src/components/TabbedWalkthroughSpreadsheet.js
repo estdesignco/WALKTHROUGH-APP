@@ -862,20 +862,40 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                               <td className="border border-[#B49B7E] px-1 py-1">
                                 <input type="date" defaultValue={item.order_date || ''} onBlur={(e) => updateItemOffline(item.id, { order_date: e.target.value })} className="bg-transparent text-[#B49B7E] text-xs w-full" />
                               </td>
-                              <td className="border border-[#B49B7E] px-1 py-1">
+                              <td className="border border-[#B49B7E] px-1 py-1" style={{
+                                background: item.status ? `linear-gradient(135deg, ${getStatusColor(item.status)}FF 0%, ${getStatusColor(item.status)}AA 20%, ${getStatusColor(item.status)} 40%, ${getStatusColor(item.status)}AA 80%, ${getStatusColor(item.status)}FF 100%)` : 'transparent',
+                                boxShadow: item.status ? `0 0 15px ${getStatusColor(item.status)}40, inset 0 0 30px rgba(255, 255, 255, 0.1)` : 'none'
+                              }}>
                                 <div className="flex flex-col h-full">
                                   <div className="h-6 mb-1">
-                                    <select defaultValue={item.status || ''} onChange={(e) => updateItemOffline(item.id, { status: e.target.value })} className="w-full h-full bg-gray-800 text-white text-xs border-none p-0">
-                                      <option value="">--</option>
-                                      <option value="READY FOR INSTALL">✓ READY FOR INSTALL</option>
-                                      <option value="BACKORDERED">★ BACKORDERED</option>
-                                      <option value="PICKED">★ PICKED</option>
-                                      <option value="RESEARCHING">▲ RESEARCHING</option>
-                                      <option value="APPROVED">▲ APPROVED</option>
+                                    <select value={item.status || ''} onChange={(e) => updateItemOffline(item.id, { status: e.target.value })} className="w-full h-full bg-transparent border-none text-white text-xs p-0">
+                                      <option value="">—</option>
+                                      <option value="TO BE SELECTED">⚪ TO BE SELECTED</option>
+                                      <option value="RESEARCHING">🔵 RESEARCHING</option>
+                                      <option value="PENDING APPROVAL">🟡 PENDING APPROVAL</option>
+                                      <option value="APPROVED">🟢 APPROVED</option>
+                                      <option value="ORDERED">🔷 ORDERED</option>
+                                      <option value="PICKED">⭐ PICKED</option>
+                                      <option value="CONFIRMED">🟩 CONFIRMED</option>
+                                      <option value="IN PRODUCTION">🟠 IN PRODUCTION</option>
+                                      <option value="SHIPPED">🚢 SHIPPED</option>
+                                      <option value="IN TRANSIT">🟣 IN TRANSIT</option>
+                                      <option value="OUT FOR DELIVERY">📦 OUT FOR DELIVERY</option>
+                                      <option value="DELIVERED TO RECEIVER">💜 DELIVERED TO RECEIVER</option>
+                                      <option value="DELIVERED TO JOB SITE">💗 DELIVERED TO JOB SITE</option>
+                                      <option value="RECEIVED">📥 RECEIVED</option>
+                                      <option value="READY FOR INSTALL">🔧 READY FOR INSTALL</option>
+                                      <option value="INSTALLING">🛠️ INSTALLING</option>
+                                      <option value="INSTALLED">✅ INSTALLED</option>
+                                      <option value="ON HOLD">⏸️ ON HOLD</option>
+                                      <option value="BACKORDERED">⏳ BACKORDERED</option>
+                                      <option value="DAMAGED">💔 DAMAGED</option>
+                                      <option value="RETURNED">↩️ RETURNED</option>
+                                      <option value="CANCELLED">❌ CANCELLED</option>
                                     </select>
                                   </div>
                                   <div className="h-6">
-                                    <input type="text" placeholder="Order #" className="w-full h-full bg-transparent border-none text-[#B49B7E] text-xs p-0" />
+                                    <input type="text" defaultValue={item.order_number || ''} placeholder="Order #" onBlur={(e) => updateItemOffline(item.id, { order_number: e.target.value })} className="w-full h-full bg-transparent border-none text-[#B49B7E] text-xs p-0" />
                                   </div>
                                 </div>
                               </td>
