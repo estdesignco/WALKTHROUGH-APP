@@ -499,8 +499,8 @@ const InstallationCalendar = ({ projectId }) => {
         
         {criticalPathItems.length === 0 ? (
           <div className="p-8 text-center">
-            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <div className="text-xl text-green-400 font-bold">All items on track! 🎉</div>
+            <CheckCircle className="w-16 h-16 text-[#D4A574] mx-auto mb-4" />
+            <div className="text-xl text-[#D4A574] font-bold">All items on track! 🎉</div>
             <div className="text-sm text-[#B49B7E] mt-2">No critical delays detected</div>
           </div>
         ) : (
