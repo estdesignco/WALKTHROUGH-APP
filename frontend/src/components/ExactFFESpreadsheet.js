@@ -1268,14 +1268,29 @@ const ExactFFESpreadsheet = ({
                                                                   value={item.stock_status || ''}
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
                                                                   onChange={async (e) => {
-                                                                    const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-                                                                    await fetch(`${backendUrl}/api/items/${item.id}`, {
-                                                                      method: 'PUT',
-                                                                      headers: { 'Content-Type': 'application/json' },
-                                                                      body: JSON.stringify({ stock_status: e.target.value })
-                                                                    });
-                                                                    if (onReload) onReload();
-                                                                    console.log('Stock status saved:', e.target.value);
+                                                                    try {
+                                                                      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                                      const response = await fetch(`${backendUrl}/api/items/${item.id}`, {
+                                                                        method: 'PUT',
+                                                                        headers: { 'Content-Type': 'application/json' },
+                                                                        body: JSON.stringify({ stock_status: e.target.value })
+                                                                      });
+                                                                      
+                                                                      if (response.ok) {
+                                                                        console.log('✅ Stock status saved:', e.target.value);
+                                                                        // Update local state and reload
+                                                                        item.stock_status = e.target.value;
+                                                                        if (onReload) {
+                                                                          onReload();
+                                                                        }
+                                                                      } else {
+                                                                        console.error('❌ Failed to save stock status');
+                                                                        alert('Failed to save stock status');
+                                                                      }
+                                                                    } catch (error) {
+                                                                      console.error('❌ Error saving stock status:', error);
+                                                                      alert('Error saving stock status');
+                                                                    }
                                                                   }}
                                                                 >
                                                                   <option value="">—</option>
@@ -1297,7 +1312,7 @@ const ExactFFESpreadsheet = ({
                                                                     await fetch(`${backendUrl}/api/items/${item.id}`, {
                                                                       method: 'PUT',
                                                                       headers: { 'Content-Type': 'application/json' },
-                                                                      body: JSON.stringify({ stock_quantity: e.target.value })
+                                                                      body: JSON.stringify({ stock_quantity: parseInt(e.target.value) || 0 })
                                                                     });
                                                                     console.log('Stock qty saved:', e.target.value);
                                                                   }}
