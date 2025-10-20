@@ -786,25 +786,6 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                               <td className="border border-[#B49B7E] px-2 py-1 text-center">
                                 {item.image_url ? <img src={item.image_url} alt={item.name} className="w-12 h-12 object-cover rounded" /> : <span className="text-gray-500 text-xs">No image</span>}
                               </td>
-                              <td className="border border-[#D4A574] px-1 py-1">
-                                <select defaultValue={item.stock_status || ''} onChange={(e) => updateItemOffline(item.id, { stock_status: e.target.value })} className="w-full h-full bg-gray-800 border-none text-white text-xs p-0">
-                                  <option value="">--</option>
-                                  <option value="IN STOCK">✅ IN STOCK</option>
-                                  <option value="LOW STOCK">⚠️ LOW STOCK</option>
-                                  <option value="OUT OF STOCK">❌ OUT OF STOCK</option>
-                                  <option value="BACKORDERED">⏳ BACKORDERED</option>
-                                  <option value="DISCONTINUED">🚫 DISCONTINUED</option>
-                                </select>
-                              </td>
-                              <td className="border border-[#D4A574] px-1 py-1">
-                                <input type="number" defaultValue={item.stock_quantity || ''} onBlur={(e) => updateItemOffline(item.id, { stock_quantity: e.target.value })} className="w-full h-full bg-transparent border-none text-[#D4A574] text-xs p-0" placeholder="Qty" />
-                              </td>
-                              <td className="border border-[#D4A574] px-1 py-1">
-                                <input type="date" defaultValue={item.restock_date || ''} onBlur={(e) => updateItemOffline(item.id, { restock_date: e.target.value })} className="w-full h-full bg-transparent border-none text-white text-xs p-0" />
-                              </td>
-                              <td className="border border-[#D4A574] px-1 py-1">
-                                <input type="number" defaultValue={item.lead_time_weeks || ''} onBlur={(e) => updateItemOffline(item.id, { lead_time_weeks: e.target.value })} className="w-full h-full bg-transparent border-none text-[#D4A574] text-xs p-0" placeholder="8" />
-                              </td>
                               <td className="border border-[#B49B7E] px-1 py-1">
                                 <input type="date" defaultValue={item.order_date || ''} onBlur={(e) => updateItemOffline(item.id, { order_date: e.target.value })} className="bg-transparent text-[#B49B7E] text-xs w-full" />
                               </td>
