@@ -465,7 +465,7 @@ const InstallationCalendar = ({ projectId }) => {
             <div className="text-xs text-white font-bold">{statusSummary.in_transit}</div>
           </div>
           <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '65%' }}>
-            <div className="w-4 h-4 bg-[#6B46C1] rounded-full border-2 border-[#D4A574]" style={{ boxShadow: '0 0 8px #6B46C1' }}></div>
+            <div className="w-4 h-4 bg-[#4A3A6A] rounded-full border-2 border-[#D4A574]" style={{ boxShadow: '0 0 8px #4A3A6A' }}></div>
             <div className="text-xs text-[#B49B7E] mt-2 whitespace-nowrap">DELIVERED</div>
             <div className="text-xs text-white font-bold">{statusSummary.delivered}</div>
           </div>
