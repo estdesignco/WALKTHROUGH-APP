@@ -162,7 +162,7 @@ const ExportsDashboard = ({ projectId }) => {
           </div>
 
           {/* Mover's Simplified FFE */}
-          <div className="rounded-lg border border-[#D4A574]/50 p-6" style={
+          <div className="rounded-lg border border-[#D4A574]/50 p-6" style={{
             background: 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(0,0,0,0.9) 50%, rgba(16,185,129,0.2) 100%)'
           }}>
             <div className="text-center mb-4">
