@@ -330,13 +330,18 @@ const DesignToolsDashboard = ({ projectId }) => {
             <div key={roomName} className="mb-4">
               <button
                 onClick={() => setExpandedRooms({ ...expandedRooms, [roomName]: !expandedRooms[roomName] })}
-                className="w-full text-left bg-[#1E293B] hover:bg-[#2E394B] border-2 border-[#D4A574]/50 rounded-lg p-4 mb-3 transition-all"
+                className="w-full text-left border-2 border-[#D4A574] rounded-lg p-4 mb-3 transition-all"
+                style={{
+                  background: `linear-gradient(135deg, ${getRoomColor(roomName)}FF 0%, ${getRoomColor(roomName)}AA 20%, ${getRoomColor(roomName)} 40%, ${getRoomColor(roomName)}AA 80%, ${getRoomColor(roomName)}FF 100%)`,
+                  boxShadow: `0 0 25px ${getRoomColor(roomName)}60, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)`,
+                  textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
+                }}
               >
                 <div className="flex justify-between items-center">
-                  <h4 className="text-xl font-bold text-[#D4C5A9]">
+                  <h4 className="text-xl font-bold text-white">
                     {expandedRooms[roomName] ? '▼' : '▶'} 📍 {roomName}
                   </h4>
-                  <span className="text-[#D4A574] font-bold">{roomMaterials.length} items</span>
+                  <span className="text-white font-bold">{roomMaterials.length} items</span>
                 </div>
               </button>
               
