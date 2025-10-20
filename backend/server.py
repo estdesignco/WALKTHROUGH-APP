@@ -841,6 +841,12 @@ class ItemBase(BaseModel):
     notes: Optional[str] = ""
     priority: str = "Medium"  # High, Medium, Low
     lead_time_weeks: int = 0
+    
+    # STOCK TRACKING FIELDS
+    stock_status: Optional[str] = ""  # IN STOCK, LOW STOCK, OUT OF STOCK, BACKORDERED, DISCONTINUED
+    stock_quantity: Optional[int] = 0
+    restock_date: Optional[datetime] = None
+    
     warranty_info: Optional[str] = ""
     installation_notes: Optional[str] = ""
     room_location: Optional[str] = ""
