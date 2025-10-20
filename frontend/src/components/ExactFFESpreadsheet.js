@@ -1047,7 +1047,7 @@ const ExactFFESpreadsheet = ({
                                                             }}>
                                                           ADDITIONAL INFO.
                                                         </td>
-                                                        <td colSpan="4" className="border border-[#D4A574] px-2 py-1 text-xs font-bold text-white text-center rounded" 
+                                                        <td colSpan="2" className="border border-[#D4A574] px-2 py-1 text-xs font-bold text-white text-center rounded" 
                                                             style={{ 
                                                               background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
                                                               boxShadow: '0 0 25px #D4A57460, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
