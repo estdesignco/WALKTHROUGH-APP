@@ -45,10 +45,12 @@ const DesignToolsDashboard = ({ projectId }) => {
         setMaterials(data.materials || []);
         setInspirationImages(data.inspiration_images || []);
         setBeforeAfterPhotos(data.before_after_photos || []);
+        setPinterestBoardUrl(data.pinterest_board_url || 'https://www.pinterest.com/EstDesignCo');
         setWholeHomeData(data.whole_home_data || {
           doorHardware: { interior: '', exterior: '', hinges: '' },
           paint: { trim: '', trimColor: '#FFFFFF', ceiling: '', ceilingColor: '#FFFFFF', baseMolding: '', baseColor: '#FFFFFF' },
-          flooring: { floor1: '', floor2: '', basement: '' }
+          flooring: { floor1: '', floor2: '', basement: '' },
+          customSections: []
         });
       }
       
