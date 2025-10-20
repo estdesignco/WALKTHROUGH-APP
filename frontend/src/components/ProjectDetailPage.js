@@ -647,7 +647,7 @@ export default function ProjectDetailPage() {
             </div>
 
             <div className="border-b border-stone-700">
-                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                <nav className="-mb-px flex flex-wrap space-x-4" aria-label="Tabs">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
                         return (
