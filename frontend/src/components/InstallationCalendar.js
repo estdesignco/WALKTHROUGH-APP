@@ -98,7 +98,7 @@ const InstallationCalendar = ({ projectId }) => {
             {daysToPresentation > 0 ? `${daysToPresentation} days from now` : 'Ready now!'}
           </div>
           <div className="mt-4 text-sm text-white/80">
-            {statusSummary.to_be_selected} items still need to be selected
+            {statusSummary.to_be_selected + statusSummary.in_progress} items not yet ready for presentation
           </div>
         </div>
 
