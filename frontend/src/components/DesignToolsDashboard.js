@@ -36,6 +36,11 @@ const DesignToolsDashboard = ({ projectId }) => {
         setMaterials(data.materials || []);
         setInspirationImages(data.inspiration_images || []);
         setBeforeAfterPhotos(data.before_after_photos || []);
+        setWholeHomeData(data.whole_home_data || {
+          doorHardware: { interior: '', exterior: '', hinges: '' },
+          paint: { trim: '', trimColor: '#FFFFFF', ceiling: '', ceilingColor: '#FFFFFF', baseMolding: '', baseColor: '#FFFFFF' },
+          flooring: { floor1: '', floor2: '', basement: '' }
+        });
       }
       
       const projectResponse = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=ffe`);
