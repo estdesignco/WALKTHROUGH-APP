@@ -9489,7 +9489,64 @@ async def generate_load_in_sheets(project_id: str):
     """Generate load-in room sheets with 2-4 items per page"""
     try:
         project = await db.projects.find_one({"id": project_id})
-        return {"success": True, "message": "Load-in sheets ready"}
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Organize items by room
+        room_items = {}
+        for room in project.get("rooms", []):
+            items = []
+            for category in room.get("categories", []):
+                for subcategory in category.get("subcategories", []):
+                    for item in subcategory.get("items", []):
+                        items.append({
+                            "name": item.get("name"),
+                            "quantity": item.get("quantity", 1),
+                            "image_url": item.get("image_url", "")
+                        })
+            if items:
+                room_items[room.get("name")] = items
+        
+        # Generate HTML
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Load-In Room Sheets - {project.get('name', 'Project')}</title>
+            <style>
+                @media print {{ @page {{ margin: 0.25in; size: letter; }} .page-break {{ page-break-after: always; }} }}
+                body {{ font-family: Arial, sans-serif; margin: 0; background: white; }}
+                .room-page {{ page-break-after: always; padding: 20px; }}
+                .room-header {{ background: #8B4513; color: white; text-align: center; padding: 20px; font-size: 32px; font-weight: bold; margin-bottom: 20px; }}
+                .item-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
+                .item-grid.large {{ grid-template-columns: 1fr; }}
+                .item-card {{ border: 3px solid #D4A574; padding: 15px; text-align: center; }}
+                .item-card img {{ max-width: 100%; max-height: 300px; margin-bottom: 10px; }}
+                .item-name {{ font-size: 24px; font-weight: bold; color: #8B4513; }}
+                .item-qty {{ font-size: 18px; color: #666; }}
+            </style>
+        </head>
+        <body>
+            {''.join([f'''
+            <div class="room-page">
+                <div class="room-header">{room_name.upper()}</div>
+                <div class="item-grid {'large' if len(items) <= 2 else ''}">
+                    {''.join([f'''
+                    <div class="item-card">
+                        {'<img src="' + item['image_url'] + '">' if item.get('image_url') else '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-center; color: #999; font-size: 48px;">📦</div>'}
+                        <div class="item-name">{item['name']}</div>
+                        <div class="item-qty">Qty: {item['quantity']}</div>
+                    </div>
+                    ''' for item in items[:4]])}
+                </div>
+            </div>
+            ''' for room_name, items in room_items.items()])}
+        </body>
+        </html>
+        """
+        
+        return Response(content=html, media_type="text/html")
+        
     except Exception as e:
         logging.error(f"Error generating load-in sheets: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -9499,7 +9556,66 @@ async def generate_movers_ffe(project_id: str):
     """Generate simplified FFE for movers"""
     try:
         project = await db.projects.find_one({"id": project_id})
-        return {"success": True, "message": "Mover's FFE ready"}
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Collect all items
+        all_items = []
+        for room in project.get("rooms", []):
+            for category in room.get("categories", []):
+                for subcategory in category.get("subcategories", []):
+                    for item in subcategory.get("items", []):
+                        all_items.append({
+                            "room": room.get("name"),
+                            "item": item.get("name"),
+                            "quantity": item.get("quantity", 1)
+                        })
+        
+        # Generate HTML
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Mover's FFE Sheet - {project.get('name', 'Project')}</title>
+            <style>
+                @media print {{ @page {{ margin: 0.5in; }} }}
+                body {{ font-family: Arial, sans-serif; margin: 20px; background: white; }}
+                h1 {{ color: #8B4513; text-align: center; }}
+                table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+                th {{ background: #8B4513; color: white; padding: 12px; text-align: left; border: 1px solid #D4A574; }}
+                td {{ padding: 10px; border: 1px solid #D4A574; }}
+                tr:nth-child(even) {{ background: #f9f9f9; }}
+            </style>
+        </head>
+        <body>
+            <h1>🚚 MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
+            <p style="text-align: center;"><strong>Total Items:</strong> {len(all_items)}</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ROOM</th>
+                        <th>ITEM</th>
+                        <th>QUANTITY</th>
+                        <th>CHECKED ✓</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {''.join([f'''
+                    <tr>
+                        <td><strong>{item['room']}</strong></td>
+                        <td>{item['item']}</td>
+                        <td style="text-align: center;"><strong>{item['quantity']}</strong></td>
+                        <td style="width: 60px;"></td>
+                    </tr>
+                    ''' for item in all_items])}
+                </tbody>
+            </table>
+        </body>
+        </html>
+        """
+        
+        return Response(content=html, media_type="text/html")
+        
     except Exception as e:
         logging.error(f"Error generating mover's FFE: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
