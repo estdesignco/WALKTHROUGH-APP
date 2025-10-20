@@ -9428,36 +9428,53 @@ async def generate_electrician_sheet(project_id: str):
                                 "image_url": item.get("image_url", "")
                             })
         
-        # Build HTML items
-        items_html = ""
+        # Build HTML items grouped by room
+        items_by_room = {}
         for item in lighting_items:
-            img_html = f'<img src="{item["image_url"]}" alt="{item["name"]}">' if item.get("image_url") else '<div style="width: 200px; height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-center; color: #999;">No Image</div>'
+            room = item['room']
+            if room not in items_by_room:
+                items_by_room[room] = []
+            items_by_room[room].append(item)
+        
+        items_html = ""
+        for room_name, room_items in items_by_room.items():
+            items_html += f'<div class="room-section"><h3 class="room-header">{room_name.upper()}</h3>'
             
-            items_html += f"""
-            <div class="item">
-                <div class="item-header"><strong>{item['room']} - {item['name']}</strong></div>
-                <div style="display: flex; gap: 20px;">
-                    <div style="flex: 1;">
-                        <div class="spec-row"><div class="spec-label">Quantity:</div><div class="spec-value">{item['quantity']}</div></div>
-                        <div class="spec-row"><div class="spec-label">Size:</div><div class="spec-value">{item['size']}</div></div>
-                        <div class="spec-row"><div class="spec-label">Finish/Color:</div><div class="spec-value">{item['finish_color']}</div></div>
-                        <div class="spec-row"><div class="spec-label">Vendor:</div><div class="spec-value">{item['vendor']}</div></div>
+            for item in room_items:
+                img_html = f'<img src="{item["image_url"]}" alt="{item["name"]}">' if item.get("image_url") else '<div style="width: 200px; height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-center; color: #999;">No Image</div>'
+                
+                items_html += f"""
+                <div class="item">
+                    <div class="item-header"><strong>{item['name']}</strong></div>
+                    <div style="display: flex; gap: 20px;">
+                        <div style="flex: 1;">
+                            <div class="spec-row"><div class="spec-label">Quantity:</div><div class="spec-value">{item['quantity']}</div></div>
+                            <div class="spec-row"><div class="spec-label">Size:</div><div class="spec-value">{item['size']}</div></div>
+                            <div class="spec-row"><div class="spec-label">Finish/Color:</div><div class="spec-value">{item['finish_color']}</div></div>
+                            <div class="spec-row"><div class="spec-label">Vendor:</div><div class="spec-value">{item['vendor']}</div></div>
+                        </div>
+                        {img_html}
                     </div>
-                    {img_html}
+                    <div class="notes-box">
+                        <strong>Installation Notes:</strong><br>
+                        {item.get('installation_notes') or item.get('notes') or '_____________________________________'}
+                    </div>
                 </div>
-                <div class="notes-box">
-                    <strong>Installation Notes:</strong><br>
-                    {item.get('installation_notes') or item.get('notes') or '_____________________________________'}
-                </div>
-            </div>
-            """
+                """
+            
+            items_html += '</div>'
         
         html = f"""<!DOCTYPE html><html><head><title>Electrician Sheet</title>
         <style>
             @media print {{ @page {{ margin: 0.5in; }} }}
             body {{ font-family: 'Century Gothic', Arial, sans-serif; margin: 20px; background: white; color: black; }}
-            h1 {{ color: black; border-bottom: 3px solid black; padding-bottom: 10px; font-weight: bold; }}
-            h2 {{ color: black; }}
+            .logo {{ text-align: center; margin-bottom: 20px; }}
+            .logo img {{ height: 60px; filter: grayscale(100%); }}
+            h1 {{ color: black; border-bottom: 3px solid black; padding-bottom: 10px; font-weight: bold; text-align: center; }}
+            h2 {{ color: black; text-align: center; }}
+            .room-section {{ page-break-before: always; margin-top: 30px; }}
+            .room-section:first-of-type {{ page-break-before: avoid; }}
+            .room-header {{ background: black; color: white; padding: 15px; font-size: 24px; font-weight: bold; margin-bottom: 20px; text-align: center; }}
             .item {{ page-break-inside: avoid; margin-bottom: 30px; border: 2px solid black; padding: 15px; }}
             .item-header {{ background: black; color: white; padding: 10px; margin: -15px -15px 10px -15px; font-weight: bold; }}
             .spec-row {{ display: flex; margin-bottom: 5px; }}
@@ -9466,9 +9483,10 @@ async def generate_electrician_sheet(project_id: str):
             img {{ max-width: 200px; max-height: 200px; border: 1px solid black; }}
             .notes-box {{ background: white; border: 2px dashed black; padding: 10px; margin-top: 10px; min-height: 60px; }}
         </style></head><body>
-        <h1>⚡ ELECTRICIAN INSTALLATION SHEET</h1>
+        <div class="logo"><img src="https://designflow-hub.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
+        <h1>ELECTRICIAN INSTALLATION SHEET</h1>
         <h2>{project.get('name', 'Project')} - {project.get('client_info', {}).get('full_name', '')}</h2>
-        <p><strong>Total Lighting Items:</strong> {len(lighting_items)}</p>
+        <p style="text-align: center;"><strong>Total Lighting Items:</strong> {len(lighting_items)}</p>
         <hr style="border: 1px solid black; margin: 20px 0;">
         {items_html}
         </body></html>"""
