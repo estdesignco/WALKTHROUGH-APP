@@ -120,7 +120,7 @@ const InstallationCalendar = ({ projectId }) => {
             {daysToInstall > 0 ? `${daysToInstall} days from now` : 'Ready to install!'}
           </div>
           <div className="mt-4 text-sm text-white/80">
-            {statusSummary.delivered + statusSummary.installed} of {statusSummary.total} items delivered
+            {statusSummary.delivered + statusSummary.ready_for_install + statusSummary.installed} of {statusSummary.total} items ready/installed
           </div>
         </div>
       </div>
