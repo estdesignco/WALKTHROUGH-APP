@@ -72,7 +72,99 @@ const InstallationCalendar = ({ projectId }) => {
           daysNeeded = 3; // 3 days waiting for response
         } else if (status === 'GET QUOTE' || status === 'WAITING ON QT') {
           daysNeeded = 5; // 5 days for quote
-        }\n        \n        const itemDate = new Date();\n        itemDate.setDate(itemDate.getDate() + daysNeeded);\n        \n        if (itemDate > latestPresentationDate) {\n          latestPresentationDate = itemDate;\n        }\n        \n        notReadyForPresentation.push({\n          ...item,\n          reason: `Status: ${status || 'Not started'}`,\n          days_delayed: daysNeeded\n        });\n      }\n    });\n\n    // Calculate INSTALL Date - when all items DELIVERED and READY FOR INSTALL\n    let latestInstallDate = new Date();\n    let notReadyForInstall = [];\n    \n    allItems.forEach(item => {\n      let itemReadyDate = new Date();\n      const status = item.status || '';\n      \n      // Check if already ready for install\n      if (['DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'RECEIVED', 'READY FOR INSTALL', 'INSTALLING', 'INSTALLED'].includes(status)) {\n        return; // Item is ready\n      }\n      \n      // Use EST. DATES from spreadsheet if available\n      if (item.estimated_delivery_date) {\n        itemReadyDate = new Date(item.estimated_delivery_date);\n      } else if (item.order_date) {\n        // Calculate from order date + lead time\n        const leadTime = parseInt(item.lead_time_weeks) || 8;\n        itemReadyDate = new Date(item.order_date);\n        itemReadyDate.setDate(itemReadyDate.getDate() + (leadTime * 7));\n      } else {\n        // Not ordered yet - estimate based on status\n        let daysNeeded = 0;\n        \n        if (status === '' || status === 'TO BE SELECTED') {\n          daysNeeded = 84; // 12 weeks total\n        } else if (status === 'RESEARCHING' || status === 'PENDING APPROVAL') {\n          daysNeeded = 70; // 10 weeks\n        } else if (status === 'APPROVED') {\n          daysNeeded = 63; // 9 weeks (ready to order)\n        } else if (status === 'ORDERED' || status === 'PICKED' || status === 'CONFIRMED') {\n          daysNeeded = parseInt(item.lead_time_weeks) * 7 || 56; // Use lead time or 8 weeks default\n        } else if (status === 'IN PRODUCTION') {\n          daysNeeded = 35; // 5 weeks\n        } else if (status === 'SHIPPED' || status === 'IN TRANSIT') {\n          daysNeeded = 7; // 1 week in transit\n        } else if (status === 'OUT FOR DELIVERY') {\n          daysNeeded = 2; // 2 days\n        }\n        \n        // Add extra time if backordered or out of stock\n        if (status === 'BACKORDERED' || item.stock_status === 'OUT OF STOCK') {\n          daysNeeded += parseInt(item.restock_days) || 30; // Add restock time\n        }\n        \n        itemReadyDate.setDate(itemReadyDate.getDate() + daysNeeded);\n      }\n\n      if (itemReadyDate > latestInstallDate) {\n        latestInstallDate = itemReadyDate;\n      }\n\n      const daysUntilReady = Math.ceil((itemReadyDate - new Date()) / (1000 * 60 * 60 * 24));\n      \n      // Add to blockers if significantly delayed\n      if (daysUntilReady > 30 || status === 'BACKORDERED' || item.stock_status === 'OUT OF STOCK') {\n        notReadyForInstall.push({\n          ...item,\n          reason: status === 'BACKORDERED' ? 'Backordered - waiting for restock' : \n                  item.stock_status === 'OUT OF STOCK' ? `Out of Stock (Restock: ${item.restock_date || 'TBD'})` :\n                  !item.order_date ? 'Not yet ordered' :\n                  `Long lead time (${Math.ceil(daysUntilReady / 7)} weeks)`,\n          days_delayed: daysUntilReady,\n          expected_arrival: itemReadyDate.toLocaleDateString()\n        });\n      }\n    });\n\n    setPredictedPresentationDate(latestPresentationDate);\n    setPredictedInstallDate(latestInstallDate);\n    \n    // Combine blockers and sort by most critical\n    const allBlockers = [...notReadyForPresentation, ...notReadyForInstall];\n    setCriticalPathItems(allBlockers.sort((a, b) => b.days_delayed - a.days_delayed).slice(0, 15));\n  };
+        }
+        
+        const itemDate = new Date();
+        itemDate.setDate(itemDate.getDate() + daysNeeded);
+        
+        if (itemDate > latestPresentationDate) {
+          latestPresentationDate = itemDate;
+        }
+        
+        notReadyForPresentation.push({
+          ...item,
+          reason: `Status: ${status || 'Not started'}`,
+          days_delayed: daysNeeded
+        });
+      }
+    });
+
+    // Calculate INSTALL Date - when all items DELIVERED and READY FOR INSTALL
+    let latestInstallDate = new Date();
+    let notReadyForInstall = [];
+    
+    allItems.forEach(item => {
+      let itemReadyDate = new Date();
+      const status = item.status || '';
+      
+      // Check if already ready for install
+      if (['DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'RECEIVED', 'READY FOR INSTALL', 'INSTALLING', 'INSTALLED'].includes(status)) {
+        return; // Item is ready
+      }
+      
+      // Use EST. DATES from spreadsheet if available
+      if (item.estimated_delivery_date) {
+        itemReadyDate = new Date(item.estimated_delivery_date);
+      } else if (item.order_date) {
+        // Calculate from order date + lead time
+        const leadTime = parseInt(item.lead_time_weeks) || 8;
+        itemReadyDate = new Date(item.order_date);
+        itemReadyDate.setDate(itemReadyDate.getDate() + (leadTime * 7));
+      } else {
+        // Not ordered yet - estimate based on status
+        let daysNeeded = 0;
+        
+        if (status === '' || status === 'TO BE SELECTED') {
+          daysNeeded = 84; // 12 weeks total
+        } else if (status === 'RESEARCHING' || status === 'PENDING APPROVAL') {
+          daysNeeded = 70; // 10 weeks
+        } else if (status === 'APPROVED') {
+          daysNeeded = 63; // 9 weeks (ready to order)
+        } else if (status === 'ORDERED' || status === 'PICKED' || status === 'CONFIRMED') {
+          daysNeeded = parseInt(item.lead_time_weeks) * 7 || 56; // Use lead time or 8 weeks default
+        } else if (status === 'IN PRODUCTION') {
+          daysNeeded = 35; // 5 weeks
+        } else if (status === 'SHIPPED' || status === 'IN TRANSIT') {
+          daysNeeded = 7; // 1 week in transit
+        } else if (status === 'OUT FOR DELIVERY') {
+          daysNeeded = 2; // 2 days
+        }
+        
+        // Add extra time if backordered or out of stock
+        if (status === 'BACKORDERED' || item.stock_status === 'OUT OF STOCK') {
+          daysNeeded += parseInt(item.restock_days) || 30; // Add restock time
+        }
+        
+        itemReadyDate.setDate(itemReadyDate.getDate() + daysNeeded);
+      }
+
+      if (itemReadyDate > latestInstallDate) {
+        latestInstallDate = itemReadyDate;
+      }
+
+      const daysUntilReady = Math.ceil((itemReadyDate - new Date()) / (1000 * 60 * 60 * 24));
+      
+      // Add to blockers if significantly delayed
+      if (daysUntilReady > 30 || status === 'BACKORDERED' || item.stock_status === 'OUT OF STOCK') {
+        notReadyForInstall.push({
+          ...item,
+          reason: status === 'BACKORDERED' ? 'Backordered - waiting for restock' : 
+                  item.stock_status === 'OUT OF STOCK' ? `Out of Stock (Restock: ${item.restock_date || 'TBD'})` :
+                  !item.order_date ? 'Not yet ordered' :
+                  `Long lead time (${Math.ceil(daysUntilReady / 7)} weeks)`,
+          days_delayed: daysUntilReady,
+          expected_arrival: itemReadyDate.toLocaleDateString()
+        });
+      }
+    });
+
+    setPredictedPresentationDate(latestPresentationDate);
+    setPredictedInstallDate(latestInstallDate);
+    
+    // Combine blockers and sort by most critical
+    const allBlockers = [...notReadyForPresentation, ...notReadyForInstall];
+    setCriticalPathItems(allBlockers.sort((a, b) => b.days_delayed - a.days_delayed).slice(0, 15));
+  };
 
   const getStatusSummary = () => {
     if (!project?.rooms) return {};
