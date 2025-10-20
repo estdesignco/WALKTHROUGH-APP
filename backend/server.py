@@ -9144,6 +9144,37 @@ async def process_pdf_import(
         )
 
 
+# TIME TRACKING ENDPOINTS
+@api_router.post("/time-entries")
+async def create_time_entry(entry: dict):
+    """Create a new time entry for a project"""
+    try:
+        time_entry = {
+            "id": str(uuid.uuid4()),
+            "project_id": entry.get("project_id"),
+            "hours": float(entry.get("hours", 0)),
+            "task": entry.get("task", ""),
+            "date": entry.get("date"),
+            "created_at": datetime.utcnow()
+        }
+        
+        await db.time_entries.insert_one(time_entry)
+        return {"success": True, "time_entry": time_entry}
+    except Exception as e:
+        logging.error(f"Error creating time entry: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/time-entries/{project_id}")
+async def get_time_entries(project_id: str):
+    """Get all time entries for a project"""
+    try:
+        entries = await db.time_entries.find({"project_id": project_id}).to_list(None)
+        return {"time_entries": entries}
+    except Exception as e:
+        logging.error(f"Error getting time entries: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(furniture_router)
