@@ -27,6 +27,8 @@ const DesignToolsDashboard = ({ projectId }) => {
   const [selectedVendor, setSelectedVendor] = useState('');
   const [showAddSection, setShowAddSection] = useState(false);
   const [newSection, setNewSection] = useState({ name: '', fields: [''] });
+  const [pinterestBoardUrl, setPinterestBoardUrl] = useState('https://www.pinterest.com/EstDesignCo');
+  const [showPinterestSettings, setShowPinterestSettings] = useState(false);
 
   useEffect(() => {
     loadDesignData();
