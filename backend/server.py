@@ -9301,6 +9301,20 @@ async def delete_design_image(project_id: str, image_id: str):
         logging.error(f"Error deleting image: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/design-data/{project_id}/whole-home")
+async def save_whole_home_data(project_id: str, data: dict):
+    """Save whole home finishes data"""
+    try:
+        await db.design_data.update_one(
+            {"project_id": project_id},
+            {"$set": {"whole_home_data": data}, "$setOnInsert": {"project_id": project_id}},
+            upsert=True
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error saving whole home data: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # Include the router in the main app
 app.include_router(api_router)
