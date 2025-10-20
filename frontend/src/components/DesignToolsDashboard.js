@@ -485,12 +485,21 @@ const DesignToolsDashboard = ({ projectId }) => {
             <h3 className="text-2xl font-bold text-[#D4A574] mb-2">🏠 Whole Home Finishes</h3>
             <div className="text-sm text-[#B49B7E]">Items that apply to the entire home or multiple floors</div>
           </div>
-          <button
-            onClick={saveWholeHomeData}
-            className="bg-[#10B981] hover:bg-[#059669] text-white px-6 py-3 rounded-lg font-bold"
-          >
-            💾 Save Changes
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowAddSection(true)}
+              className="bg-[#8B4513] hover:bg-[#A0522D] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Add Section
+            </button>
+            <button
+              onClick={saveWholeHomeData}
+              className="bg-[#10B981] hover:bg-[#059669] text-white px-6 py-3 rounded-lg font-bold"
+            >
+              💾 Save Changes
+            </button>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
