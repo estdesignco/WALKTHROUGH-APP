@@ -157,26 +157,30 @@ const InstallationCalendar = ({ projectId }) => {
         </div>
 
         {/* Status Progress Bars */}
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-6 gap-4">
           <div>
             <div className="text-sm text-[#B49B7E] mb-2">To Select</div>
             <div className="text-2xl font-bold text-white">{statusSummary.to_be_selected}</div>
           </div>
           <div>
+            <div className="text-sm text-[#B49B7E] mb-2">In Progress</div>
+            <div className="text-2xl font-bold text-blue-400">{statusSummary.in_progress}</div>
+          </div>
+          <div>
+            <div className="text-sm text-[#B49B7E] mb-2">Ready for Presentation</div>
+            <div className="text-2xl font-bold text-purple-400">{statusSummary.ready_for_presentation}</div>
+          </div>
+          <div>
             <div className="text-sm text-[#B49B7E] mb-2">Ordered</div>
-            <div className="text-2xl font-bold text-blue-400">{statusSummary.ordered}</div>
+            <div className="text-2xl font-bold text-cyan-400">{statusSummary.ordered}</div>
           </div>
           <div>
             <div className="text-sm text-[#B49B7E] mb-2">In Transit</div>
             <div className="text-2xl font-bold text-yellow-400">{statusSummary.in_transit}</div>
           </div>
           <div>
-            <div className="text-sm text-[#B49B7E] mb-2">Delivered</div>
-            <div className="text-2xl font-bold text-purple-400">{statusSummary.delivered}</div>
-          </div>
-          <div>
-            <div className="text-sm text-[#B49B7E] mb-2">Installed</div>
-            <div className="text-2xl font-bold text-green-400">{statusSummary.installed}</div>
+            <div className="text-sm text-[#B49B7E] mb-2">Ready/Installed</div>
+            <div className="text-2xl font-bold text-green-400">{statusSummary.ready_for_install + statusSummary.installed}</div>
           </div>
         </div>
       </div>
