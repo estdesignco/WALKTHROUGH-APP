@@ -364,9 +364,8 @@ const InstallationCalendar = ({ projectId }) => {
             <div className="text-xs text-gray-400 whitespace-nowrap">{daysToPresentation}d</div>
           </div>
           
-          {/* Install Date Marker */}
           <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '85%' }}>
-            <div className="w-5 h-5 rounded-full border-4" style={{ background: '#6B46C1', borderColor: '#D4A574', boxShadow: '0 0 10px #6B46C1' }}></div>
+            <div className="w-5 h-5 rounded-full border-4" style={{ background: '#4A3A6A', borderColor: '#D4A574', boxShadow: '0 0 10px #4A3A6A' }}></div>
             <div className="text-xs text-[#D4C5A9] mt-2 font-bold whitespace-nowrap">INSTALL</div>
             <div className="text-xs text-gray-400 whitespace-nowrap">{daysToInstall}d</div>
           </div>
