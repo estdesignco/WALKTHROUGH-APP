@@ -5,9 +5,37 @@ import MobileAddItemModal from './MobileAddItemModal';
 import { exportProjectToCSV, exportProjectSummary, calculateProjectStats } from '../utils/exportUtils';
 import { leicaManager } from '../utils/leicaD5Manager';
 import { getRoomColor, getCategoryColor, ROOM_COLORS } from '../utils/roomColors';
+import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 import StatusOverview from './StatusOverview';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+
+const getStockStatusColor = (stockStatus) => {
+  const stockColors = {
+    'IN STOCK': '#10B981',
+    'LOW STOCK': '#F59E0B',
+    'OUT OF STOCK': '#EF4444',
+    'BACKORDERED': '#DC2626',
+    'DISCONTINUED': '#991B1B'
+  };
+  return stockColors[stockStatus] || 'transparent';
+};
+
+const getCarrierColor = (carrier) => {
+  const colors = {
+    'FedEx': '#FF6600',
+    'FedEx Ground': '#FF6600',
+    'UPS': '#8B4513',
+    'UPS Ground': '#8B4513',
+    'USPS': '#004B87',
+    'DHL': '#FFD700',
+    'Brooks': '#4682B4',
+    'Zenith': '#20B2AA',
+    'Sunbelt': '#FF4500',
+    'R+L Carriers': '#32CD32'
+  };
+  return colors[carrier] || '#6B7280';
+};
 
 export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'walkthrough' }) {
   const [project, setProject] = useState(null);
