@@ -620,6 +620,11 @@ export default function ProjectDetailPage() {
                 <AutomationDashboard projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading automation...</div> },
+        { name: "Exports", icon: FileText, component: project ? (
+            <div className="exports-content">
+                <ExportsDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading exports...</div> },
         { name: "Measurements", icon: Aperture, component: project ? (
             <div className="measurements-content">
                 <MeasurementsAndFilesPage projectId={projectId} />
