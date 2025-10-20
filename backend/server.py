@@ -9531,14 +9531,18 @@ async def generate_load_in_sheets(project_id: str):
         <style>
             @media print {{ @page {{ size: letter; margin: 0.25in; }} .room-page {{ page-break-after: always; }} }}
             body {{ margin: 0; background: white; font-family: 'Century Gothic', Arial, sans-serif; color: black; }}
-            .room-page {{ padding: 20px; }}
+            .logo {{ text-align: center; margin: 20px 0; }}
+            .logo img {{ height: 60px; filter: grayscale(100%); }}
+            .room-page {{ padding: 20px; page-break-after: always; }}
             .room-header {{ background: black; color: white; text-align: center; padding: 30px; font-size: 48px; font-weight: bold; margin-bottom: 20px; }}
             .item-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
             .item-card {{ border: 4px solid black; padding: 20px; text-align: center; }}
             .item-card img {{ max-width: 100%; max-height: 350px; margin-bottom: 15px; }}
             .item-name {{ font-size: 28px; font-weight: bold; color: black; margin-bottom: 10px; }}
             .item-qty {{ font-size: 22px; color: black; }}
-        </style></head><body>{pages_html}</body></html>"""
+        </style></head><body>
+        <div class="logo"><img src="https://designflow-hub.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
+        {pages_html}</body></html>"""
         
         return Response(content=html, media_type="text/html")
         
