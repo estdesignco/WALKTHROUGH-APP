@@ -266,6 +266,32 @@ const DesignToolsDashboard = ({ projectId }) => {
     }
   };
 
+  const handleAddCustomSection = () => {
+    const section = {
+      id: Date.now().toString(),
+      name: newSection.name,
+      fields: newSection.fields.filter(f => f.trim())
+    };
+    
+    setWholeHomeData({
+      ...wholeHomeData,
+      customSections: [...(wholeHomeData.customSections || []), section]
+    });
+    
+    setShowAddSection(false);
+    setNewSection({ name: '', fields: [''] });
+  };
+
+  const addColorFromVendor = (vendorColor) => {
+    handleAddColor();
+    setNewColor({ 
+      name: `${vendorColor.vendor} - ${vendorColor.name}`, 
+      hex: vendorColor.hex, 
+      usage: `${vendorColor.code}` 
+    });
+    setShowPaintBrowser(false);
+  };
+
   if (loading) {
     return <div className="text-center py-12 text-[#D4C5A9]">Loading design tools...</div>;
   }
