@@ -616,6 +616,43 @@ const DesignToolsDashboard = ({ projectId }) => {
               />
             </div>
           </div>
+          
+          {/* CUSTOM SECTIONS - USER ADDED */}
+          {wholeHomeData.customSections?.map((section, index) => (
+            <div key={section.id} className="rounded-lg border border-[#D4A574]/50 p-4" style={{
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,0.8) 100%)'
+            }}>
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-lg font-bold text-[#D4A574]">✨ {section.name}</h4>
+                <button
+                  onClick={() => {
+                    const updated = { ...wholeHomeData };
+                    updated.customSections = updated.customSections.filter(s => s.id !== section.id);
+                    setWholeHomeData(updated);
+                  }}
+                  className="text-red-400 hover:text-red-300"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="space-y-2">
+                {section.fields.map((field, fieldIndex) => (
+                  <input 
+                    key={fieldIndex}
+                    type="text" 
+                    value={field}
+                    onChange={(e) => {
+                      const updated = { ...wholeHomeData };
+                      updated.customSections[index].fields[fieldIndex] = e.target.value;
+                      setWholeHomeData(updated);
+                    }}
+                    placeholder={`Field ${fieldIndex + 1}`}
+                    className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
