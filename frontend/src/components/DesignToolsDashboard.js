@@ -42,7 +42,8 @@ const DesignToolsDashboard = ({ projectId }) => {
         loadBeforePhotos(projectData);
       }
     } catch (error) {
-      console.error('Error loading design data:', error);\n    } finally {
+      console.error('Error loading design data:', error);
+    } finally {
       setLoading(false);
     }
   };
