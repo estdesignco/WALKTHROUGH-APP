@@ -1105,6 +1105,26 @@ const ExactFFESpreadsheet = ({
                                     boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>IMAGE</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
+                                    boxShadow: '0 0 20px #D4A57450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>STOCK STATUS</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
+                                    boxShadow: '0 0 20px #D4A57450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>STOCK QTY</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
+                                    boxShadow: '0 0 20px #D4A57450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>RESTOCK DATE</td>
+                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
+                                    boxShadow: '0 0 20px #D4A57450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>LEAD TIME (WKS)</td>
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
                                     background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
                                     boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
