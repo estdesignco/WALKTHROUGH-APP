@@ -602,6 +602,11 @@ export default function ProjectDetailPage() {
                 <InstallationCalendar projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading calendar...</div> },
+        { name: "Reports", icon: BarChart3, component: project ? (
+            <div className="reports-content">
+                <ReportsDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading reports...</div> },
         { name: "Measurements", icon: Aperture, component: project ? (
             <div className="measurements-content">
                 <MeasurementsAndFilesPage projectId={projectId} />
