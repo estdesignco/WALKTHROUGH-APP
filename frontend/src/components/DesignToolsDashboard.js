@@ -15,6 +15,11 @@ const DesignToolsDashboard = ({ projectId }) => {
   const [newMaterial, setNewMaterial] = useState({ name: '', type: '', source: '', image: null });
   const [expandedRooms, setExpandedRooms] = useState({});
   const [materialView, setMaterialView] = useState('byRoom'); // 'byRoom' or 'wholeHome'
+  const [wholeHomeData, setWholeHomeData] = useState({
+    doorHardware: { interior: '', exterior: '', hinges: '' },
+    paint: { trim: '', trimColor: '#FFFFFF', ceiling: '', ceilingColor: '#FFFFFF', baseMolding: '', baseColor: '#FFFFFF' },
+    flooring: { floor1: '', floor2: '', basement: '' }
+  });
 
   useEffect(() => {
     loadDesignData();
