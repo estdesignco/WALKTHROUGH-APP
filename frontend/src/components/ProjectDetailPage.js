@@ -654,7 +654,7 @@ export default function ProjectDetailPage() {
                             <button
                                 key={tab.name}
                                 onClick={() => handleTabChange(tab.name)}
-                                className={`whitespace-nowrap py-3 px-6 border-b-4 font-bold text-base flex items-center space-x-2 rounded-t-lg transition-all ${
+                                className={`whitespace-nowrap py-3 px-4 border-b-4 font-bold text-sm flex items-center space-x-2 rounded-t-lg transition-all ${
                                     activeTab === tab.name
                                         ? 'text-[#D4A574] border-[#D4A574]'
                                         : 'border-transparent text-[#D4C5A9] hover:text-[#D4A574] hover:border-[#B49B7E]'
