@@ -292,30 +292,92 @@ const DesignToolsDashboard = ({ projectId }) => {
       }}>
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold text-[#D4A574]">🧵 Material Library</h3>
-          <button
-            onClick={() => setShowAddMaterial(true)}
-            className="bg-[#8B4513] hover:bg-[#A0522D] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Add Material
-          </button>
+          <div className="flex gap-3">
+            <div className="flex gap-2 bg-[#1E293B] rounded-lg p-1">
+              <button
+                onClick={() => setMaterialView('byRoom')}
+                className={`px-4 py-2 rounded font-bold text-sm ${materialView === 'byRoom' ? 'bg-[#D4A574] text-black' : 'text-[#B49B7E]'}`}
+              >
+                By Room
+              </button>
+              <button
+                onClick={() => setMaterialView('wholeHome')}
+                className={`px-4 py-2 rounded font-bold text-sm ${materialView === 'wholeHome' ? 'bg-[#D4A574] text-black' : 'text-[#B49B7E]'}`}
+              >
+                Entire Home
+              </button>
+            </div>
+            <button
+              onClick={() => setShowAddMaterial(true)}
+              className="bg-[#8B4513] hover:bg-[#A0522D] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Add Material
+            </button>
+          </div>
         </div>
         
-        {/* Group materials by room */}
-        {Object.entries(
-          materials.reduce((acc, material) => {
-            const room = material.room || 'Ungrouped';
-            if (!acc[room]) acc[room] = [];
-            acc[room].push(material);
-            return acc;
-          }, {})
-        ).map(([roomName, roomMaterials]) => (
-          <div key={roomName} className="mb-8">
-            <h4 className="text-xl font-bold text-[#D4C5A9] mb-4 border-b-2 border-[#D4A574]/50 pb-2">
-              📍 {roomName}
-            </h4>
+        {materialView === 'byRoom' ? (
+          /* BY ROOM VIEW - COLLAPSIBLE */
+          Object.entries(
+            materials.reduce((acc, material) => {
+              const room = material.room || 'Ungrouped';
+              if (!acc[room]) acc[room] = [];
+              acc[room].push(material);
+              return acc;
+            }, {})
+          ).map(([roomName, roomMaterials]) => (
+            <div key={roomName} className="mb-4">
+              <button
+                onClick={() => setExpandedRooms({ ...expandedRooms, [roomName]: !expandedRooms[roomName] })}
+                className="w-full text-left bg-[#1E293B] hover:bg-[#2E394B] border-2 border-[#D4A574]/50 rounded-lg p-4 mb-3 transition-all"
+              >
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xl font-bold text-[#D4C5A9]">
+                    {expandedRooms[roomName] ? '▼' : '▶'} 📍 {roomName}
+                  </h4>
+                  <span className="text-[#D4A574] font-bold">{roomMaterials.length} items</span>
+                </div>
+              </button>
+              
+              {expandedRooms[roomName] && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pl-4">
+                  {roomMaterials.map((material, index) => (
+                    <div key={material.id || index} className="rounded-xl border-2 border-[#D4A574]/50 overflow-hidden hover:border-[#D4A574] transition-all">
+                      {material.image ? (
+                        <img src={material.image} alt={material.name} className="w-full h-48 object-cover" />
+                      ) : (
+                        <div className="w-full h-48 bg-gray-800 flex items-center justify-center">
+                          <Layers className="w-12 h-12 text-gray-600" />
+                        </div>
+                      )}
+                      <div className="bg-[#1E293B] p-4">
+                        <div className="font-bold text-[#D4A574] mb-1">{material.name}</div>
+                        <div className="text-sm text-[#B49B7E] mb-1">{material.type}</div>
+                        {material.color && <div className="text-xs text-gray-300 mb-1">Color: {material.color}</div>}
+                        <div className="text-xs text-gray-400 mb-3">{material.source}</div>
+                        {material.from_ffe && <div className="text-xs text-purple-400 mb-2">🔗 From FFE</div>}
+                        <button
+                          onClick={() => handleDeleteMaterial(material.id)}
+                          className="text-red-400 hover:text-red-300 text-sm"
+                        >
+                          <Trash2 className="w-4 h-4 inline" /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          /* ENTIRE HOME VIEW - FLAT LIST */
+          <div>
+            <div className="text-lg font-bold text-[#D4C5A9] mb-4 border-b-2 border-[#D4A574]/50 pb-2">
+              🏠 Whole Home Materials ({materials.filter(m => !m.room || m.room === 'Ungrouped').length} items)
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {roomMaterials.map((material, index) => (
+              {materials.filter(m => !m.room || m.room === 'Ungrouped').map((material, index) => (
                 <div key={material.id || index} className="rounded-xl border-2 border-[#D4A574]/50 overflow-hidden hover:border-[#D4A574] transition-all">
                   {material.image ? (
                     <img src={material.image} alt={material.name} className="w-full h-48 object-cover" />
@@ -341,7 +403,7 @@ const DesignToolsDashboard = ({ projectId }) => {
               ))}
             </div>
           </div>
-        ))}
+        )}
         
         {materials.length === 0 && (
           <div className="text-center py-12 text-[#B49B7E]">
