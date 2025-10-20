@@ -875,6 +875,10 @@ class ItemUpdate(BaseModel):
     install_date: Optional[datetime] = None
     image_url: Optional[str] = None
     carrier: Optional[str] = None
+    stock_status: Optional[str] = None
+    stock_quantity: Optional[int] = None
+    restock_date: Optional[datetime] = None
+    lead_time_weeks: Optional[int] = None
 
 class Item(ItemBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
