@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Palette, Layers, ImageIcon, Upload, Trash2, Plus, Download } from 'lucide-react';
+import { getRoomColor } from '../utils/roomColors';
 
 const DesignToolsDashboard = ({ projectId }) => {
   const [project, setProject] = useState(null);
