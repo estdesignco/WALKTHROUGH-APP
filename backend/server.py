@@ -9552,7 +9552,7 @@ async def generate_load_in_sheets(project_id: str):
 
 @api_router.post("/exports/{project_id}/movers-ffe")
 async def generate_movers_ffe(project_id: str):
-    """Generate simplified FFE for movers"""
+    """Generate simplified FFE for movers with pictures"""
     try:
         import httpx
         BACKEND_URL = "http://localhost:8001"
@@ -9560,15 +9560,17 @@ async def generate_movers_ffe(project_id: str):
             response = await client.get(f"{BACKEND_URL}/api/projects/{project_id}?sheet_type=ffe")
             project = response.json()
         
-        # Collect all items
-        rows_html = ""
+        # Collect all items with images
+        items_html = ""
         row_num = 1
         for room in project.get("rooms", []):
             for category in room.get("categories", []):
                 for subcategory in category.get("subcategories", []):
                     for item in subcategory.get("items", []):
                         bg = "#f9f9f9" if row_num % 2 == 0 else "white"
-                        rows_html += f'<tr style="background: {bg};"><td><strong>{room.get("name")}</strong></td><td>{item.get("name")}</td><td>{item.get("vendor", "")}</td><td style="text-align: center;"><strong>{item.get("quantity", 1)}</strong></td><td style="width: 60px;"></td></tr>'
+                        img_html = f'<img src="{item.get("image_url")}" style="max-width: 80px; max-height: 80px;">' if item.get("image_url") else '<div style="width: 80px; height: 80px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 24px;">📦</div>'
+                        
+                        items_html += f'<tr style="background: {bg};"><td style="text-align: center;">{img_html}</td><td><strong>{room.get("name")}</strong></td><td>{item.get("name")}</td><td>{item.get("vendor", "")}</td><td style="text-align: center;"><strong>{item.get("quantity", 1)}</strong></td><td style="width: 60px;"></td></tr>'
                         row_num += 1
         
         html = f"""<!DOCTYPE html><html><head><title>Mover's FFE</title>
@@ -9580,13 +9582,13 @@ async def generate_movers_ffe(project_id: str):
             h1 {{ color: black; text-align: center; font-weight: bold; }}
             table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
             th {{ background: black; color: white; padding: 12px; text-align: left; border: 1px solid black; font-weight: bold; }}
-            td {{ padding: 10px; border: 1px solid black; color: black; }}
+            td {{ padding: 10px; border: 1px solid black; color: black; vertical-align: middle; }}
         </style></head><body>
         <div class="logo"><img src="https://designflow-hub.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
         <h1>MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
         <p style="text-align: center;"><strong>Total Items:</strong> {row_num - 1}</p>
-        <table><thead><tr><th>ROOM</th><th>ITEM</th><th>VENDOR</th><th>QUANTITY</th><th>CHECKED</th></tr></thead>
-        <tbody>{rows_html}</tbody></table>
+        <table><thead><tr><th>IMAGE</th><th>ROOM</th><th>ITEM</th><th>VENDOR</th><th>QTY</th><th>CHECKED</th></tr></thead>
+        <tbody>{items_html}</tbody></table>
         </body></html>"""
         
         return Response(content=html, media_type="text/html")
