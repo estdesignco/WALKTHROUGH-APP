@@ -9482,9 +9482,11 @@ async def generate_electrician_sheet(project_id: str):
 async def generate_load_in_sheets(project_id: str):
     """Generate load-in room sheets"""
     try:
-        project = await db.projects.find_one({"id": project_id})
-        if not project:
-            raise HTTPException(status_code=404, detail="Project not found")
+        import httpx
+        BACKEND_URL = "http://localhost:8001"
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{BACKEND_URL}/api/projects/{project_id}?sheet_type=ffe")
+            project = response.json()
         
         pages_html = ""
         for room in project.get("rooms", []):
@@ -9499,7 +9501,6 @@ async def generate_load_in_sheets(project_id: str):
                         })
             
             if room_items:
-                # Create page per room
                 items_grid = ""
                 for item in room_items[:4]:
                     img = f'<img src="{item["image_url"]}">' if item.get("image_url") else '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-center; font-size: 48px;">📦</div>'
@@ -9530,9 +9531,11 @@ async def generate_load_in_sheets(project_id: str):
 async def generate_movers_ffe(project_id: str):
     """Generate simplified FFE for movers"""
     try:
-        project = await db.projects.find_one({"id": project_id})
-        if not project:
-            raise HTTPException(status_code=404, detail="Project not found")
+        import httpx
+        BACKEND_URL = "http://localhost:8001"
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{BACKEND_URL}/api/projects/{project_id}?sheet_type=ffe")
+            project = response.json()
         
         # Collect all items
         rows_html = ""
