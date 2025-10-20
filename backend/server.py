@@ -9402,9 +9402,12 @@ async def delete_automation_rule(project_id: str, rule_id: str):
 async def generate_electrician_sheet(project_id: str):
     """Generate electrician spec sheet with all lighting items"""
     try:
-        project = await db.projects.find_one({"id": project_id})
-        if not project:
-            raise HTTPException(status_code=404, detail="Project not found")
+        # Use the existing API to get fully populated project
+        import httpx
+        BACKEND_URL = "http://localhost:8001"
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{BACKEND_URL}/api/projects/{project_id}?sheet_type=ffe")
+            project = response.json()
         
         # Get all lighting items
         lighting_items = []
