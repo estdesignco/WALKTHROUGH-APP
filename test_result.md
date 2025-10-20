@@ -1099,6 +1099,54 @@ frontend:
         agent: "testing"
         comment: "🎉 ADD ITEM MODAL AND SCRAPING FULLY FUNCTIONAL! Comprehensive testing confirms all Add Item functionality working perfectly. ✅ MODAL ACCESS: Successfully clicked Add Item button and modal opened with all form fields (Item Name, Quantity, Size, Status, Vendor, SKU, Cost, Product Link, Remarks). ✅ SCRAPING INTEGRATION: URL input field present with blue 'Fill' button for scraping functionality. ✅ FOUR HANDS URL TESTED: Filled Product Link field with https://fourhands.com/product/248067-003 as requested in review - field accepts URL properly. ✅ FORM VALIDATION: All required fields marked with asterisks, proper placeholders, and form validation working. ✅ STATUS DROPDOWN: Blank default status as requested, with full status options available. ✅ VENDOR FIELD: Text input accepts scraped vendor values. ✅ SKU FIELD: Present and functional for scraped SKU data. ✅ MODAL FUNCTIONALITY: Opens/closes properly, Cancel and Create Item buttons functional. The Add Item modal with scraping integration is production-ready and fully operational!"
 
+  - task: "Finance Tab - Budget, Markup, Summary Cards, Room Breakdown"
+    implemented: true
+    working: false
+    file: "FinanceDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🎯 FINANCE TAB TESTING COMPLETED - PARTIAL SUCCESS: Tested Finance tab at /project/8bb8cbf2-e691-4227-9892-d78c79d5b0a4?tab=Finance. ✅ BUDGET INPUT VISIBLE: Project Budget input field found and functional. ✅ MARKUP % INPUT VISIBLE: Default Markup % input field found with placeholder '125'. ✅ 4 SUMMARY CARDS PRESENT: All 4 financial summary cards displaying correctly - TOTAL COST ($1250.50), CLIENT PRICE ($1563.13), PROFIT ($312.63 with 20.0% margin), REMAINING BUDGET ($NaN with 0.0% used). ❌ ROOM BREAKDOWN TABLE MISSING: Room Breakdown heading found but table element not detected in DOM. The table may be rendering below the fold or have visibility issues. ⚠️ MINOR ISSUE: Remaining Budget shows $NaN because project budget is not set (0 value). This is expected behavior when budget input is empty. Overall: 3/4 core features working correctly. Room breakdown table needs investigation."
+
+  - task: "Calendar Tab - Prediction Cards, Timelines, Critical Path"
+    implemented: true
+    working: false
+    file: "InstallationCalendar.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🎯 CALENDAR TAB TESTING COMPLETED - PARTIAL SUCCESS: Tested Calendar tab at /project/8bb8cbf2-e691-4227-9892-d78c79d5b0a4?tab=Calendar. ✅ 2 PREDICTION DATE CARDS PRESENT: Both 'Predicted Presentation Date' (November 10, 2025 - 21 days from now) and 'Predicted Install Date' (February 11, 2026 - 114 days from now) cards displaying correctly with proper styling and data. ❌ 3 TIMELINES MISSING: Could not find text for 'Complete Project Timeline', 'Timeline to Presentation', or 'Timeline to Install'. The timeline visualizations may be using different text labels or rendering as graphics without text. ❌ CRITICAL PATH ITEMS TABLE MISSING: 'Critical Path Items' heading not found in DOM. The table may be conditionally rendered or using different text. ⚠️ VISUAL ELEMENTS: Screenshots show timeline graphics are present with START/PRESENTATION/INSTALL markers and status breakdowns (To Select: 81, In Progress: 4, etc.), but text-based selectors couldn't locate them. Overall: 1/4 core features confirmed via text selectors. Visual timeline elements appear to be present but need alternative detection methods."
+
+  - task: "Desktop FFE Tab - Stock Columns, Dropdown, Persistence"
+    implemented: true
+    working: false
+    file: "ExactFFESpreadsheet.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🎯 DESKTOP FFE TAB TESTING COMPLETED - CRITICAL FAILURE: Tested Desktop FFE at /ffe/8bb8cbf2-e691-4227-9892-d78c79d5b0a4. ❌ STOCK INFO HEADER NOT FOUND: Could not locate 'STOCK INFO.' section header in gold color. ❌ STOCK COLUMNS MISSING: Neither 'STOCK STATUS/QTY' nor 'RESTOCK/LEAD TIME' column headers found in DOM. ❌ STOCK DROPDOWN NOT TESTABLE: Without stock columns present, cannot test dropdown functionality, OUT OF STOCK color change, or value persistence after reload. ❌ CRITICAL ISSUE: The stock functionality appears to not be implemented or is not rendering on the FFE page. Screenshots show standard FFE spreadsheet with shipping columns but no stock-related columns visible. ⚠️ PROJECT LOADING: FFE page loaded successfully with project data (90 Total Items, status breakdown showing), but stock features are completely absent. Overall: 0/5 stock-related features found. Stock functionality needs to be implemented or enabled on desktop FFE view."
+
+  - task: "Mobile FFE - 15 Columns, No Stock Columns, Status Overview"
+    implemented: true
+    working: "NA"
+    file: "MobileFFESpreadsheet.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "🎯 MOBILE FFE TESTING INCOMPLETE - NAVIGATION ISSUES: Attempted to test Mobile FFE at /mobile-app. ⚠️ NAVIGATION CHALLENGES: Mobile app loaded but navigation to specific project (8bb8cbf2-e691-4227-9892-d78c79d5b0a4) and FF&E Bible was difficult due to dynamic project selection. ⚠️ COLUMN COUNT: Found header cells but count may not be accurate due to mobile viewport and collapsed sections. ⚠️ STOCK COLUMNS: Confirmed stock columns (STOCK STATUS/QTY, RESTOCK/LEAD TIME) are NOT present on mobile view, which is correct per requirements. ⚠️ STATUS OVERVIEW: Could not definitively locate status overview with pie charts in mobile view. ⚠️ SPREADSHEET DISPLAY: Table element found but full verification of 15 columns and proper mobile layout incomplete. Overall: Testing was blocked by mobile navigation complexity. Mobile FFE appears to be implemented but requires manual verification with correct project navigation flow."
+
   - task: "Pie Charts and Status Overview"
     implemented: true
     working: true
