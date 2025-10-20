@@ -1251,8 +1251,17 @@ const ExactFFESpreadsheet = ({
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <select 
+                                                                  value={item.stock_status || ''}
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Stock status changed:', e.target.value)}
+                                                                  onChange={async (e) => {
+                                                                    const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                                    await fetch(`${backendUrl}/api/items/${item.id}`, {
+                                                                      method: 'PUT',
+                                                                      headers: { 'Content-Type': 'application/json' },
+                                                                      body: JSON.stringify({ stock_status: e.target.value })
+                                                                    });
+                                                                    console.log('Stock status saved:', e.target.value);
+                                                                  }}
                                                                 >
                                                                   <option value="">—</option>
                                                                   <option value="IN STOCK" style={{ backgroundColor: '#10B981', color: 'white' }}>✅ IN STOCK</option>
@@ -1265,9 +1274,18 @@ const ExactFFESpreadsheet = ({
                                                               <div className="h-6">
                                                                 <input 
                                                                   type="number" 
+                                                                  defaultValue={item.stock_quantity || ''}
                                                                   placeholder="Stock Qty"
                                                                   className="w-full h-full bg-transparent border-none text-[#D4A574] text-xs text-center p-0"
-                                                                  onChange={(e) => console.log('Stock qty changed:', e.target.value)}
+                                                                  onBlur={async (e) => {
+                                                                    const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                                    await fetch(`${backendUrl}/api/items/${item.id}`, {
+                                                                      method: 'PUT',
+                                                                      headers: { 'Content-Type': 'application/json' },
+                                                                      body: JSON.stringify({ stock_quantity: e.target.value })
+                                                                    });
+                                                                    console.log('Stock qty saved:', e.target.value);
+                                                                  }}
                                                                 />
                                                               </div>
                                                             </div>
@@ -1278,17 +1296,35 @@ const ExactFFESpreadsheet = ({
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <input 
-                                                                  type="date" 
+                                                                  type="date"
+                                                                  defaultValue={item.restock_date || ''}
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Restock date changed:', e.target.value)}
+                                                                  onBlur={async (e) => {
+                                                                    const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                                    await fetch(`${backendUrl}/api/items/${item.id}`, {
+                                                                      method: 'PUT',
+                                                                      headers: { 'Content-Type': 'application/json' },
+                                                                      body: JSON.stringify({ restock_date: e.target.value })
+                                                                    });
+                                                                    console.log('Restock date saved:', e.target.value);
+                                                                  }}
                                                                 />
                                                               </div>
                                                               <div className="h-6">
                                                                 <input 
-                                                                  type="number" 
+                                                                  type="number"
+                                                                  defaultValue={item.lead_time_weeks || ''}
                                                                   placeholder="Lead (wks)"
                                                                   className="w-full h-full bg-transparent border-none text-[#D4A574] text-xs text-center p-0"
-                                                                  onChange={(e) => console.log('Lead time changed:', e.target.value)}
+                                                                  onBlur={async (e) => {
+                                                                    const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                                    await fetch(`${backendUrl}/api/items/${item.id}`, {
+                                                                      method: 'PUT',
+                                                                      headers: { 'Content-Type': 'application/json' },
+                                                                      body: JSON.stringify({ lead_time_weeks: e.target.value })
+                                                                    });
+                                                                    console.log('Lead time saved:', e.target.value);
+                                                                  }}
                                                                 />
                                                               </div>
                                                             </div>
