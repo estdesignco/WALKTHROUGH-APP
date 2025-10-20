@@ -9477,64 +9477,45 @@ async def generate_electrician_sheet(project_id: str):
 
 @api_router.post("/exports/{project_id}/load-in-sheets")
 async def generate_load_in_sheets(project_id: str):
-    """Generate load-in room sheets with 2-4 items per page"""
+    """Generate load-in room sheets"""
     try:
         project = await db.projects.find_one({"id": project_id})
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
         
-        # Organize items by room
-        room_items = {}
+        pages_html = ""
         for room in project.get("rooms", []):
-            items = []
+            room_items = []
             for category in room.get("categories", []):
                 for subcategory in category.get("subcategories", []):
                     for item in subcategory.get("items", []):
-                        items.append({
+                        room_items.append({
                             "name": item.get("name"),
                             "quantity": item.get("quantity", 1),
                             "image_url": item.get("image_url", "")
                         })
-            if items:
-                room_items[room.get("name")] = items
+            
+            if room_items:
+                # Create page per room
+                items_grid = ""
+                for item in room_items[:4]:
+                    img = f'<img src="{item["image_url"]}">' if item.get("image_url") else '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-center; font-size: 48px;">📦</div>'
+                    items_grid += f'<div class="item-card">{img}<div class="item-name">{item["name"]}</div><div class="item-qty">Qty: {item["quantity"]}</div></div>'
+                
+                pages_html += f'<div class="room-page"><div class="room-header">{room.get("name").upper()}</div><div class="item-grid">{items_grid}</div></div>'
         
-        # Generate HTML
-        html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Load-In Room Sheets - {project.get('name', 'Project')}</title>
-            <style>
-                @media print {{ @page {{ margin: 0.25in; size: letter; }} .page-break {{ page-break-after: always; }} }}
-                body {{ font-family: Arial, sans-serif; margin: 0; background: white; }}
-                .room-page {{ page-break-after: always; padding: 20px; }}
-                .room-header {{ background: #8B4513; color: white; text-align: center; padding: 20px; font-size: 32px; font-weight: bold; margin-bottom: 20px; }}
-                .item-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
-                .item-grid.large {{ grid-template-columns: 1fr; }}
-                .item-card {{ border: 3px solid #D4A574; padding: 15px; text-align: center; }}
-                .item-card img {{ max-width: 100%; max-height: 300px; margin-bottom: 10px; }}
-                .item-name {{ font-size: 24px; font-weight: bold; color: #8B4513; }}
-                .item-qty {{ font-size: 18px; color: #666; }}
-            </style>
-        </head>
-        <body>
-            {''.join([f'''
-            <div class="room-page">
-                <div class="room-header">{room_name.upper()}</div>
-                <div class="item-grid {'large' if len(items) <= 2 else ''}">
-                    {''.join([f'''
-                    <div class="item-card">
-                        {'<img src="' + item['image_url'] + '">' if item.get('image_url') else '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-center; color: #999; font-size: 48px;">📦</div>'}
-                        <div class="item-name">{item['name']}</div>
-                        <div class="item-qty">Qty: {item['quantity']}</div>
-                    </div>
-                    ''' for item in items[:4]])}
-                </div>
-            </div>
-            ''' for room_name, items in room_items.items()])}
-        </body>
-        </html>
-        """
+        html = f"""<!DOCTYPE html><html><head><title>Load-In Sheets</title>
+        <style>
+            @media print {{ @page {{ size: letter; margin: 0.25in; }} .room-page {{ page-break-after: always; }} }}
+            body {{ margin: 0; background: white; font-family: Arial; }}
+            .room-page {{ padding: 20px; }}
+            .room-header {{ background: #8B4513; color: white; text-align: center; padding: 30px; font-size: 48px; font-weight: bold; margin-bottom: 20px; }}
+            .item-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
+            .item-card {{ border: 4px solid #D4A574; padding: 20px; text-align: center; }}
+            .item-card img {{ max-width: 100%; max-height: 350px; margin-bottom: 15px; }}
+            .item-name {{ font-size: 28px; font-weight: bold; color: #8B4513; margin-bottom: 10px; }}
+            .item-qty {{ font-size: 22px; color: #666; }}
+        </style></head><body>{pages_html}</body></html>"""
         
         return Response(content=html, media_type="text/html")
         
