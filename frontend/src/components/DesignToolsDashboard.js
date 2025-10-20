@@ -30,14 +30,111 @@ const DesignToolsDashboard = ({ projectId }) => {
         setBeforeAfterPhotos(data.before_after_photos || []);
       }
       
-      const projectResponse = await fetch(`${BACKEND_URL}/api/projects/${projectId}`);
+      const projectResponse = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=ffe`);
       if (projectResponse.ok) {
-        setProject(await projectResponse.json());
+        const projectData = await projectResponse.json();
+        setProject(projectData);
+        
+        // Auto-detect fabrics and paint from FFE items
+        autoDetectFabricsAndPaint(projectData);
+        
+        // Auto-load before photos from room photos (without measurements)
+        loadBeforePhotos(projectData);
       }
     } catch (error) {
-      console.error('Error loading design data:', error);
-    } finally {
+      console.error('Error loading design data:', error);\n    } finally {
       setLoading(false);
+    }
+  };
+
+  const autoDetectFabricsAndPaint = (projectData) => {
+    const fabricKeywords = ['fabric', 'drape', 'curtain', 'chair', 'sofa', 'upholstery', 'ottoman', 'cushion'];
+    const paintKeywords = ['paint', 'color', 'finish'];
+    
+    const detectedMaterials = [];
+    
+    projectData.rooms?.forEach(room => {
+      room.categories?.forEach(category => {
+        // Check if paint category
+        const isPaintCategory = category.name.toLowerCase().includes('paint') || 
+                               category.name.toLowerCase().includes('finish') ||
+                               category.name.toLowerCase().includes('wallpaper');
+        
+        category.subcategories?.forEach(subcategory => {
+          subcategory.items?.forEach(item => {
+            const itemName = (item.name || '').toLowerCase();
+            
+            // Check for fabrics
+            if (fabricKeywords.some(keyword => itemName.includes(keyword))) {
+              detectedMaterials.push({
+                id: item.id,
+                name: item.name,
+                type: 'Fabric',
+                source: item.vendor || '',
+                image: item.image_url,
+                room: room.name,
+                color: item.finish_color,
+                from_ffe: true
+              });
+            }
+            
+            // Check for paint (especially from paint category)
+            if (isPaintCategory || paintKeywords.some(keyword => itemName.includes(keyword))) {
+              detectedMaterials.push({
+                id: item.id,
+                name: item.name,
+                type: 'Paint',
+                source: item.vendor || '',
+                image: item.image_url,
+                room: room.name,
+                color: item.finish_color,
+                from_ffe: true
+              });
+            }
+          });
+        });
+      });
+    });
+    
+    // Merge with existing materials (don't duplicate)
+    const existingIds = materials.map(m => m.id);
+    const newMaterials = detectedMaterials.filter(m => !existingIds.includes(m.id));
+    setMaterials([...materials, ...newMaterials]);
+  };
+
+  const loadBeforePhotos = async (projectData) => {
+    try {
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const beforePhotos = [];
+      
+      for (const room of projectData.rooms || []) {
+        try {
+          const photoResponse = await fetch(`${BACKEND_URL}/api/photos/by-room/${projectId}/${room.id}`);
+          if (photoResponse.ok) {
+            const photoData = await photoResponse.json();
+            // Only get photos WITHOUT measurements
+            const photosWithoutMeasurements = (photoData.photos || []).filter(p => !p.metadata?.has_measurements);
+            
+            photosWithoutMeasurements.forEach(photo => {
+              beforePhotos.push({
+                id: photo.id,
+                type: 'before',
+                image: photo.photo_data,
+                filename: photo.file_name,
+                room: room.name,
+                from_room_photos: true
+              });
+            });
+          }
+        } catch (err) {
+          console.error(`Error loading photos for room ${room.name}:`, err);
+        }
+      }
+      
+      // Merge with existing before/after photos
+      setBeforeAfterPhotos([...beforeAfterPhotos, ...beforePhotos]);
+    } catch (error) {
+      console.error('Error loading before photos:', error);
     }
   };
 
