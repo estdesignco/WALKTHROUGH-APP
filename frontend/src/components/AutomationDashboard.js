@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Zap, Mail, Bell, CheckSquare, Settings } from 'lucide-react';
+import { Zap, Mail, Bell, CheckSquare, Settings, Plus, Trash2 } from 'lucide-react';
 
 const AutomationDashboard = ({ projectId }) => {
   const [project, setProject] = useState(null);
