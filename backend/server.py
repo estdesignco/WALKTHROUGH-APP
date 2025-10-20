@@ -9315,6 +9315,20 @@ async def save_whole_home_data(project_id: str, data: dict):
         logging.error(f"Error saving whole home data: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/design-data/{project_id}/pinterest")
+async def save_pinterest_board(project_id: str, data: dict):
+    """Save Pinterest board URL"""
+    try:
+        await db.design_data.update_one(
+            {"project_id": project_id},
+            {"$set": {"pinterest_board_url": data.get("pinterest_board_url")}, "$setOnInsert": {"project_id": project_id}},
+            upsert=True
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error saving Pinterest URL: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # Include the router in the main app
 app.include_router(api_router)
