@@ -710,6 +710,17 @@ const ExactFFESpreadsheet = ({
     return shipToColors[shipTo] || '#FEF08A';
   };
 
+  const getStockStatusColor = (stockStatus) => {
+    const stockColors = {
+      'IN STOCK': '#10B981',        // Green
+      'LOW STOCK': '#F59E0B',       // Orange
+      'OUT OF STOCK': '#EF4444',    // Red
+      'BACKORDERED': '#DC2626',     // Dark Red
+      'DISCONTINUED': '#991B1B'     // Very Dark Red
+    };
+    return stockColors[stockStatus] || 'transparent';
+  };
+
   const getDeliveryStatusColor = (status) => {
     const deliveryColors = {
       'PENDING': '#FEF08A',
