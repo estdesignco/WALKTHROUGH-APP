@@ -246,8 +246,8 @@ const InstallationCalendar = ({ projectId }) => {
         </div>
 
         <div className="rounded-2xl p-8 border border-[#D4A574]/60" style={{
-          background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 50%, #6B46C1FF 100%)',
-          boxShadow: '0 0 30px #6B46C160, inset 0 0 50px rgba(255, 255, 255, 0.12)'
+          background: 'linear-gradient(135deg, #4A3A6AFF 0%, #4A3A6AAA 50%, #4A3A6AFF 100%)',
+          boxShadow: '0 0 30px #4A3A6A60, inset 0 0 50px rgba(255, 255, 255, 0.12)'
         }}>
           <div className="flex items-center gap-4 mb-4">
             <Calendar className="w-12 h-12 text-white" />
