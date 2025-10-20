@@ -9182,7 +9182,12 @@ async def get_design_data(project_id: str):
     try:
         design_data = await db.design_data.find_one({"project_id": project_id})
         if not design_data:
-            return {\n                "color_palettes": [],\n                "materials": [],\n                "inspiration_images": [],\n                "before_after_photos": []\n            }
+            return {
+                "color_palettes": [],
+                "materials": [],
+                "inspiration_images": [],
+                "before_after_photos": []
+            }
         return design_data
     except Exception as e:
         logging.error(f"Error getting design data: {str(e)}")
