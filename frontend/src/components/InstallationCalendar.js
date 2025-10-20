@@ -346,7 +346,7 @@ const InstallationCalendar = ({ projectId }) => {
           {/* Progress Fill */}
           <div className="absolute top-1/2 left-0 h-3 rounded-full transform -translate-y-1/2" style={{ 
             width: '15%',
-            background: 'linear-gradient(to right, #D4A574, #8B4513, #6B46C1)',
+            background: 'linear-gradient(to right, #D4A574, #8B4513, #4A3A6A)',
             boxShadow: '0 0 15px #D4A57450'
           }}></div>
           
