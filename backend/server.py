@@ -9512,14 +9512,14 @@ async def generate_load_in_sheets(project_id: str):
         html = f"""<!DOCTYPE html><html><head><title>Load-In Sheets</title>
         <style>
             @media print {{ @page {{ size: letter; margin: 0.25in; }} .room-page {{ page-break-after: always; }} }}
-            body {{ margin: 0; background: white; font-family: Arial; }}
+            body {{ margin: 0; background: white; font-family: 'Century Gothic', Arial, sans-serif; color: black; }}
             .room-page {{ padding: 20px; }}
-            .room-header {{ background: #8B4513; color: white; text-align: center; padding: 30px; font-size: 48px; font-weight: bold; margin-bottom: 20px; }}
+            .room-header {{ background: black; color: white; text-align: center; padding: 30px; font-size: 48px; font-weight: bold; margin-bottom: 20px; }}
             .item-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
-            .item-card {{ border: 4px solid #D4A574; padding: 20px; text-align: center; }}
+            .item-card {{ border: 4px solid black; padding: 20px; text-align: center; }}
             .item-card img {{ max-width: 100%; max-height: 350px; margin-bottom: 15px; }}
-            .item-name {{ font-size: 28px; font-weight: bold; color: #8B4513; margin-bottom: 10px; }}
-            .item-qty {{ font-size: 22px; color: #666; }}
+            .item-name {{ font-size: 28px; font-weight: bold; color: black; margin-bottom: 10px; }}
+            .item-qty {{ font-size: 22px; color: black; }}
         </style></head><body>{pages_html}</body></html>"""
         
         return Response(content=html, media_type="text/html")
