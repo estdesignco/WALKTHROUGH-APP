@@ -9568,7 +9568,7 @@ async def generate_movers_ffe(project_id: str):
                 for subcategory in category.get("subcategories", []):
                     for item in subcategory.get("items", []):
                         bg = "#f9f9f9" if row_num % 2 == 0 else "white"
-                        img_html = f'<img src="{item.get("image_url")}" style="max-width: 80px; max-height: 80px;">' if item.get("image_url") else '<div style="width: 80px; height: 80px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 24px;">📦</div>'
+                        img_html = f'<img src="{item.get("image_url")}" style="max-width: 80px; max-height: 80px;">' if item.get("image_url") else '<div style="width: 80px; height: 80px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999;">No Image</div>'
                         
                         items_html += f'<tr style="background: {bg};"><td style="text-align: center;">{img_html}</td><td><strong>{room.get("name")}</strong></td><td>{item.get("name")}</td><td>{item.get("vendor", "")}</td><td style="text-align: center;"><strong>{item.get("quantity", 1)}</strong></td><td style="width: 60px;"></td></tr>'
                         row_num += 1
