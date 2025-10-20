@@ -9546,21 +9546,21 @@ async def generate_movers_ffe(project_id: str):
                 for subcategory in category.get("subcategories", []):
                     for item in subcategory.get("items", []):
                         bg = "#f9f9f9" if row_num % 2 == 0 else "white"
-                        rows_html += f'<tr style="background: {bg};"><td><strong>{room.get("name")}</strong></td><td>{item.get("name")}</td><td style="text-align: center;"><strong>{item.get("quantity", 1)}</strong></td><td style="width: 60px;"></td></tr>'
+                        rows_html += f'<tr style="background: {bg};"><td><strong>{room.get("name")}</strong></td><td>{item.get("name")}</td><td>{item.get("vendor", "")}</td><td style="text-align: center;"><strong>{item.get("quantity", 1)}</strong></td><td style="width: 60px;"></td></tr>'
                         row_num += 1
         
         html = f"""<!DOCTYPE html><html><head><title>Mover's FFE</title>
         <style>
             @media print {{ @page {{ margin: 0.5in; }} }}
-            body {{ font-family: Arial; margin: 20px; background: white; }}
-            h1 {{ color: #8B4513; text-align: center; }}
+            body {{ font-family: 'Century Gothic', Arial, sans-serif; margin: 20px; background: white; color: black; }}
+            h1 {{ color: black; text-align: center; font-weight: bold; }}
             table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
-            th {{ background: #8B4513; color: white; padding: 12px; text-align: left; border: 1px solid #D4A574; }}
-            td {{ padding: 10px; border: 1px solid #D4A574; }}
+            th {{ background: black; color: white; padding: 12px; text-align: left; border: 1px solid black; font-weight: bold; }}
+            td {{ padding: 10px; border: 1px solid black; color: black; }}
         </style></head><body>
         <h1>🚚 MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
         <p style="text-align: center;"><strong>Total Items:</strong> {row_num - 1}</p>
-        <table><thead><tr><th>ROOM</th><th>ITEM</th><th>QUANTITY</th><th>CHECKED ✓</th></tr></thead>
+        <table><thead><tr><th>ROOM</th><th>ITEM</th><th>VENDOR</th><th>QUANTITY</th><th>CHECKED ✓</th></tr></thead>
         <tbody>{rows_html}</tbody></table>
         </body></html>"""
         
