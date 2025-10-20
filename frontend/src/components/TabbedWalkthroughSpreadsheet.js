@@ -664,6 +664,11 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                               boxShadow: '0 0 25px #8B451360, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
                               textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
                             }}>ADDITIONAL INFO.</th>
+                            <th colSpan="2" className="border border-[#D4A574] px-2 py-1 text-xs font-bold text-white text-center" style={{ 
+                              background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
+                              boxShadow: '0 0 25px #D4A57460, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
+                              textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
+                            }}>STOCK INFO.</th>
                             <th colSpan="6" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center" style={{ 
                               background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
                               boxShadow: '0 0 25px #6B46C160, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
