@@ -673,24 +673,57 @@ const DesignToolsDashboard = ({ projectId }) => {
         </div>
       </div>
 
-      {/* INSPIRATION BOARD */}
+      {/* INSPIRATION BOARD - WITH PINTEREST INTEGRATION */}
       <div className="rounded-2xl p-6 border border-[#D4A574]/60 mb-8" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
       }}>
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold text-[#D4A574]">💡 Inspiration Board</h3>
-          <label className="bg-[#6B46C1] hover:bg-[#7B56D1] text-white px-6 py-3 rounded-lg font-bold cursor-pointer flex items-center gap-2">
-            <Upload className="w-5 h-5" />
-            Upload Image
-            <input 
-              type="file" 
-              accept="image/*" 
-              className="hidden"
-              onChange={(e) => e.target.files[0] && handleImageUpload('inspiration', e.target.files[0])}
-            />
-          </label>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowPinterestSettings(true)}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2"
+            >
+              📌 Pinterest Settings
+            </button>
+            <label className="bg-[#6B46C1] hover:bg-[#7B56D1] text-white px-6 py-3 rounded-lg font-bold cursor-pointer flex items-center gap-2">
+              <Upload className="w-5 h-5" />
+              Upload Image
+              <input 
+                type="file" 
+                accept="image/*" 
+                className="hidden"
+                onChange={(e) => e.target.files[0] && handleImageUpload('inspiration', e.target.files[0])}
+              />
+            </label>
+          </div>
         </div>
         
+        {/* Pinterest Embedded Board */}
+        {pinterestBoardUrl && (
+          <div className="mb-6 rounded-lg overflow-hidden border-2 border-[#D4A574]/50">
+            <div className="bg-[#1E293B] p-3 border-b border-[#D4A574]/50">
+              <div className="flex justify-between items-center">
+                <div className="text-[#D4A574] font-bold">📌 Your Pinterest Board</div>
+                <a href={pinterestBoardUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#B49B7E] hover:text-[#D4A574]">
+                  Open in Pinterest →
+                </a>
+              </div>
+            </div>
+            <div className="bg-white p-4" style={{ minHeight: '400px' }}>
+              <a 
+                data-pin-do="embedBoard" 
+                data-pin-board-width="100%" 
+                data-pin-scale-height="400" 
+                data-pin-scale-width="100%"
+                href={pinterestBoardUrl}
+              ></a>
+              <script async defer src="//assets.pinterest.com/js/pinit.js"></script>
+            </div>
+          </div>
+        )}
+        
+        {/* Uploaded Inspiration Images */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {inspirationImages.map((img, index) => (
             <div key={img.id || index} className="relative group rounded-lg overflow-hidden border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all">
@@ -712,9 +745,9 @@ const DesignToolsDashboard = ({ projectId }) => {
             </div>
           ))}
           
-          {inspirationImages.length === 0 && (
+          {inspirationImages.length === 0 && !pinterestBoardUrl && (
             <div className="col-span-full text-center py-16 text-[#B49B7E]">
-              No inspiration images yet. Upload images to create your mood board.
+              No inspiration images yet. Upload images or connect your Pinterest board.
             </div>
           )}
         </div>
