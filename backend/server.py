@@ -9532,59 +9532,30 @@ async def generate_movers_ffe(project_id: str):
             raise HTTPException(status_code=404, detail="Project not found")
         
         # Collect all items
-        all_items = []
+        rows_html = ""
+        row_num = 1
         for room in project.get("rooms", []):
             for category in room.get("categories", []):
                 for subcategory in category.get("subcategories", []):
                     for item in subcategory.get("items", []):
-                        all_items.append({
-                            "room": room.get("name"),
-                            "item": item.get("name"),
-                            "quantity": item.get("quantity", 1)
-                        })
+                        bg = "#f9f9f9" if row_num % 2 == 0 else "white"
+                        rows_html += f'<tr style="background: {bg};"><td><strong>{room.get("name")}</strong></td><td>{item.get("name")}</td><td style="text-align: center;"><strong>{item.get("quantity", 1)}</strong></td><td style="width: 60px;"></td></tr>'
+                        row_num += 1
         
-        # Generate HTML
-        html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Mover's FFE Sheet - {project.get('name', 'Project')}</title>
-            <style>
-                @media print {{ @page {{ margin: 0.5in; }} }}
-                body {{ font-family: Arial, sans-serif; margin: 20px; background: white; }}
-                h1 {{ color: #8B4513; text-align: center; }}
-                table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
-                th {{ background: #8B4513; color: white; padding: 12px; text-align: left; border: 1px solid #D4A574; }}
-                td {{ padding: 10px; border: 1px solid #D4A574; }}
-                tr:nth-child(even) {{ background: #f9f9f9; }}
-            </style>
-        </head>
-        <body>
-            <h1>🚚 MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
-            <p style="text-align: center;"><strong>Total Items:</strong> {len(all_items)}</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ROOM</th>
-                        <th>ITEM</th>
-                        <th>QUANTITY</th>
-                        <th>CHECKED ✓</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {''.join([f'''
-                    <tr>
-                        <td><strong>{item['room']}</strong></td>
-                        <td>{item['item']}</td>
-                        <td style="text-align: center;"><strong>{item['quantity']}</strong></td>
-                        <td style="width: 60px;"></td>
-                    </tr>
-                    ''' for item in all_items])}
-                </tbody>
-            </table>
-        </body>
-        </html>
-        """
+        html = f"""<!DOCTYPE html><html><head><title>Mover's FFE</title>
+        <style>
+            @media print {{ @page {{ margin: 0.5in; }} }}
+            body {{ font-family: Arial; margin: 20px; background: white; }}
+            h1 {{ color: #8B4513; text-align: center; }}
+            table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+            th {{ background: #8B4513; color: white; padding: 12px; text-align: left; border: 1px solid #D4A574; }}
+            td {{ padding: 10px; border: 1px solid #D4A574; }}
+        </style></head><body>
+        <h1>🚚 MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
+        <p style="text-align: center;"><strong>Total Items:</strong> {row_num - 1}</p>
+        <table><thead><tr><th>ROOM</th><th>ITEM</th><th>QUANTITY</th><th>CHECKED ✓</th></tr></thead>
+        <tbody>{rows_html}</tbody></table>
+        </body></html>"""
         
         return Response(content=html, media_type="text/html")
         
