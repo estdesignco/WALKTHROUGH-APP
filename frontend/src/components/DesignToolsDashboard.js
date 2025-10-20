@@ -968,6 +968,136 @@ const DesignToolsDashboard = ({ projectId }) => {
           </div>
         </div>
       )}
+
+      {/* PAINT VENDOR BROWSER MODAL */}
+      {showPaintBrowser && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onClick={() => setShowPaintBrowser(false)}>
+          <div className="bg-[#1E293B] border-2 border-[#D4A574] rounded-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-3xl font-bold text-[#D4A574]">🎨 Paint Vendor Browser</h3>
+              <button onClick={() => setShowPaintBrowser(false)} className="text-[#D4A574] text-4xl hover:text-red-400">✕</button>
+            </div>
+            
+            {/* Search and Filter */}
+            <div className="flex gap-4 mb-6">
+              <input
+                type="text"
+                value={paintSearchTerm}
+                onChange={(e) => setPaintSearchTerm(e.target.value)}
+                placeholder="Search colors (e.g., 'White Dove', 'Gray')..."
+                className="flex-1 bg-gray-800 text-white px-4 py-3 rounded-lg border border-[#D4A574]"
+              />
+              <select
+                value={selectedVendor}
+                onChange={(e) => setSelectedVendor(e.target.value)}
+                className="bg-gray-800 text-white px-4 py-3 rounded-lg border border-[#D4A574]"
+              >
+                <option value="">All Vendors</option>
+                {Object.keys(PAINT_VENDORS).map(vendor => (
+                  <option key={vendor} value={vendor}>{vendor}</option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Paint Colors Grid */}
+            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-96 overflow-y-auto">
+              {(paintSearchTerm ? searchPaintColors(paintSearchTerm) : 
+                selectedVendor ? getColorsByVendor(selectedVendor).map(c => ({ ...c, vendor: selectedVendor })) : 
+                getAllPaintColors()).slice(0, 100).map((color, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setNewColor({ name: `${color.vendor} - ${color.name}`, hex: color.hex, usage: color.code });
+                    setShowPaintBrowser(false);
+                    setShowAddColor(true);
+                  }}
+                  className="rounded-lg border-2 border-[#D4A574]/50 hover:border-[#D4A574] overflow-hidden transition-all"
+                  title={`${color.vendor} - ${color.name} (${color.code})`}
+                >
+                  <div className="h-24" style={{ backgroundColor: color.hex }}></div>
+                  <div className="bg-[#1E293B] p-2">
+                    <div className="text-xs text-[#D4A574] font-bold truncate">{color.name}</div>
+                    <div className="text-xs text-gray-400">{color.code}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADD CUSTOM SECTION MODAL */}
+      {showAddSection && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-[#1E293B] border-2 border-[#D4A574] rounded-2xl p-8 max-w-md w-full">
+            <h3 className="text-2xl font-bold text-[#D4A574] mb-6">➕ Add Custom Section</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[#B49B7E] mb-2">Section Name</label>
+                <input
+                  type="text"
+                  value={newSection.name}
+                  onChange={(e) => setNewSection({ ...newSection, name: e.target.value })}
+                  className="w-full bg-gray-800 text-white px-4 py-2 rounded-lg border border-[#D4A574]"
+                  placeholder="e.g., Window Hardware, Lighting Fixtures"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-[#B49B7E] mb-2">Fields</label>
+                {newSection.fields.map((field, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={field}
+                      onChange={(e) => {
+                        const updated = [...newSection.fields];
+                        updated[index] = e.target.value;
+                        setNewSection({ ...newSection, fields: updated });
+                      }}
+                      className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg border border-[#D4A574]"
+                      placeholder={`Field ${index + 1}`}
+                    />
+                    {newSection.fields.length > 1 && (
+                      <button
+                        onClick={() => {
+                          const updated = newSection.fields.filter((_, i) => i !== index);
+                          setNewSection({ ...newSection, fields: updated });
+                        }}
+                        className="text-red-400 hover:text-red-300"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={() => setNewSection({ ...newSection, fields: [...newSection.fields, ''] })}
+                  className="text-[#D4A574] hover:text-[#C49564] text-sm font-bold mt-2"
+                >
+                  + Add Field
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex gap-4 mt-6">
+              <button
+                onClick={handleAddCustomSection}
+                className="flex-1 bg-[#D4A574] hover:bg-[#C49564] text-black px-6 py-3 rounded-lg font-bold"
+              >
+                Add Section
+              </button>
+              <button
+                onClick={() => setShowAddSection(false)}
+                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-bold"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
