@@ -590,6 +590,11 @@ export default function ProjectDetailPage() {
                 <FFEDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading FF&E...</div> },
+        { name: "Finance", icon: DollarSign, component: project ? (
+            <div className="finance-content">
+                <FinanceDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading finance...</div> },
         { name: "Measurements", icon: Aperture, component: project ? (
             <div className="measurements-content">
                 <MeasurementsAndFilesPage projectId={projectId} />
