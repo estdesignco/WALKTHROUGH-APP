@@ -19,8 +19,14 @@ const DesignToolsDashboard = ({ projectId }) => {
   const [wholeHomeData, setWholeHomeData] = useState({
     doorHardware: { interior: '', exterior: '', hinges: '' },
     paint: { trim: '', trimColor: '#FFFFFF', ceiling: '', ceilingColor: '#FFFFFF', baseMolding: '', baseColor: '#FFFFFF' },
-    flooring: { floor1: '', floor2: '', basement: '' }
+    flooring: { floor1: '', floor2: '', basement: '' },
+    customSections: [] // For user-added sections
   });
+  const [showPaintBrowser, setShowPaintBrowser] = useState(false);
+  const [paintSearchTerm, setPaintSearchTerm] = useState('');
+  const [selectedVendor, setSelectedVendor] = useState('');
+  const [showAddSection, setShowAddSection] = useState(false);
+  const [newSection, setNewSection] = useState({ name: '', fields: [''] });
 
   useEffect(() => {
     loadDesignData();
