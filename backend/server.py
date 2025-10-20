@@ -9575,14 +9575,17 @@ async def generate_movers_ffe(project_id: str):
         <style>
             @media print {{ @page {{ margin: 0.5in; }} }}
             body {{ font-family: 'Century Gothic', Arial, sans-serif; margin: 20px; background: white; color: black; }}
+            .logo {{ text-align: center; margin-bottom: 20px; }}
+            .logo img {{ height: 60px; filter: grayscale(100%); }}
             h1 {{ color: black; text-align: center; font-weight: bold; }}
             table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
             th {{ background: black; color: white; padding: 12px; text-align: left; border: 1px solid black; font-weight: bold; }}
             td {{ padding: 10px; border: 1px solid black; color: black; }}
         </style></head><body>
-        <h1>🚚 MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
+        <div class="logo"><img src="https://designflow-hub.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
+        <h1>MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
         <p style="text-align: center;"><strong>Total Items:</strong> {row_num - 1}</p>
-        <table><thead><tr><th>ROOM</th><th>ITEM</th><th>VENDOR</th><th>QUANTITY</th><th>CHECKED ✓</th></tr></thead>
+        <table><thead><tr><th>ROOM</th><th>ITEM</th><th>VENDOR</th><th>QUANTITY</th><th>CHECKED</th></tr></thead>
         <tbody>{rows_html}</tbody></table>
         </body></html>"""
         
