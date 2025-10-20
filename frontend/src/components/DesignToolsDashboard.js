@@ -306,13 +306,22 @@ const DesignToolsDashboard = ({ projectId }) => {
       }}>
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold text-[#D4A574]">🎨 Color Palette Manager</h3>
-          <button
-            onClick={() => setShowAddColor(true)}
-            className="bg-[#D4A574] hover:bg-[#C49564] text-black px-6 py-3 rounded-lg font-bold flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Add Color
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowPaintBrowser(true)}
+              className="bg-[#8B4513] hover:bg-[#A0522D] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2"
+            >
+              <Search className="w-5 h-5" />
+              Browse Paint Vendors
+            </button>
+            <button
+              onClick={() => setShowAddColor(true)}
+              className="bg-[#D4A574] hover:bg-[#C49564] text-black px-6 py-3 rounded-lg font-bold flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Add Custom Color
+            </button>
+          </div>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
