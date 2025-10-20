@@ -441,8 +441,8 @@ const InstallationCalendar = ({ projectId }) => {
 
       {/* INSTALL TIMELINE - SEPARATE */}
       <div className="rounded-2xl p-8 border border-[#D4A574]/60 mb-8" style={{
-        background: 'linear-gradient(135deg, #6B46C1FF 0%, rgba(0,0,0,0.95) 30%, rgba(107,70,193,0.2) 70%, rgba(0,0,0,0.95) 100%)',
-        boxShadow: '0 0 25px #6B46C130, inset 0 0 50px rgba(107, 70, 193, 0.08)'
+        background: 'linear-gradient(135deg, #4A3A6AFF 0%, rgba(0,0,0,0.95) 30%, rgba(74,58,106,0.2) 70%, rgba(0,0,0,0.95) 100%)',
+        boxShadow: '0 0 25px #4A3A6A30, inset 0 0 50px rgba(74, 58, 106, 0.08)'
       }}>
         <h3 className="text-2xl font-bold text-[#D4A574] mb-6">🏠 Timeline to Install</h3>
         
