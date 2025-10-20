@@ -801,6 +801,36 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                               <td className="border border-[#B49B7E] px-2 py-1 text-center">
                                 {item.image_url ? <img src={item.image_url} alt={item.name} className="w-12 h-12 object-cover rounded" /> : <span className="text-gray-500 text-xs">No image</span>}
                               </td>
+                              <td className="border border-[#D4A574] px-1 py-1" style={{
+                                background: item.stock_status ? `linear-gradient(135deg, ${getStockStatusColor(item.stock_status)}FF 0%, ${getStockStatusColor(item.stock_status)}AA 20%, ${getStockStatusColor(item.stock_status)} 40%, ${getStockStatusColor(item.stock_status)}AA 80%, ${getStockStatusColor(item.stock_status)}FF 100%)` : 'transparent',
+                                boxShadow: item.stock_status ? `0 0 15px ${getStockStatusColor(item.stock_status)}40` : 'none'
+                              }}>
+                                <div className="flex flex-col h-full">
+                                  <div className="h-6 mb-1">
+                                    <select value={item.stock_status || ''} onChange={(e) => updateItemOffline(item.id, { stock_status: e.target.value })} className="w-full h-full bg-transparent border-none text-white text-xs p-0">
+                                      <option value="">—</option>
+                                      <option value="IN STOCK">✅ IN STOCK</option>
+                                      <option value="LOW STOCK">⚠️ LOW STOCK</option>
+                                      <option value="OUT OF STOCK">❌ OUT OF STOCK</option>
+                                      <option value="BACKORDERED">⏳ BACKORDERED</option>
+                                      <option value="DISCONTINUED">🚫 DISCONTINUED</option>
+                                    </select>
+                                  </div>
+                                  <div className="h-6">
+                                    <input type="number" defaultValue={item.stock_quantity || ''} placeholder="Qty" onBlur={(e) => updateItemOffline(item.id, { stock_quantity: e.target.value })} className="w-full h-full bg-transparent border-none text-white text-xs text-center p-0" />
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="border border-[#D4A574] px-1 py-1">
+                                <div className="flex flex-col h-full">
+                                  <div className="h-6 mb-1">
+                                    <input type="date" defaultValue={item.restock_date || ''} onBlur={(e) => updateItemOffline(item.id, { restock_date: e.target.value })} className="w-full h-full bg-transparent border-none text-white text-xs p-0" />
+                                  </div>
+                                  <div className="h-6">
+                                    <input type="number" defaultValue={item.lead_time_weeks || ''} placeholder="8" onBlur={(e) => updateItemOffline(item.id, { lead_time_weeks: e.target.value })} className="w-full h-full bg-transparent border-none text-[#D4A574] text-xs text-center p-0" />
+                                  </div>
+                                </div>
+                              </td>
                               <td className="border border-[#B49B7E] px-1 py-1">
                                 <input type="date" defaultValue={item.order_date || ''} onBlur={(e) => updateItemOffline(item.id, { order_date: e.target.value })} className="bg-transparent text-[#B49B7E] text-xs w-full" />
                               </td>
