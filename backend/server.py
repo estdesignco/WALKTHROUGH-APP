@@ -9330,6 +9330,72 @@ async def save_pinterest_board(project_id: str, data: dict):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# AUTOMATION ENDPOINTS
+@api_router.get("/automation/{project_id}")
+async def get_automation_rules(project_id: str):
+    """Get all automation rules for a project"""
+    try:
+        automation_data = await db.automation.find_one({"project_id": project_id})
+        if not automation_data:
+            return {"rules": []}
+        return automation_data
+    except Exception as e:
+        logging.error(f"Error getting automation rules: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/automation/{project_id}/rules")
+async def create_automation_rule(project_id: str, rule: dict):
+    """Create a new automation rule"""
+    try:
+        rule_entry = {
+            "id": str(uuid.uuid4()),
+            "name": rule.get("name"),
+            "trigger": rule.get("trigger"),
+            "condition": rule.get("condition"),
+            "action": rule.get("action"),
+            "recipient": rule.get("recipient"),
+            "message": rule.get("message"),
+            "enabled": True,
+            "created_at": datetime.utcnow()
+        }
+        
+        await db.automation.update_one(
+            {"project_id": project_id},
+            {"$push": {"rules": rule_entry}, "$setOnInsert": {"project_id": project_id}},
+            upsert=True
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error creating automation rule: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/automation/{project_id}/rules/{rule_id}")
+async def update_automation_rule(project_id: str, rule_id: str, data: dict):
+    """Update an automation rule (enable/disable)"""
+    try:
+        await db.automation.update_one(
+            {"project_id": project_id, "rules.id": rule_id},
+            {"$set": {"rules.$.enabled": data.get("enabled")}}
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error updating automation rule: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/automation/{project_id}/rules/{rule_id}")
+async def delete_automation_rule(project_id: str, rule_id: str):
+    """Delete an automation rule"""
+    try:
+        await db.automation.update_one(
+            {"project_id": project_id},
+            {"$pull": {"rules": {"id": rule_id}}}
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error deleting automation rule: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(furniture_router)
