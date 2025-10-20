@@ -12,6 +12,8 @@ const DesignToolsDashboard = ({ projectId }) => {
   const [showAddMaterial, setShowAddMaterial] = useState(false);
   const [newColor, setNewColor] = useState({ name: '', hex: '#D4A574', usage: '' });
   const [newMaterial, setNewMaterial] = useState({ name: '', type: '', source: '', image: null });
+  const [expandedRooms, setExpandedRooms] = useState({});
+  const [materialView, setMaterialView] = useState('byRoom'); // 'byRoom' or 'wholeHome'
 
   useEffect(() => {
     loadDesignData();
