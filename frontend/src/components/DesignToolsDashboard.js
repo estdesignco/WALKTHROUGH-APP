@@ -416,7 +416,10 @@ const DesignToolsDashboard = ({ projectId }) => {
               {expandedRooms[roomName] && (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pl-4">
                   {roomMaterials.map((material, index) => (
-                    <div key={material.id || index} className="rounded-xl border-2 border-[#D4A574]/50 overflow-hidden hover:border-[#D4A574] transition-all">
+                    <div key={material.id || index} className="rounded-xl border-2 overflow-hidden transition-all" style={{
+                      borderColor: '#D4A574',
+                      boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 30px rgba(212, 165, 116, 0.08)'
+                    }}>
                       {material.image ? (
                         <img src={material.image} alt={material.name} className="w-full h-48 object-cover" />
                       ) : (
@@ -424,7 +427,10 @@ const DesignToolsDashboard = ({ projectId }) => {
                           <Layers className="w-12 h-12 text-gray-600" />
                         </div>
                       )}
-                      <div className="bg-[#1E293B] p-4">
+                      <div className="p-4" style={{
+                        background: 'linear-gradient(135deg, rgba(30, 30, 40, 0.95) 0%, rgba(20, 20, 30, 0.9) 50%, rgba(30, 30, 40, 0.95) 100%)',
+                        boxShadow: 'inset 0 0 20px rgba(212, 165, 116, 0.05)'
+                      }}>
                         <div className="font-bold text-[#D4A574] mb-1">{material.name}</div>
                         <div className="text-sm text-[#B49B7E] mb-1">{material.type}</div>
                         {material.color && <div className="text-xs text-gray-300 mb-1">Color: {material.color}</div>}
