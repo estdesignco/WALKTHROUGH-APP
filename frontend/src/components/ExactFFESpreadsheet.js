@@ -1257,8 +1257,11 @@ const ExactFFESpreadsheet = ({
                                                             )}
                                                           </td>
                                                           
-                                                          {/* STOCK STATUS/QTY - STACKED */}
-                                                          <td className="border border-[#D4A574] px-1 py-1 text-sm">
+                                                          {/* STOCK STATUS/QTY - STACKED - COLORED BY STOCK STATUS */}
+                                                          <td className="border border-[#D4A574] px-1 py-1 text-sm" style={{
+                                                            background: item.stock_status ? `linear-gradient(135deg, ${getStockStatusColor(item.stock_status)}FF 0%, ${getStockStatusColor(item.stock_status)}AA 20%, ${getStockStatusColor(item.stock_status)} 40%, ${getStockStatusColor(item.stock_status)}AA 80%, ${getStockStatusColor(item.stock_status)}FF 100%)` : 'transparent',
+                                                            boxShadow: item.stock_status ? `0 0 15px ${getStockStatusColor(item.stock_status)}40, inset 0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)` : 'none'
+                                                          }}>
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <select 
@@ -1271,15 +1274,16 @@ const ExactFFESpreadsheet = ({
                                                                       headers: { 'Content-Type': 'application/json' },
                                                                       body: JSON.stringify({ stock_status: e.target.value })
                                                                     });
+                                                                    if (onReload) onReload();
                                                                     console.log('Stock status saved:', e.target.value);
                                                                   }}
                                                                 >
                                                                   <option value="">—</option>
-                                                                  <option value="IN STOCK" style={{ backgroundColor: '#10B981', color: 'white' }}>✅ IN STOCK</option>
-                                                                  <option value="LOW STOCK" style={{ backgroundColor: '#F59E0B', color: 'white' }}>⚠️ LOW STOCK</option>
-                                                                  <option value="OUT OF STOCK" style={{ backgroundColor: '#EF4444', color: 'white' }}>❌ OUT OF STOCK</option>
-                                                                  <option value="BACKORDERED" style={{ backgroundColor: '#DC2626', color: 'white' }}>⏳ BACKORDERED</option>
-                                                                  <option value="DISCONTINUED" style={{ backgroundColor: '#991B1B', color: 'white' }}>🚫 DISCONTINUED</option>
+                                                                  <option value="IN STOCK">✅ IN STOCK</option>
+                                                                  <option value="LOW STOCK">⚠️ LOW STOCK</option>
+                                                                  <option value="OUT OF STOCK">❌ OUT OF STOCK</option>
+                                                                  <option value="BACKORDERED">⏳ BACKORDERED</option>
+                                                                  <option value="DISCONTINUED">🚫 DISCONTINUED</option>
                                                                 </select>
                                                               </div>
                                                               <div className="h-6">
@@ -1287,7 +1291,7 @@ const ExactFFESpreadsheet = ({
                                                                   type="number" 
                                                                   defaultValue={item.stock_quantity || ''}
                                                                   placeholder="Stock Qty"
-                                                                  className="w-full h-full bg-transparent border-none text-[#D4A574] text-xs text-center p-0"
+                                                                  className="w-full h-full bg-transparent border-none text-white text-xs text-center p-0"
                                                                   onBlur={async (e) => {
                                                                     const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
                                                                     await fetch(`${backendUrl}/api/items/${item.id}`, {
