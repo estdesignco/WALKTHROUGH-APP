@@ -596,6 +596,11 @@ export default function ProjectDetailPage() {
                 <FinanceDashboard projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading finance...</div> },
+        { name: "Calendar", icon: Calendar, component: project ? (
+            <div className="calendar-content">
+                <InstallationCalendar projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading calendar...</div> },
         { name: "Measurements", icon: Aperture, component: project ? (
             <div className="measurements-content">
                 <MeasurementsAndFilesPage projectId={projectId} />
