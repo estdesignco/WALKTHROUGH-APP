@@ -447,8 +447,18 @@ const DesignToolsDashboard = ({ projectId }) => {
       <div className="rounded-2xl p-6 border border-[#D4A574]/60 mb-8" style={{
         background: 'linear-gradient(135deg, rgba(139,69,19,0.2) 0%, rgba(0,0,0,0.95) 50%, rgba(139,69,19,0.2) 100%)'
       }}>
-        <h3 className="text-2xl font-bold text-[#D4A574] mb-6">🏠 Whole Home Finishes</h3>
-        <div className="text-sm text-[#B49B7E] mb-6">Items that apply to the entire home or multiple floors</div>
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h3 className="text-2xl font-bold text-[#D4A574] mb-2">🏠 Whole Home Finishes</h3>
+            <div className="text-sm text-[#B49B7E]">Items that apply to the entire home or multiple floors</div>
+          </div>
+          <button
+            onClick={saveWholeHomeData}
+            className="bg-[#10B981] hover:bg-[#059669] text-white px-6 py-3 rounded-lg font-bold"
+          >
+            💾 Save Changes
+          </button>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Door Hardware */}
@@ -457,9 +467,27 @@ const DesignToolsDashboard = ({ projectId }) => {
           }}>
             <h4 className="text-lg font-bold text-[#D4A574] mb-3">🚪 Door Hardware</h4>
             <div className="space-y-2">
-              <input type="text" placeholder="Interior door handles" className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" />
-              <input type="text" placeholder="Exterior door handles" className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" />
-              <input type="text" placeholder="Hinges finish" className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" />
+              <input 
+                type="text" 
+                value={wholeHomeData.doorHardware.interior} 
+                onChange={(e) => setWholeHomeData({ ...wholeHomeData, doorHardware: { ...wholeHomeData.doorHardware, interior: e.target.value }})}
+                placeholder="Interior door handles" 
+                className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
+              />
+              <input 
+                type="text" 
+                value={wholeHomeData.doorHardware.exterior} 
+                onChange={(e) => setWholeHomeData({ ...wholeHomeData, doorHardware: { ...wholeHomeData.doorHardware, exterior: e.target.value }})}
+                placeholder="Exterior door handles" 
+                className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
+              />
+              <input 
+                type="text" 
+                value={wholeHomeData.doorHardware.hinges} 
+                onChange={(e) => setWholeHomeData({ ...wholeHomeData, doorHardware: { ...wholeHomeData.doorHardware, hinges: e.target.value }})}
+                placeholder="Hinges finish" 
+                className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
+              />
             </div>
           </div>
           
@@ -470,16 +498,49 @@ const DesignToolsDashboard = ({ projectId }) => {
             <h4 className="text-lg font-bold text-[#D4A574] mb-3">🎨 Whole Home Paint</h4>
             <div className="space-y-2">
               <div className="flex gap-2">
-                <input type="text" placeholder="Trim color" className="flex-1 bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" />
-                <input type="color" className="w-12 h-10 rounded" />
+                <input 
+                  type="text" 
+                  value={wholeHomeData.paint.trim} 
+                  onChange={(e) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, trim: e.target.value }})}
+                  placeholder="Trim color" 
+                  className="flex-1 bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
+                />
+                <input 
+                  type="color" 
+                  value={wholeHomeData.paint.trimColor} 
+                  onChange={(e) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, trimColor: e.target.value }})}
+                  className="w-12 h-10 rounded" 
+                />
               </div>
               <div className="flex gap-2">
-                <input type="text" placeholder="Ceiling color" className="flex-1 bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" />
-                <input type="color" className="w-12 h-10 rounded" />
+                <input 
+                  type="text" 
+                  value={wholeHomeData.paint.ceiling} 
+                  onChange={(e) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, ceiling: e.target.value }})}
+                  placeholder="Ceiling color" 
+                  className="flex-1 bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
+                />
+                <input 
+                  type="color" 
+                  value={wholeHomeData.paint.ceilingColor} 
+                  onChange={(e) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, ceilingColor: e.target.value }})}
+                  className="w-12 h-10 rounded" 
+                />
               </div>
               <div className="flex gap-2">
-                <input type="text" placeholder="Base molding color" className="flex-1 bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" />
-                <input type="color" className="w-12 h-10 rounded" />
+                <input 
+                  type="text" 
+                  value={wholeHomeData.paint.baseMolding} 
+                  onChange={(e) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, baseMolding: e.target.value }})}
+                  placeholder="Base molding color" 
+                  className="flex-1 bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
+                />
+                <input 
+                  type="color" 
+                  value={wholeHomeData.paint.baseColor} 
+                  onChange={(e) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, baseColor: e.target.value }})}
+                  className="w-12 h-10 rounded" 
+                />
               </div>
             </div>
           </div>
@@ -490,9 +551,27 @@ const DesignToolsDashboard = ({ projectId }) => {
           }}>
             <h4 className="text-lg font-bold text-[#D4A574] mb-3">🏢 Flooring by Floor</h4>
             <div className="space-y-2">
-              <input type="text" placeholder="1st Floor - Flooring type" className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" />
-              <input type="text" placeholder="2nd Floor - Flooring type" className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" />
-              <input type="text" placeholder="Basement - Flooring type" className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" />
+              <input 
+                type="text" 
+                value={wholeHomeData.flooring.floor1} 
+                onChange={(e) => setWholeHomeData({ ...wholeHomeData, flooring: { ...wholeHomeData.flooring, floor1: e.target.value }})}
+                placeholder="1st Floor - Flooring type" 
+                className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
+              />
+              <input 
+                type="text" 
+                value={wholeHomeData.flooring.floor2} 
+                onChange={(e) => setWholeHomeData({ ...wholeHomeData, flooring: { ...wholeHomeData.flooring, floor2: e.target.value }})}
+                placeholder="2nd Floor - Flooring type" 
+                className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
+              />
+              <input 
+                type="text" 
+                value={wholeHomeData.flooring.basement} 
+                onChange={(e) => setWholeHomeData({ ...wholeHomeData, flooring: { ...wholeHomeData.flooring, basement: e.target.value }})}
+                placeholder="Basement - Flooring type" 
+                className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
+              />
             </div>
           </div>
         </div>
