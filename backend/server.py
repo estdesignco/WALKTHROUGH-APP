@@ -9469,7 +9469,7 @@ async def generate_electrician_sheet(project_id: str):
             @media print {{ @page {{ margin: 0.5in; }} }}
             body {{ font-family: 'Century Gothic', Arial, sans-serif; margin: 20px; background: white; color: black; }}
             .logo {{ text-align: center; margin-bottom: 20px; }}
-            .logo img {{ height: 60px; filter: grayscale(100%); }}
+            .logo img {{ height: 150px; filter: grayscale(100%); }}
             h1 {{ color: black; border-bottom: 3px solid black; padding-bottom: 10px; font-weight: bold; text-align: center; }}
             h2 {{ color: black; text-align: center; }}
             .room-section {{ page-break-before: always; margin-top: 30px; }}
@@ -9532,7 +9532,7 @@ async def generate_load_in_sheets(project_id: str):
             @media print {{ @page {{ size: letter; margin: 0.25in; }} .room-page {{ page-break-after: always; }} }}
             body {{ margin: 0; background: white; font-family: 'Century Gothic', Arial, sans-serif; color: black; }}
             .logo {{ text-align: center; margin: 20px 0; }}
-            .logo img {{ height: 60px; filter: grayscale(100%); }}
+            .logo img {{ height: 150px; filter: grayscale(100%); }}
             .room-page {{ padding: 20px; page-break-after: always; }}
             .room-header {{ background: black; color: white; text-align: center; padding: 30px; font-size: 48px; font-weight: bold; margin-bottom: 20px; }}
             .item-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
@@ -9576,7 +9576,7 @@ async def generate_movers_ffe(project_id: str):
             @media print {{ @page {{ margin: 0.5in; }} }}
             body {{ font-family: 'Century Gothic', Arial, sans-serif; margin: 20px; background: white; color: black; }}
             .logo {{ text-align: center; margin-bottom: 20px; }}
-            .logo img {{ height: 60px; filter: grayscale(100%); }}
+            .logo img {{ height: 150px; filter: grayscale(100%); }}
             h1 {{ color: black; text-align: center; font-weight: bold; }}
             table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
             th {{ background: black; color: white; padding: 12px; text-align: left; border: 1px solid black; font-weight: bold; }}
