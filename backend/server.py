@@ -9175,6 +9175,128 @@ async def get_time_entries(project_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# DESIGN TOOLS ENDPOINTS
+@api_router.get("/design-data/{project_id}")
+async def get_design_data(project_id: str):
+    """Get all design data for a project"""
+    try:
+        design_data = await db.design_data.find_one({"project_id": project_id})
+        if not design_data:
+            return {\n                "color_palettes": [],\n                "materials": [],\n                "inspiration_images": [],\n                "before_after_photos": []\n            }
+        return design_data
+    except Exception as e:
+        logging.error(f"Error getting design data: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/design-data/{project_id}/colors")
+async def add_color(project_id: str, color: dict):
+    """Add a color to project palette"""
+    try:
+        color_entry = {
+            "id": str(uuid.uuid4()),
+            "name": color.get("name"),
+            "hex": color.get("hex"),
+            "usage": color.get("usage"),
+            "created_at": datetime.utcnow()
+        }
+        
+        await db.design_data.update_one(
+            {"project_id": project_id},
+            {"$push": {"color_palettes": color_entry}, "$setOnInsert": {"project_id": project_id}},
+            upsert=True
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error adding color: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/design-data/{project_id}/materials")
+async def add_material(project_id: str, material: dict):
+    """Add a material to library"""
+    try:
+        material_entry = {
+            "id": str(uuid.uuid4()),
+            "name": material.get("name"),
+            "type": material.get("type"),
+            "source": material.get("source"),
+            "image": material.get("image"),
+            "created_at": datetime.utcnow()
+        }
+        
+        await db.design_data.update_one(
+            {"project_id": project_id},
+            {"$push": {"materials": material_entry}, "$setOnInsert": {"project_id": project_id}},
+            upsert=True
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error adding material: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/design-data/{project_id}/images")
+async def add_design_image(project_id: str, image_data: dict):
+    """Add inspiration or before/after image"""
+    try:
+        image_entry = {
+            "id": str(uuid.uuid4()),
+            "type": image_data.get("type"),  # 'inspiration', 'before', 'after'
+            "image": image_data.get("image"),
+            "filename": image_data.get("filename"),
+            "created_at": datetime.utcnow()
+        }
+        
+        field = "inspiration_images" if image_data.get("type") == "inspiration" else "before_after_photos"
+        
+        await db.design_data.update_one(
+            {"project_id": project_id},
+            {"$push": {field: image_entry}, "$setOnInsert": {"project_id": project_id}},
+            upsert=True
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error adding image: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/design-data/{project_id}/colors/{color_id}")
+async def delete_color(project_id: str, color_id: str):
+    """Delete a color from palette"""
+    try:
+        await db.design_data.update_one(
+            {"project_id": project_id},
+            {"$pull": {"color_palettes": {"id": color_id}}}
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error deleting color: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/design-data/{project_id}/materials/{material_id}")
+async def delete_material(project_id: str, material_id: str):
+    """Delete a material from library"""
+    try:
+        await db.design_data.update_one(
+            {"project_id": project_id},
+            {"$pull": {"materials": {"id": material_id}}}
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error deleting material: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/design-data/{project_id}/images/{image_id}")
+async def delete_design_image(project_id: str, image_id: str):
+    """Delete an inspiration or before/after image"""
+    try:
+        await db.design_data.update_one(
+            {"project_id": project_id},
+            {"$pull": {"inspiration_images": {"id": image_id}, "before_after_photos": {"id": image_id}}}
+        )
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Error deleting image: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(furniture_router)
