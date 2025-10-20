@@ -473,53 +473,6 @@ const DesignToolsDashboard = ({ projectId }) => {
         </div>
       </div>
 
-      {/* MATERIAL LIBRARY */}
-      <div className="rounded-2xl p-6 border border-[#D4A574]/60 mb-8" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-bold text-[#D4A574]">🧵 Material Library</h3>
-          <button
-            onClick={() => setShowAddMaterial(true)}
-            className="bg-[#8B4513] hover:bg-[#A0522D] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Add Material
-          </button>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {materials.map((material, index) => (
-            <div key={material.id || index} className="rounded-xl border-2 border-[#D4A574]/50 overflow-hidden hover:border-[#D4A574] transition-all">
-              {material.image ? (
-                <img src={material.image} alt={material.name} className="w-full h-48 object-cover" />
-              ) : (
-                <div className="w-full h-48 bg-gray-800 flex items-center justify-center">
-                  <Layers className="w-12 h-12 text-gray-600" />
-                </div>
-              )}
-              <div className="bg-[#1E293B] p-4">
-                <div className="font-bold text-[#D4A574] mb-1">{material.name}</div>
-                <div className="text-sm text-[#B49B7E] mb-1">{material.type}</div>
-                <div className="text-xs text-gray-400 mb-3">{material.source}</div>
-                <button
-                  onClick={() => handleDeleteMaterial(material.id)}
-                  className="text-red-400 hover:text-red-300 text-sm"
-                >
-                  <Trash2 className="w-4 h-4 inline" /> Delete
-                </button>
-              </div>
-            </div>
-          ))}
-          
-          {materials.length === 0 && (
-            <div className="col-span-full text-center py-12 text-[#B49B7E]">
-              No materials added yet. Click "Add Material" to start your library.
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* INSPIRATION BOARD */}
       <div className="rounded-2xl p-6 border border-[#D4A574]/60 mb-8" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
