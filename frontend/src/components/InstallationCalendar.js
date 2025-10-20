@@ -272,29 +272,33 @@ const InstallationCalendar = ({ projectId }) => {
       <div className="rounded-2xl p-8 border border-[#D4A574]/60 mb-8" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-2xl font-bold text-[#D4A574] mb-6">📊 Project Progress</h3>
+        <h3 className="text-2xl font-bold text-[#D4A574] mb-6">📊 Complete Project Timeline</h3>
         
         <div className="relative h-24 mb-8">
           {/* Timeline Bar */}
-          <div className="absolute top-1/2 left-0 right-0 h-2 bg-gray-700 rounded-full transform -translate-y-1/2"></div>
+          <div className="absolute top-1/2 left-0 right-0 h-3 bg-gray-700 rounded-full transform -translate-y-1/2"></div>
           
-          {/* Today Marker */}
-          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '10%' }}>
-            <div className="w-4 h-4 bg-yellow-400 rounded-full"></div>
-            <div className="text-xs text-yellow-400 mt-2 whitespace-nowrap">TODAY</div>
+          {/* Progress Fill - from start to current furthest point */}
+          <div className="absolute top-1/2 left-0 h-3 bg-gradient-to-r from-yellow-400 via-purple-500 to-green-500 rounded-full transform -translate-y-1/2" style={{ width: '15%' }}></div>
+          
+          {/* START Marker */}
+          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '0%' }}>
+            <div className="w-5 h-5 bg-white rounded-full border-4 border-yellow-400"></div>
+            <div className="text-xs text-yellow-400 mt-2 font-bold whitespace-nowrap">START</div>
+            <div className="text-xs text-gray-400 whitespace-nowrap">Today</div>
           </div>
           
           {/* Presentation Date Marker */}
           <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '45%' }}>
-            <div className="w-4 h-4 bg-purple-500 rounded-full"></div>
-            <div className="text-xs text-purple-400 mt-2 whitespace-nowrap">PRESENTATION</div>
+            <div className="w-5 h-5 bg-purple-500 rounded-full border-4 border-purple-300"></div>
+            <div className="text-xs text-purple-400 mt-2 font-bold whitespace-nowrap">PRESENTATION</div>
             <div className="text-xs text-gray-400 whitespace-nowrap">{daysToPresentation}d</div>
           </div>
           
           {/* Install Date Marker */}
-          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '80%' }}>
-            <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-            <div className="text-xs text-green-400 mt-2 whitespace-nowrap">INSTALL</div>
+          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '85%' }}>
+            <div className="w-5 h-5 bg-green-500 rounded-full border-4 border-green-300"></div>
+            <div className="text-xs text-green-400 mt-2 font-bold whitespace-nowrap">INSTALL</div>
             <div className="text-xs text-gray-400 whitespace-nowrap">{daysToInstall}d</div>
           </div>
         </div>
@@ -325,6 +329,77 @@ const InstallationCalendar = ({ projectId }) => {
             <div className="text-sm text-[#B49B7E] mb-2">Ready/Installed</div>
             <div className="text-2xl font-bold text-green-400">{statusSummary.ready_for_install + statusSummary.installed}</div>
           </div>
+        </div>
+      </div>
+
+      {/* PRESENTATION TIMELINE - SEPARATE */}
+      <div className="rounded-2xl p-8 border border-purple-500/60 mb-8" style={{
+        background: 'linear-gradient(135deg, rgba(107,70,193,0.1) 0%, rgba(0,0,0,0.95) 50%, rgba(107,70,193,0.1) 100%)'
+      }}>
+        <h3 className="text-2xl font-bold text-purple-400 mb-6">🎨 Timeline to Presentation</h3>
+        
+        <div className="relative h-20 mb-6">
+          <div className="absolute top-1/2 left-0 right-0 h-3 bg-gray-700 rounded-full transform -translate-y-1/2"></div>
+          <div className="absolute top-1/2 left-0 h-3 bg-gradient-to-r from-gray-400 to-purple-500 rounded-full transform -translate-y-1/2" style={{ width: `${Math.min((statusSummary.ready_for_presentation / statusSummary.total * 100), 100)}%` }}></div>
+          
+          {/* Milestones */}
+          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '0%' }}>
+            <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
+            <div className="text-xs text-gray-400 mt-2 whitespace-nowrap">TO BE SELECTED</div>
+            <div className="text-xs text-white font-bold">{statusSummary.to_be_selected}</div>
+          </div>
+          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '25%' }}>
+            <div className="w-4 h-4 bg-blue-400 rounded-full"></div>
+            <div className="text-xs text-blue-400 mt-2 whitespace-nowrap">IN PROGRESS</div>
+            <div className="text-xs text-white font-bold">{statusSummary.in_progress}</div>
+          </div>
+          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '80%' }}>
+            <div className="w-4 h-4 bg-purple-500 rounded-full"></div>
+            <div className="text-xs text-purple-400 mt-2 font-bold whitespace-nowrap">READY FOR PRESENTATION</div>
+            <div className="text-xs text-white font-bold">{statusSummary.ready_for_presentation}</div>
+          </div>
+        </div>
+        
+        <div className="text-center text-purple-400 font-bold text-lg">
+          {statusSummary.ready_for_presentation} of {statusSummary.total} items ready • {Math.round((statusSummary.ready_for_presentation / statusSummary.total) * 100)}% complete
+        </div>
+      </div>
+
+      {/* INSTALL TIMELINE - SEPARATE */}
+      <div className="rounded-2xl p-8 border border-green-500/60 mb-8" style={{
+        background: 'linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(0,0,0,0.95) 50%, rgba(16,185,129,0.1) 100%)'
+      }}>
+        <h3 className="text-2xl font-bold text-green-400 mb-6">🏠 Timeline to Install</h3>
+        
+        <div className="relative h-20 mb-6">
+          <div className="absolute top-1/2 left-0 right-0 h-3 bg-gray-700 rounded-full transform -translate-y-1/2"></div>
+          <div className="absolute top-1/2 left-0 h-3 bg-gradient-to-r from-cyan-400 via-yellow-400 to-green-500 rounded-full transform -translate-y-1/2" style={{ width: `${Math.min(((statusSummary.delivered + statusSummary.ready_for_install + statusSummary.installed) / statusSummary.total * 100), 100)}%` }}></div>
+          
+          {/* Milestones */}
+          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '0%' }}>
+            <div className="w-4 h-4 bg-cyan-400 rounded-full"></div>
+            <div className="text-xs text-cyan-400 mt-2 whitespace-nowrap">ORDERED</div>
+            <div className="text-xs text-white font-bold">{statusSummary.ordered}</div>
+          </div>
+          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '35%' }}>
+            <div className="w-4 h-4 bg-yellow-400 rounded-full"></div>
+            <div className="text-xs text-yellow-400 mt-2 whitespace-nowrap">IN TRANSIT</div>
+            <div className="text-xs text-white font-bold">{statusSummary.in_transit}</div>
+          </div>
+          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '65%' }}>
+            <div className="w-4 h-4 bg-purple-400 rounded-full"></div>
+            <div className="text-xs text-purple-400 mt-2 whitespace-nowrap">DELIVERED</div>
+            <div className="text-xs text-white font-bold">{statusSummary.delivered}</div>
+          </div>
+          <div className="absolute top-1/2 transform -translate-y-1/2" style={{ left: '85%' }}>
+            <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+            <div className="text-xs text-green-400 mt-2 font-bold whitespace-nowrap">READY FOR INSTALL</div>
+            <div className="text-xs text-white font-bold">{statusSummary.ready_for_install + statusSummary.installed}</div>
+          </div>
+        </div>
+        
+        <div className="text-center text-green-400 font-bold text-lg">
+          {statusSummary.delivered + statusSummary.ready_for_install + statusSummary.installed} of {statusSummary.total} items ready • {Math.round(((statusSummary.delivered + statusSummary.ready_for_install + statusSummary.installed) / statusSummary.total) * 100)}% complete
         </div>
       </div>
 
