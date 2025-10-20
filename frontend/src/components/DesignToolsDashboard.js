@@ -497,26 +497,17 @@ const DesignToolsDashboard = ({ projectId }) => {
         </div>
       </div>
 
-      {/* BEFORE/AFTER GALLERY */}
+      {/* BEFORE/AFTER GALLERY - GROUPED BY ROOM */}
       <div className="rounded-2xl p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
       }}>
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold text-[#D4A574]">📸 Before & After Gallery</h3>
           <div className="flex gap-3">
-            <label className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-bold cursor-pointer flex items-center gap-2">
-              <Upload className="w-5 h-5" />
-              Before Photo
-              <input 
-                type="file" 
-                accept="image/*" 
-                className="hidden"
-                onChange={(e) => e.target.files[0] && handleImageUpload('before', e.target.files[0])}
-              />
-            </label>
+            <div className="text-sm text-[#B49B7E]">Before photos auto-loaded from room photos</div>
             <label className="bg-[#10B981] hover:bg-[#059669] text-white px-6 py-3 rounded-lg font-bold cursor-pointer flex items-center gap-2">
               <Upload className="w-5 h-5" />
-              After Photo
+              Add After Photo
               <input 
                 type="file" 
                 accept="image/*" 
@@ -527,63 +518,80 @@ const DesignToolsDashboard = ({ projectId }) => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Before Photos */}
-          <div>
-            <h4 className="text-xl font-bold text-gray-400 mb-4">🔴 BEFORE</h4>
-            <div className="grid grid-cols-2 gap-3">
-              {beforeAfterPhotos.filter(p => p.type === 'before').map((photo, index) => (
-                <div key={photo.id || index} className="relative group rounded-lg overflow-hidden border-2 border-gray-600 hover:border-red-500 transition-all">
-                  <img src={photo.image} alt="Before" className="w-full h-48 object-cover" />
-                  <div className="absolute top-2 right-2">
-                    <button
-                      onClick={async () => {
-                        if (window.confirm('Delete?')) {
-                          const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-                          await fetch(`${BACKEND_URL}/api/design-data/${projectId}/images/${photo.id}`, { method: 'DELETE' });
-                          loadDesignData();
-                        }
-                      }}
-                      className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+        {/* Group by room */}
+        {Object.entries(
+          beforeAfterPhotos.reduce((acc, photo) => {
+            const room = photo.room || 'Ungrouped';
+            if (!acc[room]) acc[room] = { before: [], after: [] };
+            if (photo.type === 'before') acc[room].before.push(photo);
+            else acc[room].after.push(photo);
+            return acc;
+          }, {})
+        ).map(([roomName, photos]) => (
+          <div key={roomName} className="mb-8">
+            <h4 className="text-xl font-bold text-[#D4C5A9] mb-4 border-b-2 border-[#D4A574]/50 pb-2">
+              📍 {roomName}
+            </h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Before Photos */}
+              <div>
+                <h5 className="text-lg font-bold text-red-400 mb-3">🔴 BEFORE ({photos.before.length})</h5>
+                <div className="grid grid-cols-2 gap-3">
+                  {photos.before.map((photo, index) => (
+                    <div key={photo.id || index} className="relative group rounded-lg overflow-hidden border-2 border-gray-600 hover:border-red-500 transition-all">
+                      <img src={photo.image} alt="Before" className="w-full h-48 object-cover" />
+                      {photo.from_room_photos && <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded">Auto</div>}
+                      <div className="absolute top-2 right-2">
+                        <button
+                          onClick={async () => {
+                            if (window.confirm('Delete?')) {
+                              const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+                              await fetch(`${BACKEND_URL}/api/design-data/${projectId}/images/${photo.id}`, { method: 'DELETE' });
+                              loadDesignData();
+                            }
+                          }}
+                          className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+              
+              {/* After Photos */}
+              <div>
+                <h5 className="text-lg font-bold text-green-400 mb-3">🟢 AFTER ({photos.after.length})</h5>
+                <div className="grid grid-cols-2 gap-3">
+                  {photos.after.map((photo, index) => (
+                    <div key={photo.id || index} className="relative group rounded-lg overflow-hidden border-2 border-gray-600 hover:border-green-500 transition-all">
+                      <img src={photo.image} alt="After" className="w-full h-48 object-cover" />
+                      <div className="absolute top-2 right-2">
+                        <button
+                          onClick={async () => {
+                            if (window.confirm('Delete?')) {
+                              const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+                              await fetch(`${BACKEND_URL}/api/design-data/${projectId}/images/${photo.id}`, { method: 'DELETE' });
+                              loadDesignData();
+                            }
+                          }}
+                          className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-          
-          {/* After Photos */}
-          <div>
-            <h4 className="text-xl font-bold text-green-400 mb-4">🟢 AFTER</h4>
-            <div className="grid grid-cols-2 gap-3">
-              {beforeAfterPhotos.filter(p => p.type === 'after').map((photo, index) => (
-                <div key={photo.id || index} className="relative group rounded-lg overflow-hidden border-2 border-gray-600 hover:border-green-500 transition-all">
-                  <img src={photo.image} alt="After" className="w-full h-48 object-cover" />
-                  <div className="absolute top-2 right-2">
-                    <button
-                      onClick={async () => {
-                        if (window.confirm('Delete?')) {
-                          const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-                          await fetch(`${BACKEND_URL}/api/design-data/${projectId}/images/${photo.id}`, { method: 'DELETE' });
-                          loadDesignData();
-                        }
-                      }}
-                      className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        ))}
         
         {beforeAfterPhotos.length === 0 && (
           <div className="text-center py-16 text-[#B49B7E]">
-            No before/after photos yet. Upload images to showcase your transformations.
+            Before photos will auto-load from room photos. Upload After photos to showcase transformations.
           </div>
         )}
       </div>
