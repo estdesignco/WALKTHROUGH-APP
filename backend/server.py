@@ -9560,18 +9560,36 @@ async def generate_movers_ffe(project_id: str):
             response = await client.get(f"{BACKEND_URL}/api/projects/{project_id}?sheet_type=ffe")
             project = response.json()
         
-        # Collect all items with images
-        items_html = ""
-        row_num = 1
+        # Collect all items grouped by room
+        items_by_room = {}
         for room in project.get("rooms", []):
+            room_name = room.get("name")
+            items_by_room[room_name] = []
             for category in room.get("categories", []):
                 for subcategory in category.get("subcategories", []):
                     for item in subcategory.get("items", []):
-                        bg = "#f9f9f9" if row_num % 2 == 0 else "white"
-                        img_html = f'<img src="{item.get("image_url")}" style="max-width: 80px; max-height: 80px;">' if item.get("image_url") else '<div style="width: 80px; height: 80px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999;">No Image</div>'
-                        
-                        items_html += f'<tr style="background: {bg};"><td style="text-align: center;">{img_html}</td><td><strong>{room.get("name")}</strong></td><td>{item.get("name")}</td><td>{item.get("vendor", "")}</td><td style="text-align: center;"><strong>{item.get("quantity", 1)}</strong></td><td style="width: 60px;"></td></tr>'
-                        row_num += 1
+                        items_by_room[room_name].append({
+                            "name": item.get("name"),
+                            "vendor": item.get("vendor", ""),
+                            "quantity": item.get("quantity", 1),
+                            "image_url": item.get("image_url", "")
+                        })
+        
+        # Build HTML with room headers
+        items_html = ""
+        row_num = 1
+        for room_name, room_items in items_by_room.items():
+            if room_items:
+                # Room header row
+                items_html += f'<tr class="room-header-row"><td colspan="6"><strong>{room_name.upper()}</strong></td></tr>'
+                
+                # Items for this room
+                for item in room_items:
+                    bg = "#f9f9f9" if row_num % 2 == 0 else "white"
+                    img_html = f'<img src="{item["image_url"]}" style="max-width: 80px; max-height: 80px;">' if item.get("image_url") else '<div style="width: 80px; height: 80px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999;">No Image</div>'
+                    
+                    items_html += f'<tr style="background: {bg};"><td style="text-align: center;">{img_html}</td><td>{room_name}</td><td>{item["name"]}</td><td>{item["vendor"]}</td><td style="text-align: center;"><strong>{item["quantity"]}</strong></td><td style="width: 60px;"></td></tr>'
+                    row_num += 1
         
         html = f"""<!DOCTYPE html><html><head><title>Mover's FFE</title>
         <style>
@@ -9583,6 +9601,8 @@ async def generate_movers_ffe(project_id: str):
             table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
             th {{ background: black; color: white; padding: 12px; text-align: left; border: 1px solid black; font-weight: bold; }}
             td {{ padding: 10px; border: 1px solid black; color: black; vertical-align: middle; }}
+            .room-header-row {{ background: black !important; }}
+            .room-header-row td {{ color: white; font-weight: bold; font-size: 18px; padding: 15px; text-align: center; }}
         </style></head><body>
         <div class="logo"><img src="https://designflow-hub.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
         <h1>MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
