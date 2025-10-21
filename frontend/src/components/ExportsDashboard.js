@@ -290,6 +290,57 @@ const ExportsDashboard = ({ projectId }) => {
           </div>
         </div>
       </div>
+
+      {/* GOOGLE SHEETS IMPORT MODAL */}
+      {showGoogleSheetsImport && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-[#1E293B] border-2 border-[#D4A574] rounded-2xl p-8 max-w-md w-full">
+            <h3 className="text-2xl font-bold text-[#D4A574] mb-6">📊 Import from Google Sheets</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[#B49B7E] mb-2">Google Sheets URL</label>
+                <input
+                  type="text"
+                  value={googleSheetsUrl}
+                  onChange={(e) => setGoogleSheetsUrl(e.target.value)}
+                  className="w-full bg-gray-800 text-white px-4 py-2 rounded-lg border border-[#D4A574]"
+                  placeholder="https://docs.google.com/spreadsheets/d/..."
+                />
+                <div className="text-xs text-gray-400 mt-2">
+                  Make sure your sheet is shared with "Anyone with the link can view"
+                </div>
+              </div>
+              
+              <div className="bg-blue-900/20 border border-blue-500/50 p-4 rounded-lg">
+                <div className="text-sm text-blue-300 mb-2"><strong>Expected Format:</strong></div>
+                <div className="text-xs text-gray-300">
+                  <p>• Column A: Room</p>
+                  <p>• Column B: Category</p>
+                  <p>• Column C: Item Name</p>
+                  <p>• Column D: Quantity</p>
+                  <p>• Column E: Vendor</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-4 mt-6">
+              <button
+                onClick={importFromGoogleSheets}
+                className="flex-1 bg-[#34A853] hover:bg-[#2D8E47] text-white px-6 py-3 rounded-lg font-bold"
+              >
+                Import Data
+              </button>
+              <button
+                onClick={() => setShowGoogleSheetsImport(false)}
+                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-bold"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
