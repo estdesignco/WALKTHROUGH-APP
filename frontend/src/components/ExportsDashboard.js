@@ -211,12 +211,34 @@ const ExportsDashboard = ({ projectId }) => {
       </div>
 
       {/* CALENDAR SYNC */}
-      <div className="rounded-2xl p-6 border border-[#D4A574]/60" style={{
+      <div className="rounded-2xl p-6 border border-[#D4A574]/60 mb-8" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-2xl font-bold text-[#D4A574] mb-6">📅 Calendar Integration</h3>
+        <h3 className="text-2xl font-bold text-[#D4A574] mb-6">📥 Import & Sync</h3>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Google Sheets Import */}
+          <div className="rounded-lg border border-[#D4A574]/50 p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="text-4xl">📊</div>
+              <div>
+                <h4 className="text-xl font-bold text-[#D4C5A9]">Google Sheets</h4>
+                <p className="text-sm text-[#B49B7E]">Import FFE data</p>
+              </div>
+            </div>
+            <ul className="text-sm text-gray-300 mb-4 space-y-1">
+              <li>• Import items from spreadsheet</li>
+              <li>• Auto-create rooms & categories</li>
+              <li>• Bulk data entry</li>
+            </ul>
+            <button
+              onClick={() => setShowGoogleSheetsImport(true)}
+              className="w-full bg-[#34A853] hover:bg-[#2D8E47] text-white px-6 py-3 rounded-lg font-bold"
+            >
+              Import from Google Sheets
+            </button>
+          </div>
+
           {/* Google Calendar */}
           <div className="rounded-lg border border-[#D4A574]/50 p-6">
             <div className="flex items-center gap-4 mb-4">
