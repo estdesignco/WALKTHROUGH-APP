@@ -6,6 +6,8 @@ const ExportsDashboard = ({ projectId }) => {
   const [loading, setLoading] = useState(true);
   const [googleCalendarConnected, setGoogleCalendarConnected] = useState(false);
   const [teamsCalendarConnected, setTeamsCalendarConnected] = useState(false);
+  const [showGoogleSheetsImport, setShowGoogleSheetsImport] = useState(false);
+  const [googleSheetsUrl, setGoogleSheetsUrl] = useState('');
 
   useEffect(() => {
     loadProjectData();
