@@ -9409,11 +9409,13 @@ async def generate_electrician_sheet(project_id: str):
             response = await client.get(f"{BACKEND_URL}/api/projects/{project_id}?sheet_type=ffe")
             project = response.json()
         
-        # Get all lighting items
+        # Get all lighting items from LIGHTING CATEGORY ONLY
         lighting_items = []
         for room in project.get("rooms", []):
             for category in room.get("categories", []):
-                if "lighting" in category.get("name", "").lower():
+                category_name = category.get("name", "").lower()
+                # ONLY if category is "Lighting" - not furniture, not other categories
+                if category_name == "lighting":
                     for subcategory in category.get("subcategories", []):
                         for item in subcategory.get("items", []):
                             lighting_items.append({
