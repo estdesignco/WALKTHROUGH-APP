@@ -42,22 +42,25 @@ class InteriorDesignSystemTester:
                 response = requests.delete(url, headers=headers, timeout=30)
 
             success = response.status_code == expected_status
+            
+            # Try to get JSON response
+            try:
+                response_data = response.json()
+            except:
+                response_data = response.text
+            
             if success:
                 self.tests_passed += 1
                 print(f"✅ Passed - Status: {response.status_code}")
-                try:
-                    return success, response.json()
-                except:
-                    return success, response.text
+                return success, response_data
             else:
                 print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
-                try:
-                    error_detail = response.json()
-                    print(f"   Error: {error_detail}")
-                except:
-                    print(f"   Error: {response.text[:200]}")
-
-            return success, {}
+                if isinstance(response_data, dict):
+                    print(f"   Response: {response_data}")
+                else:
+                    print(f"   Response: {str(response_data)[:200]}")
+                # Still return the response data even if status code doesn't match
+                return success, response_data
 
         except Exception as e:
             print(f"❌ Failed - Error: {str(e)}")
