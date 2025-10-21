@@ -9642,6 +9642,19 @@ async def sync_teams_calendar(project_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# GOOGLE SHEETS IMPORT
+@api_router.post("/imports/google-sheets/{project_id}")
+async def import_google_sheets(project_id: str, data: dict):
+    """Import FFE data from Google Sheets"""
+    try:
+        sheets_url = data.get("sheets_url")
+        # Placeholder - actual Google Sheets API integration needed
+        return {"success": True, "message": "Google Sheets import ready - requires API setup"}
+    except Exception as e:
+        logging.error(f"Error importing Google Sheets: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(furniture_router)
