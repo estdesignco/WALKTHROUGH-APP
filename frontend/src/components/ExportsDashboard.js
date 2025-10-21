@@ -112,6 +112,33 @@ const ExportsDashboard = ({ projectId }) => {
     }
   };
 
+  const importFromGoogleSheets = async () => {
+    if (!googleSheetsUrl.trim()) {
+      alert('Please enter a Google Sheets URL');
+      return;
+    }
+    
+    try {
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${BACKEND_URL}/api/imports/google-sheets/${projectId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheets_url: googleSheetsUrl })
+      });
+      
+      if (response.ok) {
+        alert('✅ Google Sheets imported successfully!');
+        setShowGoogleSheetsImport(false);
+        setGoogleSheetsUrl('');
+      } else {
+        alert('Failed to import Google Sheets');
+      }
+    } catch (error) {
+      console.error('Error importing Google Sheets:', error);
+      alert('Failed to import Google Sheets');
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-12 text-[#D4C5A9]">Loading exports...</div>;
   }
