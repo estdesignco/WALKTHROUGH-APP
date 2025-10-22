@@ -283,6 +283,14 @@ const App = () => {
                       path="/project/:projectId/detail" 
                       element={<CustomerfacingProjectDetailPage />}
                     />
+                    <Route 
+                      path="/power-features" 
+                      element={<PowerFeaturesDashboard />}
+                    />
+                    <Route 
+                      path="/power-features/:projectId" 
+                      element={<PowerFeaturesDashboard />}
+                    />
                   </Routes>
                 </main>
               </>
