@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import CalculatorDashboard from './CalculatorDashboard';
 import VendorContactManager from './VendorContactManager';
 import MaterialLibrary from './MaterialLibrary';
 import BudgetTracker from './BudgetTracker';
 
-const PowerFeaturesDashboard = ({ projectId }) => {
+const PowerFeaturesDashboard = () => {
+  const { projectId } = useParams();
   const [activeTab, setActiveTab] = useState('calculators');
 
   const tabs = [
