@@ -75,6 +75,29 @@ const MainDashboard = () => {
 
       {/* Main Content */}
       <div className="px-8 py-12">
+        {/* BIG CALCULATOR BUTTON - UNMISSABLE! */}
+        <div className="max-w-4xl mx-auto mb-8">
+          <button
+            onClick={() => handleNavigation('/power-features')}
+            className="w-full text-white p-8 rounded-2xl font-bold transition-all duration-200 text-2xl"
+            style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              boxShadow: '0 10px 40px rgba(102, 126, 234, 0.5)',
+              border: '3px solid #8b7fff'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.02)';
+              e.target.style.boxShadow = '0 15px 50px rgba(102, 126, 234, 0.7)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)';
+              e.target.style.boxShadow = '0 10px 40px rgba(102, 126, 234, 0.5)';
+            }}
+          >
+            🧮 PROFESSIONAL CALCULATORS & POWER FEATURES ✨
+          </button>
+        </div>
+
         {/* Navigation Links at Top with Thin Gold Borders */}
         <div className="max-w-4xl mx-auto mb-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
