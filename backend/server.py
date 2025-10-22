@@ -9662,6 +9662,7 @@ app.include_router(api_router)
 app.include_router(furniture_router)
 app.include_router(furniture_search_router, prefix="/api/furniture")
 app.include_router(calculator_router)
+app.include_router(power_features_router)
 
 # HOUZZ CLIPPER WEBHOOK - Intercepts data on its way to Houzz
 @app.post("/api/houzz-clipper-webhook")
