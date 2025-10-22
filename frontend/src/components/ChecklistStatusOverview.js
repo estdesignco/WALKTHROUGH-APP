@@ -226,56 +226,90 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
         </div>
       </div>
 
-      {/* RIGHT COLUMN - SHIPPING SECTION */}
+      {/* RIGHT COLUMN - CALCULATORS SECTION */}
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
-        <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">Shipping Information</h3>
+        <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">🧮 Quick Calculators</h3>
         
-        {/* 1. CARRIER PIE CHART */}
-        <div className="mb-6">
-          <h4 className="text-md font-medium text-[#D4A574] mb-3">Carrier Distribution</h4>
-          <div className="h-48">
-            {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
-              <Pie data={carrierPieData} options={pieOptions} />
-            ) : (
-              <div className="flex items-center justify-center h-full text-[#D4A574]">
-                No carrier data
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 2. CARRIER BREAKDOWN LIST */}
-        <div className="space-y-2">
-          {Object.entries(carrierBreakdown).map(([carrier, count]) => {
-            const percentage = totalItems > 0 ? (count / totalItems) * 100 : 0;
-            return (
-              <div key={carrier} className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: getCarrierColor(carrier) }}
-                  ></div>
-                  <span className="text-sm text-[#D4A574]">{carrier}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="bg-gray-700 rounded-full h-2 w-16">
-                    <div
-                      className="h-2 rounded-full transition-all duration-300"
-                      style={{
-                        backgroundColor: getCarrierColor(carrier),
-                        width: `${percentage}%`
-                      }}
-                    />
-                  </div>
-                  <span className="text-sm font-medium text-[#D4C5A9] w-8 text-right">
-                    {count}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+        {/* CALCULATOR BUTTONS */}
+        <div className="space-y-3">
+          <a 
+            href="/power-features" 
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white'
+            }}
+          >
+            📐 Wallpaper Calculator
+          </a>
+          
+          <a 
+            href="/power-features" 
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+              color: 'white'
+            }}
+          >
+            🪟 Drapery Calculator
+          </a>
+          
+          <a 
+            href="/power-features" 
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+              color: 'white'
+            }}
+          >
+            🔧 Hardware Calculator
+          </a>
+          
+          <a 
+            href="/power-features" 
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+              color: 'white'
+            }}
+          >
+            🎨 Paint Calculator
+          </a>
+          
+          <a 
+            href="/power-features" 
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+              color: 'white'
+            }}
+          >
+            ⬜ Flooring Calculator
+          </a>
+          
+          <a 
+            href="/power-features" 
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+              color: 'white'
+            }}
+          >
+            💡 Lighting Calculator
+          </a>
+          
+          <a 
+            href="/power-features" 
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+              color: '#333'
+            }}
+          >
+            ✨ View All Features
+          </a>
         </div>
       </div>
     </div>
