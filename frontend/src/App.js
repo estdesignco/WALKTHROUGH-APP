@@ -33,6 +33,7 @@ import ExactDashboard from './components/ExactDashboard';
 import PerfectDashboard from './components/PerfectDashboard';
 import MobileAppSimulator from './components/MobileAppSimulator';
 import CanvaCallbackHandler from './components/CanvaCallbackHandler';
+import PowerFeaturesDashboard from './components/PowerFeaturesDashboard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
