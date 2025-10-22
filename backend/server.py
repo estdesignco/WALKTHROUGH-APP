@@ -25,6 +25,7 @@ from enhanced_rooms_intelligent import INTELLIGENT_ROOM_STRUCTURE  # Add intelli
 from complete_furniture_api import router as furniture_router
 from furniture_search import router as furniture_search_router
 from calculator_api import router as calculator_router
+from power_features_api import router as power_features_router
 import aiosmtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
