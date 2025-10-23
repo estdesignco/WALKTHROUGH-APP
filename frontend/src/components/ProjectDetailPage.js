@@ -636,6 +636,11 @@ export default function ProjectDetailPage() {
                 <ToDoList projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading to-do list...</div> },
+        { name: "Calculators", icon: Calculator, component: project ? (
+            <div className="calculators-content">
+                <PowerFeaturesDashboard />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading calculators...</div> },
     ];
 
     if (isLoading) {
