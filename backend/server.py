@@ -1033,59 +1033,95 @@ async def send_questionnaire_email(client_name: str, client_email: str, question
         message['From'] = f"{sender_name} <{sender_email}>"
         message['To'] = client_email
         
-        # Create HTML content
+        # Create HTML content - BEAUTIFUL EMAIL MATCHING YOUR BRAND
         html_content = f"""
         <!DOCTYPE html>
-        <html>
+        <html lang="en">
         <head>
-            <meta charset="utf-8">
+            <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Your Interior Design Questionnaire</title>
-            <style>
-                body {{ font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #f5f5f5; }}
-                .container {{ max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; }}
-                .header {{ background-color: #1f2937; color: white; padding: 30px 20px; text-align: center; }}
-                .header h1 {{ margin: 0; font-size: 28px; letter-spacing: 2px; }}
-                .content {{ padding: 30px 20px; }}
-                .button {{ display: inline-block; background-color: #d97706; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }}
-                .footer {{ background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 14px; color: #666; }}
-            </style>
+            <title>Design Questionnaire - Established Design Co.</title>
         </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>ESTABLISHED DESIGN CO.</h1>
+        <body style="font-family: 'Century Gothic', 'Futura', Arial, sans-serif; background: linear-gradient(to bottom, #0a0a0a, #1a1a1a, #0a0a0a); margin: 0; padding: 40px 20px; min-height: 100vh;">
+            
+            <!-- Email Container -->
+            <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%); border-radius: 20px; border: 2px solid rgba(139, 115, 85, 0.3); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9), 0 0 100px rgba(139, 115, 85, 0.15); overflow: hidden;">
+
+                <!-- Gold Header with Logo -->
+                <div style="background: linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%); padding: 30px 20px; text-align: center; box-shadow: 0 4px 20px rgba(139, 115, 85, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2);">
+                    <div style="font-size: 36px; font-weight: 300; letter-spacing: 8px; color: #1a1a1a; text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);">ESTABLISHED</div>
+                    <div style="font-size: 14px; letter-spacing: 4px; color: #2a2a2a; margin-top: 5px;">DESIGN CO.</div>
                 </div>
-                <div class="content">
-                    <h2>Hello {client_name},</h2>
-                    <p>Thank you for your interest in working with Established Design Co.! We're excited to learn more about your design vision and create something beautiful together.</p>
+
+                <!-- Main Content -->
+                <div style="padding: 50px 40px;">
                     
-                    <p>To get started, please complete our comprehensive client questionnaire. This will help us understand your style preferences, project goals, and lifestyle needs so we can create the perfect design plan for you.</p>
-                    
-                    <p style="text-align: center;">
-                        <a href="{questionnaire_url}" class="button">Complete Your Questionnaire</a>
-                    </p>
-                    
-                    <p>The questionnaire takes about 10-15 minutes to complete and covers:</p>
-                    <ul>
-                        <li>Your design style preferences</li>
-                        <li>Room selections and priorities</li>
-                        <li>Budget and timeline expectations</li>
-                        <li>Lifestyle and family needs</li>
-                        <li>Color and material preferences</li>
-                    </ul>
-                    
-                    <p>Once you've completed the questionnaire, we'll schedule a consultation to discuss your project in detail and begin the walkthrough process.</p>
-                    
-                    <p>If you have any questions, please don't hesitate to reach out. We look forward to working with you!</p>
-                    
-                    <p>Best regards,<br>
-                    The {sender_name} Team</p>
+                    <!-- Personal Greeting -->
+                    <div style="text-align: center; margin-bottom: 40px;">
+                        <h2 style="font-size: 28px; font-weight: 300; color: #D4C5A9; margin: 0 0 15px 0; letter-spacing: 2px;">Welcome, {client_name}</h2>
+                        <div style="width: 100px; height: 1px; background: linear-gradient(to right, transparent, #D4A574, transparent); margin: 0 auto 25px;"></div>
+                        <p style="font-size: 16px; color: #e0e0e0; line-height: 1.8; margin: 0;">We're thrilled to begin this design journey with you</p>
+                    </div>
+
+                    <!-- Main Message -->
+                    <div style="margin-bottom: 40px; background: rgba(212, 197, 169, 0.05); border-left: 3px solid #D4A574; padding: 25px; border-radius: 8px;">
+                        <p style="font-size: 16px; color: #e0e0e0; line-height: 1.8; margin: 0 0 20px 0;">Thank you for choosing Established Design Co. to bring your vision to life. We believe every space tells a unique story, and we can't wait to create yours.</p>
+                        
+                        <p style="font-size: 16px; color: #e0e0e0; line-height: 1.8; margin: 0;">To ensure we capture every detail of your dream space, please take a few moments to complete our design questionnaire. Your responses will guide us in creating a personalized design plan that truly reflects your style and needs.</p>
+                    </div>
+
+                    <!-- Call to Action Button -->
+                    <div style="text-align: center; margin: 50px 0;">
+                        <a href="{questionnaire_url}" style="display: inline-block; background: linear-gradient(135deg, #8b7355 0%, #a0845c 100%); color: #ffffff; font-size: 18px; font-weight: 600; padding: 18px 45px; border-radius: 50px; text-decoration: none; box-shadow: 0 10px 30px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2); letter-spacing: 1px; text-transform: uppercase;">
+                            ✨ Begin Your Questionnaire ✨
+                        </a>
+                    </div>
+
+                    <!-- What's Included -->
+                    <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(212, 165, 116, 0.2); border-radius: 12px; padding: 30px; margin-bottom: 40px;">
+                        <h3 style="font-size: 20px; font-weight: 400; color: #D4A574; margin: 0 0 20px 0; letter-spacing: 1px; text-align: center;">What We'll Discover Together:</h3>
+                        <div style="color: #e0e0e0; font-size: 15px; line-height: 2;">
+                            <div style="margin-bottom: 12px; padding-left: 25px; position: relative;">
+                                <span style="position: absolute; left: 0; color: #D4A574;">✦</span> Your unique style preferences and inspirations
+                            </div>
+                            <div style="margin-bottom: 12px; padding-left: 25px; position: relative;">
+                                <span style="position: absolute; left: 0; color: #D4A574;">✦</span> Spaces you want to transform
+                            </div>
+                            <div style="margin-bottom: 12px; padding-left: 25px; position: relative;">
+                                <span style="position: absolute; left: 0; color: #D4A574;">✦</span> Your lifestyle and functional needs
+                            </div>
+                            <div style="margin-bottom: 12px; padding-left: 25px; position: relative;">
+                                <span style="position: absolute; left: 0; color: #D4A574;">✦</span> Color palettes and material preferences
+                            </div>
+                            <div style="padding-left: 25px; position: relative;">
+                                <span style="position: absolute; left: 0; color: #D4A574;">✦</span> Budget and timeline expectations
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Touch -->
+                    <div style="margin-bottom: 30px; text-align: center; padding: 25px; background: rgba(212, 197, 169, 0.08); border-radius: 10px;">
+                        <p style="font-size: 15px; color: #D4C5A9; line-height: 1.8; margin: 0; font-style: italic;">"We don't just design spaces—we craft experiences that reflect who you are and how you want to live."</p>
+                    </div>
+
+                    <!-- Closing -->
+                    <div style="margin-bottom: 30px;">
+                        <p style="font-size: 16px; color: #e0e0e0; line-height: 1.7; margin: 0 0 20px 0;">This questionnaire typically takes 10-15 minutes to complete. Take your time, and feel free to share as much or as little as you'd like—every detail helps us create the perfect space for you.</p>
+                        <p style="font-size: 16px; color: #e0e0e0; line-height: 1.7; margin: 0;">We're honored to be part of your design journey.</p>
+                        <br>
+                        <p style="font-size: 16px; color: #e0e0e0; margin: 0;">With warmth and creativity,</p>
+                        <p style="font-size: 18px; color: #D4A574; font-weight: 600; margin: 8px 0 0 0;">The {sender_name} Team</p>
+                    </div>
                 </div>
-                <div class="footer">
-                    <p>© 2025 Established Design Co. | Professional Interior Design Services</p>
+
+                <!-- Elegant Footer -->
+                <div style="background: linear-gradient(135deg, rgba(139, 115, 85, 0.15) 0%, rgba(160, 132, 92, 0.1) 100%); padding: 30px; text-align: center; border-top: 1px solid rgba(212, 165, 116, 0.2);">
+                    <div style="font-size: 14px; color: #D4C5A9; margin-bottom: 10px; letter-spacing: 1px;">ESTABLISHED DESIGN CO.</div>
+                    <div style="font-size: 12px; color: #a0a0a0; letter-spacing: 0.5px;">Luxury Interior Design | Creating Extraordinary Spaces</div>
+                    <div style="margin-top: 15px; font-size: 11px; color: #808080;">© 2025 All Rights Reserved</div>
                 </div>
             </div>
+
         </body>
         </html>
         """
