@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useSearchParams, useNavigate } from "react-router-dom";
-import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText } from "lucide-react";
+import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText, Calculator } from "lucide-react";
 import WalkthroughDashboard from './WalkthroughDashboard';
 import ChecklistDashboard from './ChecklistDashboard';
 import FFEDashboard from './FFEDashboard';
@@ -12,6 +12,7 @@ import ReportsDashboard from './ReportsDashboard';
 import DesignToolsDashboard from './DesignToolsDashboard';
 import AutomationDashboard from './AutomationDashboard';
 import ExportsDashboard from './ExportsDashboard';
+import PowerFeaturesDashboard from './PowerFeaturesDashboard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
