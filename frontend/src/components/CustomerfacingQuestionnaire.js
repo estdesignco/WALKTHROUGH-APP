@@ -303,67 +303,26 @@ export default function CustomerfacingQuestionnaire() {
             const newProject = await Project.create(projectData);
             console.log('✅ Project created successfully:', newProject);
 
-            // Create rooms WITH THE CORRECT STARTER ITEMS
+            // Create rooms with FULL walkthrough structure (backend auto-populates)
             console.log('🏠 Checking rooms to create:', formData.rooms_involved);
             if (formData.rooms_involved && formData.rooms_involved.length > 0) {
                 const uniqueRooms = [...new Set(formData.rooms_involved)];
                 
-                for (const roomName of uniqueRooms) {
+                for (let i = 0; i < uniqueRooms.length; i++) {
+                    const roomName = uniqueRooms[i];
+                    console.log(`🚀 Creating room ${i+1}/${uniqueRooms.length}: ${roomName}`);
+                    
+                    // Backend automatically creates comprehensive structure for walkthrough rooms
                     const newRoom = await Room.create({ 
                         project_id: newProject.id, 
-                        name: roomName, 
-                        notes: '' 
+                        name: roomName,
+                        description: '',
+                        order_index: i,
+                        sheet_type: 'walkthrough',  // This triggers auto-population with full structure
+                        auto_populate: true  // Explicitly request full structure
                     });
-
-                    // THIS IS THE CORRECTED, SIMPLIFIED ITEM POPULATION LOGIC
-                    const basicItems = [
-                        { category: 'LIGHTING', sub_category: 'CEILING', name: 'Ceiling Light - Click to edit' },
-                        { category: 'FURNITURE', sub_category: 'SEATING', name: 'Seating - Click to edit' },
-                        { category: 'ACCESSORIES', sub_category: 'ART & DECOR', name: 'Art & Decor - Click to edit' },
-                        { category: 'PAINT, WALLPAPER, HARDWARE & FINISHES', sub_category: 'WALL', name: 'Wall Finish - Click to edit' },
-                        { category: 'PAINT, WALLPAPER, HARDWARE & FINISHES', sub_category: 'FLOORING', name: 'Flooring - Click to edit' }
-                    ];
-
-                    if (roomName.toLowerCase().includes('kitchen')) {
-                        basicItems.push(
-                            { category: 'APPLIANCES', sub_category: 'KITCHEN APPLIANCES', name: 'Refrigerator - Click to edit' },
-                            { category: 'PLUMBING', sub_category: 'KITCHEN SINKS & FAUCETS', name: 'Kitchen Sink - Click to edit' },
-                            { category: 'CABINETS', sub_category: 'LOWER', name: 'Lower Cabinets - Click to edit' },
-                            { category: 'COUNTERTOPS & TILE', sub_category: 'COUNTERTOPS', name: 'Countertops - Click to edit' }
-                        );
-                    } else if (roomName.toLowerCase().includes('bath')) {
-                        basicItems.push(
-                            { category: 'PLUMBING', sub_category: 'SHOWER & TUB', name: 'Shower/Tub - Click to edit' },
-                            { category: 'CABINETS', sub_category: 'VANITY', name: 'Vanity - Click to edit' },
-                            { category: 'COUNTERTOPS & TILE', sub_category: 'TILE', name: 'Floor Tile - Click to edit' }
-                        );
-                    } else if (roomName.toLowerCase().includes('bedroom')) {
-                        basicItems.push(
-                            { category: 'FURNITURE', sub_category: 'BEDS', name: 'Bed - Click to edit' },
-                            { category: 'TEXTILES', sub_category: 'BEDDING', name: 'Bedding - Click to edit' }
-                        );
-                    } else if (roomName === "Entire Home") {
-                        // Additional items for 'Entire Home'
-                        basicItems.push(
-                            { category: 'WINDOWS AND DOORS', sub_category: 'WINDOWS', name: 'Window Treatment - Click to edit' },
-                            { category: 'HARDWARE', sub_category: 'DOOR HARDWARE', name: 'Door Hardware - Click to edit' },
-                            { category: 'PAINT AND MATERIALS', sub_category: 'INTERIOR PAINT', name: 'Interior Paint - Click to edit' },
-                            { category: 'ELECTRONICS AND SMART HOME', sub_category: 'SECURITY SYSTEMS', name: 'Security System - Click to edit' },
-                            { category: 'ARCHITECTURAL ELEMENTS', sub_category: 'MOLDING', name: 'Molding - Click to edit' }
-                        );
-                    }
-
-                    const itemsToCreate = basicItems.map(item => ({
-                        project_id: newProject.id,
-                        room_id: newRoom.id,
-                        category_id: item.category,
-                        subcategory_id: item.sub_category,
-                        name: item.name,
-                        status: 'TO BE SELECTED',
-                        quantity: 1,
-                    }));
-
-                    await Item.bulkCreate(itemsToCreate);
+                    
+                    console.log(`✅ Room created with comprehensive structure: ${roomName}`, newRoom);
                 }
             }
 
