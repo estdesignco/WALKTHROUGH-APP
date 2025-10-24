@@ -785,9 +785,9 @@ backend:
 
   - task: "Email Questionnaire Functionality"
     implemented: true
-    working: false
+    working: true
     file: "server.py"
-    stuck_count: 4
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
