@@ -4942,9 +4942,14 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
 async def send_questionnaire_to_client(request: EmailQuestionnaireRequest, background_tasks: BackgroundTasks):
     """Send questionnaire email to client"""
     try:
-        # Generate questionnaire URL (will be handled by frontend routing)
-        backend_url = os.getenv('REACT_APP_BACKEND_URL', 'http://localhost:3000')
-        questionnaire_url = f"{backend_url}/questionnaire/{request.client_email}"
+        # Generate questionnaire URL (customer-facing frontend URL)
+        # The frontend runs on same host as backend in production, so we use window.location.origin
+        # In development, backend is 8000 and frontend is 3000
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        questionnaire_url = f"{frontend_url}/customer/questionnaire"
+        
+        logging.info(f"📧 Sending questionnaire email to {request.client_name} ({request.client_email})")
+        logging.info(f"🔗 Questionnaire URL: {questionnaire_url}")
         
         # Send email directly (async function)
         await send_questionnaire_email(
@@ -4954,11 +4959,11 @@ async def send_questionnaire_to_client(request: EmailQuestionnaireRequest, backg
             request.sender_name
         )
         
-        logging.info(f"Questionnaire email queued for {request.client_name} ({request.client_email})")
+        logging.info(f"✅ Questionnaire email sent to {request.client_name} ({request.client_email})")
         
         return EmailResponse(
             status="success",
-            message=f"Questionnaire email has been queued for delivery to {request.client_name}"
+            message=f"Questionnaire email has been sent successfully to {request.client_name}"
         )
         
     except EmailDeliveryError as e:
