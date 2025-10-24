@@ -1151,10 +1151,12 @@ async def send_questionnaire_email(client_name: str, client_email: str, question
         © 2025 Established Design Co. | Professional Interior Design Services
         """
         
-        # Attach parts
-        text_part = MIMEText(text_content, 'plain')
-        html_part = MIMEText(html_content, 'html')
+        # Attach parts - HTML LAST so it's preferred by email clients
+        text_part = MIMEText(text_content, 'plain', 'utf-8')
+        html_part = MIMEText(html_content, 'html', 'utf-8')
         
+        # IMPORTANT: Attach plain text first, then HTML
+        # Email clients will prefer the last (most complex) version they can render
         message.attach(text_part)
         message.attach(html_part)
         
