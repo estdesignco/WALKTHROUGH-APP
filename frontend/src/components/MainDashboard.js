@@ -76,20 +76,7 @@ const MainDashboard = () => {
       {/* Main Content */}
       <div className="px-8 py-12">
         {/* Navigation Links at Top with Thin Gold Borders */}
-        <div className="max-w-6xl mx-auto mb-12 grid grid-cols-2 md:grid-cols-5 gap-4">
-          <button
-            onClick={() => handleNavigation('/furniture-search')}
-            className="text-stone-300 p-4 rounded-lg transition-all duration-200"
-            style={{
-              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
-              border: '1px solid #8b7355',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
-            }}
-          >
-            <div className="text-2xl mb-2">🔍</div>
-            <div className="text-sm">Furniture Search</div>
-          </button>
-          
+        <div className="max-w-6xl mx-auto mb-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
             onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=Walkthrough`) : alert('No projects available')}
             className="text-stone-300 p-4 rounded-lg transition-all duration-200"
