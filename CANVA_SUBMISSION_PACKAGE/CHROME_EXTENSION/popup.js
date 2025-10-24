@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://designflow-hub.preview.emergentagent.com';
+const BACKEND_URL = 'https://designflow-hub-1.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

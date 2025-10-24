@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://designflow-hub.preview.emergentagent.com/api
+https://designflow-hub-1.preview.emergentagent.com/api
 ```
 
 ---
