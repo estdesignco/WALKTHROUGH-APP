@@ -155,7 +155,7 @@ const MainDashboard = () => {
             <span>New Client</span>
           </button>
           <button 
-            onClick={() => handleNavigation('/email-preview')}
+            onClick={() => setShowEmailModal(true)}
             className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
