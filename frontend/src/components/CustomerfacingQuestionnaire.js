@@ -773,9 +773,29 @@ export default function CustomerfacingQuestionnaire() {
                         </FieldWrapper>
                         <FieldWrapper label="Do you have any images that reflect your vision? OR Any Inspiration Photos? (optional)">
                             <div className="p-4 border-2 border-dashed border-stone-400 rounded-lg text-center">
-                                <Button type="button" variant="outline" className="border-[#8B7355] text-[#8B7355]">
+                                <input
+                                    type="file"
+                                    id="inspiration-photos"
+                                    multiple
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files || []);
+                                        console.log('Inspiration files selected:', files.length);
+                                        handleFormChange('inspiration_photos', files);
+                                    }}
+                                />
+                                <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    className="border-[#8B7355] text-[#8B7355]"
+                                    onClick={() => document.getElementById('inspiration-photos').click()}
+                                >
                                     Add file
                                 </Button>
+                                {formData.inspiration_photos && formData.inspiration_photos.length > 0 && (
+                                    <p className="text-green-500 text-sm mt-2">✓ {formData.inspiration_photos.length} file(s) selected</p>
+                                )}
                             </div>
                         </FieldWrapper>
                         <FieldWrapper label="Do you have a Houzz or Pinterest page? Please list your accounts below, and you can also invite us to your boards.">
