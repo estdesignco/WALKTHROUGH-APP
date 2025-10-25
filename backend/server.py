@@ -4943,10 +4943,9 @@ async def send_questionnaire_to_client(request: EmailQuestionnaireRequest, backg
     """Send questionnaire email to client"""
     try:
         # Generate questionnaire URL (customer-facing frontend URL)
-        # The frontend runs on same host as backend in production, so we use window.location.origin
-        # In development, backend is 8000 and frontend is 3000
+        # Link goes to LANDING PAGE first, then client clicks "Begin Your Questionnaire"
         frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
-        questionnaire_url = f"{frontend_url}/customer/questionnaire"
+        questionnaire_url = f"{frontend_url}/customer"  # Landing page, NOT direct to form
         
         logging.info(f"📧 Sending questionnaire email to {request.client_name} ({request.client_email})")
         logging.info(f"🔗 Questionnaire URL: {questionnaire_url}")
