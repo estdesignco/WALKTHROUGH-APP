@@ -307,23 +307,33 @@ export default function CustomerfacingQuestionnaire() {
             console.log('🏠 Checking rooms to create:', formData.rooms_involved);
             if (formData.rooms_involved && formData.rooms_involved.length > 0) {
                 const uniqueRooms = [...new Set(formData.rooms_involved)];
+                console.log(`📋 Will create ${uniqueRooms.length} rooms:`, uniqueRooms);
                 
                 for (let i = 0; i < uniqueRooms.length; i++) {
                     const roomName = uniqueRooms[i];
                     console.log(`🚀 Creating room ${i+1}/${uniqueRooms.length}: ${roomName}`);
                     
-                    // Backend automatically creates comprehensive structure for walkthrough rooms
-                    const newRoom = await Room.create({ 
-                        project_id: newProject.id, 
-                        name: roomName,
-                        description: '',
-                        order_index: i,
-                        sheet_type: 'walkthrough',  // This triggers auto-population with full structure
-                        auto_populate: true  // Explicitly request full structure
-                    });
-                    
-                    console.log(`✅ Room created with comprehensive structure: ${roomName}`, newRoom);
+                    try {
+                        // Backend automatically creates comprehensive structure for walkthrough rooms
+                        const newRoom = await Room.create({ 
+                            project_id: newProject.id, 
+                            name: roomName,
+                            description: '',
+                            order_index: i,
+                            sheet_type: 'walkthrough',  // This triggers auto-population with full structure
+                            auto_populate: true  // Explicitly request full structure
+                        });
+                        
+                        console.log(`✅ Room created successfully: ${roomName}`, newRoom);
+                    } catch (roomError) {
+                        console.error(`❌ FAILED to create room ${roomName}:`, roomError);
+                        alert(`Warning: Failed to create room "${roomName}". Error: ${roomError.message}`);
+                    }
                 }
+                
+                console.log('✅ ALL ROOMS CREATED - Questionnaire submission complete!');
+            } else {
+                console.warn('⚠️ No rooms selected in questionnaire');
             }
 
             setSubmissionStatus('success');
