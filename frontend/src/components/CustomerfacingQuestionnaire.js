@@ -736,9 +736,30 @@ export default function CustomerfacingQuestionnaire() {
                         <FieldWrapper label="Please upload any photos of the existing spaces you'd like us to see.">
                             <div className="p-4 border-2 border-dashed border-stone-400 rounded-lg text-center">
                                 <p className="text-stone-400 text-sm italic mb-2">These can be quick phone shots — no need for anything fancy!</p>
-                                <Button type="button" variant="outline" className="border-[#8B7355] text-[#8B7355]">
+                                <input
+                                    type="file"
+                                    id="existing-space-photos"
+                                    multiple
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files || []);
+                                        console.log('Files selected:', files.length);
+                                        // Store files in form data
+                                        handleFormChange('existing_space_photos', files);
+                                    }}
+                                />
+                                <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    className="border-[#8B7355] text-[#8B7355]"
+                                    onClick={() => document.getElementById('existing-space-photos').click()}
+                                >
                                     Add file
                                 </Button>
+                                {formData.existing_space_photos && formData.existing_space_photos.length > 0 && (
+                                    <p className="text-green-500 text-sm mt-2">✓ {formData.existing_space_photos.length} file(s) selected</p>
+                                )}
                             </div>
                         </FieldWrapper>
                         <FieldWrapper label="Finishes and Patterns">
