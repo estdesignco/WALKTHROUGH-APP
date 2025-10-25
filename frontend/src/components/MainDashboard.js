@@ -6,6 +6,8 @@ const MainDashboard = () => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailData, setEmailData] = useState({ email: '', name: '' });
 
   useEffect(() => {
     const fetchProjects = async () => {
