@@ -327,9 +327,6 @@ const MainDashboard = () => {
           )}
         </div>
       </div>
-    </div>
-  );
-
 
       {/* Email Modal */}
       {showEmailModal && (
@@ -383,7 +380,8 @@ const MainDashboard = () => {
           </div>
         </div>
       )}
-
+    </div>
+  );
 };
 
 export default MainDashboard;
