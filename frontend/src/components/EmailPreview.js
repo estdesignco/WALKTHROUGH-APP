@@ -154,15 +154,20 @@ const EmailPreview = () => {
             <Copy className="w-5 h-5" />
             {copied ? 'Copied!' : 'Copy HTML'}
           </button>
-          
-          <a
-            href={`mailto:?subject=Design Questionnaire - Established Design Co.&body=${encodeURIComponent(generateHTMLString())}`}
-            className="flex items-center gap-2 bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-3 text-lg font-medium rounded-full shadow-xl hover:shadow-[#B49B7E]/25 transition-all duration-300"
-            style={{ color: '#F5F5DC' }}
-          >
+        </div>
+        
+        {/* Important Notice */}
+        <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-6 mb-8">
+          <h3 className="text-yellow-400 font-semibold mb-2 flex items-center gap-2">
             <Mail className="w-5 h-5" />
-            Send Email
-          </a>
+            How to Send This Email:
+          </h3>
+          <p className="text-[#F5F5DC]/80 text-sm leading-relaxed">
+            ⚠️ To send this beautiful email to clients, go back to the Studio Dashboard and click the <strong className="text-[#B49B7E]">"📧 Email New Client"</strong> button. This will send the properly formatted HTML email via your SMTP server.
+          </p>
+          <p className="text-[#F5F5DC]/60 text-xs mt-2">
+            This preview page is for viewing only. Use the "Copy HTML" button above to copy the template code.
+          </p>
         </div>
       </div>
 
