@@ -182,7 +182,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "COMPREHENSIVE TESTING REQUEST - Test ALL features of the Interior Design Management System to identify what's working and what's broken. Features to Test: 1) Item CRUD Operations (Create, Update, DELETE items - User reports trash button is broken), 2) PDF Import (Upload PDF with product links, verify links extracted and products scraped), 3) Questionnaire → Walkthrough (Submit questionnaire with selected rooms, verify rooms added to walkthrough), 4) Teams Notifications (Change item status, verify Teams webhook triggered), 5) Backend Endpoints (Test all CRUD endpoints for items, rooms, categories, subcategories). Priority: Fix the trash button (DELETE item) first, then verify all other features work."
+  "FINAL COMPLETE END-TO-END WORKFLOW TEST - Test the complete questionnaire submission workflow including room creation and verification across all pages (Walkthrough, Checklist, FFE). Verify console logs show proper room creation messages and that rooms are populated with items as expected."
 
 backend:
   - task: "🔥 CRITICAL HOUZZ PRO BROWSER AUTOMATION TEST"
