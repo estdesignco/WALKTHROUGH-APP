@@ -1,3 +1,4 @@
+// Mobile Walkthrough Spreadsheet Component - UPDATED WITH SYNC BUTTON v2
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useOfflineSync } from '../hooks/useOfflineSync';
