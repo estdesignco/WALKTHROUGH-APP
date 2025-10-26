@@ -65,6 +65,10 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
       };
       
       loadProjectData();
+      
+      // AUTO-REFRESH: Reload project data every 30 seconds
+      const interval = setInterval(loadProjectData, 30000);
+      return () => clearInterval(interval);
     } else {
       setLoading(false);
       setError('No project ID provided');
