@@ -250,10 +250,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         return updatedProject;
       });
       
-      // Reload if online
-      if (online) {
-        await loadProject();
-      }
+      // NO RELOAD - local state update is enough for instant feedback
     } catch (error) {
       console.error('Failed to toggle:', error);
     }
