@@ -110,10 +110,13 @@ ROOM_COLORS = {
     "deck": "#7A8A6A",               # Muted olive-green
     "screened porch": "#8A7A6A",     # Muted warm gray
     "home gym": "#6A7A8A",           # Muted slate
-    "upstairs left guest bedroom": "#9A7A6A",    # Muted caramel
-    "upstairs left guest bathroom": "#7A6A8A",   # Muted periwinkle
-    "upstairs right guest bedroom": "#8A6A6A",   # Muted pewter
-    "upstairs right guest bathroom": "#6A8A8A"   # Muted aqua
+    "foyer": "#9A7A5A",              # Muted copper
+    "pool area": "#5A9A7A",          # Muted aquamarine
+    "basement guest room": "#7A6A9A",  # Muted periwinkle
+    "upstairs right guest bedroom": "#9A7A6A",    # Muted caramel
+    "upstairs right guest bathroom": "#7A6A8A",   # Muted blue-gray
+    "upstairs left guest bedroom": "#8A6A6A",     # Muted pewter
+    "upstairs left guest bathroom": "#6A8A8A"     # Muted cyan
 }
 
 # Enhanced Item Status Options with Colors for Sophisticated Tracking
