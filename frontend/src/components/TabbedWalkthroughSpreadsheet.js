@@ -1023,7 +1023,24 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                                   onChange={async (e) => {
                                     const newStatus = e.target.checked ? 'PICKED' : '';
                                     await updateItemOffline(item.id, { status: newStatus });
-                                    await loadProject();
+                                    
+                                    // Update local state immediately - NO RELOAD
+                                    setProject(prevProject => {
+                                      const updated = JSON.parse(JSON.stringify(prevProject));
+                                      updated.rooms = updated.rooms.map(r => ({
+                                        ...r,
+                                        categories: r.categories.map(c => ({
+                                          ...c,
+                                          subcategories: c.subcategories.map(s => ({
+                                            ...s,
+                                            items: s.items.map(i => 
+                                              i.id === item.id ? { ...i, status: newStatus } : i
+                                            )
+                                          }))
+                                        }))
+                                      }));
+                                      return updated;
+                                    });
                                   }}
                                 />
                               </td>
