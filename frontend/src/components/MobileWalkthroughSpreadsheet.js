@@ -278,10 +278,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
         return updatedProject;
       });
       
-      // Reload if online
-      if (online) {
-        await loadProject();
-      }
+      // NO RELOAD - local state update handles the UI change
     } catch (error) {
       console.error('Failed to delete:', error);
       alert('Failed to delete item');
