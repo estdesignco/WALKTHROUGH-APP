@@ -160,10 +160,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
         return updatedProject;
       });
       
-      // Reload if online
-      if (online) {
-        await loadProject();
-      }
+      // NO RELOAD - local state handles the delete
     } catch (error) {
       console.error('Failed to delete:', error);
       alert('Failed to delete item');
