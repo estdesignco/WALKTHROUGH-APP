@@ -556,6 +556,17 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                 ✥ ADD ROOM
               </button>
               
+              <button
+                onClick={async () => {
+                  console.log('🔄 MANUAL SYNC - Reloading from server');
+                  await loadProject();
+                  alert('✅ Synced with server!');
+                }}
+                className="bg-green-600 hover:bg-green-700 px-8 py-3 rounded-full text-white font-bold text-lg shadow-xl"
+              >
+                🔄 SYNC
+              </button>
+              
               <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full" style={{
                 boxShadow: '0 0 30px rgba(212, 165, 116, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)'
               }}>
