@@ -130,10 +130,7 @@ export default function MobileFFESpreadsheet({ projectId }) {
         return updatedProject;
       });
       
-      // Reload from server if online
-      if (online) {
-        await loadProject();
-      }
+      // NO RELOAD - local state update is sufficient
     } catch (error) {
       console.error('Update failed:', error);
     }
