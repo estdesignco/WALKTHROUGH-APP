@@ -1033,7 +1033,19 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                                   checked={item.status === 'PICKED'}
                                   onChange={async (e) => {
                                     const newStatus = e.target.checked ? 'PICKED' : '';
-                                    await updateItemOffline(item.id, { status: newStatus });
+                                    
+                                    // DIRECT BACKEND SAVE
+                                    try {
+                                      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                      await fetch(`${BACKEND_URL}/api/items/${item.id}`, {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ status: newStatus })
+                                      });
+                                      console.log('✅ Mobile checkbox saved to backend!');
+                                    } catch (err) {
+                                      console.error('❌ Failed to save checkbox:', err);
+                                    }
                                     
                                     // Update local state immediately - NO RELOAD
                                     setProject(prevProject => {
