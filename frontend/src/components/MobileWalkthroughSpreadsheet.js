@@ -605,9 +605,28 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                                   checked={item.status === 'PICKED'}
                                   onChange={async (e) => {
                                     const newStatus = e.target.checked ? 'PICKED' : '';
-                                    await updateItemOffline(item.id, { status: newStatus });
                                     
-                                    // Update local state immediately
+                                    console.log(`📝 Updating item ${item.id} status to: ${newStatus}`);
+                                    
+                                    // DIRECT API CALL - Save to backend immediately
+                                    try {
+                                      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                      const response = await fetch(`${BACKEND_URL}/api/items/${item.id}`, {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ status: newStatus })
+                                      });
+                                      
+                                      if (response.ok) {
+                                        console.log('✅ Checkbox saved to backend!');
+                                      } else {
+                                        console.error('❌ Failed to save checkbox:', response.status);
+                                      }
+                                    } catch (err) {
+                                      console.error('❌ API error saving checkbox:', err);
+                                    }
+                                    
+                                    // Update local state immediately for instant UI feedback
                                     setProject(prevProject => {
                                       const updatedProject = JSON.parse(JSON.stringify(prevProject));
                                       updatedProject.rooms = updatedProject.rooms.map(r => ({
