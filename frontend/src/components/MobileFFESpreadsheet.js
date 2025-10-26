@@ -199,6 +199,17 @@ export default function MobileFFESpreadsheet({ projectId }) {
                 ✥ ADD ROOM
               </button>
               
+              <button
+                onClick={async () => {
+                  console.log('🔄 Manual sync triggered on FFE');
+                  await loadProject();
+                  alert('✅ FFE synced with server!');
+                }}
+                className="bg-green-600 hover:bg-green-700 px-8 py-3 rounded-full text-white font-bold text-lg shadow-xl"
+              >
+                🔄 SYNC
+              </button>
+              
               <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full">
                 <span className="text-2xl font-bold text-black tracking-wider">FF&E SPREADSHEET</span>
               </div>
