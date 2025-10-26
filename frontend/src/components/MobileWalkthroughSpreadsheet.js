@@ -615,6 +615,9 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                                   className="w-4 h-4 cursor-pointer" 
                                   checked={item.status === 'PICKED'}
                                   onChange={async (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    
                                     const newStatus = e.target.checked ? 'PICKED' : '';
                                     
                                     console.log(`📝 Updating item ${item.id} status to: ${newStatus}`);
