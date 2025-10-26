@@ -1017,8 +1017,10 @@ const SimpleWalkthroughSpreadsheet = ({
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {/* ITEMS FOR THIS SUBCATEGORY */}
-                                    {(subcategory.items || []).map((item, itemIndex) => (
+                                    {/* ITEMS FOR THIS SUBCATEGORY - ONLY SHOW PICKED ITEMS */}
+                                    {(subcategory.items || [])
+                                      .filter(item => item.status === 'PICKED')
+                                      .map((item, itemIndex) => (
                                     <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-gradient-to-r from-black/80 to-gray-900/80' : 'bg-gradient-to-r from-gray-900/60 to-black/60'}>
                                       <td className="border border-[#B49B7E]/20 px-1 py-1 text-center w-6">
                                         <input 
