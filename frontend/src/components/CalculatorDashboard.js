@@ -81,7 +81,15 @@ const CalculatorDashboard = ({ projectId }) => {
   const calculateDrapery = async () => {
     setLoading(true);
     try {
-      const res = await axios.post(`${API}/calculators/drapery`, draperyData);
+      // Convert empty strings to null/0 before sending
+      const payload = {
+        ...draperyData,
+        window_width: parseFloat(draperyData.window_width) || 0,
+        finished_length: parseFloat(draperyData.finished_length) || 0,
+        fullness_ratio: parseFloat(draperyData.fullness_ratio) || 2.5,
+        fabric_width: parseFloat(draperyData.fabric_width) || 54
+      };
+      const res = await axios.post(`${API}/calculators/drapery`, payload);
       setResults(res.data);
     } catch (error) {
       const errorMsg = error.response?.data?.detail 
@@ -96,7 +104,14 @@ const CalculatorDashboard = ({ projectId }) => {
   const calculateHardware = async () => {
     setLoading(true);
     try {
-      const res = await axios.post(`${API}/calculators/hardware`, hardwareData);
+      // Convert empty strings to null/0 before sending
+      const payload = {
+        ...hardwareData,
+        window_width: parseFloat(hardwareData.window_width) || 0,
+        rod_overhang_per_side: parseFloat(hardwareData.rod_overhang_per_side) || 6,
+        rod_diameter: parseFloat(hardwareData.rod_diameter) || 1.0
+      };
+      const res = await axios.post(`${API}/calculators/hardware`, payload);
       setResults(res.data);
     } catch (error) {
       const errorMsg = error.response?.data?.detail 
