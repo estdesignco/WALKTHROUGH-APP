@@ -275,6 +275,19 @@ const CalculatorDashboard = ({ projectId }) => {
               />
             </div>
 
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Cost Per Double Roll ($) - Optional</label>
+              <input
+                type="number"
+                value={wallpaperData.cost_per_roll}
+                onChange={(e) => setWallpaperData({...wallpaperData, cost_per_roll: e.target.value})}
+                style={styles.input}
+                placeholder="125.00"
+              />
+            </div>
+
+
             <button onClick={calculateWallpaper} disabled={loading} style={styles.calculateButton}>
               {loading ? '⏳ Calculating...' : '🧮 Calculate Wallpaper'}
             </button>
