@@ -338,6 +338,45 @@ const ContactSheet = ({ projectId }) => {
       </div>
     </div>
   );
+
+
+        {/* CONTACT LIBRARY MODAL */}
+        {showLibrary && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <div className="bg-gray-900 rounded-xl p-8 w-full max-w-3xl border border-[#8b7355] max-h-[80vh] overflow-y-auto">
+              <h2 className="text-2xl font-bold text-[#D4A574] mb-6">📚 Contact Library</h2>
+              
+              {savedContacts.length === 0 ? (
+                <p className="text-[#D4C5A9] text-center py-8">No saved contacts yet. Check "Save to Library" when adding a contact.</p>
+              ) : (
+                <div className="space-y-3">
+                  {savedContacts.map((contact, idx) => (
+                    <div key={idx} className="p-4 bg-black/60 rounded-lg border border-[#8b7355]/40 flex justify-between items-center hover:bg-black/80 transition-all">
+                      <div>
+                        <p className="text-[#D4A574] font-semibold">{contact.name} - {contact.phone}</p>
+                        <p className="text-[#D4C5A9] text-sm">{contact.role} {contact.company && `- ${contact.company}`}</p>
+                      </div>
+                      <button
+                        onClick={() => loadFromLibrary(contact)}
+                        className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold"
+                      >
+                        Use This Contact
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={() => setShowLibrary(false)}
+                className="mt-6 w-full px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-bold"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+
 };
 
 export default ContactSheet;
