@@ -61,20 +61,23 @@ const styles = {
     textAlign: 'center',
     marginBottom: '40px',
     padding: '40px 20px',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #1e3a5f 0%, #2a5a8a 50%, #1e3a5f 100%)',
+    backgroundSize: '200% auto',
     borderRadius: '15px',
-    boxShadow: '0 10px 40px rgba(102, 126, 234, 0.3)'
+    boxShadow: '0 10px 40px rgba(30, 58, 95, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+    animation: 'shimmer 3s linear infinite'
   },
   mainTitle: {
     fontSize: '48px',
-    fontWeight: 'bold',
+    fontWeight: '300',
     color: '#ffffff',
     margin: '0 0 15px 0',
-    textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+    textShadow: '0 2px 10px rgba(0,0,0,0.3)',
+    letterSpacing: '2px'
   },
   subtitle: {
     fontSize: '20px',
-    color: '#e0e0e0',
+    color: '#D4C5A9',
     margin: 0
   },
   tabBar: {
@@ -82,19 +85,20 @@ const styles = {
     gap: '10px',
     marginBottom: '30px',
     padding: '10px',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0a0a0a',
     borderRadius: '15px',
     flexWrap: 'wrap',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    border: '1px solid rgba(139, 115, 85, 0.3)'
   },
   tab: {
     flex: 1,
     minWidth: '200px',
     padding: '20px 30px',
-    border: '3px solid #333',
+    border: '1px solid #8b7355',
     borderRadius: '12px',
-    backgroundColor: '#2a2a2a',
-    color: '#ffffff',
+    background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)',
+    color: '#D4C5A9',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     display: 'flex',
@@ -102,13 +106,17 @@ const styles = {
     justifyContent: 'center',
     gap: '10px',
     fontSize: '18px',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
   },
   tabActive: {
-    backgroundColor: '#667eea',
-    borderColor: '#667eea',
+    background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+    backgroundSize: '200% auto',
+    borderColor: '#a0845c',
+    color: '#1a1a1a',
     transform: 'scale(1.05)',
-    boxShadow: '0 5px 20px rgba(102, 126, 234, 0.4)'
+    boxShadow: '0 5px 20px rgba(139, 115, 85, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+    animation: 'shimmer 3s linear infinite'
   },
   tabIcon: {
     fontSize: '28px'
