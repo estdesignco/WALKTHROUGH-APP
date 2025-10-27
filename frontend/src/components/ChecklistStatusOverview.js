@@ -232,15 +232,16 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       }}>
         <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">🧮 Quick Calculators</h3>
         
-        {/* CALCULATOR BUTTONS - MUTED GOLD WITH SHIMMER */}
+        {/* CALCULATOR BUTTONS - DIFFERENT MUTED COLORS WITH SHIMMER */}
         <div className="space-y-3">
           <a 
             href="/power-features" 
-            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
               background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+              animation: 'shimmer 3s infinite'
             }}
           >
             📐 Wallpaper Calculator
@@ -248,11 +249,12 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
           
           <a 
             href="/power-features" 
-            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+              background: 'linear-gradient(135deg, #7A6A5A 0%, #8A7A6A 50%, #7A6A5A 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              boxShadow: '0 4px 15px rgba(122, 106, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+              animation: 'shimmer 3s infinite'
             }}
           >
             🪟 Drapery Calculator
@@ -260,11 +262,12 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
           
           <a 
             href="/power-features" 
-            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+              background: 'linear-gradient(135deg, #6A7A5A 0%, #7A8A6A 50%, #6A7A5A 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              boxShadow: '0 4px 15px rgba(106, 122, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+              animation: 'shimmer 3s infinite'
             }}
           >
             🔧 Hardware Calculator
@@ -272,11 +275,12 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
           
           <a 
             href="/power-features" 
-            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+              background: 'linear-gradient(135deg, #8A6A5A 0%, #9A7A6A 50%, #8A6A5A 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              boxShadow: '0 4px 15px rgba(138, 106, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+              animation: 'shimmer 3s infinite'
             }}
           >
             🎨 Paint Calculator
@@ -284,11 +288,12 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
           
           <a 
             href="/power-features" 
-            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+              background: 'linear-gradient(135deg, #6A5A8A 0%, #7A6A9A 50%, #6A5A8A 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              boxShadow: '0 4px 15px rgba(106, 90, 138, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+              animation: 'shimmer 3s infinite'
             }}
           >
             ⬜ Flooring Calculator
@@ -296,11 +301,12 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
           
           <a 
             href="/power-features" 
-            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+              background: 'linear-gradient(135deg, #5A7A6A 0%, #6A8A7A 50%, #5A7A6A 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              boxShadow: '0 4px 15px rgba(90, 122, 106, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+              animation: 'shimmer 3s infinite'
             }}
           >
             💡 Lighting Calculator
@@ -308,11 +314,12 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
           
           <a 
             href="/power-features" 
-            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
               background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+              animation: 'shimmer 3s infinite'
             }}
           >
             ✨ View All Features
