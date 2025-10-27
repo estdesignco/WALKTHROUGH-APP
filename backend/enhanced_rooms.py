@@ -1689,5 +1689,5 @@ DEFAULT_ROOM_STRUCTURE = {
                 ]
             }
         ]
-    ]
+    }
 }
