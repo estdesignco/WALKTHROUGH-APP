@@ -267,7 +267,7 @@ const CalculatorDashboard = ({ projectId }) => {
                 <input
                   type="number"
                   value={draperyData.window_width}
-                  onChange={(e) => setDraperyData({...draperyData, window_width: parseFloat(e.target.value)})}
+                  onChange={(e) => setDraperyData({...draperyData, window_width: e.target.value})}
                   style={styles.input}
                   placeholder="80"
                 />
@@ -277,7 +277,7 @@ const CalculatorDashboard = ({ projectId }) => {
                 <input
                   type="number"
                   value={draperyData.finished_length}
-                  onChange={(e) => setDraperyData({...draperyData, finished_length: parseFloat(e.target.value)})}
+                  onChange={(e) => setDraperyData({...draperyData, finished_length: e.target.value})}
                   style={styles.input}
                   placeholder="84"
                 />
