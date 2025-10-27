@@ -574,20 +574,21 @@ const styles = {
     textAlign: 'center',
     marginBottom: '30px',
     padding: '30px 20px',
-    background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+    background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)',
     borderRadius: '10px',
-    boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+    border: '1px solid #8b7355',
+    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
   },
   title: {
     fontSize: '32px',
     fontWeight: '300',
-    color: '#1a1a1a',
+    color: '#D4C5A9',
     margin: '0 0 10px 0',
     letterSpacing: '2px'
   },
   subtitle: {
     fontSize: '16px',
-    color: '#2a2a2a',
+    color: '#D4C5A9',
     margin: 0
   },
   calculatorSelector: {
