@@ -61,9 +61,10 @@ const styles = {
     textAlign: 'center',
     marginBottom: '40px',
     padding: '40px 20px',
-    background: 'linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 50%, #2a3a4a 100%)',
+    background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)',
     borderRadius: '15px',
-    boxShadow: '0 10px 40px rgba(42, 58, 74, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+    border: '1px solid #8b7355',
+    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
   },
   mainTitle: {
     fontSize: '48px',
