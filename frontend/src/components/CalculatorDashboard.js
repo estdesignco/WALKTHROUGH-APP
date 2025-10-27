@@ -577,7 +577,7 @@ const styles = {
     background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)',
     borderRadius: '10px',
     border: '1px solid #8b7355',
-    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
+    boxShadow: '0 0 20px rgba(139, 115, 85, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
   },
   title: {
     fontSize: '32px',
