@@ -7,7 +7,7 @@ const ContactSheet = ({ projectId }) => {
   const [showAddContact, setShowAddContact] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', phone: '', email: '', role: '', company: '', address: '', notes: ''
+    name: '', phone: '', email: '', role: '', company: '', address: '', notes: '', save_to_library: false
   });
 
   const API = (process.env.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
