@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useSearchParams, useNavigate } from "react-router-dom";
-import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText, Calculator } from "lucide-react";
+import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText, Calculator, Users } from "lucide-react";
 import WalkthroughDashboard from './WalkthroughDashboard';
 import ContactSheet from './ContactSheet';
 
