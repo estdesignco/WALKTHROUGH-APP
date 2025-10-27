@@ -1529,103 +1529,6 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
                 ]
             }
         ]
-    },
-    
-    "basement guest room": {
-        "categories": [
-            {
-                "name": "Lighting",
-                "color": "#7B68AA",
-                "subcategories": [
-                    {"name": "INSTALLED", "color": "#9B89B3", "items": [
-                        {"name": "Ceiling Fixture", "finish_color": ""},
-                        {"name": "Recessed Lighting", "finish_color": ""},
-                        {"name": "Sconces", "finish_color": ""}
-                    ]},
-                    {"name": "PORTABLE", "color": "#9B89B3", "items": [
-                        {"name": "Nightstand Lamps", "finish_color": ""},
-                        {"name": "Floor Lamp", "finish_color": ""}
-                    ]}
-                ]
-            },
-            {
-                "name": "Furniture",
-                "color": "#8B6914",
-                "subcategories": [
-                    {"name": "PIECE", "color": "#A0782F", "items": [
-                        {"name": "Bed Frame", "finish_color": ""},
-                        {"name": "Mattress", "finish_color": ""},
-                        {"name": "Nightstands", "finish_color": ""},
-                        {"name": "Dresser", "finish_color": ""},
-                        {"name": "Bench", "finish_color": ""}
-                    ]}
-                ]
-            },
-            {
-                "name": "Window Treatments",
-                "color": "#4A90E2",
-                "subcategories": [
-                    {"name": "WINDOW COVERINGS", "color": "#6BA3E6", "items": [
-                        {"name": "Curtains/Drapery", "finish_color": ""},
-                        {"name": "Blinds", "finish_color": ""}
-                    ]}
-                ]
-            },
-            {
-                "name": "Textiles & Soft Goods",
-                "color": "#DC143C",
-                "subcategories": [
-                    {"name": "TEXTILES", "color": "#F08080", "items": [
-                        {"name": "Area Rug", "finish_color": ""},
-                        {"name": "Throw Pillows", "finish_color": ""},
-                        {"name": "Bedding Set", "finish_color": ""}
-                    ]}
-                ]
-            },
-            {
-                "name": "Paint, Wallpaper, and Finishes",
-                "color": "#FF6347",
-                "subcategories": [
-                    {"name": "FINISHES", "color": "#FF7F50", "items": [
-                        {"name": "Paint color", "finish_color": ""},
-                        {"name": "Wallpaper", "finish_color": ""},
-                        {"name": "Finish", "finish_color": ""}
-                    ]}
-                ]
-            }
-        ]
-    },
-    
-    "upstairs right guest bedroom": {
-        "categories": [
-            {"name": "Lighting", "color": "#7B68AA", "subcategories": [
-                {"name": "INSTALLED", "color": "#9B89B3", "items": [{"name": "Ceiling Fixture", "finish_color": ""}, {"name": "Recessed Lighting", "finish_color": ""}]},
-                {"name": "PORTABLE", "color": "#9B89B3", "items": [{"name": "Nightstand Lamps", "finish_color": ""}, {"name": "Floor Lamp", "finish_color": ""}]}
-            ]},
-            {"name": "Furniture", "color": "#8B6914", "subcategories": [
-                {"name": "PIECE", "color": "#A0782F", "items": [{"name": "Bed Frame", "finish_color": ""}, {"name": "Mattress", "finish_color": ""}, {"name": "Nightstands", "finish_color": ""}, {"name": "Dresser", "finish_color": ""}]}
-            ]},
-            {"name": "Window Treatments", "color": "#4A90E2", "subcategories": [{"name": "WINDOW COVERINGS", "color": "#6BA3E6", "items": [{"name": "Curtains", "finish_color": ""}, {"name": "Blinds", "finish_color": ""}]}]},
-            {"name": "Textiles & Soft Goods", "color": "#DC143C", "subcategories": [{"name": "TEXTILES", "color": "#F08080", "items": [{"name": "Area Rug", "finish_color": ""}, {"name": "Bedding Set", "finish_color": ""}]}]},
-            {"name": "Paint, Wallpaper, and Finishes", "color": "#FF6347", "subcategories": [{"name": "FINISHES", "color": "#FF7F50", "items": [{"name": "Paint color", "finish_color": ""}, {"name": "Finish", "finish_color": ""}]}]}
-        ]
-    },
-    
-    "upstairs left guest bedroom": {
-        "categories": [
-            {"name": "Lighting", "color": "#7B68AA", "subcategories": [
-                {"name": "INSTALLED", "color": "#9B89B3", "items": [{"name": "Ceiling Fixture", "finish_color": ""}, {"name": "Recessed Lighting", "finish_color": ""}]},
-                {"name": "PORTABLE", "color": "#9B89B3", "items": [{"name": "Nightstand Lamps", "finish_color": ""}, {"name": "Floor Lamp", "finish_color": ""}]}
-            ]},
-            {"name": "Furniture", "color": "#8B6914", "subcategories": [
-                {"name": "PIECE", "color": "#A0782F", "items": [{"name": "Bed Frame", "finish_color": ""}, {"name": "Mattress", "finish_color": ""}, {"name": "Nightstands", "finish_color": ""}, {"name": "Dresser", "finish_color": ""}]}
-            ]},
-            {"name": "Window Treatments", "color": "#4A90E2", "subcategories": [{"name": "WINDOW COVERINGS", "color": "#6BA3E6", "items": [{"name": "Curtains", "finish_color": ""}, {"name": "Blinds", "finish_color": ""}]}]},
-            {"name": "Textiles & Soft Goods", "color": "#DC143C", "subcategories": [{"name": "TEXTILES", "color": "#F08080", "items": [{"name": "Area Rug", "finish_color": ""}, {"name": "Bedding Set", "finish_color": ""}]}]},
-            {"name": "Paint, Wallpaper, and Finishes", "color": "#FF6347", "subcategories": [{"name": "FINISHES", "color": "#FF7F50", "items": [{"name": "Paint color", "finish_color": ""}, {"name": "Finish", "finish_color": ""}]}]}
-        ]
-
-        ]
     }
 }
 
@@ -1702,6 +1605,89 @@ DEFAULT_ROOM_STRUCTURE = {
                     ]
                 }
             ]
-        }
-    ]
+        },
+    
+    "pantry": {
+        "categories": [
+            {
+                "name": "Lighting",
+                "color": "#9370DB",
+                "subcategories": [
+                    {
+                        "name": "INSTALLED",
+                        "color": "#A687E6",
+                        "items": [
+                            {"name": "Ceiling Light", "finish_color": "White/Nickel"},
+                            {"name": "Motion Sensor Light", "finish_color": "White"},
+                            {"name": "LED Strip Lighting", "finish_color": "Warm White/Cool White"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Cabinets, Built-ins, and Trim",
+                "color": "#8B4513",
+                "subcategories": [
+                    {
+                        "name": "CABINETS",
+                        "color": "#A0522D",
+                        "items": [
+                            {"name": "Upper Cabinets", "finish_color": "Wood/Painted"},
+                            {"name": "Base Cabinets", "finish_color": "Wood/Painted"},
+                            {"name": "Tall Cabinets", "finish_color": "Wood/Painted"},
+                            {"name": "Pull-out Drawers", "finish_color": "Wood/Painted"},
+                            {"name": "Lazy Susan", "finish_color": "Wood/Painted"}
+                        ]
+                    },
+                    {
+                        "name": "BUILT-INS",
+                        "color": "#A0522D",
+                        "items": [
+                            {"name": "Built-in Shelving", "finish_color": "Wood/Metal"},
+                            {"name": "Pull-out Spice Rack", "finish_color": "Wood/Metal"},
+                            {"name": "Can Organizer", "finish_color": "Metal/Plastic"}
+                        ]
+                    },
+                    {
+                        "name": "TRIM",
+                        "color": "#A0522D",
+                        "items": [
+                            {"name": "Baseboard", "finish_color": "Wood/Painted"},
+                            {"name": "Crown Molding", "finish_color": "Wood/Painted"},
+                            {"name": "Door Trim", "finish_color": "Wood/Painted"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Tile and Tops",
+                "color": "#1E90FF",
+                "subcategories": [
+                    {
+                        "name": "TILE",
+                        "color": "#4169E1",
+                        "items": [
+                            {"name": "Floor Tile", "finish_color": "Ceramic/Porcelain"},
+                            {"name": "Grout", "finish_color": "Various Colors"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Paint, Wallpaper, and Finishes",
+                "color": "#FF6347",
+                "subcategories": [
+                    {
+                        "name": "FINISHES",
+                        "color": "#FF7F50",
+                        "items": [
+                            {"name": "Paint color", "finish_color": "Custom"},
+                            {"name": "Wallpaper", "finish_color": "Custom Pattern"},
+                            {"name": "Finish", "finish_color": "Matte/Satin/Gloss"}
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
 }
