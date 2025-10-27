@@ -542,6 +542,57 @@ const CalculatorDashboard = ({ projectId }) => {
         )}
       </div>
 
+
+
+        {/* SQUARE FOOTAGE CALCULATOR */}
+        {activeCalculator === 'sqft' && (
+          <div style={styles.form}>
+            <h3 style={styles.formTitle}>📏 Square Footage Calculator</h3>
+            <p style={styles.formSubtitle}>Calculate total square footage for rooms</p>
+            
+            <div style={styles.formRow}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Length (feet)</label>
+                <input
+                  type="number"
+                  placeholder="Enter length"
+                  style={styles.input}
+                  id="sqft-length"
+                />
+              </div>
+              
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Width (feet)</label>
+                <input
+                  type="number"
+                  placeholder="Enter width"
+                  style={styles.input}
+                  id="sqft-width"
+                />
+              </div>
+            </div>
+
+            <button 
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  const length = parseFloat(document.getElementById('sqft-length').value);
+                  const width = parseFloat(document.getElementById('sqft-width').value);
+                  const res = await axios.post(`${API}/calculators/square-footage`, { length, width });
+                  setResults(res.data);
+                } catch (error) {
+                  alert('Error: ' + (error.response?.data?.detail || error.message));
+                }
+                setLoading(false);
+              }}
+              disabled={loading}
+              style={styles.calculateButton}
+            >
+              {loading ? 'Calculating...' : 'Calculate Square Footage'}
+            </button>
+          </div>
+        )}
+
       {/* RESULTS DISPLAY */}
       {results && (
         <div style={styles.results}>
