@@ -27,6 +27,22 @@ body {
   outline: none;
 }
 
+
+/* Shimmer animation for gold buttons */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+[style*="animation: shimmer"] {
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite !important;
+}
+
 /* Professional Muted Color Palette */
 :root {
   /* Muted Room Colors - Professional */
