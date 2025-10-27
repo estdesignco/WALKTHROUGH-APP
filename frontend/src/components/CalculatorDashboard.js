@@ -32,7 +32,8 @@ const CalculatorDashboard = ({ projectId }) => {
     fullness_ratio: 2.5,
     fabric_width: 54,
     pattern_repeat: null,
-    include_lining: false
+    include_lining: false,
+    cost_per_yard: ''  // NEW
   });
 
   // HARDWARE CALCULATOR STATE
@@ -40,7 +41,9 @@ const CalculatorDashboard = ({ projectId }) => {
     window_width: '',
     rod_overhang_per_side: 6,
     rod_diameter: 1.0,
-    drapery_weight: 'medium'
+    drapery_weight: 'medium',
+    cost_per_rod: '',  // NEW
+    cost_per_bracket: ''  // NEW
   });
 
   // PAINT CALCULATOR STATE
@@ -58,7 +61,8 @@ const CalculatorDashboard = ({ projectId }) => {
     room_width: '',
     tile_length: 12,
     tile_width: 12,
-    waste_factor: 0.10
+    waste_factor: 0.10,
+    cost_per_sqft: ''  // NEW
   });
 
   // LIGHTING CALCULATOR STATE
