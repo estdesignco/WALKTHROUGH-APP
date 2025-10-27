@@ -135,18 +135,33 @@ const ContactSheet = ({ projectId }) => {
           <p className="text-center text-[#D4C5A9] mt-2">Manage all contacts for this project</p>
         </div>
 
-        <button
-          onClick={() => { setShowAddContact(true); setEditingContact(null); setFormData({ name: '', phone: '', email: '', role: '', company: '', address: '', notes: '' }); }}
-          className="mb-6 px-8 py-3 rounded-lg font-bold transition-all hover:scale-105"
-          style={{
-            background: 'linear-gradient(135deg, #b8965c 0%, #a0845c 30%, #8b7355 70%, #6a5a4a 100%)',
-            color: '#1a1a1a',
-            border: '1px solid #8b7355',
-            boxShadow: '0 0 20px rgba(139, 115, 85, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
-          }}
-        >
-          + Add Contact
-        </button>
+        <div className="flex gap-4 mb-6">
+          <button
+            onClick={() => { setShowAddContact(true); setEditingContact(null); setFormData({ name: '', phone: '', email: '', role: '', company: '', address: '', notes: '', save_to_library: false }); }}
+            className="px-8 py-3 rounded-lg font-bold transition-all hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #b8965c 0%, #a0845c 30%, #8b7355 70%, #6a5a4a 100%)',
+              color: '#1a1a1a',
+              border: '1px solid #8b7355',
+              boxShadow: '0 0 20px rgba(139, 115, 85, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
+            }}
+          >
+            + Add Contact
+          </button>
+
+          <button
+            onClick={() => setShowLibrary(true)}
+            className="px-8 py-3 rounded-lg font-bold transition-all hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #6A7A5A 0%, #7A8A6A 50%, #6A7A5A 100%)',
+              color: '#1a1a1a',
+              border: '1px solid #6A7A5A',
+              boxShadow: '0 0 20px rgba(106, 122, 90, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
+            }}
+          >
+            📚 Load from Library ({savedContacts.length})
+          </button>
+        </div>
 
         <div className="grid gap-4">
           {contacts.map(contact => (
