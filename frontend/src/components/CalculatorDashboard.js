@@ -187,7 +187,7 @@ const CalculatorDashboard = ({ projectId }) => {
     { id: 'drapery', name: '🪟 Drapery', icon: '🪟' },
     { id: 'hardware', name: '🔧 Hardware', icon: '🔧' },
     { id: 'paint', name: '🎨 Paint', icon: '🖌️' },
-    { id: 'flooring', name: '⬜ Flooring', icon: '⬜' },
+    { id: 'flooring', name: '⬜ Tile & Flooring', icon: '⬜' },
     { id: 'lighting', name: '💡 Lighting', icon: '💡' },
     { id: 'sqft', name: '📏 Square Ft', icon: '📐' },
     { id: 'convert', name: '🔄 Convert', icon: '🔄' }
