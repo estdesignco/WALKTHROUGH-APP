@@ -1,248 +1,156 @@
 import React from 'react';
-import { Pie } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend
-} from 'chart.js';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemStatuses }) => {
+  const statusData = Object.entries(statusBreakdown || {}).map(([status, count]) => ({
+    name: status || 'Unassigned',
+    value: count,
+    color: getStatusColor(status)
+  }));
 
-const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemStatuses, carrierTypes }) => {
-  
-  // Convert regular status breakdown to checklist format
-  const getChecklistStatusBreakdown = () => {
-    const checklistStatuses = {
-      'TO BE PICKED': { count: 0, color: '#6B7280' },        // Changed from BLANK to TO BE PICKED (gray)
-      'PICKED': { count: 0, color: '#3B82F6' },
-      'ORDER SAMPLES': { count: 0, color: '#10B981' },
-      'SAMPLES ARRIVED': { count: 0, color: '#8B5CF6' },
-      'ASK NEIL': { count: 0, color: '#F59E0B' },
-      'ASK CHARLENE': { count: 0, color: '#EF4444' },
-      'ASK JALA': { count: 0, color: '#EC4899' },
-      'GET QUOTE': { count: 0, color: '#06B6D4' },
-      'WAITING ON QT': { count: 0, color: '#F97316' },
-      'READY FOR PRESENTATION': { count: 0, color: '#84CC16' }
+  const carrierData = Object.entries(carrierBreakdown || {}).map(([carrier, count]) => ({
+    name: carrier,
+    value: count
+  }));
+
+  const CARRIER_COLORS = ['#5A7A5A', '#8A7A5A', '#6A8A5A', '#7A5A6A', '#5A6A8A'];
+
+  function getStatusColor(status) {
+    const statusColors = {
+      'TO BE SELECTED': '#D4A574',
+      'RESEARCHING': '#B8860B',
+      'PENDING APPROVAL': '#DAA520',
+      'ORDER SAMPLES': '#10B981',
+      'SAMPLES ARRIVED': '#8B5CF6',
+      'ASK NEIL': '#F59E0B',
+      'ASK CHARLENE': '#EF4444',
+      'ASK JALA': '#EC4899',
+      'GET QUOTE': '#06B6D4',
+      'WAITING ON QT': '#F97316',
+      'READY FOR PRESENTATION': '#84CC16',
+      'PICKED': '#3B82F6',
+      'APPROVED BY CLIENT': '#10B981',
+      'ORDERED': '#32CD32',
+      'BACKORDERED': '#FFA500',
+      'IN PRODUCTION': '#FFD700',
+      'SHIPPED': '#4169E1',
+      'DELIVERED TO RECEIVER': '#9370DB',
+      'DELIVERED TO JOB SITE': '#8A2BE2',
+      'INSTALLED': '#00CED1',
+      '': '#9CA3AF'
     };
-    
-    // Map existing statuses to checklist statuses
-    Object.keys(statusBreakdown).forEach(status => {
-      if (checklistStatuses[status]) {
-        checklistStatuses[status].count = statusBreakdown[status];
-      } else if (status === '' || status === 'TO BE SELECTED' || status === 'TO BE PICKED') {
-        // Map blank, "TO BE SELECTED", and "TO BE PICKED" to TO BE PICKED
-        checklistStatuses['TO BE PICKED'].count += statusBreakdown[status];
-      } else {
-        // For any other unknown statuses, add them to TO BE PICKED as well
-        checklistStatuses['TO BE PICKED'].count += statusBreakdown[status];
-      }
-    });
-    
-    return checklistStatuses;
-  };
-
-  const checklistBreakdown = getChecklistStatusBreakdown();
-
-  // Carrier colors
-  const getCarrierColor = (carrier) => {
-    const colors = {
-      'FedEx': '#4B0082',              // Purple
-      'UPS': '#8B4513',               // UPS Brown
-      'UPS Ground': '#8B4513',        // UPS Brown
-      'USPS': '#1E40AF',              // Blue
-      'DHL': '#DC2626',               // Red
-      'Brooks': '#059669',            // Green
-      'Zenith': '#F59E0B',            // Amber
-      'Surber': '#8B5CF6'             // Violet
-    };
-    return colors[carrier] || '#6B7280';
-  };
-
-  // Chart options
-  const pieOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'right',
-        labels: {
-          color: '#D4A574',
-          font: {
-            size: 12
-          },
-          usePointStyle: true,
-          pointStyle: 'circle',
-          padding: 15
-        }
-      },
-      tooltip: {
-        backgroundColor: '#1F2937',
-        titleColor: '#F9FAFB',
-        bodyColor: '#F9FAFB',
-        borderColor: '#374151',
-        borderWidth: 1,
-        callbacks: {
-          label: function(context) {
-            const percentage = ((context.raw / totalItems) * 100).toFixed(1);
-            return `${context.label}: ${context.raw} (${percentage}%)`;
-          }
-        }
-      }
-    }
-  };
-
-  // Calculate totals for percentage calculations
-  const totalItemsFromStatus = Object.values(checklistBreakdown).reduce((sum, status) => sum + status.count, 0);
-  const totalPicked = Object.values(checklistBreakdown).reduce((sum, status) => 
-    sum + (status.count || 0), 0);
-
-  // Prepare data for Status Overview pie chart with shimmer
-  const statusPieData = {
-    labels: Object.keys(checklistBreakdown).filter(status => checklistBreakdown[status].count > 0),
-    datasets: [
-      {
-        data: Object.keys(checklistBreakdown)
-          .filter(status => checklistBreakdown[status].count > 0)
-          .map(status => checklistBreakdown[status].count),
-        backgroundColor: Object.keys(checklistBreakdown)
-          .filter(status => checklistBreakdown[status].count > 0)
-          .map(status => checklistBreakdown[status].color),
-        borderWidth: 3,
-        borderColor: Object.keys(checklistBreakdown)
-          .filter(status => checklistBreakdown[status].count > 0)
-          .map(status => '#D4A574'),
-        hoverBorderWidth: 4,
-        hoverBorderColor: '#FFD700',
-        shadowOffsetX: 0,
-        shadowOffsetY: 0,
-        shadowBlur: 15,
-        shadowColor: Object.keys(checklistBreakdown)
-          .filter(status => checklistBreakdown[status].count > 0)
-          .map(status => checklistBreakdown[status].color + '80')
-      }
-    ]
-  };
-
-  // Prepare data for Carrier Distribution pie chart
-  const carrierPieData = {
-    labels: Object.keys(carrierBreakdown).filter(carrier => carrierBreakdown[carrier] > 0),
-    datasets: [
-      {
-        data: Object.keys(carrierBreakdown)
-          .filter(carrier => carrierBreakdown[carrier] > 0)
-          .map(carrier => carrierBreakdown[carrier]),
-        backgroundColor: Object.keys(carrierBreakdown)
-          .filter(carrier => carrierBreakdown[carrier] > 0)
-          .map(carrier => getCarrierColor(carrier)),
-        borderWidth: 0,
-        hoverBorderWidth: 2,
-        hoverBorderColor: '#ffffff'
-      }
-    ]
-  };
+    return statusColors[status] || '#9CA3AF';
+  }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      {/* LEFT COLUMN - STATUS OVERVIEW */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">Status Overview</h3>
-        
-        {/* STATUS PIE CHART */}
-        <div className="mb-6">
-          <div className="h-48">
-            {totalItems > 0 ? (
-              <Pie data={statusPieData} options={pieOptions} />
-            ) : (
-              <div className="flex items-center justify-center h-full text-[#D4A574]">
-                No items to display
-              </div>
-            )}
+    <div className="space-y-8 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
+          background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+        }}>
+          <h3 className="text-lg font-semibold text-[#D4C5A9] mb-6">📊 Status Breakdown</h3>
+          
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-[#D4C5A9]">Total Items</span>
+              <span className="text-2xl font-bold text-[#D4A574]">{totalItems || 0}</span>
+            </div>
           </div>
-        </div>
 
-        {/* STATUS SUMMARY */}
-        <div className="text-center">
-          <div className="text-2xl font-bold text-[#D4C5A9]">
-            {totalItems} Total Items
-          </div>
-          <div className="text-sm text-[#D4A574] mt-1">
-            ({checklistBreakdown['PICKED']?.count || 0} PICKED - {totalItems > 0 ? Math.round(((checklistBreakdown['PICKED']?.count || 0) / totalItems) * 100) : 0}%)
-          </div>
-        </div>
-      </div>
+          {statusData && statusData.length > 0 && (
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {statusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
 
-      {/* MIDDLE COLUMN - STATUS BREAKDOWN */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold mb-4 border-b-2 border-[#D4A574] pb-2 text-white rounded-lg px-3 py-2" style={{ 
-          background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
-          boxShadow: '0 0 25px #D4A57460, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.4)',
-          textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
-        }}>Status Breakdown</h3>
-        
-        <div className="space-y-3 max-h-80 overflow-y-auto">
-          {[
-            'BLANK', 'PICKED', 'ORDER SAMPLES', 'SAMPLES ARRIVED', 'ASK NEIL', 'ASK CHARLENE', 
-            'ASK JALA', 'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION'
-          ].map(status => {
-            const statusData = checklistBreakdown[status] || { count: 0, color: '#6B7280' };
-            const count = statusData.count;
-            const percentage = totalItems > 0 ? (count / totalItems) * 100 : 0;
-            
-            return (
-              <div key={status} className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div 
-                    className="w-3 h-3 rounded-full border border-[#D4A574]" 
-                    style={{ 
-                      background: `linear-gradient(135deg, ${statusData.color}FF 0%, ${statusData.color}AA 50%, ${statusData.color}FF 100%)`,
-                      boxShadow: `0 0 8px ${statusData.color}60, inset 0 0 4px rgba(255, 255, 255, 0.2)`
-                    }}
-                  ></div>
-                  <span className="text-sm text-[#D4A574]">{status}</span>
+          <div className="mt-6 space-y-2">
+            {statusData.slice(0, 5).map(({ name, value, color }) => (
+              <div key={name} className="flex justify-between items-center text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
+                  <span className="text-[#D4C5A9]">{name}</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="bg-gray-700 rounded-full h-2 w-16">
-                    <div
-                      className="h-2 rounded-full transition-all duration-300"
-                      style={{
-                        background: `linear-gradient(90deg, ${statusData.color}FF 0%, ${statusData.color}AA 50%, ${statusData.color}FF 100%)`,
-                        boxShadow: `0 0 6px ${statusData.color}40`,
-                        width: `${percentage}%`
-                      }}
-                    />
+                <span className="text-[#D4A574] font-semibold">{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
+          background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+        }}>
+          <h3 className="text-lg font-semibold text-[#D4C5A9] mb-6">📦 Carrier Distribution</h3>
+          
+          {carrierData && carrierData.length > 0 ? (
+            <>
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={carrierData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {carrierData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={CARRIER_COLORS[index % CARRIER_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              
+              <div className="mt-6 space-y-2">
+                {carrierData.map(({ name, value }, index) => (
+                  <div key={name} className="flex justify-between items-center text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CARRIER_COLORS[index % CARRIER_COLORS.length] }}></div>
+                      <span className="text-[#D4C5A9]">{name}</span>
+                    </div>
+                    <span className="text-[#D4A574] font-semibold">{value}</span>
                   </div>
-                  <span className="text-sm font-medium text-[#D4C5A9] w-8 text-right">
-                    {count}
-                  </span>
-                </div>
+                ))}
               </div>
-            );
-          })}
+            </>
+          ) : (
+            <p className="text-[#D4C5A9] text-center py-8">No carriers assigned yet</p>
+          )}
         </div>
       </div>
 
-      {/* RIGHT COLUMN - CALCULATORS SECTION */}
       <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
         background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
       }}>
         <h3 className="text-lg font-semibold text-[#D4C5A9] mb-4">🧮 Quick Calculators</h3>
         
-        {/* CALCULATOR BUTTONS - DIFFERENT MUTED COLORS WITH SHIMMER */}
+        {/* CALCULATOR BUTTONS - STATIC SHIMMER NO ANIMATION */}
         <div className="space-y-3">
           <a 
             href="/power-features" 
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
               background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
-              backgroundSize: '200% auto',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-              animation: 'shimmer 3s linear infinite'
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             📐 Wallpaper Calculator
@@ -253,10 +161,8 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
               background: 'linear-gradient(135deg, #7A6A5A 0%, #8A7A6A 50%, #7A6A5A 100%)',
-              backgroundSize: '200% auto',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(122, 106, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-              animation: 'shimmer 3s linear infinite'
+              boxShadow: '0 4px 15px rgba(122, 106, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             🪟 Drapery Calculator
@@ -267,10 +173,8 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
               background: 'linear-gradient(135deg, #6A7A5A 0%, #7A8A6A 50%, #6A7A5A 100%)',
-              backgroundSize: '200% auto',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(106, 122, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-              animation: 'shimmer 3s linear infinite'
+              boxShadow: '0 4px 15px rgba(106, 122, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             🔧 Hardware Calculator
@@ -281,10 +185,8 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
               background: 'linear-gradient(135deg, #8A6A5A 0%, #9A7A6A 50%, #8A6A5A 100%)',
-              backgroundSize: '200% auto',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(138, 106, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-              animation: 'shimmer 3s linear infinite'
+              boxShadow: '0 4px 15px rgba(138, 106, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             🎨 Paint Calculator
@@ -295,10 +197,8 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
               background: 'linear-gradient(135deg, #6A5A8A 0%, #7A6A9A 50%, #6A5A8A 100%)',
-              backgroundSize: '200% auto',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(106, 90, 138, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-              animation: 'shimmer 3s linear infinite'
+              boxShadow: '0 4px 15px rgba(106, 90, 138, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             ⬜ Flooring Calculator
@@ -309,10 +209,8 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
               background: 'linear-gradient(135deg, #5A7A6A 0%, #6A8A7A 50%, #5A7A6A 100%)',
-              backgroundSize: '200% auto',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(90, 122, 106, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-              animation: 'shimmer 3s linear infinite'
+              boxShadow: '0 4px 15px rgba(90, 122, 106, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             💡 Lighting Calculator
@@ -323,10 +221,8 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
               background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
-              backgroundSize: '200% auto',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-              animation: 'shimmer 3s linear infinite'
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             ✨ View All Features
