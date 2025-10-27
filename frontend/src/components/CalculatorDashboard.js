@@ -84,7 +84,11 @@ const CalculatorDashboard = ({ projectId }) => {
       const res = await axios.post(`${API}/calculators/drapery`, draperyData);
       setResults(res.data);
     } catch (error) {
-      alert('Error calculating drapery: ' + (error.response?.data?.detail || error.message));
+      const errorMsg = error.response?.data?.detail 
+        ? JSON.stringify(error.response.data.detail) 
+        : error.message;
+      alert('Error calculating drapery: ' + errorMsg);
+      console.error('Drapery error:', error.response?.data);
     }
     setLoading(false);
   };
@@ -95,7 +99,11 @@ const CalculatorDashboard = ({ projectId }) => {
       const res = await axios.post(`${API}/calculators/hardware`, hardwareData);
       setResults(res.data);
     } catch (error) {
-      alert('Error calculating hardware: ' + (error.response?.data?.detail || error.message));
+      const errorMsg = error.response?.data?.detail 
+        ? JSON.stringify(error.response.data.detail) 
+        : error.message;
+      alert('Error calculating hardware: ' + errorMsg);
+      console.error('Hardware error:', error.response?.data);
     }
     setLoading(false);
   };
