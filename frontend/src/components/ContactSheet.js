@@ -17,7 +17,19 @@ const ContactSheet = ({ projectId }) => {
   useEffect(() => {
     loadContacts();
     loadRoles();
+    loadSavedContacts();
   }, [projectId]);
+
+  const loadSavedContacts = async () => {
+    try {
+      const saved = localStorage.getItem('saved_contacts');
+      if (saved) {
+        setSavedContacts(JSON.parse(saved));
+      }
+    } catch (err) {
+      console.error('Error loading saved contacts:', err);
+    }
+  };
 
   const loadContacts = async () => {
     try {
