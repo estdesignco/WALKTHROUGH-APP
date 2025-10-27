@@ -575,8 +575,10 @@ const styles = {
     marginBottom: '30px',
     padding: '30px 20px',
     background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+    backgroundSize: '200% auto',
     borderRadius: '10px',
-    boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+    boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+    animation: 'shimmer 3s linear infinite'
   },
   title: {
     fontSize: '32px',
