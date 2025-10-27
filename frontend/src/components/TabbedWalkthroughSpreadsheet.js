@@ -41,6 +41,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
   const [project, setProject] = useState(null);
   const [activeRoomTab, setActiveRoomTab] = useState(0);
   const [expandedCategories, setExpandedCategories] = useState({});
+  const hasExpandedInitially = useRef(false);
   const [loading, setLoading] = useState(true);
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
