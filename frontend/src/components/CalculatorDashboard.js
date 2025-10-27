@@ -347,7 +347,7 @@ const CalculatorDashboard = ({ projectId }) => {
                 <input
                   type="number"
                   value={hardwareData.window_width}
-                  onChange={(e) => setHardwareData({...hardwareData, window_width: parseFloat(e.target.value)})}
+                  onChange={(e) => setHardwareData({...hardwareData, window_width: e.target.value})}
                   style={styles.input}
                   placeholder="60-240"
                 />
@@ -357,7 +357,7 @@ const CalculatorDashboard = ({ projectId }) => {
                 <input
                   type="number"
                   value={hardwareData.rod_overhang_per_side}
-                  onChange={(e) => setHardwareData({...hardwareData, rod_overhang_per_side: parseFloat(e.target.value)})}
+                  onChange={(e) => setHardwareData({...hardwareData, rod_overhang_per_side: e.target.value})}
                   style={styles.input}
                   placeholder="6"
                 />
