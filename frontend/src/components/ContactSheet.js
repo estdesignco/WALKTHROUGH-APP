@@ -55,14 +55,41 @@ const ContactSheet = ({ projectId }) => {
         await axios.put(`${API}/contacts/${editingContact.id}`, formData);
       } else {
         await axios.post(`${API}/contacts`, { ...formData, project_id: projectId });
+        
+        // Save to library if checkbox is checked
+        if (formData.save_to_library) {
+          const newSaved = [...savedContacts, {
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.email,
+            role: formData.role,
+            company: formData.company,
+            address: formData.address
+          }];
+          setSavedContacts(newSaved);
+          localStorage.setItem('saved_contacts', JSON.stringify(newSaved));
+        }
       }
       loadContacts();
       setShowAddContact(false);
       setEditingContact(null);
-      setFormData({ name: '', phone: '', email: '', role: '', company: '', address: '', notes: '' });
+      setFormData({ name: '', phone: '', email: '', role: '', company: '', address: '', notes: '', save_to_library: false });
     } catch (err) {
       alert('Error saving contact: ' + err.message);
     }
+  };
+
+  const loadFromLibrary = (savedContact) => {
+    setFormData({
+      ...formData,
+      name: savedContact.name,
+      phone: savedContact.phone,
+      email: savedContact.email || '',
+      role: savedContact.role,
+      company: savedContact.company || '',
+      address: savedContact.address || ''
+    });
+    setShowLibrary(false);
   };
 
   const handleDelete = async (contactId) => {
