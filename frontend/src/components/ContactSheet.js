@@ -174,9 +174,18 @@ const ContactSheet = ({ projectId }) => {
                   <input
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    onChange={(e) => {
+                      let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                      if (value.length >= 6) {
+                        value = value.slice(0,3) + '-' + value.slice(3,6) + '-' + value.slice(6,10);
+                      } else if (value.length >= 3) {
+                        value = value.slice(0,3) + '-' + value.slice(3);
+                      }
+                      setFormData({...formData, phone: value});
+                    }}
                     className="w-full px-4 py-2 bg-black/60 border border-[#8b7355] text-[#D4C5A9] rounded-lg"
                     placeholder="555-123-4567"
+                    maxLength="12"
                   />
                 </div>
                 
