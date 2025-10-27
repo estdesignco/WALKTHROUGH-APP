@@ -567,60 +567,65 @@ const styles = {
     padding: '20px',
     maxWidth: '1200px',
     margin: '0 auto',
-    backgroundColor: '#1a1a1a',
-    borderRadius: '15px',
-    boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+    backgroundColor: '#0a0a0a',
+    minHeight: '100vh'
   },
   header: {
     textAlign: 'center',
     marginBottom: '30px',
-    padding: '20px',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    borderRadius: '10px'
+    padding: '30px 20px',
+    background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+    borderRadius: '10px',
+    boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
   },
   title: {
     fontSize: '32px',
-    fontWeight: 'bold',
-    color: '#ffffff',
-    margin: '0 0 10px 0'
+    fontWeight: '300',
+    color: '#1a1a1a',
+    margin: '0 0 10px 0',
+    letterSpacing: '2px'
   },
   subtitle: {
     fontSize: '16px',
-    color: '#e0e0e0',
+    color: '#2a2a2a',
     margin: 0
   },
   calculatorSelector: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-    gap: '10px',
+    gap: '15px',
     marginBottom: '30px'
   },
   calcButton: {
     padding: '15px 10px',
-    border: '2px solid #333',
+    border: '1px solid #8b7355',
     borderRadius: '10px',
-    backgroundColor: '#2a2a2a',
-    color: '#ffffff',
+    background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)',
+    color: '#D4C5A9',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '5px'
+    gap: '5px',
+    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
   },
   calcButtonActive: {
-    backgroundColor: '#667eea',
-    borderColor: '#667eea',
-    transform: 'scale(1.05)'
+    background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+    borderColor: '#a0845c',
+    color: '#1a1a1a',
+    transform: 'scale(1.05)',
+    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
   },
   calcIcon: {
     fontSize: '24px'
   },
   calculatorContent: {
-    backgroundColor: '#2a2a2a',
+    background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)',
     borderRadius: '10px',
     padding: '30px',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    border: '1px solid rgba(139, 115, 85, 0.3)'
   },
   form: {
     maxWidth: '800px',
@@ -628,13 +633,14 @@ const styles = {
   },
   formTitle: {
     fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: '10px'
+    fontWeight: '300',
+    color: '#D4A574',
+    marginBottom: '10px',
+    letterSpacing: '1px'
   },
   formSubtitle: {
     fontSize: '14px',
-    color: '#b0b0b0',
+    color: '#D4C5A9',
     marginBottom: '30px'
   },
   formGroup: {
@@ -649,7 +655,7 @@ const styles = {
   label: {
     display: 'block',
     marginBottom: '8px',
-    color: '#e0e0e0',
+    color: '#D4C5A9',
     fontSize: '14px',
     fontWeight: '500'
   },
@@ -657,9 +663,9 @@ const styles = {
     width: '100%',
     padding: '12px',
     borderRadius: '8px',
-    border: '2px solid #444',
-    backgroundColor: '#1a1a1a',
-    color: '#ffffff',
+    border: '1px solid #8b7355',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    color: '#D4C5A9',
     fontSize: '16px',
     boxSizing: 'border-box'
   },
@@ -667,16 +673,16 @@ const styles = {
     width: '100%',
     padding: '12px',
     borderRadius: '8px',
-    border: '2px solid #444',
-    backgroundColor: '#1a1a1a',
-    color: '#ffffff',
+    border: '1px solid #8b7355',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    color: '#D4C5A9',
     fontSize: '16px',
     boxSizing: 'border-box'
   },
   checkboxLabel: {
     display: 'flex',
     alignItems: 'center',
-    color: '#e0e0e0',
+    color: '#D4C5A9',
     fontSize: '14px',
     cursor: 'pointer'
   },
@@ -691,25 +697,27 @@ const styles = {
     padding: '15px',
     borderRadius: '10px',
     border: 'none',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    color: '#ffffff',
+    background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+    color: '#1a1a1a',
     fontSize: '18px',
     fontWeight: 'bold',
     cursor: 'pointer',
     transition: 'transform 0.2s ease',
-    marginTop: '20px'
+    marginTop: '20px',
+    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
   },
   results: {
-    backgroundColor: '#2a2a2a',
+    background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)',
     borderRadius: '10px',
     padding: '30px',
-    border: '2px solid #667eea'
+    border: '2px solid #8b7355'
   },
   resultsTitle: {
     fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#667eea',
-    marginBottom: '20px'
+    fontWeight: '300',
+    color: '#D4A574',
+    marginBottom: '20px',
+    letterSpacing: '1px'
   },
   resultsContent: {
     display: 'grid',
@@ -719,12 +727,12 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     padding: '15px',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     borderRadius: '8px',
-    borderLeft: '4px solid #667eea'
+    borderLeft: '4px solid #8b7355'
   },
   resultLabel: {
-    color: '#b0b0b0',
+    color: '#D4C5A9',
     fontSize: '14px',
     fontWeight: '500'
   },
