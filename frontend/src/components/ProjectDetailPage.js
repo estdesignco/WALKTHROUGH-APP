@@ -598,42 +598,6 @@ export default function ProjectDetailPage() {
                 <FFEDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading FF&E...</div> },
-        { name: "Contacts", icon: Users, component: project ? (
-            <div className="contacts-content">
-                <ContactSheet projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading contacts...</div> },
-
-        { name: "Finance", icon: DollarSign, component: project ? (
-            <div className="finance-content">
-                <FinanceDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading finance...</div> },
-        { name: "Calendar", icon: Calendar, component: project ? (
-            <div className="calendar-content">
-                <InstallationCalendar projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading calendar...</div> },
-        { name: "Reports", icon: BarChart3, component: project ? (
-            <div className="reports-content">
-                <ReportsDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading reports...</div> },
-        { name: "Design", icon: Palette, component: project ? (
-            <div className="design-content">
-                <DesignToolsDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading design tools...</div> },
-        { name: "Automation", icon: Zap, component: project ? (
-            <div className="automation-content">
-                <AutomationDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading automation...</div> },
-        { name: "Exports", icon: FileText, component: project ? (
-            <div className="exports-content">
-                <ExportsDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading exports...</div> },
         { name: "Measurements", icon: Aperture, component: project ? (
             <div className="measurements-content">
                 <MeasurementsAndFilesPage projectId={projectId} />
@@ -644,11 +608,46 @@ export default function ProjectDetailPage() {
                 <ToDoList projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading to-do list...</div> },
+        { name: "Calendar", icon: Calendar, component: project ? (
+            <div className="calendar-content">
+                <InstallationCalendar projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading calendar...</div> },
+        { name: "Contacts", icon: Users, component: project ? (
+            <div className="contacts-content">
+                <ContactSheet projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading contacts...</div> },
+        { name: "Design", icon: Palette, component: project ? (
+            <div className="design-content">
+                <DesignToolsDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading design tools...</div> },
+        { name: "Finance", icon: DollarSign, component: project ? (
+            <div className="finance-content">
+                <FinanceDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading finance...</div> },
         { name: "Calculators", icon: Calculator, component: project ? (
             <div className="calculators-content">
                 <PowerFeaturesDashboard />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading calculators...</div> },
+        { name: "Automation", icon: Zap, component: project ? (
+            <div className="automation-content">
+                <AutomationDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading automation...</div> },
+        { name: "Reports", icon: BarChart3, component: project ? (
+            <div className="reports-content">
+                <ReportsDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading reports...</div> },
+        { name: "Exports", icon: FileText, component: project ? (
+            <div className="exports-content">
+                <ExportsDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading exports...</div> },
     ];
 
     if (isLoading) {
