@@ -20,7 +20,8 @@ const CalculatorDashboard = ({ projectId }) => {
     pattern_repeat: 0,
     roll_width: 21,
     roll_length: 33,
-    fabric_width: 54
+    fabric_width: 54,
+    cost_per_roll: ''  // NEW: Cost per double roll
   });
 
   // DRAPERY CALCULATOR STATE
