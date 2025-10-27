@@ -9717,6 +9717,9 @@ async def import_google_sheets(project_id: str, data: dict):
 app.include_router(api_router)
 app.include_router(furniture_router)
 app.include_router(furniture_search_router, prefix="/api/furniture")
+app.include_router(contacts_router)
+contacts_api.set_db(db)
+
 app.include_router(calculator_router)
 app.include_router(power_features_router)
 
