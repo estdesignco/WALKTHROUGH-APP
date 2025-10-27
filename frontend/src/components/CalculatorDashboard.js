@@ -612,12 +612,10 @@ const styles = {
   },
   calcButtonActive: {
     background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
-    backgroundSize: '200% auto',
     borderColor: '#a0845c',
     color: '#1a1a1a',
     transform: 'scale(1.05)',
-    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-    animation: 'shimmer 3s linear infinite'
+    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
   },
   calcIcon: {
     fontSize: '24px'
