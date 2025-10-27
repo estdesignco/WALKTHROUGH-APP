@@ -6,6 +6,8 @@ const ContactSheet = ({ projectId }) => {
   const [roles, setRoles] = useState([]);
   const [showAddContact, setShowAddContact] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [savedContacts, setSavedContacts] = useState([]);
   const [formData, setFormData] = useState({
     name: '', phone: '', email: '', role: '', company: '', address: '', notes: '', save_to_library: false
   });
