@@ -61,11 +61,9 @@ const styles = {
     textAlign: 'center',
     marginBottom: '40px',
     padding: '40px 20px',
-    background: 'linear-gradient(135deg, #1e3a5f 0%, #2a5a8a 50%, #1e3a5f 100%)',
-    backgroundSize: '200% auto',
+    background: 'linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 50%, #2a3a4a 100%)',
     borderRadius: '15px',
-    boxShadow: '0 10px 40px rgba(30, 58, 95, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-    animation: 'shimmer 3s linear infinite'
+    boxShadow: '0 10px 40px rgba(42, 58, 74, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
   },
   mainTitle: {
     fontSize: '48px',
