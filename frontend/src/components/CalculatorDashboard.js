@@ -72,6 +72,15 @@ const CalculatorDashboard = ({ projectId }) => {
     setLoading(true);
     try {
       const res = await axios.post(`${API}/calculators/wallpaper`, wallpaperData);
+      
+      // Add cost calculation if cost_per_roll is provided
+      if (wallpaperData.cost_per_roll && res.data.rolls_needed) {
+        const costPerRoll = parseFloat(wallpaperData.cost_per_roll);
+        const totalCost = costPerRoll * res.data.rolls_needed;
+        res.data.cost_per_roll = costPerRoll.toFixed(2);
+        res.data.total_cost = totalCost.toFixed(2);
+      }
+      
       setResults(res.data);
     } catch (error) {
       alert('Error calculating wallpaper: ' + (error.response?.data?.detail || error.message));
