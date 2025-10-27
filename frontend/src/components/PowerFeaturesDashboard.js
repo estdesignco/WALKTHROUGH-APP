@@ -69,7 +69,7 @@ const styles = {
   mainTitle: {
     fontSize: '48px',
     fontWeight: '300',
-    color: '#ffffff',
+    color: '#D4C5A9',
     margin: '0 0 15px 0',
     textShadow: '0 2px 10px rgba(0,0,0,0.3)',
     letterSpacing: '2px'
