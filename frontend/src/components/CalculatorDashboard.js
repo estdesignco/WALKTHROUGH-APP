@@ -737,7 +737,7 @@ const styles = {
     fontWeight: '500'
   },
   resultValue: {
-    color: '#ffffff',
+    color: '#D4A574',
     fontSize: '18px',
     fontWeight: 'bold'
   }
