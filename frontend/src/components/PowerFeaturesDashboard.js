@@ -109,12 +109,10 @@ const styles = {
   },
   tabActive: {
     background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
-    backgroundSize: '200% auto',
     borderColor: '#a0845c',
     color: '#1a1a1a',
     transform: 'scale(1.05)',
-    boxShadow: '0 5px 20px rgba(139, 115, 85, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-    animation: 'shimmer 3s linear infinite'
+    boxShadow: '0 5px 20px rgba(139, 115, 85, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
   },
   tabIcon: {
     fontSize: '28px'
