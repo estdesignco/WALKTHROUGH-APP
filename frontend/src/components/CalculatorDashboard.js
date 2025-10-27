@@ -702,13 +702,15 @@ const styles = {
     borderRadius: '10px',
     border: 'none',
     background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+    backgroundSize: '200% auto',
     color: '#1a1a1a',
     fontSize: '18px',
     fontWeight: 'bold',
     cursor: 'pointer',
     transition: 'transform 0.2s ease',
     marginTop: '20px',
-    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    animation: 'shimmer 3s linear infinite'
   },
   results: {
     background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)',
