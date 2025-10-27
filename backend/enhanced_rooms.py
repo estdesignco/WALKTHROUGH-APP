@@ -1528,6 +1528,7 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
                     }
                 ]
             }
+        ]
     },
     
     "basement guest room": {
