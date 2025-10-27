@@ -148,9 +148,10 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             href="/power-features" 
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+              background: 'linear-gradient(135deg, #b8965c 0%, #a0845c 30%, #8b7355 70%, #6a5a4a 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+              border: '1px solid #8b7355',
+              boxShadow: '0 0 20px rgba(139, 115, 85, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
             }}
           >
             📐 Wallpaper Calculator
@@ -160,9 +161,10 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             href="/power-features" 
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #7A6A5A 0%, #8A7A6A 50%, #7A6A5A 100%)',
+              background: 'linear-gradient(135deg, #9a8a6a 0%, #8A7A6A 30%, #7A6A5A 70%, #5a4a3a 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(122, 106, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+              border: '1px solid #7A6A5A',
+              boxShadow: '0 0 20px rgba(122, 106, 90, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
             }}
           >
             🪟 Drapery Calculator
@@ -172,9 +174,10 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             href="/power-features" 
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #6A7A5A 0%, #7A8A6A 50%, #6A7A5A 100%)',
+              background: 'linear-gradient(135deg, #8a9a6a 0%, #7A8A6A 30%, #6A7A5A 70%, #4a5a3a 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(106, 122, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+              border: '1px solid #6A7A5A',
+              boxShadow: '0 0 20px rgba(106, 122, 90, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
             }}
           >
             🔧 Hardware Calculator
@@ -184,9 +187,10 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             href="/power-features" 
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #8A6A5A 0%, #9A7A6A 50%, #8A6A5A 100%)',
+              background: 'linear-gradient(135deg, #aa8a6a 0%, #9A7A6A 30%, #8A6A5A 70%, #5a4a3a 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(138, 106, 90, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+              border: '1px solid #8A6A5A',
+              boxShadow: '0 0 20px rgba(138, 106, 90, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
             }}
           >
             🎨 Paint Calculator
@@ -196,9 +200,10 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             href="/power-features" 
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #6A5A8A 0%, #7A6A9A 50%, #6A5A8A 100%)',
+              background: 'linear-gradient(135deg, #8a7aaa 0%, #7A6A9A 30%, #6A5A8A 70%, #4a3a5a 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(106, 90, 138, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+              border: '1px solid #6A5A8A',
+              boxShadow: '0 0 20px rgba(106, 90, 138, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
             }}
           >
             ⬜ Flooring Calculator
@@ -208,9 +213,10 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             href="/power-features" 
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #5A7A6A 0%, #6A8A7A 50%, #5A7A6A 100%)',
+              background: 'linear-gradient(135deg, #7a9a8a 0%, #6A8A7A 30%, #5A7A6A 70%, #3a5a4a 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(90, 122, 106, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+              border: '1px solid #5A7A6A',
+              boxShadow: '0 0 20px rgba(90, 122, 106, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
             }}
           >
             💡 Lighting Calculator
@@ -220,9 +226,10 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             href="/power-features" 
             className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+              background: 'linear-gradient(135deg, #b8965c 0%, #a0845c 30%, #8b7355 70%, #6a5a4a 100%)',
               color: '#1a1a1a',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+              border: '1px solid #8b7355',
+              boxShadow: '0 0 20px rgba(139, 115, 85, 0.3), inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)'
             }}
           >
             ✨ View All Features
