@@ -284,10 +284,11 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
           
           <a 
             href="/power-features" 
-            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105"
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl"
             style={{
-              background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-              color: 'white'
+              background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+              color: '#1a1a1a',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             ⬜ Flooring Calculator
@@ -295,10 +296,11 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
           
           <a 
             href="/power-features" 
-            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105"
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl"
             style={{
-              background: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
-              color: 'white'
+              background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+              color: '#1a1a1a',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             💡 Lighting Calculator
@@ -306,10 +308,11 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
           
           <a 
             href="/power-features" 
-            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105"
+            className="block w-full p-4 rounded-lg text-center font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl"
             style={{
-              background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-              color: '#333'
+              background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+              color: '#1a1a1a',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             ✨ View All Features
