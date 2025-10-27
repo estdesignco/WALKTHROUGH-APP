@@ -110,8 +110,16 @@ const CalculatorDashboard = ({ projectId }) => {
         pattern_repeat: draperyData.pattern_repeat ? parseFloat(draperyData.pattern_repeat) : null,
         include_lining: draperyData.include_lining
       };
-      console.log('Drapery payload:', payload);
       const res = await axios.post(`${API}/calculators/drapery`, payload);
+      
+      // Add cost calculation if cost_per_yard is provided
+      if (draperyData.cost_per_yard && res.data.fabric_yardage) {
+        const costPerYard = parseFloat(draperyData.cost_per_yard);
+        const totalCost = costPerYard * res.data.fabric_yardage;
+        res.data.cost_per_yard = costPerYard.toFixed(2);
+        res.data.total_fabric_cost = totalCost.toFixed(2);
+      }
+      
       setResults(res.data);
     } catch (error) {
       const errorMsg = error.response?.data?.detail 
@@ -139,8 +147,18 @@ const CalculatorDashboard = ({ projectId }) => {
         rod_diameter: parseFloat(hardwareData.rod_diameter) || 1.0,
         drapery_weight: hardwareData.drapery_weight
       };
-      console.log('Hardware payload:', payload);
       const res = await axios.post(`${API}/calculators/hardware`, payload);
+      
+      // Add cost calculation
+      if (hardwareData.cost_per_rod || hardwareData.cost_per_bracket) {
+        const rodCost = parseFloat(hardwareData.cost_per_rod) || 0;
+        const bracketCost = parseFloat(hardwareData.cost_per_bracket) || 0;
+        const totalCost = rodCost + (bracketCost * res.data.brackets_needed);
+        res.data.cost_per_rod = rodCost.toFixed(2);
+        res.data.cost_per_bracket = bracketCost.toFixed(2);
+        res.data.total_hardware_cost = totalCost.toFixed(2);
+      }
+      
       setResults(res.data);
     } catch (error) {
       const errorMsg = error.response?.data?.detail 
@@ -168,6 +186,15 @@ const CalculatorDashboard = ({ projectId }) => {
     setLoading(true);
     try {
       const res = await axios.post(`${API}/calculators/flooring`, flooringData);
+      
+      // Add cost calculation if cost_per_sqft is provided
+      if (flooringData.cost_per_sqft && res.data.room_square_footage) {
+        const costPerSqft = parseFloat(flooringData.cost_per_sqft);
+        const totalCost = costPerSqft * res.data.room_square_footage;
+        res.data.cost_per_sqft = costPerSqft.toFixed(2);
+        res.data.total_flooring_cost = totalCost.toFixed(2);
+      }
+      
       setResults(res.data);
     } catch (error) {
       alert('Error calculating flooring: ' + (error.response?.data?.detail || error.message));
