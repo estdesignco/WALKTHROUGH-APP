@@ -300,6 +300,21 @@ const ContactSheet = ({ projectId }) => {
                     placeholder="Additional notes..."
                   />
                 </div>
+
+                {!editingContact && (
+                  <div className="col-span-2">
+                    <label className="flex items-center gap-2 text-[#D4C5A9] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.save_to_library}
+                        onChange={(e) => setFormData({...formData, save_to_library: e.target.checked})}
+                        className="w-4 h-4"
+                      />
+                      <span>💾 Save to Contact Library (reuse on future projects)</span>
+                    </label>
+                  </div>
+                )}
+
               </div>
 
               <div className="flex gap-4 mt-6">
