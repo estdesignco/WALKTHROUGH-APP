@@ -79,46 +79,62 @@ const CalculatorDashboard = ({ projectId }) => {
   };
 
   const calculateDrapery = async () => {
+    // Validate required fields
+    if (!draperyData.window_width || !draperyData.finished_length) {
+      alert('Please enter Window Width and Finished Length!');
+      return;
+    }
+    
     setLoading(true);
     try {
-      // Convert empty strings to null/0 before sending
       const payload = {
-        ...draperyData,
-        window_width: parseFloat(draperyData.window_width) || 0,
-        finished_length: parseFloat(draperyData.finished_length) || 0,
+        window_width: parseFloat(draperyData.window_width),
+        finished_length: parseFloat(draperyData.finished_length),
+        pleat_type: draperyData.pleat_type,
         fullness_ratio: parseFloat(draperyData.fullness_ratio) || 2.5,
-        fabric_width: parseFloat(draperyData.fabric_width) || 54
+        fabric_width: parseFloat(draperyData.fabric_width) || 54,
+        pattern_repeat: draperyData.pattern_repeat ? parseFloat(draperyData.pattern_repeat) : null,
+        include_lining: draperyData.include_lining
       };
+      console.log('Drapery payload:', payload);
       const res = await axios.post(`${API}/calculators/drapery`, payload);
       setResults(res.data);
     } catch (error) {
       const errorMsg = error.response?.data?.detail 
-        ? JSON.stringify(error.response.data.detail) 
+        ? (Array.isArray(error.response.data.detail) 
+            ? error.response.data.detail.map(e => e.msg).join(', ')
+            : JSON.stringify(error.response.data.detail))
         : error.message;
-      alert('Error calculating drapery: ' + errorMsg);
-      console.error('Drapery error:', error.response?.data);
+      alert('Error: ' + errorMsg);
     }
     setLoading(false);
   };
 
   const calculateHardware = async () => {
+    // Validate required field
+    if (!hardwareData.window_width) {
+      alert('Please enter Window Width!');
+      return;
+    }
+    
     setLoading(true);
     try {
-      // Convert empty strings to null/0 before sending
       const payload = {
-        ...hardwareData,
-        window_width: parseFloat(hardwareData.window_width) || 0,
+        window_width: parseFloat(hardwareData.window_width),
         rod_overhang_per_side: parseFloat(hardwareData.rod_overhang_per_side) || 6,
-        rod_diameter: parseFloat(hardwareData.rod_diameter) || 1.0
+        rod_diameter: parseFloat(hardwareData.rod_diameter) || 1.0,
+        drapery_weight: hardwareData.drapery_weight
       };
+      console.log('Hardware payload:', payload);
       const res = await axios.post(`${API}/calculators/hardware`, payload);
       setResults(res.data);
     } catch (error) {
       const errorMsg = error.response?.data?.detail 
-        ? JSON.stringify(error.response.data.detail) 
+        ? (Array.isArray(error.response.data.detail) 
+            ? error.response.data.detail.map(e => e.msg).join(', ')
+            : JSON.stringify(error.response.data.detail))
         : error.message;
-      alert('Error calculating hardware: ' + errorMsg);
-      console.error('Hardware error:', error.response?.data);
+      alert('Error: ' + errorMsg);
     }
     setLoading(false);
   };
