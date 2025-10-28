@@ -1655,51 +1655,76 @@ async def get_projects():
     result = []
     
     for project_data in projects:
-        # Fetch rooms for each project
-        rooms = await db.rooms.find({"project_id": project_data["id"]}).to_list(1000)
-        project_data["rooms"] = []
-        
-        for room_data in rooms:
-            # Fetch categories for each room
-            categories = await db.categories.find({"room_id": room_data["id"]}).to_list(1000)
-            room_data["categories"] = []
+        try:
+            # Remove MongoDB _id field
+            if "_id" in project_data:
+                del project_data["_id"]
             
-            for category_data in categories:
-                # Fetch subcategories for each category
-                subcategories = await db.subcategories.find({"category_id": category_data["id"]}).to_list(1000)
-                category_data["subcategories"] = []
+            # Fetch rooms for each project
+            rooms = await db.rooms.find({"project_id": project_data["id"]}).to_list(1000)
+            project_data["rooms"] = []
+            
+            for room_data in rooms:
+                # Remove MongoDB _id field
+                if "_id" in room_data:
+                    del room_data["_id"]
                 
-                for subcategory_data in subcategories:
-                    # Fetch items for each subcategory
-                    items = await db.items.find({"subcategory_id": subcategory_data["id"]}).to_list(1000)
-                    # Fix any items with None names before validation
-                    for item in items:
-                        if not item.get("name"):
-                            item["name"] = "Unknown Product"
-                    subcategory_data["items"] = [Item(**item) for item in items]
+                # Fetch categories for each room
+                categories = await db.categories.find({"room_id": room_data["id"]}).to_list(1000)
+                room_data["categories"] = []
+                
+                for category_data in categories:
+                    # Remove MongoDB _id field
+                    if "_id" in category_data:
+                        del category_data["_id"]
                     
-                category_data["subcategories"] = [SubCategory(**subcat) for subcat in subcategories]
+                    # Fetch subcategories for each category
+                    subcategories = await db.subcategories.find({"category_id": category_data["id"]}).to_list(1000)
+                    category_data["subcategories"] = []
+                    
+                    for subcategory_data in subcategories:
+                        # Remove MongoDB _id field
+                        if "_id" in subcategory_data:
+                            del subcategory_data["_id"]
+                        
+                        # Fetch items for each subcategory
+                        items = await db.items.find({"subcategory_id": subcategory_data["id"]}).to_list(1000)
+                        # Fix any items with None names before validation
+                        for item in items:
+                            # Remove MongoDB _id field
+                            if "_id" in item:
+                                del item["_id"]
+                            if not item.get("name"):
+                                item["name"] = "Unknown Product"
+                        subcategory_data["items"] = [Item(**item) for item in items]
+                        
+                    category_data["subcategories"] = [SubCategory(**subcat) for subcat in subcategories]
+                    
+                room_data["categories"] = [Category(**cat) for cat in categories]
                 
-            room_data["categories"] = [Category(**cat) for cat in categories]
+            project_data["rooms"] = [Room(**room) for room in rooms]
             
-        project_data["rooms"] = [Room(**room) for room in rooms]
-        
-        # Ensure project_type has a valid value
-        if not project_data.get("project_type"):
-            project_data["project_type"] = "Renovation"
-            
-        # Ensure client_info fields have valid values
-        if project_data.get("client_info"):
-            if not project_data["client_info"].get("address"):
-                project_data["client_info"]["address"] = ""
-            if not project_data["client_info"].get("full_name"):
-                project_data["client_info"]["full_name"] = "Unknown Client"
-            if not project_data["client_info"].get("email"):
-                project_data["client_info"]["email"] = ""
-            if not project_data["client_info"].get("phone"):
-                project_data["client_info"]["phone"] = ""
-            
-        result.append(Project(**project_data))
+            # Ensure project_type has a valid value
+            if not project_data.get("project_type"):
+                project_data["project_type"] = "Renovation"
+                
+            # Ensure client_info fields have valid values
+            if project_data.get("client_info"):
+                if not project_data["client_info"].get("address"):
+                    project_data["client_info"]["address"] = ""
+                if not project_data["client_info"].get("full_name"):
+                    project_data["client_info"]["full_name"] = "Unknown Client"
+                if not project_data["client_info"].get("email"):
+                    project_data["client_info"]["email"] = ""
+                if not project_data["client_info"].get("phone"):
+                    project_data["client_info"]["phone"] = ""
+                
+            result.append(Project(**project_data))
+        except Exception as e:
+            print(f"❌ Error serializing project {project_data.get('name', 'unknown')}: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            continue
     
     return result
 
