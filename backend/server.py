@@ -5615,10 +5615,14 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
     Extract product links from a Canva board using advanced bot detection bypass
     """
     try:
-        print(f"🎨 EXTRACTING LINKS FROM CANVA BOARD WITH STEALTH MODE")
+        # Check if Playwright is available
+        if not PLAYWRIGHT_AVAILABLE:
+            raise HTTPException(
+                status_code=503,
+                detail="Web scraping feature not available. Playwright not installed."
+            )
         
-        # Import Playwright for scraping
-        from playwright.async_api import async_playwright
+        print(f"🎨 EXTRACTING LINKS FROM CANVA BOARD WITH STEALTH MODE")
         
         playwright = await async_playwright().start()
         
