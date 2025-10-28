@@ -307,16 +307,12 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
 
   const handleAddCategory = async (roomId, categoryName) => {
     try {
-      await axios.post(`${API_URL}/categories`, {
-        name: categoryName,
-        room_id: roomId,
-        project_id: projectId,
-        sheet_type: 'walkthrough'
-      });
+      // Use comprehensive endpoint to create category with ALL items
+      await axios.post(`${API_URL}/categories/comprehensive?room_id=${roomId}&category_name=${categoryName}`);
       await loadProject();
     } catch (error) {
       console.error('Failed to add category:', error);
-      alert('Failed to add category');
+      alert('Failed to add category: ' + (error.response?.data?.detail || error.message));
     }
   };
 
