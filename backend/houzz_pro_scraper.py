@@ -29,7 +29,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 # MongoDB connection
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(MONGO_URL)
-db = client.get_database('furniture_tracker')
+db = client[os.environ.get('DB_NAME', 'furniture_tracker')]
 
 # Backend API URL for posting scraped data
 BACKEND_URL = os.environ.get('BACKEND_URL', 'http://localhost:8001')
