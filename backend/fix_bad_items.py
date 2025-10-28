@@ -9,7 +9,7 @@ load_dotenv()
 
 async def fix_bad_items():
     client = AsyncIOMotorClient(os.environ.get('MONGO_URL'))
-    db = client.design_db
+    db = client[os.environ.get('DB_NAME', 'design_db')]
     
     # Find items with None or empty names
     bad_items = await db.items.find({"$or": [{"name": None}, {"name": ""}]}).to_list(None)
