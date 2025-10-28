@@ -9,7 +9,7 @@ import json
 import sys
 
 # Backend URL from frontend/.env
-BACKEND_URL = "https://designflow-hub-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://projectease-5.preview.emergentagent.com/api"
 
 def test_email_sending():
     """Test the send-questionnaire endpoint with exact data from review request"""

@@ -391,7 +391,7 @@ async def main():
     print("="*80)
     print(f"🎉 COMPLETE!")
     print(f"✅ Successfully imported {clipped} products")
-    print(f"🔗 View: https://designflow-hub-1.preview.emergentagent.com/furniture-search")
+    print(f"🔗 View: https://projectease-5.preview.emergentagent.com/furniture-search")
     print("="*80 + "\n")
     
     client.close()
