@@ -1634,7 +1634,7 @@ async def root():
 @api_router.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "healthy", "timestamp": datetime.utcnow()}
+    return {"status": "healthy", "timestamp": datetime.utcnow(), "version": "1.0.1-wheeler-active"}
 
 # PROJECT ENDPOINTS
 @api_router.post("/projects", response_model=Project)
