@@ -41,7 +41,7 @@ pdfminer.six==20250506
 pdfplumber==0.11.7
 pillow==11.3.0
 platformdirs==4.4.0
-playwright==1.40.0
+# playwright==1.40.0  # Removed - not needed for mobile app, only used for Houzz scraping
 pluggy==1.6.0
 pyasn1==0.6.1
 pycodestyle==2.14.0
