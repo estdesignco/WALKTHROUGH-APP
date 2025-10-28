@@ -694,6 +694,15 @@ export default function CustomerfacingQuestionnaire() {
                             <FieldWrapper label="Do you have an Architect? If so, please list Name and phone number below?">
                                 <Textarea className={inputStyles} value={formData.renovation_architect || ''} onChange={(e) => handleFormChange('renovation_architect', e.target.value)} />
                             </FieldWrapper>
+                            <FieldWrapper label="Other Team Members (Electrician, Plumber, Contractor, etc.) - Please list Name, Role, and Phone">
+                                <Textarea 
+                                    className={inputStyles} 
+                                    placeholder="Example: John Smith - Electrician - 555-1234&#10;Jane Doe - Plumber - 555-5678"
+                                    rows={4}
+                                    value={formData.renovation_other_team || ''} 
+                                    onChange={(e) => handleFormChange('renovation_other_team', e.target.value)} 
+                                />
+                            </FieldWrapper>
                             <InputField label="Do you have NEW UPDATED plans drawn?" id="renovation_has_new_plans" value={formData.renovation_has_new_plans || ''} onChange={(e) => handleFormChange('renovation_has_new_plans', e.target.value)} />
                             <FieldWrapper label="Briefly describe the existing condition of the space.">
                                 <Textarea className={inputStyles} value={formData.renovation_existing_condition || ''} onChange={(e) => handleFormChange('renovation_existing_condition', e.target.value)} />
