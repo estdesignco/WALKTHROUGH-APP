@@ -57,8 +57,15 @@ def create_wheeler_project():
         for i, room_name in enumerate(ROOMS, 1):
             print(f"  Adding room {i}/{len(ROOMS)}: {room_name}...")
             room_response = requests.post(
-                f"{BACKEND_URL}/projects/{project_id}/rooms",
-                json={"name": room_name},
+                f"{BACKEND_URL}/rooms",
+                json={
+                    "name": room_name,
+                    "project_id": project_id,
+                    "sheet_type": "walkthrough",
+                    "auto_populate": True,
+                    "description": "",
+                    "order_index": i
+                },
                 timeout=60
             )
             
@@ -66,6 +73,7 @@ def create_wheeler_project():
                 print(f"    ✅ {room_name} added with full structure")
             else:
                 print(f"    ⚠️ {room_name} failed: {room_response.status_code}")
+                print(f"        {room_response.text[:200]}")
         
         print(f"\n✅ Created {len(ROOMS)} rooms with full comprehensive structure!")
         return project_id
