@@ -5119,12 +5119,16 @@ async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
     REAL Houzz Pro clipper integration - Actually logs in and clips products
     """
     try:
+        # Check if Playwright is available
+        if not PLAYWRIGHT_AVAILABLE:
+            raise HTTPException(
+                status_code=503,
+                detail="Web scraping feature not available. Playwright not installed."
+            )
+        
         print(f"🏠 STARTING REAL HOUZZ PRO CLIPPING")
         print(f"   Product URL: {product_url}")
         print(f"   Product Name: {product_info.get('name', 'Unknown')}")
-        
-        # Import Playwright for browser automation
-        from playwright.async_api import async_playwright
         
         playwright = await async_playwright().start()
         
