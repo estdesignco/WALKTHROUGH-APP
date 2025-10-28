@@ -660,6 +660,15 @@ export default function CustomerfacingQuestionnaire() {
                             <FieldWrapper label="Do you have a builder? If so, please list Name and phone number below?">
                                 <Textarea className={inputStyles} value={formData.new_build_builder || ''} onChange={(e) => handleFormChange('new_build_builder', e.target.value)} />
                             </FieldWrapper>
+                            <FieldWrapper label="Other Team Members (Electrician, Plumber, Contractor, etc.) - Please list Name, Role, and Phone">
+                                <Textarea 
+                                    className={inputStyles} 
+                                    placeholder="Example: John Smith - Electrician - 555-1234&#10;Jane Doe - Plumber - 555-5678"
+                                    rows={4}
+                                    value={formData.new_build_other_team || ''} 
+                                    onChange={(e) => handleFormChange('new_build_other_team', e.target.value)} 
+                                />
+                            </FieldWrapper>
                             <InputField label="Do you have plans drawn?" id="new_build_has_plans" value={formData.new_build_has_plans || ''} onChange={(e) => handleFormChange('new_build_has_plans', e.target.value)} />
                             <InputField label="How far along in the building process are you?" id="new_build_process_stage" value={formData.new_build_process_stage || ''} onChange={(e) => handleFormChange('new_build_process_stage', e.target.value)} />
                             <FieldWrapper label="Once home is complete, will you be needing furniture? If so, give us an idea of what items you would love to procure!">
