@@ -10162,6 +10162,64 @@ async def save_questionnaire(project_id: str, data: dict):
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Spouse/Partner")
         
+        # Parse Other Team Members (New Build)
+        if answers.get('new_build_other_team'):
+            team_text = answers['new_build_other_team'].strip()
+            if team_text:
+                # Split by newlines
+                lines = [line.strip() for line in team_text.split('\n') if line.strip()]
+                for line in lines:
+                    # Try to parse format: "Name - Role - Phone"
+                    parts = [p.strip() for p in line.split('-')]
+                    if len(parts) >= 2:
+                        name = parts[0]
+                        role = parts[1] if len(parts) > 1 else 'Team Member'
+                        phone = parts[2] if len(parts) > 2 else ''
+                        
+                        contact_doc = {
+                            "id": str(uuid.uuid4()),
+                            "project_id": project_id,
+                            "name": name,
+                            "role": role,
+                            "phone": phone,
+                            "email": "",
+                            "company": "",
+                            "notes": "Added from questionnaire",
+                            "created_at": datetime.utcnow(),
+                            "updated_at": datetime.utcnow()
+                        }
+                        await db.contacts.insert_one(contact_doc)
+                        contacts_created.append(role)
+        
+        # Parse Other Team Members (Renovation)
+        if answers.get('renovation_other_team'):
+            team_text = answers['renovation_other_team'].strip()
+            if team_text:
+                # Split by newlines
+                lines = [line.strip() for line in team_text.split('\n') if line.strip()]
+                for line in lines:
+                    # Try to parse format: "Name - Role - Phone"
+                    parts = [p.strip() for p in line.split('-')]
+                    if len(parts) >= 2:
+                        name = parts[0]
+                        role = parts[1] if len(parts) > 1 else 'Team Member'
+                        phone = parts[2] if len(parts) > 2 else ''
+                        
+                        contact_doc = {
+                            "id": str(uuid.uuid4()),
+                            "project_id": project_id,
+                            "name": name,
+                            "role": role,
+                            "phone": phone,
+                            "email": "",
+                            "company": "",
+                            "notes": "Added from questionnaire",
+                            "created_at": datetime.utcnow(),
+                            "updated_at": datetime.utcnow()
+                        }
+                        await db.contacts.insert_one(contact_doc)
+                        contacts_created.append(role)
+        
         print(f"✅ Auto-created {len(contacts_created)} contacts from questionnaire: {contacts_created}")
         
         return {
