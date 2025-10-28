@@ -23,7 +23,7 @@ from playwright.async_api import async_playwright
 from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE  # Add comprehensive structure import
 from enhanced_rooms_intelligent import INTELLIGENT_ROOM_STRUCTURE  # Add intelligent structure import
 from complete_furniture_api import router as furniture_router
-from furniture_search import router as furniture_search_router
+# from furniture_search import router as furniture_search_router  # Removed - Houzz scraper not used
 from calculator_api import router as calculator_router
 from power_features_api import router as power_features_router
 from contacts_api import router as contacts_router
