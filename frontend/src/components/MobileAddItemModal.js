@@ -7,6 +7,7 @@ export default function MobileAddItemModal({
   onClose, 
   projectId, 
   rooms, 
+  selectedSubCategoryId,
   onItemAdded 
 }) {
   const [selectedRoom, setSelectedRoom] = useState('');
@@ -22,31 +23,39 @@ export default function MobileAddItemModal({
   const categories = selectedRoomData?.categories || [];
 
   const handleSubmit = async () => {
-    if (!itemName.trim() || !selectedRoom || !selectedCategory) {
-      alert('Please fill in all required fields');
+    if (!itemName.trim()) {
+      alert('Please enter item name');
       return;
     }
 
     try {
       setLoading(true);
       
-      // Find the first subcategory in the selected category
-      const category = categories.find(c => c.id === selectedCategory);
-      const subcategoryId = category?.subcategories?.[0]?.id;
+      // Use the passed selectedSubCategoryId if available, otherwise find from selection
+      let subcategoryId = selectedSubCategoryId;
       
       if (!subcategoryId) {
-        alert('No subcategory found');
-        return;
+        if (!selectedRoom || !selectedCategory) {
+          alert('Please select room and category');
+          return;
+        }
+        
+        const category = categories.find(c => c.id === selectedCategory);
+        subcategoryId = category?.subcategories?.[0]?.id;
+        
+        if (!subcategoryId) {
+          alert('No subcategory found');
+          return;
+        }
       }
 
       const newItem = {
-        name: itemName,
+        name: itemName.trim(),
         quantity: parseInt(quantity) || 1,
         size: size || "",
         vendor: vendor || "",
         sku: sku || "",
         subcategory_id: subcategoryId,
-        order_index: 0,
         finish_color: "",
         status: "",
         cost: 0,
@@ -56,8 +65,9 @@ export default function MobileAddItemModal({
       };
 
       console.log('Adding item:', newItem);
-      await axios.post(`${API_URL}/items`, newItem);
+      const response = await axios.post(`${API_URL}/items`, newItem);
       
+      console.log('✅ Item created:', response.data);
       alert('✅ Item added successfully!');
       onItemAdded();
       onClose();
@@ -65,10 +75,10 @@ export default function MobileAddItemModal({
       console.error('Failed to add item:', error);
       const errorMsg = error.response?.data?.detail 
         ? (Array.isArray(error.response.data.detail) 
-            ? error.response.data.detail.map(e => `${e.loc.join('.')}: ${e.msg}`).join('\n')
+            ? error.response.data.detail.map(e => `${e.loc?.join('.')}: ${e.msg}`).join('\n')
             : JSON.stringify(error.response.data.detail))
         : error.message;
-      alert('Failed to add item: ' + errorMsg);
+      alert('Failed to add item:\n' + errorMsg);
     } finally {
       setLoading(false);
     }
