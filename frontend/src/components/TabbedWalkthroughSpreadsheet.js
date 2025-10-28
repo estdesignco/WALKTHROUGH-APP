@@ -342,8 +342,8 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
     try {
       console.log('➕ Adding blank item to subcategory:', subcategoryId);
       
-      // Create a blank item that can be filled in
-      await axios.post(`${API_URL}/items`, {
+      // Create a blank item
+      const response = await axios.post(`${API_URL}/items`, {
         name: '',
         vendor: '',
         sku: '',
@@ -357,7 +357,24 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
       });
       
       console.log('✅ Blank item added successfully');
-      await loadProject();
+      
+      // Update local state instead of reloading entire project
+      const newItem = response.data;
+      setProject(prevProject => {
+        const updated = JSON.parse(JSON.stringify(prevProject));
+        updated.rooms = updated.rooms.map(r => ({
+          ...r,
+          categories: r.categories.map(c => ({
+            ...c,
+            subcategories: c.subcategories.map(s => 
+              s.id === subcategoryId 
+                ? { ...s, items: [...s.items, newItem] }
+                : s
+            )
+          }))
+        }));
+        return updated;
+      });
     } catch (error) {
       console.error('Failed to add blank item:', error);
       alert('Failed to add item: ' + error.message);
