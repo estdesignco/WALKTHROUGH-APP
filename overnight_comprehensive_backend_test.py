@@ -261,17 +261,31 @@ def test_calculator_apis():
         {
             "name": "Wallpaper Calculator",
             "endpoint": "/calculators/wallpaper",
-            "data": {"wall_height": 10, "wall_width": 12, "pattern_repeat": 24}
+            "data": {
+                "wallpaper_type": "double_roll",
+                "wall_width": 12.0,
+                "wall_height": 10.0,
+                "pattern_repeat": 24.0
+            }
         },
         {
             "name": "Drapery Calculator",
             "endpoint": "/calculators/drapery",
-            "data": {"window_width": 60, "window_height": 84, "fullness": 2.5}
+            "data": {
+                "window_width": 60.0,
+                "window_height": 84.0,
+                "fullness": 2.5,
+                "fabric_width": 54.0
+            }
         },
         {
             "name": "Hardware Calculator",
             "endpoint": "/calculators/hardware",
-            "data": {"cabinet_count": 10, "drawer_count": 5}
+            "data": {
+                "cabinet_doors": 10,
+                "drawer_fronts": 5,
+                "hardware_type": "knobs"
+            }
         },
         {
             "name": "Square Footage Calculator",
@@ -281,12 +295,23 @@ def test_calculator_apis():
         {
             "name": "Paint Calculator",
             "endpoint": "/calculators/paint",
-            "data": {"wall_height": 10, "wall_length": 40, "coats": 2}
+            "data": {
+                "wall_height": 10.0,
+                "total_wall_length": 40.0,
+                "coats": 2,
+                "door_count": 1,
+                "window_count": 2
+            }
         },
         {
             "name": "Tile/Flooring Calculator",
-            "endpoint": "/calculators/tile-flooring",
-            "data": {"room_length": 15, "room_width": 12, "tile_size": 12}
+            "endpoint": "/calculators/tile",
+            "data": {
+                "room_length": 15.0,
+                "room_width": 12.0,
+                "tile_length": 12.0,
+                "tile_width": 12.0
+            }
         },
         {
             "name": "Lighting Calculator",
@@ -295,8 +320,12 @@ def test_calculator_apis():
         },
         {
             "name": "Measurement Converter",
-            "endpoint": "/calculators/measurement-converter",
-            "data": {"value": 10, "from_unit": "feet", "to_unit": "inches"}
+            "endpoint": "/calculators/convert",
+            "data": {
+                "value": 10.0,
+                "from_unit": "feet",
+                "to_unit": "inches"
+            }
         }
     ]
     
@@ -307,7 +336,7 @@ def test_calculator_apis():
                 result = response.json()
                 log_result("passed", calc['name'], "PASS", f"Result: {json.dumps(result)[:100]}")
             else:
-                log_result("failed", calc['name'], "FAIL", f"Status: {response.status_code}")
+                log_result("failed", calc['name'], "FAIL", f"Status: {response.status_code}, Response: {response.text[:200]}")
         except Exception as e:
             log_result("failed", calc['name'], "FAIL", str(e))
 
