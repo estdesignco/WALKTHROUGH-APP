@@ -8202,11 +8202,12 @@ async def process_batch_categorization(job_id: str, item_ids: List[str]):
                 if not item:
                     continue
                 
-                # Get AI suggestion
+                # Get AI suggestion (internal API call)
                 import httpx
                 async with httpx.AsyncClient() as client:
+                    backend_url = os.environ.get('BACKEND_URL', 'http://localhost:8001')
                     response = await client.post(
-                        f"http://localhost:8001/api/ai/suggest-category",
+                        f"{backend_url}/api/ai/suggest-category",
                         params={
                             "item_name": item.get("name", ""),
                             "description": item.get("description", "")
