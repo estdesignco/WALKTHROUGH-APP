@@ -344,17 +344,16 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
       
       // Create a blank item that can be filled in
       await axios.post(`${API_URL}/items`, {
-        name: 'New Item',
+        name: '',
         vendor: '',
         sku: '',
-        quantity: '1',
+        quantity: 1,
         size: '',
         finish_color: '',
-        cost: '',
+        cost: 0,
         status: '',
         notes: '',
-        subcategory_id: subcategoryId,
-        order_index: 0
+        subcategory_id: subcategoryId
       });
       
       console.log('✅ Blank item added successfully');
