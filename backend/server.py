@@ -9492,7 +9492,7 @@ async def generate_electrician_sheet(project_id: str):
     try:
         # Use the existing API to get fully populated project
         import httpx
-        BACKEND_URL = "http://localhost:8001"
+        BACKEND_URL = os.environ.get('BACKEND_URL', 'http://localhost:8001')
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{BACKEND_URL}/api/projects/{project_id}?sheet_type=ffe")
             project = response.json()
