@@ -170,6 +170,8 @@ export default function CustomerfacingQuestionnaire() {
         budget_range: '',
         project_priority: [],
         other_project_description: '',
+        spouse_partner_name: '',
+        spouse_partner_phone: '',
         new_build_address: '',
         new_build_architect: '',
         new_build_builder: '',
