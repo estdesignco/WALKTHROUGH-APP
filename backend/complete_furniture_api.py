@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel
 import logging
-from houzz_working_integration import working_houzz_integration
+# from houzz_working_integration import working_houzz_integration  # Removed - Houzz scraper not used
 
 logger = logging.getLogger(__name__)
 
