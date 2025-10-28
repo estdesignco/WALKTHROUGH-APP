@@ -10142,6 +10142,26 @@ async def save_questionnaire(project_id: str, data: dict):
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Builder")
         
+        # Check for Spouse/Partner
+        if answers.get('spouse_partner_name'):
+            name = answers['spouse_partner_name'].strip()
+            phone = answers.get('spouse_partner_phone', '').strip()
+            if name:
+                contact_doc = {
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "name": name,
+                    "role": "Spouse/Partner",
+                    "phone": phone,
+                    "email": "",
+                    "company": "",
+                    "notes": "Added from questionnaire",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.contacts.insert_one(contact_doc)
+                contacts_created.append("Spouse/Partner")
+        
         print(f"✅ Auto-created {len(contacts_created)} contacts from questionnaire: {contacts_created}")
         
         return {
