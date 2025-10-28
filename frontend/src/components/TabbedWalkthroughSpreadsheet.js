@@ -264,8 +264,8 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
 
   const loadAvailableCategories = async () => {
     try {
-      const response = await axios.get(`${API_URL}/category-options`);
-      setAvailableCategories(response.data || []);
+      const response = await axios.get(`${API_URL}/categories/available`);
+      setAvailableCategories(response.data.categories || []);
     } catch (error) {
       console.error('Failed to load categories:', error);
     }
