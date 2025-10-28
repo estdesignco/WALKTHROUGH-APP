@@ -1652,10 +1652,12 @@ async def create_project(project: ProjectCreate):
 @api_router.get("/projects", response_model=List[Project])
 async def get_projects():
     projects = await db.projects.find().to_list(1000)
+    print(f"📊 Found {len(projects)} projects in database")
     result = []
     
     for project_data in projects:
         try:
+            print(f"🔄 Processing project: {project_data.get('name')}")
             # Remove MongoDB _id field
             if "_id" in project_data:
                 del project_data["_id"]
