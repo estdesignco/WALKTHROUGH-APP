@@ -28,7 +28,7 @@ def create_wheeler_project():
             "phone": "555-0100",
             "address": "Wheeler Ridge Estate"
         },
-        "project_type": "Full Home Design",
+        "project_type": "Renovation",
         "budget": "$500,000",
         "timeline": "6 months",
         "style_preferences": ["Modern", "Luxury"],
