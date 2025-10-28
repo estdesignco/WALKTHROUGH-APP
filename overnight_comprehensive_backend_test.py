@@ -412,13 +412,13 @@ def test_email_functionality():
             "client_email": "info@estdesignco.com",
             "sender_name": "Established Design Co."
         }
-        response = requests.post(f"{BASE_URL}/email/send-questionnaire", json=email_data, timeout=15)
+        response = requests.post(f"{BASE_URL}/send-questionnaire", json=email_data, timeout=15)
         if response.status_code == 200:
-            log_result("passed", "POST /email/send-questionnaire", "PASS", "Email sent successfully")
+            log_result("passed", "POST /send-questionnaire", "PASS", "Email sent successfully")
         else:
-            log_result("failed", "POST /email/send-questionnaire", "FAIL", f"Status: {response.status_code}, Response: {response.text[:200]}")
+            log_result("failed", "POST /send-questionnaire", "FAIL", f"Status: {response.status_code}, Response: {response.text[:200]}")
     except Exception as e:
-        log_result("failed", "POST /email/send-questionnaire", "FAIL", str(e))
+        log_result("failed", "POST /send-questionnaire", "FAIL", str(e))
 
 def test_power_features():
     """Test Power Features - Budget tracker, vendor manager, material library"""
