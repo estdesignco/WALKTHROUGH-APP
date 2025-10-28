@@ -3,13 +3,8 @@ set -e
 
 echo "🚀 Starting Interior Design App..."
 
-# Start MongoDB if not running
-if ! pgrep mongod > /dev/null; then
-    echo "Starting MongoDB..."
-    mkdir -p /data/db
-    mongod --fork --logpath /var/log/mongodb.log --dbpath /data/db
-    sleep 3
-fi
+# Note: MongoDB is provided by Emergent (managed service)
+# No need to start local MongoDB instance
 
 # Start Backend on port 8001
 echo "Starting Backend on port 8001..."
