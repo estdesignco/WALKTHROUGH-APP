@@ -1,10 +1,8 @@
 #!/bin/bash
 set -e
 
-# Start MongoDB
-mkdir -p /data/db
-mongod --fork --logpath /var/log/mongodb.log --dbpath /data/db
-sleep 3
+# Note: MongoDB is provided by Emergent (managed service)
+# No need to start local MongoDB instance
 
 # Start Backend
 cd /app/backend
