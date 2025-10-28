@@ -8,7 +8,13 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 from motor.motor_asyncio import AsyncIOMotorClient
-from playwright.async_api import async_playwright
+# Playwright is optional - only used for web scraping
+try:
+    from playwright.async_api import async_playwright
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
+    async_playwright = None
 import re
 from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
