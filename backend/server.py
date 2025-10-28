@@ -19,7 +19,13 @@ import uuid
 import time
 from datetime import datetime, timezone
 from enum import Enum
-from playwright.async_api import async_playwright
+# Playwright is optional - only used for web scraping features
+try:
+    from playwright.async_api import async_playwright
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
+    async_playwright = None
 from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE  # Add comprehensive structure import
 from enhanced_rooms_intelligent import INTELLIGENT_ROOM_STRUCTURE  # Add intelligent structure import
 from complete_furniture_api import router as furniture_router
