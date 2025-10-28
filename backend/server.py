@@ -9746,7 +9746,7 @@ async def import_google_sheets(project_id: str, data: dict):
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(furniture_router)
-app.include_router(furniture_search_router, prefix="/api/furniture")
+# app.include_router(furniture_search_router, prefix="/api/furniture")  # Removed - Houzz scraper not used
 app.include_router(contacts_router)
 contacts_api.set_db(db)
 
