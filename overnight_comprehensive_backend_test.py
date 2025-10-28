@@ -113,12 +113,13 @@ def test_rooms_api():
     print("TESTING ROOMS API")
     print("="*80)
     
-    # Test 1: Get rooms by project
+    # Test 1: Get rooms via project endpoint
     try:
-        response = requests.get(f"{BASE_URL}/rooms/by-project/{TEST_PROJECT_ID}", timeout=10)
+        response = requests.get(f"{BASE_URL}/projects/{TEST_PROJECT_ID}", timeout=10)
         if response.status_code == 200:
-            rooms = response.json()
-            log_result("passed", "GET /rooms/by-project/{id}", "PASS", f"Retrieved {len(rooms)} rooms")
+            project = response.json()
+            rooms = project.get('rooms', [])
+            log_result("passed", "GET /projects/{id} (Get rooms)", "PASS", f"Retrieved {len(rooms)} rooms")
             
             if len(rooms) > 0:
                 test_room_id = rooms[0].get('id')
@@ -134,9 +135,9 @@ def test_rooms_api():
                 except Exception as e:
                     log_result("failed", "PUT /rooms/{id} (Update)", "FAIL", str(e))
         else:
-            log_result("failed", "GET /rooms/by-project/{id}", "FAIL", f"Status: {response.status_code}")
+            log_result("failed", "GET /projects/{id} (Get rooms)", "FAIL", f"Status: {response.status_code}")
     except Exception as e:
-        log_result("failed", "GET /rooms/by-project/{id}", "FAIL", str(e))
+        log_result("failed", "GET /projects/{id} (Get rooms)", "FAIL", str(e))
     
     # Test 3: Create room with auto-populate
     try:
