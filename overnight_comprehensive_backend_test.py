@@ -351,10 +351,10 @@ def test_contact_api():
         new_contact = {
             "project_id": TEST_PROJECT_ID,
             "name": "Test Vendor",
-            "company": "Test Company",
-            "email": "vendor@test.com",
             "phone": "555-0199",
-            "type": "vendor",
+            "email": "vendor@test.com",
+            "role": "Vendor",
+            "company": "Test Company",
             "notes": "Test contact"
         }
         response = requests.post(f"{BASE_URL}/contacts", json=new_contact, timeout=10)
@@ -395,7 +395,7 @@ def test_contact_api():
             except Exception as e:
                 log_result("failed", "DELETE /contacts/{id}", "FAIL", str(e))
         else:
-            log_result("failed", "POST /contacts (Create)", "FAIL", f"Status: {response.status_code}")
+            log_result("failed", "POST /contacts (Create)", "FAIL", f"Status: {response.status_code}, Response: {response.text[:200]}")
     except Exception as e:
         log_result("failed", "POST /contacts (Create)", "FAIL", str(e))
 
