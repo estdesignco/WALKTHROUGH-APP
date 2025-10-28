@@ -9645,7 +9645,7 @@ async def generate_movers_ffe(project_id: str):
     """Generate simplified FFE for movers with pictures"""
     try:
         import httpx
-        BACKEND_URL = "http://localhost:8001"
+        BACKEND_URL = os.environ.get('BACKEND_URL', 'http://localhost:8001')
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{BACKEND_URL}/api/projects/{project_id}?sheet_type=ffe")
             project = response.json()
