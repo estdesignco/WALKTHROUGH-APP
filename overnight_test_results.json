@@ -4,73 +4,127 @@
       "test": "GET /projects",
       "status": "PASS",
       "details": "Retrieved 1 projects",
-      "timestamp": "2025-10-28T07:06:34.921185"
+      "timestamp": "2025-10-28T07:08:32.941199"
     },
     {
       "test": "GET /projects/{id}",
       "status": "PASS",
       "details": "Project: TEST PROJECT",
-      "timestamp": "2025-10-28T07:06:34.986510"
+      "timestamp": "2025-10-28T07:08:33.020590"
     },
     {
       "test": "POST /projects (Create)",
       "status": "PASS",
-      "details": "Created project ID: 5d7c707c-3432-44bc-b1a6-554469447ffa",
-      "timestamp": "2025-10-28T07:06:35.025448"
+      "details": "Created project ID: 81f676f9-595d-4981-ae3e-dfc93568c440",
+      "timestamp": "2025-10-28T07:08:33.055079"
     },
     {
       "test": "DELETE /projects/{id}",
       "status": "PASS",
       "details": "Project deleted successfully",
-      "timestamp": "2025-10-28T07:06:35.099246"
+      "timestamp": "2025-10-28T07:08:33.127298"
+    },
+    {
+      "test": "GET /projects/{id} (Get rooms)",
+      "status": "PASS",
+      "details": "Retrieved 2 rooms",
+      "timestamp": "2025-10-28T07:08:33.194402"
+    },
+    {
+      "test": "PUT /rooms/{id} (Update)",
+      "status": "PASS",
+      "details": "Room updated successfully",
+      "timestamp": "2025-10-28T07:08:33.229748"
     },
     {
       "test": "POST /rooms (Create with auto-populate)",
       "status": "PASS",
-      "details": "Created room ID: d518d0dc-f6f5-4b18-bcb6-4f8c67f9af48",
-      "timestamp": "2025-10-28T07:06:35.191079"
+      "details": "Created room ID: b6847195-4042-493e-9a46-88457c0f4b2c",
+      "timestamp": "2025-10-28T07:08:33.289203"
     },
     {
       "test": "DELETE /rooms/{id}",
       "status": "PASS",
       "details": "Room deleted successfully",
-      "timestamp": "2025-10-28T07:06:35.235991"
+      "timestamp": "2025-10-28T07:08:33.328505"
     },
     {
       "test": "POST /items (Add item)",
       "status": "PASS",
-      "details": "Created item ID: c6f7910a-0010-4bc6-8028-13ffdd51fa43",
-      "timestamp": "2025-10-28T07:06:35.340859"
+      "details": "Created item ID: f917a5ab-9041-439b-a3e2-eb1f194930e1",
+      "timestamp": "2025-10-28T07:08:33.440812"
     },
     {
       "test": "PUT /items/{id} (Update)",
       "status": "PASS",
       "details": "Item updated successfully",
-      "timestamp": "2025-10-28T07:06:35.378086"
+      "timestamp": "2025-10-28T07:08:33.476302"
     },
     {
       "test": "PUT /items/{id} (Check item)",
       "status": "PASS",
       "details": "Item checked successfully",
-      "timestamp": "2025-10-28T07:06:35.411273"
+      "timestamp": "2025-10-28T07:08:33.510347"
     },
     {
       "test": "DELETE /items/{id}",
       "status": "PASS",
       "details": "Item deleted successfully",
-      "timestamp": "2025-10-28T07:06:35.445622"
+      "timestamp": "2025-10-28T07:08:33.546663"
+    },
+    {
+      "test": "Wallpaper Calculator",
+      "status": "PASS",
+      "details": "Result: {\"type\": \"double_roll\", \"wall_area_sqft\": 120.0, \"opening_area_sqft\": 0, \"net_area_sqft\": 120.0, \"ro",
+      "timestamp": "2025-10-28T07:08:33.581115"
     },
     {
       "test": "Square Footage Calculator",
       "status": "PASS",
       "details": "Result: {\"square_footage\": 180.0, \"length\": 15.0, \"width\": 12.0, \"room_type\": \"rectangular\"}",
-      "timestamp": "2025-10-28T07:06:35.573829"
+      "timestamp": "2025-10-28T07:08:33.679462"
     },
     {
       "test": "Lighting Calculator",
       "status": "PASS",
       "details": "Result: {\"room_square_footage\": 180.0, \"total_lumens_needed\": 5400.0, \"lumens_per_sqft\": 30, \"fixtures_recom",
-      "timestamp": "2025-10-28T07:06:35.680271"
+      "timestamp": "2025-10-28T07:08:33.772386"
+    },
+    {
+      "test": "Measurement Converter",
+      "status": "PASS",
+      "details": "Result: {\"original_value\": 10.0, \"original_unit\": \"feet\", \"converted_value\": 120.0, \"converted_unit\": \"inche",
+      "timestamp": "2025-10-28T07:08:33.804242"
+    },
+    {
+      "test": "POST /contacts (Create)",
+      "status": "PASS",
+      "details": "Created contact ID: 8ecce398-af0f-4279-a72e-f727aad627cc",
+      "timestamp": "2025-10-28T07:08:33.846401"
+    },
+    {
+      "test": "GET /contacts/project/{id}",
+      "status": "PASS",
+      "details": "Retrieved 1 contacts",
+      "timestamp": "2025-10-28T07:08:33.876609"
+    },
+    {
+      "test": "PUT /contacts/{id} (Update)",
+      "status": "PASS",
+      "details": "Contact updated successfully",
+      "timestamp": "2025-10-28T07:08:33.908680"
+    },
+    {
+      "test": "DELETE /contacts/{id}",
+      "status": "PASS",
+      "details": "Contact deleted successfully",
+      "timestamp": "2025-10-28T07:08:33.944652"
+    },
+    {
+      "test": "POST /send-questionnaire",
+      "status": "PASS",
+      "details": "Email sent successfully",
+      "timestamp": "2025-10-28T07:08:38.168182"
     }
   ],
   "failed": [
@@ -78,79 +132,49 @@
       "test": "PUT /projects/{id} (Update)",
       "status": "FAIL",
       "details": "Status: 422",
-      "timestamp": "2025-10-28T07:06:35.062265"
-    },
-    {
-      "test": "GET /rooms/by-project/{id}",
-      "status": "FAIL",
-      "details": "Status: 404",
-      "timestamp": "2025-10-28T07:06:35.136021"
-    },
-    {
-      "test": "Wallpaper Calculator",
-      "status": "FAIL",
-      "details": "Status: 422",
-      "timestamp": "2025-10-28T07:06:35.476801"
+      "timestamp": "2025-10-28T07:08:33.089864"
     },
     {
       "test": "Drapery Calculator",
       "status": "FAIL",
-      "details": "Status: 422",
-      "timestamp": "2025-10-28T07:06:35.508564"
+      "details": "Status: 422, Response: {\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"finished_length\"],\"msg\":\"Field required\",\"input\":{\"window_width\":60.0,\"window_height\":84.0,\"fullness\":2.5,\"fabric_width\":54.0},\"url\":\"https://errors.pydanti",
+      "timestamp": "2025-10-28T07:08:33.616081"
     },
     {
       "test": "Hardware Calculator",
       "status": "FAIL",
-      "details": "Status: 422",
-      "timestamp": "2025-10-28T07:06:35.541079"
+      "details": "Status: 422, Response: {\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"window_width\"],\"msg\":\"Field required\",\"input\":{\"cabinet_doors\":10,\"drawer_fronts\":5,\"hardware_type\":\"knobs\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missi",
+      "timestamp": "2025-10-28T07:08:33.649312"
     },
     {
       "test": "Paint Calculator",
       "status": "FAIL",
-      "details": "Status: 422",
-      "timestamp": "2025-10-28T07:06:35.606204"
+      "details": "Status: 422, Response: {\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"room_length\"],\"msg\":\"Field required\",\"input\":{\"wall_height\":10.0,\"total_wall_length\":40.0,\"coats\":2,\"door_count\":1,\"window_count\":2},\"url\":\"https://errors.p",
+      "timestamp": "2025-10-28T07:08:33.709701"
     },
     {
       "test": "Tile/Flooring Calculator",
       "status": "FAIL",
-      "details": "Status: 404",
-      "timestamp": "2025-10-28T07:06:35.647136"
-    },
-    {
-      "test": "Measurement Converter",
-      "status": "FAIL",
-      "details": "Status: 404",
-      "timestamp": "2025-10-28T07:06:35.710132"
-    },
-    {
-      "test": "POST /contacts (Create)",
-      "status": "FAIL",
-      "details": "Status: 422",
-      "timestamp": "2025-10-28T07:06:35.748253"
-    },
-    {
-      "test": "POST /email/send-questionnaire",
-      "status": "FAIL",
       "details": "Status: 404, Response: {\"detail\":\"Not Found\"}",
-      "timestamp": "2025-10-28T07:06:35.778069"
+      "timestamp": "2025-10-28T07:08:33.740137"
     },
     {
       "test": "GET /power-features/budget/{id}",
       "status": "FAIL",
       "details": "Status: 404",
-      "timestamp": "2025-10-28T07:06:35.807779"
+      "timestamp": "2025-10-28T07:08:38.220802"
     },
     {
       "test": "GET /power-features/vendors",
       "status": "FAIL",
       "details": "Status: 404",
-      "timestamp": "2025-10-28T07:06:35.837264"
+      "timestamp": "2025-10-28T07:08:38.255237"
     },
     {
       "test": "GET /power-features/materials",
       "status": "FAIL",
       "details": "Status: 404",
-      "timestamp": "2025-10-28T07:06:35.869407"
+      "timestamp": "2025-10-28T07:08:38.289442"
     }
   ],
   "warnings": [],

@@ -1,0 +1,139 @@
+================================================================================
+COMPREHENSIVE OVERNIGHT BACKEND DIAGNOSTICS
+Testing ALL backend functionality
+================================================================================
+Backend URL: https://designflow-hub-1.preview.emergentagent.com/api
+Test Project ID: 35db1692-4325-47dc-9b66-16bfe9b9fcf3
+Started at: 2025-10-28T07:08:32.850412
+
+================================================================================
+TESTING PROJECTS API
+================================================================================
+✅ GET /projects: PASS
+   Details: Retrieved 1 projects
+✅ GET /projects/{id}: PASS
+   Details: Project: TEST PROJECT
+✅ POST /projects (Create): PASS
+   Details: Created project ID: 81f676f9-595d-4981-ae3e-dfc93568c440
+❌ PUT /projects/{id} (Update): FAIL
+   Details: Status: 422
+✅ DELETE /projects/{id}: PASS
+   Details: Project deleted successfully
+
+================================================================================
+TESTING ROOMS API
+================================================================================
+✅ GET /projects/{id} (Get rooms): PASS
+   Details: Retrieved 2 rooms
+✅ PUT /rooms/{id} (Update): PASS
+   Details: Room updated successfully
+✅ POST /rooms (Create with auto-populate): PASS
+   Details: Created room ID: b6847195-4042-493e-9a46-88457c0f4b2c
+✅ DELETE /rooms/{id}: PASS
+   Details: Room deleted successfully
+
+================================================================================
+TESTING ITEMS API
+================================================================================
+✅ POST /items (Add item): PASS
+   Details: Created item ID: f917a5ab-9041-439b-a3e2-eb1f194930e1
+✅ PUT /items/{id} (Update): PASS
+   Details: Item updated successfully
+✅ PUT /items/{id} (Check item): PASS
+   Details: Item checked successfully
+✅ DELETE /items/{id}: PASS
+   Details: Item deleted successfully
+
+================================================================================
+TESTING CALCULATOR APIs (8 calculators)
+================================================================================
+✅ Wallpaper Calculator: PASS
+   Details: Result: {"type": "double_roll", "wall_area_sqft": 120.0, "opening_area_sqft": 0, "net_area_sqft": 120.0, "ro
+❌ Drapery Calculator: FAIL
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","finished_length"],"msg":"Field required","input":{"window_width":60.0,"window_height":84.0,"fullness":2.5,"fabric_width":54.0},"url":"https://errors.pydanti
+❌ Hardware Calculator: FAIL
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","window_width"],"msg":"Field required","input":{"cabinet_doors":10,"drawer_fronts":5,"hardware_type":"knobs"},"url":"https://errors.pydantic.dev/2.11/v/missi
+✅ Square Footage Calculator: PASS
+   Details: Result: {"square_footage": 180.0, "length": 15.0, "width": 12.0, "room_type": "rectangular"}
+❌ Paint Calculator: FAIL
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","room_length"],"msg":"Field required","input":{"wall_height":10.0,"total_wall_length":40.0,"coats":2,"door_count":1,"window_count":2},"url":"https://errors.p
+❌ Tile/Flooring Calculator: FAIL
+   Details: Status: 404, Response: {"detail":"Not Found"}
+✅ Lighting Calculator: PASS
+   Details: Result: {"room_square_footage": 180.0, "total_lumens_needed": 5400.0, "lumens_per_sqft": 30, "fixtures_recom
+✅ Measurement Converter: PASS
+   Details: Result: {"original_value": 10.0, "original_unit": "feet", "converted_value": 120.0, "converted_unit": "inche
+
+================================================================================
+TESTING CONTACT API
+================================================================================
+✅ POST /contacts (Create): PASS
+   Details: Created contact ID: 8ecce398-af0f-4279-a72e-f727aad627cc
+✅ GET /contacts/project/{id}: PASS
+   Details: Retrieved 1 contacts
+✅ PUT /contacts/{id} (Update): PASS
+   Details: Contact updated successfully
+✅ DELETE /contacts/{id}: PASS
+   Details: Contact deleted successfully
+
+================================================================================
+TESTING EMAIL FUNCTIONALITY
+================================================================================
+✅ POST /send-questionnaire: PASS
+   Details: Email sent successfully
+
+================================================================================
+TESTING POWER FEATURES
+================================================================================
+❌ GET /power-features/budget/{id}: FAIL
+   Details: Status: 404
+❌ GET /power-features/vendors: FAIL
+   Details: Status: 404
+❌ GET /power-features/materials: FAIL
+   Details: Status: 404
+
+================================================================================
+COMPREHENSIVE TEST SUMMARY
+================================================================================
+
+Total Tests: 29
+✅ Passed: 21
+❌ Failed: 8
+⚠️  Warnings: 0
+
+================================================================================
+FAILED TESTS:
+================================================================================
+
+❌ PUT /projects/{id} (Update)
+   Details: Status: 422
+
+❌ Drapery Calculator
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","finished_length"],"msg":"Field required","input":{"window_width":60.0,"window_height":84.0,"fullness":2.5,"fabric_width":54.0},"url":"https://errors.pydanti
+
+❌ Hardware Calculator
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","window_width"],"msg":"Field required","input":{"cabinet_doors":10,"drawer_fronts":5,"hardware_type":"knobs"},"url":"https://errors.pydantic.dev/2.11/v/missi
+
+❌ Paint Calculator
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","room_length"],"msg":"Field required","input":{"wall_height":10.0,"total_wall_length":40.0,"coats":2,"door_count":1,"window_count":2},"url":"https://errors.p
+
+❌ Tile/Flooring Calculator
+   Details: Status: 404, Response: {"detail":"Not Found"}
+
+❌ GET /power-features/budget/{id}
+   Details: Status: 404
+
+❌ GET /power-features/vendors
+   Details: Status: 404
+
+❌ GET /power-features/materials
+   Details: Status: 404
+
+================================================================================
+PERFORMANCE ANALYSIS:
+================================================================================
+All tests completed within acceptable timeframes (10-15s timeout)
+
+✅ Detailed results saved to: /app/overnight_test_results.json
+
+Completed at: 2025-10-28T07:08:38.290513
