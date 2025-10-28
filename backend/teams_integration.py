@@ -14,9 +14,13 @@ load_dotenv()
 
 class TeamsIntegration:
     def __init__(self):
-        self.teams_email = os.getenv('TEAMS_EMAIL', 'Neil@estdesignco.com')
-        self.teams_password = os.getenv('TEAMS_PASSWORD', 'Tazz1991!!!!')
+        self.teams_email = os.getenv('TEAMS_EMAIL')
+        self.teams_password = os.getenv('TEAMS_PASSWORD')
         self.webhook_url = os.getenv('TEAMS_WEBHOOK_URL', '')
+        
+        # Validate required credentials (only warn, don't fail - Teams is optional)
+        if not self.teams_email or not self.teams_password:
+            logging.warning("Teams credentials not configured. Teams integration will be disabled.")
         
     async def create_todo_item(self, project_name: str, item_name: str, old_status: str, new_status: str, 
                              room_name: str, vendor: str = "", cost: float = 0.0) -> bool:
