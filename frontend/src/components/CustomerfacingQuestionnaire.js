@@ -175,6 +175,7 @@ export default function CustomerfacingQuestionnaire() {
         new_build_address: '',
         new_build_architect: '',
         new_build_builder: '',
+        new_build_other_team: '',
         new_build_has_plans: '',
         new_build_process_stage: '',
         new_build_need_furniture: '',
