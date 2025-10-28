@@ -428,36 +428,36 @@ def test_power_features():
     
     # Test 1: Budget tracker
     try:
-        response = requests.get(f"{BASE_URL}/power-features/budget/{TEST_PROJECT_ID}", timeout=10)
+        response = requests.get(f"{BASE_URL}/budget/{TEST_PROJECT_ID}", timeout=10)
         if response.status_code == 200:
             budget_data = response.json()
-            log_result("passed", "GET /power-features/budget/{id}", "PASS", f"Budget data retrieved")
+            log_result("passed", "GET /budget/{id}", "PASS", f"Budget data retrieved")
         else:
-            log_result("failed", "GET /power-features/budget/{id}", "FAIL", f"Status: {response.status_code}")
+            log_result("failed", "GET /budget/{id}", "FAIL", f"Status: {response.status_code}")
     except Exception as e:
-        log_result("failed", "GET /power-features/budget/{id}", "FAIL", str(e))
+        log_result("failed", "GET /budget/{id}", "FAIL", str(e))
     
     # Test 2: Vendor contact manager
     try:
-        response = requests.get(f"{BASE_URL}/power-features/vendors", timeout=10)
+        response = requests.get(f"{BASE_URL}/vendors", timeout=10)
         if response.status_code == 200:
             vendors = response.json()
-            log_result("passed", "GET /power-features/vendors", "PASS", f"Retrieved {len(vendors)} vendors")
+            log_result("passed", "GET /vendors", "PASS", f"Retrieved {len(vendors)} vendors")
         else:
-            log_result("failed", "GET /power-features/vendors", "FAIL", f"Status: {response.status_code}")
+            log_result("failed", "GET /vendors", "FAIL", f"Status: {response.status_code}")
     except Exception as e:
-        log_result("failed", "GET /power-features/vendors", "FAIL", str(e))
+        log_result("failed", "GET /vendors", "FAIL", str(e))
     
     # Test 3: Material library
     try:
-        response = requests.get(f"{BASE_URL}/power-features/materials", timeout=10)
+        response = requests.get(f"{BASE_URL}/materials", timeout=10)
         if response.status_code == 200:
             materials = response.json()
-            log_result("passed", "GET /power-features/materials", "PASS", f"Retrieved materials library")
+            log_result("passed", "GET /materials", "PASS", f"Retrieved {len(materials)} materials")
         else:
-            log_result("failed", "GET /power-features/materials", "FAIL", f"Status: {response.status_code}")
+            log_result("failed", "GET /materials", "FAIL", f"Status: {response.status_code}")
     except Exception as e:
-        log_result("failed", "GET /power-features/materials", "FAIL", str(e))
+        log_result("failed", "GET /materials", "FAIL", str(e))
 
 def print_summary():
     """Print comprehensive test summary"""
