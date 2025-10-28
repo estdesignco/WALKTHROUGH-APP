@@ -9592,7 +9592,7 @@ async def generate_load_in_sheets(project_id: str):
     """Generate load-in room sheets"""
     try:
         import httpx
-        BACKEND_URL = "http://localhost:8001"
+        BACKEND_URL = os.environ.get('BACKEND_URL', 'http://localhost:8001')
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{BACKEND_URL}/api/projects/{project_id}?sheet_type=ffe")
             project = response.json()
