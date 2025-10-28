@@ -16,7 +16,7 @@ router = APIRouter()
 # MongoDB connection
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(MONGO_URL)
-db = client.get_database('furniture_tracker')
+db = client[os.environ.get('DB_NAME', 'furniture_tracker')]
 
 # TRADE FURNITURE VENDOR DATABASE - YOUR ACTUAL VENDORS
 TRADE_VENDORS = [
