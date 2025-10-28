@@ -42,13 +42,20 @@ export default function MobileAddItemModal({
       const newItem = {
         name: itemName,
         quantity: parseInt(quantity) || 1,
-        size,
-        vendor,
-        sku,
+        size: size || "",
+        vendor: vendor || "",
+        sku: sku || "",
         subcategory_id: subcategoryId,
-        order_index: 0
+        order_index: 0,
+        finish_color: "",
+        status: "",
+        cost: 0,
+        remarks: "",
+        link: "",
+        image_url: ""
       };
 
+      console.log('Adding item:', newItem);
       await axios.post(`${API_URL}/items`, newItem);
       
       alert('✅ Item added successfully!');
@@ -56,7 +63,12 @@ export default function MobileAddItemModal({
       onClose();
     } catch (error) {
       console.error('Failed to add item:', error);
-      alert('Failed to add item');
+      const errorMsg = error.response?.data?.detail 
+        ? (Array.isArray(error.response.data.detail) 
+            ? error.response.data.detail.map(e => `${e.loc.join('.')}: ${e.msg}`).join('\n')
+            : JSON.stringify(error.response.data.detail))
+        : error.message;
+      alert('Failed to add item: ' + errorMsg);
     } finally {
       setLoading(false);
     }
