@@ -8719,11 +8719,12 @@ async def process_pdf_preview(
         
         for link in product_links:
             try:
-                # Scrape product
+                # Scrape product (internal API call)
                 import httpx
+                backend_url = os.environ.get('BACKEND_URL', 'http://localhost:8001')
                 async with httpx.AsyncClient(timeout=300.0) as client:
                     scrape_res = await client.post(
-                        f"http://localhost:8001/api/scrape-product",
+                        f"{backend_url}/api/scrape-product",
                         json={"url": link, "auto_clip_to_houzz": True}
                     )
                     
