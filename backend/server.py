@@ -10022,7 +10022,7 @@ async def export_ffe_to_pdf(data: dict):
 
 @api_router.post("/questionnaire/{project_id}")
 async def save_questionnaire(project_id: str, data: dict):
-    """Save questionnaire answers for project"""
+    """Save questionnaire answers for project and auto-create contacts"""
     try:
         questionnaire_doc = {
             "id": str(uuid.uuid4()),
@@ -10041,10 +10041,114 @@ async def save_questionnaire(project_id: str, data: dict):
             upsert=True
         )
         
+        # AUTO-CREATE CONTACTS FROM QUESTIONNAIRE
+        answers = data.get("answers", {})
+        contacts_created = []
+        
+        # Helper function to parse contact info (Name: phone)
+        def parse_contact_info(text):
+            """Extract name and phone from text like 'John Doe: 555-1234'"""
+            if not text or text.strip() == '':
+                return None
+            
+            text = text.strip()
+            # Try to split by : or - or ,
+            if ':' in text:
+                parts = text.split(':', 1)
+                name = parts[0].strip()
+                phone = parts[1].strip() if len(parts) > 1 else ''
+            elif '-' in text and len(text.split('-')) >= 3:
+                # Might be just phone number
+                name = 'Contact'
+                phone = text.strip()
+            else:
+                # Just name provided
+                name = text.strip()
+                phone = ''
+            
+            return {'name': name, 'phone': phone}
+        
+        # Check for New Build contacts
+        if answers.get('new_build_architect'):
+            contact_info = parse_contact_info(answers['new_build_architect'])
+            if contact_info:
+                contact_doc = {
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "name": contact_info['name'],
+                    "role": "Architect",
+                    "phone": contact_info['phone'],
+                    "email": "",
+                    "company": "",
+                    "notes": "Added from questionnaire",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.contacts.insert_one(contact_doc)
+                contacts_created.append("Architect")
+        
+        if answers.get('new_build_builder'):
+            contact_info = parse_contact_info(answers['new_build_builder'])
+            if contact_info:
+                contact_doc = {
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "name": contact_info['name'],
+                    "role": "Builder",
+                    "phone": contact_info['phone'],
+                    "email": "",
+                    "company": "",
+                    "notes": "Added from questionnaire",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.contacts.insert_one(contact_doc)
+                contacts_created.append("Builder")
+        
+        # Check for Renovation contacts
+        if answers.get('renovation_architect'):
+            contact_info = parse_contact_info(answers['renovation_architect'])
+            if contact_info:
+                contact_doc = {
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "name": contact_info['name'],
+                    "role": "Architect",
+                    "phone": contact_info['phone'],
+                    "email": "",
+                    "company": "",
+                    "notes": "Added from questionnaire",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.contacts.insert_one(contact_doc)
+                contacts_created.append("Architect")
+        
+        if answers.get('renovation_builder'):
+            contact_info = parse_contact_info(answers['renovation_builder'])
+            if contact_info:
+                contact_doc = {
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "name": contact_info['name'],
+                    "role": "Builder",
+                    "phone": contact_info['phone'],
+                    "email": "",
+                    "company": "",
+                    "notes": "Added from questionnaire",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.contacts.insert_one(contact_doc)
+                contacts_created.append("Builder")
+        
+        print(f"✅ Auto-created {len(contacts_created)} contacts from questionnaire: {contacts_created}")
+        
         return {
             "success": True,
             "questionnaire_id": questionnaire_doc["id"],
-            "completion_percentage": questionnaire_doc["completion_percentage"]
+            "completion_percentage": questionnaire_doc["completion_percentage"],
+            "contacts_created": contacts_created
         }
         
     except Exception as e:
