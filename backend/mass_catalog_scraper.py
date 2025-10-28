@@ -13,7 +13,7 @@ import requests
 # MongoDB connection
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(MONGO_URL)
-db = client.get_database('furniture_tracker')
+db = client[os.environ.get('DB_NAME', 'furniture_tracker')]
 
 # YOUR ACTUAL TRADE VENDORS WITH SCRAPING STRATEGIES
 TRADE_VENDOR_CONFIGS = [
