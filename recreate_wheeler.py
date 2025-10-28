@@ -4,7 +4,7 @@ import requests
 import json
 from datetime import datetime
 
-BACKEND_URL = "https://designflow-hub-1.preview.emergentagent.com/api"
+BACKEND_URL = "http://localhost:8001/api"
 
 # 17 rooms from the original WHEELER RIDGE project
 ROOMS = [
