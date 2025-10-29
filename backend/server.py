@@ -9222,6 +9222,14 @@ async def import_google_sheets(project_id: str, data: dict):
 
 # Include the router in the main app
 app.include_router(api_router)
+
+
+# ROOT-LEVEL HEALTH CHECK for Kubernetes probes (without /api prefix)
+@app.get("/health")
+async def root_health_check():
+    """Root-level health check for Kubernetes readiness/liveness probes"""
+    return {"status": "healthy", "timestamp": datetime.utcnow(), "version": "1.0.1"}
+
 app.include_router(furniture_router)
 # app.include_router(furniture_search_router, prefix="/api/furniture")  # Removed - Houzz scraper not used
 app.include_router(contacts_router)
