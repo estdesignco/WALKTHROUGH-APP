@@ -9,7 +9,6 @@ frontend/.env
 **/*.pyo
 
 # Development files
-node_modules
 .git
 .gitignore
 *.log
