@@ -1,0 +1,15 @@
+# Prevent .env files from being deployed
+backend/.env
+frontend/.env
+.env
+
+# Prevent cache from being deployed
+**/__pycache__
+**/*.pyc
+**/*.pyo
+
+# Development files
+node_modules
+.git
+.gitignore
+*.log
