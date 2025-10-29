@@ -9862,30 +9862,7 @@ async def save_clipped_product_to_app(data: dict):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@api_router.post("/clipper/save-to-houzz")
-async def save_clipped_product_to_houzz(data: dict):
-    """Save clipped product to Houzz Pro - Placeholder for Houzz API integration"""
-    try:
-        # TODO: Integrate with actual Houzz Pro API
-        # For now, just log the data
-        print("\n" + "="*60)
-        print("HOUZZ PRO CLIPPER DATA:")
-        print("="*60)
-        print(f"Product: {data.get('productTitle')}")
-        print(f"Cost: {data.get('cost')}")
-        print(f"Vendor: {data.get('vendor')}")
-        print(f"Project: {data.get('projectId')}")
-        print(f"Room: {data.get('room')}")
-        print("="*60 + "\n")
-        
-        # Return success for now
-        return {"success": True, "message": "Product logged for Houzz Pro (API integration pending)"}
-        
-    except Exception as e:
-        print(f"Error saving to Houzz: {e}")
-        # Don't fail if Houzz save fails
-        return {"success": False, "message": str(e)}
-
+# REMOVED: Houzz Pro integration - not in use
 
 # COMPLETE WALKTHROUGH ENDPOINT
 @api_router.post("/complete-walkthrough/{project_id}")
