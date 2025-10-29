@@ -5,6 +5,12 @@ echo "🚀 Starting Interior Design App..."
 
 # Note: MongoDB is provided by Emergent (managed service)
 
+# CRITICAL: Clean Python bytecode cache to prevent stale imports
+echo "Cleaning Python cache..."
+find /app/backend -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+find /app/backend -name "*.pyc" -delete 2>/dev/null || true
+echo "✅ Cache cleaned"
+
 # Start Backend
 echo "Starting backend on port 8001..."
 cd /app/backend
