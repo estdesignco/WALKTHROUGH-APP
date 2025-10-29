@@ -8202,7 +8202,7 @@ async def process_pdf_preview(
                 async with httpx.AsyncClient(timeout=300.0) as client:
                     scrape_res = await client.post(
                         f"{backend_url}/api/scrape-product",
-                        json={"url": link, "auto_clip_to_houzz": True}
+                        json={"url": link}
                     )
                     
                     if scrape_res.status_code == 200:
@@ -8611,7 +8611,7 @@ async def process_pdf_import(
                 async with httpx.AsyncClient(timeout=300.0) as client:  # 5 minutes per product
                     scrape_res = await client.post(
                         f"{backend_url}/api/scrape-product",
-                        json={"url": link, "auto_clip_to_houzz": True}
+                        json={"url": link}
                     )
                     
                     if scrape_res.status_code == 200:
