@@ -4,7 +4,6 @@ set -e
 echo "🚀 Starting Interior Design App..."
 
 # Note: MongoDB is provided by Emergent (managed service)
-# No need to start local MongoDB instance
 
 # Start Backend
 echo "Starting backend on port 8001..."
@@ -12,16 +11,18 @@ cd /app/backend
 /root/.venv/bin/uvicorn server:app --host 0.0.0.0 --port 8001 > /tmp/backend.log 2>&1 &
 BACKEND_PID=$!
 
-# Wait for backend to be ready
+# Wait for backend to be ready (using wget instead of curl for better compatibility)
 echo "Waiting for backend to start..."
-for i in {1..30}; do
-    if curl -s http://localhost:8001/api/health > /dev/null 2>&1; then
+for i in {1..60}; do
+    if wget -q -O- http://localhost:8001/api/health > /dev/null 2>&1; then
         echo "✅ Backend is ready!"
         break
     fi
-    if [ $i -eq 30 ]; then
-        echo "❌ Backend failed to start within 30 seconds"
+    if [ $i -eq 60 ]; then
+        echo "❌ Backend failed to start within 60 seconds"
+        echo "=== BACKEND LOGS ==="
         cat /tmp/backend.log
+        echo "===================="
         exit 1
     fi
     sleep 1
@@ -30,4 +31,4 @@ done
 # Start Frontend
 echo "Starting frontend on port 3000..."
 cd /app/frontend  
-yarn start
+exec yarn start
