@@ -5101,19 +5101,7 @@ async def scrape_product_advanced(data: dict):
         print(f"❌ SCRAPE ERROR DETAILS:\n{error_details}")
         raise HTTPException(status_code=400, detail=f"Failed to scrape URL: {str(e)}")
 
-async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
-    """
-    REAL Houzz Pro clipper integration - Actually logs in and clips products
-    """
-    try:
-        # Check if Playwright is available
-        if not PLAYWRIGHT_AVAILABLE:
-            raise HTTPException(
-                status_code=503,
-                detail="Web scraping feature not available. Playwright not installed."
-            )
-        
-        print(f"🏠 STARTING REAL HOUZZ PRO CLIPPING")
+# REMOVED HOUZZ FUNCTION: async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
 async def extract_links_from_canva_board(board_url: str, page_number: Optional[int] = None) -> list:
     """
     Extract product links from a Canva board using advanced bot detection bypass
@@ -9272,8 +9260,7 @@ app.include_router(calculator_router)
 app.include_router(power_features_router)
 
 # HOUZZ CLIPPER WEBHOOK - Intercepts data on its way to Houzz
-@app.post("/api/houzz-clipper-webhook")
-# Advanced Integration Endpoints
+# REMOVED HOUZZ FUNCTION: @app.post("/api/houzz-clipper-webhook")
 @api_router.post("/integrations/walkthrough/complete")
 async def complete_walkthrough(data: dict):
     """Complete walkthrough and generate checklist items"""
