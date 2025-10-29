@@ -5610,25 +5610,7 @@ async def manual_furniture_import(data: dict):
                     if not room_found:
                         print(f"❌ Room '{room_name}' not found in project")
                 
-                # Auto-clip to Houzz Pro if requested (REAL INTEGRATION)
-                houzz_result = None
-                if auto_clip_to_houzz and new_item.get('product_url'):
-                    try:
-                        print(f"🏠 REAL Auto-clipping to Houzz Pro: {new_item['name']}")
-                        # Call the REAL Houzz Pro integration function
-                        product_info = {
-                            'name': new_item.get('name'),
-                            'vendor': new_item.get('vendor'),
-                            'cost': new_item.get('cost'),
-                            'image_url': new_item.get('image_url', ''),
-                            'size': item_data.get('size', ''),
-                            'sku': item_data.get('sku', '')
-                        }
-                        houzz_result = await auto_clip_to_houzz_pro(new_item['product_url'], product_info)
-                        print(f"✅ REAL Houzz clipping completed: {houzz_result}")
-                    except Exception as houzz_error:
-                        print(f"❌ REAL Houzz clipping failed: {houzz_error}")
-                        houzz_result = {"error": str(houzz_error)}
+                # Houzz integration removed - not in use
                 
                 result_item = {
                     "name": new_item["name"],
@@ -5636,10 +5618,6 @@ async def manual_furniture_import(data: dict):
                     "cost": new_item["cost"],
                     "database_created": True
                 }
-                
-                # Add Houzz result if available
-                if houzz_result:
-                    result_item["houzz_clip_result"] = houzz_result
                 
                 results.append(result_item)
                 successful_imports += 1
