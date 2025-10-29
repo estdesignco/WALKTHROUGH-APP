@@ -9671,7 +9671,7 @@ async def get_questionnaire(project_id: str):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to get questionnaire: {str(e)}")
 
-# PRODUCT CLIPPER ENDPOINTS - HOUZZ INTEGRATION
+# PRODUCT CLIPPER ENDPOINTS
 @api_router.post("/clipper/save-to-app")
 async def save_clipped_product_to_app(data: dict):
     """Save clipped product to our Furniture App"""
