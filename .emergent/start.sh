@@ -3,9 +3,28 @@ set -e
 
 echo "🚀 Starting Interior Design App..."
 
-# Note: MongoDB is provided by Emergent (managed service)
+# CRITICAL: Generate backend/.env from Kubernetes secrets
+echo "Generating backend/.env from environment variables..."
+cat > /app/backend/.env << EOF
+# MongoDB Configuration (from Kubernetes secrets)
+MONGO_URL=${MONGO_URL:-mongodb://localhost:27017}
+DB_NAME=${DB_NAME:-interior_design_db}
 
-# CRITICAL: Clean Python bytecode cache to prevent stale imports
+# Server Configuration
+PORT=${PORT:-8000}
+
+# Frontend URL
+FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+
+# Email Configuration
+SMTP_SERVER=${SMTP_SERVER:-smtp.office365.com}
+SMTP_PORT=${SMTP_PORT:-587}
+SENDER_EMAIL=${SENDER_EMAIL:-}
+SENDER_PASSWORD=${SENDER_PASSWORD:-}
+EOF
+echo "✅ Backend .env generated from secrets"
+
+# Clean Python bytecode cache to prevent stale imports
 echo "Cleaning Python cache..."
 find /app/backend -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 find /app/backend -name "*.pyc" -delete 2>/dev/null || true
