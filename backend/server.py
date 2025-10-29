@@ -5083,10 +5083,8 @@ async def scrape_product_advanced(data: dict):
     """
     Advanced product scraping endpoint using Playwright
     Handles JavaScript-rendered wholesale sites like Four Hands, Uttermost, etc.
-    NOW ENHANCED: Also auto-clips to Houzz Pro during scraping!
     """
     url = data.get('url', '')
-    auto_clip_to_houzz = data.get('auto_clip_to_houzz', False)
     
     if not url:
         raise HTTPException(status_code=400, detail="URL is required")
@@ -5094,17 +5092,6 @@ async def scrape_product_advanced(data: dict):
     try:
         print(f"🔍 Scraping product from: {url}")
         product_info = await scrape_product_with_playwright(url)
-        
-        # NEW: Auto-clip to Houzz Pro if requested
-        if auto_clip_to_houzz:
-            print("🏠 Auto-clipping to Houzz Pro...")
-            try:
-                clip_result = await auto_clip_to_houzz_pro(url, product_info)
-                product_info["houzz_clip_result"] = clip_result
-                print(f"✅ Houzz Pro clip result: {clip_result}")
-            except Exception as clip_error:
-                print(f"⚠️ Houzz Pro clip failed: {clip_error}")
-                product_info["houzz_clip_error"] = str(clip_error)
         
         return {"success": True, "data": product_info}
     except Exception as e:
