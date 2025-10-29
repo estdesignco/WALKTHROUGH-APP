@@ -5630,8 +5630,7 @@ async def manual_furniture_import(data: dict):
                 "database_created": False
             })
     
-    # Collect Houzz results for summary
-    houzz_results = [r.get("houzz_clip_result") for r in results if r.get("houzz_clip_result")]
+    # Houzz integration removed
     
     response = {
         "success": True,
@@ -5640,11 +5639,6 @@ async def manual_furniture_import(data: dict):
         "successful_imports": successful_imports,
         "room_name": room_name
     }
-    
-    # Add Houzz results if any exist
-    if houzz_results:
-        response["houzz_results"] = houzz_results
-        response["houzz_clips_attempted"] = len(houzz_results)
     
     return response
 
