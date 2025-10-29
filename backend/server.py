@@ -5549,7 +5549,6 @@ async def manual_furniture_import(data: dict):
     project_id = data.get('project_id', '')
     room_name = data.get('room_name', '')
     items = data.get('items', [])
-    auto_clip_to_houzz = data.get('auto_clip_to_houzz', False)
     
     if not project_id or not room_name or not items:
         raise HTTPException(status_code=400, detail="Missing required fields")
