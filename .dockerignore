@@ -1,7 +1,9 @@
-# Prevent .env files from being deployed
+# Prevent sensitive backend .env from being deployed
 backend/.env
-frontend/.env
 .env
+
+# Frontend .env is safe (only has public backend URL) - needed for build
+# NOT excluding frontend/.env
 
 # Prevent cache from being deployed
 **/__pycache__
