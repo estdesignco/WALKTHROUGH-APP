@@ -624,6 +624,11 @@ export default function ProjectDetailPage() {
                 <DesignToolsDashboard projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading design tools...</div> },
+        { name: "Moodboard", icon: Sparkles, component: project ? (
+            <div className="moodboard-content">
+                <DimensionalMoodBoard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading 3D moodboard...</div> },
         { name: "Finance", icon: DollarSign, component: project ? (
             <div className="finance-content">
                 <FinanceDashboard projectId={projectId} />
