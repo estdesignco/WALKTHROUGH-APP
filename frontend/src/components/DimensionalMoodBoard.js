@@ -1,92 +1,7 @@
-import React, { useState, useEffect, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Grid, Sky, PerspectiveCamera } from '@react-three/drei';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-
-// 3D ROOM COMPONENT
-function Room3D({ roomDimensions, wallPaints, furnitureItems }) {
-    const { length, width, height } = roomDimensions;
-    
-    // Convert feet to meters (Three.js uses meters)
-    const l = length * 0.3048;
-    const w = width * 0.3048;
-    const h = height * 0.3048;
-    
-    return (
-        <>
-            {/* FLOOR */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-                <planeGeometry args={[l, w]} />
-                <meshStandardMaterial 
-                    color={wallPaints?.floor?.hex_color || "#D4C5A9"} 
-                    roughness={0.8}
-                />
-            </mesh>
-            
-            {/* BACK WALL */}
-            <mesh position={[0, h/2, -w/2]}>
-                <planeGeometry args={[l, h]} />
-                <meshStandardMaterial 
-                    color={wallPaints?.back?.hex_color || "#1E293B"} 
-                    side={2}
-                />
-            </mesh>
-            
-            {/* LEFT WALL */}
-            <mesh position={[-l/2, h/2, 0]} rotation={[0, Math.PI / 2, 0]}>
-                <planeGeometry args={[w, h]} />
-                <meshStandardMaterial 
-                    color={wallPaints?.left?.hex_color || "#1E293B"} 
-                    side={2}
-                />
-            </mesh>
-            
-            {/* RIGHT WALL */}
-            <mesh position={[l/2, h/2, 0]} rotation={[0, -Math.PI / 2, 0]}>
-                <planeGeometry args={[w, h]} />
-                <meshStandardMaterial 
-                    color={wallPaints?.right?.hex_color || "#1E293B"} 
-                    side={2}
-                />
-            </mesh>
-            
-            {/* CEILING */}
-            <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, h, 0]}>
-                <planeGeometry args={[l, w]} />
-                <meshStandardMaterial 
-                    color={wallPaints?.ceiling?.hex_color || "#F5F5DC"} 
-                    roughness={0.9}
-                />
-            </mesh>
-            
-            {/* FURNITURE ITEMS */}
-            {furnitureItems.map((item, index) => (
-                <FurnitureBox key={index} item={item} />
-            ))}
-            
-            {/* LIGHTING */}
-            <ambientLight intensity={0.6} />
-            <directionalLight position={[5, 10, 5]} intensity={0.8} castShadow />
-            <pointLight position={[-5, 5, -5]} intensity={0.4} />
-        </>
-    );
-}
-
-// FURNITURE BOX (Placeholder - will be replaced with actual 3D models)
-function FurnitureBox({ item }) {
-    const x = item.position_x * 0.3048;
-    const y = item.position_y * 0.3048;
-    const z = item.position_z * 0.3048;
-    
-    return (
-        <mesh position={[x, y, z]} rotation={[0, item.rotation_y, 0]} castShadow>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial color="#D4A574" />
-        </mesh>
-    );
-}
 
 // MAIN DIMENSIONAL MOOD BOARD COMPONENT
 export default function DimensionalMoodBoard({ projectId }) {
@@ -96,21 +11,91 @@ export default function DimensionalMoodBoard({ projectId }) {
     const [checklistItems, setChecklistItems] = useState([]);
     const [showPaintPicker, setShowPaintPicker] = useState(false);
     const [selectedWall, setSelectedWall] = useState(null);
+    const [selectedBrand, setSelectedBrand] = useState('sherwin_williams');
     const [roomDimensions, setRoomDimensions] = useState({ length: 15, width: 12, height: 10 });
+    const [wallPaints, setWallPaints] = useState({
+        front: { hex: '#1E293B', name: 'Navy' },
+        back: { hex: '#1E293B', name: 'Navy' },
+        left: { hex: '#1E293B', name: 'Navy' },
+        right: { hex: '#1E293B', name: 'Navy' },
+        ceiling: { hex: '#F5F5DC', name: 'Cream' },
+        floor: { hex: '#D4C5A9', name: 'Muted Gold' }
+    });
+    const canvasRef = useRef(null);
     
     useEffect(() => {
         loadMoodboards();
         loadPaintCatalog();
         loadChecklistItems();
+        drawRoom();
     }, [projectId]);
+    
+    useEffect(() => {
+        drawRoom();
+    }, [roomDimensions, wallPaints]);
+    
+    const drawRoom = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        
+        // Clear canvas
+        ctx.fillStyle = '#0F172A';
+        ctx.fillRect(0, 0, w, h);
+        
+        // Draw 3D room perspective
+        const scale = 20;
+        const centerX = w / 2;
+        const centerY = h / 2;
+        
+        // Floor
+        ctx.fillStyle = wallPaints.floor.hex;
+        ctx.beginPath();
+        ctx.moveTo(centerX - roomDimensions.width * scale / 2, centerY + 100);
+        ctx.lineTo(centerX + roomDimensions.width * scale / 2, centerY + 100);
+        ctx.lineTo(centerX + roomDimensions.width * scale / 2 - 50, centerY + 200);
+        ctx.lineTo(centerX - roomDimensions.width * scale / 2 + 50, centerY + 200);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Back wall
+        ctx.fillStyle = wallPaints.back.hex;
+        ctx.fillRect(centerX - 200, centerY - 200, 400, 300);
+        
+        // Left wall
+        ctx.fillStyle = wallPaints.left.hex;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 200, centerY - 200);
+        ctx.lineTo(centerX - 200, centerY + 100);
+        ctx.lineTo(centerX - 250, centerY + 150);
+        ctx.lineTo(centerX - 250, centerY - 150);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Right wall
+        ctx.fillStyle = wallPaints.right.hex;
+        ctx.beginPath();
+        ctx.moveTo(centerX + 200, centerY - 200);
+        ctx.lineTo(centerX + 200, centerY + 100);
+        ctx.lineTo(centerX + 250, centerY + 150);
+        ctx.lineTo(centerX + 250, centerY - 150);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Add labels
+        ctx.fillStyle = '#D4A574';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${roomDimensions.length}' x ${roomDimensions.width}' x ${roomDimensions.height}'`, centerX, 30);
+    };
     
     const loadMoodboards = async () => {
         try {
             const response = await axios.get(`${BACKEND_URL}/api/moodboards/project/${projectId}`);
             setMoodboards(response.data);
-            if (response.data.length > 0) {
-                setSelectedMoodboard(response.data[0]);
-            }
         } catch (error) {
             console.error('Failed to load moodboards:', error);
         }
@@ -150,23 +135,12 @@ export default function DimensionalMoodBoard({ projectId }) {
         }
     };
     
-    const createNewMoodboard = async () => {
-        try {
-            const response = await axios.post(`${BACKEND_URL}/api/moodboards`, {
-                project_id: projectId,
-                room_name: "New Room",
-                room_length: 15,
-                room_width: 12,
-                room_height: 10,
-                furniture_items: [],
-                wall_paints: [],
-                notes: ""
-            });
-            setMoodboards([...moodboards, response.data]);
-            setSelectedMoodboard(response.data);
-        } catch (error) {
-            console.error('Failed to create moodboard:', error);
-        }
+    const applyPaintToWall = (wall, color) => {
+        setWallPaints({
+            ...wallPaints,
+            [wall]: { hex: color.hex, name: color.name, code: color.code }
+        });
+        setShowPaintPicker(false);
     };
     
     return (
