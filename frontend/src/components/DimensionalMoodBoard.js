@@ -161,15 +161,6 @@ export default function DimensionalMoodBoard({ projectId }) {
             <div className="grid grid-cols-12 gap-6 p-6">
                 {/* LEFT SIDEBAR - Controls */}
                 <div className="col-span-3 space-y-4">
-                    {/* New Moodboard Button */}
-                    <button
-                        onClick={createNewMoodboard}
-                        className="w-full bg-gradient-to-br from-[#1E293B] to-[#0F172A] hover:from-[#2D3B4F] hover:to-[#1E293B] text-[#D4A574] font-bold py-4 px-6 rounded-xl border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all duration-300 shadow-xl relative overflow-hidden group"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <span className="relative z-10">+ New Moodboard</span>
-                    </button>
-                    
                     {/* Room Dimensions */}
                     <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border-2 border-[#D4A574]/30 shadow-xl">
                         <h3 className="text-[#D4A574] font-bold mb-3 text-lg">📐 Room Dimensions</h3>
@@ -179,7 +170,7 @@ export default function DimensionalMoodBoard({ projectId }) {
                                 <input
                                     type="number"
                                     value={roomDimensions.length}
-                                    onChange={(e) => setRoomDimensions({...roomDimensions, length: parseFloat(e.target.value)})}
+                                    onChange={(e) => setRoomDimensions({...roomDimensions, length: parseFloat(e.target.value) || 15})}
                                     className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/30 focus:border-[#D4A574] focus:outline-none"
                                 />
                             </div>
@@ -188,7 +179,7 @@ export default function DimensionalMoodBoard({ projectId }) {
                                 <input
                                     type="number"
                                     value={roomDimensions.width}
-                                    onChange={(e) => setRoomDimensions({...roomDimensions, width: parseFloat(e.target.value)})}
+                                    onChange={(e) => setRoomDimensions({...roomDimensions, width: parseFloat(e.target.value) || 12})}
                                     className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/30 focus:border-[#D4A574] focus:outline-none"
                                 />
                             </div>
@@ -197,7 +188,7 @@ export default function DimensionalMoodBoard({ projectId }) {
                                 <input
                                     type="number"
                                     value={roomDimensions.height}
-                                    onChange={(e) => setRoomDimensions({...roomDimensions, height: parseFloat(e.target.value)})}
+                                    onChange={(e) => setRoomDimensions({...roomDimensions, height: parseFloat(e.target.value) || 10})}
                                     className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/30 focus:border-[#D4A574] focus:outline-none"
                                 />
                             </div>
@@ -215,9 +206,13 @@ export default function DimensionalMoodBoard({ projectId }) {
                                         setSelectedWall(wall);
                                         setShowPaintPicker(true);
                                     }}
-                                    className="w-full bg-gray-800 hover:bg-gray-700 text-[#D4C5A9] px-3 py-2 rounded border border-[#D4A574]/30 hover:border-[#D4A574] transition-all text-left capitalize"
+                                    className="w-full bg-gray-800 hover:bg-gray-700 text-[#D4C5A9] px-3 py-2 rounded border border-[#D4A574]/30 hover:border-[#D4A574] transition-all text-left capitalize flex items-center justify-between"
                                 >
-                                    {wall} Wall
+                                    <span>{wall} Wall</span>
+                                    <div 
+                                        className="w-6 h-6 rounded border border-gray-600"
+                                        style={{ backgroundColor: wallPaints[wall].hex }}
+                                    ></div>
                                 </button>
                             ))}
                         </div>
@@ -225,132 +220,134 @@ export default function DimensionalMoodBoard({ projectId }) {
                     
                     {/* Checklist Items */}
                     <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border-2 border-[#D4A574]/30 shadow-xl max-h-96 overflow-y-auto">
-                        <h3 className="text-[#D4A574] font-bold mb-3 text-lg">🛋️ Checklist Items</h3>
-                        <div className="space-y-2">
-                            {checklistItems.map((item, index) => (
-                                <div 
-                                    key={index}
-                                    draggable
-                                    className="bg-gray-800 hover:bg-gray-700 text-[#D4C5A9] px-3 py-2 rounded border border-[#D4A574]/20 hover:border-[#D4A574] cursor-move transition-all text-sm"
-                                >
-                                    <div className="font-semibold">{item.name}</div>
-                                    <div className="text-xs text-gray-400">{item.category_name}</div>
-                                </div>
-                            ))}
-                        </div>
+                        <h3 className="text-[#D4A574] font-bold mb-3 text-lg">🛋️ Checklist Items ({checklistItems.length})</h3>
+                        {checklistItems.length === 0 ? (
+                            <p className="text-gray-400 text-sm">No PICKED items in checklist</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {checklistItems.map((item, index) => (
+                                    <div 
+                                        key={index}
+                                        className="bg-gray-800 hover:bg-gray-700 text-[#D4C5A9] px-3 py-2 rounded border border-[#D4A574]/20 hover:border-[#D4A574] cursor-pointer transition-all text-sm"
+                                    >
+                                        <div className="font-semibold">{item.name}</div>
+                                        <div className="text-xs text-gray-400">{item.category_name}</div>
+                                        {item.cost > 0 && (
+                                            <div className="text-xs text-[#D4A574]">${item.cost}</div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
                 
-                {/* CENTER - 3D VIEWER */}
+                {/* CENTER - CANVAS VIEWER */}
                 <div className="col-span-6">
-                    <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl border-2 border-[#D4A574]/50 shadow-2xl overflow-hidden" style={{ height: '800px' }}>
-                        <Canvas shadows camera={{ position: [8, 6, 8], fov: 50 }}>
-                            <Suspense fallback={null}>
-                                <Room3D 
-                                    roomDimensions={roomDimensions}
-                                    wallPaints={selectedMoodboard?.wall_paints || {}}
-                                    furnitureItems={selectedMoodboard?.furniture_items || []}
-                                />
-                                <OrbitControls 
-                                    enablePan={true}
-                                    enableZoom={true}
-                                    enableRotate={true}
-                                    minDistance={3}
-                                    maxDistance={30}
-                                />
-                                <Grid 
-                                    args={[100, 100]}
-                                    cellSize={0.5}
-                                    cellThickness={0.5}
-                                    cellColor="#D4A574"
-                                    sectionSize={3}
-                                    sectionThickness={1}
-                                    sectionColor="#D4A574"
-                                    fadeDistance={25}
-                                    fadeStrength={1}
-                                    infiniteGrid
-                                />
-                                <Sky sunPosition={[100, 20, 100]} />
-                            </Suspense>
-                        </Canvas>
+                    <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl border-2 border-[#D4A574]/50 shadow-2xl overflow-hidden relative" style={{ height: '800px' }}>
+                        <canvas 
+                            ref={canvasRef}
+                            width={1000}
+                            height={800}
+                            className="w-full h-full"
+                        />
                         
-                        {/* 3D Controls Overlay */}
+                        {/* Controls Overlay */}
                         <div className="absolute top-4 left-4 bg-black/70 text-[#D4A574] px-4 py-2 rounded-lg text-sm">
-                            🖱️ Left Click + Drag: Rotate | Right Click + Drag: Pan | Scroll: Zoom
+                            📐 {roomDimensions.length}' × {roomDimensions.width}' × {roomDimensions.height}'
                         </div>
                     </div>
                 </div>
                 
-                {/* RIGHT SIDEBAR - Paint Catalog & Details */}
+                {/* RIGHT SIDEBAR - Paint Catalog */}
                 <div className="col-span-3 space-y-4">
-                    {/* Paint Picker Modal */}
+                    {/* Paint Picker */}
                     {showPaintPicker && paintCatalog && (
-                        <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border-2 border-[#D4A574]/50 shadow-2xl max-h-96 overflow-y-auto">
+                        <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border-2 border-[#D4A574]/50 shadow-2xl max-h-[700px] overflow-y-auto">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-[#D4A574] font-bold text-lg">🎨 Select Paint</h3>
+                                <h3 className="text-[#D4A574] font-bold text-lg">🎨 Paint {selectedWall} Wall</h3>
                                 <button
                                     onClick={() => setShowPaintPicker(false)}
-                                    className="text-gray-400 hover:text-[#D4A574]"
+                                    className="text-gray-400 hover:text-[#D4A574] text-2xl"
                                 >
                                     ✕
                                 </button>
                             </div>
                             
-                            {Object.keys(paintCatalog.catalogs).map(brand => (
-                                <div key={brand} className="mb-4">
-                                    <h4 className="text-[#D4C5A9] font-semibold mb-2 capitalize">
-                                        {brand.replace(/_/g, ' ')}
-                                    </h4>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {paintCatalog.catalogs[brand].map(color => (
-                                            <button
-                                                key={color.code}
-                                                onClick={() => {
-                                                    // Apply paint to selected wall
-                                                    console.log(`Applying ${color.name} to ${selectedWall}`);
-                                                    setShowPaintPicker(false);
-                                                }}
-                                                className="flex items-center gap-2 p-2 bg-gray-800 hover:bg-gray-700 rounded border border-[#D4A574]/20 hover:border-[#D4A574] transition-all"
-                                            >
-                                                <div
-                                                    className="w-8 h-8 rounded border border-gray-600"
-                                                    style={{ backgroundColor: color.hex }}
-                                                ></div>
-                                                <div className="text-left text-xs">
-                                                    <div className="text-[#D4C5A9] font-semibold">{color.name}</div>
-                                                    <div className="text-gray-400">{color.code}</div>
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
+                            {/* Brand Selector */}
+                            <div className="flex gap-2 mb-4 flex-wrap">
+                                {Object.keys(paintCatalog.catalogs).map(brand => (
+                                    <button
+                                        key={brand}
+                                        onClick={() => setSelectedBrand(brand)}
+                                        className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
+                                            selectedBrand === brand
+                                                ? 'bg-[#D4A574] text-black'
+                                                : 'bg-gray-800 text-[#D4C5A9] hover:bg-gray-700'
+                                        }`}
+                                    >
+                                        {brand.replace(/_/g, ' ').toUpperCase()}
+                                    </button>
+                                ))}
+                            </div>
+                            
+                            {/* Color Grid */}
+                            <div className="grid grid-cols-1 gap-3">
+                                {paintCatalog.catalogs[selectedBrand]?.map(color => (
+                                    <button
+                                        key={color.code}
+                                        onClick={() => applyPaintToWall(selectedWall, color)}
+                                        className="flex items-center gap-3 p-3 bg-gray-800 hover:bg-gray-700 rounded-lg border border-[#D4A574]/20 hover:border-[#D4A574] transition-all group"
+                                    >
+                                        <div
+                                            className="w-16 h-16 rounded border-2 border-gray-600 group-hover:border-[#D4A574] shadow-lg"
+                                            style={{ backgroundColor: color.hex }}
+                                        ></div>
+                                        <div className="text-left flex-1">
+                                            <div className="text-[#D4C5A9] font-bold">{color.name}</div>
+                                            <div className="text-gray-400 text-sm">{color.code}</div>
+                                            <div className="text-[#D4A574] text-xs">{color.hex}</div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     )}
                     
-                    {/* Instructions */}
-                    <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border-2 border-[#D4A574]/30 shadow-xl">
-                        <h3 className="text-[#D4A574] font-bold mb-3 text-lg">📋 Quick Guide</h3>
-                        <div className="space-y-2 text-sm text-[#D4C5A9]">
-                            <p>• Set room dimensions</p>
-                            <p>• Paint walls with real colors</p>
-                            <p>• Drag checklist items into room</p>
-                            <p>• Rotate view to see all angles</p>
-                            <p>• Generate client presentation</p>
-                        </div>
-                    </div>
-                    
-                    {/* Coming Soon Features */}
-                    <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border-2 border-[#D4A574]/30 shadow-xl">
-                        <h3 className="text-[#D4A574] font-bold mb-3 text-lg">🚀 Coming Soon</h3>
-                        <div className="space-y-2 text-sm text-[#D4C5A9]">
-                            <p>• LiDAR room scanning</p>
-                            <p>• Fabric on furniture</p>
-                            <p>• Item detail sheets</p>
-                            <p>• Export to PDF</p>
-                            <p>• Client sharing</p>
-                        </div>
-                    </div>
+                    {!showPaintPicker && (
+                        <>
+                            {/* Current Paint Scheme */}
+                            <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border-2 border-[#D4A574]/30 shadow-xl">
+                                <h3 className="text-[#D4A574] font-bold mb-3 text-lg">🎨 Current Colors</h3>
+                                <div className="space-y-2">
+                                    {Object.entries(wallPaints).map(([wall, paint]) => (
+                                        <div key={wall} className="flex items-center gap-2 text-sm">
+                                            <div
+                                                className="w-8 h-8 rounded border border-gray-600"
+                                                style={{ backgroundColor: paint.hex }}
+                                            ></div>
+                                            <div className="flex-1">
+                                                <div className="text-[#D4C5A9] font-semibold capitalize">{wall}</div>
+                                                <div className="text-gray-400 text-xs">{paint.name}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            {/* Instructions */}
+                            <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border-2 border-[#D4A574]/30 shadow-xl">
+                                <h3 className="text-[#D4A574] font-bold mb-3 text-lg">📋 Quick Guide</h3>
+                                <div className="space-y-2 text-sm text-[#D4C5A9]">
+                                    <p>• Adjust room dimensions</p>
+                                    <p>• Click wall buttons to paint</p>
+                                    <p>• Choose from 21+ designer colors</p>
+                                    <p>• Items from Checklist shown left</p>
+                                    <p>• Canvas updates in real-time</p>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
