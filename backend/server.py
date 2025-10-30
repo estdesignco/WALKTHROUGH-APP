@@ -34,6 +34,7 @@ from calculator_api import router as calculator_router
 from power_features_api import router as power_features_router
 from contacts_api import router as contacts_router
 import contacts_api
+from moodboard_api import router as moodboard_router
 
 import aiosmtplib
 from email.mime.text import MIMEText
