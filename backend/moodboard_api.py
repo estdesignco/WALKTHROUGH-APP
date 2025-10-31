@@ -185,5 +185,107 @@ ACCESSORIES_LIBRARY = [
 
 @router.get("/accessories")
 async def get_accessories_library():
+
+
+# PHOTO UPLOAD ENDPOINT
+@router.post("/{moodboard_id}/upload-photo")
+async def upload_room_photo(moodboard_id: str, file: UploadFile = File(...)):
+    """Upload real room photo for moodboard"""
+    try:
+        # Read file
+        contents = await file.read()
+        
+        # Convert to base64
+        photo_base64 = base64.b64encode(contents).decode('utf-8')
+        
+        # Update moodboard with photo
+        result = await db.moodboards.update_one(
+            {"id": moodboard_id},
+            {"$set": {
+                "room_photo_base64": photo_base64,
+                "room_photo_filename": file.filename,
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Moodboard not found")
+        
+        return {"success": True, "message": "Photo uploaded successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload photo: {str(e)}")
+
+# AI PHOTOREALISTIC RENDERING
+@router.post("/{moodboard_id}/generate-render")
+async def generate_photorealistic_render(moodboard_id: str, data: dict):
+    """Generate AI photorealistic render of the room"""
+    try:
+        from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+        
+        # Get moodboard
+        moodboard = await db.moodboards.find_one({"id": moodboard_id})
+        if not moodboard:
+            raise HTTPException(status_code=404, detail="Moodboard not found")
+        
+        # Get API key
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not api_key:
+            raise HTTPException(status_code=500, detail="AI key not configured")
+        
+        # Build prompt from moodboard data
+        room_desc = f"{moodboard.get('room_length', 15)}' x {moodboard.get('room_width', 12)}' room"
+        
+        # Add wall colors to prompt
+        wall_paints = moodboard.get('wall_paints', [])
+        paint_desc = ""
+        for wall_paint in wall_paints:
+            if wall_paint.get('wall_id') in ['front', 'back', 'left', 'right']:
+                paint_desc += f"{wall_paint.get('paint_name', 'neutral')} walls, "
+        
+        # Add furniture to prompt
+        furniture_items = moodboard.get('furniture_items', [])
+        furniture_desc = ", ".join([item.get('name', 'furniture') for item in furniture_items[:5]])
+        
+        # Build complete prompt
+        prompt = f"Photorealistic interior design render of a {room_desc} with {paint_desc}{furniture_desc}. Professional architectural photography, natural lighting, modern luxury interior design, high-end finishes, elegant styling"
+        
+        print(f"🎨 Generating AI render with prompt: {prompt}")
+        
+        # Generate image
+        image_gen = OpenAIImageGeneration(api_key=api_key)
+        images = await image_gen.generate_images(
+            prompt=prompt,
+            model="gpt-image-1",
+            number_of_images=1
+        )
+        
+        if images and len(images) > 0:
+            # Convert to base64
+            image_base64 = base64.b64encode(images[0]).decode('utf-8')
+            
+            # Save to moodboard
+            await db.moodboards.update_one(
+                {"id": moodboard_id},
+                {"$set": {
+                    "ai_render_base64": image_base64,
+                    "ai_render_prompt": prompt,
+                    "ai_render_generated_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+            
+            return {
+                "success": True,
+                "image_base64": image_base64,
+                "prompt": prompt
+            }
+        else:
+            raise HTTPException(status_code=500, detail="No image was generated")
+            
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
+
     """Get generic accessories library"""
     return {"accessories": ACCESSORIES_LIBRARY}
