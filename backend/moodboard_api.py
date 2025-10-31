@@ -185,7 +185,8 @@ ACCESSORIES_LIBRARY = [
 
 @router.get("/accessories")
 async def get_accessories_library():
-
+    """Get generic accessories library"""
+    return {"accessories": ACCESSORIES_LIBRARY}
 
 # PHOTO UPLOAD ENDPOINT
 @router.post("/{moodboard_id}/upload-photo")
