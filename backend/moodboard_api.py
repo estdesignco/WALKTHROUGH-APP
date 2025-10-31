@@ -1,15 +1,19 @@
 """
 DIMENSIONAL MOOD BOARD API
-3D room builder with paint catalogs and furniture placement
+3D room builder with paint catalogs, furniture placement, and AI photorealistic editing
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 import uuid
 import os
+import base64
 from motor.motor_asyncio import AsyncIOMotorClient
+from dotenv import load_dotenv
+
+load_dotenv()
 
 router = APIRouter(prefix="/api/moodboards", tags=["Moodboards"])
 
