@@ -3,7 +3,7 @@ import { useParams, Link, useSearchParams, useNavigate } from "react-router-dom"
 import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText, Calculator, Users, Sparkles } from "lucide-react";
 import WalkthroughDashboard from './WalkthroughDashboard';
 import ContactSheet from './ContactSheet';
-import DimensionalMoodBoard from './DimensionalMoodBoard';
+import DimensionalMoodBoardEnhanced from './DimensionalMoodBoardEnhanced';
 
 import ChecklistDashboard from './ChecklistDashboard';
 import FFEDashboard from './FFEDashboard';
