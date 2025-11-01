@@ -10,6 +10,7 @@ from datetime import datetime
 import uuid
 import os
 import base64
+import httpx
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 
