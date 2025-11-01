@@ -267,20 +267,23 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
         
         print("🤖 Calling Replicate LaMa Cleaner to remove furniture...")
         
-        # Replicate needs publicly accessible URLs, not base64 data URLs
-        # For now, return error message asking user to use public URL
-        # TODO: Upload base64 to temp storage and get public URL
+        # Save base64 image to temporary file and serve via public URL
+        import tempfile
+        temp_image_path = f"/app/frontend/public/temp_{moodboard_id}_{doc_type}.png"
         
-        return {
-            "success": False,
-            "message": "Feature in development: Need to implement temporary image hosting for Replicate API. For now, please use a publicly accessible image URL.",
-            "status": "pending_implementation"
-        }
+        # Decode and save image
+        image_data = base64.b64decode(image_base64)
+        with open(temp_image_path, 'wb') as f:
+            f.write(image_data)
         
-        # ORIGINAL CODE (commented out until we implement temp storage):
-        # image_url = f"data:image/png;base64,{image_base64}"
-        # async with httpx.AsyncClient(timeout=120.0) as client:
-        #     response = await client.post(...
+        # Create public URL
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://designflow-hub-1.preview.emergentagent.com')
+        image_url = f"{frontend_url}/temp_{moodboard_id}_{doc_type}.png"
+        
+        print(f"📤 Image saved to: {image_url}")
+        
+        # Call Replicate LaMa Cleaner API
+        async with httpx.AsyncClient(timeout=120.0) as client:
             # Create prediction
             response = await client.post(
                 "https://api.replicate.com/v1/predictions",
