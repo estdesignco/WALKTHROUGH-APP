@@ -165,3 +165,70 @@ async def get_accessories():
         {"category": "Vases", "items": ["Ceramic Vase", "Glass Vase"]},
         {"category": "Plants", "items": ["Fiddle Leaf Fig", "Monstera"]},
     ]}
+
+@router.post("/{moodboard_id}/ai/remove-furniture")
+async def ai_remove_furniture(moodboard_id: str, data: dict):
+    """Use Replicate LaMa Cleaner to remove furniture from photo"""
+    try:
+        doc_type = data.get('doc_type', 'dollhouse')
+        
+        # Get moodboard
+        mb = await db.moodboards.find_one({"id": moodboard_id})
+        if not mb:
+            raise HTTPException(status_code=404, detail="Moodboard not found")
+        
+        image_base64 = mb.get('documents', {}).get(doc_type, {}).get('image_base64')
+        if not image_base64:
+            raise HTTPException(status_code=400, detail="No image uploaded")
+        
+        # Get Replicate API key
+        replicate_key = os.environ.get('REPLICATE_API_KEY')
+        if not replicate_key:
+            raise HTTPException(status_code=500, detail="Replicate API key not configured")
+        
+        print(f"🤖 Calling Replicate LaMa Cleaner to remove furniture...")
+        
+        # Convert base64 to data URL for Replicate
+        image_url = f"data:image/png;base64,{image_base64}"
+        
+        # Call Replicate LaMa Cleaner API
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            # Create prediction
+            response = await client.post(
+                "https://api.replicate.com/v1/predictions",
+                headers={
+                    "Authorization": f"Bearer {replicate_key}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "version": "zylim0702/remove-object:2024-09-25",
+                    "input": {
+                        "image": image_url,
+                        "mask": image_url  # For now, use same image - will implement proper masking later
+                    }
+                }
+            )
+            
+            if response.status_code == 201:
+                prediction = response.json()
+                prediction_id = prediction.get('id')
+                
+                print(f"✅ Replicate prediction created: {prediction_id}")
+                
+                return {
+                    "success": True,
+                    "message": "Furniture removal started",
+                    "prediction_id": prediction_id,
+                    "status": prediction.get('status')
+                }
+            else:
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"Replicate API error: {response.text}"
+                )
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"AI removal failed: {str(e)}")
+
