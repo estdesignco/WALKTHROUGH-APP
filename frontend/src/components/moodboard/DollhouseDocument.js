@@ -41,13 +41,19 @@ export default function DollhouseDocument({ moodboardId, sharedData, updateShare
         
         setGenerating(true);
         try {
-            await axios.post(`${BACKEND_URL}/api/moodboards/${moodboardId}/ai/remove-furniture`, {
+            const response = await axios.post(`${BACKEND_URL}/api/moodboards/${moodboardId}/ai/remove-furniture`, {
                 doc_type: 'dollhouse',
                 remove_all: true
             });
-            alert('🤖 AI furniture removal started! (Replicate API key needed)');
+            
+            // Show actual backend response
+            if (response.data.success) {
+                alert(`✅ ${response.data.message}\nPrediction ID: ${response.data.prediction_id || 'N/A'}`);
+            } else {
+                alert(`⚠️ ${response.data.message}`);
+            }
         } catch (error) {
-            alert('❌ Failed: ' + error.message);
+            alert('❌ Failed: ' + (error.response?.data?.detail || error.message));
         } finally {
             setGenerating(false);
         }
