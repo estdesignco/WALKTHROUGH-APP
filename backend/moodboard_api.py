@@ -23,6 +23,19 @@ mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ.get('DB_NAME', 'interior_design_db')]
 
+# Replicate API configuration
+REPLICATE_API_KEY = os.environ.get('REPLICATE_API_KEY', '')
+REPLICATE_API_URL = "https://api.replicate.com/v1/predictions"
+
+# AI MODEL VERSIONS (Latest 2024-2025)
+AI_MODELS = {
+    "segment_anything": "meta/sam-2",  # Latest SAM 2 for automatic segmentation
+    "lama_cleaner": "zylim0702/remove-object:2024-09-25",  # Furniture removal
+    "sd_inpainting": "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4",  # Add furniture
+    "wall_recolor": "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4"  # Recolor walls
+}
+
+
 # PAINT CATALOGS
 PAINT_CATALOGS = {
     "sherwin_williams": [
