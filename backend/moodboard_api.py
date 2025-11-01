@@ -186,7 +186,7 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
         if not replicate_key:
             raise HTTPException(status_code=500, detail="Replicate API key not configured")
         
-        print(f"🤖 Calling Replicate LaMa Cleaner to remove furniture...")
+        print("🤖 Calling Replicate LaMa Cleaner to remove furniture...")
         
         # Convert base64 to data URL for Replicate
         image_url = f"data:image/png;base64,{image_base64}"
