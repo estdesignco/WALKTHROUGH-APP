@@ -280,10 +280,10 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "version": "zylim0702/remove-object:2024-09-25",
+                    "version": "8aa692429aa512b8af53b4ded17300bc146cdeddd47902d697d7e6cd5ef0477f",
                     "input": {
                         "image": image_url,
-                        "mask": image_url  # For now, use same image - will implement proper masking later
+                        "mask": image_url
                     }
                 }
             )
