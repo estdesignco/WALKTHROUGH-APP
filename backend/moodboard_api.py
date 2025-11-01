@@ -267,11 +267,20 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
         
         print("🤖 Calling Replicate LaMa Cleaner to remove furniture...")
         
-        # Convert base64 to data URL for Replicate
-        image_url = f"data:image/png;base64,{image_base64}"
+        # Replicate needs publicly accessible URLs, not base64 data URLs
+        # For now, return error message asking user to use public URL
+        # TODO: Upload base64 to temp storage and get public URL
         
-        # Call Replicate LaMa Cleaner API
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        return {
+            "success": False,
+            "message": "Feature in development: Need to implement temporary image hosting for Replicate API. For now, please use a publicly accessible image URL.",
+            "status": "pending_implementation"
+        }
+        
+        # ORIGINAL CODE (commented out until we implement temp storage):
+        # image_url = f"data:image/png;base64,{image_base64}"
+        # async with httpx.AsyncClient(timeout=120.0) as client:
+        #     response = await client.post(...
             # Create prediction
             response = await client.post(
                 "https://api.replicate.com/v1/predictions",
