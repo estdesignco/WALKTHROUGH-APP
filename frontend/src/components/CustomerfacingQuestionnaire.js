@@ -337,6 +337,19 @@ export default function CustomerfacingQuestionnaire() {
                 }
                 
                 console.log('✅ ALL ROOMS CREATED - Questionnaire submission complete!');
+                
+                // Save ALL questionnaire answers
+                console.log('💾 Saving complete questionnaire answers...');
+                try {
+                    await axios.post(`${BACKEND_URL}/api/questionnaire/${newProject.id}`, {
+                        answers: formData,
+                        completion_percentage: 100,
+                        completed_at: new Date().toISOString()
+                    });
+                    console.log('✅ Questionnaire answers saved!');
+                } catch (saveError) {
+                    console.error('❌ Failed to save questionnaire answers:', saveError);
+                }
             } else {
                 console.warn('⚠️ No rooms selected in questionnaire');
             }
