@@ -166,10 +166,13 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "version": "8aa692429aa512b8af53b4ded17300bc146cdeddd47902d697d7e6cd5ef0477f",
+                    "version": "95b7223104132402a9ae91cc677285bc5eb997834bd2349fa486f53910fd68b3",  # Stable Diffusion Inpainting
                     "input": {
                         "image": image_data_url,
-                        "mask": mask_data_url  # Proper white mask
+                        "mask": mask_data_url,
+                        "prompt": "empty room, clean floor, no furniture, interior architecture only, photorealistic",
+                        "negative_prompt": "furniture, sofa, chair, table, items, clutter",
+                        "num_inference_steps": 25
                     }
                 }
             )
