@@ -166,13 +166,10 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "version": "95b7223104132402a9ae91cc677285bc5eb997834bd2349fa486f53910fd68b3",  # Stable Diffusion Inpainting
+                    "version": "cdac78a1",  # allenhooo/lama - Better LaMa model
                     "input": {
                         "image": image_data_url,
-                        "mask": mask_data_url,
-                        "prompt": "empty room, clean floor, no furniture, interior architecture only, photorealistic",
-                        "negative_prompt": "furniture, sofa, chair, table, items, clutter",
-                        "num_inference_steps": 25
+                        "mask": mask_data_url
                     }
                 }
             )
