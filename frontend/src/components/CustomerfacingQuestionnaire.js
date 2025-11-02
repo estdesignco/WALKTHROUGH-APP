@@ -407,19 +407,22 @@ export default function CustomerfacingQuestionnaire() {
         "Entire Home",
         
         // MAIN LIVING SPACES (Most Common)
-        "Living Room", "Family Room", "Great Room", "Kitchen", "Dining Room", "Foyer", "Entryway",
+        "Living Room", "Family Room", "Kitchen", "Dining Room", "Foyer",
         
         // BEDROOMS & BATHROOMS (Primary First)  
-        "Primary Bedroom", "Primary Bathroom", "Guest Bedroom", "Guest Bathroom", "Children's Bedroom", "Nursery",
+        "Primary Bedroom", "Primary Bathroom", 
+        "Guest Bedroom 1", "Guest Bedroom 2", "Guest Bedroom 3", 
+        "Guest Bathroom 1", "Guest Bathroom 2", "Guest Bathroom 3",
+        "Children's Bedroom", "Nursery",
         
         // WORK & STUDY SPACES
         "Home Office", "Study", "Library",
         
         // ADDITIONAL BATHROOMS
-        "Half Bathroom", "Jack and Jill Bathroom",
+        "Powder", "Half Bathroom", "Jack and Jill Bathroom",
         
         // KITCHEN & DINING RELATED
-        "Pantry", "Butler's Pantry", "Breakfast Nook", "Bar Area", "Wine Cellar",
+        "Pantry", "Butler's Pantry", "Scullery", "Breakfast Nook", "Bar Area", "Wine Cellar",
         
         // UTILITY & STORAGE
         "Laundry Room", "Mudroom", "Utility Room", "Linen Closet", "Walk-in Closet",
