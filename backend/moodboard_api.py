@@ -166,7 +166,7 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "version": "cdac78a1",  # allenhooo/lama - Better LaMa model
+                    "version": "cdac78a1bec5b23c07fd29692fb70baa513ea403a39e643c48ec5edadb15fe72",  # allenhooo/lama - Full hash
                     "input": {
                         "image": image_data_url,
                         "mask": mask_data_url
