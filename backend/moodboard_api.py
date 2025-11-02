@@ -280,10 +280,10 @@ async def ai_detect_furniture(moodboard_id: str, data: dict):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "version": "fe97b453a6455861e3bac769b441ca1f1086110da7466dbb65cf1eecfd60dc83",  # SAM 2
+                    "version": "279de0319887c761cd16793c26ac96515324e063b9e5093823b08667960cd555",  # Grounding DINO - Fast detection
                     "input": {
                         "image": image_data_url,
-                        "multimask_output": True  # Get multiple masks
+                        "prompt": "chair, sofa, couch, table, desk, cabinet, shelf, bed, dresser, nightstand, ottoman, bench, stool"
                     }
                 }
             )
