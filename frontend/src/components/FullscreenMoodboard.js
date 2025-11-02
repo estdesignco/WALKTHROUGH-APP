@@ -161,7 +161,7 @@ export default function FullscreenMoodboard({ projectId }) {
             
             <div className="flex-1 overflow-hidden relative">
                 {activeDoc === 'dollhouse' && moodboard && <DollhouseDocument moodboardId={moodboard.id} sharedData={sharedData} updateSharedData={updateSharedData} paintCatalog={paintCatalog} />}
-                {activeDoc === 'flat3d' && moodboard && <Flat3DDocument moodboardId={moodboard.id} sharedData={sharedData} updateSharedData={updateSharedData} paintCatalog={paintCatalog} />}
+                {activeDoc === 'flat3d' && moodboard && <Flat3DDocument moodboardId={moodboard.id} sharedData={sharedData} updateSharedData={updateSharedData} paintCatalog={paintCatalog} roomPhotos={roomPhotos} selectedRoom={selectedRoom} />}
                 {activeDoc === 'floorplan' && moodboard && <FloorPlanDocument moodboardId={moodboard.id} sharedData={sharedData} updateSharedData={updateSharedData} paintCatalog={paintCatalog} />}
                 
                 {showChecklist && (
