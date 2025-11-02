@@ -33,6 +33,23 @@ const ProjectList = ({ onSelectProject, isOffline }) => {
     }
   };
 
+  const handleDeleteProject = async (projectId, projectName, e) => {
+    e.stopPropagation(); // Prevent project selection when clicking delete
+    
+    if (!window.confirm(`Are you sure you want to delete "${projectName}"?\n\nThis will delete ALL rooms, items, and data. This cannot be undone!`)) {
+      return;
+    }
+    
+    try {
+      await projectAPI.delete(projectId);
+      alert('✅ Project deleted successfully!');
+      loadProjects(); // Refresh list
+    } catch (error) {
+      alert('❌ Failed to delete project: ' + error.message);
+      console.error('Delete error:', error);
+    }
+  };
+
   const handleSelectProject = (project) => {
     onSelectProject(project);
     // Cache project for offline use
