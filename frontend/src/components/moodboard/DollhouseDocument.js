@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
@@ -11,13 +11,28 @@ export default function DollhouseDocument({ moodboardId, sharedData, updateShare
     const [selectedBrand, setSelectedBrand] = useState('sherwin_williams');
     const fileInputRef = useRef(null);
     
+    useEffect(() => {
+        loadPhoto();
+    }, [moodboardId]);
+    
+    const loadPhoto = async () => {
+        try {
+            const response = await axios.get(`${BACKEND_URL}/api/moodboards/${moodboardId}`);
+            const imageBase64 = response.data?.documents?.dollhouse?.image_base64;
+            if (imageBase64) {
+                setPhoto(`data:image/png;base64,${imageBase64}`);
+            }
+        } catch (error) {
+            console.error('Failed to load photo:', error);
+        }
+    };
+    
     const handlePhotoUpload = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
         
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('doc_type', 'dollhouse');
         
         try {
             await axios.post(`${BACKEND_URL}/api/moodboards/${moodboardId}/upload-photo?doc_type=dollhouse`, formData);
@@ -26,10 +41,9 @@ export default function DollhouseDocument({ moodboardId, sharedData, updateShare
             reader.onload = (e) => setPhoto(e.target.result);
             reader.readAsDataURL(file);
             
-            alert('✅ Photo uploaded to Dollhouse document!');
+            alert('✅ Photo uploaded!');
         } catch (error) {
-            console.error('Upload failed:', error);
-            alert('❌ Upload failed');
+            alert('❌ Upload failed: ' + error.message);
         }
     };
     
@@ -46,9 +60,9 @@ export default function DollhouseDocument({ moodboardId, sharedData, updateShare
                 remove_all: true
             });
             
-            // Show actual backend response
-            if (response.data.success) {
-                alert(`✅ ${response.data.message}\nPrediction ID: ${response.data.prediction_id || 'N/A'}`);
+            if (response.data.success && response.data.prediction_id) {
+                alert(`🤖 Processing... Prediction ID: ${response.data.prediction_id}`);
+                // TODO: Poll for result and update photo
             } else {
                 alert(`⚠️ ${response.data.message}`);
             }
@@ -60,30 +74,10 @@ export default function DollhouseDocument({ moodboardId, sharedData, updateShare
     };
     
     const recolorWall = async (wall, color) => {
-        if (!photo) {
-            alert('Please upload a photo first');
-            return;
-        }
-        
-        setGenerating(true);
-        try {
-            await axios.post(`${BACKEND_URL}/api/moodboards/${moodboardId}/ai/recolor-wall`, {
-                doc_type: 'dollhouse',
-                wall_id: wall,
-                hex_color: color.hex
-            });
-            
-            // Update shared data
-            const newPaints = { ...sharedData.wallPaints, [wall]: color };
-            updateSharedData({ wallPaints: newPaints });
-            setShowPaintPicker(false);
-            
-            alert('✅ Wall color updated! (Full AI recoloring coming soon)');
-        } catch (error) {
-            alert('❌ Failed: ' + (error.response?.data?.detail || error.message));
-        } finally {
-            setGenerating(false);
-        }
+        const newPaints = { ...sharedData.wallPaints, [wall]: color };
+        updateSharedData({ wallPaints: newPaints });
+        setShowPaintPicker(false);
+        alert('✅ Wall color updated!');
     };
     
     return (
@@ -132,6 +126,15 @@ export default function DollhouseDocument({ moodboardId, sharedData, updateShare
                 <div className="absolute top-4 left-4 bg-black/70 text-[#D4A574] px-4 py-2 rounded">
                     🏠 3D Dollhouse - AI Photo Editing
                 </div>
+                
+                {generating && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <div className="bg-gray-900 p-6 rounded-lg border-2 border-[#D4A574]">
+                            <div className="text-[#D4A574] text-xl font-bold mb-2">⏳ Processing with AI...</div>
+                            <div className="text-[#D4C5A9]">This may take 10-30 seconds</div>
+                        </div>
+                    </div>
+                )}
             </div>
             
             {showPaintPicker && paintCatalog && (
