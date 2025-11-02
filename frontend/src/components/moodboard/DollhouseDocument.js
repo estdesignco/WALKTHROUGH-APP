@@ -55,22 +55,52 @@ export default function DollhouseDocument({ moodboardId, sharedData, updateShare
         
         setGenerating(true);
         try {
+            // Start Replicate prediction
             const response = await axios.post(`${BACKEND_URL}/api/moodboards/${moodboardId}/ai/remove-furniture`, {
-                doc_type: 'dollhouse',
-                remove_all: true
+                doc_type: 'dollhouse'
             });
             
-            if (response.data.success && response.data.image_base64) {
-                // Display the edited image
-                setPhoto(`data:image/png;base64,${response.data.image_base64}`);
-                alert('✅ Furniture removed successfully!');
-            } else {
-                alert(`⚠️ ${response.data.message}`);
+            if (response.data.success && response.data.prediction_id) {
+                const predictionId = response.data.prediction_id;
+                console.log(`🤖 Prediction started: ${predictionId}`);
+                
+                // Poll for result
+                let attempts = 0;
+                const pollInterval = setInterval(async () => {
+                    attempts++;
+                    
+                    try {
+                        const statusResp = await axios.get(`${BACKEND_URL}/api/moodboards/replicate-status/${predictionId}`);
+                        
+                        console.log(`Poll ${attempts}: ${statusResp.data.status}`);
+                        
+                        if (statusResp.data.status === 'succeeded' && statusResp.data.image_base64) {
+                            clearInterval(pollInterval);
+                            setPhoto(`data:image/png;base64,${statusResp.data.image_base64}`);
+                            setGenerating(false);
+                            alert('✅ Furniture removed successfully!');
+                            
+                            // Save to database
+                            await axios.put(`${BACKEND_URL}/api/moodboards/${moodboardId}`, {
+                                [`documents.dollhouse.image_base64`]: statusResp.data.image_base64
+                            });
+                        } else if (statusResp.data.status === 'failed') {
+                            clearInterval(pollInterval);
+                            setGenerating(false);
+                            alert('❌ Replicate failed: ' + statusResp.data.error);
+                        } else if (attempts > 120) {
+                            clearInterval(pollInterval);
+                            setGenerating(false);
+                            alert('⏱️ Timeout - processing took too long');
+                        }
+                    } catch (pollError) {
+                        console.error('Poll error:', pollError);
+                    }
+                }, 2000); // Poll every 2 seconds
             }
         } catch (error) {
-            alert('❌ Failed: ' + (error.response?.data?.detail || error.message));
-        } finally {
             setGenerating(false);
+            alert('❌ Failed: ' + (error.response?.data?.detail || error.message));
         }
     };
     
