@@ -340,14 +340,26 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
                 print(f"Poll {i+1}: Status = {status}")
                 
                 if status == 'succeeded':
-                    output_url = result.get('output')
-                    if output_url:
-                        # Download the edited image
-                        print(f"📥 Downloading edited image from: {output_url}")
-                        img_response = await client.get(output_url)
-                        edited_image_bytes = img_response.content
+                    output = result.get('output')
+                    print(f"📥 Replicate output type: {type(output)}, value: {output}")
+                    
+                    if output:
+                        # Replicate may return a URL string or file object
+                        if isinstance(output, str):
+                            # It's a URL - download it
+                            print(f"Downloading from URL: {output}")
+                            img_response = await client.get(output)
+                            edited_image_bytes = img_response.content
+                        elif isinstance(output, list) and len(output) > 0:
+                            # It's a list of URLs
+                            print(f"Downloading from first URL in list: {output[0]}")
+                            img_response = await client.get(output[0])
+                            edited_image_bytes = img_response.content
+                        else:
+                            # Unknown format
+                            raise HTTPException(status_code=500, detail=f"Unexpected output format: {type(output)}")
                         
-                        # Convert to base64 and save to database
+                        # Convert to base64
                         edited_base64 = base64.b64encode(edited_image_bytes).decode('utf-8')
                         
                         await db.moodboards.update_one(
