@@ -245,6 +245,36 @@ async def get_accessories():
         {"category": "Plants", "items": ["Fiddle Leaf Fig", "Monstera"]},
     ]}
 
+
+
+# CHECK REPLICATE PREDICTION STATUS
+@router.get("/replicate-status/{prediction_id}")
+async def get_replicate_status(prediction_id: str):
+    """Poll Replicate prediction status and get result"""
+    try:
+        replicate_key = os.environ.get('REPLICATE_API_KEY')
+        if not replicate_key:
+            raise HTTPException(status_code=500, detail="Replicate API key not configured")
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(
+                f"https://api.replicate.com/v1/predictions/{prediction_id}",
+                headers={"Authorization": f"Bearer {replicate_key}"}
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                return {
+                    "status": result.get('status'),
+                    "output": result.get('output'),
+                    "error": result.get('error')
+                }
+            else:
+                raise HTTPException(status_code=response.status_code, detail=response.text)
+                
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/{moodboard_id}/ai/remove-furniture")
 async def ai_remove_furniture(moodboard_id: str, data: dict):
     """Use Replicate LaMa Cleaner to remove furniture from photo"""
