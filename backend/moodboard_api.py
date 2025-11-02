@@ -135,7 +135,28 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
         
         print("🤖 Starting Replicate prediction...")
         
+        # Create data URL
         image_data_url = f"data:image/png;base64,{image_base64}"
+        
+        # Create a white mask (remove everything) - LaMa needs a proper mask
+        # For now, let's create a simple white rectangle mask
+        from PIL import Image
+        import io
+        
+        # Decode original image to get dimensions
+        img_bytes = base64.b64decode(image_base64)
+        img = Image.open(io.BytesIO(img_bytes))
+        width, height = img.size
+        
+        # Create white mask (white = remove, black = keep)
+        mask = Image.new('RGB', (width, height), 'white')
+        mask_io = io.BytesIO()
+        mask.save(mask_io, format='PNG')
+        mask_io.seek(0)
+        mask_base64 = base64.b64encode(mask_io.getvalue()).decode('utf-8')
+        mask_data_url = f"data:image/png;base64,{mask_base64}"
+        
+        print(f"✅ Created mask: {width}x{height} white image")
         
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
@@ -148,7 +169,7 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
                     "version": "8aa692429aa512b8af53b4ded17300bc146cdeddd47902d697d7e6cd5ef0477f",
                     "input": {
                         "image": image_data_url,
-                        "mask": image_data_url
+                        "mask": mask_data_url  # Proper white mask
                     }
                 }
             )
