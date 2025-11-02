@@ -35,7 +35,33 @@ export default function FullscreenMoodboard({ projectId }) {
         loadOrCreateMoodboard();
         loadPaintCatalog();
         loadChecklistItems();
+        loadProjectRooms();
     }, [projectId]);
+    
+    const loadProjectRooms = async () => {
+        try {
+            const response = await axios.get(`${BACKEND_URL}/api/projects/${projectId}`);
+            if (response.data.rooms) {
+                setRooms(response.data.rooms);
+                if (response.data.rooms.length > 0) {
+                    const firstRoom = response.data.rooms[0];
+                    setSelectedRoom(firstRoom);
+                    loadRoomPhotos(firstRoom.id);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load rooms:', error);
+        }
+    };
+    
+    const loadRoomPhotos = async (roomId) => {
+        try {
+            const response = await axios.get(`${BACKEND_URL}/api/photos/by-room/${projectId}/${roomId}`);
+            setRoomPhotos(response.data.photos || []);
+        } catch (error) {
+            console.error('Failed to load photos:', error);
+        }
+    };
     
     const loadOrCreateMoodboard = async () => {
         try {
