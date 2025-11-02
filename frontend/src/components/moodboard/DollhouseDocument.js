@@ -78,9 +78,9 @@ export default function DollhouseDocument({ moodboardId, sharedData, updateShare
             updateSharedData({ wallPaints: newPaints });
             setShowPaintPicker(false);
             
-            alert('🎨 AI wall recoloring started! (Replicate API key needed)');
+            alert('✅ Wall color updated! (Full AI recoloring coming soon)');
         } catch (error) {
-            alert('❌ Failed: ' + error.message);
+            alert('❌ Failed: ' + (error.response?.data?.detail || error.message));
         } finally {
             setGenerating(false);
         }
