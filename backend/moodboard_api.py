@@ -111,8 +111,39 @@ async def update_moodboard(moodboard_id: str, updates: dict):
 @router.post("/{moodboard_id}/upload-photo")
 async def upload_photo(moodboard_id: str, doc_type: str, file: UploadFile = File(...)):
     print(f"📤 Uploading photo to moodboard {moodboard_id}, doc_type: {doc_type}")
+    
     contents = await file.read()
-    photo_b64 = base64.b64encode(contents).decode('utf-8')
+    
+    # Compress image if too large for MongoDB (16MB limit)
+    from PIL import Image
+    import io
+    
+    img = Image.open(io.BytesIO(contents))
+    
+    # Resize if image is too large
+    max_dimension = 1920  # Max width or height
+    if img.width > max_dimension or img.height > max_dimension:
+        ratio = min(max_dimension / img.width, max_dimension / img.height)
+        new_size = (int(img.width * ratio), int(img.height * ratio))
+        img = img.resize(new_size, Image.Resampling.LANCZOS)
+        print(f"📏 Resized image from original to {new_size}")
+    
+    # Convert to JPEG with quality optimization
+    output = io.BytesIO()
+    if img.mode in ('RGBA', 'LA', 'P'):
+        img = img.convert('RGB')
+    img.save(output, format='JPEG', quality=85, optimize=True)
+    output.seek(0)
+    compressed_bytes = output.getvalue()
+    
+    photo_b64 = base64.b64encode(compressed_bytes).decode('utf-8')
+    
+    # Check final size
+    final_size_mb = len(photo_b64) / (1024 * 1024)
+    print(f"📦 Final image size: {final_size_mb:.2f}MB")
+    
+    if final_size_mb > 15:
+        raise HTTPException(status_code=413, detail="Image too large even after compression. Please use a smaller image.")
     
     result = await db.moodboards.update_one(
         {"id": moodboard_id},
@@ -124,7 +155,7 @@ async def upload_photo(moodboard_id: str, doc_type: str, file: UploadFile = File
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Moodboard not found")
     
-    return {"success": True, "doc_type": doc_type}
+    return {"success": True, "doc_type": doc_type, "size_mb": final_size_mb}
 
 
 # AI REMOVE FURNITURE - Returns prediction ID immediately
