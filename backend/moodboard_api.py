@@ -295,14 +295,8 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
         
         print("🤖 Calling Replicate LaMa Cleaner...")
         
-        # Save image to public folder
-        temp_image_path = f"/app/frontend/public/temp_{moodboard_id}_{doc_type}.png"
-        image_data = base64.b64decode(image_base64)
-        with open(temp_image_path, 'wb') as f:
-            f.write(image_data)
-        
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://designflow-hub-1.preview.emergentagent.com')
-        image_url = f"{frontend_url}/temp_{moodboard_id}_{doc_type}.png"
+        # Create data URL from base64 (Replicate accepts this for files <1MB)
+        image_data_url = f"data:image/png;base64,{image_base64}"
         
         async with httpx.AsyncClient(timeout=120.0) as client:
             # Create prediction
@@ -315,8 +309,8 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
                 json={
                     "version": "8aa692429aa512b8af53b4ded17300bc146cdeddd47902d697d7e6cd5ef0477f",
                     "input": {
-                        "image": image_url,
-                        "mask": image_url
+                        "image": image_data_url,
+                        "mask": image_data_url  # Using same image as mask for full removal
                     }
                 }
             )
