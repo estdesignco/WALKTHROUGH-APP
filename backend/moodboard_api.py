@@ -331,9 +331,9 @@ async def ai_detect_furniture(moodboard_id: str, data: dict):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "version": "efd10a8ddc57ea28773327e881ce95e20cc1d734c589f7dd01d2036921ed78aa",  # Grounding DINO - Correct hash
+                    "version": "efd10a8ddc57ea28773327e881ce95e20cc1d734c589f7dd01d2036921ed78aa",
                     "input": {
-                        "image": image_data_url,
+                        "image": image_url,  # Use public URL instead of data URL
                         "prompt": "chair, sofa, couch, table, desk, cabinet, shelf, bed, dresser, nightstand, ottoman, bench, stool"
                     }
                 }
