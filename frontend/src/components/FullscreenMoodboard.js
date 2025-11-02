@@ -9,10 +9,13 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 
 export default function FullscreenMoodboard({ projectId }) {
     const navigate = useNavigate();
-    const [activeDoc, setActiveDoc] = useState('dollhouse');
+    const [activeDoc, setActiveDoc] = useState('flat3d'); // Start with Flat 3D
     const [moodboard, setMoodboard] = useState(null);
     const [paintCatalog, setPaintCatalog] = useState(null);
     const [checklistItems, setChecklistItems] = useState([]);
+    const [rooms, setRooms] = useState([]);
+    const [selectedRoom, setSelectedRoom] = useState(null);
+    const [roomPhotos, setRoomPhotos] = useState([]);
     const [showChecklist, setShowChecklist] = useState(false);
     
     const [sharedData, setSharedData] = useState({
