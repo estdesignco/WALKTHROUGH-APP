@@ -5,7 +5,10 @@ from fastapi import APIRouter, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 from datetime import datetime
-import uuid, os, base64, httpx
+import uuid
+import os
+import base64
+import httpx
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 
