@@ -110,13 +110,22 @@ async def update_moodboard(moodboard_id: str, updates: dict):
 
 @router.post("/{moodboard_id}/upload-photo")
 async def upload_photo(moodboard_id: str, doc_type: str, file: UploadFile = File(...)):
+    print(f"📤 Uploading photo to moodboard {moodboard_id}, doc_type: {doc_type}")
     contents = await file.read()
     photo_b64 = base64.b64encode(contents).decode('utf-8')
-    await db.moodboards.update_one(
+    
+    result = await db.moodboards.update_one(
         {"id": moodboard_id},
         {"$set": {f"documents.{doc_type}.image_base64": photo_b64}}
     )
-    return {"success": True}
+    
+    print(f"✅ Photo saved. Matched: {result.matched_count}, Modified: {result.modified_count}")
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Moodboard not found")
+    
+    return {"success": True, "doc_type": doc_type}
+
 
 # AI REMOVE FURNITURE - Returns prediction ID immediately
 @router.post("/{moodboard_id}/ai/remove-furniture")
