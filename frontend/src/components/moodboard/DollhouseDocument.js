@@ -60,9 +60,10 @@ export default function DollhouseDocument({ moodboardId, sharedData, updateShare
                 remove_all: true
             });
             
-            if (response.data.success && response.data.prediction_id) {
-                alert(`🤖 Processing... Prediction ID: ${response.data.prediction_id}`);
-                // TODO: Poll for result and update photo
+            if (response.data.success && response.data.image_base64) {
+                // Display the edited image
+                setPhoto(`data:image/png;base64,${response.data.image_base64}`);
+                alert('✅ Furniture removed successfully!');
             } else {
                 alert(`⚠️ ${response.data.message}`);
             }
