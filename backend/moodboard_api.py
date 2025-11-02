@@ -237,9 +237,145 @@ async def get_replicate_status(prediction_id: str):
 async def ai_recolor_wall(moodboard_id: str, data: dict):
     return {"success": True, "message": "Wall color updated"}
 
-@router.get("/accessories")
-async def get_accessories():
-    return {"accessories": [
-        {"category": "Vases", "items": ["Ceramic Vase"]},
-        {"category": "Plants", "items": ["Fiddle Leaf Fig"]},
-    ]}
+# SEGMENT ANYTHING - Detect all furniture in photo
+@router.post("/{moodboard_id}/ai/detect-furniture")
+async def ai_detect_furniture(moodboard_id: str, data: dict):
+    """Use Segment Anything to detect all furniture pieces in photo"""
+    try:
+        doc_type = data.get('doc_type', 'flat3d')
+        
+        mb = await db.moodboards.find_one({"id": moodboard_id})
+        if not mb:
+            raise HTTPException(status_code=404, detail="Not found")
+        
+        image_base64 = mb.get('documents', {}).get(doc_type, {}).get('image_base64')
+        if not image_base64:
+            raise HTTPException(status_code=400, detail="No image uploaded")
+        
+        replicate_key = os.environ.get('REPLICATE_API_KEY')
+        if not replicate_key:
+            raise HTTPException(status_code=500, detail="API key not configured")
+        
+        print("🔍 Detecting furniture with SAM 2...")
+        
+        image_data_url = f"data:image/png;base64,{image_base64}"
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                "https://api.replicate.com/v1/predictions",
+                headers={
+                    "Authorization": f"Bearer {replicate_key}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "version": "fe97b453a6455861e3bac769b441ca1f1086110da7466dbb65cf1eecfd60dc83",  # SAM 2
+                    "input": {
+                        "image": image_data_url,
+                        "multimask_output": True  # Get multiple masks
+                    }
+                }
+            )
+            
+            if response.status_code == 201:
+                prediction = response.json()
+                return {
+                    "success": True,
+                    "prediction_id": prediction.get('id'),
+                    "message": "Furniture detection started"
+                }
+            else:
+                raise HTTPException(status_code=response.status_code, detail=response.text)
+                
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+# AI REMOVE SELECTED FURNITURE - With proper masks for selected pieces
+@router.post("/{moodboard_id}/ai/remove-selected-furniture")
+async def ai_remove_selected_furniture(moodboard_id: str, data: dict):
+    """Remove only selected furniture pieces using custom mask"""
+    try:
+        doc_type = data.get('doc_type', 'flat3d')
+        selected_segments = data.get('selected_segments', [])  # List of mask indices
+        
+        mb = await db.moodboards.find_one({"id": moodboard_id})
+        if not mb:
+            raise HTTPException(status_code=404, detail="Not found")
+        
+        image_base64 = mb.get('documents', {}).get(doc_type, {}).get('image_base64')
+        if not image_base64:
+            raise HTTPException(status_code=400, detail="No image uploaded")
+        
+        # Get stored furniture segments
+        segments = mb.get('documents', {}).get(doc_type, {}).get('furniture_segments', [])
+        if not segments:
+            raise HTTPException(status_code=400, detail="No furniture detected yet. Run detection first.")
+        
+        replicate_key = os.environ.get('REPLICATE_API_KEY')
+        
+        print(f"🗑️ Removing {len(selected_segments)} selected furniture pieces...")
+        
+        # Create mask from selected segments
+        from PIL import Image
+        import io
+        import numpy as np
+        
+        img_bytes = base64.b64decode(image_base64)
+        img = Image.open(io.BytesIO(img_bytes))
+        width, height = img.size
+        
+        # Create black mask, then paint white where selected furniture is
+        mask_array = np.zeros((height, width), dtype=np.uint8)
+        
+        for seg_idx in selected_segments:
+            if seg_idx < len(segments):
+                segment = segments[seg_idx]
+                # Draw white on mask where this furniture piece is
+                # segment should have mask coordinates
+                seg_mask = segment.get('mask_data')  # Binary mask from SAM
+                if seg_mask:
+                    mask_array = np.maximum(mask_array, np.array(seg_mask))
+        
+        # Convert to white (255) where furniture is
+        mask_array = (mask_array * 255).astype(np.uint8)
+        mask_img = Image.fromarray(mask_array, mode='L').convert('RGB')
+        
+        mask_io = io.BytesIO()
+        mask_img.save(mask_io, format='PNG')
+        mask_io.seek(0)
+        mask_base64 = base64.b64encode(mask_io.getvalue()).decode('utf-8')
+        mask_data_url = f"data:image/png;base64,{mask_base64}"
+        
+        image_data_url = f"data:image/png;base64,{image_base64}"
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                "https://api.replicate.com/v1/predictions",
+                headers={
+                    "Authorization": f"Bearer {replicate_key}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "version": "cdac78a1bec5b23c07fd29692fb70baa513ea403a39e643c48ec5edadb15fe72",
+                    "input": {
+                        "image": image_data_url,
+                        "mask": mask_data_url  # Only selected furniture pieces
+                    }
+                }
+            )
+            
+            if response.status_code == 201:
+                prediction = response.json()
+                return {
+                    "success": True,
+                    "prediction_id": prediction.get('id'),
+                    "message": f"Removing {len(selected_segments)} furniture pieces"
+                }
+            else:
+                raise HTTPException(status_code=response.status_code, detail=response.text)
+                
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
