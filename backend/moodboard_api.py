@@ -309,19 +309,11 @@ async def ai_detect_furniture(moodboard_id: str, data: dict):
         
         print("🔍 Detecting furniture with Grounding DINO...")
         
-        # Grounding DINO works better with HTTP URLs, not data URLs
-        # Save image temporarily and use public URL
-        import tempfile
-        temp_path = f"/app/frontend/public/temp_detect_{moodboard_id}.jpg"
+        # Use data URL (image is 0.43MB, under 1MB limit)
+        # Grounding DINO expects image/jpeg format for data URLs
+        image_data_url = f"data:image/jpeg;base64,{image_base64}"
         
-        img_bytes = base64.b64decode(image_base64)
-        with open(temp_path, 'wb') as f:
-            f.write(img_bytes)
-        
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://designflow-hub-1.preview.emergentagent.com')
-        image_url = f"{frontend_url}/temp_detect_{moodboard_id}.jpg"
-        
-        print(f"📤 Image URL: {image_url}")
+        print(f"📤 Image data URL length: {len(image_data_url)}")
         
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
