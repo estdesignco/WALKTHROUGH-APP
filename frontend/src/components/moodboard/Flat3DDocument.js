@@ -12,6 +12,19 @@ export default function Flat3DDocument({ moodboardId, sharedData, updateSharedDa
     const [generating, setGenerating] = useState(false);
     const [furnitureSegments, setFurnitureSegments] = useState([]);
     const [selectedSegments, setSelectedSegments] = useState([]);
+    const fileInputRef = useRef(null);
+    
+    const handleQuickUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setPhoto(e.target.result);
+            alert('✅ Photo loaded! (Temporary - not saved to Measurements)');
+        };
+        reader.readAsDataURL(file);
+    };
     
     useEffect(() => {
         if (roomPhotos && roomPhotos.length > 0) {
