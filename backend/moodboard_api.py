@@ -291,15 +291,23 @@ async def ai_detect_furniture(moodboard_id: str, data: dict):
         if not mb:
             raise HTTPException(status_code=404, detail="Not found")
         
+        print(f"🔍 Moodboard found: {moodboard_id}")
+        print(f"Documents keys: {mb.get('documents', {}).keys()}")
+        print(f"Flat3D keys: {mb.get('documents', {}).get('flat3d', {}).keys()}")
+        
         image_base64 = mb.get('documents', {}).get(doc_type, {}).get('image_base64')
+        
         if not image_base64:
-            raise HTTPException(status_code=400, detail="No image uploaded")
+            print(f"❌ No image found in documents.{doc_type}.image_base64")
+            raise HTTPException(status_code=400, detail=f"No image uploaded for {doc_type}")
+        
+        print(f"✅ Image found, length: {len(image_base64)}")
         
         replicate_key = os.environ.get('REPLICATE_API_KEY')
         if not replicate_key:
             raise HTTPException(status_code=500, detail="API key not configured")
         
-        print("🔍 Detecting furniture with SAM 2...")
+        print("🔍 Detecting furniture with Grounding DINO...")
         
         image_data_url = f"data:image/png;base64,{image_base64}"
         
