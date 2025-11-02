@@ -126,7 +126,29 @@ export default function FullscreenMoodboard({ projectId }) {
     return (
         <div className="fixed inset-0 bg-[#0F172A] flex flex-col">
             <div className="h-12 bg-gradient-to-r from-[#1E293B] to-[#0F172A] border-b-2 border-[#D4A574] flex items-center justify-between px-4 flex-shrink-0">
-                <button onClick={() => navigate(`/project/${projectId}`)} className="text-[#D4A574] hover:text-[#BCA888] font-semibold">← Back</button>
+                <div className="flex items-center gap-4">
+                    <button onClick={() => navigate(`/project/${projectId}`)} className="text-[#D4A574] hover:text-[#BCA888] font-semibold">← Back</button>
+                    
+                    {/* ROOM SELECTOR */}
+                    <select
+                        value={selectedRoom?.id || ''}
+                        onChange={(e) => {
+                            const room = rooms.find(r => r.id === e.target.value);
+                            setSelectedRoom(room);
+                            loadRoomPhotos(room.id);
+                        }}
+                        className="bg-gray-800 text-[#D4C5A9] px-3 py-1 rounded border border-[#D4A574]/30 focus:border-[#D4A574] text-sm"
+                    >
+                        <option value="">Select Room...</option>
+                        {rooms.map(room => (
+                            <option key={room.id} value={room.id}>{room.name}</option>
+                        ))}
+                    </select>
+                    
+                    {roomPhotos.length > 0 && (
+                        <span className="text-[#D4C5A9] text-sm">📷 {roomPhotos.length} photos</span>
+                    )}
+                </div>
                 
                 <div className="flex gap-2">
                     <button onClick={() => setActiveDoc('dollhouse')} className={`px-4 py-1 rounded font-semibold text-sm ${activeDoc === 'dollhouse' ? 'bg-[#D4A574] text-black' : 'bg-gray-800 text-[#D4C5A9]'}`}>🏠 3D Dollhouse</button>
