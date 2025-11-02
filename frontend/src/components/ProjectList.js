@@ -144,9 +144,18 @@ const ProjectList = ({ onSelectProject, isOffline }) => {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white">{project.name}</h3>
-                <span className="bg-blue-600 text-white px-2 py-1 rounded text-sm">
-                  {project.project_type}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="bg-blue-600 text-white px-2 py-1 rounded text-sm">
+                    {project.project_type}
+                  </span>
+                  <button
+                    onClick={(e) => handleDeleteProject(project.id, project.name, e)}
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold transition-colors"
+                    title="Delete Project"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
               
               <div className="space-y-2">
