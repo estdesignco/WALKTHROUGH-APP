@@ -113,6 +113,14 @@ export default function Flat3DDocument({ moodboardId, sharedData, updateSharedDa
     return (
         <div className="h-full flex">
             <div className="w-60 bg-gray-900/30 border-r border-[#D4A574]/30 p-3 overflow-y-auto flex-shrink-0">
+                {/* Quick Upload */}
+                <div className="mb-4">
+                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleQuickUpload} className="hidden" />
+                    <button onClick={() => fileInputRef.current?.click()} className="w-full bg-[#D4A574] hover:bg-[#BCA888] text-black font-bold py-2 px-4 rounded mb-2">
+                        📷 Quick Upload Photo
+                    </button>
+                </div>
+                
                 {/* Room Info */}
                 {selectedRoom && (
                     <div className="bg-gray-900/50 rounded p-3 mb-4">
