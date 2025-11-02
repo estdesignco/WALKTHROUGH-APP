@@ -281,7 +281,6 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
     try:
         doc_type = data.get('doc_type', 'dollhouse')
         
-        # Get moodboard
         mb = await db.moodboards.find_one({"id": moodboard_id})
         if not mb:
             raise HTTPException(status_code=404, detail="Moodboard not found")
@@ -290,29 +289,21 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
         if not image_base64:
             raise HTTPException(status_code=400, detail="No image uploaded")
         
-        # Get Replicate API key
         replicate_key = os.environ.get('REPLICATE_API_KEY')
         if not replicate_key:
             raise HTTPException(status_code=500, detail="Replicate API key not configured")
         
-        print("🤖 Calling Replicate LaMa Cleaner to remove furniture...")
+        print("🤖 Calling Replicate LaMa Cleaner...")
         
-        # Save base64 image to temporary file and serve via public URL
-        import tempfile
+        # Save image to public folder
         temp_image_path = f"/app/frontend/public/temp_{moodboard_id}_{doc_type}.png"
-        
-        # Decode and save image
         image_data = base64.b64decode(image_base64)
         with open(temp_image_path, 'wb') as f:
             f.write(image_data)
         
-        # Create public URL
         frontend_url = os.environ.get('FRONTEND_URL', 'https://designflow-hub-1.preview.emergentagent.com')
         image_url = f"{frontend_url}/temp_{moodboard_id}_{doc_type}.png"
         
-        print(f"📤 Image saved to: {image_url}")
-        
-        # Call Replicate LaMa Cleaner API
         async with httpx.AsyncClient(timeout=120.0) as client:
             # Create prediction
             response = await client.post(
@@ -330,24 +321,67 @@ async def ai_remove_furniture(moodboard_id: str, data: dict):
                 }
             )
             
-            if response.status_code == 201:
-                prediction = response.json()
-                prediction_id = prediction.get('id')
+            if response.status_code != 201:
+                raise HTTPException(status_code=response.status_code, detail=response.text)
+            
+            prediction = response.json()
+            prediction_id = prediction.get('id')
+            
+            print(f"✅ Prediction created: {prediction_id}")
+            print("⏳ Waiting for Replicate to process...")
+            
+            # POLL FOR RESULT (wait up to 60 seconds)
+            import asyncio
+            for i in range(60):
+                await asyncio.sleep(1)
                 
-                print(f"✅ Replicate prediction created: {prediction_id}")
-                
-                return {
-                    "success": True,
-                    "message": "Furniture removal started",
-                    "prediction_id": prediction_id,
-                    "status": prediction.get('status')
-                }
-            else:
-                raise HTTPException(
-                    status_code=response.status_code,
-                    detail=f"Replicate API error: {response.text}"
+                status_response = await client.get(
+                    f"https://api.replicate.com/v1/predictions/{prediction_id}",
+                    headers={"Authorization": f"Bearer {replicate_key}"}
                 )
-        
+                
+                result = status_response.json()
+                status = result.get('status')
+                
+                print(f"Poll {i+1}: Status = {status}")
+                
+                if status == 'succeeded':
+                    output_url = result.get('output')
+                    if output_url:
+                        # Download the edited image
+                        print(f"📥 Downloading edited image from: {output_url}")
+                        img_response = await client.get(output_url)
+                        edited_image_bytes = img_response.content
+                        
+                        # Convert to base64 and save to database
+                        edited_base64 = base64.b64encode(edited_image_bytes).decode('utf-8')
+                        
+                        await db.moodboards.update_one(
+                            {"id": moodboard_id},
+                            {"$set": {
+                                f"documents.{doc_type}.image_base64": edited_base64,
+                                "updated_at": datetime.utcnow()
+                            }}
+                        )
+                        
+                        print("✅ Edited image saved to database!")
+                        
+                        return {
+                            "success": True,
+                            "message": "Furniture removed successfully!",
+                            "image_base64": edited_base64,
+                            "prediction_id": prediction_id
+                        }
+                    else:
+                        raise HTTPException(status_code=500, detail="No output from Replicate")
+                
+                elif status == 'failed':
+                    error = result.get('error', 'Unknown error')
+                    raise HTTPException(status_code=500, detail=f"Replicate failed: {error}")
+            
+            # Timeout after 60 seconds
+            raise HTTPException(status_code=408, detail="Replicate processing timeout")
+                
     except Exception as e:
         import traceback
         traceback.print_exc()
