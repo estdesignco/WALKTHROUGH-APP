@@ -112,20 +112,19 @@ export default function ProjectDetailPage() {
     };
 
     const handleInputChange = (field, value, nested = null) => {
-        if (nested) {
-            setEditedProject(prev => ({
-                ...prev,
-                [nested]: {
-                    ...prev[nested],
-                    [field]: value
-                }
-            }));
-        } else {
-            setEditedProject(prev => ({
-                ...prev,
-                [field]: value
-            }));
-        }
+        setEditedProject(prev => {
+            if (!prev) return prev;
+            const newProject = JSON.parse(JSON.stringify(prev)); // Deep clone
+            
+            if (nested) {
+                if (!newProject[nested]) newProject[nested] = {};
+                newProject[nested][field] = value;
+            } else {
+                newProject[field] = value;
+            }
+            
+            return newProject;
+        });
     };
 
     // Complete Filled Questionnaire Component
