@@ -9492,6 +9492,28 @@ async def save_questionnaire(project_id: str, data: dict):
                 phone = ''
             
             return {'name': name, 'phone': phone}
+
+        # AUTO-CREATE CLIENT CONTACT
+        client_name = answers.get('client_name', '')
+        client_email = answers.get('email', '')
+        client_phone = answers.get('phone', '')
+        
+        if client_name:
+            contact_doc = {
+                "id": str(uuid.uuid4()),
+                "project_id": project_id,
+                "name": client_name,
+                "role": "Client",
+                "phone": client_phone,
+                "email": client_email,
+                "company": "",
+                "notes": "Primary client contact from questionnaire",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.contacts.insert_one(contact_doc)
+            contacts_created.append("Client")
+
         
         # Check for New Build contacts
         if answers.get('new_build_architect'):
