@@ -77,12 +77,15 @@ const CalculatorDashboard = ({ projectId }) => {
     try {
       const res = await axios.post(`${API}/calculators/wallpaper`, wallpaperData);
       
-      // Add cost calculation if cost_per_roll is provided
-      if (wallpaperData.cost_per_roll && res.data.rolls_needed) {
-        const costPerRoll = parseFloat(wallpaperData.cost_per_roll);
-        const totalCost = costPerRoll * res.data.rolls_needed;
-        res.data.cost_per_roll = costPerRoll.toFixed(2);
-        res.data.total_cost = totalCost.toFixed(2);
+      // Add cost calculation if cost_per_unit is provided
+      if (wallpaperData.cost_per_unit) {
+        const costPerUnit = parseFloat(wallpaperData.cost_per_unit);
+        if (res.data.rolls_needed) {
+          res.data.total_cost = (costPerUnit * res.data.rolls_needed).toFixed(2);
+        } else if (res.data.yards_needed) {
+          res.data.total_cost = (costPerUnit * res.data.yards_needed).toFixed(2);
+        }
+        res.data.cost_per_unit = costPerUnit.toFixed(2);
       }
       
       setResults(res.data);
