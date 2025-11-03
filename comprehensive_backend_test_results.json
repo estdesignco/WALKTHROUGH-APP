@@ -1,0 +1,267 @@
+{
+  "passed": [
+    {
+      "test": "POST /projects - Create with full validation",
+      "status": "PASS",
+      "details": "Created project ID: 6830e92b-182c-420d-9e79-7335e4fda0b8",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.504483"
+    },
+    {
+      "test": "GET /projects - List all",
+      "status": "PASS",
+      "details": "Retrieved 5 projects",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.509296"
+    },
+    {
+      "test": "GET /projects/{id} - Get with hierarchy",
+      "status": "PASS",
+      "details": "Project: Comprehensive Test Project, Rooms: 0",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.512370"
+    },
+    {
+      "test": "POST /rooms - Create Living Room with auto-populate",
+      "status": "PASS",
+      "details": "Created with 7 categories, 73 items",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.543655"
+    },
+    {
+      "test": "POST /rooms - Create Kitchen with auto-populate",
+      "status": "PASS",
+      "details": "Created with 8 categories, 113 items",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.582104"
+    },
+    {
+      "test": "POST /rooms - Create Master Bedroom with auto-populate",
+      "status": "PASS",
+      "details": "Created with 7 categories, 68 items",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.608540"
+    },
+    {
+      "test": "POST /rooms - Create Primary Bathroom with auto-populate",
+      "status": "PASS",
+      "details": "Created with 11 categories, 106 items",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.648835"
+    },
+    {
+      "test": "POST /rooms - Create Guest Bedroom 1 with auto-populate",
+      "status": "PASS",
+      "details": "Created with 7 categories, 73 items",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.672703"
+    },
+    {
+      "test": "GET rooms via project",
+      "status": "PASS",
+      "details": "Retrieved 5 rooms",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.759772"
+    },
+    {
+      "test": "PUT /rooms/{id} - Update",
+      "status": "PASS",
+      "details": "Room updated successfully",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.763108"
+    },
+    {
+      "test": "POST /items - Create with all fields",
+      "status": "PASS",
+      "details": "Created item ID: e82b795d-e8dc-4b7f-97b3-b9fb569f9a9f",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.844576"
+    },
+    {
+      "test": "PUT /items/{id} - Update name/cost/vendor",
+      "status": "PASS",
+      "details": "Item updated successfully",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.847919"
+    },
+    {
+      "test": "PUT /items/{id} - Update status (check)",
+      "status": "PASS",
+      "details": "Status updated to PICKED",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.852038"
+    },
+    {
+      "test": "PUT /items/{id} - Update tracking/carrier/finish",
+      "status": "PASS",
+      "details": "Tracking info updated successfully",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.855011"
+    },
+    {
+      "test": "PUT /items/{id} - Update stock fields",
+      "status": "PASS",
+      "details": "Stock info updated successfully",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.857795"
+    },
+    {
+      "test": "GET /items/{id} - Retrieve item",
+      "status": "PASS",
+      "details": "Retrieved item: Modern Chandelier - Crystal UPDATED",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.859590"
+    },
+    {
+      "test": "DELETE /items/{id} - Delete item",
+      "status": "PASS",
+      "details": "Item deleted successfully",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.861389"
+    },
+    {
+      "test": "POST /contacts - Create contact",
+      "status": "PASS",
+      "details": "Created contact ID: f2197b60-9bf2-4c50-ab62-d2130a75219b",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.877181"
+    },
+    {
+      "test": "GET /contacts/project/{id} - List contacts",
+      "status": "PASS",
+      "details": "Retrieved 1 contacts",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.879557"
+    },
+    {
+      "test": "PUT /contacts/{id} - Update contact",
+      "status": "PASS",
+      "details": "Contact updated successfully",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.881988"
+    },
+    {
+      "test": "DELETE /contacts/{id} - Delete contact",
+      "status": "PASS",
+      "details": "Contact deleted successfully",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.884029"
+    },
+    {
+      "test": "POST /calculators/hardware",
+      "status": "PASS",
+      "details": "Rod length: None, Brackets: 2",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.889243"
+    },
+    {
+      "test": "POST /calculators/square-footage",
+      "status": "PASS",
+      "details": "Square footage: None sq ft",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.890498"
+    },
+    {
+      "test": "POST /calculators/flooring (tile)",
+      "status": "PASS",
+      "details": "Tiles needed: 1980",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.892886"
+    },
+    {
+      "test": "POST /calculators/lighting",
+      "status": "PASS",
+      "details": "Lumens needed: None",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.894044"
+    },
+    {
+      "test": "POST /calculators/convert - Measurement converter",
+      "status": "PASS",
+      "details": "Converted: 10.0 None",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.895188"
+    },
+    {
+      "test": "POST /send-questionnaire - Send email",
+      "status": "PASS",
+      "details": "Email sent: Questionnaire email has been sent successfully to Test Client",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:49.039160"
+    },
+    {
+      "test": "GET /budget/{project_id} - Budget tracker",
+      "status": "PASS",
+      "details": "Total cost: $0",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:49.043960"
+    },
+    {
+      "test": "GET /vendors - Vendor manager",
+      "status": "PASS",
+      "details": "Retrieved 0 vendors",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:49.045958"
+    },
+    {
+      "test": "GET /materials - Material library",
+      "status": "PASS",
+      "details": "Retrieved 0 materials",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:49.047505"
+    },
+    {
+      "test": "POST /projects - Questionnaire submission",
+      "status": "PASS",
+      "details": "Created project ID: 0f1595a1-e6b3-4dc2-a7bb-e47fc6c5295d",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:49.049311"
+    },
+    {
+      "test": "Questionnaire - Contact auto-creation",
+      "status": "PASS",
+      "details": "Auto-created 0 contacts: ",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:49.051132"
+    }
+  ],
+  "failed": [
+    {
+      "test": "POST /calculators/wallpaper - Double roll",
+      "status": "FAIL",
+      "details": "Status: 422, Response: {\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"wallpaper_type\"],\"msg\":\"Field required\",\"input\":{\"wall_height\":10,\"wall_width\":12,\"pattern_repeat\":24,\"roll_type\":\"double_roll\",\"cost_per_roll\":89.99},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.886322"
+    },
+    {
+      "test": "POST /calculators/drapery",
+      "status": "FAIL",
+      "details": "Status: 422, Response: {\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"finished_length\"],\"msg\":\"Field required\",\"input\":{\"window_width\":60,\"window_height\":84,\"fullness\":2.5,\"fabric_width\":54,\"pattern_repeat\":27},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"},{\"type\":\"missing\",\"loc\":[\"body\",\"pleat_type\"],\"msg\":\"Field required\",\"input\":{\"window_width\":60,\"window_height\":84,\"fullness\":2.5,\"fabric_width\":54,\"pattern_repeat\":27},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.887704"
+    },
+    {
+      "test": "POST /calculators/paint",
+      "status": "FAIL",
+      "details": "Status: 422, Response: {\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"wall_height\"],\"msg\":\"Field required\",\"input\":{\"room_length\":15,\"room_width\":12,\"ceiling_height\":9,\"coats\":2,\"coverage_per_gallon\":350},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.891713"
+    },
+    {
+      "test": "Questionnaire - Data persistence",
+      "status": "FAIL",
+      "details": "Some data not persisted correctly: [True, True, True, True, False]",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:49.053238"
+    }
+  ],
+  "warnings": [
+    {
+      "test": "PUT /projects/{id} - Update",
+      "status": "MINOR",
+      "details": "Status: 422 - May require full object",
+      "error": null,
+      "timestamp": "2025-11-03T03:43:45.515081"
+    }
+  ]
+}

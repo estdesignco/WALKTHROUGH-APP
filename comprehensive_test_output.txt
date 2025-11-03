@@ -1,0 +1,145 @@
+================================================================================
+COMPREHENSIVE APP-WIDE BACKEND TESTING
+Testing ALL backend features end-to-end
+================================================================================
+
+================================================================================
+TEST 1: PROJECTS API
+================================================================================
+✅ POST /projects - Create with full validation: PASS
+   Details: Created project ID: 6830e92b-182c-420d-9e79-7335e4fda0b8
+✅ GET /projects - List all: PASS
+   Details: Retrieved 5 projects
+✅ GET /projects/{id} - Get with hierarchy: PASS
+   Details: Project: Comprehensive Test Project, Rooms: 0
+⚠️ PUT /projects/{id} - Update: MINOR
+   Details: Status: 422 - May require full object
+
+================================================================================
+TEST 2: ROOMS API - ALL ROOM TYPES
+================================================================================
+✅ POST /rooms - Create Living Room with auto-populate: PASS
+   Details: Created with 7 categories, 73 items
+✅ POST /rooms - Create Kitchen with auto-populate: PASS
+   Details: Created with 8 categories, 113 items
+✅ POST /rooms - Create Master Bedroom with auto-populate: PASS
+   Details: Created with 7 categories, 68 items
+✅ POST /rooms - Create Primary Bathroom with auto-populate: PASS
+   Details: Created with 11 categories, 106 items
+✅ POST /rooms - Create Guest Bedroom 1 with auto-populate: PASS
+   Details: Created with 7 categories, 73 items
+✅ GET rooms via project: PASS
+   Details: Retrieved 5 rooms
+✅ PUT /rooms/{id} - Update: PASS
+   Details: Room updated successfully
+
+================================================================================
+TEST 3: ITEMS API - ALL OPERATIONS
+================================================================================
+✅ POST /items - Create with all fields: PASS
+   Details: Created item ID: e82b795d-e8dc-4b7f-97b3-b9fb569f9a9f
+✅ PUT /items/{id} - Update name/cost/vendor: PASS
+   Details: Item updated successfully
+✅ PUT /items/{id} - Update status (check): PASS
+   Details: Status updated to PICKED
+✅ PUT /items/{id} - Update tracking/carrier/finish: PASS
+   Details: Tracking info updated successfully
+✅ PUT /items/{id} - Update stock fields: PASS
+   Details: Stock info updated successfully
+✅ GET /items/{id} - Retrieve item: PASS
+   Details: Retrieved item: Modern Chandelier - Crystal UPDATED
+✅ DELETE /items/{id} - Delete item: PASS
+   Details: Item deleted successfully
+
+================================================================================
+TEST 4: CONTACTS API
+================================================================================
+✅ POST /contacts - Create contact: PASS
+   Details: Created contact ID: f2197b60-9bf2-4c50-ab62-d2130a75219b
+✅ GET /contacts/project/{id} - List contacts: PASS
+   Details: Retrieved 1 contacts
+✅ PUT /contacts/{id} - Update contact: PASS
+   Details: Contact updated successfully
+✅ DELETE /contacts/{id} - Delete contact: PASS
+   Details: Contact deleted successfully
+
+================================================================================
+TEST 5: ALL CALCULATORS
+================================================================================
+❌ POST /calculators/wallpaper - Double roll: FAIL
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","wallpaper_type"],"msg":"Field required","input":{"wall_height":10,"wall_width":12,"pattern_repeat":24,"roll_type":"double_roll","cost_per_roll":89.99},"url":"https://errors.pydantic.dev/2.11/v/missing"}]}
+❌ POST /calculators/drapery: FAIL
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","finished_length"],"msg":"Field required","input":{"window_width":60,"window_height":84,"fullness":2.5,"fabric_width":54,"pattern_repeat":27},"url":"https://errors.pydantic.dev/2.11/v/missing"},{"type":"missing","loc":["body","pleat_type"],"msg":"Field required","input":{"window_width":60,"window_height":84,"fullness":2.5,"fabric_width":54,"pattern_repeat":27},"url":"https://errors.pydantic.dev/2.11/v/missing"}]}
+✅ POST /calculators/hardware: PASS
+   Details: Rod length: None, Brackets: 2
+✅ POST /calculators/square-footage: PASS
+   Details: Square footage: None sq ft
+❌ POST /calculators/paint: FAIL
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","wall_height"],"msg":"Field required","input":{"room_length":15,"room_width":12,"ceiling_height":9,"coats":2,"coverage_per_gallon":350},"url":"https://errors.pydantic.dev/2.11/v/missing"}]}
+✅ POST /calculators/flooring (tile): PASS
+   Details: Tiles needed: 1980
+✅ POST /calculators/lighting: PASS
+   Details: Lumens needed: None
+✅ POST /calculators/convert - Measurement converter: PASS
+   Details: Converted: 10.0 None
+
+================================================================================
+TEST 6: EMAIL FUNCTIONALITY
+================================================================================
+✅ POST /send-questionnaire - Send email: PASS
+   Details: Email sent: Questionnaire email has been sent successfully to Test Client
+
+================================================================================
+TEST 7: POWER FEATURES
+================================================================================
+✅ GET /budget/{project_id} - Budget tracker: PASS
+   Details: Total cost: $0
+✅ GET /vendors - Vendor manager: PASS
+   Details: Retrieved 0 vendors
+✅ GET /materials - Material library: PASS
+   Details: Retrieved 0 materials
+
+================================================================================
+TEST 8: QUESTIONNAIRE WORKFLOW
+================================================================================
+✅ POST /projects - Questionnaire submission: PASS
+   Details: Created project ID: 0f1595a1-e6b3-4dc2-a7bb-e47fc6c5295d
+✅ Questionnaire - Contact auto-creation: PASS
+   Details: Auto-created 0 contacts: 
+❌ Questionnaire - Data persistence: FAIL
+   Details: Some data not persisted correctly: [True, True, True, True, False]
+
+================================================================================
+COMPREHENSIVE BACKEND TEST SUMMARY
+================================================================================
+
+Total Tests: 37
+✅ Passed: 32
+❌ Failed: 4
+⚠️  Warnings: 1
+Success Rate: 86.5%
+
+================================================================================
+FAILED TESTS - BUGS FOUND
+================================================================================
+
+❌ POST /calculators/wallpaper - Double roll
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","wallpaper_type"],"msg":"Field required","input":{"wall_height":10,"wall_width":12,"pattern_repeat":24,"roll_type":"double_roll","cost_per_roll":89.99},"url":"https://errors.pydantic.dev/2.11/v/missing"}]}
+
+❌ POST /calculators/drapery
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","finished_length"],"msg":"Field required","input":{"window_width":60,"window_height":84,"fullness":2.5,"fabric_width":54,"pattern_repeat":27},"url":"https://errors.pydantic.dev/2.11/v/missing"},{"type":"missing","loc":["body","pleat_type"],"msg":"Field required","input":{"window_width":60,"window_height":84,"fullness":2.5,"fabric_width":54,"pattern_repeat":27},"url":"https://errors.pydantic.dev/2.11/v/missing"}]}
+
+❌ POST /calculators/paint
+   Details: Status: 422, Response: {"detail":[{"type":"missing","loc":["body","wall_height"],"msg":"Field required","input":{"room_length":15,"room_width":12,"ceiling_height":9,"coats":2,"coverage_per_gallon":350},"url":"https://errors.pydantic.dev/2.11/v/missing"}]}
+
+❌ Questionnaire - Data persistence
+   Details: Some data not persisted correctly: [True, True, True, True, False]
+
+================================================================================
+WARNINGS - MINOR ISSUES
+================================================================================
+
+⚠️  PUT /projects/{id} - Update
+   Details: Status: 422 - May require full object
+
+✅ Full results saved to: /app/comprehensive_backend_test_results.json
