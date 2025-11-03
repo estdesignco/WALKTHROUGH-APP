@@ -190,7 +190,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "FINAL COMPLETE END-TO-END WORKFLOW TEST - Test the complete questionnaire submission workflow including room creation and verification across all pages (Walkthrough, Checklist, FFE). Verify console logs show proper room creation messages and that rooms are populated with items as expected."
+  "COMPREHENSIVE FRONTEND TESTING - Post-Deployment Verification on https://projectease-5.emergent.host - Test ALL features: Email & Questionnaire Flow, Delete Button, Walkthrough (Mobile & Desktop), Checklist, Contacts, Calculators, Moodboard"
 
 backend:
   - task: "🔥 CRITICAL HOUZZ PRO BROWSER AUTOMATION TEST"
