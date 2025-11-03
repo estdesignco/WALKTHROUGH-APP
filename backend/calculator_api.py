@@ -104,13 +104,17 @@ async def calculate_wallpaper(req: WallpaperRequest):
         else:
             yards_needed = math.ceil(area_with_waste / (req.fabric_width / 3))
         
+        total_cost = yards_needed * req.cost_per_unit
+        
         return {
             "type": "by_yard",
             "wall_area_sqft": round(wall_area, 2),
             "net_area_sqft": round(net_area, 2),
             "fabric_width_inches": req.fabric_width,
             "yards_needed": yards_needed,
-            "waste_percentage": 10
+            "waste_percentage": 10,
+            "cost_per_yard": req.cost_per_unit,
+            "total_cost": round(total_cost, 2)
         }
 
 # ============================================
