@@ -286,7 +286,16 @@ const MainDashboard = () => {
               }}
             >
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl text-stone-300 font-medium">{project.name}</h3>
+                <div className="flex items-center space-x-3">
+                  <h3 className="text-xl text-stone-300 font-medium">{project.name}</h3>
+                  <button
+                    onClick={(e) => handleDeleteProject(project.id, project.name, e)}
+                    className="text-red-400 hover:text-red-300 transition-colors duration-200 text-sm"
+                    title="Delete Project"
+                  >
+                    🗑️
+                  </button>
+                </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-stone-500">Last Updated</span>
                   <div className="w-4 h-4 bg-stone-600 rounded"></div>
