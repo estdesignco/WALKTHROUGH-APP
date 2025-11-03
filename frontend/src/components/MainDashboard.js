@@ -53,6 +53,35 @@ const MainDashboard = () => {
     navigate(`/project/${projectId}`);
   };
 
+  const handleDeleteProject = async (projectId, projectName, e) => {
+    e.stopPropagation(); // Prevent project selection when clicking delete
+    
+    if (!window.confirm(`Are you sure you want to delete "${projectName}"?\n\nThis will delete ALL rooms, items, and data. This cannot be undone!`)) {
+      return;
+    }
+    
+    try {
+      await projectAPI.delete(projectId);
+      alert('✅ Project deleted successfully!');
+      // Refresh the projects list
+      const response = await projectAPI.getAll();
+      const projectsData = response.data || response || [];
+      const mappedProjects = projectsData.map(project => ({
+        id: project.id,
+        name: project.name,
+        clientName: project.client_info?.full_name || 'Unknown Client',
+        address: project.client_info?.address || '',
+        status: 'Active',
+        lastUpdated: new Date(project.updated_at).toLocaleDateString() || 'Unknown',
+        createdDate: new Date(project.created_at).toLocaleDateString() || 'Unknown'
+      }));
+      setProjects(mappedProjects);
+    } catch (error) {
+      alert('❌ Failed to delete project: ' + error.message);
+      console.error('Delete error:', error);
+    }
+  };
+
   const handleSendEmail = async () => {
     try {
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
