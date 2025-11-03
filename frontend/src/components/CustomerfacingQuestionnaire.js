@@ -395,7 +395,7 @@ export default function CustomerfacingQuestionnaire() {
                 know_you_share_more: '', how_heard: '', how_heard_other: '',
             });
             // Redirect after successful project creation
-            window.location.href = `/customer/project/${newProject.id}`;
+            window.location.href = `/project/${newProject.id}?tab=Questionnaire`;
         } catch (error) {
             console.error("❌ QUESTIONNAIRE SUBMISSION FAILED:", error);
             console.error("❌ Error details:", {
