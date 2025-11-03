@@ -31,6 +31,9 @@ class WallpaperRequest(BaseModel):
     roll_width: float = Field(default=21, description="Roll width in inches")
     roll_length: float = Field(default=33, description="Roll length in feet (for double roll)")
     fabric_width: float = Field(default=54, description="Fabric width in inches (for by-yard)")
+    # COST
+    cost_per_unit: float = Field(default=0, ge=0, description="Cost per double roll / yard")
+
 
 @router.post("/wallpaper")
 async def calculate_wallpaper(req: WallpaperRequest):
