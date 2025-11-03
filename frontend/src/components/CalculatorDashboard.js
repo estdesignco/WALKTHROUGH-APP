@@ -308,11 +308,13 @@ const CalculatorDashboard = ({ projectId }) => {
 
 
             <div style={styles.formGroup}>
-              <label style={styles.label}>Cost Per Double Roll ($) - Optional</label>
+              <label style={styles.label}>
+                {wallpaperData.wallpaper_type === 'by_yard' ? 'Cost Per Yard ($)' : 'Cost Per Double Roll ($)'} - Optional
+              </label>
               <input
                 type="number"
-                value={wallpaperData.cost_per_roll}
-                onChange={(e) => setWallpaperData({...wallpaperData, cost_per_roll: e.target.value})}
+                value={wallpaperData.cost_per_unit}
+                onChange={(e) => setWallpaperData({...wallpaperData, cost_per_unit: e.target.value})}
                 style={styles.input}
                 placeholder="125.00"
               />
