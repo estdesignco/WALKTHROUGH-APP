@@ -154,7 +154,8 @@ export default function CustomerfacingQuestionnaire() {
     // Load Google Maps
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: 'AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0',
-        libraries: ['places']
+        libraries: ['places'],
+        version: 'weekly'  // Use latest version
     });
     
     const [autocomplete, setAutocomplete] = useState(null);
