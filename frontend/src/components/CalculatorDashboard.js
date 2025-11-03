@@ -21,7 +21,7 @@ const CalculatorDashboard = ({ projectId }) => {
     roll_width: 21,
     roll_length: 33,
     fabric_width: 54,
-    cost_per_roll: ''  // NEW: Cost per double roll
+    cost_per_unit: ''  // Cost per double roll OR yard
   });
 
   // DRAPERY CALCULATOR STATE
