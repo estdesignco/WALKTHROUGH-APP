@@ -1606,5 +1606,27 @@ DEFAULT_ROOM_STRUCTURE = {
                 }
             ]
         }
-    ]
+    ],
+    
+    # GUEST BEDROOMS use same structure as primary bedroom
+    "guest bedroom 1": COMPREHENSIVE_ROOM_STRUCTURE.get("primary bedroom", {}).get("categories", []),
+    "guest bedroom 2": COMPREHENSIVE_ROOM_STRUCTURE.get("primary bedroom", {}).get("categories", []),
+    "guest bedroom 3": COMPREHENSIVE_ROOM_STRUCTURE.get("primary bedroom", {}).get("categories", []),
+    
+    # GUEST BATHROOMS use same structure as primary bathroom
+    "guest bathroom 1": COMPREHENSIVE_ROOM_STRUCTURE.get("primary bathroom", {}).get("categories", []),
+    "guest bathroom 2": COMPREHENSIVE_ROOM_STRUCTURE.get("primary bathroom", {}).get("categories", []),
+    "guest bathroom 3": COMPREHENSIVE_ROOM_STRUCTURE.get("primary bathroom", {}).get("categories", []),
+    
+    # OTHER ROOMS
+    "scullery": COMPREHENSIVE_ROOM_STRUCTURE.get("kitchen", {}).get("categories", []),
+    "family room": COMPREHENSIVE_ROOM_STRUCTURE.get("living room", {}).get("categories", []),
+    "foyer": COMPREHENSIVE_ROOM_STRUCTURE.get("living room", {}).get("categories", []),
+    "home office": COMPREHENSIVE_ROOM_STRUCTURE.get("living room", {}).get("categories", []),
+    "study": COMPREHENSIVE_ROOM_STRUCTURE.get("living room", {}).get("categories", []),
+    "library": COMPREHENSIVE_ROOM_STRUCTURE.get("living room", {}).get("categories", []),
+    "half bathroom": COMPREHENSIVE_ROOM_STRUCTURE.get("powder room", {}).get("categories", []),
+    "butler's pantry": COMPREHENSIVE_ROOM_STRUCTURE.get("pantry", {}).get("categories", []),
+    "children's bedroom": COMPREHENSIVE_ROOM_STRUCTURE.get("primary bedroom", {}).get("categories", []),
+    "nursery": COMPREHENSIVE_ROOM_STRUCTURE.get("primary bedroom", {}).get("categories", []),
 }
