@@ -99,7 +99,7 @@ const EmailTemplate = ({ clientName, projectName }) => {
                     {/* Call to Action Button */}
                     <div style={{ textAlign: 'center', marginBottom: '40px' }}>
                         <a 
-                            href="${process.env.REACT_APP_BACKEND_URL || window.location.origin}/customer/questionnaire" 
+                            href={`${window.location.origin}/customer/questionnaire`}
                             style={{
                                 display: 'inline-block',
                                 background: 'linear-gradient(to right, #B49B7E, #A08B6F)',
