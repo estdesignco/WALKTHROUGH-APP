@@ -12,6 +12,8 @@ import ChecklistDashboard from "./components/ChecklistDashboard";
 import StudioLandingPage from "./components/StudioLandingPage";
 import ComprehensiveQuestionnaire from "./components/ComprehensiveQuestionnaire";
 import ProjectDetailPage from "./components/ProjectDetailPage";
+import EditQuestionnairePage from "./components/EditQuestionnairePage";
+
 import CustomerfacingLandingPage from './components/CustomerfacingLandingPage';
 import CustomerLandingPage from './components/CustomerLandingPage';
 import CustomerfacingQuestionnaire from './components/CustomerfacingQuestionnaire';
