@@ -174,10 +174,10 @@ export default function ProjectDetailPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Full Name</label>
                             {isEditing ? (
-                                <input
+                                <EditInput
                                     type="text"
                                     value={editedProject?.client_info?.full_name || ''}
-                                    onChange={(e) => handleInputChange('full_name', e.target.value, 'client_info')}
+                                    onChange={(val) => handleInputChange('full_name', val, 'client_info')}
                                     className="w-full p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] bg-gray-800"
                                 />
                             ) : (
