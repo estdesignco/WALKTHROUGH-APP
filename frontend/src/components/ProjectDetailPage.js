@@ -17,6 +17,8 @@ import AutomationDashboard from './AutomationDashboard';
 import ExportsDashboard from './ExportsDashboard';
 import PowerFeaturesDashboard from './PowerFeaturesDashboard';
 
+import EditableQuestionnaireView from './EditableQuestionnaireView';
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 // API functions
