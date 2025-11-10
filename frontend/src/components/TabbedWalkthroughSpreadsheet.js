@@ -221,7 +221,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
       hasExpandedInitially.current = true;
       console.log('✅ Auto-expanded all categories on initial load:', Object.keys(allExpanded).length);
     }
-  }, [project?.rooms]);
+  }, [project?.rooms, hasExpandedInitially.current]); // Don't re-run after initial expansion
 
   const loadProject = async () => {
     try {
