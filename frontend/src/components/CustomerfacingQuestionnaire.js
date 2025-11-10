@@ -708,11 +708,17 @@ export default function CustomerfacingQuestionnaire() {
                             <FieldWrapper label="Please list NEW BUILD address">
                                 <Textarea className={inputStyles} value={formData.new_build_address || ''} onChange={(e) => handleFormChange('new_build_address', e.target.value)} />
                             </FieldWrapper>
-                            <FieldWrapper label="Do you have an Architect? If so, please list Name and phone number below?">
-                                <Textarea className={inputStyles} value={formData.new_build_architect || ''} onChange={(e) => handleFormChange('new_build_architect', e.target.value)} />
+                            <FieldWrapper label="Do you have an Architect?">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input className={inputStyles} placeholder="Architect Name" value={formData.new_build_architect || ''} onChange={(e) => handleFormChange('new_build_architect', e.target.value)} />
+                                    <Input className={inputStyles} placeholder="Architect Phone" value={formData.new_build_architect_phone || ''} onChange={(e) => handleFormChange('new_build_architect_phone', e.target.value)} />
+                                </div>
                             </FieldWrapper>
-                            <FieldWrapper label="Do you have a builder? If so, please list Name and phone number below?">
-                                <Textarea className={inputStyles} value={formData.new_build_builder || ''} onChange={(e) => handleFormChange('new_build_builder', e.target.value)} />
+                            <FieldWrapper label="Do you have a Builder?">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input className={inputStyles} placeholder="Builder Name" value={formData.new_build_builder || ''} onChange={(e) => handleFormChange('new_build_builder', e.target.value)} />
+                                    <Input className={inputStyles} placeholder="Builder Phone" value={formData.new_build_builder_phone || ''} onChange={(e) => handleFormChange('new_build_builder_phone', e.target.value)} />
+                                </div>
                             </FieldWrapper>
                             <FieldWrapper label="Other Team Members (Electrician, Plumber, Contractor, etc.) - Please list Name, Role, and Phone">
                                 <Textarea 
