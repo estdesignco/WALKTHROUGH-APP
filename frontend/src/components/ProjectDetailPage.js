@@ -111,21 +111,20 @@ export default function ProjectDetailPage() {
         }
     };
 
-    const handleInputChange = (field, value, nested = null) => {
+    const handleInputChange = React.useCallback((field, value, nested = null) => {
         setEditedProject(prev => {
             if (!prev) return prev;
-            const newProject = JSON.parse(JSON.stringify(prev)); // Deep clone
+            const newProject = { ...prev };
             
             if (nested) {
-                if (!newProject[nested]) newProject[nested] = {};
-                newProject[nested][field] = value;
+                newProject[nested] = { ...prev[nested], [field]: value };
             } else {
                 newProject[field] = value;
             }
             
             return newProject;
         });
-    };
+    }, []);
 
     // Complete Filled Questionnaire Component
     const CompleteFilledQuestionnaire = () => {
