@@ -489,8 +489,8 @@ export default function CustomerfacingQuestionnaire() {
         'Media Room': '#374151', 'Home Gym': '#EA580C', 'Play Room': '#C2410C', 'Craft Room': '#BE185D',
         'Music Room': '#BE185D', 'Art Studio': '#BE185D', 'Library': '#4A5568', 'Wine Cellar': '#4A5568',
         'Hobby Room': '#BE185D', 'Workshop': '#4A5568', 'Foyer': '#A56A43', 'Backyard': '#2F5233',
-        'Patio': '#2F5233', 'Powder Bath': '#9B3B7A', 'Great Room': '#7C6B7F', 'Study': '#C07B3A',
-        'Game Room': '#C2410C', 'Entryway': '#A56A43', 'Hallway': '#A56A43', 'Screened Porch': '#3B7A6C', 'Deck': '#2F5233',
+        'Patio': '#2F5233', 'Powder': '#9B3B7A', 'Powder Bath': '#9B3B7A', 'Study': '#C07B3A',
+        'Game Room': '#C2410C', 'Hallway': '#A56A43', 'Screened Porch': '#3B7A6C', 'Deck': '#2F5233',
         'Outdoor Kitchen': '#2F5233', 'Pool House': '#2F5233', 'Guest House': '#4A6741'
     };
 
