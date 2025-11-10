@@ -245,6 +245,11 @@ const App = () => {
                       element={<ProjectDetailPage />}
                     />
                     <Route 
+                      path="/project/:projectId/edit-questionnaire" 
+                      element={<EditQuestionnairePage />}
+                    />
+
+                    <Route 
                       path="/scraping-test" 
                       element={<ScrapingTestPage />}
                     />
