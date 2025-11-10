@@ -139,7 +139,7 @@ export default function ProjectDetailPage() {
                     <h2 className="text-2xl font-bold text-[#8B7355]">COMPREHENSIVE CLIENT QUESTIONNAIRE</h2>
                     {!isEditing ? (
                         <button 
-                            onClick={handleEditClick}
+                            onClick={() => navigate(`/project/${projectId}/edit-questionnaire`)}
                             className="px-4 py-2 bg-[#8B7355] text-white rounded hover:bg-[#9c8563] transition-colors"
                         >
                             Edit Answers
