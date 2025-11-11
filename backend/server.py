@@ -9348,16 +9348,17 @@ async def save_questionnaire(project_id: str, data: dict):
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Builder")
         
-        # Check for Renovation contacts
+        # Renovation Architect (separate name and phone fields)
         if answers.get('renovation_architect'):
-            contact_info = parse_contact_info(answers['renovation_architect'])
-            if contact_info:
+            architect_name = answers.get('renovation_architect', '').strip()
+            architect_phone = answers.get('renovation_architect_phone', '').strip()
+            if architect_name:
                 contact_doc = {
                     "id": str(uuid.uuid4()),
                     "project_id": project_id,
-                    "name": contact_info['name'],
+                    "name": architect_name,
                     "role": "Architect",
-                    "phone": contact_info['phone'],
+                    "phone": architect_phone,
                     "email": "",
                     "company": "",
                     "notes": "Added from questionnaire",
@@ -9367,15 +9368,17 @@ async def save_questionnaire(project_id: str, data: dict):
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Architect")
         
+        # Renovation Builder (separate name and phone fields)
         if answers.get('renovation_builder'):
-            contact_info = parse_contact_info(answers['renovation_builder'])
-            if contact_info:
+            builder_name = answers.get('renovation_builder', '').strip()
+            builder_phone = answers.get('renovation_builder_phone', '').strip()
+            if builder_name:
                 contact_doc = {
                     "id": str(uuid.uuid4()),
                     "project_id": project_id,
-                    "name": contact_info['name'],
+                    "name": builder_name,
                     "role": "Builder",
-                    "phone": contact_info['phone'],
+                    "phone": builder_phone,
                     "email": "",
                     "company": "",
                     "notes": "Added from questionnaire",
@@ -9914,16 +9917,17 @@ async def export_ffe_to_pdf(data: dict):
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Builder")
         
-        # Check for Renovation contacts
+        # Renovation Architect (separate name and phone fields)
         if answers.get('renovation_architect'):
-            contact_info = parse_contact_info(answers['renovation_architect'])
-            if contact_info:
+            architect_name = answers.get('renovation_architect', '').strip()
+            architect_phone = answers.get('renovation_architect_phone', '').strip()
+            if architect_name:
                 contact_doc = {
                     "id": str(uuid.uuid4()),
                     "project_id": project_id,
-                    "name": contact_info['name'],
+                    "name": architect_name,
                     "role": "Architect",
-                    "phone": contact_info['phone'],
+                    "phone": architect_phone,
                     "email": "",
                     "company": "",
                     "notes": "Added from questionnaire",
@@ -9933,15 +9937,17 @@ async def export_ffe_to_pdf(data: dict):
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Architect")
         
+        # Renovation Builder (separate name and phone fields)
         if answers.get('renovation_builder'):
-            contact_info = parse_contact_info(answers['renovation_builder'])
-            if contact_info:
+            builder_name = answers.get('renovation_builder', '').strip()
+            builder_phone = answers.get('renovation_builder_phone', '').strip()
+            if builder_name:
                 contact_doc = {
                     "id": str(uuid.uuid4()),
                     "project_id": project_id,
-                    "name": contact_info['name'],
+                    "name": builder_name,
                     "role": "Builder",
-                    "phone": contact_info['phone'],
+                    "phone": builder_phone,
                     "email": "",
                     "company": "",
                     "notes": "Added from questionnaire",
