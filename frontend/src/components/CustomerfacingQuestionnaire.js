@@ -828,7 +828,32 @@ export default function CustomerfacingQuestionnaire() {
                     {formData.project_type === 'Renovation' && (
                         <Section title="RENOVATION" description="If you are not looking to renovate, please feel free to skip these questions!">
                             <FieldWrapper label="Please list Renovation Address (If different!)">
-                                <Textarea className={inputStyles} value={formData.renovation_address || ''} onChange={(e) => handleFormChange('renovation_address', e.target.value)} />
+                                {isLoaded ? (
+                                    <Autocomplete
+                                        onLoad={(auto) => setAutocompleteRenovation(auto)}
+                                        onPlaceChanged={() => {
+                                            if (autocompleteRenovation) {
+                                                const place = autocompleteRenovation.getPlace();
+                                                handleFormChange('renovation_address', place.formatted_address || '');
+                                            }
+                                        }}
+                                    >
+                                        <textarea
+                                            className={inputStyles}
+                                            value={formData.renovation_address || ''}
+                                            onChange={(e) => handleFormChange('renovation_address', e.target.value)}
+                                            placeholder="Start typing address..."
+                                            rows={2}
+                                        />
+                                    </Autocomplete>
+                                ) : (
+                                    <textarea
+                                        className={inputStyles}
+                                        value={formData.renovation_address || ''}
+                                        onChange={(e) => handleFormChange('renovation_address', e.target.value)}
+                                        rows={2}
+                                    />
+                                )}
                             </FieldWrapper>
                             <InputField label="When did you move into this home?" id="renovation_move_in_date" type="date" value={formData.renovation_move_in_date || ''} onChange={(e) => handleFormChange('renovation_move_in_date', e.target.value)} />
                             <FieldWrapper label="Do you have a builder? If so, please list Name and phone number below?">
