@@ -9495,6 +9495,12 @@ async def save_clipped_product_to_app(data: dict):
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
         
+        
+        return {"success": True, "message": "Item saved"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 app.include_router(api_router)
 
 
