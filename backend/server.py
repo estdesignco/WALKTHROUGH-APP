@@ -9452,6 +9452,27 @@ async def save_questionnaire(project_id: str, data: dict):
                         "updated_at": datetime.utcnow()
                     }
                     await db.contacts.insert_one(contact_doc)
+
+        # Parse furniture_team_members array
+        if answers.get('furniture_team_members') and isinstance(answers['furniture_team_members'], list):
+            for member_obj in answers['furniture_team_members']:
+                if member_obj.get('name') and member_obj.get('role'):
+                    contact_doc = {
+                        "id": str(uuid.uuid4()),
+                        "project_id": project_id,
+                        "name": member_obj.get('name'),
+                        "role": member_obj.get('role'),
+                        "phone": member_obj.get('phone', ''),
+                        "email": "",
+                        "company": "",
+                        "notes": "Added from questionnaire team members (furniture refresh)",
+                        "created_at": datetime.utcnow(),
+                        "updated_at": datetime.utcnow()
+                    }
+                    await db.contacts.insert_one(contact_doc)
+                    contacts_created.append(member_obj.get('role'))
+        
+
                     contacts_created.append(member_obj.get('role'))
         
 
