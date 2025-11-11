@@ -161,6 +161,8 @@ export default function CustomerfacingQuestionnaire() {
     });
     
     const [autocomplete, setAutocomplete] = useState(null);
+    const [autocompleteNewBuild, setAutocompleteNewBuild] = useState(null);
+    const [autocompleteRenovation, setAutocompleteRenovation] = useState(null);
     
     const [formData, setFormData] = useState({
         rooms_involved: [],
