@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import axios from 'axios';
-import { APIProvider, PlaceAutocomplete } from '@googlemaps/extended-component-library/react';
+import { Autocomplete, useLoadScript } from '@react-google-maps/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -153,6 +153,15 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
 const GOOGLE_MAPS_LIBRARIES = ['places'];
 
 export default function CustomerfacingQuestionnaire() {
+    const { isLoaded } = useLoadScript({
+        googleMapsApiKey: 'AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0',
+        libraries: GOOGLE_MAPS_LIBRARIES
+    });
+    
+    const [autocomplete, setAutocomplete] = useState(null);
+    const [autocompleteNewBuild, setAutocompleteNewBuild] = useState(null);
+    const [autocompleteRenovation, setAutocompleteRenovation] = useState(null);
+    
     const [formData, setFormData] = useState({
         rooms_involved: [],
         ideal_sofa_price: '',
