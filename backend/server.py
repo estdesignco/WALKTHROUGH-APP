@@ -57,6 +57,22 @@ db = client[os.environ['DB_NAME']]
 # Create the main app without a prefix
 app = FastAPI(title="Interior Design Management System", version="1.0.0")
 
+
+# CORS Configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://app.estdesignco.com",
+        "https://projectease-5.emergent.host",
+        "http://localhost:3000",
+        "https://designflow-hub-1.preview.emergentagent.com"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
