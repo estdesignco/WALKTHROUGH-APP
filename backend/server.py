@@ -9222,229 +9222,6 @@ async def import_google_sheets(project_id: str, data: dict):
 
 
 # Include the router in the main app
-app.include_router(api_router)
-
-
-# ROOT-LEVEL HEALTH CHECK for Kubernetes probes (without /api prefix)
-@app.get("/health")
-async def root_health_check():
-    """Root-level health check for Kubernetes readiness/liveness probes"""
-    return {"status": "healthy", "timestamp": datetime.utcnow(), "version": "1.0.1"}
-
-app.include_router(furniture_router)
-# app.include_router(furniture_search_router, prefix="/api/furniture")  # Removed - Houzz scraper not used
-app.include_router(contacts_router)
-contacts_api.set_db(db)
-
-app.include_router(calculator_router)
-app.include_router(power_features_router)
-app.include_router(moodboard_router)
-
-# HOUZZ CLIPPER WEBHOOK - Intercepts data on its way to Houzz
-# REMOVED HOUZZ FUNCTION: @app.post("/api/houzz-clipper-webhook")
-@api_router.post("/integrations/walkthrough/complete")
-async def complete_walkthrough(data: dict):
-    """Complete walkthrough and generate checklist items"""
-    try:
-        project_id = data.get('project_id')
-        walkthrough_data = data.get('walkthrough_data', {})
-        
-        # Generate checklist items based on walkthrough findings
-        checklist_items = []
-        
-        for room_data in walkthrough_data.get('rooms', []):
-            room_name = room_data.get('name')
-            measurements = room_data.get('measurements', {})
-            
-            # Generate room-specific checklist items
-            if measurements.get('length') and measurements.get('width'):
-                area = float(measurements['length']) * float(measurements['width'])
-                
-                if 'kitchen' in room_name.lower():
-                    checklist_items.extend([
-                        f"Order {area * 1.5:.0f} sq ft of flooring for {room_name}",
-                        f"Coordinate appliance delivery for {room_name}",
-                        f"Schedule cabinet installation for {room_name}"
-                    ])
-                elif 'bathroom' in room_name.lower():
-                    checklist_items.extend([
-                        f"Order plumbing fixtures for {room_name}",
-                        f"Schedule tile installation for {room_name}"
-                    ])
-                else:
-                    checklist_items.extend([
-                        f"Order furniture for {room_name}",
-                        f"Schedule painting for {room_name}"
-                    ])
-        
-        # Save checklist to database
-        checklist_doc = {
-            "id": str(uuid.uuid4()),
-            "project_id": project_id,
-            "items": checklist_items,
-            "generated_from": "walkthrough",
-            "created_at": datetime.utcnow(),
-            "completed_items": []
-        }
-        
-        result = await db.checklists.insert_one(checklist_doc)
-        
-        return {
-            "success": True,
-            "checklist_id": checklist_doc["id"],
-            "items_generated": len(checklist_items),
-            "checklist_items": checklist_items
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Walkthrough completion failed: {str(e)}")
-
-@api_router.post("/barcode-lookup")
-async def lookup_product_by_barcode(data: dict):
-    """Look up product information by barcode/UPC"""
-    try:
-        barcode = data.get('barcode', '')
-        if not barcode:
-            raise HTTPException(status_code=400, detail="Barcode is required")
-        
-        print(f"🔍 Looking up barcode: {barcode}")
-        
-        # Try multiple barcode lookup services
-        product_info = None
-        
-        # Service 1: UPC Database API (example)
-        try:
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (compatible; FFE-Manager/1.0)'
-            }
-            
-            # Try UPC database lookup
-            upc_response = requests.get(
-                f'https://api.upcitemdb.com/prod/trial/lookup?upc={barcode}',
-                headers=headers,
-                timeout=10
-            )
-            
-            if upc_response.status_code == 200:
-                upc_data = upc_response.json()
-                if upc_data.get('items') and len(upc_data['items']) > 0:
-                    item = upc_data['items'][0]
-                    product_info = {
-                        'name': item.get('title', ''),
-                        'vendor': item.get('brand', ''),
-                        'sku': barcode,
-                        'description': item.get('description', ''),
-                        'image_url': item.get('images', [None])[0],
-                        'category': item.get('category', ''),
-                        'upc': barcode
-                    }
-                    print(f"✅ Product found via UPC database: {product_info['name']}")
-        except Exception as e:
-            print(f"UPC database lookup failed: {e}")
-        
-        # Service 2: Fallback to manual barcode pattern matching
-        if not product_info:
-            # Generate product info based on barcode patterns
-            product_info = {
-                'name': f'Product {barcode}',
-                'vendor': 'Unknown Manufacturer',
-                'sku': barcode,
-                'description': f'Product identified by barcode {barcode}',
-                'image_url': None,
-                'category': 'General',
-                'upc': barcode,
-                'barcode_source': 'manual_scan'
-            }
-            print(f"✅ Generated product info from barcode: {barcode}")
-        
-        return {
-            "success": True,
-            "data": product_info,
-            "barcode": barcode,
-            "source": "barcode_lookup"
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Barcode lookup failed: {str(e)}")
-
-@api_router.post("/export/pdf")
-async def export_ffe_to_pdf(data: dict):
-    """Export FF&E schedule to PDF"""
-    try:
-        project_id = data.get('project_id')
-        
-        # Get project data
-        project = await db.projects.find_one({"id": project_id})
-        if not project:
-            raise HTTPException(status_code=404, detail="Project not found")
-        
-        # Get all items
-        rooms = project.get('rooms', [])
-        
-        # Generate PDF data (simplified version)
-        pdf_data = {
-            "title": f"FF&E Schedule - {project.get('name', 'Project')}",
-            "client": project.get('client_info', {}).get('full_name', 'Client'),
-            "date": datetime.utcnow().strftime('%B %d, %Y'),
-            "rooms": [],
-            "summary": {
-                "total_items": 0,
-                "total_rooms": len(rooms),
-                "total_budget": 0
-            }
-        }
-        
-        for room in rooms:
-            room_data = {
-                "name": room.get('name'),
-                "categories": []
-            }
-            
-            total_room_items = 0
-            room_budget = 0
-            
-            for category in room.get('categories', []):
-                category_data = {
-                    "name": category.get('name'),
-                    "items": []
-                }
-                
-                for subcategory in category.get('subcategories', []):
-                    for item in subcategory.get('items', []):
-                        item_cost = float(item.get('cost', '0').replace('$', '').replace(',', '') or 0)
-                        category_data["items"].append({
-                            "name": item.get('name'),
-                            "vendor": item.get('vendor'),
-                            "sku": item.get('sku'),
-                            "quantity": item.get('quantity', 1),
-                            "cost": item.get('cost'),
-                            "status": item.get('status'),
-                            "carrier": item.get('carrier')
-                        })
-                        total_room_items += 1
-                        room_budget += item_cost * item.get('quantity', 1)
-                
-                if category_data["items"]:
-                    room_data["categories"].append(category_data)
-            
-            room_data["total_items"] = total_room_items
-            room_data["budget"] = room_budget
-            pdf_data["rooms"].append(room_data)
-            pdf_data["summary"]["total_items"] += total_room_items
-            pdf_data["summary"]["total_budget"] += room_budget
-        
-        # In a real implementation, this would generate an actual PDF
-        # For now, return the structured data
-        return {
-            "success": True,
-            "pdf_data": pdf_data,
-            "ready_for_download": True,
-            "generated_at": datetime.utcnow().isoformat()
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"PDF export failed: {str(e)}")
-
 @api_router.post("/questionnaire/{project_id}")
 async def save_questionnaire(project_id: str, data: dict):
     """Save questionnaire answers for project and auto-create contacts"""
@@ -9718,6 +9495,498 @@ async def save_clipped_product_to_app(data: dict):
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
         
+app.include_router(api_router)
+
+
+# ROOT-LEVEL HEALTH CHECK for Kubernetes probes (without /api prefix)
+@app.get("/health")
+async def root_health_check():
+    """Root-level health check for Kubernetes readiness/liveness probes"""
+    return {"status": "healthy", "timestamp": datetime.utcnow(), "version": "1.0.1"}
+
+app.include_router(furniture_router)
+# app.include_router(furniture_search_router, prefix="/api/furniture")  # Removed - Houzz scraper not used
+app.include_router(contacts_router)
+contacts_api.set_db(db)
+
+app.include_router(calculator_router)
+app.include_router(power_features_router)
+app.include_router(moodboard_router)
+
+# HOUZZ CLIPPER WEBHOOK - Intercepts data on its way to Houzz
+# REMOVED HOUZZ FUNCTION: @app.post("/api/houzz-clipper-webhook")
+@api_router.post("/integrations/walkthrough/complete")
+async def complete_walkthrough(data: dict):
+    """Complete walkthrough and generate checklist items"""
+    try:
+        project_id = data.get('project_id')
+        walkthrough_data = data.get('walkthrough_data', {})
+        
+        # Generate checklist items based on walkthrough findings
+        checklist_items = []
+        
+        for room_data in walkthrough_data.get('rooms', []):
+            room_name = room_data.get('name')
+            measurements = room_data.get('measurements', {})
+            
+            # Generate room-specific checklist items
+            if measurements.get('length') and measurements.get('width'):
+                area = float(measurements['length']) * float(measurements['width'])
+                
+                if 'kitchen' in room_name.lower():
+                    checklist_items.extend([
+                        f"Order {area * 1.5:.0f} sq ft of flooring for {room_name}",
+                        f"Coordinate appliance delivery for {room_name}",
+                        f"Schedule cabinet installation for {room_name}"
+                    ])
+                elif 'bathroom' in room_name.lower():
+                    checklist_items.extend([
+                        f"Order plumbing fixtures for {room_name}",
+                        f"Schedule tile installation for {room_name}"
+                    ])
+                else:
+                    checklist_items.extend([
+                        f"Order furniture for {room_name}",
+                        f"Schedule painting for {room_name}"
+                    ])
+        
+        # Save checklist to database
+        checklist_doc = {
+            "id": str(uuid.uuid4()),
+            "project_id": project_id,
+            "items": checklist_items,
+            "generated_from": "walkthrough",
+            "created_at": datetime.utcnow(),
+            "completed_items": []
+        }
+        
+        result = await db.checklists.insert_one(checklist_doc)
+        
+        return {
+            "success": True,
+            "checklist_id": checklist_doc["id"],
+            "items_generated": len(checklist_items),
+            "checklist_items": checklist_items
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Walkthrough completion failed: {str(e)}")
+
+@api_router.post("/barcode-lookup")
+async def lookup_product_by_barcode(data: dict):
+    """Look up product information by barcode/UPC"""
+    try:
+        barcode = data.get('barcode', '')
+        if not barcode:
+            raise HTTPException(status_code=400, detail="Barcode is required")
+        
+        print(f"🔍 Looking up barcode: {barcode}")
+        
+        # Try multiple barcode lookup services
+        product_info = None
+        
+        # Service 1: UPC Database API (example)
+        try:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (compatible; FFE-Manager/1.0)'
+            }
+            
+            # Try UPC database lookup
+            upc_response = requests.get(
+                f'https://api.upcitemdb.com/prod/trial/lookup?upc={barcode}',
+                headers=headers,
+                timeout=10
+            )
+            
+            if upc_response.status_code == 200:
+                upc_data = upc_response.json()
+                if upc_data.get('items') and len(upc_data['items']) > 0:
+                    item = upc_data['items'][0]
+                    product_info = {
+                        'name': item.get('title', ''),
+                        'vendor': item.get('brand', ''),
+                        'sku': barcode,
+                        'description': item.get('description', ''),
+                        'image_url': item.get('images', [None])[0],
+                        'category': item.get('category', ''),
+                        'upc': barcode
+                    }
+                    print(f"✅ Product found via UPC database: {product_info['name']}")
+        except Exception as e:
+            print(f"UPC database lookup failed: {e}")
+        
+        # Service 2: Fallback to manual barcode pattern matching
+        if not product_info:
+            # Generate product info based on barcode patterns
+            product_info = {
+                'name': f'Product {barcode}',
+                'vendor': 'Unknown Manufacturer',
+                'sku': barcode,
+                'description': f'Product identified by barcode {barcode}',
+                'image_url': None,
+                'category': 'General',
+                'upc': barcode,
+                'barcode_source': 'manual_scan'
+            }
+            print(f"✅ Generated product info from barcode: {barcode}")
+        
+        return {
+            "success": True,
+            "data": product_info,
+            "barcode": barcode,
+            "source": "barcode_lookup"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Barcode lookup failed: {str(e)}")
+
+@api_router.post("/export/pdf")
+async def export_ffe_to_pdf(data: dict):
+    """Export FF&E schedule to PDF"""
+    try:
+        project_id = data.get('project_id')
+        
+        # Get project data
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Get all items
+        rooms = project.get('rooms', [])
+        
+        # Generate PDF data (simplified version)
+        pdf_data = {
+            "title": f"FF&E Schedule - {project.get('name', 'Project')}",
+            "client": project.get('client_info', {}).get('full_name', 'Client'),
+            "date": datetime.utcnow().strftime('%B %d, %Y'),
+            "rooms": [],
+            "summary": {
+                "total_items": 0,
+                "total_rooms": len(rooms),
+                "total_budget": 0
+            }
+        }
+        
+        for room in rooms:
+            room_data = {
+                "name": room.get('name'),
+                "categories": []
+            }
+            
+            total_room_items = 0
+            room_budget = 0
+            
+            for category in room.get('categories', []):
+                category_data = {
+                    "name": category.get('name'),
+                    "items": []
+                }
+                
+                for subcategory in category.get('subcategories', []):
+                    for item in subcategory.get('items', []):
+                        item_cost = float(item.get('cost', '0').replace('$', '').replace(',', '') or 0)
+                        category_data["items"].append({
+                            "name": item.get('name'),
+                            "vendor": item.get('vendor'),
+                            "sku": item.get('sku'),
+                            "quantity": item.get('quantity', 1),
+                            "cost": item.get('cost'),
+                            "status": item.get('status'),
+                            "carrier": item.get('carrier')
+                        })
+                        total_room_items += 1
+                        room_budget += item_cost * item.get('quantity', 1)
+                
+                if category_data["items"]:
+                    room_data["categories"].append(category_data)
+            
+            room_data["total_items"] = total_room_items
+            room_data["budget"] = room_budget
+            pdf_data["rooms"].append(room_data)
+            pdf_data["summary"]["total_items"] += total_room_items
+            pdf_data["summary"]["total_budget"] += room_budget
+        
+        # In a real implementation, this would generate an actual PDF
+        # For now, return the structured data
+        return {
+            "success": True,
+            "pdf_data": pdf_data,
+            "ready_for_download": True,
+            "generated_at": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"PDF export failed: {str(e)}")
+
+    """Save questionnaire answers for project and auto-create contacts"""
+    try:
+        questionnaire_doc = {
+            "id": str(uuid.uuid4()),
+            "project_id": project_id,
+            "answers": data.get("answers", {}),
+            "completed_at": data.get("completed_at"),
+            "completion_percentage": data.get("completion_percentage", 0),
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Update existing or create new
+        await db.questionnaires.replace_one(
+            {"project_id": project_id},
+            questionnaire_doc,
+            upsert=True
+        )
+        
+        # AUTO-CREATE CONTACTS FROM QUESTIONNAIRE
+        answers = data.get("answers", {})
+        contacts_created = []
+        
+        # Helper function to parse contact info (Name: phone)
+        def parse_contact_info(text):
+            """Extract name and phone from text like 'John Doe: 555-1234'"""
+            if not text or text.strip() == '':
+                return None
+            
+            text = text.strip()
+            # Try to split by : or - or ,
+            if ':' in text:
+                parts = text.split(':', 1)
+                name = parts[0].strip()
+                phone = parts[1].strip() if len(parts) > 1 else ''
+            elif '-' in text and len(text.split('-')) >= 3:
+                # Might be just phone number
+                name = 'Contact'
+                phone = text.strip()
+            else:
+                # Just name provided
+                name = text.strip()
+                phone = ''
+            
+            return {'name': name, 'phone': phone}
+
+        # AUTO-CREATE CLIENT CONTACT
+        client_name = answers.get('client_name', '')
+        client_email = answers.get('email', '')
+        client_phone = answers.get('phone', '')
+        
+        if client_name:
+            contact_doc = {
+                "id": str(uuid.uuid4()),
+                "project_id": project_id,
+                "name": client_name,
+                "role": "Client",
+                "phone": client_phone,
+                "email": client_email,
+                "company": "",
+                "notes": "Primary client contact from questionnaire",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.contacts.insert_one(contact_doc)
+            contacts_created.append("Client")
+
+        
+        # Check for New Build contacts
+        if answers.get('new_build_architect'):
+            contact_info = parse_contact_info(answers['new_build_architect'])
+            if contact_info:
+                contact_doc = {
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "name": contact_info['name'],
+                    "role": "Architect",
+                    "phone": contact_info['phone'],
+                    "email": "",
+                    "company": "",
+                    "notes": "Added from questionnaire",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.contacts.insert_one(contact_doc)
+                contacts_created.append("Architect")
+        
+        if answers.get('new_build_builder'):
+            contact_info = parse_contact_info(answers['new_build_builder'])
+            if contact_info:
+                contact_doc = {
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "name": contact_info['name'],
+                    "role": "Builder",
+                    "phone": contact_info['phone'],
+                    "email": "",
+                    "company": "",
+                    "notes": "Added from questionnaire",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.contacts.insert_one(contact_doc)
+                contacts_created.append("Builder")
+        
+        # Check for Renovation contacts
+        if answers.get('renovation_architect'):
+            contact_info = parse_contact_info(answers['renovation_architect'])
+            if contact_info:
+                contact_doc = {
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "name": contact_info['name'],
+                    "role": "Architect",
+                    "phone": contact_info['phone'],
+                    "email": "",
+                    "company": "",
+                    "notes": "Added from questionnaire",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.contacts.insert_one(contact_doc)
+                contacts_created.append("Architect")
+        
+        if answers.get('renovation_builder'):
+            contact_info = parse_contact_info(answers['renovation_builder'])
+            if contact_info:
+                contact_doc = {
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "name": contact_info['name'],
+                    "role": "Builder",
+                    "phone": contact_info['phone'],
+                    "email": "",
+                    "company": "",
+                    "notes": "Added from questionnaire",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.contacts.insert_one(contact_doc)
+                contacts_created.append("Builder")
+        
+        # Check for Spouse/Partner
+        if answers.get('spouse_partner_name'):
+            name = answers['spouse_partner_name'].strip()
+            phone = answers.get('spouse_partner_phone', '').strip()
+            if name:
+                contact_doc = {
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "name": name,
+                    "role": "Spouse/Partner",
+                    "phone": phone,
+                    "email": "",
+                    "company": "",
+                    "notes": "Added from questionnaire",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.contacts.insert_one(contact_doc)
+                contacts_created.append("Spouse/Partner")
+        
+        # Parse Other Team Members (New Build)
+        if answers.get('new_build_other_team'):
+            team_text = answers['new_build_other_team'].strip()
+            if team_text:
+                # Split by newlines
+                lines = [line.strip() for line in team_text.split('\n') if line.strip()]
+                for line in lines:
+                    # Try to parse format: "Name - Role - Phone"
+                    parts = [p.strip() for p in line.split('-')]
+                    if len(parts) >= 2:
+                        name = parts[0]
+                        role = parts[1] if len(parts) > 1 else 'Team Member'
+                        phone = parts[2] if len(parts) > 2 else ''
+                        
+                        contact_doc = {
+                            "id": str(uuid.uuid4()),
+                            "project_id": project_id,
+                            "name": name,
+                            "role": role,
+                            "phone": phone,
+                            "email": "",
+                            "company": "",
+                            "notes": "Added from questionnaire",
+                            "created_at": datetime.utcnow(),
+                            "updated_at": datetime.utcnow()
+                        }
+                        await db.contacts.insert_one(contact_doc)
+                        contacts_created.append(role)
+        
+        # Parse Other Team Members (Renovation)
+        if answers.get('renovation_other_team'):
+            team_text = answers['renovation_other_team'].strip()
+            if team_text:
+                # Split by newlines
+                lines = [line.strip() for line in team_text.split('\n') if line.strip()]
+                for line in lines:
+                    # Try to parse format: "Name - Role - Phone"
+                    parts = [p.strip() for p in line.split('-')]
+                    if len(parts) >= 2:
+                        name = parts[0]
+                        role = parts[1] if len(parts) > 1 else 'Team Member'
+                        phone = parts[2] if len(parts) > 2 else ''
+                        
+                        contact_doc = {
+                            "id": str(uuid.uuid4()),
+                            "project_id": project_id,
+                            "name": name,
+                            "role": role,
+                            "phone": phone,
+                            "email": "",
+                            "company": "",
+                            "notes": "Added from questionnaire",
+                            "created_at": datetime.utcnow(),
+                            "updated_at": datetime.utcnow()
+                        }
+                        await db.contacts.insert_one(contact_doc)
+                        contacts_created.append(role)
+        
+        print(f"✅ Auto-created {len(contacts_created)} contacts from questionnaire: {contacts_created}")
+        
+        return {
+            "success": True,
+            "questionnaire_id": questionnaire_doc["id"],
+            "completion_percentage": questionnaire_doc["completion_percentage"],
+            "contacts_created": contacts_created
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to save questionnaire: {str(e)}")
+
+    """Get questionnaire answers for project"""
+    try:
+        questionnaire = await db.questionnaires.find_one({"project_id": project_id})
+        
+        if questionnaire:
+            return {
+                "project_id": project_id,
+                "answers": questionnaire.get("answers", {}),
+                "completion_percentage": questionnaire.get("completion_percentage", 0),
+                "completed_at": questionnaire.get("completed_at"),
+                "last_updated": questionnaire.get("updated_at")
+            }
+        else:
+            return {
+                "project_id": project_id,
+                "answers": {},
+                "completion_percentage": 0
+            }
+            
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to get questionnaire: {str(e)}")
+
+# PRODUCT CLIPPER ENDPOINTS
+@api_router.post("/clipper/save-to-app")
+async def save_clipped_product_to_app(data: dict):
+    """Save clipped product to our Furniture App"""
+    try:
+        project_id = data.get('projectId')
+        room_name = data.get('roomName')
+        category_name = data.get('categoryName')
+        item_data = data.get('itemData', {})
+        
+        # Find the project
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
         # Find or create room
         room = None
         for r in project.get('rooms', []):
@@ -9726,398 +9995,3 @@ async def save_clipped_product_to_app(data: dict):
                 break
         
         if not room:
-            # Create new room
-            room = {
-                "id": str(uuid.uuid4()),
-                "name": room_name,
-                "sheet_type": "checklist",  # Default to checklist
-                "categories": []
-            }
-            await db.projects.update_one(
-                {"id": project_id},
-                {"$push": {"rooms": room}}
-            )
-        
-        # Find or create category
-        category = None
-        for cat in room.get('categories', []):
-            if cat['name'].lower() == category_name.lower():
-                category = cat
-                break
-        
-        if not category:
-            # Create new category
-            category = {
-                "id": str(uuid.uuid4()),
-                "name": category_name,
-                "subcategories": [{
-                    "id": str(uuid.uuid4()),
-                    "name": "NEEDED",
-                    "items": []
-                }]
-            }
-            # Add category to room
-            await db.projects.update_one(
-                {"id": project_id, "rooms.id": room['id']},
-                {"$push": {"rooms.$.categories": category}}
-            )
-        
-        # Create new item
-        new_item = {
-            "id": str(uuid.uuid4()),
-            "name": item_data.get('name', 'Unnamed Item'),
-            "vendor": item_data.get('vendor', ''),
-            "cost": item_data.get('cost', 0),
-            "price": item_data.get('price', 0),
-            "sku": item_data.get('sku', ''),
-            "size": item_data.get('size', ''),
-            "finish_color": item_data.get('finish_color', ''),
-            "image_url": item_data.get('image_url', ''),
-            "link": item_data.get('link', ''),
-            "remarks": item_data.get('remarks', ''),
-            "description": item_data.get('description', ''),
-            "materials": item_data.get('materials', ''),
-            "msrp": item_data.get('msrp', 0),
-            "tags": item_data.get('tags', []),
-            "taxable": item_data.get('taxable', True),
-            "status": "PICKED",
-            "quantity": 1
-        }
-        
-        # Add item to first subcategory
-        await db.projects.update_one(
-            {
-                "id": project_id,
-                "rooms.id": room['id'],
-                "rooms.categories.id": category['id'] if category.get('id') else category.get('name')
-            },
-            {"$push": {"rooms.$[room].categories.$[cat].subcategories.0.items": new_item}},
-            array_filters=[
-                {"room.id": room['id']},
-                {"cat.id": category['id'] if category.get('id') else category.get('name')}
-            ]
-        )
-        
-        return {"success": True, "message": "Product saved to Furniture App", "item_id": new_item['id']}
-        
-    except Exception as e:
-        print(f"Error saving to app: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# REMOVED: Houzz Pro integration - not in use
-
-# COMPLETE WALKTHROUGH ENDPOINT
-@api_router.post("/complete-walkthrough/{project_id}")
-async def complete_walkthrough_endpoint(project_id: str):
-    """Complete walkthrough and transition to checklist mode"""
-    try:
-        # Find the project
-        project = await db.projects.find_one({"id": project_id})
-        if not project:
-            raise HTTPException(status_code=404, detail="Project not found")
-        
-        # Mark project as walkthrough complete
-        await db.projects.update_one(
-            {"id": project_id},
-            {"$set": {"walkthrough_complete": True, "updated_at": datetime.utcnow()}}
-        )
-        
-        return {"success": True, "message": "Walkthrough completed successfully"}
-        
-    except Exception as e:
-        print(f"Error completing walkthrough: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@api_router.post("/integrations/mobile/sync")
-async def mobile_sync(data: dict):
-    """Sync mobile app data with server"""
-    try:
-        device_id = data.get('device_id')
-        offline_actions = data.get('offline_actions', [])
-        
-        # Process offline actions
-        synced_actions = []
-        
-        for action in offline_actions:
-            try:
-                action_type = action.get('type')
-                action_data = action.get('data')
-                
-                if action_type == 'CREATE_ITEM':
-                    result = await db.items.insert_one(action_data)
-                    synced_actions.append(action['id'])
-                elif action_type == 'UPDATE_STATUS':
-                    await db.items.update_one(
-                        {"id": action_data['item_id']},
-                        {"$set": {"status": action_data['status'], "updated_at": datetime.utcnow()}}
-                    )
-                    synced_actions.append(action['id'])
-                    
-            except Exception as e:
-                print(f"Failed to sync action: {e}")
-        
-        return {
-            "success": True,
-            "synced_actions": len(synced_actions),
-            "sync_timestamp": datetime.utcnow().isoformat()
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Mobile sync failed: {str(e)}")
-
-# ==========================================
-# PHASE 5 & 6: PERFORMANCE & ADVANCED FEATURES
-# ==========================================
-
-@api_router.get("/export/project/{project_id}/pdf")
-async def export_project_pdf(project_id: str, sheet_type: str = "checklist"):
-    """
-    Export project as PDF for sharing/printing.
-    Generates professional PDF with project details.
-    """
-    try:
-        # Get project data
-        project_doc = await db.projects.find_one({"id": project_id})
-        if not project_doc:
-            raise HTTPException(status_code=404, detail="Project not found")
-        
-        # Get rooms and items
-        rooms = await db.rooms.find({"project_id": project_id}).to_list(None)
-        
-        # Generate PDF (simplified for now - can be enhanced)
-        from fastapi.responses import Response
-        import json
-        
-        # For now, return JSON that can be rendered as PDF client-side
-        # In production, use a PDF library like ReportLab or WeasyPrint
-        export_data = {
-            "project": project_doc,
-            "rooms": rooms,
-            "generated_at": datetime.utcnow().isoformat(),
-            "sheet_type": sheet_type
-        }
-        
-        return Response(
-            content=json.dumps(export_data, indent=2, default=str),
-            media_type="application/json",
-            headers={
-                "Content-Disposition": f"attachment; filename=project_{project_id}_{sheet_type}.json"
-            }
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logging.error(f"PDF export error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@api_router.get("/export/project/{project_id}/excel")
-async def export_project_excel(project_id: str, sheet_type: str = "checklist"):
-    """
-    Export project as Excel spreadsheet.
-    Perfect for sharing with clients or contractors.
-    """
-    try:
-        from fastapi.responses import Response
-        import json
-        
-        project_doc = await db.projects.find_one({"id": project_id})
-        if not project_doc:
-            raise HTTPException(status_code=404, detail="Project not found")
-        
-        # Get all data
-        rooms = await db.rooms.find({"project_id": project_id}).to_list(None)
-        
-        # Create CSV format (compatible with Excel)
-        csv_lines = []
-        csv_lines.append("Room,Category,Subcategory,Item,Vendor,Cost,Status,SKU,Link")
-        
-        for room in rooms:
-            categories = await db.categories.find({"room_id": room["id"]}).to_list(None)
-            for category in categories:
-                subcategories = await db.subcategories.find({"category_id": category["id"]}).to_list(None)
-                for subcategory in subcategories:
-                    items = await db.items.find({"subcategory_id": subcategory["id"]}).to_list(None)
-                    for item in items:
-                        csv_lines.append(
-                            f'"{room["name"]}","{category["name"]}","{subcategory["name"]}","{item.get("name", "")}","{item.get("vendor", "")}","{item.get("cost", "")}","{item.get("status", "")}","{item.get("sku", "")}","{item.get("link", "")}"'
-                        )
-        
-        csv_content = "\n".join(csv_lines)
-        
-        return Response(
-            content=csv_content,
-            media_type="text/csv",
-            headers={
-                "Content-Disposition": f"attachment; filename=project_{project_id}_{sheet_type}.csv"
-            }
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logging.error(f"Excel export error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@api_router.get("/analytics/project/{project_id}")
-async def get_project_analytics(project_id: str):
-    """
-    Advanced analytics for project insights.
-    Provides spending breakdown, status distribution, vendor analysis.
-    """
-    try:
-        # Get all rooms
-        rooms = await db.rooms.find({"project_id": project_id}).to_list(None)
-        room_ids = [r["id"] for r in rooms]
-        
-        # Get all categories
-        categories = await db.categories.find({"room_id": {"$in": room_ids}}).to_list(None)
-        category_ids = [c["id"] for c in categories]
-        
-        # Get all subcategories
-        subcategories = await db.subcategories.find({"category_id": {"$in": category_ids}}).to_list(None)
-        subcategory_ids = [s["id"] for s in subcategories]
-        
-        # Get all items
-        items = await db.items.find({"subcategory_id": {"$in": subcategory_ids}}).to_list(None)
-        
-        # Calculate analytics
-        total_items = len(items)
-        total_cost = sum(item.get("cost", 0) for item in items if isinstance(item.get("cost"), (int, float)))
-        
-        # Status distribution
-        status_dist = {}
-        for item in items:
-            status = item.get("status", "Not Set")
-            status_dist[status] = status_dist.get(status, 0) + 1
-        
-        # Vendor distribution
-        vendor_dist = {}
-        vendor_spending = {}
-        for item in items:
-            vendor = item.get("vendor", "Unknown")
-            vendor_dist[vendor] = vendor_dist.get(vendor, 0) + 1
-            cost = item.get("cost", 0) if isinstance(item.get("cost"), (int, float)) else 0
-            vendor_spending[vendor] = vendor_spending.get(vendor, 0) + cost
-        
-        # Room distribution
-        room_spending = {}
-        room_items = {}
-        for room in rooms:
-            room_name = room["name"]
-            room_spending[room_name] = 0
-            room_items[room_name] = 0
-            
-            # Get categories in this room
-            room_categories = [c for c in categories if c["room_id"] == room["id"]]
-            room_category_ids = [c["id"] for c in room_categories]
-            
-            # Get subcategories in these categories
-            room_subcategories = [s for s in subcategories if s["category_id"] in room_category_ids]
-            room_subcategory_ids = [s["id"] for s in room_subcategories]
-            
-            # Get items in these subcategories
-            room_items_list = [i for i in items if i["subcategory_id"] in room_subcategory_ids]
-            room_items[room_name] = len(room_items_list)
-            room_spending[room_name] = sum(
-                item.get("cost", 0) for item in room_items_list 
-                if isinstance(item.get("cost"), (int, float))
-            )
-        
-        return {
-            "success": True,
-            "project_id": project_id,
-            "summary": {
-                "total_items": total_items,
-                "total_cost": total_cost,
-                "total_rooms": len(rooms),
-                "total_vendors": len(vendor_dist)
-            },
-            "status_distribution": status_dist,
-            "vendor_distribution": vendor_dist,
-            "vendor_spending": vendor_spending,
-            "room_spending": room_spending,
-            "room_items": room_items,
-            "top_vendors": sorted(
-                vendor_spending.items(), 
-                key=lambda x: x[1], 
-                reverse=True
-            )[:10],
-            "top_spending_rooms": sorted(
-                room_spending.items(), 
-                key=lambda x: x[1], 
-                reverse=True
-            )
-        }
-        
-    except Exception as e:
-        logging.error(f"Analytics error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@api_router.get("/health/system-status")
-async def get_system_status():
-    """
-    System health check and performance metrics.
-    Useful for monitoring and diagnostics.
-    """
-    try:
-        # Check database connection
-        db_status = "healthy"
-        try:
-            await db.projects.count_documents({})
-        except:
-            db_status = "error"
-        
-        # Check Canva integration
-        canva_status = "configured" if os.getenv("CANVA_CLIENT_ID") else "not_configured"
-        
-        # Check AI integration
-        ai_status = "configured" if os.getenv("OPENAI_API_KEY") else "not_configured"
-        
-        return {
-            "status": "operational",
-            "timestamp": datetime.utcnow().isoformat(),
-            "services": {
-                "database": db_status,
-                "canva_integration": canva_status,
-                "ai_categorization": ai_status,
-                "file_storage": "operational"
-            },
-            "version": "3.0.0",
-            "features": {
-                "canva_scanner": True,
-                "bidirectional_sync": True,
-                "image_upload": True,
-                "ai_categorization": True,
-                "export": True,
-                "analytics": True
-            }
-        }
-        
-    except Exception as e:
-        return {
-            "status": "error",
-            "error": str(e),
-            "timestamp": datetime.utcnow().isoformat()
-        }
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=False,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
