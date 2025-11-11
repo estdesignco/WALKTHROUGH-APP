@@ -950,6 +950,23 @@ export default function CustomerfacingQuestionnaire() {
                             <FieldWrapper label="Briefly describe the existing condition of the space.">
                                 <Textarea className={inputStyles} value={formData.furniture_refresh_condition || ''} onChange={(e) => handleFormChange('furniture_refresh_condition', e.target.value)} />
                             </FieldWrapper>
+
+                            <FieldWrapper label="Designer/Contractor">
+                                <div className="grid grid-cols-3 gap-4 mb-3">
+                                    <div><label className="text-sm text-[#B49B7E]">Name</label></div>
+                                    <div><label className="text-sm text-[#B49B7E]">Role</label></div>
+                                    <div><label className="text-sm text-[#B49B7E]">Phone</label></div>
+                                </div>
+                                {(formData.furniture_team_members || [{ name: '', role: '', phone: '' }]).map((member, idx) => (
+                                    <div key={idx} className="grid grid-cols-3 gap-3 mb-3">
+                                        <Input className={inputStyles} placeholder="Name" value={member.name || ''} onChange={(e) => { const newTeam = [...(formData.furniture_team_members || [{ name: '', role: '', phone: '' }])]; newTeam[idx] = { ...newTeam[idx], name: e.target.value }; handleFormChange('furniture_team_members', newTeam); }} />
+                                        <Input className={inputStyles} placeholder="Role" value={member.role || ''} onChange={(e) => { const newTeam = [...(formData.furniture_team_members || [{ name: '', role: '', phone: '' }])]; newTeam[idx] = { ...newTeam[idx], role: e.target.value }; handleFormChange('furniture_team_members', newTeam); }} />
+                                        <Input className={inputStyles} placeholder="XXX-XXX-XXXX" type="tel" value={member.phone || ''} onChange={(e) => { const onlyNums = e.target.value.replace(/[^\d]/g, ''); let formatted = onlyNums; if (onlyNums.length > 3 && onlyNums.length <= 6) { formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`; } else if (onlyNums.length > 6) { formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 6)}-${onlyNums.slice(6, 10)}`; } const newTeam = [...(formData.furniture_team_members || [{ name: '', role: '', phone: '' }])]; newTeam[idx] = { ...newTeam[idx], phone: formatted }; handleFormChange('furniture_team_members', newTeam); }} />
+                                    </div>
+                                ))}
+                                <button type="button" onClick={() => { const newTeam = [...(formData.furniture_team_members || []), { name: '', role: '', phone: '' }]; handleFormChange('furniture_team_members', newTeam); }} className="px-4 py-2 bg-[#B49B7E] hover:bg-[#A08B6F] text-white rounded font-semibold">+ Add Team Member</button>
+                            </FieldWrapper>
+
                             <InputField label="Do you have the CURRENT plans/drawings for your home?" id="furniture_has_current_plans" value={formData.furniture_has_current_plans || ''} onChange={(e) => handleFormChange('furniture_has_current_plans', e.target.value)} />
                             <InputField label="When did you move into this home?" id="furniture_move_in_date" type="date" value={formData.furniture_move_in_date || ''} onChange={(e) => handleFormChange('furniture_move_in_date', e.target.value)} />
                             <FieldWrapper label="Is there anything else we need to know about the scope of this project?">
