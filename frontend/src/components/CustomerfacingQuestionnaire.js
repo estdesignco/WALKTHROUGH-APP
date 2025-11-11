@@ -720,15 +720,69 @@ export default function CustomerfacingQuestionnaire() {
                                     <Input className={inputStyles} placeholder="Builder Phone" value={formData.new_build_builder_phone || ''} onChange={(e) => handleFormChange('new_build_builder_phone', e.target.value)} />
                                 </div>
                             </FieldWrapper>
-                            <FieldWrapper label="Other Team Members (Electrician, Plumber, Contractor, etc.) - Please list Name, Role, and Phone">
-                                <Textarea 
-                                    className={inputStyles} 
-                                    placeholder="Example: John Smith - Electrician - 555-1234&#10;Jane Doe - Plumber - 555-5678"
-                                    rows={4}
-                                    value={formData.new_build_other_team || ''} 
-                                    onChange={(e) => handleFormChange('new_build_other_team', e.target.value)} 
-                                />
+                            
+                            <FieldWrapper label="Other Team Members">
+                                <div className="space-y-3">
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <div><label className="text-sm text-[#B49B7E]">Name</label></div>
+                                        <div><label className="text-sm text-[#B49B7E]">Role (Electrician, Plumber, etc.)</label></div>
+                                        <div><label className="text-sm text-[#B49B7E]">Phone</label></div>
+                                    </div>
+                                    {(formData.team_members || [{ name: '', role: '', phone: '' }]).map((member, idx) => (
+                                        <div key={idx} className="grid grid-cols-3 gap-3">
+                                            <Input 
+                                                className={inputStyles} 
+                                                placeholder="Name"
+                                                value={member.name || ''}
+                                                onChange={(e) => {
+                                                    const newTeam = [...(formData.team_members || [{ name: '', role: '', phone: '' }])];
+                                                    newTeam[idx] = { ...newTeam[idx], name: e.target.value };
+                                                    handleFormChange('team_members', newTeam);
+                                                }}
+                                            />
+                                            <Input 
+                                                className={inputStyles} 
+                                                placeholder="Role"
+                                                value={member.role || ''}
+                                                onChange={(e) => {
+                                                    const newTeam = [...(formData.team_members || [{ name: '', role: '', phone: '' }])];
+                                                    newTeam[idx] = { ...newTeam[idx], role: e.target.value };
+                                                    handleFormChange('team_members', newTeam);
+                                                }}
+                                            />
+                                            <Input 
+                                                className={inputStyles} 
+                                                placeholder="XXX-XXX-XXXX"
+                                                type="tel"
+                                                value={member.phone || ''}
+                                                onChange={(e) => {
+                                                    const onlyNums = e.target.value.replace(/[^\d]/g, '');
+                                                    let formatted = onlyNums;
+                                                    if (onlyNums.length > 3 && onlyNums.length <= 6) {
+                                                        formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`;
+                                                    } else if (onlyNums.length > 6) {
+                                                        formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 6)}-${onlyNums.slice(6, 10)}`;
+                                                    }
+                                                    const newTeam = [...(formData.team_members || [{ name: '', role: '', phone: '' }])];
+                                                    newTeam[idx] = { ...newTeam[idx], phone: formatted };
+                                                    handleFormChange('team_members', newTeam);
+                                                }}
+                                            />
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const newTeam = [...(formData.team_members || []), { name: '', role: '', phone: '' }];
+                                            handleFormChange('team_members', newTeam);
+                                        }}
+                                        className="px-4 py-2 bg-[#B49B7E] hover:bg-[#A08B6F] text-white rounded font-semibold"
+                                    >
+                                        + Add Team Member
+                                    </button>
+                                </div>
                             </FieldWrapper>
+                            
                             <InputField label="Do you have plans drawn?" id="new_build_has_plans" value={formData.new_build_has_plans || ''} onChange={(e) => handleFormChange('new_build_has_plans', e.target.value)} />
                             <InputField label="How far along in the building process are you?" id="new_build_process_stage" value={formData.new_build_process_stage || ''} onChange={(e) => handleFormChange('new_build_process_stage', e.target.value)} />
                             <FieldWrapper label="Once home is complete, will you be needing furniture? If so, give us an idea of what items you would love to procure!">
