@@ -809,15 +809,69 @@ export default function CustomerfacingQuestionnaire() {
                             <FieldWrapper label="Do you have an Architect? If so, please list Name and phone number below?">
                                 <Textarea className={inputStyles} value={formData.renovation_architect || ''} onChange={(e) => handleFormChange('renovation_architect', e.target.value)} />
                             </FieldWrapper>
-                            <FieldWrapper label="Other Team Members (Electrician, Plumber, Contractor, etc.) - Please list Name, Role, and Phone">
-                                <Textarea 
-                                    className={inputStyles} 
-                                    placeholder="Example: John Smith - Electrician - 555-1234&#10;Jane Doe - Plumber - 555-5678"
-                                    rows={4}
-                                    value={formData.renovation_other_team || ''} 
-                                    onChange={(e) => handleFormChange('renovation_other_team', e.target.value)} 
-                                />
+                            
+                            <FieldWrapper label="Other Team Members">
+                                <div className="space-y-3">
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <div><label className="text-sm text-[#B49B7E]">Name</label></div>
+                                        <div><label className="text-sm text-[#B49B7E]">Role (Electrician, Plumber, etc.)</label></div>
+                                        <div><label className="text-sm text-[#B49B7E]">Phone</label></div>
+                                    </div>
+                                    {(formData.renovation_team_members || [{ name: '', role: '', phone: '' }]).map((member, idx) => (
+                                        <div key={idx} className="grid grid-cols-3 gap-3">
+                                            <Input 
+                                                className={inputStyles} 
+                                                placeholder="Name"
+                                                value={member.name || ''}
+                                                onChange={(e) => {
+                                                    const newTeam = [...(formData.renovation_team_members || [{ name: '', role: '', phone: '' }])];
+                                                    newTeam[idx] = { ...newTeam[idx], name: e.target.value };
+                                                    handleFormChange('renovation_team_members', newTeam);
+                                                }}
+                                            />
+                                            <Input 
+                                                className={inputStyles} 
+                                                placeholder="Role"
+                                                value={member.role || ''}
+                                                onChange={(e) => {
+                                                    const newTeam = [...(formData.renovation_team_members || [{ name: '', role: '', phone: '' }])];
+                                                    newTeam[idx] = { ...newTeam[idx], role: e.target.value };
+                                                    handleFormChange('renovation_team_members', newTeam);
+                                                }}
+                                            />
+                                            <Input 
+                                                className={inputStyles} 
+                                                placeholder="XXX-XXX-XXXX"
+                                                type="tel"
+                                                value={member.phone || ''}
+                                                onChange={(e) => {
+                                                    const onlyNums = e.target.value.replace(/[^\d]/g, '');
+                                                    let formatted = onlyNums;
+                                                    if (onlyNums.length > 3 && onlyNums.length <= 6) {
+                                                        formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`;
+                                                    } else if (onlyNums.length > 6) {
+                                                        formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 6)}-${onlyNums.slice(6, 10)}`;
+                                                    }
+                                                    const newTeam = [...(formData.renovation_team_members || [{ name: '', role: '', phone: '' }])];
+                                                    newTeam[idx] = { ...newTeam[idx], phone: formatted };
+                                                    handleFormChange('renovation_team_members', newTeam);
+                                                }}
+                                            />
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const newTeam = [...(formData.renovation_team_members || []), { name: '', role: '', phone: '' }];
+                                            handleFormChange('renovation_team_members', newTeam);
+                                        }}
+                                        className="px-4 py-2 bg-[#B49B7E] hover:bg-[#A08B6F] text-white rounded font-semibold"
+                                    >
+                                        + Add Team Member
+                                    </button>
+                                </div>
                             </FieldWrapper>
+                            
                             <InputField label="Do you have NEW UPDATED plans drawn?" id="renovation_has_new_plans" value={formData.renovation_has_new_plans || ''} onChange={(e) => handleFormChange('renovation_has_new_plans', e.target.value)} />
                             <FieldWrapper label="Briefly describe the existing condition of the space.">
                                 <Textarea className={inputStyles} value={formData.renovation_existing_condition || ''} onChange={(e) => handleFormChange('renovation_existing_condition', e.target.value)} />
