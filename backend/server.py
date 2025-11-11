@@ -10001,5 +10001,3 @@ async def save_clipped_product_to_app(data: dict):
                 break
         
         if not room:
-            raise HTTPException(status_code=404, detail="Room not found")
-
