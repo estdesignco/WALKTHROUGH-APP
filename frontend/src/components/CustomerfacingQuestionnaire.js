@@ -153,17 +153,6 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
 const GOOGLE_MAPS_LIBRARIES = ['places'];
 
 export default function CustomerfacingQuestionnaire() {
-    // Load Google Maps
-    const { isLoaded } = useLoadScript({
-        googleMapsApiKey: 'AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0',
-        libraries: GOOGLE_MAPS_LIBRARIES,
-        version: 'weekly'  // Use latest version
-    });
-    
-    const [autocomplete, setAutocomplete] = useState(null);
-    const [autocompleteNewBuild, setAutocompleteNewBuild] = useState(null);
-    const [autocompleteRenovation, setAutocompleteRenovation] = useState(null);
-    
     const [formData, setFormData] = useState({
         rooms_involved: [],
         ideal_sofa_price: '',
