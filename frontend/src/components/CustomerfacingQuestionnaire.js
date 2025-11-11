@@ -250,8 +250,8 @@ export default function CustomerfacingQuestionnaire() {
     const [newRoomName, setNewRoomName] = useState("");
 
     const handleFormChange = (field, value) => {
-        // Auto-format phone numbers
-        if (field === 'phone' || field === 'spouse_partner_phone') {
+        // Auto-format phone numbers for ALL phone fields
+        if (field.includes('phone') || field.includes('Phone')) {
             const onlyNums = value.replace(/[^\d]/g, '');
             let formatted = onlyNums;
             if (onlyNums.length > 3 && onlyNums.length <= 6) {
