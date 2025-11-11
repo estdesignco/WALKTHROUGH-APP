@@ -183,6 +183,7 @@ export default function CustomerfacingQuestionnaire() {
         other_project_description: '',
         spouse_partner_name: '',
         spouse_partner_phone: '',
+        team_members: [{ name: '', role: '', phone: '' }],
         new_build_address: '',
         new_build_architect: '',
         new_build_builder: '',
