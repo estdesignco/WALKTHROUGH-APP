@@ -207,6 +207,7 @@ export default function CustomerfacingQuestionnaire() {
         renovation_memories: '',
         renovation_scope_notes: '',
         furniture_refresh_condition: '',
+        furniture_team_members: [{ name: '', role: '', phone: '' }],
         furniture_has_current_plans: '',
         furniture_move_in_date: '',
         furniture_scope_notes: '',
