@@ -680,32 +680,13 @@ export default function CustomerfacingQuestionnaire() {
                     {formData.project_type === 'New Build' && (
                         <Section title="NEW BUILD" description="If you are not currently building a new home, please feel free to skip these questions!">
                             <FieldWrapper label="Please list NEW BUILD address">
-                                {isLoaded ? (
-                                    <Autocomplete
-                                        onLoad={(auto) => setAutocompleteNewBuild(auto)}
-                                        onPlaceChanged={() => {
-                                            if (autocompleteNewBuild) {
-                                                const place = autocompleteNewBuild.getPlace();
-                                                handleFormChange('new_build_address', place.formatted_address || '');
-                                            }
-                                        }}
-                                    >
-                                        <textarea
-                                            className={inputStyles}
-                                            value={formData.new_build_address || ''}
-                                            onChange={(e) => handleFormChange('new_build_address', e.target.value)}
-                                            placeholder="Start typing address..."
-                                            rows={2}
-                                        />
-                                    </Autocomplete>
-                                ) : (
-                                    <textarea
-                                        className={inputStyles}
-                                        value={formData.new_build_address || ''}
-                                        onChange={(e) => handleFormChange('new_build_address', e.target.value)}
-                                        rows={2}
-                                    />
-                                )}
+                                <textarea
+                                    className={inputStyles}
+                                    value={formData.new_build_address || ''}
+                                    onChange={(e) => handleFormChange('new_build_address', e.target.value)}
+                                    placeholder="Enter address..."
+                                    rows={2}
+                                />
                             </FieldWrapper>
                             <FieldWrapper label="Do you have an Architect?">
                                 <div className="grid grid-cols-2 gap-4">
