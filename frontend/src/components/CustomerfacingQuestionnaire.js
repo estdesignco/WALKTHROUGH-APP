@@ -382,6 +382,7 @@ export default function CustomerfacingQuestionnaire() {
                 new_build_address: '', new_build_architect: '', new_build_builder: '', new_build_has_plans: '',
                 new_build_process_stage: '', new_build_need_furniture: '', new_build_scope_notes: '',
                 renovation_address: '', renovation_move_in_date: '', renovation_builder: '', renovation_architect: '',
+                renovation_team_members: [{ name: '', role: '', phone: '' }],
                 renovation_existing_condition: '', renovation_need_furniture: '', renovation_memories: '',
                 renovation_scope_notes: '', furniture_refresh_condition: '', furniture_has_current_plans: '',
                 furniture_move_in_date: '', furniture_scope_notes: '', design_love_home: '', design_space_use: '',
