@@ -787,13 +787,22 @@ export default function CustomerfacingQuestionnaire() {
                                 />
                             </FieldWrapper>
                             <InputField label="When did you move into this home?" id="renovation_move_in_date" type="date" value={formData.renovation_move_in_date || ''} onChange={(e) => handleFormChange('renovation_move_in_date', e.target.value)} />
-                            <FieldWrapper label="Do you have a builder? If so, please list Name and phone number below?">
-                                <Textarea className={inputStyles} value={formData.renovation_builder || ''} onChange={(e) => handleFormChange('renovation_builder', e.target.value)} />
+                            
+                            <FieldWrapper label="Do you have a Builder?">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input className={inputStyles} placeholder="Builder Name" value={formData.renovation_builder || ''} onChange={(e) => handleFormChange('renovation_builder', e.target.value)} />
+                                    <Input className={inputStyles} placeholder="Builder Phone" value={formData.renovation_builder_phone || ''} onChange={(e) => handleFormChange('renovation_builder_phone', e.target.value)} />
+                                </div>
                             </FieldWrapper>
+                            
+                            <FieldWrapper label="Do you have an Architect?">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input className={inputStyles} placeholder="Architect Name" value={formData.renovation_architect || ''} onChange={(e) => handleFormChange('renovation_architect', e.target.value)} />
+                                    <Input className={inputStyles} placeholder="Architect Phone" value={formData.renovation_architect_phone || ''} onChange={(e) => handleFormChange('renovation_architect_phone', e.target.value)} />
+                                </div>
+                            </FieldWrapper>
+                            
                             <InputField label="Do you have the CURRENT plans/drawings for your home?" id="renovation_has_current_plans" value={formData.renovation_has_current_plans || ''} onChange={(e) => handleFormChange('renovation_has_current_plans', e.target.value)} />
-                            <FieldWrapper label="Do you have an Architect? If so, please list Name and phone number below?">
-                                <Textarea className={inputStyles} value={formData.renovation_architect || ''} onChange={(e) => handleFormChange('renovation_architect', e.target.value)} />
-                            </FieldWrapper>
                             
                             <FieldWrapper label="Other Team Members">
                                 <div className="space-y-3">
