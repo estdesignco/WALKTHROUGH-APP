@@ -196,6 +196,7 @@ export default function CustomerfacingQuestionnaire() {
         renovation_move_in_date: '',
         renovation_builder: '',
         renovation_architect: '',
+        renovation_team_members: [{ name: '', role: '', phone: '' }],
         renovation_other_team: '',
         renovation_existing_condition: '',
         renovation_need_furniture: '',
