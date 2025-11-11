@@ -4,6 +4,7 @@ import { Autocomplete, useLoadScript } from '@react-google-maps/api';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+const GOOGLE_MAPS_LIBRARIES = ['places'];
 
 export default function EditQuestionnairePage() {
     const { projectId } = useParams();
@@ -18,7 +19,7 @@ export default function EditQuestionnairePage() {
     
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: 'AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0',
-        libraries: ['places']
+        libraries: GOOGLE_MAPS_LIBRARIES
     });
     
     useEffect(() => {
