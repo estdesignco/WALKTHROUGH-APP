@@ -534,12 +534,20 @@ export default function CustomerfacingQuestionnaire() {
                         <InputField label="Spouse / Partner Name" id="spouse_partner_name" value={formData.spouse_partner_name || ''} onChange={(e) => handleFormChange('spouse_partner_name', e.target.value)} />
                         <InputField label="Spouse / Partner Phone" id="spouse_partner_phone" type="tel" value={formData.spouse_partner_phone || ''} onChange={(e) => handleFormChange('spouse_partner_phone', e.target.value)} />
                         <FieldWrapper label="Project Address">
-                            <input
-                                type="text"
+                            <Autocomplete
+                                apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
+                                onPlaceSelected={(place) => {
+                                    if (place && place.formatted_address) {
+                                        handleFormChange('address', place.formatted_address);
+                                    }
+                                }}
+                                options={{
+                                    types: ['address'],
+                                }}
                                 className={inputStyles}
                                 value={formData.address || ''}
                                 onChange={(e) => handleFormChange('address', e.target.value)}
-                                placeholder="Enter address..."
+                                placeholder="Start typing your address..."
                             />
                         </FieldWrapper>
                         <FieldWrapper label="Preferred Method of Communication">
