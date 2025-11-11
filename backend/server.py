@@ -10002,4 +10002,9 @@ async def save_clipped_product_to_app(data: dict):
         
         if not room:
             raise HTTPException(status_code=404, detail="Room not found")
+        
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
