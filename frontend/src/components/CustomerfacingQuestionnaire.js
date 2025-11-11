@@ -150,11 +150,13 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
     );
 };
 
+const GOOGLE_MAPS_LIBRARIES = ['places'];
+
 export default function CustomerfacingQuestionnaire() {
     // Load Google Maps
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: 'AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0',
-        libraries: ['places'],
+        libraries: GOOGLE_MAPS_LIBRARIES,
         version: 'weekly'  // Use latest version
     });
     
