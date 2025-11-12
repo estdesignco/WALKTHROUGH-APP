@@ -691,12 +691,19 @@ export default function CustomerfacingQuestionnaire() {
                     {formData.project_type === 'New Build' && (
                         <Section title="NEW BUILD" description="If you are not currently building a new home, please feel free to skip these questions!">
                             <FieldWrapper label="Please list NEW BUILD address">
-                                <textarea
+                                <Autocomplete
+                                    apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
+                                    onPlaceSelected={(place) => {
+                                        if (place && place.formatted_address) {
+                                            handleFormChange('new_build_address', place.formatted_address);
+                                        }
+                                    }}
+                                    options={{ types: ['address'] }}
                                     className={inputStyles}
+                                    style={{ width: '100%', padding: '12px', backgroundColor: 'rgba(0,0,0,0.4)', border: '1px solid rgba(212,165,116,0.3)', borderRadius: '8px', color: '#F5F5DC' }}
                                     value={formData.new_build_address || ''}
                                     onChange={(e) => handleFormChange('new_build_address', e.target.value)}
-                                    placeholder="Enter address..."
-                                    rows={2}
+                                    placeholder="Start typing address..."
                                 />
                             </FieldWrapper>
                             <FieldWrapper label="Do you have an Architect?">
