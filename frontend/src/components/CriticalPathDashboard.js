@@ -22,10 +22,38 @@ export default function CriticalPathDashboard({ projectId }) {
   const [project, setProject] = useState(null);
   const [orderedItems, setOrderedItems] = useState([]);
   const [groupedByVendor, setGroupedByVendor] = useState({});
+  const [customVendorLinks, setCustomVendorLinks] = useState({});
+  const [addingLinkFor, setAddingLinkFor] = useState(null);
+  const [newLink, setNewLink] = useState('');
   
   useEffect(() => {
     loadProject();
+    loadCustomLinks();
   }, [projectId]);
+  
+  const loadCustomLinks = () => {
+    const saved = localStorage.getItem(`vendor_links_${projectId}`);
+    if (saved) setCustomVendorLinks(JSON.parse(saved));
+  };
+  
+  const saveCustomLink = (vendor) => {
+    if (!newLink.trim()) return;
+    
+    const updated = { ...customVendorLinks, [vendor]: newLink };
+    setCustomVendorLinks(updated);
+    localStorage.setItem(`vendor_links_${projectId}`, JSON.stringify(updated));
+    setAddingLinkFor(null);
+    setNewLink('');
+  };
+  
+  const updateItemTracking = async (itemId, field, value) => {
+    try {
+      await axios.put(`${BACKEND_URL}/api/items/${itemId}`, { [field]: value });
+      loadProject(); // Refresh to sync with FFE
+    } catch (error) {
+      console.error('Failed to update item:', error);
+    }
+  };
   
   const loadProject = async () => {
     try {
