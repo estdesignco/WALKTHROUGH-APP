@@ -6,8 +6,16 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 const VENDOR_ORDER_URLS = {
   'Four Hands': 'https://fourhands.com/account/orders',
   'Rowe Furniture': 'https://rowefurniture.com/reports/order_status',
-  'Visual Comfort': 'https://visualcomfort.com/account/orders',
-  'Uttermost': 'https://uttermost.com/account/orders',
+  'Visual Comfort': 'https://www.visualcomfort.com/orderview/orders/history/',
+  'Uttermost': 'https://uttermost.com/account-dashboard/my-orders?page=1&perPage=10',
+  'Regina Andrew': 'https://www.reginaandrew.com/app/my_account.ssp?fragment=overview#/purchases',
+  'Loloi Rugs': 'https://www.loloirugs.com/account?view=order-history',
+  'V&H': 'https://vandh.com/#/orders',
+  'Crestview Collection': 'https://www.crestviewcollection.com/account-dashboard/my-orders',
+  'Bassett Mirror': 'https://www.bassettmirror.com/customers/open_orders.cfm',
+  'Safavieh': 'https://safavieh.com/my-orders',
+  'York Wallcoverings': 'https://www.yorkwall.com/OrderHistory/Index',
+  'Classic Home': 'https://www.classichome.com/pages/account-orders',
 };
 
 export default function CriticalPathDashboard({ projectId }) {
