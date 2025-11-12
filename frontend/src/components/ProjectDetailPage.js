@@ -5,6 +5,7 @@ import EditInput from './EditInput';
 import WalkthroughDashboard from './WalkthroughDashboard';
 import ContactSheet from './ContactSheet';
 import FullscreenMoodboard from './FullscreenMoodboard';
+import CriticalPathDashboard from './CriticalPathDashboard';
 
 import ChecklistDashboard from './ChecklistDashboard';
 import FFEDashboard from './FFEDashboard';
