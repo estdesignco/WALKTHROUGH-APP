@@ -124,22 +124,55 @@ export default function CriticalPathDashboard({ projectId }) {
           <div key={vendor} className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-6 border-2 border-[#D4A574]/30">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-[#D4A574]">{vendor}</h2>
-              {VENDOR_ORDER_URLS[vendor] && (
-                <a
-                  href={VENDOR_ORDER_URLS[vendor]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3 bg-gradient-to-r from-[#D4A574] to-[#BCA888] hover:from-[#E4B584] hover:to-[#C49564] text-black rounded-lg font-bold"
-                >
-                  🔗 View {vendor} Orders
-                </a>
-              )}
+              <div className="flex gap-3">
+                {(VENDOR_ORDER_URLS[vendor] || customVendorLinks[vendor]) ? (
+                  <a
+                    href={customVendorLinks[vendor] || VENDOR_ORDER_URLS[vendor]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3 bg-gradient-to-r from-[#D4A574] to-[#BCA888] hover:from-[#E4B584] hover:to-[#C49564] text-black rounded-lg font-bold"
+                  >
+                    🔗 View {vendor} Orders
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => setAddingLinkFor(vendor)}
+                    className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-[#D4C5A9] rounded-lg font-bold"
+                  >
+                    + Add Order Tracking Link
+                  </button>
+                )}
+                
+                {addingLinkFor === vendor && (
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={newLink}
+                      onChange={(e) => setNewLink(e.target.value)}
+                      placeholder="https://vendor.com/orders"
+                      className="px-4 py-2 bg-gray-800 text-white border border-[#D4A574]/50 rounded"
+                    />
+                    <button
+                      onClick={() => saveCustomLink(vendor)}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-bold"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => { setAddingLinkFor(null); setNewLink(''); }}
+                      className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="space-y-3">
               {groupedByVendor[vendor].map((item, idx) => (
                 <div key={idx} className="bg-gray-800 rounded-lg p-4 border border-[#D4A574]/20">
-                  <div className="grid grid-cols-5 gap-4">
+                  <div className="grid grid-cols-6 gap-4">
                     <div>
                       <div className="text-sm text-gray-400">Item</div>
                       <div className="text-[#D4C5A9] font-semibold">{item.name}</div>
@@ -150,15 +183,47 @@ export default function CriticalPathDashboard({ projectId }) {
                     </div>
                     <div>
                       <div className="text-sm text-gray-400">Status</div>
-                      <div className="text-[#D4A574] font-semibold">{item.status}</div>
+                      <select
+                        value={item.status || ''}
+                        onChange={(e) => updateItemTracking(item.id, 'status', e.target.value)}
+                        className="bg-gray-700 text-[#D4A574] px-2 py-1 rounded border border-[#D4A574]/30"
+                      >
+                        <option value="ORDERED">ORDERED</option>
+                        <option value="CONFIRMED">CONFIRMED</option>
+                        <option value="IN PRODUCTION">IN PRODUCTION</option>
+                        <option value="SHIPPED">SHIPPED</option>
+                        <option value="IN TRANSIT">IN TRANSIT</option>
+                        <option value="DELIVERED">DELIVERED</option>
+                      </select>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-400">Tracking</div>
-                      <div className="text-[#D4C5A9]">{item.tracking_number || 'N/A'}</div>
+                      <div className="text-sm text-gray-400">Tracking #</div>
+                      <input
+                        type="text"
+                        value={item.tracking_number || ''}
+                        onChange={(e) => updateItemTracking(item.id, 'tracking_number', e.target.value)}
+                        className="bg-gray-700 text-[#D4C5A9] px-2 py-1 rounded border border-[#D4A574]/30 w-full"
+                        placeholder="Enter tracking #"
+                      />
                     </div>
                     <div>
                       <div className="text-sm text-gray-400">Carrier</div>
-                      <div className="text-[#D4C5A9]">{item.carrier || 'N/A'}</div>
+                      <input
+                        type="text"
+                        value={item.carrier || ''}
+                        onChange={(e) => updateItemTracking(item.id, 'carrier', e.target.value)}
+                        className="bg-gray-700 text-[#D4C5A9] px-2 py-1 rounded border border-[#D4A574]/30 w-full"
+                        placeholder="FedEx, UPS, etc."
+                      />
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-400">ETA</div>
+                      <input
+                        type="date"
+                        value={item.estimated_delivery || ''}
+                        onChange={(e) => updateItemTracking(item.id, 'estimated_delivery', e.target.value)}
+                        className="bg-gray-700 text-[#D4C5A9] px-2 py-1 rounded border border-[#D4A574]/30"
+                      />
                     </div>
                   </div>
                 </div>
