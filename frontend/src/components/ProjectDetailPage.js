@@ -636,6 +636,12 @@ export default function ProjectDetailPage() {
                 <FinanceDashboard projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading finance...</div> },
+        { name: "Critical Path", icon: BarChart3, component: project ? (
+            <div className="critical-path-content">
+                <CriticalPathDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading critical path...</div> },
+
         { name: "Calculators", icon: Calculator, component: project ? (
             <div className="calculators-content">
                 <PowerFeaturesDashboard />
