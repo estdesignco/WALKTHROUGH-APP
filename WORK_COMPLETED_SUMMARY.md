@@ -171,7 +171,7 @@ Created comprehensive integration plan document:
 ## 🚀 How to Test
 
 ### Test Offline Mode:
-1. Open mobile app: `https://projectease-5.preview.emergentagent.com/mobile-app`
+1. Open mobile app: `https://spacemaster-1.preview.emergentagent.com/mobile-app`
 2. Select a project
 3. Open Walkthrough or FF&E
 4. **Turn off WiFi/mobile data**
@@ -221,10 +221,10 @@ Created comprehensive integration plan document:
 ## 📱 Mobile App URL
 
 **Main App:**
-`https://projectease-5.preview.emergentagent.com`
+`https://spacemaster-1.preview.emergentagent.com`
 
 **Mobile Simulator:**
-`https://projectease-5.preview.emergentagent.com/mobile-app`
+`https://spacemaster-1.preview.emergentagent.com/mobile-app`
 
 ---
 

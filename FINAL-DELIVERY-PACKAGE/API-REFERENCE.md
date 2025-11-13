@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://projectease-5.preview.emergentagent.com/api
+https://spacemaster-1.preview.emergentagent.com/api
 ```
 
 ---

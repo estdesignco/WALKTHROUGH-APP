@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://projectease-5.preview.emergentagent.com';
+const BACKEND_URL = 'https://spacemaster-1.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

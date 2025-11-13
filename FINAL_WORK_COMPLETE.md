@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://projectease-5.preview.emergentagent.com
+https://spacemaster-1.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://projectease-5.preview.emergentagent.com/mobile-app
+https://spacemaster-1.preview.emergentagent.com/mobile-app
 
 ---
 

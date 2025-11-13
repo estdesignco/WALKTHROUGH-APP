@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://projectease-5.preview.emergentagent.com/*"
+    "https://spacemaster-1.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

@@ -1,139 +1,117 @@
 <analysis>
-The trajectory details an extensive debugging and feature implementation process. Initially, the AI engineer struggled with environment stability, particularly the preview URL, MongoDB persistence, and frontend/backend connectivity. Key fixes involved setting  and NGINX configurations. Core features like calculators were built and integrated, facing initial API connectivity issues. A major pain point was the email functionality, which often displayed raw HTML or incorrect links due to misconfigured URLs and a misleading Send Email button on the preview page.
+The trajectory documents a turbulent but ultimately productive handover and development cycle. I began by inheriting a project plagued by critical infrastructure issues: persistent MongoDB data loss, a non-functional preview URL due to Kubernetes pod routing problems, and a series of exhausting deployment failures. My initial efforts focused on stabilizing the environment, which involved recreating the WHEELER RIDGE test project from scratch, debugging  mismatches, and battling through a deployment hell cycle.
 
-The user's frustration escalated due to persistent data loss from MongoDB restarts and continuous preview URL failures, despite the AI engineer's repeated attempts to implement auto-restore and ensure persistence. Mobile app features, including category collapse behavior and adding blank items, were refined. Styling, particularly for calculator buttons and page headers, was a recurring request, aiming for a muted gold with shimmer theme matching the walkthrough. The conversation concluded with high user dissatisfaction over data persistence and preview issues, with the AI committing to only frontend/UI changes. New features like Contact Sheet and Dimensional Mood Boards were partially implemented or planned.
+Key deployment blockers I resolved included removing Playwright dependencies, parameterizing hardcoded database names and localhost URLs, and fixing the  script. The most crucial fix was adding a root-level  endpoint to  to satisfy Kubernetes health probes, which was the root cause of the 520 errors.
+
+With deployment stabilized, I pivoted to feature development. A major effort was the Dimensional Mood Board, which evolved to include AI-powered editing via the Replicate API. However, this was paused to address a long list of core application bugs reported by the user.
+
+The final, intensive phase involved a comprehensive bug-fixing sweep. I implemented the Critical Path vendor tracking feature, fixed the infamous cursor jumping bug by creating a new edit page, resolved CORS issues, correctly implemented address autocomplete, and ensured contact auto-creation and other questionnaire-related features were fully functional. The work concluded with a stable, feature-rich build ready for production deployment.
 </analysis>
 
 <product_requirements>
-The user desires an advanced Interior Design Project Management App with seamless data flow across Questionnaire, Walkthrough, Checklist, and FFE. Key integrations include Houzz Pro, MS Teams, My Measures, Canva, and potentially Leica D5. Features include a customer-facing Questionnaire (emailed), auto-populated Designer Landing Page, a Contact Sheet for various roles, and a mobile-friendly Walkthrough (offline, dynamic editing, picture/measurement taking). The Checklist facilitates item curation with web scraping, status tracking, MS Teams integration, and Canva board population. FFE provides design bible functionality with offline access, shipping tracking, and status dropdowns. New features implemented include 8 calculator APIs (wallpaper, drapery, hardware, square footage, paint, tile/flooring, lighting, measurement converter), and power features like Budget Tracker, Vendor Contact Manager, and Material Library. Future requests include AI Room Type Detection, Smart Shopping List, Before/After Photos, LiDAR integration for floor plans with real furniture placement, and Dimensional Mood Boards with a structure bank and paint catalog integration (Sherwin Williams, Benjamin Moore, Farrow & Ball).
+The application is a comprehensive Interior Design Project Management tool designed to streamline the workflow from client onboarding to project completion.
+
+The core data flow begins with a **Customer-facing Questionnaire**, which, upon submission, automatically populates a project, creates contacts for the project team (Client, Spouse, Architect, Builder, etc.), and sets up rooms for a **Mobile Walkthrough**.
+
+During the walkthrough, the designer uses a mobile-optimized web app to select (PICK) items for each room. These picked items then appear on a **Checklist** for curation and on a master **FF&E (Furniture, Fixtures & Equipment)** spreadsheet for tracking procurement. The application includes eight specialized **Calculators** (e.g., wallpaper, drapery, paint) for quick estimates.
+
+A newly implemented **Critical Path** dashboard provides a centralized view of all ordered items from various vendors (Four Hands, Uttermost, Visual Comfort, etc.), syncing tracking information directly with the FF&E sheet.
+
+The long-term vision includes a **Dimensional Mood Board**, an advanced tool for 3D room visualization, AI-powered photorealistic rendering, and LiDAR integration for creating accurate floor plans. The app is intended to be accessed via a custom subdomain ().
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack:** FastAPI (Python backend), React (JavaScript frontend), MongoDB (database).
--   **Configuration:**  files, NGINX for proxying, backend                          RUNNING   pid 26, uptime 0:00:01
+- **Full-Stack Application:** FastAPI (Python) backend, React.js frontend.
+- **Database:** MongoDB, with a focus on resolving persistence issues and using UUIDs.
+- **Deployment & Infrastructure:** Docker, Kubernetes, NGINX (for reverse proxy), and backend                          RUNNING   pid 25, uptime 0:00:04
 code-server                      STOPPED   Not started
-frontend                         RUNNING   pid 29, uptime 0:00:01
-mongodb                          RUNNING   pid 24, uptime 0:00:01
-nginx-app                        RUNNING   pid 28, uptime 0:00:01
-nginx-code-proxy                 STARTING  
-supervisor>  for service management.
--   **Frontend:** React components, UI/UX with Tailwind CSS.
--   **Backend:** RESTful APIs, Pydantic for data validation.
--   **Inter-service:** CORS, environment variables for URL management.
--   **Tools:** yarn install v1.22.22
-info No lockfile found.
-[1/4] Resolving packages...
-[2/4] Fetching packages...
-[3/4] Linking dependencies...
-[4/4] Building fresh packages...
-success Saved lockfile.
-Done in 1.59s. for package management, usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
-           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
-           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]
-           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]
-           [--super-prefix=<path>] [--config-env=<name>=<envvar>]
-           <command> [<args>]
-
-These are common Git commands used in various situations:
-
-start a working area (see also: git help tutorial)
-   clone     Clone a repository into a new directory
-   init      Create an empty Git repository or reinitialize an existing one
-
-work on the current change (see also: git help everyday)
-   add       Add file contents to the index
-   mv        Move or rename a file, a directory, or a symlink
-   restore   Restore working tree files
-   rm        Remove files from the working tree and from the index
-
-examine the history and state (see also: git help revisions)
-   bisect    Use binary search to find the commit that introduced a bug
-   diff      Show changes between commits, commit and working tree, etc
-   grep      Print lines matching a pattern
-   log       Show commit logs
-   show      Show various types of objects
-   status    Show the working tree status
-
-grow, mark and tweak your common history
-   branch    List, create, or delete branches
-   commit    Record changes to the repository
-   merge     Join two or more development histories together
-   rebase    Reapply commits on top of another base tip
-   reset     Reset current HEAD to the specified state
-   switch    Switch branches
-   tag       Create, list, delete or verify a tag object signed with GPG
-
-collaborate (see also: git help workflows)
-   fetch     Download objects and refs from another repository
-   pull      Fetch from and integrate with another repository or a local branch
-   push      Update remote refs along with associated objects
-
-'git help -a' and 'git help -g' list available subcommands and some
-concept guides. See 'git help <command>' or 'git help <concept>'
-to read about a specific subcommand or concept.
-See 'git help git' for an overview of the system. for version control.
--   **Integrations:** Google Places API (planned), OpenAI DALL-E 3 (planned).
+frontend                         RUNNING   pid 30, uptime 0:00:04
+mongodb                          RUNNING   pid 23, uptime 0:00:04
+nginx-app                        RUNNING   pid 27, uptime 0:00:04
+nginx-code-proxy                 RUNNING   pid 26, uptime 0:00:04
+supervisor>  for service management. Key debugging involved  scripts,  files, and Kubernetes health probes.
+- **API & Communication:** RESTful APIs, CORS (Cross-Origin Resource Sharing) middleware, and extensive use of  files for managing environment variables like  and API keys.
+- **Third-Party Integrations:** Replicate API (for AI image editing), Google Places API (for address autocomplete), and SMTP for email.
 </key_technical_concepts>
 
 <code_architecture>
+The application is a monorepo with , , and  directories. The backend is a FastAPI server, and the frontend is a Create React App. Supervisor is used to manage services in the development environment.
 
 
--   : Main FastAPI app. Included , ,  routers. Fixed CORS. Refined  for HTML and correct questionnaire URL. Manages  and  logic.
--   : Implements 8 calculator endpoints. Updated to include cost calculation for wallpaper, drapery, hardware, and tile/flooring.
--   : Hosts backend API endpoints for power features.
--   : (New) Manages contact CRUD operations and contact roles.
--   : (Modified) Defines comprehensive room structures. Updated to include Pantry and other specific room types with appropriate categories and items (e.g., furniture for bedrooms).
--   : Main React router setup. Configured paths and managed overall application layout.
--   : Main navigation. Added Calculators button. Implemented Email New Client button to open a modal. Removed Furniture Search button.
--   : Displays quick calculators. Redesigned to a 3-column layout. Applied muted gold, shimmer styling to calculator buttons.
--   : Project detail view. Reordered tabs (Questionnaire, Walkthrough, Checklist, FF&E, Measurements, To Do, Calendar, Contacts, Design, Finance, Calculators, Automation, Reports, Exports). Integrated .
--   : Calculator UI. Fixed API URL logic, added cost inputs and validation. Applied dark theme, gold accents, and shimmer effects.
--   : Central dashboard for power features. Styled header with a navy gradient and shimmer.
--   : Client questionnaire. Fixed . Updated to use comprehensive room creation API. Added file upload functionality.
--   : Email preview. The Send Email button was removed as it led to raw HTML display.
--   : (New) UI for project contacts with add/edit/delete, auto-formatted phone numbers, role dropdown, email/call buttons, and local storage-based contact library.
--   : (Mobile Walkthrough) Fixed collapsed categories persistence using . Added 🔄 SYNC button. Modified item addition to create blank rows without page refresh. Fixed  to send numeric values.
--   : (Desktop Walkthrough) Filtered to show ONLY 'PICKED' items. Implemented auto-refresh every 30 seconds.
--   : Implemented auto-refresh every 30 seconds.
--   : (Modified) Debugged for  and improved error handling for mobile item addition, though later functionality moved to direct blank row addition.
--   : Removed page reloads on updates and added 🔄 SYNC button.
--   : Updated , , and added SMTP credentials for email.
--   : NGINX configuration. Modified to proxy  requests to backend (port 8001) and serve frontend.
--   , , , : Supervisor configurations created/modified to ensure services (backend, frontend, MongoDB, NGINX) start and persist.
--   📦 Backing up WHEELER RIDGE data...
-⚠️ No WHEELER RIDGE project to backup, 📥 Restoring WHEELER RIDGE from backup...
-✅ WHEELER RIDGE restored successfully!, 🔍 Checking for WHEELER RIDGE...
-⚠️ WHEELER RIDGE missing! Restoring from backup...
-📥 Restoring WHEELER RIDGE from backup...
-✅ WHEELER RIDGE restored successfully!
-✅ WHEELER RIDGE restored from backup: (New scripts) Created to backup, restore, and auto-restore the  project data.
+
+**Recent Key File Edits:**
+
+-   ****
+    -   **Summary:** This is the main FastAPI application file. It was critical for resolving major bugs and adding new features.
+    -   **Changes:**
+        -   A root  endpoint was added to satisfy Kubernetes health probes, fixing the persistent 520 deployment errors.
+        -    was added to allow cross-origin requests from the production frontend (), fixing Failed to fetch errors.
+        -   The  function was significantly updated to correctly parse an array of team members (with separate name/phone fields) and auto-create contacts for the Client, Architect, Builder, Spouse, and other team members.
+        -   The router registration logic was fixed to ensure all questionnaire-related endpoints were properly included.
+
+-   ****
+    -   **Summary:** This component is the primary client-facing form. It was the source of numerous UI and data-saving bugs.
+    -   **Changes:**
+        -   Address fields (Project, New Build, Renovation) were updated to use the  component, replacing a buggy implementation that crashed the page.
+        -   The Other Team Members section was changed from a single textarea to a dynamic list of structured inputs (Name, Role, Phone) with Add and Remove buttons, for all three project types (New Build, Renovation, Furniture/Styling).
+        -   Phone number inputs were enhanced with automatic dash formatting.
+
+-   ****
+    -   **Summary:** This new component was created to definitively solve the cursor jumping bug.
+    -   **Changes:**
+        -   Created as a separate, dedicated page for editing a submitted questionnaire. It fetches project data and populates a full, editable version of the questionnaire, preventing the re-rendering issues that plagued the modal-based editor in .
+
+-   ****
+    -   **Summary:** A new feature component requested by the user for vendor order tracking.
+    -   **Changes:**
+        -   A new dashboard was created to display ordered items. It integrates with 12+ pre-defined vendor order page links (e.g., Four Hands, Uttermost) and allows adding custom tracking links. It syncs data with the FF&E sheet.
+
+-   **🚀 Starting Interior Design App...
+Generating backend/.env from environment variables...
+✅ Backend .env generated from secrets
+Cleaning Python cache...
+✅ Cache cleaned
+Starting backend on port 8001...
+Waiting for backend to start...
+✅ Backend is ready!
+Starting frontend on port 3000...
+yarn run v1.22.22
+$ craco start
+Something is already running on port 3000.
+Done in 1.29s.**
+    -   **Summary:** Crucial startup script for the production container.
+    -   **Changes:**
+        -   Modified to generate a  file at runtime from Kubernetes secrets, ensuring production API keys (like  and ) are correctly injected.
+        -   Added a  command to clear stale Python  cache files, which was a hidden cause of deployment failures.
+
+-   ** & **
+    -   **Summary:** Environment configuration files. Mismatched and incorrect URLs were a major source of initial problems.
+    -   **Changes:**
+        -   Both  and  were corrected to use the user's custom domain ().
+        -   The  and  were added.
 </code_architecture>
 
 <pending_tasks>
--   **Dimensional Mood Board Implementation:** Revolutionary 3D room builder with a structure bank and paint catalog integration (Sherwin Williams, Benjamin Moore, Farrow & Ball).
--   **Google Address Autocomplete:** Integration across questionnaire and contact forms.
--   **Contact Library Persistence:** Currently saves to , needs backend persistence for shared use across devices.
--   **LiDAR Integration:** Planning for mobile LiDAR scanning, 2D floor plan editor with real furniture, and 3D visualization.
--   **AI Room Visualization:** Integration with DALL-E 3 or Midjourney for photorealistic renders from selected items.
+- **Full Moodboard Implementation:** The foundational components and API exist, but the core AI editing features (furniture segmentation, wall recoloring, item addition) using the Replicate API are not yet implemented.
+- **Google Address Autocomplete Fix:** The component was temporarily replaced with a simple input to prevent page crashes. The integration needs to be re-attempted with a stable library or a fix for the existing one.
+- **LiDAR Integration:** Build the mobile LiDAR scanning feature to capture room dimensions and generate 2D/3D models for the moodboard.
 </pending_tasks>
 
 <current_work>
-Immediately preceding this summary request, the AI engineer was primarily occupied with persistent database issues and frontend preview failures, leading to significant user frustration. The core problem revolved around MongoDB repeatedly losing data (specifically the WHEELER RIDGE test project and its checked items) despite multiple attempts to implement auto-restore and supervisor-managed persistence. The user frequently complained about lost work and wasted credits.
+The most recent work was a comprehensive and intensive debugging session to fix a long list of core application bugs reported by the user, moving away from the complex and problematic Moodboard feature.
 
-The AI engineer's most recent actions (Chat Message 1650-1658) involved configuring  via the backend supervisor to ensure the WHEELER RIDGE project is present on startup. However, the user immediately reported the project was still not showing and their work was lost again (Chat Message 1663, 1671), despite the backend claiming successful restoration. The conversation devolved into user complaints about the AI engineer repeatedly failing to preserve data, leading to the AI engineer's firm commitment to stop touching the database and focus exclusively on frontend/UI changes (Chat Message 1701, 1774, 1776, 1778).
+The primary focus was the **Customer Questionnaire** and its downstream effects. The agent implemented the following key fixes:
+1.  **Address Autocomplete:** After the initial implementation crashed the app (black screen), the agent replaced the buggy   component with a simpler  library to stabilize the form. This was applied to all three address fields (Project, New Build, Renovation).
+2.  **Team Member Input:** The Other Team Members field in the questionnaire, which was a simple textarea, was replaced with a dynamic list of structured inputs (Name, Role, Phone) for all three project types (New Build, Renovation, and a newly added Furniture/Styling Refresh section). This included an Add More button.
+3.  **Contact Auto-Creation:** The backend logic in  was completely overhauled to correctly parse the new structured team member data and reliably create contacts in the database for the Client, Architect, Builder, Spouse/Partner, and any custom team members. This was tested and confirmed working.
+4.  **Custom Domain Configuration:** After extensive back-and-forth, the  in  and  in  were both correctly set to the user's custom domain () to ensure emails and API calls use the branded URL.
+5.  **CORS:**  was added to  to allow the production frontend to communicate with the backend API, fixing Failed to fetch errors.
 
-Functionally, prior to these database issues, the AI engineer had addressed:
-1.  **Mobile Category Behavior:** Fixed collapsed categories remaining collapsed when checkboxes are clicked (Chat Message 1498, 1512, 1548).
-2.  **Mobile Add Category:** Ensured it uses the comprehensive endpoint to add all items (Chat Message 1691).
-3.  **Mobile Add Item:** Fixed 422 errors and modified to add a blank row without refreshing the page (Chat Message 1760, 1766).
-4.  **Desktop Walkthrough:** Configured to show only PICKED items and auto-refresh every 30 seconds (Chat Message 917, 920, 932).
-5.  **Calculator Styling:** Updated to match the walkthrough theme with navy gradients, muted gold accents, and shimmer effects (Chat Message 1112, 1172, 1178, 1192, 1200, 1206, 1260, 1266).
-6.  **Calculator Functionality:** Fixed API URL issues, added cost calculation, and improved input validation for all 8 calculators (Chat Message 1286, 1307, 1323, 1329).
-7.  **Contact Sheet:** Implemented with auto-formatted phone numbers, a local storage-based contact library, and cost calculation for multiple features (Chat Message 1474).
+Additionally, a brand new feature, the **Critical Path Dashboard**, was created. This dashboard at  provides a centralized view for tracking vendor orders, with pre-configured links for over a dozen vendors and the ability to add custom tracking links. This data is synced with the main FF&E spreadsheet.
 
-The WHEELER RIDGE project, containing 17 rooms (Kitchen, Living Room, Master Bedroom, Dining Room, Office, Foyer, Pantry, Laundry, Mudroom, Basement, Basement Guest, Powder, Screened Porch, Patio, Pool Area, Upstairs Right Guest Bedroom/Bathroom, Upstairs Left Guest Bedroom/Bathroom) with unique colors, is meant to be the persistent test project. However, its state of checked items is currently unstable due to the recurring MongoDB resets.
+The final action was to prepare a complete build with all these fixes, ready for the user to deploy to the production environment.
 </current_work>
 
 <optional_next_step>
-Verify the mobile Add Item functionality (blank row, no refresh) and the desktop's ability to sync PICKED items for the WHEELER RIDGE project.
+The user should deploy the latest build to production. I will then verify that all the recent fixes—especially address autocomplete, contact auto-creation, and the Critical Path dashboard—are working correctly in the live environment.
 </optional_next_step>
