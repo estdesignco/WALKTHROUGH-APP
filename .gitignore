@@ -98,167 +98,56 @@ frontend/node_modules/.cache/default-development/14.pack_
 frontend/node_modules/.cache/default-development/14.pack
 frontend/node_modules/.cache/default-development/15.pack
 frontend/node_modules/.cache/default-development/17.pack
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
 frontend/node_modules/.cache/default-development/2.pack_
 frontend/node_modules/.cache/default-development/7.pack
 frontend/node_modules/.cache/default-development/11.pack_
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
 google-chrome-stable_current_amd64.deb
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
 frontend/node_modules/.cache/default-development/18.pack
--e 
-# Environment files
-*.env
-*.env.*
+# Removed duplicate .env blocks
 frontend/node_modules/.cache/default-development/20.pack
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
 frontend/public/mobile-app.tar.gz
 mobile-app.tar.gz
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
 frontend/build/mobile-app.tar.gz
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
 frontend/node_modules/.cache/default-development/16.pack
 frontend/node_modules/.cache/default-development/19.pack
 frontend/node_modules/.cache/default-development/21.pack
 frontend/node_modules/.cache/default-development/23.pack
--e 
-# Environment files
-*.env
-*.env.*
+# Removed duplicate .env blocks
 frontend/node_modules/.cache/default-development/25.pack
 frontend/node_modules/.cache/default-development/22.pack
 frontend/node_modules/.cache/default-development/26.pack
@@ -293,44 +182,14 @@ frontend/node_modules/.cache/default-development/56.pack
 frontend/node_modules/.cache/default-development/58.pack
 frontend/node_modules/.cache/default-development/60.pack
 frontend/node_modules/.cache/default-development/63.pack
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
 frontend/node_modules/.cache/default-development/1.pack_
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
+# Removed duplicate .env blocks
