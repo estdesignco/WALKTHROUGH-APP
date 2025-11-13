@@ -31,6 +31,8 @@ dist/
 dist
 
 # Environment files (comprehensive coverage)
+# Note: backend/.env contains secrets and is excluded via .dockerignore
+# frontend/.env contains only public URLs and is needed for deployment
 
 *token.json*
 *credentials.json*
