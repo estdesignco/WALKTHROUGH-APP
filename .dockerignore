@@ -1,6 +1,5 @@
-# Prevent sensitive backend .env from being deployed
-backend/.env
-.env
+# Backend .env structure is needed - secrets injected at runtime via start.sh
+# .env files are safe - Kubernetes injects actual secrets at deployment time
 
 # Frontend .env is safe (only has public backend URL) - needed for build
 # NOT excluding frontend/.env
