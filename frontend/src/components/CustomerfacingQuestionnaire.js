@@ -318,8 +318,11 @@ export default function CustomerfacingQuestionnaire() {
             console.log('✅ Project created successfully:', newProject);
 
             // Create rooms with FULL walkthrough structure (backend auto-populates)
-            console.log('🏠 Checking rooms to create:', formData.rooms_involved);
-            if (formData.rooms_involved && formData.rooms_involved.length > 0) {
+            console.log('🏠 Checking rooms to create. formData.rooms_involved:', formData.rooms_involved);
+            console.log('🏠 Type:', typeof formData.rooms_involved, 'Length:', formData.rooms_involved?.length);
+            console.log('🏠 Is Array?:', Array.isArray(formData.rooms_involved));
+            
+            if (formData.rooms_involved && Array.isArray(formData.rooms_involved) && formData.rooms_involved.length > 0) {
                 const uniqueRooms = [...new Set(formData.rooms_involved)];
                 console.log(`📋 Will create ${uniqueRooms.length} rooms:`, uniqueRooms);
                 
