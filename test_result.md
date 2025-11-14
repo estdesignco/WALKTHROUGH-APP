@@ -234,13 +234,16 @@ frontend:
     implemented: true
     working: false
     file: "EditQuestionnairePage.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL ISSUE CONFIRMED: Edit Questionnaire page goes completely BLANK (black screen) when accessed. The page navigates to /project/{id}/edit-questionnaire successfully, but renders a completely blank page with 7255 characters of content (mostly JavaScript). Key elements missing: 1) 'Edit Questionnaire Answers' header (h1) not found, 2) 'CLIENT INFORMATION' section (h2) not found, 3) Input fields with previously entered data not found. Console error detected: 'Cannot read properties of null (reading '__e3_')' - This indicates a React rendering error, likely due to missing or null data when the component tries to render. The EditQuestionnairePage component is failing to load questionnaire data from the backend API, causing the entire page to fail rendering."
+      - working: false
+        agent: "testing"
+        comment: "❌ TEST 3 FAILED - EDIT PAGE SHOWS RUNTIME ERRORS (NOT BLANK BUT BROKEN): Tested edit questionnaire functionality after successful form submission. Navigated to project detail page (project ID: b791a90b-5441-4198-8246-ac76bd9f67c7) and clicked Edit button. The page does NOT show a blank black screen, but instead shows 'Uncaught runtime errors' overlay with critical React error: 'Cannot read properties of null (reading '__e3_')'. This error appears 3 times in the console, indicating a serious React component rendering issue. The error originates from Google Maps API integration (maps.googleapis.com/maps-api-v3/api/js/62/13e/main.js) and affects the Autocomplete component. Screenshot shows red error overlay blocking the entire page. The EditQuestionnairePage component is attempting to render but fails due to null reference errors in the Google Maps Autocomplete initialization. ROOT CAUSE: The @react-google-maps/api useLoadScript hook or Autocomplete component is trying to access null properties during initialization, likely because the Google Maps API key has referrer restrictions that prevent proper loading on the edit page."
 
 backend:
   - task: "🔥 CRITICAL HOUZZ PRO BROWSER AUTOMATION TEST"
