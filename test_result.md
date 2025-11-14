@@ -190,7 +190,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "COMPREHENSIVE FRONTEND TESTING - Post-Deployment Verification on https://projectease-5.emergent.host - Test ALL features: Email & Questionnaire Flow, Delete Button, Walkthrough (Mobile & Desktop), Checklist, Contacts, Calculators, Moodboard"
+  "Customer Questionnaire Testing - Test complete questionnaire submission with all fields and verify Edit Questionnaire page does not go blank"
 
 backend:
   - task: "🔥 CRITICAL HOUZZ PRO BROWSER AUTOMATION TEST"
