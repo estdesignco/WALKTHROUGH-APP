@@ -193,7 +193,7 @@ user_problem_statement: |
   "Customer Questionnaire Testing - Test complete questionnaire submission with all fields and verify Edit Questionnaire page does not go blank"
 
 frontend:
-  - task: "Customer Questionnaire Form Submission"
+  - task: "Google Maps Address Autocomplete"
     implemented: true
     working: false
     file: "CustomerfacingQuestionnaire.js"
@@ -203,7 +203,22 @@ frontend:
     status_history:
       - working: false
         agent: "testing"
+        comment: "❌ CRITICAL GOOGLE MAPS API CONFIGURATION ISSUE: Google Maps autocomplete is NOT working due to API key restriction error. Console error: 'Google Maps JavaScript API error: RefererNotAllowedMapError - Your site URL to be authorized: https://spacemaster-1.preview.emergentagent.com/customer/questionnaire'. The Google Maps API key (AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0) needs to be configured in Google Cloud Console to allow requests from the production domain. Currently, autocomplete dropdowns do not appear when typing addresses in: 1) Project Address field, 2) New Build Address field, 3) Renovation Address field. The Autocomplete component from 'react-google-autocomplete' is properly implemented in the code, but the API key restriction is blocking all autocomplete functionality. SOLUTION: Add 'https://spacemaster-1.preview.emergentagent.com/*' to the API key's allowed referrers in Google Cloud Console."
+  
+  - task: "Customer Questionnaire Form Submission"
+    implemented: true
+    working: "NA"
+    file: "CustomerfacingQuestionnaire.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
         comment: "❌ CRITICAL ISSUE: Rooms not being saved during questionnaire submission. Console logs show '⚠️ No rooms selected in questionnaire' even though Kitchen and Living Room checkboxes were clicked. The checkbox state is not being properly captured in formData.rooms_involved array. This causes projects to be created without any rooms, which breaks the entire workflow. Root cause: Checkbox click events may not be triggering the handleRoomsChange function properly, or the state update is not persisting before form submission."
+      - working: "NA"
+        agent: "testing"
+        comment: "⚠️ TESTING INCOMPLETE: Unable to complete full questionnaire submission test due to UI interaction timeout. Test encountered 'ElementHandle.click: Timeout 30000ms exceeded' error when trying to click the 'Primary Residence' radio button. The error indicates '<html lang=\"en\">…</html> intercepts pointer events', suggesting an overlay or modal is blocking interactions. This prevented testing of: 1) Room checkbox selection and persistence, 2) Complete form submission, 3) Edit questionnaire page, 4) Data saving verification, 5) Mobile walkthrough data transfer. The form was successfully filled up to the 'TOTAL SCOPE OF WORK' section before the timeout occurred. NEEDS INVESTIGATION: Check for any overlays, modals, or z-index issues that might be blocking form interactions."
   
   - task: "Edit Questionnaire Page - Blank Screen Issue"
     implemented: true
