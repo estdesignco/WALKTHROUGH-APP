@@ -18,7 +18,7 @@ export default function EditQuestionnairePage() {
     const [autocompleteRenovation, setAutocompleteRenovation] = useState(null);
     
     const { isLoaded } = useLoadScript({
-        googleMapsApiKey: 'AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0',
+        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         libraries: GOOGLE_MAPS_LIBRARIES
     });
     
