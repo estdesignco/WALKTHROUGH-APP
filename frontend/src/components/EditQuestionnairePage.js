@@ -126,6 +126,17 @@ export default function EditQuestionnairePage() {
     const inputClass = "w-full p-3 bg-gray-800 text-white border border-[#D4A574]/50 rounded focus:border-[#D4A574] focus:outline-none";
     const labelClass = "block text-[#D4A574] mb-2 font-semibold";
     
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0F172A] p-6 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#D4A574] mb-4"></div>
+                    <p className="text-[#D4A574] text-xl">Loading questionnaire data...</p>
+                </div>
+            </div>
+        );
+    }
+    
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0F172A] p-6">
             <div className="max-w-6xl mx-auto">
