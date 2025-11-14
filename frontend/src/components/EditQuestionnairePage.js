@@ -29,6 +29,7 @@ export default function EditQuestionnairePage() {
     
     const loadData = async () => {
         try {
+            setLoading(true);
             const [projectRes, questionnaireRes] = await Promise.all([
                 axios.get(`${BACKEND_URL}/api/projects/${projectId}`),
                 axios.get(`${BACKEND_URL}/api/questionnaire/${projectId}`)
@@ -46,6 +47,9 @@ export default function EditQuestionnairePage() {
             }
         } catch (error) {
             console.error('Failed to load:', error);
+            alert('Failed to load questionnaire data. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
     
