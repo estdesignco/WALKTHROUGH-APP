@@ -262,7 +262,9 @@ export default function CustomerfacingQuestionnaire() {
     };
 
     const handleRoomsChange = (newRooms) => {
+        console.log('🔄 handleRoomsChange called with:', newRooms);
         handleFormChange('rooms_involved', newRooms);
+        console.log('✅ Updated rooms_involved to:', newRooms);
     };
 
     const handleAddRoom = () => {
