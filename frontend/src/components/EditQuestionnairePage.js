@@ -189,12 +189,12 @@ export default function EditQuestionnairePage() {
                                 <div><label className={labelClass}>Spouse/Partner Phone</label><input type="tel" value={answers.spouse_partner_phone || ''} onChange={(e) => handleChange('spouse_partner_phone', e.target.value)} className={inputClass} placeholder="XXX-XXX-XXXX" /></div>
                                 <div className="col-span-2">
                                     <label className={labelClass}>Project Address</label>
-                                    {isLoaded ? (
+                                    {isLoaded && Autocomplete ? (
                                         <Autocomplete onLoad={(auto) => setAutocompleteAddress(auto)} onPlaceChanged={() => { if (autocompleteAddress) { const place = autocompleteAddress.getPlace(); handleChange('address', place.formatted_address || ''); } }}>
                                             <input type="text" value={answers.address || ''} onChange={(e) => handleChange('address', e.target.value)} className={inputClass} placeholder="Start typing address..." />
                                         </Autocomplete>
                                     ) : (
-                                        <input type="text" value={answers.address || ''} onChange={(e) => handleChange('address', e.target.value)} className={inputClass} />
+                                        <input type="text" value={answers.address || ''} onChange={(e) => handleChange('address', e.target.value)} className={inputClass} placeholder="Enter address manually" />
                                     )}
                                 </div>
                             </div>
