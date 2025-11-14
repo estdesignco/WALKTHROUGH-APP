@@ -9,6 +9,8 @@ import NetInfo from '@react-native-community/netinfo';
 // Screens
 import HomeScreen from './src/screens/HomeScreen';
 import ProjectListScreen from './src/screens/ProjectListScreen';
+import ProjectDetailsScreen from './src/screens/ProjectDetailsScreen';
+import ContactsScreen from './src/screens/ContactsScreen';
 import WalkthroughScreen from './src/screens/WalkthroughScreen';
 import PhotoManagerScreen from './src/screens/PhotoManagerScreen';
 import LeicaConnectionScreen from './src/screens/LeicaConnectionScreen';
