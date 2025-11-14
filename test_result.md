@@ -192,6 +192,31 @@
 user_problem_statement: |
   "Customer Questionnaire Testing - Test complete questionnaire submission with all fields and verify Edit Questionnaire page does not go blank"
 
+frontend:
+  - task: "Customer Questionnaire Form Submission"
+    implemented: true
+    working: false
+    file: "CustomerfacingQuestionnaire.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE: Rooms not being saved during questionnaire submission. Console logs show '⚠️ No rooms selected in questionnaire' even though Kitchen and Living Room checkboxes were clicked. The checkbox state is not being properly captured in formData.rooms_involved array. This causes projects to be created without any rooms, which breaks the entire workflow. Root cause: Checkbox click events may not be triggering the handleRoomsChange function properly, or the state update is not persisting before form submission."
+  
+  - task: "Edit Questionnaire Page - Blank Screen Issue"
+    implemented: true
+    working: false
+    file: "EditQuestionnairePage.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE CONFIRMED: Edit Questionnaire page goes completely BLANK (black screen) when accessed. The page navigates to /project/{id}/edit-questionnaire successfully, but renders a completely blank page with 7255 characters of content (mostly JavaScript). Key elements missing: 1) 'Edit Questionnaire Answers' header (h1) not found, 2) 'CLIENT INFORMATION' section (h2) not found, 3) Input fields with previously entered data not found. Console error detected: 'Cannot read properties of null (reading '__e3_')' - This indicates a React rendering error, likely due to missing or null data when the component tries to render. The EditQuestionnairePage component is failing to load questionnaire data from the backend API, causing the entire page to fail rendering."
+
 backend:
   - task: "🔥 CRITICAL HOUZZ PRO BROWSER AUTOMATION TEST"
     implemented: true
