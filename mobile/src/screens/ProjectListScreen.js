@@ -62,9 +62,8 @@ export default function ProjectListScreen({ navigation }) {
   };
 
   const handleProjectPress = (project) => {
-    navigation.navigate('Walkthrough', { 
-      projectId: project.id,
-      projectName: project.name 
+    navigation.navigate('ProjectDetails', { 
+      projectId: project.id
     });
   };
 
