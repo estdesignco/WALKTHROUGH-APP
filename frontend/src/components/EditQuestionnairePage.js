@@ -18,10 +18,15 @@ export default function EditQuestionnairePage() {
     const [autocompleteNewBuild, setAutocompleteNewBuild] = useState(null);
     const [autocompleteRenovation, setAutocompleteRenovation] = useState(null);
     
-    const { isLoaded } = useLoadScript({
+    const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         libraries: GOOGLE_MAPS_LIBRARIES
     });
+    
+    // If Google Maps fails to load, we can still edit other fields
+    if (loadError) {
+        console.warn('Google Maps failed to load, address autocomplete will be disabled:', loadError);
+    }
     
     useEffect(() => {
         loadData();
