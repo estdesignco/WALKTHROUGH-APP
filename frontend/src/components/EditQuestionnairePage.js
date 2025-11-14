@@ -12,6 +12,7 @@ export default function EditQuestionnairePage() {
     const [project, setProject] = useState(null);
     const [answers, setAnswers] = useState({});
     const [saving, setSaving] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [teamMembers, setTeamMembers] = useState([{ name: '', role: '', phone: '' }]);
     const [autocompleteAddress, setAutocompleteAddress] = useState(null);
     const [autocompleteNewBuild, setAutocompleteNewBuild] = useState(null);
