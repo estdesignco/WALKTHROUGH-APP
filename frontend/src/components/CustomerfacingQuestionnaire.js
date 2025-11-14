@@ -535,7 +535,7 @@ export default function CustomerfacingQuestionnaire() {
                         <InputField label="Spouse / Partner Phone" id="spouse_partner_phone" type="tel" value={formData.spouse_partner_phone || ''} onChange={(e) => handleFormChange('spouse_partner_phone', e.target.value)} />
                         <FieldWrapper label="Project Address">
                             <Autocomplete
-                                apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
+                                apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
                                 onPlaceSelected={(place) => {
                                     if (place && place.formatted_address) {
                                         handleFormChange('address', place.formatted_address);
