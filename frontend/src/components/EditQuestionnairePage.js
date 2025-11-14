@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useLoadScript, Autocomplete } from '@react-google-maps/api';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+const GOOGLE_MAPS_LIBRARIES = ['places'];
 
 export default function EditQuestionnairePage() {
     const { projectId } = useParams();
