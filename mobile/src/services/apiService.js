@@ -48,6 +48,12 @@ export const apiService = {
   createProject: (data) => api.post('/projects', data),
   updateProject: (projectId, data) => api.put(`/projects/${projectId}`, data),
   
+  // Questionnaire
+  getQuestionnaire: (projectId) => api.get(`/questionnaire/${projectId}`),
+  
+  // Contacts
+  getContacts: (projectId) => api.get(`/contacts/project/${projectId}`),
+  
   // Rooms
   getRooms: (projectId) => api.get(`/projects/${projectId}/rooms`),
   getRoom: (roomId) => api.get(`/rooms/${roomId}`),
