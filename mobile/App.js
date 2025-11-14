@@ -93,6 +93,16 @@ export default function App() {
           options={{ title: 'Projects' }}
         />
         <Stack.Screen 
+          name="ProjectDetails" 
+          component={ProjectDetailsScreen}
+          options={{ title: 'Project Details' }}
+        />
+        <Stack.Screen 
+          name="Contacts" 
+          component={ContactsScreen}
+          options={{ title: 'Contacts' }}
+        />
+        <Stack.Screen 
           name="Walkthrough" 
           component={WalkthroughScreen}
           options={{ title: 'Walkthrough' }}
