@@ -152,6 +152,30 @@ function ProjectMenuScreen({ project, onNavigate }) {
           </button>
 
           <button
+            onClick={() => onNavigate('project-details')}
+            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-5xl md:text-6xl mb-3">📄</div>
+              <div className="font-bold text-[#D4C5A9] text-2xl md:text-3xl mb-2">Project Details</div>
+              <div className="text-sm md:text-base text-gray-300">View complete questionnaire & project information</div>
+            </div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('contacts')}
+            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-5xl md:text-6xl mb-3">📇</div>
+              <div className="font-bold text-[#D4C5A9] text-2xl md:text-3xl mb-2">Contacts</div>
+              <div className="text-sm md:text-base text-gray-300">View all project contacts with tap-to-call</div>
+            </div>
+          </button>
+
+          <button
             onClick={() => onNavigate('photos')}
             className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
           >
