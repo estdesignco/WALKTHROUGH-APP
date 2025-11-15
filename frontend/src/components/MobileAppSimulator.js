@@ -769,6 +769,10 @@ export default function MobileAppSimulator() {
             </div>
           </div>
         );
+      case 'project-details':
+        return <ProjectDetailsScreen project={selectedProject} onNavigate={handleNavigate} />;
+      case 'contacts':
+        return <ContactsScreen project={selectedProject} onNavigate={handleNavigate} />;
       default:
         return <MobileHomeScreen onNavigate={handleNavigate} />;
     }
