@@ -4,18 +4,6 @@ import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 
-// Dynamically import Google Maps only if needed
-let useLoadScript, Autocomplete;
-try {
-    const googleMaps = require('@react-google-maps/api');
-    useLoadScript = googleMaps.useLoadScript;
-    Autocomplete = googleMaps.Autocomplete;
-} catch (error) {
-    console.warn('Google Maps API not available:', error);
-}
-
-const GOOGLE_MAPS_LIBRARIES = ['places'];
-
 export default function EditQuestionnairePage() {
     const { projectId } = useParams();
     const navigate = useNavigate();
@@ -24,32 +12,6 @@ export default function EditQuestionnairePage() {
     const [saving, setSaving] = useState(false);
     const [loading, setLoading] = useState(true);
     const [teamMembers, setTeamMembers] = useState([{ name: '', role: '', phone: '' }]);
-    const [autocompleteAddress, setAutocompleteAddress] = useState(null);
-    const [autocompleteNewBuild, setAutocompleteNewBuild] = useState(null);
-    const [autocompleteRenovation, setAutocompleteRenovation] = useState(null);
-    
-    // Try to load Google Maps, but don't crash if it fails
-    let isLoaded = false;
-    let loadError = null;
-    
-    try {
-        if (useLoadScript) {
-            const result = useLoadScript({
-                googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-                libraries: GOOGLE_MAPS_LIBRARIES
-            });
-            isLoaded = result.isLoaded;
-            loadError = result.loadError;
-        }
-    } catch (error) {
-        console.warn('Failed to initialize Google Maps:', error);
-        loadError = error;
-    }
-    
-    // If Google Maps fails to load, we can still edit other fields
-    if (loadError) {
-        console.warn('Google Maps failed to load, address autocomplete will be disabled:', loadError);
-    }
     
     useEffect(() => {
         loadData();
