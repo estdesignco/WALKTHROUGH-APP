@@ -233,11 +233,11 @@ frontend:
   
   - task: "Customer Questionnaire Form Submission"
     implemented: true
-    working: true
+    working: "NA"
     file: "CustomerfacingQuestionnaire.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
+    stuck_count: 1
+    priority: "critical"
+    needs_retesting: true
     status_history:
       - working: false
         agent: "testing"
@@ -248,6 +248,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ TEST 2 PASSED - QUESTIONNAIRE SUBMISSION FULLY WORKING! Comprehensive testing confirms complete questionnaire submission with room creation is working perfectly. Successfully filled form with: Full Name='Complete Test', Project Name='Full Test Project', Email='fulltest@test.com', Phone='615-555-7777', Spouse='Spouse Test', Spouse Phone='615-555-8888', and selected 3 rooms (Kitchen, Living Room, Primary Bedroom). ALL CRITICAL CONSOLE LOGS VERIFIED: ✅ '🔄 handleRoomsChange called with: [Kitchen]', '🔄 handleRoomsChange called with: [Kitchen, Living Room]', '🔄 handleRoomsChange called with: [Kitchen, Living Room, Primary Bedroom]' - room selection working perfectly. ✅ '🏠 Checking rooms to create. formData.rooms_involved: [Kitchen, Living Room, Primary Bedroom]' - rooms array properly populated. ✅ '📋 Will create 3 rooms: [Kitchen, Living Room, Primary Bedroom]' - room creation initiated. ✅ '🚀 Creating room 1/3: Kitchen', '✅ Room created successfully: Kitchen', '🚀 Creating room 2/3: Living Room', '✅ Room created successfully: Living Room', '🚀 Creating room 3/3: Primary Bedroom', '✅ Room created successfully: Primary Bedroom' - all 3 rooms created successfully. ✅ '✅ ALL ROOMS CREATED - Questionnaire submission complete!' - confirmation message present. ✅ '💾 Saving complete questionnaire answers...', '✅ Questionnaire answers saved!' - questionnaire data saved. ✅ Successfully redirected to project page with project ID: b791a90b-5441-4198-8246-ac76bd9f67c7. NO '⚠️ No rooms selected' warning detected. The room checkbox functionality is working correctly and all data is being saved properly."
+      - working: "NA"
+        agent: "testing"
+        comment: "⚠️ CANNOT TEST - BLOCKED BY ROUTING ISSUE: Unable to test questionnaire form submission because the questionnaire page is completely inaccessible due to routing failure. The /customer/questionnaire route redirects to root page instead of loading the questionnaire form. Cannot fill form fields, select rooms, or submit the form."
   
   - task: "Edit Questionnaire Page - Blank Screen Issue"
     implemented: true
