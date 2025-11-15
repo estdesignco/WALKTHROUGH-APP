@@ -220,7 +220,7 @@ frontend:
     implemented: true
     working: false
     file: "CustomerfacingQuestionnaire.js"
-    stuck_count: 2
+    stuck_count: 3
     priority: "high"
     needs_retesting: false
     status_history:
@@ -233,6 +233,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "⚠️ CANNOT TEST - BLOCKED BY ROUTING ISSUE: Unable to test Google Maps autocomplete functionality because the questionnaire page is completely inaccessible due to routing failure. The /customer/questionnaire route redirects to root page instead of loading the questionnaire form."
+      - working: false
+        agent: "testing"
+        comment: "❌ PROOF TEST #1 PARTIAL - GOOGLE MAPS API KEY STILL RESTRICTED: Typed '1600 Amphitheatre' in the Project Address field on the questionnaire form. The Google autocomplete dropdown IS visible in the UI (screenshot proof1_google_autocomplete.png shows the dropdown), BUT console errors confirm the API key restriction is still active: 'Google Maps JavaScript API error: RefererNotAllowedMapError - Your site URL to be authorized: https://spacemaster-1.preview.emergentagent.com/customer/questionnaire'. The dropdown appears but may not function correctly due to the API restriction. CRITICAL ACTION REQUIRED: Configure Google Cloud Console to add 'https://spacemaster-1.preview.emergentagent.com/*' to the API key's allowed HTTP referrers. Without this fix, the autocomplete may fail to return results or work intermittently."
   
   - task: "Customer Questionnaire Form Submission"
     implemented: true
