@@ -254,11 +254,11 @@ frontend:
   
   - task: "Edit Questionnaire Page - Blank Screen Issue"
     implemented: true
-    working: false
+    working: "NA"
     file: "EditQuestionnairePage.js"
-    stuck_count: 2
-    priority: "high"
-    needs_retesting: false
+    stuck_count: 3
+    priority: "critical"
+    needs_retesting: true
     status_history:
       - working: false
         agent: "testing"
@@ -266,6 +266,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ TEST 3 FAILED - EDIT PAGE SHOWS RUNTIME ERRORS (NOT BLANK BUT BROKEN): Tested edit questionnaire functionality after successful form submission. Navigated to project detail page (project ID: b791a90b-5441-4198-8246-ac76bd9f67c7) and clicked Edit button. The page does NOT show a blank black screen, but instead shows 'Uncaught runtime errors' overlay with critical React error: 'Cannot read properties of null (reading '__e3_')'. This error appears 3 times in the console, indicating a serious React component rendering issue. The error originates from Google Maps API integration (maps.googleapis.com/maps-api-v3/api/js/62/13e/main.js) and affects the Autocomplete component. Screenshot shows red error overlay blocking the entire page. The EditQuestionnairePage component is attempting to render but fails due to null reference errors in the Google Maps Autocomplete initialization. ROOT CAUSE: The @react-google-maps/api useLoadScript hook or Autocomplete component is trying to access null properties during initialization, likely because the Google Maps API key has referrer restrictions that prevent proper loading on the edit page."
+      - working: "NA"
+        agent: "testing"
+        comment: "⚠️ CANNOT TEST - BLOCKED BY ROUTING ISSUE: Unable to test Edit Questionnaire page functionality because the questionnaire page itself is completely inaccessible due to routing failure. Cannot submit a questionnaire to create a project, therefore cannot navigate to project detail page to click Edit button. Testing is completely blocked by the upstream routing issue."
   
   - task: "Data Transfer to Mobile Walkthrough"
     implemented: true
