@@ -447,6 +447,223 @@ function MobilePhotoManagerScreen({ project, room, onNavigate }) {
 }
 
 // ===== MAIN APP =====
+// ===== PROJECT DETAILS SCREEN =====
+function ProjectDetailsScreen({ project, onNavigate }) {
+  const [questionnaire, setQuestionnaire] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (project?.id) {
+      loadQuestionnaire();
+    }
+  }, [project]);
+
+  const loadQuestionnaire = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/questionnaire/${project.id}`);
+      setQuestionnaire(response.data);
+    } catch (error) {
+      console.error('Failed to load questionnaire:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const answers = questionnaire?.answers || {};
+
+  const InfoRow = ({ label, value }) => {
+    if (!value || value === '') return null;
+    return (
+      <div className="mb-4">
+        <div className="text-xs text-gray-400 mb-1">{label}</div>
+        <div className="text-base text-[#F3F4F6]">{value}</div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="h-full overflow-auto bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0F172A]">
+      <div className="bg-gradient-to-r from-[#1E293B] via-[#0F172A] to-[#1E293B] p-6 border-b-4 border-[#D4A574]">
+        <button 
+          onClick={() => onNavigate('project-menu')}
+          className="text-[#D4A574] mb-4 flex items-center gap-2"
+        >
+          ← Back to Project Menu
+        </button>
+        <h1 className="text-3xl font-bold text-[#D4A574] mb-2">{project?.name}</h1>
+        <p className="text-[#D4C5A9]">Project Information</p>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center p-12">
+          <div className="text-[#D4A574]">Loading project details...</div>
+        </div>
+      ) : (
+        <div className="p-6 space-y-6">
+          {/* Client Information */}
+          <div className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl border-l-4 border-[#D4A574]">
+            <h2 className="text-xl font-bold text-[#D4A574] mb-4">CLIENT INFORMATION</h2>
+            <InfoRow label="Client Name" value={project?.client_info?.full_name || answers.client_name} />
+            <InfoRow label="Email" value={project?.client_info?.email || answers.email} />
+            <InfoRow label="Phone" value={project?.client_info?.phone || answers.phone} />
+            <InfoRow label="Address" value={project?.client_info?.address || answers.address} />
+            <InfoRow label="Spouse/Partner" value={answers.spouse_partner_name} />
+            <InfoRow label="Spouse Phone" value={answers.spouse_partner_phone} />
+          </div>
+
+          {/* Project Details */}
+          <div className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl border-l-4 border-[#D4A574]">
+            <h2 className="text-xl font-bold text-[#D4A574] mb-4">PROJECT DETAILS</h2>
+            <InfoRow label="Project Type" value={project?.project_type} />
+            <InfoRow label="Timeline" value={project?.timeline || answers.timeline} />
+            <InfoRow label="Budget" value={project?.budget || answers.budget_range} />
+            <InfoRow label="Property Type" value={answers.property_type} />
+          </div>
+
+          {/* New Build Team */}
+          {(answers.new_build_architect || answers.new_build_builder) && (
+            <div className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl border-l-4 border-[#D4A574]">
+              <h2 className="text-xl font-bold text-[#D4A574] mb-4">NEW BUILD TEAM</h2>
+              <InfoRow label="Architect" value={answers.new_build_architect} />
+              <InfoRow label="Architect Phone" value={answers.new_build_architect_phone} />
+              <InfoRow label="Builder" value={answers.new_build_builder} />
+              <InfoRow label="Builder Phone" value={answers.new_build_builder_phone} />
+              <InfoRow label="New Build Address" value={answers.new_build_address} />
+            </div>
+          )}
+
+          {/* Rooms */}
+          {project?.rooms && project.rooms.length > 0 && (
+            <div className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl border-l-4 border-[#D4A574]">
+              <h2 className="text-xl font-bold text-[#D4A574] mb-4">ROOMS IN PROJECT</h2>
+              <div className="flex flex-wrap gap-2">
+                {project.rooms.map((room, index) => (
+                  <div key={room.id || index} className="bg-[#374151] px-3 py-2 rounded-full border border-[#D4A574]">
+                    <span className="text-[#D4A574] text-sm">{room.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="space-y-4">
+            <button
+              onClick={() => onNavigate('contacts')}
+              className="w-full bg-gradient-to-r from-[#D4A574] to-[#BCA888] text-[#1F2937] font-bold py-4 rounded-xl"
+            >
+              📋 View Contacts
+            </button>
+            <button
+              onClick={() => onNavigate('walkthrough')}
+              className="w-full bg-gradient-to-r from-[#D4A574] to-[#BCA888] text-[#1F2937] font-bold py-4 rounded-xl"
+            >
+              📸 Start Walkthrough
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== CONTACTS SCREEN =====
+function ContactsScreen({ project, onNavigate }) {
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (project?.id) {
+      loadContacts();
+    }
+  }, [project]);
+
+  const loadContacts = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/contacts/project/${project.id}`);
+      setContacts(response.data || []);
+    } catch (error) {
+      console.error('Failed to load contacts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const groupedContacts = contacts.reduce((acc, contact) => {
+    const role = contact.role || 'Other';
+    if (!acc[role]) acc[role] = [];
+    acc[role].push(contact);
+    return acc;
+  }, {});
+
+  const roleOrder = ['Client', 'Spouse/Partner', 'Architect', 'Builder', 'Interior Designer', 'General Contractor'];
+  const sortedRoles = [
+    ...roleOrder.filter(role => groupedContacts[role]),
+    ...Object.keys(groupedContacts).filter(role => !roleOrder.includes(role))
+  ];
+
+  return (
+    <div className="h-full overflow-auto bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0F172A]">
+      <div className="bg-gradient-to-r from-[#1E293B] via-[#0F172A] to-[#1E293B] p-6 border-b-4 border-[#D4A574]">
+        <button 
+          onClick={() => onNavigate('project-menu')}
+          className="text-[#D4A574] mb-4 flex items-center gap-2"
+        >
+          ← Back to Project Menu
+        </button>
+        <h1 className="text-3xl font-bold text-[#D4A574] mb-2">Project Contacts</h1>
+        <p className="text-[#D4C5A9]">{contacts.length} contact(s)</p>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center p-12">
+          <div className="text-[#D4A574]">Loading contacts...</div>
+        </div>
+      ) : contacts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-12 text-center">
+          <div className="text-6xl mb-4">📇</div>
+          <div className="text-xl text-gray-400 mb-2">No contacts found</div>
+          <div className="text-sm text-gray-500">Contacts will appear after questionnaire submission</div>
+        </div>
+      ) : (
+        <div className="p-6 space-y-6">
+          {sortedRoles.map((role) => (
+            <div key={role}>
+              <h2 className="text-lg font-bold text-[#D4A574] mb-3">{role}</h2>
+              {groupedContacts[role].map((contact, index) => (
+                <div key={contact.id || index} className="bg-gradient-to-br from-gray-900 to-black p-5 rounded-xl border-l-4 border-[#D4A574] mb-3">
+                  <div className="text-lg font-bold text-[#F3F4F6] mb-3">{contact.name}</div>
+                  {contact.company && (
+                    <div className="text-sm text-gray-400 mb-3">{contact.company}</div>
+                  )}
+                  {contact.phone && (
+                    <a href={`tel:${contact.phone}`} className="flex items-center gap-2 text-[#D4C5A9] mb-2">
+                      <span>📞</span>
+                      <span>{contact.phone}</span>
+                    </a>
+                  )}
+                  {contact.email && (
+                    <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-[#D4C5A9] mb-2">
+                      <span>✉️</span>
+                      <span>{contact.email}</span>
+                    </a>
+                  )}
+                  {contact.address && (
+                    <div className="flex items-center gap-2 text-[#D4C5A9]">
+                      <span>📍</span>
+                      <span>{contact.address}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function MobileAppSimulator() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [screen, setScreen] = useState(searchParams.get('screen') || 'home');
