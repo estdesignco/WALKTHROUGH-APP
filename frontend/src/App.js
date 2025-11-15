@@ -152,11 +152,23 @@ const App = () => {
   return (
     <div className="App min-h-screen bg-gray-900">
       <BrowserRouter>
-        {/* Mobile app gets full screen without navigation */}
+        {/* Routes without navigation - full screen experiences */}
         <Routes>
           <Route 
             path="/mobile-app" 
             element={<MobileAppSimulator />}
+          />
+          <Route 
+            path="/customer/questionnaire" 
+            element={<CustomerfacingQuestionnaire />}
+          />
+          <Route 
+            path="/customer" 
+            element={<CustomerLandingPage />}
+          />
+          <Route 
+            path="/customer/project/:projectId" 
+            element={<CustomerfacingProjectDetailPage />}
           />
           <Route 
             path="*" 
