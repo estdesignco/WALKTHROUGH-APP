@@ -285,15 +285,6 @@ const App = () => {
                       path="/workflow-dashboard" 
                       element={<WorkflowDashboard />}
                     />
-                    {/* Customer-facing routes */}
-                    <Route 
-                      path="/customer/questionnaire" 
-                      element={<CustomerfacingQuestionnaire />}
-                    />
-                    <Route 
-                      path="/customer/project/:projectId" 
-                      element={<CustomerfacingProjectDetailPage />}
-                    />
                     <Route 
                       path="/questionnaire" 
                       element={<CustomerfacingQuestionnaire />}
