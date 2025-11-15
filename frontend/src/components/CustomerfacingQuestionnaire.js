@@ -317,6 +317,20 @@ export default function CustomerfacingQuestionnaire() {
             const newProject = await Project.create(projectData);
             console.log('✅ Project created successfully:', newProject);
 
+            // ALWAYS save questionnaire answers FIRST (regardless of rooms)
+            console.log('💾 Saving complete questionnaire answers...');
+            try {
+                await axios.post(`${BACKEND_URL}/api/questionnaire/${newProject.id}`, {
+                    answers: formData,
+                    completion_percentage: 100,
+                    completed_at: new Date().toISOString()
+                });
+                console.log('✅ Questionnaire answers saved!');
+            } catch (saveError) {
+                console.error('❌ Failed to save questionnaire answers:', saveError);
+                alert('Warning: Questionnaire data may not have saved completely. Error: ' + saveError.message);
+            }
+
             // Create rooms with FULL walkthrough structure (backend auto-populates)
             console.log('🏠 Checking rooms to create. formData.rooms_involved:', formData.rooms_involved);
             console.log('🏠 Type:', typeof formData.rooms_involved, 'Length:', formData.rooms_involved?.length);
@@ -349,21 +363,8 @@ export default function CustomerfacingQuestionnaire() {
                 }
                 
                 console.log('✅ ALL ROOMS CREATED - Questionnaire submission complete!');
-                
-                // Save ALL questionnaire answers
-                console.log('💾 Saving complete questionnaire answers...');
-                try {
-                    await axios.post(`${BACKEND_URL}/api/questionnaire/${newProject.id}`, {
-                        answers: formData,
-                        completion_percentage: 100,
-                        completed_at: new Date().toISOString()
-                    });
-                    console.log('✅ Questionnaire answers saved!');
-                } catch (saveError) {
-                    console.error('❌ Failed to save questionnaire answers:', saveError);
-                }
             } else {
-                console.warn('⚠️ No rooms selected in questionnaire');
+                console.warn('⚠️ No rooms selected in questionnaire - project created without rooms');
             }
 
             setSubmissionStatus('success');
