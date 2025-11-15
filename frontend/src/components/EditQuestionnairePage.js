@@ -183,13 +183,7 @@ export default function EditQuestionnairePage() {
                             
                             <div className="mt-4">
                                 <label className={labelClass}>New Build Address</label>
-                                {isLoaded ? (
-                                    <Autocomplete onLoad={(auto) => setAutocompleteNewBuild(auto)} onPlaceChanged={() => { if (autocompleteNewBuild) { const place = autocompleteNewBuild.getPlace(); handleChange('new_build_address', place.formatted_address || ''); } }}>
-                                        <textarea value={answers.new_build_address || ''} onChange={(e) => handleChange('new_build_address', e.target.value)} rows={2} className={inputClass} placeholder="Start typing address..." />
-                                    </Autocomplete>
-                                ) : (
-                                    <textarea value={answers.new_build_address || ''} onChange={(e) => handleChange('new_build_address', e.target.value)} rows={2} className={inputClass} />
-                                )}
+                                <textarea value={answers.new_build_address || ''} onChange={(e) => handleChange('new_build_address', e.target.value)} rows={2} className={inputClass} placeholder="Enter address" />
                             </div>
                         </section>
                         
