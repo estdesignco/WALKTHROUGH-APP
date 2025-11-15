@@ -201,6 +201,18 @@ user_problem_statement: |
   "Customer Questionnaire Testing - Test complete questionnaire submission with all fields and verify Edit Questionnaire page does not go blank"
 
 frontend:
+  - task: "Customer Landing Page and Questionnaire Routing"
+    implemented: true
+    working: false
+    file: "App.js, CustomerLandingPage.js, CustomerfacingQuestionnaire.js"
+    stuck_count: 3
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL ROUTING FAILURE - CUSTOMER PAGES COMPLETELY INACCESSIBLE: Comprehensive testing reveals that BOTH /customer and /customer/questionnaire routes are NOT working. When navigating to either URL, the application redirects to the root page (/) showing the Studio Projects page instead of the customer-facing pages. EVIDENCE: 1) Navigating to https://spacemaster-1.preview.emergentagent.com/customer shows Studio Projects page with 'ESTABLISHED DESIGN CO.' logo, Walkthrough/Checklist/FF&E/Calculators buttons, and '+ New Client', 'Email New Client', 'Full Questionnaire' buttons. 2) Navigating to https://spacemaster-1.preview.emergentagent.com/customer/questionnaire also redirects to root showing Studio Projects page. 3) Console logs show '🔄 Fetching projects from API...' which indicates MainDashboard or StudioLandingPage component is loading instead of CustomerLandingPage or CustomerfacingQuestionnaire. 4) The 'Begin Your Design Journey' button is NOT found on the page (timeout after 10 seconds). 5) Questionnaire form fields (#client_name, #name, #email, etc.) are NOT found on the page. ROOT CAUSE: React Router configuration issue causing customer routes to fall through to root route. The routes are defined in App.js but something is preventing them from matching correctly. IMPACT: This is a BLOCKING issue - the entire customer-facing questionnaire workflow is completely inaccessible. Cannot test questionnaire submission, data saving, edit functionality, or any customer-facing features. URGENT ACTION REQUIRED: Fix React Router configuration to properly load CustomerLandingPage at /customer and CustomerfacingQuestionnaire at /customer/questionnaire."
+  
   - task: "Google Maps Address Autocomplete"
     implemented: true
     working: false
@@ -215,6 +227,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ TEST 1 FAILED - GOOGLE MAPS STILL NOT WORKING: Despite user's claim that Google Maps is 'confirmed working', comprehensive testing shows the RefererNotAllowedMapError is still present. Console logs clearly show: 'Google Maps JavaScript API error: RefererNotAllowedMapError - Your site URL to be authorized: https://spacemaster-1.preview.emergentagent.com/customer/questionnaire'. The API key restriction has NOT been fixed in Google Cloud Console. No autocomplete dropdown appears when typing '123 Main St' in the Project Address field. The issue persists and requires Google Cloud Console configuration change to add the production domain to allowed referrers."
+      - working: "NA"
+        agent: "testing"
+        comment: "⚠️ CANNOT TEST - BLOCKED BY ROUTING ISSUE: Unable to test Google Maps autocomplete functionality because the questionnaire page is completely inaccessible due to routing failure. The /customer/questionnaire route redirects to root page instead of loading the questionnaire form."
   
   - task: "Customer Questionnaire Form Submission"
     implemented: true
