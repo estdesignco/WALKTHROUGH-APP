@@ -903,19 +903,38 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     {formData.project_type === 'Renovation' && (
                         <Section title="RENOVATION" description="If you are not looking to renovate, please feel free to skip these questions!">
                             <FieldWrapper label="Please list Renovation Address (If different!)">
-                                <Autocomplete
-                                    apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
-                                    onPlaceSelected={(place) => {
-                                        if (place && place.formatted_address) {
-                                            handleFormChange('renovation_address', place.formatted_address);
-                                        }
-                                    }}
-                                    options={{ types: ['address'] }}
-                                    className={inputStyles}
-                                    value={formData.renovation_address || ''}
-                                    onChange={(e) => handleFormChange('renovation_address', e.target.value)}
-                                    placeholder="Start typing address..."
-                                />
+                                {isLoaded ? (
+                                    <Autocomplete
+                                        onLoad={(autocomplete) => {
+                                            autocomplete.setFields(['formatted_address']);
+                                        }}
+                                        onPlaceChanged={(autocomplete) => {
+                                            const place = autocomplete.getPlace();
+                                            if (place && place.formatted_address) {
+                                                handleFormChange('renovation_address', place.formatted_address);
+                                            }
+                                        }}
+                                        options={{
+                                            types: ['address'],
+                                        }}
+                                    >
+                                        <textarea
+                                            className={inputStyles}
+                                            value={formData.renovation_address || ''}
+                                            onChange={(e) => handleFormChange('renovation_address', e.target.value)}
+                                            placeholder="Start typing address..."
+                                            rows={2}
+                                        />
+                                    </Autocomplete>
+                                ) : (
+                                    <textarea
+                                        className={inputStyles}
+                                        value={formData.renovation_address || ''}
+                                        onChange={(e) => handleFormChange('renovation_address', e.target.value)}
+                                        placeholder="Loading Google Maps..."
+                                        rows={2}
+                                    />
+                                )}
                             </FieldWrapper>
                             <InputField label="When did you move into this home?" id="renovation_move_in_date" type="date" value={formData.renovation_move_in_date || ''} onChange={(e) => handleFormChange('renovation_move_in_date', e.target.value)} />
                             
