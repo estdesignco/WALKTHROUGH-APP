@@ -784,13 +784,13 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                             <FieldWrapper label="Please list NEW BUILD address">
                                 {isLoaded ? (
                                     <Autocomplete
-                                        onLoad={(autocomplete) => {
-                                            autocomplete.setFields(['formatted_address']);
-                                        }}
-                                        onPlaceChanged={(autocomplete) => {
-                                            const place = autocomplete.getPlace();
-                                            if (place && place.formatted_address) {
-                                                handleFormChange('new_build_address', place.formatted_address);
+                                        onLoad={(autocomplete) => setAutocompleteNewBuild(autocomplete)}
+                                        onPlaceChanged={() => {
+                                            if (autocompleteNewBuild) {
+                                                const place = autocompleteNewBuild.getPlace();
+                                                if (place && place.formatted_address) {
+                                                    handleFormChange('new_build_address', place.formatted_address);
+                                                }
                                             }
                                         }}
                                         options={{
@@ -799,8 +799,6 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                     >
                                         <textarea
                                             className={inputStyles}
-                                            value={formData.new_build_address || ''}
-                                            onChange={(e) => handleFormChange('new_build_address', e.target.value)}
                                             placeholder="Start typing address..."
                                             rows={2}
                                         />
