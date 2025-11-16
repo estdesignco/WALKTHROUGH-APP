@@ -780,19 +780,38 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     {formData.project_type === 'New Build' && (
                         <Section title="NEW BUILD" description="If you are not currently building a new home, please feel free to skip these questions!">
                             <FieldWrapper label="Please list NEW BUILD address">
-                                <Autocomplete
-                                    apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
-                                    onPlaceSelected={(place) => {
-                                        if (place && place.formatted_address) {
-                                            handleFormChange('new_build_address', place.formatted_address);
-                                        }
-                                    }}
-                                    options={{ types: ['address'] }}
-                                    className={inputStyles}
-                                    value={formData.new_build_address || ''}
-                                    onChange={(e) => handleFormChange('new_build_address', e.target.value)}
-                                    placeholder="Start typing address..."
-                                />
+                                {isLoaded ? (
+                                    <Autocomplete
+                                        onLoad={(autocomplete) => {
+                                            autocomplete.setFields(['formatted_address']);
+                                        }}
+                                        onPlaceChanged={(autocomplete) => {
+                                            const place = autocomplete.getPlace();
+                                            if (place && place.formatted_address) {
+                                                handleFormChange('new_build_address', place.formatted_address);
+                                            }
+                                        }}
+                                        options={{
+                                            types: ['address'],
+                                        }}
+                                    >
+                                        <textarea
+                                            className={inputStyles}
+                                            value={formData.new_build_address || ''}
+                                            onChange={(e) => handleFormChange('new_build_address', e.target.value)}
+                                            placeholder="Start typing address..."
+                                            rows={2}
+                                        />
+                                    </Autocomplete>
+                                ) : (
+                                    <textarea
+                                        className={inputStyles}
+                                        value={formData.new_build_address || ''}
+                                        onChange={(e) => handleFormChange('new_build_address', e.target.value)}
+                                        placeholder="Loading Google Maps..."
+                                        rows={2}
+                                    />
+                                )}
                             </FieldWrapper>
                             <FieldWrapper label="Do you have an Architect?">
                                 <div className="grid grid-cols-2 gap-4">
