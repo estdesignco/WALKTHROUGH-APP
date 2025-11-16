@@ -905,13 +905,13 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                             <FieldWrapper label="Please list Renovation Address (If different!)">
                                 {isLoaded ? (
                                     <Autocomplete
-                                        onLoad={(autocomplete) => {
-                                            autocomplete.setFields(['formatted_address']);
-                                        }}
-                                        onPlaceChanged={(autocomplete) => {
-                                            const place = autocomplete.getPlace();
-                                            if (place && place.formatted_address) {
-                                                handleFormChange('renovation_address', place.formatted_address);
+                                        onLoad={(autocomplete) => setAutocompleteRenovation(autocomplete)}
+                                        onPlaceChanged={() => {
+                                            if (autocompleteRenovation) {
+                                                const place = autocompleteRenovation.getPlace();
+                                                if (place && place.formatted_address) {
+                                                    handleFormChange('renovation_address', place.formatted_address);
+                                                }
                                             }
                                         }}
                                         options={{
@@ -920,8 +920,6 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                     >
                                         <textarea
                                             className={inputStyles}
-                                            value={formData.renovation_address || ''}
-                                            onChange={(e) => handleFormChange('renovation_address', e.target.value)}
                                             placeholder="Start typing address..."
                                             rows={2}
                                         />
