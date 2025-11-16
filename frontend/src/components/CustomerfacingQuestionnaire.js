@@ -252,6 +252,31 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
     const [submissionStatus, setSubmissionStatus] = useState(null);
     const [newRoomName, setNewRoomName] = useState("");
 
+    // Load existing data when in edit mode
+    useEffect(() => {
+        if (editProjectId) {
+            loadExistingData();
+        }
+    }, [editProjectId]);
+
+    const loadExistingData = async () => {
+        try {
+            const [projectRes, questionnaireRes] = await Promise.all([
+                axios.get(`${BACKEND_URL}/api/projects/${editProjectId}`),
+                axios.get(`${BACKEND_URL}/api/questionnaire/${editProjectId}`)
+            ]);
+            
+            const existingAnswers = questionnaireRes.data.answers || {};
+            console.log('📥 Loaded existing answers:', existingAnswers);
+            
+            // Merge existing answers into formData
+            setFormData(prev => ({ ...prev, ...existingAnswers }));
+        } catch (error) {
+            console.error('Failed to load existing data:', error);
+        }
+    };
+
+
     const handleFormChange = (field, value) => {
         // Auto-format phone numbers for ALL phone fields
         if (field.includes('phone') || field.includes('Phone')) {
