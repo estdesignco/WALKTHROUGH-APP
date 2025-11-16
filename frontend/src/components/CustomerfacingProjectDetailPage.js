@@ -83,7 +83,7 @@ export default function ProjectPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
-                                {project.client_info?.full_name || 'Not provided'}
+                                {answers.client_name || project.client_info?.full_name || 'Not provided'}
                             </div>
                         </div>
                         <div>
