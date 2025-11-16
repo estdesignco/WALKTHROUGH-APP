@@ -155,6 +155,13 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
     const { projectId: urlProjectId } = useParams();
     const editProjectId = isEditMode ? urlProjectId : null;
     
+    
+    // Load Google Maps
+    const { isLoaded } = useLoadScript({
+        googleMapsApiKey: "AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0",
+        libraries: GOOGLE_MAPS_LIBRARIES
+    });
+
     const [formData, setFormData] = useState({
         rooms_involved: [],
         ideal_sofa_price: '',
