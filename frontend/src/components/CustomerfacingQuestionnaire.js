@@ -315,6 +315,34 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
         setIsSubmitting(true);
         setSubmissionStatus(null);
         try {
+            // If in edit mode, just update questionnaire and project
+            if (editProjectId) {
+                console.log('📝 UPDATE MODE: Saving changes for project', editProjectId);
+                
+                // Update questionnaire
+                await axios.post(`${BACKEND_URL}/api/questionnaire/${editProjectId}`, {
+                    answers: formData,
+                    completion_percentage: 100,
+                    completed_at: new Date().toISOString()
+                });
+                
+                // Update project basic info
+                await axios.put(`${BACKEND_URL}/api/projects/${editProjectId}`, {
+                    name: formData.name,
+                    client_info: {
+                        full_name: formData.client_name,
+                        email: formData.email,
+                        phone: formData.phone,
+                        address: formData.address
+                    }
+                });
+                
+                alert('✅ Changes saved successfully!');
+                window.location.href = `/customer/project/${editProjectId}`;
+                return;
+            }
+            
+            // NEW SUBMISSION MODE (existing code)
             // Transform formData to match backend ProjectCreate model
             const projectTypeMap = {
                 'Renovation': 'Renovation',
