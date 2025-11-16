@@ -209,7 +209,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Project Priority</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {Array.isArray(project.project_priority) ? project.project_priority.join(', ') : project.project_priority || 'Not specified'}
+                                {Array.isArray(answers.project_priority) ? answers.project_priority.join(', ') : project.project_priority || 'Not specified'}
                             </div>
                         </div>
                     </div>
