@@ -698,7 +698,7 @@ export default function CustomerfacingQuestionnaire() {
                         <Section title="NEW BUILD" description="If you are not currently building a new home, please feel free to skip these questions!">
                             <FieldWrapper label="Please list NEW BUILD address">
                                 <Autocomplete
-                                    apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
+                                    apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
                                     onPlaceSelected={(place) => {
                                         if (place && place.formatted_address) {
                                             handleFormChange('new_build_address', place.formatted_address);
@@ -803,7 +803,7 @@ export default function CustomerfacingQuestionnaire() {
                         <Section title="RENOVATION" description="If you are not looking to renovate, please feel free to skip these questions!">
                             <FieldWrapper label="Please list Renovation Address (If different!)">
                                 <Autocomplete
-                                    apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
+                                    apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
                                     onPlaceSelected={(place) => {
                                         if (place && place.formatted_address) {
                                             handleFormChange('renovation_address', place.formatted_address);
