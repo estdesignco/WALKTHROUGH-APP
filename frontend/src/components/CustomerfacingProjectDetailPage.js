@@ -155,7 +155,7 @@ export default function ProjectPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
-                                {project.involvement_level || 'Not specified'}
+                                {answers.involvement_level || 'Not specified'}
                             </div>
                         </div>
                         <div>
@@ -163,7 +163,7 @@ export default function ProjectPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
-                                {project.ideal_sofa_price || 'Not specified'}
+                                {answers.ideal_sofa_price || 'Not specified'}
                             </div>
                         </div>
                     </div>
@@ -191,7 +191,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Property Type</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {project.property_type || 'Not specified'}
+                                {answers.property_type || 'Not specified'}
                             </div>
                         </div>
                         <div>
@@ -410,7 +410,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Newsletter signup?</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {project.newsletter_signup || 'Not specified'}
+                                {answers.newsletter_signup || 'Not specified'}
                             </div>
                         </div>
                         <div>
