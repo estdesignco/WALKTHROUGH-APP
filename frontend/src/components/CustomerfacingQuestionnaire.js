@@ -569,9 +569,9 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
             <div className="max-w-4xl mx-auto bg-gradient-to-br from-black/60 to-gray-900/80 p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm">
                 {/* Back Button */}
                 <div className="mb-8">
-                    <Link to="/customer" className="flex items-center text-[#B49B7E]/70 hover:text-[#B49B7E] transition-all duration-300">
+                    <Link to={editProjectId ? `/customer/project/${editProjectId}` : "/customer"} className="flex items-center text-[#B49B7E]/70 hover:text-[#B49B7E] transition-all duration-300">
                         <ArrowLeft className="w-5 h-5 mr-2" />
-                        Back to Home
+                        {editProjectId ? 'Back to Project' : 'Back to Home'}
                     </Link>
                 </div>
 
