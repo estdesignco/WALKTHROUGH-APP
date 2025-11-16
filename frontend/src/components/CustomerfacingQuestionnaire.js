@@ -612,10 +612,13 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         <FieldWrapper label="Project Address">
                             {isLoaded ? (
                                 <Autocomplete
+                                    onLoad={(autocomplete) => setAutocompleteRef(autocomplete)}
                                     onPlaceChanged={() => {
-                                        const place = this.getPlace();
-                                        if (place && place.formatted_address) {
-                                            handleFormChange('address', place.formatted_address);
+                                        if (autocompleteRef) {
+                                            const place = autocompleteRef.getPlace();
+                                            if (place && place.formatted_address) {
+                                                handleFormChange('address', place.formatted_address);
+                                            }
                                         }
                                     }}
                                     options={{
