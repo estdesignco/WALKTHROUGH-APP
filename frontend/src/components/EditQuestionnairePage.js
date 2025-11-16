@@ -25,8 +25,14 @@ export default function EditQuestionnairePage() {
                 axios.get(`${BACKEND_URL}/api/questionnaire/${projectId}`)
             ]);
             
+            console.log('📥 Project data:', projectRes.data);
+            console.log('📥 Questionnaire data:', questionnaireRes.data);
+            console.log('📥 Answers extracted:', questionnaireRes.data.answers);
+            
             setProject(projectRes.data);
             setAnswers(questionnaireRes.data.answers || {});
+            
+            console.log('✅ State updated - answers:', questionnaireRes.data.answers);
             
             if (questionnaireRes.data.answers?.new_build_other_team) {
                 const parsed = questionnaireRes.data.answers.new_build_other_team.split('\\n').map(line => {
