@@ -359,33 +359,33 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Tell us about your family</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {answers.family_info || 'Not provided'}
+                                {answers.know_you_family || 'Not provided'}
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-stone-300 mb-2">Do you have pets?</label>
                                 <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {answers.pets_info || 'Not provided'}
+                                    {answers.know_you_pets || 'Not provided'}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-stone-300 mb-2">How do you entertain?</label>
                                 <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {answers.entertaining_style || 'Not provided'}
+                                    {answers.know_you_entertaining || 'Not provided'}
                                 </div>
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">What are your hobbies?</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[60px]">
-                                {answers.hobbies || 'Not provided'}
+                                {answers.know_you_hobbies || 'Not provided'}
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">What is your lifestyle like?</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {answers.lifestyle || 'Not provided'}
+                                {answers.know_you_lifestyle || 'Not provided'}
                             </div>
                         </div>
                         <div>
@@ -404,7 +404,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">How did you hear about us?</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {answers.how_heard_about_us || 'Not provided'}
+                                {answers.how_heard || 'Not provided'}
                             </div>
                         </div>
                         <div>
@@ -416,7 +416,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Social media preferences</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {answers.social_media_preferences || 'Not provided'}
+                                {answers.how_heard_other || 'Not provided'}
                             </div>
                         </div>
                     </div>
