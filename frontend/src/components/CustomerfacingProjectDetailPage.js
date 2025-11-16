@@ -139,7 +139,7 @@ export default function ProjectPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] min-h-[80px]" style={{
                                 background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
-                                {project.worked_with_designer_before || 'Not provided'}
+                                {answers.worked_with_designer_before || 'Not provided'}
                             </div>
                         </div>
                         <div>
