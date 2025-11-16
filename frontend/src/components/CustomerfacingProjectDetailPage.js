@@ -20,6 +20,7 @@ const Project = {
 export default function ProjectPage() {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
+    const [questionnaire, setQuestionnaire] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("Questionnaire");
 
@@ -31,6 +32,18 @@ export default function ProjectPage() {
                 const projectData = await Project.get(projectId);
                 console.log('Project data received:', projectData);
                 setProject(projectData);
+                
+                // Also fetch questionnaire answers
+                try {
+                    const questionnaireResponse = await fetch(`${BACKEND_URL}/api/questionnaire/${projectId}`);
+                    if (questionnaireResponse.ok) {
+                        const questionnaireData = await questionnaireResponse.json();
+                        console.log('Questionnaire data received:', questionnaireData);
+                        setQuestionnaire(questionnaireData);
+                    }
+                } catch (qError) {
+                    console.log('No questionnaire data found');
+                }
             } catch (error) {
                 console.error("Failed to fetch project:", error);
             } finally {
