@@ -245,9 +245,9 @@ frontend:
   
   - task: "Customer Questionnaire Form Submission"
     implemented: true
-    working: true
+    working: "partial"
     file: "CustomerfacingQuestionnaire.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "critical"
     needs_retesting: false
     status_history:
