@@ -608,11 +608,8 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         <FieldWrapper label="Project Address">
                             {isLoaded ? (
                                 <Autocomplete
-                                    onLoad={(autocomplete) => {
-                                        autocomplete.setFields(['formatted_address']);
-                                    }}
-                                    onPlaceChanged={(autocomplete) => {
-                                        const place = autocomplete.getPlace();
+                                    onPlaceChanged={() => {
+                                        const place = this.getPlace();
                                         if (place && place.formatted_address) {
                                             handleFormChange('address', place.formatted_address);
                                         }
@@ -624,8 +621,6 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                     <input
                                         type="text"
                                         className={inputStyles}
-                                        value={formData.address || ''}
-                                        onChange={(e) => handleFormChange('address', e.target.value)}
                                         placeholder="Start typing your address..."
                                     />
                                 </Autocomplete>
