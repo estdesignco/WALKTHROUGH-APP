@@ -162,6 +162,10 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
         libraries: GOOGLE_MAPS_LIBRARIES
     });
 
+    const [autocompleteRef, setAutocompleteRef] = useState(null);
+    const [autocompleteNewBuild, setAutocompleteNewBuild] = useState(null);
+    const [autocompleteRenovation, setAutocompleteRenovation] = useState(null);
+
     const [formData, setFormData] = useState({
         rooms_involved: [],
         ideal_sofa_price: '',
