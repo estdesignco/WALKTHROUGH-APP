@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import Autocomplete from 'react-google-autocomplete';
@@ -14,6 +14,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, PlusCircle, XCircle } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin || '';
+
+export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
+    const { projectId: urlProjectId } = useParams();
+    const editProjectId = isEditMode ? urlProjectId : null;
 
 // API functions
 const Project = {
