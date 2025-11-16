@@ -131,7 +131,7 @@ export default function ProjectPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
-                                {Array.isArray(project.contact_preferences) ? project.contact_preferences.join(', ') : project.contact_preferences || 'Not specified'}
+                                {Array.isArray(answers.contact_preferences) ? answers.contact_preferences.join(', ') : answers.contact_preferences || 'Not specified'}
                             </div>
                         </div>
                         <div className="md:col-span-2">
@@ -328,13 +328,13 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Artwork Preference</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {Array.isArray(project.design_artwork_preference) ? project.design_artwork_preference.join(', ') : project.design_artwork_preference || 'Not provided'}
+                                {Array.isArray(answers.design_artwork_preference) ? answers.design_artwork_preference.join(', ') : answers.design_artwork_preference || 'Not provided'}
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Liked Design Styles</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {Array.isArray(project.design_styles_preference) ? project.design_styles_preference.join(', ') : project.design_styles_preference || 'Not provided'}
+                                {Array.isArray(answers.design_styles_preference) ? answers.design_styles_preference.join(', ') : project.design_styles_preference || 'Not provided'}
                             </div>
                         </div>
                         <div>
@@ -346,7 +346,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Patterns & Textures Preference</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {Array.isArray(project.finishes_patterns_preference) ? project.finishes_patterns_preference.join(', ') : project.finishes_patterns_preference || 'Not provided'}
+                                {Array.isArray(answers.finishes_patterns_preference) ? answers.finishes_patterns_preference.join(', ') : answers.finishes_patterns_preference || 'Not provided'}
                             </div>
                         </div>
                     </div>
