@@ -154,7 +154,10 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
     );
 };
 
-export default function CustomerfacingQuestionnaire() {
+export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
+    const { projectId: urlProjectId } = useParams();
+    const editProjectId = isEditMode ? urlProjectId : null;
+    
     const [formData, setFormData] = useState({
         rooms_involved: [],
         ideal_sofa_price: '',
