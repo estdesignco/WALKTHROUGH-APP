@@ -60,6 +60,8 @@ export default function ProjectPage() {
     const CompleteFilledQuestionnaire = () => {
         if (!project) return <div className="text-center text-stone-300 py-8">Loading questionnaire...</div>;
         
+        const answers = questionnaire?.answers || {};
+        
         return (
             <div className="space-y-8 p-6">
                 <div className="flex justify-between items-center mb-6">
