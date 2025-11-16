@@ -99,7 +99,7 @@ export default function ProjectPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
-                                {project.client_info?.email || 'Not provided'}
+                                {answers.email || project.client_info?.email || 'Not provided'}
                             </div>
                         </div>
                         <div>
@@ -107,7 +107,7 @@ export default function ProjectPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
-                                {project.client_info?.phone || 'Not provided'}
+                                {answers.phone || project.client_info?.phone || 'Not provided'}
                             </div>
                         </div>
                         <div className="md:col-span-2">
@@ -115,7 +115,7 @@ export default function ProjectPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
-                                {project.client_info?.address || 'Not provided'}
+                                {answers.address || project.client_info?.address || 'Not provided'}
                             </div>
                         </div>
                         <div>
@@ -123,7 +123,7 @@ export default function ProjectPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
-                                {project.best_time_to_call || 'Not specified'}
+                                {answers.best_time_to_call || 'Not specified'}
                             </div>
                         </div>
                         <div>
@@ -147,7 +147,7 @@ export default function ProjectPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
-                                {project.primary_decision_maker || 'Not specified'}
+                                {answers.primary_decision_maker || 'Not specified'}
                             </div>
                         </div>
                         <div>
