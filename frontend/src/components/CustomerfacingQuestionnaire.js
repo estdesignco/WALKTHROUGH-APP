@@ -15,10 +15,6 @@ import { Loader2, PlusCircle, XCircle } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin || '';
 
-export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
-    const { projectId: urlProjectId } = useParams();
-    const editProjectId = isEditMode ? urlProjectId : null;
-
 // API functions
 const Project = {
     create: async (data) => {
