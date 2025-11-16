@@ -250,7 +250,7 @@ const App = () => {
                     />
                     <Route 
                       path="/project/:projectId/edit-questionnaire" 
-                      element={<EditQuestionnairePage />}
+                      element={<CustomerfacingQuestionnaire isEditMode={true} />}
                     />
 
                     <Route 
