@@ -868,7 +868,6 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                     }}
                                     options={{ types: ['address'] }}
                                     className={inputStyles}
-                                    style={{ width: '100%', padding: '12px', backgroundColor: 'rgba(0,0,0,0.4)', border: '1px solid rgba(212,165,116,0.3)', borderRadius: '8px', color: '#F5F5DC' }}
                                     value={formData.renovation_address || ''}
                                     onChange={(e) => handleFormChange('renovation_address', e.target.value)}
                                     placeholder="Start typing address..."
