@@ -303,19 +303,19 @@ export default function ProjectPage() {
                             <div>
                                 <label className="block text-sm font-medium text-stone-300 mb-2">Style in 3 Words</label>
                                 <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {project.design_style_words || 'Not provided'}
+                                    {answers.design_style_words || 'Not provided'}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Colors</label>
                                 <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {project.design_preferred_colors || 'Not provided'}
+                                    {answers.design_preferred_colors || 'Not provided'}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-stone-300 mb-2">Disliked Colors</label>
                                 <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {project.design_disliked_colors || 'Not provided'}
+                                    {answers.design_disliked_colors || 'Not provided'}
                                 </div>
                             </div>
                             <div>
@@ -340,7 +340,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Disliked Design Styles</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {project.design_styles_dislike || 'Not provided'}
+                                {answers.design_styles_dislike || 'Not provided'}
                             </div>
                         </div>
                         <div>
@@ -359,33 +359,33 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Tell us about your family</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {project.family_info || 'Not provided'}
+                                {answers.family_info || 'Not provided'}
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-stone-300 mb-2">Do you have pets?</label>
                                 <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {project.pets_info || 'Not provided'}
+                                    {answers.pets_info || 'Not provided'}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-stone-300 mb-2">How do you entertain?</label>
                                 <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {project.entertaining_style || 'Not provided'}
+                                    {answers.entertaining_style || 'Not provided'}
                                 </div>
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">What are your hobbies?</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[60px]">
-                                {project.hobbies || 'Not provided'}
+                                {answers.hobbies || 'Not provided'}
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">What is your lifestyle like?</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {project.lifestyle || 'Not provided'}
+                                {answers.lifestyle || 'Not provided'}
                             </div>
                         </div>
                         <div>
@@ -404,7 +404,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">How did you hear about us?</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {project.how_heard_about_us || 'Not provided'}
+                                {answers.how_heard_about_us || 'Not provided'}
                             </div>
                         </div>
                         <div>
@@ -416,7 +416,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Social media preferences</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {project.social_media_preferences || 'Not provided'}
+                                {answers.social_media_preferences || 'Not provided'}
                             </div>
                         </div>
                     </div>
