@@ -197,7 +197,7 @@ export default function ProjectPage() {
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Timeline</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                {project.timeline || 'Not specified'}
+                                {answers.timeline || project.timeline || 'Not specified'}
                             </div>
                         </div>
                         <div>
