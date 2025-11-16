@@ -194,14 +194,6 @@ const App = () => {
                       element={<StudioLandingPage />}
                     />
                     <Route 
-                      path="/customer/questionnaire" 
-                      element={<CustomerfacingQuestionnaire />}
-                    />
-                    <Route 
-                      path="/customer" 
-                      element={<CustomerLandingPage />}
-                    />
-                    <Route 
                       path="/projects" 
                       element={
                         <ProjectList 
