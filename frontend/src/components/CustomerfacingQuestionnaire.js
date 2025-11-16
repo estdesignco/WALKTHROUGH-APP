@@ -586,7 +586,9 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                 </div>
 
                 <div className="text-center mb-12">
-                    <h2 className="text-2xl font-light text-[#B49B7E] tracking-wider">COMPREHENSIVE CLIENT QUESTIONNAIRE</h2>
+                    <h2 className="text-2xl font-light text-[#B49B7E] tracking-wider">
+                        {editProjectId ? 'EDIT QUESTIONNAIRE' : 'COMPREHENSIVE CLIENT QUESTIONNAIRE'}
+                    </h2>
                     <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mt-4"></div>
                 </div>
 
