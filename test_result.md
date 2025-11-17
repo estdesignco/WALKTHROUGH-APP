@@ -207,6 +207,18 @@ user_problem_statement: |
   "RUNTIME CONFIG FIX TESTING - Test EVERYTHING at preview URL to verify backend URL configuration is correct and all features work"
 
 frontend:
+  - task: "Runtime Config - Backend URL Configuration"
+    implemented: true
+    working: false
+    file: "frontend/.env, App.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL RUNTIME CONFIG ISSUE - FRONTEND CALLING WRONG BACKEND URL! Comprehensive testing at https://spacemaster-1.preview.emergentagent.com reveals the frontend is hardcoded to call https://app.estdesignco.com/api instead of the preview domain's backend. EVIDENCE: 1) Console logs show 'API Call: GET https://app.estdesignco.com/api/projects', 2) Network requests fail with 'net::ERR_ABORTED', 3) Frontend .env has REACT_APP_BACKEND_URL=https://app.estdesignco.com, 4) Compiled bundle.js contains 'https://app.estdesignco.com' hardcoded throughout. IMPACT: ALL API calls fail - dashboard shows no projects, questionnaire cannot submit, no data loads anywhere in the app. Backend at https://spacemaster-1.preview.emergentagent.com/api is working correctly (returns 200 OK with empty array), but frontend never calls it. FIX REQUIRED: Update frontend/.env to REACT_APP_BACKEND_URL=https://spacemaster-1.preview.emergentagent.com (or use relative URLs like '/api'), rebuild frontend with 'yarn build', and redeploy. This is blocking ALL functionality in the preview environment."
+
   - task: "Customer Landing Page and Questionnaire Routing"
     implemented: true
     working: true
