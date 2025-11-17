@@ -598,36 +598,19 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         <InputField label="Spouse / Partner Name" id="spouse_partner_name" value={formData.spouse_partner_name || ''} onChange={(e) => handleFormChange('spouse_partner_name', e.target.value)} />
                         <InputField label="Spouse / Partner Phone" id="spouse_partner_phone" type="tel" value={formData.spouse_partner_phone || ''} onChange={(e) => handleFormChange('spouse_partner_phone', e.target.value)} />
                         <FieldWrapper label="Project Address">
-                            {isLoaded ? (
-                                <Autocomplete
-                                    onLoad={(autocomplete) => setAutocompleteRef(autocomplete)}
-                                    onPlaceChanged={() => {
-                                        if (autocompleteRef) {
-                                            const place = autocompleteRef.getPlace();
-                                            if (place && place.formatted_address) {
-                                                handleFormChange('address', place.formatted_address);
-                                            }
-                                        }
-                                    }}
-                                    options={{
-                                        types: ['address'],
-                                    }}
-                                >
-                                    <input
-                                        type="text"
-                                        className={inputStyles}
-                                        placeholder="Start typing your address..."
-                                    />
-                                </Autocomplete>
-                            ) : (
-                                <input
-                                    type="text"
-                                    className={inputStyles}
-                                    value={formData.address || ''}
-                                    onChange={(e) => handleFormChange('address', e.target.value)}
-                                    placeholder="Loading Google Maps..."
-                                />
-                            )}
+                            <Autocomplete
+                                apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
+                                onPlaceSelected={(place) => {
+                                    if (place && place.formatted_address) {
+                                        handleFormChange('address', place.formatted_address);
+                                    }
+                                }}
+                                options={{
+                                    types: ['address'],
+                                }}
+                                className={inputStyles}
+                                placeholder="Start typing your address..."
+                            />
                         </FieldWrapper>
                         <FieldWrapper label="Preferred Method of Communication">
                             <CheckboxGroup options={contactPrefOptions} value={formData.contact_preferences} onChange={(v) => handleFormChange('contact_preferences', v)} />
