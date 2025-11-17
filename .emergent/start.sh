@@ -60,6 +60,16 @@ for i in {1..60}; do
     sleep 1
 done
 
+# Generate runtime config for frontend
+echo "Generating frontend runtime config..."
+cat > /app/frontend/public/config.js << CONFIGEOF
+// Runtime configuration - injected at deployment
+window.ENV = {
+  REACT_APP_BACKEND_URL: '${REACT_APP_BACKEND_URL:-https://app.estdesignco.com}'
+};
+CONFIGEOF
+echo "✅ Frontend runtime config generated"
+
 # Start Frontend
 echo "Starting frontend on port 3000..."
 cd /app/frontend  
