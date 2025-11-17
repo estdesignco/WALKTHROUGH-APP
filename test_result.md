@@ -1568,12 +1568,18 @@ agent_communication:
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 15
-  run_ui: false
+  test_sequence: 16
+  run_ui: true
 
 test_plan:
   current_focus:
-    - "Comprehensive App-Wide Backend Testing - ALL Features"
+    - "Runtime Config Fix - Backend URL Configuration"
+    - "Dashboard Projects Loading"
+    - "Customer Questionnaire Submission"
   stuck_tasks: []
-  test_all: true
-  test_priority: "comprehensive"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    -agent: "testing"
+    -message: "🚨 CRITICAL RUNTIME CONFIG ISSUE CONFIRMED - WRONG BACKEND URL! Conducted comprehensive testing of preview environment at https://spacemaster-1.preview.emergentagent.com as requested. ❌ ROOT CAUSE IDENTIFIED: Frontend is calling WRONG backend URL. The frontend .env file has REACT_APP_BACKEND_URL=https://app.estdesignco.com but the preview URL is https://spacemaster-1.preview.emergentagent.com. The compiled JavaScript bundle has 'https://app.estdesignco.com' hardcoded throughout. ❌ TEST 1 FAILED - DASHBOARD PROJECTS NOT LOADING: Console logs show '🔄 Fetching projects from API...' followed by 'API Call: GET https://app.estdesignco.com/api/projects' and '❌ Error fetching projects: AxiosError'. Network request shows 'REQUEST FAILED: https://app.estdesignco.com/api/projects - net::ERR_ABORTED'. Dashboard shows empty 'Studio Projects' with no project cards. ❌ TEST 2 FAILED - QUESTIONNAIRE SUBMISSION IMPOSSIBLE: Navigated to /customer/questionnaire and form loaded correctly, but form fields (Full Name, Project Name) remained empty after attempting to fill them. Unable to complete submission test because frontend cannot communicate with backend. ❌ TEST 3 FAILED - NO PROJECTS APPEAR: After attempting submission, dashboard still shows empty projects list because all API calls are going to wrong URL. ❌ TEST 4 FAILED - CANNOT VERIFY DATA: Unable to test questionnaire data display because no projects exist due to API communication failure. ✅ BACKEND VERIFICATION: Tested https://spacemaster-1.preview.emergentagent.com/api/projects directly - backend is working correctly and returns empty array []. The issue is purely frontend configuration. 🔧 IMMEDIATE FIX REQUIRED: Update frontend/.env to use REACT_APP_BACKEND_URL=https://spacemaster-1.preview.emergentagent.com (or use relative URLs), rebuild frontend, and redeploy. The frontend must call the same domain's backend API, not a different domain."
