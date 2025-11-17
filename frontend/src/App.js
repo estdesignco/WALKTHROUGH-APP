@@ -37,7 +37,7 @@ import MobileAppSimulator from './components/MobileAppSimulator';
 import CanvaCallbackHandler from './components/CanvaCallbackHandler';
 import PowerFeaturesDashboard from './components/PowerFeaturesDashboard';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin || '';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.ENV?.REACT_APP_BACKEND_URL || window.location.origin || '';
 const API = `${BACKEND_URL}/api`;
 
 // Create axios instance with default config
