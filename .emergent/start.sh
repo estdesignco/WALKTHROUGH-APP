@@ -16,6 +16,9 @@ PORT=${PORT:-8000}
 # Frontend URL
 FRONTEND_URL=${FRONTEND_URL:-https://app.estdesignco.com}
 
+# CORS Configuration
+CORS_ORIGINS=${CORS_ORIGINS:-*}
+
 # Email Configuration
 SMTP_SERVER=${SMTP_SERVER:-smtp.office365.com}
 SMTP_PORT=${SMTP_PORT:-587}
