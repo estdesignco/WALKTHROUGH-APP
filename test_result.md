@@ -204,7 +204,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "Customer Questionnaire Testing - Test complete questionnaire submission with all fields and verify Edit Questionnaire page does not go blank"
+  "RUNTIME CONFIG FIX TESTING - Test EVERYTHING at preview URL to verify backend URL configuration is correct and all features work"
 
 frontend:
   - task: "Customer Landing Page and Questionnaire Routing"
