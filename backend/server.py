@@ -59,7 +59,7 @@ app = FastAPI(title="Interior Design Management System", version="1.0.0")
 
 
 # CORS Configuration
-CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://app.estdesignco.com,https://projectease-5.emergent.host').split(',')
+CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*').split(',')
 
 app.add_middleware(
     CORSMiddleware,
