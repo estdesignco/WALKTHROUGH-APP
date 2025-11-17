@@ -14,7 +14,7 @@ DB_NAME=${DB_NAME:-interior_design_db}
 PORT=${PORT:-8000}
 
 # Frontend URL
-FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+FRONTEND_URL=${FRONTEND_URL:-https://app.estdesignco.com}
 
 # Email Configuration
 SMTP_SERVER=${SMTP_SERVER:-smtp.office365.com}
