@@ -1,4 +1,4 @@
-// Runtime configuration - injected by start.sh
+// Runtime configuration - injected at deployment
 window.ENV = {
-  REACT_APP_BACKEND_URL: 'PLACEHOLDER_BACKEND_URL'
+  REACT_APP_BACKEND_URL: 'https://app.estdesignco.com'
 };
