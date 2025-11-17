@@ -153,17 +153,6 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
 export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
     const { projectId: urlProjectId } = useParams();
     const editProjectId = isEditMode ? urlProjectId : null;
-    
-    
-    // Load Google Maps
-    const { isLoaded } = useLoadScript({
-        googleMapsApiKey: "AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0",
-        libraries: GOOGLE_MAPS_LIBRARIES
-    });
-
-    const [autocompleteRef, setAutocompleteRef] = useState(null);
-    const [autocompleteNewBuild, setAutocompleteNewBuild] = useState(null);
-    const [autocompleteRenovation, setAutocompleteRenovation] = useState(null);
 
     const [formData, setFormData] = useState({
         rooms_involved: [],
