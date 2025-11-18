@@ -204,7 +204,7 @@
 #====================================================================================================
 
 user_problem_statement: |
-  "RUNTIME CONFIG FIX TESTING - Test EVERYTHING at preview URL to verify backend URL configuration is correct and all features work"
+  "COMPLETE END-TO-END PROOF TEST - Test questionnaire submission, dashboard display, data saving, edit page, and Google Maps at preview URL"
 
 frontend:
   - task: "Runtime Config - Backend URL Configuration"
