@@ -1,4 +1,4 @@
-// Runtime configuration - injected at deployment
+// Runtime configuration - uses same domain as frontend
 window.ENV = {
-  REACT_APP_BACKEND_URL: 'https://app.estdesignco.com'
+  REACT_APP_BACKEND_URL: window.location.origin
 };
