@@ -60,16 +60,17 @@ for i in {1..60}; do
     sleep 1
 done
 
-# Generate runtime config for frontend
+# Generate runtime config for frontend - MUST use string, not window.location
 echo "Generating frontend runtime config..."
-# Use window.location.origin as default so it calls the same domain it's hosted on
-cat > /app/frontend/public/config.js << 'CONFIGEOF'
-// Runtime configuration - uses same domain as frontend
+DEPLOY_URL="${REACT_APP_BACKEND_URL:-https://app.estdesignco.com}"
+cat > /app/frontend/public/config.js << CONFIGEOF
+// Runtime configuration - injected at deployment
 window.ENV = {
-  REACT_APP_BACKEND_URL: window.location.origin
+  REACT_APP_BACKEND_URL: '$DEPLOY_URL'
 };
+console.log('✅ Runtime config loaded:', window.ENV);
 CONFIGEOF
-echo "✅ Frontend runtime config generated"
+echo "✅ Frontend runtime config generated with URL: $DEPLOY_URL"
 
 # Start Frontend
 echo "Starting frontend on port 3000..."
