@@ -62,10 +62,11 @@ done
 
 # Generate runtime config for frontend
 echo "Generating frontend runtime config..."
-cat > /app/frontend/public/config.js << CONFIGEOF
-// Runtime configuration - injected at deployment
+# Use window.location.origin as default so it calls the same domain it's hosted on
+cat > /app/frontend/public/config.js << 'CONFIGEOF'
+// Runtime configuration - uses same domain as frontend
 window.ENV = {
-  REACT_APP_BACKEND_URL: '${REACT_APP_BACKEND_URL:-https://app.estdesignco.com}'
+  REACT_APP_BACKEND_URL: window.location.origin
 };
 CONFIGEOF
 echo "✅ Frontend runtime config generated"
