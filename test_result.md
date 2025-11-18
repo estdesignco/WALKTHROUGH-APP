@@ -207,17 +207,17 @@ user_problem_statement: |
   "COMPLETE END-TO-END PROOF TEST - Test questionnaire submission, dashboard display, data saving, edit page, and Google Maps at preview URL"
 
 frontend:
-  - task: "Runtime Config - Backend URL Configuration"
+  - task: "Complete Questionnaire Submission End-to-End"
     implemented: true
     working: false
-    file: "frontend/.env, App.js"
-    stuck_count: 0
+    file: "frontend/src/components/CustomerfacingQuestionnaire.js"
+    stuck_count: 1
     priority: "critical"
     needs_retesting: true
     status_history:
       - working: false
         agent: "testing"
-        comment: "🚨 CRITICAL RUNTIME CONFIG ISSUE - FRONTEND CALLING WRONG BACKEND URL! Comprehensive testing at https://spacemaster-1.preview.emergentagent.com reveals the frontend is hardcoded to call https://app.estdesignco.com/api instead of the preview domain's backend. EVIDENCE: 1) Console logs show 'API Call: GET https://app.estdesignco.com/api/projects', 2) Network requests fail with 'net::ERR_ABORTED', 3) Frontend .env has REACT_APP_BACKEND_URL=https://app.estdesignco.com, 4) Compiled bundle.js contains 'https://app.estdesignco.com' hardcoded throughout. IMPACT: ALL API calls fail - dashboard shows no projects, questionnaire cannot submit, no data loads anywhere in the app. Backend at https://spacemaster-1.preview.emergentagent.com/api is working correctly (returns 200 OK with empty array), but frontend never calls it. FIX REQUIRED: Update frontend/.env to REACT_APP_BACKEND_URL=https://spacemaster-1.preview.emergentagent.com (or use relative URLs like '/api'), rebuild frontend with 'yarn build', and redeploy. This is blocking ALL functionality in the preview environment."
+        comment: "🚨 CRITICAL QUESTIONNAIRE FORM INTERACTION FAILURE! Conducted comprehensive end-to-end testing at https://spacemaster-1.preview.emergentagent.com/customer. ✅ CUSTOMER LANDING PAGE WORKING: Beautiful hero image with 'Begin Your Design Journey' button loads correctly and navigates to questionnaire. ✅ QUESTIONNAIRE PAGE LOADS: Form displays with CLIENT INFORMATION section and all fields visible. ❌ FORM FIELD INTERACTION FAILURES: Playwright automation could NOT interact with form fields - Full Name input (id='client_name') timeout after 5000ms, Project Name input not found, room checkboxes (Kitchen, Living Room, Master Bedroom) not found. Only Email, Phone, and Spouse Name fields were successfully filled. ❌ FORM SUBMISSION FAILED: Submit button clicked but page stayed on /customer/questionnaire without redirecting to project detail page. No project ID captured from URL. No project created in database (dashboard shows empty array []). ❌ GOOGLE MAPS AUTOCOMPLETE: Screenshot captured but dropdown visibility unclear. 🔍 ROOT CAUSE ANALYSIS: Form uses shadcn/ui components (Input, Checkbox, RadioGroup, Select) which may have complex DOM structure that standard Playwright selectors cannot find. The InputField component wraps inputs with custom styling and the CheckboxGroup uses Radix UI primitives. Form submission likely failed due to validation errors from unfilled required fields. 🔧 IMMEDIATE ACTIONS REQUIRED: 1) Investigate why form fields are not accessible to automation (may need data-testid attributes), 2) Test form submission manually to verify backend integration works, 3) Check browser console for JavaScript errors during form interaction, 4) Verify Google Maps API key configuration for autocomplete functionality. IMPACT: Cannot verify end-to-end questionnaire workflow - submission, data persistence, dashboard display, edit page, or walkthrough data transfer."ACKEND_URL=https://spacemaster-1.preview.emergentagent.com (or use relative URLs like '/api'), rebuild frontend with 'yarn build', and redeploy. This is blocking ALL functionality in the preview environment."
 
   - task: "Customer Landing Page and Questionnaire Routing"
     implemented: true
