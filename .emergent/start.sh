@@ -31,6 +31,17 @@ REPLICATE_API_KEY=${REPLICATE_API_KEY:-}
 EOF
 echo "✅ Backend .env generated from secrets"
 
+
+# CRITICAL: Generate frontend/.env from Kubernetes secrets
+echo "Generating frontend/.env from environment variables..."
+cat > /app/frontend/.env << FRONTENDEOF
+PORT=3000
+REACT_APP_BACKEND_URL=\${REACT_APP_BACKEND_URL:-\${FRONTEND_URL:-https://app.estdesignco.com}}
+REACT_APP_GOOGLE_MAPS_API_KEY=\${REACT_APP_GOOGLE_MAPS_API_KEY:-AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0}
+FRONTENDEOF
+echo "✅ Frontend .env generated from secrets"
+
+
 # Clean Python bytecode cache to prevent stale imports
 echo "Cleaning Python cache..."
 find /app/backend -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
