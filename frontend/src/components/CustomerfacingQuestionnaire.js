@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, PlusCircle, XCircle } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin || '';
+console.log('🔗 CustomerfacingQuestionnaire BACKEND_URL:', BACKEND_URL);
 
 // API functions
 const Project = {
