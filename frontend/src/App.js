@@ -41,13 +41,32 @@ const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
 const API = `${BACKEND_URL}/api`;
 
 // Create axios instance with default config
+console.log('🌐 API configured:', { BACKEND_URL, API });
 const api = axios.create({
   baseURL: API,
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   }
 });
+
+// Add request interceptor for debugging
+api.interceptors.request.use(request => {
+  console.log('🚀 API Request:', request.method.toUpperCase(), request.url);
+  return request;
+});
+
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  response => {
+    console.log('✅ API Response:', response.status, response.config.url);
+    return response;
+  },
+  error => {
+    console.error('❌ API Error:', error.message, error.config?.url);
+    return Promise.reject(error);
+  }
+);
 
 // API functions
 export const projectAPI = {
