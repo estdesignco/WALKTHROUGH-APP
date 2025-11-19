@@ -6,7 +6,7 @@
 
 ## 📱 ACCESS THE APP
 
-**Live URL:** https://designflow-59.preview.emergentagent.com/mobile-app
+**Live URL:** https://estdesign-portal.preview.emergentagent.com/mobile-app
 
 ---
 
@@ -483,7 +483,7 @@ After testing, grade each area:
 
 ## 🚀 READY TO TEST!
 
-**Start here:** https://designflow-59.preview.emergentagent.com/mobile-app
+**Start here:** https://estdesign-portal.preview.emergentagent.com/mobile-app
 
 **Estimated time:** 30-60 minutes for full testing
 

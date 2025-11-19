@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://designflow-59.preview.emergentagent.com/email-template.html
+https://estdesign-portal.preview.emergentagent.com/email-template.html
 
 ---
 
