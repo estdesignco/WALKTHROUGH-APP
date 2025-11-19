@@ -5,7 +5,7 @@ import DollhouseDocument from './moodboard/DollhouseDocument';
 import Flat3DDocument from './moodboard/Flat3DDocument';
 import FloorPlanDocument from './moodboard/FloorPlanDocument';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
 
 export default function FullscreenMoodboard({ projectId }) {
     const navigate = useNavigate();

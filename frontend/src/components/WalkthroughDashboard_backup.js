@@ -26,7 +26,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       console.log('🚀 Loading project:', projectId);
       
       // IMMEDIATE TEST - Force load project data
-      fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`)
+      fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`)
         .then(response => {
           console.log('📡 Response received:', response.status);
           if (response.ok) {
@@ -52,7 +52,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     try {
       console.log('🚀 Loading project data for:', projectId);
       
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`);
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`);
       
       if (response.ok) {
         const projectData = await response.json();
@@ -72,7 +72,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       
       // Load dynamic checklist statuses from API instead of hardcoded values
       try {
-        const statusResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/item-statuses`);
+        const statusResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/item-statuses`);
         if (statusResponse.ok) {
           const statusData = await statusResponse.json();
           const statusList = statusData.map(status => status.status || status);

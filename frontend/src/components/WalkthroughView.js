@@ -42,7 +42,7 @@ const ExactWalkthroughSpreadsheet = ({
     console.log('🔄 Status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -68,7 +68,7 @@ const ExactWalkthroughSpreadsheet = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
@@ -165,7 +165,7 @@ const ExactWalkthroughSpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -228,7 +228,7 @@ const ExactWalkthroughSpreadsheet = ({
         return;
       }
 
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       const newItem = {
         ...itemData,
@@ -274,7 +274,7 @@ const ExactWalkthroughSpreadsheet = ({
     }
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
@@ -298,7 +298,7 @@ const ExactWalkthroughSpreadsheet = ({
     }
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'DELETE'
       });
@@ -338,7 +338,7 @@ const ExactWalkthroughSpreadsheet = ({
       console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
       
       // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
+      const tempRoomResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -365,7 +365,7 @@ const ExactWalkthroughSpreadsheet = ({
             id: undefined // Let backend generate new ID
           };
           
-          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
+          const addResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(categoryData)
@@ -375,7 +375,7 @@ const ExactWalkthroughSpreadsheet = ({
             console.log('✅ Comprehensive category added successfully');
             
             // Delete the temp room
-            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
+            await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
@@ -385,7 +385,7 @@ const ExactWalkthroughSpreadsheet = ({
         }
         
         // Clean up temp room regardless
-        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
+        await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${tempRoom.id}`, {
           method: 'DELETE'
         });
       } else {
@@ -410,7 +410,7 @@ const ExactWalkthroughSpreadsheet = ({
       
       // Update backend room order
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/reorder`, {
+        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -436,7 +436,7 @@ const ExactWalkthroughSpreadsheet = ({
       // Update backend category order  
       try {
         const roomId = source.droppableId.replace('categories-', '');
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/reorder`, {
+        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -480,7 +480,7 @@ const ExactWalkthroughSpreadsheet = ({
     }
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {

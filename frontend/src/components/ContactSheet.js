@@ -12,7 +12,7 @@ const ContactSheet = ({ projectId }) => {
     name: '', phone: '', email: '', role: '', company: '', address: '', notes: '', save_to_library: false
   });
 
-  const API = (process.env.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
+  const API = ((window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin) + '/api';
 
   useEffect(() => {
     loadContacts();

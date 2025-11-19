@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API = process.env.REACT_APP_BACKEND_URL + '/api';
+const API = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 const VendorContactManager = ({ projectId }) => {
   const [vendors, setVendors] = useState([]);

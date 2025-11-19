@@ -5,7 +5,7 @@ import MobileAddItemModal from './MobileAddItemModal';
 import { exportProjectToCSV, exportProjectSummary, calculateProjectStats } from '../utils/exportUtils';
 import { leicaManager } from '../utils/leicaD5Manager';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 export default function WorkingTabbedWalkthrough({ projectId }) {
   const [project, setProject] = useState(null);

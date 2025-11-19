@@ -49,7 +49,7 @@ const WalkthroughSpreadsheet = ({
         order_index: 0
       };
 
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItem)
@@ -73,7 +73,7 @@ const WalkthroughSpreadsheet = ({
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
         method: 'DELETE'
       });
 
@@ -92,7 +92,7 @@ const WalkthroughSpreadsheet = ({
     if (!window.confirm('Are you sure you want to delete this room?')) return;
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${roomId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
 
@@ -109,7 +109,7 @@ const WalkthroughSpreadsheet = ({
 
   const handleAddCategory = async (roomId, categoryName) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -184,7 +184,7 @@ const WalkthroughSpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/available`);
+        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
           setAvailableCategories(data.categories || []);

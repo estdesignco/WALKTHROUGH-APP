@@ -85,7 +85,7 @@ const SimpleChecklistSpreadsheet = ({
   // STATUS CHANGE HANDLERS
   const handleStatusChange = async (itemId, newStatus) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items/${itemId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -109,7 +109,7 @@ const SimpleChecklistSpreadsheet = ({
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/scrape-product`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/scrape-product`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: item.url, item_id: item.id })

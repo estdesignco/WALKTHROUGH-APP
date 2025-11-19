@@ -29,7 +29,7 @@ const ExactFFESpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+        const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -58,7 +58,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       const newItem = {
         ...itemData,
@@ -102,7 +102,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
@@ -135,7 +135,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       const newCategory = {
         room_id: roomId,
         name: categoryName,
@@ -181,7 +181,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
 
       // Handle room reordering
       if (type === 'room') {
@@ -254,7 +254,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {

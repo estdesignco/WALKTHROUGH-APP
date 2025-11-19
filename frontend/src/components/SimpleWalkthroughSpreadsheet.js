@@ -72,7 +72,7 @@ const SimpleWalkthroughSpreadsheet = ({
 
         // Update backend silently
         Promise.all(newRooms.map((room, i) => 
-          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${room.id}`, {
+          fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${room.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
@@ -100,7 +100,7 @@ const SimpleWalkthroughSpreadsheet = ({
 
         // Update backend silently
         Promise.all(newCategories.map((category, i) => 
-          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${category.id}`, {
+          fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/${category.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
@@ -191,7 +191,7 @@ const SimpleWalkthroughSpreadsheet = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -222,7 +222,7 @@ const SimpleWalkthroughSpreadsheet = ({
       console.log(`🚀 WALKTHROUGH ADD CATEGORY: Creating comprehensive '${categoryName}' with ALL subcategories and items`);
       
       // Use the new comprehensive endpoint that auto-populates with ALL items and subcategories
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -267,7 +267,7 @@ const SimpleWalkthroughSpreadsheet = ({
         return;
       }
 
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       // Create a blank row item - WITH PROPER DATA TYPES
       const blankItem = {
@@ -334,7 +334,7 @@ const SimpleWalkthroughSpreadsheet = ({
         return;
       }
 
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       const newItem = {
         ...itemData,
@@ -406,7 +406,7 @@ const SimpleWalkthroughSpreadsheet = ({
 
     try {
       console.log('🗑️ DELETING ROOM:', roomId);
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       console.log('🌐 Using backend URL:', backendUrl);
       
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
@@ -444,7 +444,7 @@ const SimpleWalkthroughSpreadsheet = ({
 
     try {
       console.log('🗑️ DELETING CATEGORY:', categoryId);
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       const response = await fetch(`${backendUrl}/api/categories/${categoryId}`, {
         method: 'DELETE',
@@ -541,7 +541,7 @@ const SimpleWalkthroughSpreadsheet = ({
       }
 
       // STEP 2: Google Apps Script Transfer Logic - Create structure then add ONLY checked items
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const projectId = filteredProject.id;
       
       let successCount = 0;
@@ -692,7 +692,7 @@ const SimpleWalkthroughSpreadsheet = ({
 
     try {
       console.log('🗑️ DELETING ITEM:', itemId);
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       console.log('🌐 Using backend URL:', backendUrl);
 
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {

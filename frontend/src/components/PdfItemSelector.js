@@ -10,7 +10,7 @@ const PdfItemSelector = ({ previewJobId, roomName, onClose, onImport }) => {
     const pollJob = setInterval(async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/import/pdf-preview/${previewJobId}`
+          `${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/import/pdf-preview/${previewJobId}`
         );
         
         if (response.ok) {
@@ -70,7 +70,7 @@ const PdfItemSelector = ({ previewJobId, roomName, onClose, onImport }) => {
       });
 
       // Build URL with array parameters
-      const url = `${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/import/pdf-selected?preview_job_id=${previewJobId}&${selectedIndices.map(i => `selected_item_indices=${i}`).join('&')}`;
+      const url = `${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/import/pdf-selected?preview_job_id=${previewJobId}&${selectedIndices.map(i => `selected_item_indices=${i}`).join('&')}`;
 
       const response = await fetch(url, {
         method: 'POST'

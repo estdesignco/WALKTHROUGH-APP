@@ -6,7 +6,7 @@ import ChecklistDashboard from './ChecklistDashboard';
 import FFEDashboard from './FFEDashboard';
 console.log('✅ FFEDashboard imported successfully:', FFEDashboard);
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
 
 // API functions
 const Project = {

@@ -57,7 +57,7 @@ const ExactFFESpreadsheet = ({
     console.log('💾 Saving scroll position:', scrollY);
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -119,7 +119,7 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
@@ -242,7 +242,7 @@ const ExactFFESpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -288,7 +288,7 @@ const ExactFFESpreadsheet = ({
     try {
       console.log('🔍 FFE: Scraping product from:', productLink);
       
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -362,7 +362,7 @@ const ExactFFESpreadsheet = ({
         return;
       }
 
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       const newItem = {
         ...itemData,
@@ -410,7 +410,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
@@ -436,7 +436,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'DELETE'
       });
@@ -478,7 +478,7 @@ const ExactFFESpreadsheet = ({
       console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
       
       // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
+      const tempRoomResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -505,7 +505,7 @@ const ExactFFESpreadsheet = ({
             id: undefined // Let backend generate new ID
           };
           
-          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
+          const addResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(categoryData)
@@ -515,7 +515,7 @@ const ExactFFESpreadsheet = ({
             console.log('✅ Comprehensive category added successfully');
             
             // Delete the temp room
-            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
+            await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
@@ -527,7 +527,7 @@ const ExactFFESpreadsheet = ({
         }
         
         // Clean up temp room regardless
-        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
+        await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${tempRoom.id}`, {
           method: 'DELETE'
         });
       } else {
@@ -569,7 +569,7 @@ const ExactFFESpreadsheet = ({
 
         // Update backend silently
         Promise.all(newRooms.map((room, i) => 
-          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${room.id}`, {
+          fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${room.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
@@ -597,7 +597,7 @@ const ExactFFESpreadsheet = ({
 
         // Update backend silently
         Promise.all(newCategories.map((category, i) => 
-          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${category.id}`, {
+          fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/${category.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
@@ -643,7 +643,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {
@@ -1269,7 +1269,7 @@ const ExactFFESpreadsheet = ({
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
                                                                   onChange={async (e) => {
                                                                     try {
-                                                                      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                                      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                                                       const response = await fetch(`${backendUrl}/api/items/${item.id}`, {
                                                                         method: 'PUT',
                                                                         headers: { 'Content-Type': 'application/json' },
@@ -1308,7 +1308,7 @@ const ExactFFESpreadsheet = ({
                                                                   placeholder="Stock Qty"
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs text-center p-0"
                                                                   onBlur={async (e) => {
-                                                                    const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                                    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                                                     await fetch(`${backendUrl}/api/items/${item.id}`, {
                                                                       method: 'PUT',
                                                                       headers: { 'Content-Type': 'application/json' },
@@ -1330,7 +1330,7 @@ const ExactFFESpreadsheet = ({
                                                                   defaultValue={item.restock_date || ''}
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
                                                                   onBlur={async (e) => {
-                                                                    const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                                    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                                                     await fetch(`${backendUrl}/api/items/${item.id}`, {
                                                                       method: 'PUT',
                                                                       headers: { 'Content-Type': 'application/json' },
@@ -1347,7 +1347,7 @@ const ExactFFESpreadsheet = ({
                                                                   placeholder="Lead (wks)"
                                                                   className="w-full h-full bg-transparent border-none text-[#D4A574] text-xs text-center p-0"
                                                                   onBlur={async (e) => {
-                                                                    const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                                    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                                                     await fetch(`${backendUrl}/api/items/${item.id}`, {
                                                                       method: 'PUT',
                                                                       headers: { 'Content-Type': 'application/json' },

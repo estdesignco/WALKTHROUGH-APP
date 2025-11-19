@@ -33,7 +33,7 @@ const CanvaBoardImporter = ({ isOpen, onClose, onImportComplete, projectId, room
     setImportResults(null);
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       console.log('🎨 STARTING MULTI-ROOM CANVA IMPORT:', canvaUrl);
       console.log('🏠 Room-Page Mappings:', validMappings);

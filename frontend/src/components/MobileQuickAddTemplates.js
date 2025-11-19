@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { getTemplatesByRoom, ITEM_TEMPLATES } from '../utils/itemTemplates';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 export default function MobileQuickAddTemplates({ 
   onClose, 

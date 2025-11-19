@@ -9,7 +9,7 @@ import MobileQuickAddTemplates from './MobileQuickAddTemplates';
 import SimplePhotoCapture from './SimplePhotoCapture';
 import { exportProjectToCSV, exportProjectSummary, calculateProjectStats } from '../utils/exportUtils';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 export default function MobileWalkthroughSpreadsheet({ projectId }) {
   const [project, setProject] = useState(null);
@@ -625,7 +625,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                                     
                                     // DIRECT API CALL - Save to backend immediately
                                     try {
-                                      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                       const response = await fetch(`${BACKEND_URL}/api/items/${item.id}`, {
                                         method: 'PUT',
                                         headers: { 'Content-Type': 'application/json' },

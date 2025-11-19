@@ -118,7 +118,7 @@ const QuestionnaireSheet = () => {
 
   const loadProject = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}`);
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/projects/${projectId}`);
       if (response.ok) {
         const projectData = await response.json();
         setProject(projectData);
@@ -131,7 +131,7 @@ const QuestionnaireSheet = () => {
   const loadExistingAnswers = async () => {
     try {
       // Load any existing questionnaire answers
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/questionnaire/${projectId}`);
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/questionnaire/${projectId}`);
       if (response.ok) {
         const existingAnswers = await response.json();
         setAnswers(existingAnswers.answers || {});
@@ -167,7 +167,7 @@ const QuestionnaireSheet = () => {
 
   const saveAnswers = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/questionnaire/${projectId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/questionnaire/${projectId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

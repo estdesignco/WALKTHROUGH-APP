@@ -15,7 +15,7 @@ const ExportsDashboard = ({ projectId }) => {
 
   const loadProjectData = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       const response = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=ffe`);
       if (response.ok) {
         setProject(await response.json());
@@ -29,7 +29,7 @@ const ExportsDashboard = ({ projectId }) => {
 
   const generateElectricianSheet = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       const response = await fetch(`${BACKEND_URL}/api/exports/${projectId}/electrician-sheet`, {
         method: 'POST'
       });
@@ -48,7 +48,7 @@ const ExportsDashboard = ({ projectId }) => {
 
   const generateLoadInSheets = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       const response = await fetch(`${BACKEND_URL}/api/exports/${projectId}/load-in-sheets`, {
         method: 'POST'
       });
@@ -67,7 +67,7 @@ const ExportsDashboard = ({ projectId }) => {
 
   const generateMoversFFE = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       const response = await fetch(`${BACKEND_URL}/api/exports/${projectId}/movers-ffe`, {
         method: 'POST'
       });
@@ -86,7 +86,7 @@ const ExportsDashboard = ({ projectId }) => {
 
   const syncToGoogleCalendar = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${BACKEND_URL}/api/calendar/google/sync/${projectId}`, {
         method: 'POST'
       });
@@ -100,7 +100,7 @@ const ExportsDashboard = ({ projectId }) => {
 
   const syncToTeamsCalendar = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${BACKEND_URL}/api/calendar/teams/sync/${projectId}`, {
         method: 'POST'
       });
@@ -119,7 +119,7 @@ const ExportsDashboard = ({ projectId }) => {
     }
     
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       const response = await fetch(`${BACKEND_URL}/api/imports/google-sheets/${projectId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

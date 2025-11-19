@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { leicaManager } from '../utils/leicaD5Manager';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 export default function MobilePhotoCapture({ projectId, roomId, onPhotoAdded, onClose }) {
   const [capturedPhoto, setCapturedPhoto] = useState(null);

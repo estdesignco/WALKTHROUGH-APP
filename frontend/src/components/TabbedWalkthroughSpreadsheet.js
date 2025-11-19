@@ -8,7 +8,7 @@ import { getRoomColor, getCategoryColor, ROOM_COLORS } from '../utils/roomColors
 import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 import StatusOverview from './StatusOverview';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 const getStockStatusColor = (stockStatus) => {
   const stockColors = {
@@ -1051,7 +1051,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                                     
                                     // DIRECT BACKEND SAVE
                                     try {
-                                      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                       await fetch(`${BACKEND_URL}/api/items/${item.id}`, {
                                         method: 'PUT',
                                         headers: { 'Content-Type': 'application/json' },

@@ -23,7 +23,7 @@ const ProfessionalFFESpreadsheet = ({
   useEffect(() => {
     const loadEnhancedData = async () => {
       try {
-        const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+        const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
         
         // Load enhanced item statuses
         const statusRes = await fetch(`${backendUrl}/api/item-statuses-enhanced`);
@@ -54,7 +54,7 @@ const ProfessionalFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       const newItem = {
         ...itemData,

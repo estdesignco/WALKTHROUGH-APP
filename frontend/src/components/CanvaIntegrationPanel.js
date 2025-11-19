@@ -4,7 +4,7 @@ const CanvaIntegrationPanel = ({ projectId, onSync }) => {
   const [canvaStatus, setCanvaStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+  const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
 
   useEffect(() => {
     checkCanvaStatus();

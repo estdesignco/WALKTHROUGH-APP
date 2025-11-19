@@ -7,7 +7,7 @@ import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 import { getStatusColor } from '../utils/statusColors';
 import StatusOverview from './StatusOverview';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 export default function TabbedFFESpreadsheet({ projectId }) {
   const [project, setProject] = useState(null);

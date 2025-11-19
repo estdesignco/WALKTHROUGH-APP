@@ -36,7 +36,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
       
       const loadProjectData = async () => {
         try {
-          const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+          const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
           console.log('🌐 Using backend URL:', backendUrl);
           
           const response = await fetch(`${backendUrl}/api/projects/${projectId}?sheet_type=walkthrough`, {
@@ -79,7 +79,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
     try {
       console.log('🚀 Loading project data for:', projectId);
       
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=walkthrough`);
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/projects/${projectId}?sheet_type=walkthrough`);
       
       if (response.ok) {
         const projectData = await response.json();

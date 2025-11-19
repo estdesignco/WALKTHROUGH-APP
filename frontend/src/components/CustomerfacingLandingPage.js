@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Loader2, Home, Trash2, Mail, Send, FileSpreadsheet } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
 
 // API functions
 const Project = {

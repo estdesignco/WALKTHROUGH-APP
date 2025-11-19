@@ -22,7 +22,7 @@ const AdvancedFeaturesDashboard = () => {
       
       setLoading(true);
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/shipping/track/${trackingNumber}`);
+        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/shipping/track/${trackingNumber}`);
         const result = await response.json();
         setTrackingResult(result);
       } catch (error) {
@@ -121,7 +121,7 @@ const AdvancedFeaturesDashboard = () => {
       
       setLoading(true);
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/canva/extract-board`, {
+        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/canva/extract-board`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ canva_url: canvaUrl })

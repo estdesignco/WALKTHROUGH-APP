@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
 
 export default function DollhouseDocument({ moodboardId, sharedData, updateSharedData, paintCatalog }) {
     const [photo, setPhoto] = useState(null);

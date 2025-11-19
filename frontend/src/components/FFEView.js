@@ -42,7 +42,7 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 FFE status change request:', { itemId, newStatus });
     
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       console.log('🌐 Using backend URL:', backendUrl);
       
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
@@ -77,7 +77,7 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
@@ -176,7 +176,7 @@ const ExactFFESpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -239,7 +239,7 @@ const ExactFFESpreadsheet = ({
         return;
       }
 
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       const newItem = {
         ...itemData,
@@ -287,7 +287,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
@@ -314,7 +314,7 @@ const ExactFFESpreadsheet = ({
 
     try {
       console.log('🗑️ FFE DELETING ITEM:', itemId);
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       console.log('🌐 Using backend URL:', backendUrl);
 
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
@@ -360,7 +360,7 @@ const ExactFFESpreadsheet = ({
       console.log(`🚀 FFE ADD CATEGORY: Creating comprehensive '${categoryName}' with ALL subcategories and items`);
       
       // Use the new comprehensive endpoint that auto-populates with ALL items and subcategories
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -397,7 +397,7 @@ const ExactFFESpreadsheet = ({
       
       // Update backend room order
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/reorder`, {
+        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -423,7 +423,7 @@ const ExactFFESpreadsheet = ({
       // Update backend category order  
       try {
         const roomId = source.droppableId.replace('categories-', '');
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/reorder`, {
+        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -464,7 +464,7 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Item field change request:', { itemId, field, value });
     
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       console.log('🌐 Using backend URL:', backendUrl);
       
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
@@ -503,7 +503,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {

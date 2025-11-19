@@ -13,7 +13,7 @@ const FinanceDashboard = ({ projectId }) => {
 
   const loadProjectFinancials = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       const response = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=ffe`);
       if (response.ok) {
         const data = await response.json();

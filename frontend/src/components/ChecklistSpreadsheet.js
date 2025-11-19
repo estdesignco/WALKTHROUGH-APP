@@ -40,7 +40,7 @@ const ChecklistSpreadsheet = ({
         order_index: 0
       };
 
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItem)
@@ -64,7 +64,7 @@ const ChecklistSpreadsheet = ({
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
         method: 'DELETE'
       });
 
@@ -83,7 +83,7 @@ const ChecklistSpreadsheet = ({
     if (!window.confirm('Are you sure you want to delete this room?')) return;
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${roomId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
 
@@ -103,7 +103,7 @@ const ChecklistSpreadsheet = ({
       console.log(`🚀 ADD CATEGORY: Creating comprehensive '${categoryName}' with ALL subcategories and items`);
       
       // Use the new comprehensive endpoint that auto-populates with ALL items and subcategories
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -128,7 +128,7 @@ const ChecklistSpreadsheet = ({
 
   const handleStatusChange = async (itemId, newStatus) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -199,7 +199,7 @@ const ChecklistSpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/available`);
+        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
           setAvailableCategories(data.categories || []);

@@ -9,7 +9,7 @@ import {
   getPendingSyncItems
 } from '../utils/offlineStorage';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 export const useOfflineSync = (projectId) => {
   const [online, setOnline] = useState(navigator.onLine);

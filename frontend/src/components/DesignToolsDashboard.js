@@ -36,7 +36,7 @@ const DesignToolsDashboard = ({ projectId }) => {
 
   const loadDesignData = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       const response = await fetch(`${BACKEND_URL}/api/design-data/${projectId}`);
       if (response.ok) {
@@ -129,7 +129,7 @@ const DesignToolsDashboard = ({ projectId }) => {
 
   const loadBeforePhotos = async (projectData) => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       const beforePhotos = [];
       
       for (const room of projectData.rooms || []) {
@@ -165,7 +165,7 @@ const DesignToolsDashboard = ({ projectId }) => {
 
   const handleAddColor = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${BACKEND_URL}/api/design-data/${projectId}/colors`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -183,7 +183,7 @@ const DesignToolsDashboard = ({ projectId }) => {
 
   const handleAddMaterial = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       const materialData = {
         ...newMaterial,
@@ -211,7 +211,7 @@ const DesignToolsDashboard = ({ projectId }) => {
       const base64 = reader.result;
       
       try {
-        const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+        const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
         await fetch(`${BACKEND_URL}/api/design-data/${projectId}/images`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -231,7 +231,7 @@ const DesignToolsDashboard = ({ projectId }) => {
     if (!window.confirm('Delete this color?')) return;
     
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${BACKEND_URL}/api/design-data/${projectId}/colors/${colorId}`, {
         method: 'DELETE'
       });
@@ -245,7 +245,7 @@ const DesignToolsDashboard = ({ projectId }) => {
     if (!window.confirm('Delete this material?')) return;
     
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${BACKEND_URL}/api/design-data/${projectId}/materials/${materialId}`, {
         method: 'DELETE'
       });
@@ -257,7 +257,7 @@ const DesignToolsDashboard = ({ projectId }) => {
 
   const saveWholeHomeData = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${BACKEND_URL}/api/design-data/${projectId}/whole-home`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -731,7 +731,7 @@ const DesignToolsDashboard = ({ projectId }) => {
                 <button
                   onClick={async () => {
                     if (window.confirm('Delete this image?')) {
-                      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+                      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
                       await fetch(`${BACKEND_URL}/api/design-data/${projectId}/images/${img.id}`, { method: 'DELETE' });
                       loadDesignData();
                     }
@@ -800,7 +800,7 @@ const DesignToolsDashboard = ({ projectId }) => {
                         <button
                           onClick={async () => {
                             if (window.confirm('Delete?')) {
-                              const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+                              const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
                               await fetch(`${BACKEND_URL}/api/design-data/${projectId}/images/${photo.id}`, { method: 'DELETE' });
                               loadDesignData();
                             }
@@ -826,7 +826,7 @@ const DesignToolsDashboard = ({ projectId }) => {
                         <button
                           onClick={async () => {
                             if (window.confirm('Delete?')) {
-                              const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+                              const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
                               await fetch(`${BACKEND_URL}/api/design-data/${projectId}/images/${photo.id}`, { method: 'DELETE' });
                               loadDesignData();
                             }
@@ -1092,7 +1092,7 @@ const DesignToolsDashboard = ({ projectId }) => {
             <div className="flex gap-4 mt-6">
               <button
                 onClick={async () => {
-                  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+                  const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
                   await fetch(`${BACKEND_URL}/api/design-data/${projectId}/pinterest`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

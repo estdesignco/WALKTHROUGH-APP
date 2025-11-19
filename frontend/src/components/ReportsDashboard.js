@@ -28,7 +28,7 @@ const ReportsDashboard = ({ projectId }) => {
 
   const loadReportData = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       // Load current project
       const projectResponse = await fetch(`${BACKEND_URL}/api/projects/${projectId}?sheet_type=ffe`);
@@ -111,7 +111,7 @@ const ReportsDashboard = ({ projectId }) => {
 
   const handleAddTimeEntry = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${BACKEND_URL}/api/time-entries`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

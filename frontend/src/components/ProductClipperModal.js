@@ -38,7 +38,7 @@ const ProductClipperModal = ({ isOpen, onClose, scrapedData = {}, projects = [],
 
   const loadProjectRooms = async (projectId) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects/${projectId}`);
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/projects/${projectId}`);
       if (response.ok) {
         const project = await response.json();
         setRooms(project.rooms || []);
@@ -65,7 +65,7 @@ const ProductClipperModal = ({ isOpen, onClose, scrapedData = {}, projects = [],
 
     setLoading(true);
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       // Calculate retail price if markup exists
       const retailPrice = formData.markup ? parseFloat(formData.cost) * (1 + parseFloat(formData.markup) / 100) : parseFloat(formData.cost);

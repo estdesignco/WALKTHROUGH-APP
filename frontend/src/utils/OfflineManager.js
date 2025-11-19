@@ -77,26 +77,26 @@ class OfflineManager {
 
     switch (type) {
       case 'CREATE_INSTALLED':
-        return fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items`, {
+        return fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/items`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
 
       case 'UPDATE_INSTALLED':
-        return fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items/${data.id}`, {
+        return fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/items/${data.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
 
       case 'DELETE_INSTALLED':
-        return fetch(`${process.env.REACT_APP_BACKEND_URL}/api/items/${data.id}`, {
+        return fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/items/${data.id}`, {
           method: 'DELETE'
         });
 
       case 'CREATE_ROOM':
-        return fetch(`${process.env.REACT_APP_BACKEND_URL}/api/rooms`, {
+        return fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/rooms`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)

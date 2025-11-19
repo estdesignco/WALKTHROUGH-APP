@@ -23,7 +23,7 @@ const UnifiedFurnitureSearch = () => {
     { id: '2', vendor_name: 'Hudson Valley Lighting', username: 'demo_user' }
   ]);
 
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+  const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
 
   useEffect(() => {
     loadProducts();

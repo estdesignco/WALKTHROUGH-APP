@@ -14,7 +14,7 @@ const WorkflowDashboard = () => {
     automation_rate: 0
   });
 
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+  const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
 
   useEffect(() => {
     loadDashboardData();

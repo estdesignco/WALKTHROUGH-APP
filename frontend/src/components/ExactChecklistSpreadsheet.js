@@ -80,7 +80,7 @@ const ExactChecklistSpreadsheet = ({
 
         // Update backend silently
         Promise.all(newRooms.map((room, i) => 
-          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${room.id}`, {
+          fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${room.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
@@ -108,7 +108,7 @@ const ExactChecklistSpreadsheet = ({
 
         // Update backend silently
         Promise.all(newCategories.map((category, i) => 
-          fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${category.id}`, {
+          fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/${category.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
@@ -132,7 +132,7 @@ const ExactChecklistSpreadsheet = ({
 
         // Update order_index for all affected subcategories
         for (let i = 0; i < newSubcategories.length; i++) {
-          await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/subcategories/${newSubcategories[i].id}`, {
+          await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/subcategories/${newSubcategories[i].id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
@@ -226,7 +226,7 @@ const ExactChecklistSpreadsheet = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -303,7 +303,7 @@ const ExactChecklistSpreadsheet = ({
     console.log('💾 Saving scroll position:', scrollY);
     
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       console.log('🌐 Using backend URL:', backendUrl);
       
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
@@ -374,7 +374,7 @@ const ExactChecklistSpreadsheet = ({
     try {
       console.log('🔍 Scraping product from:', productLink);
       
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -446,7 +446,7 @@ const ExactChecklistSpreadsheet = ({
         return;
       }
 
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       const newItem = {
         ...itemData,
@@ -493,7 +493,7 @@ const ExactChecklistSpreadsheet = ({
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
         method: 'DELETE'
       });
 
@@ -523,7 +523,7 @@ const ExactChecklistSpreadsheet = ({
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${categoryId}`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/${categoryId}`, {
         method: 'DELETE'
       });
 
@@ -546,7 +546,7 @@ const ExactChecklistSpreadsheet = ({
   // Handle deleting a subcategory and all its items
   const handleDeleteSubcategory = async (subcategoryId) => {
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       // First delete all items in the subcategory
       const subcategoryItems = project.rooms.flatMap(room => 
@@ -591,7 +591,7 @@ const ExactChecklistSpreadsheet = ({
       console.log('🔄 Creating comprehensive checklist category:', categoryName, 'for room:', roomId);
       
       // Use comprehensive endpoint directly
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/categories/comprehensive?room_id=${roomId}&category_name=${encodeURIComponent(categoryName)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
@@ -653,7 +653,7 @@ const ExactChecklistSpreadsheet = ({
             order_index: 0
           };
           
-          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items`, {
+          const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(itemData)
@@ -699,7 +699,7 @@ const ExactChecklistSpreadsheet = ({
       formData.append('room_name', roomName);
       formData.append('project_id', project.id);
       
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/upload-canva-pdf`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/upload-canva-pdf`, {
         method: 'POST',
         body: formData
       });
@@ -731,7 +731,7 @@ const ExactChecklistSpreadsheet = ({
     try {
       console.log('🎨 Scraping Canva PDF for room:', roomName, 'URL:', canvaUrl);
       
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/scrape-canva-pdf`, {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/scrape-canva-pdf`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -798,7 +798,7 @@ const ExactChecklistSpreadsheet = ({
       }
 
       // Step 2: Transfer ALL written items to FFE (create minimal structure as needed)
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const projectId = filteredProject.id;
       
       let successCount = 0;
@@ -1259,7 +1259,7 @@ const ExactChecklistSpreadsheet = ({
                             const formData = new FormData();
                             formData.append('file', file);
                             
-                            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/import/pdf-links?project_id=${project.id}&room_id=${room.id}`, {
+                            const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/import/pdf-links?project_id=${project.id}&room_id=${room.id}`, {
                               method: 'POST',
                               body: formData
                             });
@@ -1306,7 +1306,7 @@ const ExactChecklistSpreadsheet = ({
                               // Poll for progress
                               const pollProgress = setInterval(async () => {
                                 try {
-                                  const progressRes = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/import/pdf-job/${result.job_id}`);
+                                  const progressRes = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/import/pdf-job/${result.job_id}`);
                                   if (progressRes.ok) {
                                     const job = await progressRes.json();
                                     const progress = job.total_links > 0 ? (job.imported_items / job.total_links * 100).toFixed(0) : 0;
@@ -1374,7 +1374,7 @@ const ExactChecklistSpreadsheet = ({
                         }
                         
                         try {
-                          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/canva/upload-room-images?project_id=${project.id}&room_id=${room.id}`, {
+                          const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/canva/upload-room-images?project_id=${project.id}&room_id=${room.id}`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' }
                           });
@@ -1421,7 +1421,7 @@ const ExactChecklistSpreadsheet = ({
                             // Poll for progress
                             const pollProgress = setInterval(async () => {
                               try {
-                                const progressRes = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/canva/upload-job/${result.job_id}`);
+                                const progressRes = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/canva/upload-job/${result.job_id}`);
                                 if (progressRes.ok) {
                                   const job = await progressRes.json();
                                   const progress = job.total_images > 0 ? (job.uploaded_images / job.total_images * 100).toFixed(0) : 0;
@@ -1686,7 +1686,7 @@ const ExactChecklistSpreadsheet = ({
                                               
                                               // Update backend
                                               try {
-                                                const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+                                                const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                                 await fetch(`${backendUrl}/api/items/${item.id}`, {
                                                   method: 'PUT',
                                                   headers: { 'Content-Type': 'application/json' },

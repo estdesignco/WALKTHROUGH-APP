@@ -5,7 +5,7 @@ import TabbedWalkthroughSpreadsheet from './TabbedWalkthroughSpreadsheet';
 import MobilePhotoManagement from './MobilePhotoManagement';
 import MeasurementsAndFilesPage from './MeasurementsAndFilesPage';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 // ===== HOME SCREEN =====
 function MobileHomeScreen({ onNavigate }) {

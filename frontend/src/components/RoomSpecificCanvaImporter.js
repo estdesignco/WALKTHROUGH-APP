@@ -26,7 +26,7 @@ const RoomSpecificCanvaImporter = ({ isOpen, onClose, onImportComplete, projectI
     setImportResults(null);
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       console.log(`🪑 MANUAL IMPORT - Room: ${roomName}, Items: ${validItems.length}`);
       
@@ -93,7 +93,7 @@ const RoomSpecificCanvaImporter = ({ isOpen, onClose, onImportComplete, projectI
     setImportResults(null);
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
       console.log(`🎨 IMPORTING FROM CANVA - Room: ${roomName}, Page: ${pageNumber}`);
       

@@ -9,7 +9,7 @@ import MobileQuickAddTemplates from './MobileQuickAddTemplates';
 import MobilePhotoManagement from './MobilePhotoManagement';
 import { exportProjectToCSV, exportProjectSummary, calculateProjectStats } from '../utils/exportUtils';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 export default function MobileFFESpreadsheet({ projectId }) {
   const [project, setProject] = useState(null);

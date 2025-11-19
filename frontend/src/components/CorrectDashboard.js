@@ -4,7 +4,7 @@ const CorrectDashboard = () => {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailData, setEmailData] = useState({ email: '', name: '' });
 
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
 
   const handleSendEmail = async () => {
     try {

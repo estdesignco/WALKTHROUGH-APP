@@ -23,7 +23,7 @@ const ActualFFESpreadsheet = ({
   useEffect(() => {
     const loadEnhancedData = async () => {
       try {
-        const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+        const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
         
         const statusRes = await fetch(`${backendUrl}/api/item-statuses-enhanced`);
         if (statusRes.ok) {
@@ -52,7 +52,7 @@ const ActualFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       const newItem = {
         ...itemData,
@@ -88,7 +88,7 @@ const ActualFFESpreadsheet = ({
   // Populate rooms with default items when expanded (as per user request)
   const populateRoomWithDefaults = async (roomId) => {
     try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       // Call backend to get default room structure
       const response = await fetch(`${backendUrl}/api/room-defaults/${roomId}`);

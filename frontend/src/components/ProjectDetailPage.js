@@ -21,7 +21,7 @@ import PowerFeaturesDashboard from './PowerFeaturesDashboard';
 
 import EditableQuestionnaireView from './EditableQuestionnaireView';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
 
 // API functions
 const Project = {

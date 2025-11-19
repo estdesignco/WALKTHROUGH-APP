@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const CanvaSyncButton = ({ projectId, roomId, roomName, items, onSuccess }) => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+  const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
 
   const uploadToCanva = async () => {
     setUploading(true);

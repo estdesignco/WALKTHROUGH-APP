@@ -21,7 +21,7 @@ const AutomationDashboard = ({ projectId }) => {
 
   const loadAutomationData = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       const response = await fetch(`${BACKEND_URL}/api/automation/${projectId}`);
       if (response.ok) {
@@ -42,7 +42,7 @@ const AutomationDashboard = ({ projectId }) => {
 
   const handleAddRule = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${BACKEND_URL}/api/automation/${projectId}/rules`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -68,7 +68,7 @@ const AutomationDashboard = ({ projectId }) => {
 
   const handleToggleRule = async (ruleId, enabled) => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${BACKEND_URL}/api/automation/${projectId}/rules/${ruleId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -84,7 +84,7 @@ const AutomationDashboard = ({ projectId }) => {
     if (!window.confirm('Delete this automation rule?')) return;
     
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${BACKEND_URL}/api/automation/${projectId}/rules/${ruleId}`, {
         method: 'DELETE'
       });

@@ -6,7 +6,7 @@ const QuickAddProduct = ({ projectId, onSuccess }) => {
   const [selectedRoom, setSelectedRoom] = useState('');
   const [rooms, setRooms] = useState([]);
   const [projectLoaded, setProjectLoaded] = useState(false);
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
 
   const loadRooms = async () => {
     if (!projectId) {

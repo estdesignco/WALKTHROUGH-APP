@@ -21,7 +21,7 @@ const SimpleSpreadsheet = ({
     }
 
     try {
-      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = import.meta.env?.REACT_APP_BACKEND_URL || (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       const newItem = {
         ...itemData,
