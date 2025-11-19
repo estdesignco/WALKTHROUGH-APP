@@ -46,6 +46,10 @@ from canva_integration import canva_integration
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Set Playwright browser path
 os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/pw-browsers'
 
