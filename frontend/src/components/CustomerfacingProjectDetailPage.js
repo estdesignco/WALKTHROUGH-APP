@@ -365,9 +365,9 @@ export default function ProjectPage() {
                     <h3 className="text-xl font-bold text-[#8B7355] mb-4">GETTING TO KNOW YOU BETTER</h3>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Tell us about your family</label>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Tell us about your household</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {answers.know_you_family || 'Not provided'}
+                                {answers.know_you_household || 'Not provided'}
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -380,7 +380,7 @@ export default function ProjectPage() {
                             <div>
                                 <label className="block text-sm font-medium text-stone-300 mb-2">How do you entertain?</label>
                                 <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {answers.know_you_entertaining || 'Not provided'}
+                                    {answers.know_you_entertaining_style || 'Not provided'}
                                 </div>
                             </div>
                         </div>
