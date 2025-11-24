@@ -299,10 +299,7 @@ export default function ProjectPage() {
                 <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
                     <h3 className="text-xl font-bold text-[#8B7355] mb-4">DESIGN QUESTIONS</h3>
                     <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Style in 3 Words</label>
-                                <div>
+                        <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">What do you LOVE about your home?</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
                                 {answers.design_love_home || 'Not provided'}
@@ -316,7 +313,7 @@ export default function ProjectPage() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Common Color Palette</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
                                 {answers.design_common_color_palette || 'Not provided'}
                             </div>
                         </div>
@@ -326,8 +323,8 @@ export default function ProjectPage() {
                                 {answers.design_disliked_colors || 'Not provided'}
                             </div>
                         </div>
-                            <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Palette</label>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Palette</label>
                                 <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
                                     {Array.isArray(project.design_preferred_palette) ? project.design_preferred_palette.join(', ') : project.design_preferred_palette || 'Not specified'}
                                 </div>
