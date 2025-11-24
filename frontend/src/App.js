@@ -183,6 +183,10 @@ const App = () => {
             element={<CustomerfacingQuestionnaire />}
           />
           <Route 
+            path="/test-questionnaire" 
+            element={<QuestionnaireTestPage />}
+          />
+          <Route 
             path="/customer" 
             element={<CustomerLandingPage />}
           />
