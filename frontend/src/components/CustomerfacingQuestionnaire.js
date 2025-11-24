@@ -112,12 +112,17 @@ const InputField = ({ label, id, value, onChange, required = false, type = "text
         <Label htmlFor={id} className="text-lg font-light text-[#B49B7E] tracking-wide">
             {label} {required && <span className="text-[#B49B7E]/80">*</span>}
         </Label>
-        <Input
+        <input
             id={id}
-            className={inputStyles}
+            className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-stone-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B7355] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             type={type}
             value={value}
             onChange={onChange}
+            placeholder={placeholder}
+            required={required}
+        />
+    </div>
+);
             placeholder={placeholder}
         />
     </div>
