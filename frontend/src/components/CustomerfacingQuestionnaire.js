@@ -704,7 +704,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
 
                         <FieldWrapper label="Add a Custom Room">
                             <div className="flex items-center gap-2">
-                                <Input
+                                <input
                                     className={inputStyles}
                                     value={newRoomName}
                                     onChange={(e) => setNewRoomName(e.target.value)}
