@@ -1009,36 +1009,36 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     {/* Section 7: Design Questions */}
                     <Section title="DESIGN QUESTIONS">
                         <FieldWrapper label="What do you love about your current home?">
-                            <textarea className={inputStyles} value={formData.design_love_home || ''} onChange={(e) => handleFormChange('design_love_home', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_love_home || ''} onChange={(e) => handleFormChange('design_love_home', e.target.value)}></textarea>
                         </FieldWrapper>
                         <InputField label="How will the spaces be used? (e.g., formal dining, casual living, etc.)" id="design_space_use" value={formData.design_space_use || ''} onChange={(e) => handleFormChange('design_space_use', e.target.value)} />
                         <InputField label="What are their current uses?" id="design_current_use" value={formData.design_current_use || ''} onChange={(e) => handleFormChange('design_current_use', e.target.value)} />
                         <FieldWrapper label="What is the first impression you want guests to have when they enter your home?">
-                            <textarea className={inputStyles} value={formData.design_first_impression || ''} onChange={(e) => handleFormChange('design_first_impression', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_first_impression || ''} onChange={(e) => handleFormChange('design_first_impression', e.target.value)}></textarea>
                         </FieldWrapper>
                         <FieldWrapper label="Is there a common color palette in your home that you love?">
-                            <textarea className={inputStyles} value={formData.design_common_color_palette || ''} onChange={(e) => handleFormChange('design_common_color_palette', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_common_color_palette || ''} onChange={(e) => handleFormChange('design_common_color_palette', e.target.value)}></textarea>
                         </FieldWrapper>
                         <FieldWrapper label="What color palette do you prefer?">
                             <CheckboxGroup options={colorPrefOptions} value={formData.design_preferred_palette} onChange={(v) => handleFormChange('design_preferred_palette', v)} />
                         </FieldWrapper>
                         <FieldWrapper label="Are there any colors do you dislike?">
-                            <textarea className={inputStyles} value={formData.design_disliked_colors || ''} onChange={(e) => handleFormChange('design_disliked_colors', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_disliked_colors || ''} onChange={(e) => handleFormChange('design_disliked_colors', e.target.value)}></textarea>
                         </FieldWrapper>
                         <FieldWrapper label="Which interior design styles do you prefer? (Select all that apply)">
                             <CheckboxGroup options={stylePrefOptions} value={formData.design_styles_preference} onChange={(v) => handleFormChange('design_styles_preference', v)} />
                         </FieldWrapper>
                         <FieldWrapper label="What do you like about these styles?">
-                            <textarea className={inputStyles} value={formData.design_styles_love || ''} onChange={(e) => handleFormChange('design_styles_love', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_styles_love || ''} onChange={(e) => handleFormChange('design_styles_love', e.target.value)}></textarea>
                         </FieldWrapper>
                         <FieldWrapper label="What are your preferences for artwork?">
                             <CheckboxGroup options={artworkPrefOptions} value={formData.design_artwork_preference} onChange={(v) => handleFormChange('design_artwork_preference', v)} />
                         </FieldWrapper>
                         <FieldWrapper label="Is there a piece of art, furniture, or a souvenir that holds significant personal meaning to you? Tell us the story behind it.">
-                            <textarea className={inputStyles} value={formData.design_meaningful_item || ''} onChange={(e) => handleFormChange('design_meaningful_item', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_meaningful_item || ''} onChange={(e) => handleFormChange('design_meaningful_item', e.target.value)}></textarea>
                         </FieldWrapper>
                         <FieldWrapper label="Are there any existing furniture pieces or decor items you'd like to keep in the space? If so, please let us know the measurements and attach a photo below for reference.">
-                            <textarea className={inputStyles} value={formData.design_existing_furniture || ''} onChange={(e) => handleFormChange('design_existing_furniture', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_existing_furniture || ''} onChange={(e) => handleFormChange('design_existing_furniture', e.target.value)}></textarea>
                         </FieldWrapper>
                         <FieldWrapper label="Please upload any photos of the existing spaces you'd like us to see.">
                             <div className="p-4 border-2 border-dashed border-stone-400 rounded-lg text-center">
