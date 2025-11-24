@@ -306,6 +306,18 @@ export default function ProjectPage() {
                             </div>
                         </div>
                         <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">How will the spaces be used?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {answers.design_space_use || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">What are their current uses?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {answers.design_current_use || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">First Impression</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
                                 {answers.design_first_impression || 'Not provided'}
@@ -318,17 +330,29 @@ export default function ProjectPage() {
                             </div>
                         </div>
                         <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Color Palette</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {Array.isArray(answers.design_preferred_palette) ? answers.design_preferred_palette.join(', ') : answers.design_preferred_palette || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Disliked Colors</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
                                 {answers.design_disliked_colors || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Palette</label>
-                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {Array.isArray(project.design_preferred_palette) ? project.design_preferred_palette.join(', ') : project.design_preferred_palette || 'Not specified'}
-                                </div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">What do you like about these styles?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.design_styles_love || 'Not provided'}
                             </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Design Styles Preference</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {Array.isArray(answers.design_styles_preference) ? answers.design_styles_preference.join(', ') : answers.design_styles_preference || 'Not provided'}
+                            </div>
+                        </div>
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Artwork Preference</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
@@ -336,20 +360,32 @@ export default function ProjectPage() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Liked Design Styles</label>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Meaningful Item Story</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {Array.isArray(answers.design_styles_preference) ? answers.design_styles_preference.join(', ') : project.design_styles_preference || 'Not provided'}
+                                {answers.design_meaningful_item || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Disliked Design Styles</label>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Existing Furniture to Keep</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {answers.design_styles_dislike || 'Not provided'}
+                                {answers.design_existing_furniture || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Materials to Avoid</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {answers.design_materials_to_avoid || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Special Requirements</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.design_special_requirements || 'Not provided'}
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Patterns & Textures Preference</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
                                 {Array.isArray(answers.finishes_patterns_preference) ? answers.finishes_patterns_preference.join(', ') : answers.finishes_patterns_preference || 'Not provided'}
                             </div>
                         </div>
@@ -366,32 +402,128 @@ export default function ProjectPage() {
                                 {answers.know_you_household || 'Not provided'}
                             </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Do you have pets?</label>
-                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {answers.know_you_pets || 'Not provided'}
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">How do you entertain?</label>
-                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {answers.know_you_entertaining_style || 'Not provided'}
-                                </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Do you have pets?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {answers.know_you_pets || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">What are your hobbies?</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[60px]">
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Typical weekday routine</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_weekday_routine || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Typical weekend routine</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_weekend_routine || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Lighting preferences</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_lighting_preference || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">How do you entertain?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_entertaining_style || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Where do you relax?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_relax_space || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Future plans</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_future_plans || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Social media</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {answers.know_you_social_media || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Hobbies</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
                                 {answers.know_you_hobbies || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">What is your lifestyle like?</label>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">What do you like to do for fun?</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {answers.know_you_lifestyle || 'Not provided'}
+                                {answers.know_you_fun || 'Not provided'}
                             </div>
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">What makes you HAPPY?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_happy || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Family Birthdays</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {answers.know_you_family_birthdays || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Anniversary</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {answers.know_you_anniversary || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">What does family do together?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_family_together || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Favorite Restaurant</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {answers.know_you_favorite_restaurant || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Favorite Vacation Spot</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_favorite_vacation || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Favorite Foods</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_favorite_foods || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">What should space evoke?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_evoke_space || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">How should home support social life?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_support_social_life || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Anything else to share?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.know_you_share_more || 'Not provided'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Any special requests or needs?</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
