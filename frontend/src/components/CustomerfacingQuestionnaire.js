@@ -1183,20 +1183,20 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     {/* Section 9: How did you hear about us */}
                     <Section title="HOW DID YOU HEAR ABOUT US">
                         <FieldWrapper label="How did you hear about us?">
-                            <Select value={formData.how_heard} onValueChange={(value) => handleFormChange('how_heard', value)}>
-                                <SelectTrigger className={inputStyles}>
-                                    <SelectValue placeholder="Select one..." />
-                                </SelectTrigger>
-                                <SelectContent className="bg-gray-800 text-[#F5F5DC] border-stone-700">
-                                    <SelectItem value="Internet Search">Internet Search</SelectItem>
-                                    <SelectItem value="Social Media">Social Media</SelectItem>
-                                    <SelectItem value="Friend Referral">Friend Referral</SelectItem>
-                                    <SelectItem value="Magazine">Magazine</SelectItem>
-                                    <SelectItem value="Google">Google</SelectItem>
-                                    <SelectItem value="Market Event">Market Event</SelectItem>
-                                    <SelectItem value="Other">Other</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <select
+                                value={formData.how_heard}
+                                onChange={(e) => handleFormChange('how_heard', e.target.value)}
+                                className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                            >
+                                <option value="">Select one...</option>
+                                <option value="Internet Search">Internet Search</option>
+                                <option value="Social Media">Social Media</option>
+                                <option value="Friend Referral">Friend Referral</option>
+                                <option value="Magazine">Magazine</option>
+                                <option value="Google">Google</option>
+                                <option value="Market Event">Market Event</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </FieldWrapper>
                         
                         {formData.how_heard === 'Other' && (
