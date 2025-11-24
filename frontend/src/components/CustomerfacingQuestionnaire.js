@@ -277,8 +277,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
 
 
     const handleFormChange = (field, value) => {
-        console.log(`🔄 Form field changed: ${field} =`, value);
-        console.log(`📝 Current formData before update:`, formData);
+        console.log(`🔄 ${field} changed to:`, value);
         
         // Auto-format phone numbers for ALL phone fields
         if (field.includes('phone') || field.includes('Phone')) {
@@ -289,17 +288,9 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
             } else if (onlyNums.length > 6) {
                 formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 6)}-${onlyNums.slice(6, 10)}`;
             }
-            setFormData(prev => {
-                const updated = { ...prev, [field]: formatted };
-                console.log(`📝 Updated formData:`, updated);
-                return updated;
-            });
+            setFormData(prev => ({ ...prev, [field]: formatted }));
         } else {
-            setFormData(prev => {
-                const updated = { ...prev, [field]: value };
-                console.log(`📝 Updated formData:`, updated);
-                return updated;
-            });
+            setFormData(prev => ({ ...prev, [field]: value }));
         }
     };
 
