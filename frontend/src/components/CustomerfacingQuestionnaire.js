@@ -641,10 +641,6 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                 <option value="Minimally involved - I trust your expertise">Minimally involved - I trust your expertise</option>
                             </select>
                         </FieldWrapper>
-                                    </div>
-                                </div>
-                            </RadioGroup>
-                        </FieldWrapper>
                         <FieldWrapper label="What is your ideal sofa price point?">
                             <RadioGroup value={formData.ideal_sofa_price} onValueChange={(value) => handleFormChange('ideal_sofa_price', value)} className="text-[#F5F5DC]">
                                 <div className="flex flex-col space-y-2">
