@@ -404,7 +404,7 @@ export default function ProjectPage() {
 
                 {/* Getting to Know You Better */}
                 <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
-                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">GETTING TO KNOW YOU BETTER</h3>
+                    <h3 className="text-xl font-bold text-[#8B7355] mb-4">GETTING TO KNOW YOU BETTER - VERSION 2.0 UPDATED</h3>
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Tell us about your household</label>
