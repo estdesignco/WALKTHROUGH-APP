@@ -302,22 +302,30 @@ export default function ProjectPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-stone-300 mb-2">Style in 3 Words</label>
-                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {answers.design_style_words || 'Not provided'}
-                                </div>
+                                <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">What do you LOVE about your home?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.design_love_home || 'Not provided'}
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Colors</label>
-                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {answers.design_preferred_colors || 'Not provided'}
-                                </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">First Impression</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
+                                {answers.design_first_impression || 'Not provided'}
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-stone-300 mb-2">Disliked Colors</label>
-                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
-                                    {answers.design_disliked_colors || 'Not provided'}
-                                </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Common Color Palette</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {answers.design_common_color_palette || 'Not provided'}
                             </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-stone-300 mb-2">Disliked Colors</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
+                                {answers.design_disliked_colors || 'Not provided'}
+                            </div>
+                        </div>
                             <div>
                                 <label className="block text-sm font-medium text-stone-300 mb-2">Preferred Palette</label>
                                 <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200">
