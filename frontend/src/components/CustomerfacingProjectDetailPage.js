@@ -35,14 +35,19 @@ export default function ProjectPage() {
                 
                 // Also fetch questionnaire answers
                 try {
+                    console.log('🔍 Fetching questionnaire for project:', projectId);
                     const questionnaireResponse = await fetch(`${BACKEND_URL}/api/questionnaire/${projectId}`);
+                    console.log('📡 Questionnaire API status:', questionnaireResponse.status);
                     if (questionnaireResponse.ok) {
                         const questionnaireData = await questionnaireResponse.json();
-                        console.log('Questionnaire data received:', questionnaireData);
+                        console.log('✅ Questionnaire data received:', questionnaireData);
+                        console.log('📊 Number of answer fields:', Object.keys(questionnaireData.answers || {}).length);
                         setQuestionnaire(questionnaireData);
+                    } else {
+                        console.log('❌ Questionnaire API failed:', questionnaireResponse.status);
                     }
                 } catch (qError) {
-                    console.log('No questionnaire data found');
+                    console.log('❌ Questionnaire fetch error:', qError);
                 }
             } catch (error) {
                 console.error("Failed to fetch project:", error);
