@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Display Test</title>
+    <style>
+        body { background: #1a1a1a; color: #fff; font-family: Arial; padding: 40px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .field { background: #2a2a2a; padding: 20px; margin: 20px 0; border-radius: 8px; border: 1px solid #444; }
+        .label { color: #D4A574; font-weight: bold; margin-bottom: 10px; font-size: 14px; }
+        .value { color: #F5F5DC; font-size: 16px; min-height: 60px; padding: 10px; background: #1a1a1a; border-radius: 4px; }
+        h1 { color: #D4A574; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QUESTIONNAIRE DATA DISPLAY TEST - Project 979b0344</h1>
+        
+        <div class="field">
+            <div class="label">What do you love about your current home?</div>
+            <div class="value" id="design_love_home">Loading...</div>
+        </div>
+        
+        <div class="field">
+            <div class="label">What is the first impression you want guests to have when they enter your home?</div>
+            <div class="value" id="design_first_impression">Loading...</div>
+        </div>
+        
+        <div class="field">
+            <div class="label">Is there a common color palette in your home that you love?</div>
+            <div class="value" id="design_common_color_palette">Loading...</div>
+        </div>
+        
+        <div class="field">
+            <div class="label">Who lives in your household? (Include ages of children if applicable)</div>
+            <div class="value" id="know_you_household">Loading...</div>
+        </div>
+        
+        <div class="field">
+            <div class="label">Do you have pets? If yes, please specify</div>
+            <div class="value" id="know_you_pets">Loading...</div>
+        </div>
+        
+        <div class="field">
+            <div class="label">Describe a typical weekday for your household. What activities take place in the home?</div>
+            <div class="value" id="know_you_weekday_routine">Loading...</div>
+        </div>
+    </div>
+    
+    <script>
+        // Fetch data from API and display
+        fetch('https://estdesign-portal.preview.emergentagent.com/api/questionnaire/979b0344-a2f5-49af-9e83-61dc4b951b94')
+            .then(res => res.json())
+            .then(data => {
+                const answers = data.answers || {};
+                
+                document.getElementById('design_love_home').textContent = answers.design_love_home || 'Not provided';
+                document.getElementById('design_first_impression').textContent = answers.design_first_impression || 'Not provided';
+                document.getElementById('design_common_color_palette').textContent = answers.design_common_color_palette || 'Not provided';
+                document.getElementById('know_you_household').textContent = answers.know_you_household || 'Not provided';
+                document.getElementById('know_you_pets').textContent = answers.know_you_pets || 'Not provided';
+                document.getElementById('know_you_weekday_routine').textContent = answers.know_you_weekday_routine || 'Not provided';
+                
+                console.log('✅ Data loaded successfully:', answers);
+            })
+            .catch(err => {
+                console.error('❌ Error loading data:', err);
+                document.body.innerHTML += '<div style="color: red; padding: 20px;">ERROR: ' + err.message + '</div>';
+            });
+    </script>
+</body>
+</html>
