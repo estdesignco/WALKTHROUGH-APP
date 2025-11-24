@@ -137,11 +137,12 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {options.map(option => (
                 <div key={option} className="flex items-center space-x-2">
-                    <Checkbox
+                    <input
+                        type="checkbox"
                         id={option}
                         checked={value.includes(option)}
-                        onCheckedChange={(checked) => handleCheckedChange(option, checked)}
-                        className="border-[#B49B7E]/50 data-[state=checked]:bg-[#B49B7E] data-[state=checked]:border-[#B49B7E] data-[state=checked]:text-white"
+                        onChange={(e) => handleCheckedChange(option, e.target.checked)}
+                        className="w-4 h-4 text-[#B49B7E] bg-gray-700 border-gray-600 rounded focus:ring-[#B49B7E] focus:ring-2"
                     />
                     <label htmlFor={option} className="text-sm font-light leading-relaxed text-[#F5F5DC]/90">
                         {option}
