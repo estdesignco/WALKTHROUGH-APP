@@ -677,22 +677,23 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         {/* Updated to use InputField and Select */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                             <InputField label="Desired timeline for project completion" id="timeline" value={formData.timeline} onChange={(e) => handleFormChange('timeline', e.target.value)} />
-                            <div>
-                                <Label htmlFor="budget_range" className="text-lg font-semibold text-[#8B7355]">Investment / Budget Range</Label>
-                                <Select value={formData.budget_range} onValueChange={(value) => handleFormChange('budget_range', value)}>
-                                    <SelectTrigger id="budget_range" className="bg-gray-700 border-gray-600 text-[#F5F5DC] focus:border-[#8B7355] placeholder:text-stone-400">
-                                        <SelectValue placeholder="Select..." />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-gray-800 text-[#F5F5DC] border-stone-700">
-                                        <SelectItem value="35k-65k" className="focus:bg-[#8B7355] focus:text-white">$35k - $65k</SelectItem>
-                                        <SelectItem value="75k-100k" className="focus:bg-[#8B7355] focus:text-white">$75k - $100k</SelectItem>
-                                        <SelectItem value="125k-500k" className="focus:bg-[#8B7355] focus:text-white">$125k - $500k</SelectItem>
-                                        <SelectItem value="600k-1M" className="focus:bg-[#8B7355] focus:text-white">$600k - $1M</SelectItem>
-                                        <SelectItem value="2M-5M" className="focus:bg-[#8B7355] focus:text-white">$2M - $5M</SelectItem>
-                                        <SelectItem value="7M-10M" className="focus:bg-[#8B7355] focus:text-white">$7M - $10M</SelectItem>
-                                        <SelectItem value="other" className="focus:bg-[#8B7355] focus:text-white">Other</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                            <div className="space-y-3">
+                                <Label htmlFor="budget_range" className="text-lg font-light text-[#B49B7E] tracking-wide">Investment / Budget Range</Label>
+                                <select
+                                    id="budget_range"
+                                    value={formData.budget_range}
+                                    onChange={(e) => handleFormChange('budget_range', e.target.value)}
+                                    className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                                >
+                                    <option value="">Select...</option>
+                                    <option value="35k-65k">$35k - $65k</option>
+                                    <option value="75k-100k">$75k - $100k</option>
+                                    <option value="125k-500k">$125k - $500k</option>
+                                    <option value="600k-1M">$600k - $1M</option>
+                                    <option value="2M-5M">$2M - $5M</option>
+                                    <option value="7M-10M">$7M - $10M</option>
+                                    <option value="other">Other</option>
+                                </select>
                             </div>
                         </div>
 
