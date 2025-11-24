@@ -738,16 +738,17 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     {/* Section 3: Type of Project */}
                     <Section title="TYPE OF PROJECT" description="Tell us more about your project and what you would love to accomplish, and how we can best partner with you!">
                         <FieldWrapper label="What type of project is this?">
-                            <RadioGroup value={formData.project_type} onValueChange={(value) => handleFormChange('project_type', value)} className="text-[#F5F5DC]">
-                                <div className="flex flex-col space-y-2">
-                                    {["New Build", "Renovation", "Furniture/Styling Refresh", "Other"].map(option => (
-                                        <div key={option} className="flex items-center space-x-2">
-                                            <RadioGroupItem value={option} id={`type-${option}`} className="border-stone-400 text-[#8B7355]" />
-                                            <Label htmlFor={`type-${option}`} className="text-[#F5F5DC]">{option}</Label>
-                                        </div>
-                                    ))}
-                                </div>
-                            </RadioGroup>
+                            <select
+                                value={formData.project_type}
+                                onChange={(e) => handleFormChange('project_type', e.target.value)}
+                                className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                            >
+                                <option value="">Select...</option>
+                                <option value="New Build">New Build</option>
+                                <option value="Renovation">Renovation</option>
+                                <option value="Furniture/Styling Refresh">Furniture/Styling Refresh</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </FieldWrapper>
 
                         {formData.project_type === 'Other' && (
