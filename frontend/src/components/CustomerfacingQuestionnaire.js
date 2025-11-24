@@ -630,19 +630,17 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         </FieldWrapper>
                         <InputField label="Who will be the primary decision maker(s) for this project?" id="primary_decision_maker" value={formData.primary_decision_maker || ''} onChange={(e) => handleFormChange('primary_decision_maker', e.target.value)} />
                         <FieldWrapper label="How involved would you like to be in the design process?">
-                            <RadioGroup value={formData.involvement_level} onValueChange={(value) => handleFormChange('involvement_level', value)} className="text-[#F5F5DC]">
-                                <div className="flex flex-col space-y-3">
-                                    <div className="flex items-center space-x-3">
-                                        <RadioGroupItem value="Very involved - I want to approve every detail" id="very-involved" className="border-[#B49B7E]/50 text-[#B49B7E]" />
-                                        <Label htmlFor="very-involved" className="text-[#F5F5DC]/90 font-light">Very involved - I want to approve every detail</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-3">
-                                        <RadioGroupItem value="Somewhat involved - I want to approve major decisions" id="somewhat-involved" className="border-[#B49B7E]/50 text-[#B49B7E]" />
-                                        <Label htmlFor="somewhat-involved" className="text-[#F5F5DC]/90 font-light">Somewhat involved - I want to approve major decisions</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-3">
-                                        <RadioGroupItem value="Minimally involved - I trust your expertise" id="minimally-involved" className="border-[#B49B7E]/50 text-[#B49B7E]" />
-                                        <Label htmlFor="minimally-involved" className="text-[#F5F5DC]/90 font-light">Minimally involved - I trust your expertise</Label>
+                            <select 
+                                value={formData.involvement_level} 
+                                onChange={(e) => handleFormChange('involvement_level', e.target.value)}
+                                className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                            >
+                                <option value="">Select...</option>
+                                <option value="Very involved - I want to approve every detail">Very involved - I want to approve every detail</option>
+                                <option value="Somewhat involved - I want to approve major decisions">Somewhat involved - I want to approve major decisions</option>
+                                <option value="Minimally involved - I trust your expertise">Minimally involved - I trust your expertise</option>
+                            </select>
+                        </FieldWrapper>
                                     </div>
                                 </div>
                             </RadioGroup>
