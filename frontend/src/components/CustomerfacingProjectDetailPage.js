@@ -524,14 +524,6 @@ export default function ProjectPage() {
                         </div>
                     </div>
                 </div>
-                        <div>
-                            <label className="block text-sm font-medium text-stone-300 mb-2">Any special requests or needs?</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
-                                {project.special_requests || project.notes || 'No special requests'}
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 {/* How Did You Hear About Us */}
                 <div className="bg-stone-800 rounded-lg border border-stone-700 p-6">
