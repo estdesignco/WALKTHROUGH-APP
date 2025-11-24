@@ -329,7 +329,6 @@ export default function ProjectPage() {
                                     {Array.isArray(project.design_preferred_palette) ? project.design_preferred_palette.join(', ') : project.design_preferred_palette || 'Not specified'}
                                 </div>
                             </div>
-                        </div>
                         <div>
                             <label className="block text-sm font-medium text-stone-300 mb-2">Artwork Preference</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-stone-200 min-h-[80px]">
