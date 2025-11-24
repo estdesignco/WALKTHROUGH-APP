@@ -18,6 +18,7 @@ import CustomerfacingLandingPage from './components/CustomerfacingLandingPage';
 import CustomerLandingPage from './components/CustomerLandingPage';
 import CustomerfacingQuestionnaire from './components/CustomerfacingQuestionnaire';
 import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectDetailPage';
+import QuestionnaireTestPage from './components/QuestionnaireTestPage';
 import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
 import EmailPreview from './components/EmailPreview';
 import CompleteFurnitureSearch from './components/CompleteFurnitureSearch';
