@@ -312,6 +312,12 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
         e.preventDefault();
         setIsSubmitting(true);
         setSubmissionStatus(null);
+        
+        console.log('📋 SUBMITTING QUESTIONNAIRE - Full FormData:', formData);
+        console.log('🔍 Budget Range:', formData.budget_range);
+        console.log('🔍 Involvement Level:', formData.involvement_level);
+        console.log('🔍 Address:', formData.address);
+        
         try {
             // If in edit mode, just update questionnaire and project
             if (editProjectId) {
