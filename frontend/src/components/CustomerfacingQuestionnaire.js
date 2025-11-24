@@ -661,16 +661,18 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     {/* Section 2: Total Scope of Work */}
                     <Section title="TOTAL SCOPE OF WORK FOR YOUR PROJECT" description="Please take a moment and think which project best fits your needs and answer the appropriate questions below. (New build, Renovation, Furniture Refresh) And don't forget the ROOMS section, even if you are Building!">
                         <FieldWrapper label="What type of property is this?">
-                            <RadioGroup value={formData.property_type} onValueChange={(value) => handleFormChange('property_type', value)} className="text-[#F5F5DC]">
-                                <div className="flex flex-col space-y-2">
-                                    {["Primary Residence", "Vacation Home", "Rental Property", "Commercial Space", "Other"].map(option => (
-                                        <div key={option} className="flex items-center space-x-2">
-                                            <RadioGroupItem value={option} id={option} className="border-stone-400 text-[#8B7355]" />
-                                            <Label htmlFor={option} className="text-[#F5F5DC]">{option}</Label>
-                                        </div>
-                                    ))}
-                                </div>
-                            </RadioGroup>
+                            <select
+                                value={formData.property_type}
+                                onChange={(e) => handleFormChange('property_type', e.target.value)}
+                                className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                            >
+                                <option value="">Select...</option>
+                                <option value="Primary Residence">Primary Residence</option>
+                                <option value="Vacation Home">Vacation Home</option>
+                                <option value="Rental Property">Rental Property</option>
+                                <option value="Commercial Space">Commercial Space</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </FieldWrapper>
 
                         {/* Updated to use InputField and Select */}
