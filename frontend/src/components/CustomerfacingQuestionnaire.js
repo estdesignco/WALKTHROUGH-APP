@@ -796,7 +796,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                     </div>
                                     {(formData.team_members || [{ name: '', role: '', phone: '' }]).map((member, idx) => (
                                         <div key={idx} className="grid grid-cols-3 gap-3">
-                                            <Input 
+                                            <input 
                                                 className={inputStyles} 
                                                 placeholder="Name"
                                                 value={member.name || ''}
@@ -806,7 +806,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                                     handleFormChange('team_members', newTeam);
                                                 }}
                                             />
-                                            <Input 
+                                            <input 
                                                 className={inputStyles} 
                                                 placeholder="Role"
                                                 value={member.role || ''}
@@ -816,7 +816,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                                     handleFormChange('team_members', newTeam);
                                                 }}
                                             />
-                                            <Input 
+                                            <input 
                                                 className={inputStyles} 
                                                 placeholder="XXX-XXX-XXXX"
                                                 type="tel"
@@ -906,7 +906,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                     </div>
                                     {(formData.renovation_team_members || [{ name: '', role: '', phone: '' }]).map((member, idx) => (
                                         <div key={idx} className="grid grid-cols-3 gap-3">
-                                            <Input 
+                                            <input 
                                                 className={inputStyles} 
                                                 placeholder="Name"
                                                 value={member.name || ''}
@@ -916,7 +916,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                                     handleFormChange('renovation_team_members', newTeam);
                                                 }}
                                             />
-                                            <Input 
+                                            <input 
                                                 className={inputStyles} 
                                                 placeholder="Role"
                                                 value={member.role || ''}
@@ -926,7 +926,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                                     handleFormChange('renovation_team_members', newTeam);
                                                 }}
                                             />
-                                            <Input 
+                                            <input 
                                                 className={inputStyles} 
                                                 placeholder="XXX-XXX-XXXX"
                                                 type="tel"
