@@ -275,6 +275,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
 
 
     const handleFormChange = (field, value) => {
+        console.log(`🔄 Form field changed: ${field} =`, value);
         // Auto-format phone numbers for ALL phone fields
         if (field.includes('phone') || field.includes('Phone')) {
             const onlyNums = value.replace(/[^\d]/g, '');
