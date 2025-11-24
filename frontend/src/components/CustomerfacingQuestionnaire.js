@@ -644,16 +644,17 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                             </select>
                         </FieldWrapper>
                         <FieldWrapper label="What is your ideal sofa price point?">
-                            <RadioGroup value={formData.ideal_sofa_price} onValueChange={(value) => handleFormChange('ideal_sofa_price', value)} className="text-[#F5F5DC]">
-                                <div className="flex flex-col space-y-2">
-                                    {["$2,000-$4,000", "$4,000-$8,000", "$8,000-$12,000", "$12,000+"].map(option => (
-                                        <div key={option} className="flex items-center space-x-2">
-                                            <RadioGroupItem value={option} id={`sofa-price-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="border-stone-400 text-[#8B7355]" />
-                                            <Label htmlFor={`sofa-price-${option.replace(/[^a-zA-Z0-9]/g, '')}`} className="text-[#F5F5DC]">{option}</Label>
-                                        </div>
-                                    ))}
-                                </div>
-                            </RadioGroup>
+                            <select
+                                value={formData.ideal_sofa_price}
+                                onChange={(e) => handleFormChange('ideal_sofa_price', e.target.value)}
+                                className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                            >
+                                <option value="">Select...</option>
+                                <option value="$2,000-$4,000">$2,000-$4,000</option>
+                                <option value="$4,000-$8,000">$4,000-$8,000</option>
+                                <option value="$8,000-$12,000">$8,000-$12,000</option>
+                                <option value="$12,000+">$12,000+</option>
+                            </select>
                         </FieldWrapper>
                     </Section>
 
