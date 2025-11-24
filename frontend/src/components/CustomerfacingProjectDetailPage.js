@@ -67,6 +67,11 @@ export default function ProjectPage() {
         
         const answers = questionnaire?.answers || {};
         
+        console.log('🎯 CompleteFilledQuestionnaire rendering');
+        console.log('📦 questionnaire state:', questionnaire);
+        console.log('📋 answers object:', answers);
+        console.log('📊 Number of answers:', Object.keys(answers).length);
+        
         return (
             <div className="space-y-8 p-6">
                 <div className="flex justify-between items-center mb-6">
