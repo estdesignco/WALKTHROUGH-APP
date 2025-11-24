@@ -627,7 +627,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         </FieldWrapper>
                         <InputField label="Best Time to Call" id="best_time_to_call" value={formData.best_time_to_call || ''} onChange={(e) => handleFormChange('best_time_to_call', e.target.value)} />
                         <FieldWrapper label="Have you worked with a designer before? If not, what are your hesitations?">
-                            <Textarea className={inputStyles} value={formData.worked_with_designer_before || ''} onChange={(e) => handleFormChange('worked_with_designer_before', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.worked_with_designer_before || ''} onChange={(e) => handleFormChange('worked_with_designer_before', e.target.value)} />
                         </FieldWrapper>
                         <InputField label="Who will be the primary decision maker(s) for this project?" id="primary_decision_maker" value={formData.primary_decision_maker || ''} onChange={(e) => handleFormChange('primary_decision_maker', e.target.value)} />
                         <FieldWrapper label="How involved would you like to be in the design process?">
@@ -750,7 +750,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
 
                         {formData.project_type === 'Other' && (
                             <FieldWrapper label="Tell us about your project">
-                                <Textarea className={inputStyles} value={formData.other_project_description || ''} onChange={(e) => handleFormChange('other_project_description', e.target.value)} placeholder="Please describe your project..." />
+                                <textarea className={inputStyles} value={formData.other_project_description || ''} onChange={(e) => handleFormChange('other_project_description', e.target.value)} placeholder="Please describe your project..." />
                             </FieldWrapper>
                         )}
                     </Section>
@@ -776,14 +776,14 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                             </FieldWrapper>
                             <FieldWrapper label="Do you have an Architect?">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Input className={inputStyles} placeholder="Architect Name" value={formData.new_build_architect || ''} onChange={(e) => handleFormChange('new_build_architect', e.target.value)} />
-                                    <Input className={inputStyles} placeholder="Architect Phone" value={formData.new_build_architect_phone || ''} onChange={(e) => handleFormChange('new_build_architect_phone', e.target.value)} />
+                                    <input className={inputStyles} placeholder="Architect Name" value={formData.new_build_architect || ''} onChange={(e) => handleFormChange('new_build_architect', e.target.value)} />
+                                    <input className={inputStyles} placeholder="Architect Phone" value={formData.new_build_architect_phone || ''} onChange={(e) => handleFormChange('new_build_architect_phone', e.target.value)} />
                                 </div>
                             </FieldWrapper>
                             <FieldWrapper label="Do you have a Builder?">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Input className={inputStyles} placeholder="Builder Name" value={formData.new_build_builder || ''} onChange={(e) => handleFormChange('new_build_builder', e.target.value)} />
-                                    <Input className={inputStyles} placeholder="Builder Phone" value={formData.new_build_builder_phone || ''} onChange={(e) => handleFormChange('new_build_builder_phone', e.target.value)} />
+                                    <input className={inputStyles} placeholder="Builder Name" value={formData.new_build_builder || ''} onChange={(e) => handleFormChange('new_build_builder', e.target.value)} />
+                                    <input className={inputStyles} placeholder="Builder Phone" value={formData.new_build_builder_phone || ''} onChange={(e) => handleFormChange('new_build_builder_phone', e.target.value)} />
                                 </div>
                             </FieldWrapper>
                             
@@ -852,10 +852,10 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                             <InputField label="Do you have plans drawn?" id="new_build_has_plans" value={formData.new_build_has_plans || ''} onChange={(e) => handleFormChange('new_build_has_plans', e.target.value)} />
                             <InputField label="How far along in the building process are you?" id="new_build_process_stage" value={formData.new_build_process_stage || ''} onChange={(e) => handleFormChange('new_build_process_stage', e.target.value)} />
                             <FieldWrapper label="Once home is complete, will you be needing furniture? If so, give us an idea of what items you would love to procure!">
-                                <Textarea className={inputStyles} value={formData.new_build_need_furniture || ''} onChange={(e) => handleFormChange('new_build_need_furniture', e.target.value)} />
+                                <textarea className={inputStyles} value={formData.new_build_need_furniture || ''} onChange={(e) => handleFormChange('new_build_need_furniture', e.target.value)} />
                             </FieldWrapper>
                             <FieldWrapper label="Is there anything else we need to know about the scope of this project?">
-                                <Textarea className={inputStyles} value={formData.new_build_scope_notes || ''} onChange={(e) => handleFormChange('new_build_scope_notes', e.target.value)} />
+                                <textarea className={inputStyles} value={formData.new_build_scope_notes || ''} onChange={(e) => handleFormChange('new_build_scope_notes', e.target.value)} />
                             </FieldWrapper>
                         </Section>
                     )}
@@ -883,15 +883,15 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                             
                             <FieldWrapper label="Do you have a Builder?">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Input className={inputStyles} placeholder="Builder Name" value={formData.renovation_builder || ''} onChange={(e) => handleFormChange('renovation_builder', e.target.value)} />
-                                    <Input className={inputStyles} placeholder="Builder Phone" value={formData.renovation_builder_phone || ''} onChange={(e) => handleFormChange('renovation_builder_phone', e.target.value)} />
+                                    <input className={inputStyles} placeholder="Builder Name" value={formData.renovation_builder || ''} onChange={(e) => handleFormChange('renovation_builder', e.target.value)} />
+                                    <input className={inputStyles} placeholder="Builder Phone" value={formData.renovation_builder_phone || ''} onChange={(e) => handleFormChange('renovation_builder_phone', e.target.value)} />
                                 </div>
                             </FieldWrapper>
                             
                             <FieldWrapper label="Do you have an Architect?">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Input className={inputStyles} placeholder="Architect Name" value={formData.renovation_architect || ''} onChange={(e) => handleFormChange('renovation_architect', e.target.value)} />
-                                    <Input className={inputStyles} placeholder="Architect Phone" value={formData.renovation_architect_phone || ''} onChange={(e) => handleFormChange('renovation_architect_phone', e.target.value)} />
+                                    <input className={inputStyles} placeholder="Architect Name" value={formData.renovation_architect || ''} onChange={(e) => handleFormChange('renovation_architect', e.target.value)} />
+                                    <input className={inputStyles} placeholder="Architect Phone" value={formData.renovation_architect_phone || ''} onChange={(e) => handleFormChange('renovation_architect_phone', e.target.value)} />
                                 </div>
                             </FieldWrapper>
                             
@@ -961,16 +961,16 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                             
                             <InputField label="Do you have NEW UPDATED plans drawn?" id="renovation_has_new_plans" value={formData.renovation_has_new_plans || ''} onChange={(e) => handleFormChange('renovation_has_new_plans', e.target.value)} />
                             <FieldWrapper label="Briefly describe the existing condition of the space.">
-                                <Textarea className={inputStyles} value={formData.renovation_existing_condition || ''} onChange={(e) => handleFormChange('renovation_existing_condition', e.target.value)} />
+                                <textarea className={inputStyles} value={formData.renovation_existing_condition || ''} onChange={(e) => handleFormChange('renovation_existing_condition', e.target.value)} />
                             </FieldWrapper>
                             <FieldWrapper label="Once home is complete, will you be needing furniture? If so, give us an idea of what items you would love to procure!">
-                                <Textarea className={inputStyles} value={formData.renovation_need_furniture || ''} onChange={(e) => handleFormChange('renovation_need_furniture', e.target.value)} />
+                                <textarea className={inputStyles} value={formData.renovation_need_furniture || ''} onChange={(e) => handleFormChange('renovation_need_furniture', e.target.value)} />
                             </FieldWrapper>
                             <FieldWrapper label="Are there any physical MEMORIES in this home that you would like to preserve?">
-                                <Textarea className={inputStyles} value={formData.renovation_memories || ''} onChange={(e) => handleFormChange('renovation_memories', e.target.value)} />
+                                <textarea className={inputStyles} value={formData.renovation_memories || ''} onChange={(e) => handleFormChange('renovation_memories', e.target.value)} />
                             </FieldWrapper>
                             <FieldWrapper label="Is there anything else we need to know about the scope of this project?">
-                                <Textarea className={inputStyles} value={formData.renovation_scope_notes || ''} onChange={(e) => handleFormChange('renovation_scope_notes', e.target.value)} />
+                                <textarea className={inputStyles} value={formData.renovation_scope_notes || ''} onChange={(e) => handleFormChange('renovation_scope_notes', e.target.value)} />
                             </FieldWrapper>
                         </Section>
                     )}
@@ -979,7 +979,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     {formData.project_type === 'Furniture/Styling Refresh' && (
                         <Section title="FURNITURE REFRESH" description="If you are not looking for a furniture refresh, please feel free to skip these questions!">
                             <FieldWrapper label="Briefly describe the existing condition of the space.">
-                                <Textarea className={inputStyles} value={formData.furniture_refresh_condition || ''} onChange={(e) => handleFormChange('furniture_refresh_condition', e.target.value)} />
+                                <textarea className={inputStyles} value={formData.furniture_refresh_condition || ''} onChange={(e) => handleFormChange('furniture_refresh_condition', e.target.value)} />
                             </FieldWrapper>
 
                             <FieldWrapper label="Designer/Contractor">
@@ -990,9 +990,9 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                 </div>
                                 {(formData.furniture_team_members || [{ name: '', role: '', phone: '' }]).map((member, idx) => (
                                     <div key={idx} className="grid grid-cols-3 gap-3 mb-3">
-                                        <Input className={inputStyles} placeholder="Name" value={member.name || ''} onChange={(e) => { const newTeam = [...(formData.furniture_team_members || [{ name: '', role: '', phone: '' }])]; newTeam[idx] = { ...newTeam[idx], name: e.target.value }; handleFormChange('furniture_team_members', newTeam); }} />
-                                        <Input className={inputStyles} placeholder="Role" value={member.role || ''} onChange={(e) => { const newTeam = [...(formData.furniture_team_members || [{ name: '', role: '', phone: '' }])]; newTeam[idx] = { ...newTeam[idx], role: e.target.value }; handleFormChange('furniture_team_members', newTeam); }} />
-                                        <Input className={inputStyles} placeholder="XXX-XXX-XXXX" type="tel" value={member.phone || ''} onChange={(e) => { const onlyNums = e.target.value.replace(/[^\d]/g, ''); let formatted = onlyNums; if (onlyNums.length > 3 && onlyNums.length <= 6) { formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`; } else if (onlyNums.length > 6) { formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 6)}-${onlyNums.slice(6, 10)}`; } const newTeam = [...(formData.furniture_team_members || [{ name: '', role: '', phone: '' }])]; newTeam[idx] = { ...newTeam[idx], phone: formatted }; handleFormChange('furniture_team_members', newTeam); }} />
+                                        <input className={inputStyles} placeholder="Name" value={member.name || ''} onChange={(e) => { const newTeam = [...(formData.furniture_team_members || [{ name: '', role: '', phone: '' }])]; newTeam[idx] = { ...newTeam[idx], name: e.target.value }; handleFormChange('furniture_team_members', newTeam); }} />
+                                        <input className={inputStyles} placeholder="Role" value={member.role || ''} onChange={(e) => { const newTeam = [...(formData.furniture_team_members || [{ name: '', role: '', phone: '' }])]; newTeam[idx] = { ...newTeam[idx], role: e.target.value }; handleFormChange('furniture_team_members', newTeam); }} />
+                                        <input className={inputStyles} placeholder="XXX-XXX-XXXX" type="tel" value={member.phone || ''} onChange={(e) => { const onlyNums = e.target.value.replace(/[^\d]/g, ''); let formatted = onlyNums; if (onlyNums.length > 3 && onlyNums.length <= 6) { formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`; } else if (onlyNums.length > 6) { formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 6)}-${onlyNums.slice(6, 10)}`; } const newTeam = [...(formData.furniture_team_members || [{ name: '', role: '', phone: '' }])]; newTeam[idx] = { ...newTeam[idx], phone: formatted }; handleFormChange('furniture_team_members', newTeam); }} />
                                     </div>
                                 ))}
                                 <button type="button" onClick={() => { const newTeam = [...(formData.furniture_team_members || []), { name: '', role: '', phone: '' }]; handleFormChange('furniture_team_members', newTeam); }} className="px-4 py-2 bg-[#B49B7E] hover:bg-[#A08B6F] text-white rounded font-semibold">+ Add Team Member</button>
@@ -1001,7 +1001,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                             <InputField label="Do you have the CURRENT plans/drawings for your home?" id="furniture_has_current_plans" value={formData.furniture_has_current_plans || ''} onChange={(e) => handleFormChange('furniture_has_current_plans', e.target.value)} />
                             <InputField label="When did you move into this home?" id="furniture_move_in_date" type="date" value={formData.furniture_move_in_date || ''} onChange={(e) => handleFormChange('furniture_move_in_date', e.target.value)} />
                             <FieldWrapper label="Is there anything else we need to know about the scope of this project?">
-                                <Textarea className={inputStyles} value={formData.furniture_scope_notes || ''} onChange={(e) => handleFormChange('furniture_scope_notes', e.target.value)} />
+                                <textarea className={inputStyles} value={formData.furniture_scope_notes || ''} onChange={(e) => handleFormChange('furniture_scope_notes', e.target.value)} />
                             </FieldWrapper>
                         </Section>
                     )}
@@ -1009,36 +1009,36 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     {/* Section 7: Design Questions */}
                     <Section title="DESIGN QUESTIONS">
                         <FieldWrapper label="What do you love about your current home?">
-                            <Textarea className={inputStyles} value={formData.design_love_home || ''} onChange={(e) => handleFormChange('design_love_home', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_love_home || ''} onChange={(e) => handleFormChange('design_love_home', e.target.value)} />
                         </FieldWrapper>
                         <InputField label="How will the spaces be used? (e.g., formal dining, casual living, etc.)" id="design_space_use" value={formData.design_space_use || ''} onChange={(e) => handleFormChange('design_space_use', e.target.value)} />
                         <InputField label="What are their current uses?" id="design_current_use" value={formData.design_current_use || ''} onChange={(e) => handleFormChange('design_current_use', e.target.value)} />
                         <FieldWrapper label="What is the first impression you want guests to have when they enter your home?">
-                            <Textarea className={inputStyles} value={formData.design_first_impression || ''} onChange={(e) => handleFormChange('design_first_impression', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_first_impression || ''} onChange={(e) => handleFormChange('design_first_impression', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Is there a common color palette in your home that you love?">
-                            <Textarea className={inputStyles} value={formData.design_common_color_palette || ''} onChange={(e) => handleFormChange('design_common_color_palette', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_common_color_palette || ''} onChange={(e) => handleFormChange('design_common_color_palette', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="What color palette do you prefer?">
                             <CheckboxGroup options={colorPrefOptions} value={formData.design_preferred_palette} onChange={(v) => handleFormChange('design_preferred_palette', v)} />
                         </FieldWrapper>
                         <FieldWrapper label="Are there any colors do you dislike?">
-                            <Textarea className={inputStyles} value={formData.design_disliked_colors || ''} onChange={(e) => handleFormChange('design_disliked_colors', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_disliked_colors || ''} onChange={(e) => handleFormChange('design_disliked_colors', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Which interior design styles do you prefer? (Select all that apply)">
                             <CheckboxGroup options={stylePrefOptions} value={formData.design_styles_preference} onChange={(v) => handleFormChange('design_styles_preference', v)} />
                         </FieldWrapper>
                         <FieldWrapper label="What do you like about these styles?">
-                            <Textarea className={inputStyles} value={formData.design_styles_love || ''} onChange={(e) => handleFormChange('design_styles_love', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_styles_love || ''} onChange={(e) => handleFormChange('design_styles_love', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="What are your preferences for artwork?">
                             <CheckboxGroup options={artworkPrefOptions} value={formData.design_artwork_preference} onChange={(v) => handleFormChange('design_artwork_preference', v)} />
                         </FieldWrapper>
                         <FieldWrapper label="Is there a piece of art, furniture, or a souvenir that holds significant personal meaning to you? Tell us the story behind it.">
-                            <Textarea className={inputStyles} value={formData.design_meaningful_item || ''} onChange={(e) => handleFormChange('design_meaningful_item', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_meaningful_item || ''} onChange={(e) => handleFormChange('design_meaningful_item', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Are there any existing furniture pieces or decor items you'd like to keep in the space? If so, please let us know the measurements and attach a photo below for reference.">
-                            <Textarea className={inputStyles} value={formData.design_existing_furniture || ''} onChange={(e) => handleFormChange('design_existing_furniture', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_existing_furniture || ''} onChange={(e) => handleFormChange('design_existing_furniture', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Please upload any photos of the existing spaces you'd like us to see.">
                             <div className="p-4 border-2 border-dashed border-stone-400 rounded-lg text-center">
@@ -1073,10 +1073,10 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                             <CheckboxGroup options={finishesOptions} value={formData.finishes_patterns_preference} onChange={(v) => handleFormChange('finishes_patterns_preference', v)} />
                         </FieldWrapper>
                         <FieldWrapper label="Do you have any specific materials you prefer or want to avoid?">
-                            <Textarea className={inputStyles} value={formData.design_materials_to_avoid || ''} onChange={(e) => handleFormChange('design_materials_to_avoid', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_materials_to_avoid || ''} onChange={(e) => handleFormChange('design_materials_to_avoid', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Do you have any special requirements or considerations? (e.g., accessibility needs, allergies, etc.)">
-                            <Textarea className={inputStyles} value={formData.design_special_requirements || ''} onChange={(e) => handleFormChange('design_special_requirements', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_special_requirements || ''} onChange={(e) => handleFormChange('design_special_requirements', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Do you have any images that reflect your vision? OR Any Inspiration Photos? (optional)">
                             <div className="p-4 border-2 border-dashed border-stone-400 rounded-lg text-center">
@@ -1108,75 +1108,75 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         <FieldWrapper label="Do you have a Houzz or Pinterest page? Please list your accounts below, and you can also invite us to your boards.">
                             <div className="space-y-2">
                                 <p className="text-[#F5F5DC] text-sm">at https://www.pinterest.com/estdesignco/ and https://www.houzz.com/professionals/interior-designers-and-decorators/established-design-co-pfvwus-pf~1101592055</p>
-                                <Textarea className={inputStyles} value={formData.design_pinterest_houzz || ''} onChange={(e) => handleFormChange('design_pinterest_houzz', e.target.value)} />
+                                <textarea className={inputStyles} value={formData.design_pinterest_houzz || ''} onChange={(e) => handleFormChange('design_pinterest_houzz', e.target.value)} />
                             </div>
                         </FieldWrapper>
                         <FieldWrapper label="Any additional comments or questions?">
-                            <Textarea className={inputStyles} value={formData.design_additional_comments || ''} onChange={(e) => handleFormChange('design_additional_comments', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.design_additional_comments || ''} onChange={(e) => handleFormChange('design_additional_comments', e.target.value)} />
                         </FieldWrapper>
                     </Section>
 
                     {/* Section 8: Getting to Know You Better */}
                     <Section title="GETTING TO KNOW YOU BETTER..." description="We want to get to know you better so we can serve you in the best way possible! We not only want to help design your home, but want your experience with us to be tailor-made JUST FOR YOU!">
                         <FieldWrapper label="Who lives in your household? (Include ages of children if applicable)">
-                            <Textarea className={inputStyles} value={formData.know_you_household || ''} onChange={(e) => handleFormChange('know_you_household', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_household || ''} onChange={(e) => handleFormChange('know_you_household', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Do you have pets? If yes, please specify">
-                            <Textarea className={inputStyles} value={formData.know_you_pets || ''} onChange={(e) => handleFormChange('know_you_pets', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_pets || ''} onChange={(e) => handleFormChange('know_you_pets', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Describe a typical weekday for your household. What activities take place in the home?">
-                            <Textarea className={inputStyles} value={formData.know_you_weekday_routine || ''} onChange={(e) => handleFormChange('know_you_weekday_routine', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_weekday_routine || ''} onChange={(e) => handleFormChange('know_you_weekday_routine', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Describe a typical weekend for your household.">
-                            <Textarea className={inputStyles} value={formData.know_you_weekend_routine || ''} onChange={(e) => handleFormChange('know_you_weekend_routine', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_weekend_routine || ''} onChange={(e) => handleFormChange('know_you_weekend_routine', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Are you early birds or night owls? How does natural and artificial lighting play a role in your daily routines?">
-                            <Textarea className={inputStyles} value={formData.know_you_lighting_preference || ''} onChange={(e) => handleFormChange('know_you_lighting_preference', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_lighting_preference || ''} onChange={(e) => handleFormChange('know_you_lighting_preference', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="How do you typically entertain guests? (e.g., large formal dinners, casual get-togethers, intimate cocktails, kids' parties)">
-                            <Textarea className={inputStyles} value={formData.know_you_entertaining_style || ''} onChange={(e) => handleFormChange('know_you_entertaining_style', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_entertaining_style || ''} onChange={(e) => handleFormChange('know_you_entertaining_style', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Where does each family member go to relax and have personal time? What activities do they do there?">
-                            <Textarea className={inputStyles} value={formData.know_you_relax_space || ''} onChange={(e) => handleFormChange('know_you_relax_space', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_relax_space || ''} onChange={(e) => handleFormChange('know_you_relax_space', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="How do you see your family's needs changing in the next 5-10 years? (e.g., growing children, aging in place, working from home more)">
-                            <Textarea className={inputStyles} value={formData.know_you_future_plans || ''} onChange={(e) => handleFormChange('know_you_future_plans', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_future_plans || ''} onChange={(e) => handleFormChange('know_you_future_plans', e.target.value)} />
                         </FieldWrapper>
                         <InputField label="Do you have social media pages that you would mind sharing with us?" id="know_you_social_media" value={formData.know_you_social_media || ''} onChange={(e) => handleFormChange('know_you_social_media', e.target.value)} />
                         <FieldWrapper label="Tell us about your hobbies">
                             <div className="space-y-2">
                                 <p className="text-[#F5F5DC] text-sm italic">Don't be shy, tell us about you and your spouse, and your kids' favorite hobbies!</p>
-                                <Textarea className={inputStyles} value={formData.know_you_hobbies || ''} onChange={(e) => handleFormChange('know_you_hobbies', e.target.value)} />
+                                <textarea className={inputStyles} value={formData.know_you_hobbies || ''} onChange={(e) => handleFormChange('know_you_hobbies', e.target.value)} />
                             </div>
                         </FieldWrapper>
                         <FieldWrapper label="What do you you like to do for fun?">
-                            <Textarea className={inputStyles} value={formData.know_you_fun || ''} onChange={(e) => handleFormChange('know_you_fun', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_fun || ''} onChange={(e) => handleFormChange('know_you_fun', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="What makes you HAPPY?!">
-                            <Textarea className={inputStyles} value={formData.know_you_happy || ''} onChange={(e) => handleFormChange('know_you_happy', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_happy || ''} onChange={(e) => handleFormChange('know_you_happy', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="When are your families Birthdays?">
-                            <Textarea className={inputStyles} value={formData.know_you_family_birthdays || ''} onChange={(e) => handleFormChange('know_you_family_birthdays', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_family_birthdays || ''} onChange={(e) => handleFormChange('know_you_family_birthdays', e.target.value)} />
                         </FieldWrapper>
                         <InputField label="When is your Anniversary?" id="know_you_anniversary" type="date" value={formData.know_you_anniversary || ''} onChange={(e) => handleFormChange('know_you_anniversary', e.target.value)} />
                         <FieldWrapper label="What does your Family like to do together for fun?">
-                            <Textarea className={inputStyles} value={formData.know_you_family_together || ''} onChange={(e) => handleFormChange('know_you_family_together', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_family_together || ''} onChange={(e) => handleFormChange('know_you_family_together', e.target.value)} />
                         </FieldWrapper>
                         <InputField label="What is your FAVORITE restaurant" id="know_you_favorite_restaurant" value={formData.know_you_favorite_restaurant || ''} onChange={(e) => handleFormChange('know_you_favorite_restaurant', e.target.value)} />
                         <FieldWrapper label="What is your favorite place to vacation?">
-                            <Textarea className={inputStyles} value={formData.know_you_favorite_vacation || ''} onChange={(e) => handleFormChange('know_you_favorite_vacation', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_favorite_vacation || ''} onChange={(e) => handleFormChange('know_you_favorite_vacation', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Tell us about your favorite foods, snacks, drinks, wine, beer, etc... OR ANYTHING ELSE that you just LOVE that we should know about!">
-                            <Textarea className={inputStyles} value={formData.know_you_favorite_foods || ''} onChange={(e) => handleFormChange('know_you_favorite_foods', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_favorite_foods || ''} onChange={(e) => handleFormChange('know_you_favorite_foods', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="When you come home after a long day, what space do you naturally gravitate toward, and what feeling do you want that space to evoke?">
-                            <Textarea className={inputStyles} value={formData.know_you_evoke_space || ''} onChange={(e) => handleFormChange('know_you_evoke_space', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_evoke_space || ''} onChange={(e) => handleFormChange('know_you_evoke_space', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="How do you want your home to support your social life?">
-                            <Textarea className={inputStyles} value={formData.know_you_support_social_life || ''} onChange={(e) => handleFormChange('know_you_support_social_life', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_support_social_life || ''} onChange={(e) => handleFormChange('know_you_support_social_life', e.target.value)} />
                         </FieldWrapper>
                         <FieldWrapper label="Is there ANYTHING ELSE that you would like to share with us to let us know how we can best serve you such as favorite memories of your last or current home, or favorite places, or just ANYTHING you want to share with us we would LOVE to to know about it as we get to know each other better!">
-                            <Textarea className={inputStyles} value={formData.know_you_share_more || ''} onChange={(e) => handleFormChange('know_you_share_more', e.target.value)} />
+                            <textarea className={inputStyles} value={formData.know_you_share_more || ''} onChange={(e) => handleFormChange('know_you_share_more', e.target.value)} />
                         </FieldWrapper>
                     </Section>
 
@@ -1201,7 +1201,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         
                         {formData.how_heard === 'Other' && (
                             <FieldWrapper label="Please specify">
-                                <Input className={inputStyles} value={formData.how_heard_other || ''} onChange={(e) => handleFormChange('how_heard_other', e.target.value)} placeholder="Please tell us how you heard about us..." />
+                                <input className={inputStyles} value={formData.how_heard_other || ''} onChange={(e) => handleFormChange('how_heard_other', e.target.value)} placeholder="Please tell us how you heard about us..." />
                             </FieldWrapper>
                         )}
                     </Section>
