@@ -123,10 +123,6 @@ const InputField = ({ label, id, value, onChange, required = false, type = "text
         />
     </div>
 );
-            placeholder={placeholder}
-        />
-    </div>
-);
 
 const CheckboxGroup = ({ options, value = [], onChange }) => {
     const handleCheckedChange = (option, checked) => {
