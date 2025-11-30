@@ -559,17 +559,6 @@ export default function ProjectDetailPage() {
                         </div>
                     </div>
                 </div>
-                                {project.design_styles_dislike || 'Not provided'}
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Patterns & Textures Preference</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
-                                {Array.isArray(project.finishes_patterns_preference) ? project.finishes_patterns_preference.join(', ') : project.finishes_patterns_preference || 'Not provided'}
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 {/* Getting to Know You Better */}
                 <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60 mb-6" 
