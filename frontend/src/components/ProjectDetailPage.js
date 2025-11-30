@@ -576,7 +576,7 @@ export default function ProjectDetailPage() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">How do you see your family's needs changing in the next 5-10 years? (e.g., growing children, aging in place, working from home more)</label>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">How do you see your family&apos;s needs changing in the next 5-10 years? (e.g., growing children, aging in place, working from home more)</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
                                 {answers.know_you_future_plans || 'Not provided'}
                             </div>
