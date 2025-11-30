@@ -684,25 +684,21 @@ export default function ProjectDetailPage() {
                        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
                      }}>
                     <h3 className="text-xl font-bold text-[#8B7355] mb-4">HOW DID YOU HEAR ABOUT US</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">How did you hear about us?</label>
-                            <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                {project.how_heard_about_us || 'Not provided'}
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9]">
+                                {answers.how_heard || 'Not provided'}
                             </div>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Newsletter signup?</label>
-                            <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                {project.newsletter_signup || 'Not specified'}
+                        {answers.how_heard === 'Other' && (
+                            <div>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Please specify</label>
+                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9]">
+                                    {answers.how_heard_other || 'Not provided'}
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Social media preferences</label>
-                            <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                {project.social_media_preferences || 'Not provided'}
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
 
