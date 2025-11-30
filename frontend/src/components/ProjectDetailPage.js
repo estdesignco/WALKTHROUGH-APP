@@ -467,47 +467,98 @@ export default function ProjectDetailPage() {
                      }}>
                     <h3 className="text-xl font-bold text-[#8B7355] mb-4">DESIGN QUESTIONS</h3>
                     <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Style in 3 Words</label>
-                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                    {project.design_style_words || 'Not provided'}
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Preferred Colors</label>
-                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                    {project.design_preferred_colors || 'Not provided'}
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Disliked Colors</label>
-                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                    {project.design_disliked_colors || 'Not provided'}
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Preferred Palette</label>
-                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                    {Array.isArray(project.design_preferred_palette) ? project.design_preferred_palette.join(', ') : project.design_preferred_palette || 'Not specified'}
-                                </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What do you love about your current home?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.design_love_home || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Artwork Preference</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
-                                {Array.isArray(project.design_artwork_preference) ? project.design_artwork_preference.join(', ') : project.design_artwork_preference || 'Not provided'}
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">How will the spaces be used? (e.g., formal dining, casual living, etc.)</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9]">
+                                {answers.design_space_use || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Liked Design Styles</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
-                                {Array.isArray(project.design_styles_preference) ? project.design_styles_preference.join(', ') : project.design_styles_preference || 'Not provided'}
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What are their current uses?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9]">
+                                {answers.design_current_use || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Disliked Design Styles</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What is the first impression you want guests to have when they enter your home?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.design_first_impression || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Is there a common color palette in your home that you love?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.design_common_color_palette || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What color palette do you prefer?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9]">
+                                {Array.isArray(answers.design_preferred_palette) ? answers.design_preferred_palette.join(', ') : answers.design_preferred_palette || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Are there any colors do you dislike?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9]">
+                                {answers.design_disliked_colors || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Which interior design styles do you prefer? (Select all that apply)</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9]">
+                                {Array.isArray(answers.design_styles_preference) ? answers.design_styles_preference.join(', ') : answers.design_styles_preference || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What do you like about these styles?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.design_styles_love || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What are your preferences for artwork?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9]">
+                                {Array.isArray(answers.design_artwork_preference) ? answers.design_artwork_preference.join(', ') : answers.design_artwork_preference || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Is there a piece of art, furniture, or a souvenir that holds significant personal meaning to you? Tell us the story behind it.</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.design_meaningful_item || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Are there any existing furniture pieces or decor items you&apos;d like to keep in the space? If so, please let us know the measurements and attach a photo below for reference.</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.design_existing_furniture || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Finishes and Patterns</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9]">
+                                {Array.isArray(answers.finishes_patterns_preference) ? answers.finishes_patterns_preference.join(', ') : answers.finishes_patterns_preference || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Do you have any specific materials you prefer or want to avoid?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.design_materials_to_avoid || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Do you have any special requirements or considerations? (e.g., accessibility needs, allergies, etc.)</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.design_special_requirements || 'Not provided'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
                                 {project.design_styles_dislike || 'Not provided'}
                             </div>
                         </div>
