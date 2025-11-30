@@ -66,6 +66,19 @@ export default function ProjectDetailPage() {
                 const projectData = await Project.get(projectId);
                 console.log('Project data received:', projectData);
                 setProject(projectData);
+                
+                // Also fetch questionnaire answers
+                try {
+                    console.log('Fetching questionnaire for:', projectId);
+                    const questionnaireResponse = await fetch(`${BACKEND_URL}/api/questionnaire/${projectId}`);
+                    if (questionnaireResponse.ok) {
+                        const questionnaireData = await questionnaireResponse.json();
+                        console.log('✅ Questionnaire data loaded:', Object.keys(questionnaireData.answers || {}).length, 'fields');
+                        setQuestionnaire(questionnaireData);
+                    }
+                } catch (qError) {
+                    console.log('No questionnaire data');
+                }
             } catch (error) {
                 console.error("Failed to fetch project:", error);
             } finally {
