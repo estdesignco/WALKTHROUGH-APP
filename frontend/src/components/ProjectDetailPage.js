@@ -540,7 +540,7 @@ export default function ProjectDetailPage() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">How do you typically entertain guests? (e.g., large formal dinners, casual get-togethers, intimate cocktails, kids' parties)</label>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">How do you typically entertain guests? (e.g., large formal dinners, casual get-togethers, intimate cocktails, kids&apos; parties)</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
                                 {answers.know_you_entertaining_style || 'Not provided'}
                             </div>
