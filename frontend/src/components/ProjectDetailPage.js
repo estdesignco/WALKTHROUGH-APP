@@ -552,9 +552,87 @@ export default function ProjectDetailPage() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Any special requests or needs?</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
-                                {project.special_requests || project.notes || 'No special requests'}
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Describe a typical weekday for your household. What activities take place in the home?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_weekday_routine || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Describe a typical weekend for your household.</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_weekend_routine || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Are you early birds or night owls? How does natural and artificial lighting play a role in your daily routines?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_lighting_preference || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Where does each family member go to relax and have personal time? What activities do they do there?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_relax_space || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">How do you see your family's needs changing in the next 5-10 years? (e.g., growing children, aging in place, working from home more)</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_future_plans || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What do you you like to do for fun?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_fun || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What makes you HAPPY?!</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_happy || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">When are your families Birthdays?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_family_birthdays || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What does your Family like to do together for fun?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_family_together || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What is your favorite place to vacation?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_favorite_vacation || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Tell us about your favorite foods, snacks, drinks, wine, beer, etc... OR ANYTHING ELSE that you just LOVE that we should know about!</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_favorite_foods || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">When you come home after a long day, what space do you naturally gravitate toward, and what feeling do you want that space to evoke?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_evoke_space || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">How do you want your home to support your social life?</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_support_social_life || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Is there ANYTHING ELSE that you would like to share with us to let us know how we can best serve you such as favorite memories of your last or current home, or favorite places, or just ANYTHING you want to share with us we would LOVE to to know about it as we get to know each other better!</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[120px]">
+                                {answers.know_you_share_more || 'Not provided'}
                             </div>
                         </div>
                     </div>
