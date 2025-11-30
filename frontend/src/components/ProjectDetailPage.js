@@ -528,35 +528,27 @@ export default function ProjectDetailPage() {
                     <h3 className="text-xl font-bold text-[#8B7355] mb-4">GETTING TO KNOW YOU BETTER</h3>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Tell us about your family</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
-                                {project.family_info || 'Not provided'}
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Do you have pets?</label>
-                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                    {project.pets_info || 'Not provided'}
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[#D4A574] mb-2">How do you entertain?</label>
-                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                    {project.entertaining_style || 'Not provided'}
-                                </div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Who lives in your household? (Include ages of children if applicable)</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_household || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What are your hobbies?</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[60px]">
-                                {project.hobbies || 'Not provided'}
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Do you have pets? If yes, please specify</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_pets || 'Not provided'}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">What is your lifestyle like?</label>
-                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
-                                {project.lifestyle || 'Not provided'}
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">How do you typically entertain guests? (e.g., large formal dinners, casual get-togethers, intimate cocktails, kids' parties)</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_entertaining_style || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Tell us about your hobbies</label>
+                            <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
+                                {answers.know_you_hobbies || 'Not provided'}
                             </div>
                         </div>
                         <div>
