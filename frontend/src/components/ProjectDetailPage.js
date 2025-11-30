@@ -37,6 +37,7 @@ export default function ProjectDetailPage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
     const [project, setProject] = useState(null);
+    const [questionnaire, setQuestionnaire] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState(searchParams.get('tab') || "Questionnaire");
     const [isEditing, setIsEditing] = useState(false);
