@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://interioreye-app.preview.emergentagent.com/*"
+    "https://intake-flow-3.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://interioreye-app.preview.emergentagent.com
+https://intake-flow-3.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://interioreye-app.preview.emergentagent.com/mobile-app
+https://intake-flow-3.preview.emergentagent.com/mobile-app
 
 ---
 

@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://interioreye-app.preview.emergentagent.com";
+const BACKEND_URL = "https://intake-flow-3.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

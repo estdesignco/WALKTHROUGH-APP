@@ -11,7 +11,7 @@ from datetime import datetime
 import time
 
 class HouzzProScraperTester:
-    def __init__(self, base_url="https://interioreye-app.preview.emergentagent.com"):
+    def __init__(self, base_url="https://intake-flow-3.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_base = f"{base_url}/api"
         self.tests_run = 0
@@ -255,7 +255,7 @@ def main():
     print("="*80)
     print("🏠 HOUZZ PRO SCRAPER BACKEND TESTING")
     print("="*80)
-    print(f"Testing against: https://interioreye-app.preview.emergentagent.com")
+    print(f"Testing against: https://intake-flow-3.preview.emergentagent.com")
     print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("="*80)
 

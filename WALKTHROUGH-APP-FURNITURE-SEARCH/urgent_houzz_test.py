@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = "https://interioreye-app.preview.emergentagent.com"
+BACKEND_URL = "https://intake-flow-3.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 def print_header(title):

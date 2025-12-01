@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 # Configuration
-API_BASE = "https://interioreye-app.preview.emergentagent.com/api"
+API_BASE = "https://intake-flow-3.preview.emergentagent.com/api"
 
 def print_header(title):
     """Print formatted test header"""
