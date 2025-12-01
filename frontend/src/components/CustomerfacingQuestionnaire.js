@@ -272,11 +272,15 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
     };
 
 
-    const handleFormChange = (field, value) => {
+    const handleFormChange = (field, value, event = null) => {
         console.log(`🔄 ${field} changed to:`, value);
         
         // Auto-format phone numbers for ALL phone fields
         if (field.includes('phone') || field.includes('Phone')) {
+            const input = event?.target;
+            const cursorPosition = input?.selectionStart || 0;
+            const previousValue = formData[field] || '';
+            
             const onlyNums = value.replace(/[^\d]/g, '');
             let formatted = onlyNums;
             if (onlyNums.length > 3 && onlyNums.length <= 6) {
@@ -284,7 +288,20 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
             } else if (onlyNums.length > 6) {
                 formatted = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 6)}-${onlyNums.slice(6, 10)}`;
             }
+            
             setFormData(prev => ({ ...prev, [field]: formatted }));
+            
+            // Restore cursor position after formatting
+            if (input) {
+                // Calculate new cursor position based on formatting changes
+                const addedDashes = (formatted.match(/-/g) || []).length - (previousValue.match(/-/g) || []).length;
+                const newCursorPos = Math.min(cursorPosition + addedDashes, formatted.length);
+                
+                // Use setTimeout to ensure the DOM has updated
+                setTimeout(() => {
+                    input.setSelectionRange(newCursorPos, newCursorPos);
+                }, 0);
+            }
         } else {
             setFormData(prev => ({ ...prev, [field]: value }));
         }
