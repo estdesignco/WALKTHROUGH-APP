@@ -169,21 +169,54 @@ const SimpleWalkthroughSpreadsheet = ({
     setFilteredProject(filtered);
   }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
-  // Initialize all rooms and categories as expanded
+  // Initialize all rooms and categories as expanded ONLY on first load
+  // Use a ref to track if we've already initialized
+  const hasInitialized = useRef(false);
+  
   useEffect(() => {
-    if (project?.rooms) {
-      const roomExpansion = {};
-      const categoryExpansion = {};
+    if (project?.rooms && !hasInitialized.current) {
+      // Check if we have saved state in localStorage
+      const savedRooms = localStorage.getItem('walkthrough_expandedRooms');
+      const savedCategories = localStorage.getItem('walkthrough_expandedCategories');
       
-      project.rooms.forEach(room => {
-        roomExpansion[room.id] = true;
-        room.categories?.forEach(category => {
-          categoryExpansion[category.id] = true;
+      if (savedRooms && savedCategories) {
+        // Use saved state, but ensure new rooms are expanded
+        const savedRoomState = JSON.parse(savedRooms);
+        const savedCategoryState = JSON.parse(savedCategories);
+        
+        // Only add new rooms/categories that aren't in saved state
+        project.rooms.forEach(room => {
+          if (savedRoomState[room.id] === undefined) {
+            savedRoomState[room.id] = true;
+          }
+          room.categories?.forEach(category => {
+            if (savedCategoryState[category.id] === undefined) {
+              savedCategoryState[category.id] = true;
+            }
+          });
         });
-      });
+        
+        setExpandedRooms(savedRoomState);
+        setExpandedCategories(savedCategoryState);
+      } else {
+        // First time - expand all
+        const roomExpansion = {};
+        const categoryExpansion = {};
+        
+        project.rooms.forEach(room => {
+          roomExpansion[room.id] = true;
+          room.categories?.forEach(category => {
+            categoryExpansion[category.id] = true;
+          });
+        });
+        
+        setExpandedRooms(roomExpansion);
+        setExpandedCategories(categoryExpansion);
+        localStorage.setItem('walkthrough_expandedRooms', JSON.stringify(roomExpansion));
+        localStorage.setItem('walkthrough_expandedCategories', JSON.stringify(categoryExpansion));
+      }
       
-      setExpandedRooms(roomExpansion);
-      setExpandedCategories(categoryExpansion);
+      hasInitialized.current = true;
     }
   }, [project]);
 
