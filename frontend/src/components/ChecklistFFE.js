@@ -1271,6 +1271,19 @@ const ChecklistFFE = ({
           loading={false}
         />
       )}
+
+      {/* CALCULATOR POPUP */}
+      <CalculatorPopup
+        isOpen={showCalculator}
+        onClose={() => {
+          setShowCalculator(false);
+          setCalculatorItem(null);
+        }}
+        onCalculate={handleCostCalculated}
+        itemName={calculatorItem?.name || ''}
+        categoryName={calculatorCategory}
+        currentCost={calculatorItem?.cost || 0}
+      />
     </div>
   );
 };
