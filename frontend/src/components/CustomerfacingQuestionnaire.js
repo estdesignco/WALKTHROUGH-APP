@@ -152,6 +152,68 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
     );
 };
 
+// Birthday Entry Component - Add multiple family member birthdays with date pickers
+const BirthdayEntryList = ({ value = [], onChange }) => {
+    const entries = Array.isArray(value) && value.length > 0 ? value : [{ name: '', date: '' }];
+    
+    const handleEntryChange = (index, field, newValue) => {
+        const updated = [...entries];
+        updated[index] = { ...updated[index], [field]: newValue };
+        onChange(updated);
+    };
+    
+    const addEntry = () => {
+        onChange([...entries, { name: '', date: '' }]);
+    };
+    
+    const removeEntry = (index) => {
+        if (entries.length > 1) {
+            const updated = entries.filter((_, i) => i !== index);
+            onChange(updated);
+        }
+    };
+    
+    return (
+        <div className="space-y-3">
+            {entries.map((entry, index) => (
+                <div key={index} className="flex gap-3 items-center">
+                    <input
+                        type="text"
+                        placeholder="Family member name"
+                        value={entry.name || ''}
+                        onChange={(e) => handleEntryChange(index, 'name', e.target.value)}
+                        className="flex-1 h-12 rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400"
+                    />
+                    <input
+                        type="date"
+                        value={entry.date || ''}
+                        onChange={(e) => handleEntryChange(index, 'date', e.target.value)}
+                        className="w-40 h-12 rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
+                    />
+                    {entries.length > 1 && (
+                        <button
+                            type="button"
+                            onClick={() => removeEntry(index)}
+                            className="text-red-400 hover:text-red-300 p-2"
+                            title="Remove"
+                        >
+                            <XCircle className="w-5 h-5" />
+                        </button>
+                    )}
+                </div>
+            ))}
+            <button
+                type="button"
+                onClick={addEntry}
+                className="flex items-center gap-2 text-[#B49B7E] hover:text-[#D4C5A9] transition-colors"
+            >
+                <PlusCircle className="w-5 h-5" />
+                <span>Add another family member</span>
+            </button>
+        </div>
+    );
+};
+
 export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
     const { projectId: urlProjectId } = useParams();
     const editProjectId = isEditMode ? urlProjectId : null;
