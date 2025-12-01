@@ -587,7 +587,7 @@ const MasterMaterialsPage = () => {
                     {material.width && (
                       <div className="flex items-center gap-1">
                         <Ruler className="w-3 h-3" />
-                        {material.width}" wide
+                        {material.width}&quot; wide
                       </div>
                     )}
                     {material.lead_time && (
