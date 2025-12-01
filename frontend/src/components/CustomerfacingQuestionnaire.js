@@ -540,7 +540,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                 know_you_household: '', know_you_pets: '', know_you_weekday_routine: '', know_you_weekend_routine: '',
                 know_you_lighting_preference: '', know_you_entertaining_style: '', know_you_relax_space: '',
                 know_you_future_plans: '', know_you_social_media: '', know_you_hobbies: '', know_you_fun: '',
-                know_you_happy: '', know_you_family_birthdays: '', know_you_anniversary: '',
+                know_you_happy: '', know_you_family_birthdays: '', family_birthdays: [{ name: '', date: '' }], know_you_anniversary: '',
                 know_you_family_together: '', know_you_favorite_restaurant: '', know_you_favorite_vacation: '',
                 know_you_favorite_foods: '', know_you_evoke_space: '', know_you_support_social_life: '',
                 know_you_share_more: '', how_heard: '', how_heard_other: '',
