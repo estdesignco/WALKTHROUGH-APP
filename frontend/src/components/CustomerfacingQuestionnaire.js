@@ -347,6 +347,9 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
             const cursorPosition = input?.selectionStart || 0;
             const previousValue = formData[field] || '';
             
+            // Count digits before cursor in the raw input
+            const digitsBeforeCursor = value.substring(0, cursorPosition).replace(/[^\d]/g, '').length;
+            
             const onlyNums = value.replace(/[^\d]/g, '');
             let formatted = onlyNums;
             if (onlyNums.length > 3 && onlyNums.length <= 6) {
@@ -359,9 +362,15 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
             
             // Restore cursor position after formatting
             if (input) {
-                // Calculate new cursor position based on formatting changes
-                const addedDashes = (formatted.match(/-/g) || []).length - (previousValue.match(/-/g) || []).length;
-                const newCursorPos = Math.min(cursorPosition + addedDashes, formatted.length);
+                // Calculate new cursor position based on digit count
+                let newCursorPos = 0;
+                let digitCount = 0;
+                for (let i = 0; i < formatted.length && digitCount < digitsBeforeCursor; i++) {
+                    newCursorPos = i + 1;
+                    if (formatted[i] !== '-') {
+                        digitCount++;
+                    }
+                }
                 
                 // Use setTimeout to ensure the DOM has updated
                 setTimeout(() => {
