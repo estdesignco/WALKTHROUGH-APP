@@ -121,6 +121,7 @@ const InputField = ({ label, id, value, onChange, required = false, type = "text
 
 const CheckboxGroup = ({ options, value = [], onChange }) => {
     const handleCheckedChange = (option, checked) => {
+        console.log(`🔄 Checkbox ${option} changed to:`, checked);
         if (checked) {
             onChange([...value, option]);
         } else {
@@ -130,16 +131,16 @@ const CheckboxGroup = ({ options, value = [], onChange }) => {
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {options.map(option => (
-                <div key={option} className="flex items-center space-x-2">
+            {options.map((option, index) => (
+                <div key={`${option}-${index}`} className="flex items-center space-x-2">
                     <input
                         type="checkbox"
-                        id={option}
+                        id={`checkbox-${option.replace(/\s+/g, '-')}-${index}`}
                         checked={value.includes(option)}
                         onChange={(e) => handleCheckedChange(option, e.target.checked)}
                         className="w-4 h-4 text-[#B49B7E] bg-gray-700 border-gray-600 rounded focus:ring-[#B49B7E] focus:ring-2"
                     />
-                    <label htmlFor={option} className="text-sm font-light leading-relaxed text-[#F5F5DC]/90">
+                    <label htmlFor={`checkbox-${option.replace(/\s+/g, '-')}-${index}`} className="text-sm font-light leading-relaxed text-[#F5F5DC]/90 cursor-pointer">
                         {option}
                     </label>
                 </div>
