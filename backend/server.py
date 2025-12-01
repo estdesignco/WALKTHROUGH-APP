@@ -35,6 +35,7 @@ from power_features_api import router as power_features_router
 from contacts_api import router as contacts_router
 import contacts_api
 from moodboard_api import router as moodboard_router
+from master_database_api import router as master_database_router
 
 import aiosmtplib
 from email.mime.text import MIMEText
