@@ -421,7 +421,9 @@ const SimpleWalkthroughSpreadsheet = ({
         ...prev,
         [roomId]: !prev[roomId]
       };
-      localStorage.setItem('walkthrough_expandedRooms', JSON.stringify(newState));
+      if (project?.id) {
+        localStorage.setItem(`walkthrough_${project.id}_expandedRooms`, JSON.stringify(newState));
+      }
       return newState;
     });
   };
@@ -433,7 +435,9 @@ const SimpleWalkthroughSpreadsheet = ({
         ...prev,
         [categoryId]: !prev[categoryId]
       };
-      localStorage.setItem('walkthrough_expandedCategories', JSON.stringify(newState));
+      if (project?.id) {
+        localStorage.setItem(`walkthrough_${project.id}_expandedCategories`, JSON.stringify(newState));
+      }
       return newState;
     });
   };
