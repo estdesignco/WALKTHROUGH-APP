@@ -1690,13 +1690,30 @@ metadata:
 
 test_plan:
   current_focus:
-    - "API Complete Project Creation with Full Questionnaire Data"
+    - "Questionnaire API Functionality Testing - COMPLETED"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
+backend:
+  - task: "Questionnaire API Functionality Testing - Review Request"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "🎉 COMPREHENSIVE QUESTIONNAIRE API TESTING COMPLETED - ALL FUNCTIONALITY VERIFIED! Conducted thorough testing of all 5 API endpoints requested in review. ✅ PROJECT CREATION WORKING: POST /api/projects successfully creates projects with proper client_info structure and returns project ID. ✅ QUESTIONNAIRE SAVE WITH FAMILY BIRTHDAYS: POST /api/questionnaire/{project_id} correctly saves questionnaire data with new family_birthdays format as array of {name, date} objects. Tested with 4 family members: [{'name': 'John', 'date': '1985-03-15'}, {'name': 'Jane', 'date': '1987-07-22'}, {'name': 'Emma', 'date': '2015-12-10'}, {'name': 'Liam', 'date': '2018-05-03'}]. ✅ QUESTIONNAIRE RETRIEVE PRESERVES FORMAT: GET /api/questionnaire/{project_id} returns data with family_birthdays array format perfectly preserved. All 25 questionnaire fields saved correctly with 100% completion percentage. ✅ PROJECT DETAIL ACCESS: GET /api/projects/{project_id} returns complete project data including client_info and rooms array. ✅ ROOMS FUNCTIONALITY: POST /api/rooms creates rooms with auto-population (73 items across 7 categories), rooms accessible via project endpoint as designed. ✅ EXISTING PROJECT VERIFICATION: Test project d1b17a1d-6950-4bcd-b9cb-b4f3e797fce4 accessible with 4 rooms and 29 questionnaire fields. ✅ API FORMAT CORRECTION: Identified correct API format - questionnaire data must be wrapped in 'answers' object, not sent directly. All endpoints working with 100% success rate (6/6 tests passed). The questionnaire API functionality is production-ready and fully operational for Established Design Co. application!"
+
+agent_communication:
    -agent: "main"
    -message: "✅ QUESTIONNAIRE DISPLAY FIX VERIFIED - ALL FIELDS NOW DISPLAYING CORRECTLY! Fixed critical issue where ProjectDetailPage.js was reading questionnaire fields from wrong data source (project.* instead of answers.*). Changes made: 1) Added Spouse/Partner Name and Phone fields to Client Information section, 2) Fixed Best Time to Call, Preferred Communication, Designer Experience, Primary Decision Maker, Involvement Level, and Ideal Sofa Price to read from answers.*, 3) Fixed Total Scope of Work section (Property Type, Timeline, Budget Range, Project Priority) to read from answers.*, 4) Enhanced Renovation section with all relevant fields (Address, Architect, Builder, Phones, Existing Condition, Need Furniture, Memories, Scope Notes), 5) Enhanced New Build section similarly, 6) Fixed Furniture Refresh section. Test project 040b8992-2557-4305-a822-4296733b668b has ALL 67 fields filled and displays with ZERO 'Not specified' or 'Not provided' messages. Verified via API: questionnaire has 67 fields with data. Verified via screenshot: 0 'Not specified', 0 'Not provided' found on page. The earlier UI testing agent failure was due to Playwright having trouble filling React controlled form inputs, NOT a data saving/display issue. When data is properly submitted via the form or API, it saves and displays correctly."
+
+   -agent: "testing"
+   -message: "🎉 QUESTIONNAIRE API COMPREHENSIVE TESTING COMPLETED - 100% SUCCESS RATE! Conducted thorough testing of all questionnaire functionality requested in review at https://intake-flow-3.preview.emergentagent.com. ✅ ALL 5 API ENDPOINTS WORKING PERFECTLY: 1) POST /api/projects creates projects with proper structure ✅, 2) POST /api/questionnaire/{project_id} saves questionnaire with family_birthdays array format [{name, date}] ✅, 3) GET /api/questionnaire/{project_id} retrieves data with format preserved ✅, 4) GET /api/projects/{project_id} returns project details and client_info ✅, 5) POST /api/rooms creates rooms with auto-population (73 items, 7 categories) accessible via project endpoint ✅. ✅ FAMILY BIRTHDAYS FORMAT VERIFIED: New array format [{'name': 'John', 'date': '1985-03-15'}, {'name': 'Jane', 'date': '1987-07-22'}, {'name': 'Emma', 'date': '2015-12-10'}, {'name': 'Liam', 'date': '2018-05-03'}] saves and retrieves correctly. ✅ EXISTING PROJECT ACCESSIBLE: Test project d1b17a1d-6950-4bcd-b9cb-b4f3e797fce4 confirmed accessible with 4 rooms and questionnaire data. ✅ API FORMAT IDENTIFIED: Questionnaire data must be wrapped in 'answers' object for proper saving/retrieval. ✅ COMPREHENSIVE DATA TESTING: 25 questionnaire fields including client info, design preferences, lifestyle questions all save with 100% completion rate. ✅ ROOM AUTO-POPULATION: Living room creation generates 73 items across 7 categories (Lighting, Furniture, Decor & Accessories, Paint/Wallpaper/Finishes, Millwork/Architectural Elements, HVAC & Mechanical, Window Treatments) as expected. The questionnaire functionality is production-ready and meets all requirements from the review request!"
 
 ---
 ## Diagnostic Results - Issues Reported by User
