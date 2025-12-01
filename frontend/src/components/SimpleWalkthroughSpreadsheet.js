@@ -167,14 +167,24 @@ const SimpleWalkthroughSpreadsheet = ({
   }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
   // Initialize all rooms and categories as expanded ONLY on first load
-  // Use a ref to track if we've already initialized
+  // Use a ref to track if we've already initialized for this project
   const hasInitialized = useRef(false);
+  const lastProjectId = useRef(null);
   
   useEffect(() => {
+    // Reset initialization if project changes
+    if (project?.id && project.id !== lastProjectId.current) {
+      hasInitialized.current = false;
+      lastProjectId.current = project.id;
+    }
+    
     if (project?.rooms && !hasInitialized.current) {
-      // Check if we have saved state in localStorage
-      const savedRooms = localStorage.getItem('walkthrough_expandedRooms');
-      const savedCategories = localStorage.getItem('walkthrough_expandedCategories');
+      const storageKeyRooms = `walkthrough_${project.id}_expandedRooms`;
+      const storageKeyCategories = `walkthrough_${project.id}_expandedCategories`;
+      
+      // Check if we have saved state in localStorage for this project
+      const savedRooms = localStorage.getItem(storageKeyRooms);
+      const savedCategories = localStorage.getItem(storageKeyCategories);
       
       if (savedRooms && savedCategories) {
         // Use saved state, but ensure new rooms are expanded
@@ -209,8 +219,8 @@ const SimpleWalkthroughSpreadsheet = ({
         
         setExpandedRooms(roomExpansion);
         setExpandedCategories(categoryExpansion);
-        localStorage.setItem('walkthrough_expandedRooms', JSON.stringify(roomExpansion));
-        localStorage.setItem('walkthrough_expandedCategories', JSON.stringify(categoryExpansion));
+        localStorage.setItem(storageKeyRooms, JSON.stringify(roomExpansion));
+        localStorage.setItem(storageKeyCategories, JSON.stringify(categoryExpansion));
       }
       
       hasInitialized.current = true;
