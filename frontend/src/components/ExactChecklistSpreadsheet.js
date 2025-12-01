@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import AddItemModal from './AddItemModal';
 import CanvaIntegrationModal from './CanvaIntegrationModal';
+import CalculatorPopup from './CalculatorPopup';
 import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 
@@ -21,6 +22,11 @@ const ExactChecklistSpreadsheet = ({
 
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
+  
+  // Calculator popup state
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calculatorItem, setCalculatorItem] = useState(null);
+  const [calculatorCategory, setCalculatorCategory] = useState('');
   
   // State to track checked items (for PICKED status)
   const [checkedItems, setCheckedItems] = useState(new Set());
