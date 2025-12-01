@@ -1269,8 +1269,11 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         <FieldWrapper label="What makes you HAPPY?!">
                             <textarea id="know_you_happy" className={textareaStyles} value={formData.know_you_happy || ''} onChange={(e) => handleFormChange('know_you_happy', e.target.value)}></textarea>
                         </FieldWrapper>
-                        <FieldWrapper label="When are your families Birthdays?">
-                            <textarea id="know_you_family_birthdays" className={textareaStyles} value={formData.know_you_family_birthdays || ''} onChange={(e) => handleFormChange('know_you_family_birthdays', e.target.value)}></textarea>
+                        <FieldWrapper label="When are your family members' Birthdays?">
+                            <BirthdayEntryList
+                                value={formData.family_birthdays}
+                                onChange={(newBirthdays) => handleFormChange('family_birthdays', newBirthdays)}
+                            />
                         </FieldWrapper>
                         <InputField label="When is your Anniversary?" id="know_you_anniversary" type="date" value={formData.know_you_anniversary || ''} onChange={(e) => handleFormChange('know_you_anniversary', e.target.value)} />
                         <FieldWrapper label="What does your Family like to do together for fun?">
