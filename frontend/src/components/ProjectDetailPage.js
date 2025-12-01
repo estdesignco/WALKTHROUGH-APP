@@ -369,25 +369,25 @@ export default function ProjectDetailPage() {
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Property Type</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                {project.property_type || 'Not specified'}
+                                {answers.property_type || 'Not specified'}
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Timeline</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                {project.timeline || 'Not specified'}
+                                {answers.timeline || project.timeline || 'Not specified'}
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Budget Range</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                {project.budget_range || project.budget || 'Not specified'}
+                                {answers.budget_range || project.budget || 'Not specified'}
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Project Priority</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                {Array.isArray(project.project_priority) ? project.project_priority.join(', ') : project.project_priority || 'Not specified'}
+                                {Array.isArray(answers.project_priority) ? answers.project_priority.join(', ') : answers.project_priority || 'Not specified'}
                             </div>
                         </div>
                     </div>
