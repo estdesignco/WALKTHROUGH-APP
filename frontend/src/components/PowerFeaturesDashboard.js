@@ -77,6 +77,18 @@ const styles = {
     backgroundColor: '#0a0a0a',
     padding: '20px'
   },
+  backButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '10px 16px',
+    backgroundColor: '#292929',
+    border: '1px solid #525252',
+    borderRadius: '8px',
+    color: '#d4d4d4',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease'
+  },
   header: {
     textAlign: 'center',
     marginBottom: '40px',
