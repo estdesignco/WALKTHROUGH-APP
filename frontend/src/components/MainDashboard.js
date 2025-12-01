@@ -137,11 +137,11 @@ const MainDashboard = () => {
 
       {/* Main Content */}
       <div className="px-8 py-12">
-        {/* Navigation Links at Top with Thin Gold Borders */}
-        <div className="max-w-6xl mx-auto mb-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Navigation Links at Top with Thin Gold Borders - Reorganized Menu */}
+        <div className="max-w-6xl mx-auto mb-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <button
             onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=Walkthrough`) : alert('No projects available')}
-            className="text-stone-300 p-4 rounded-lg transition-all duration-200"
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
               border: '1px solid #8b7355',
@@ -154,7 +154,7 @@ const MainDashboard = () => {
           
           <button
             onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=Checklist`) : alert('No projects available')}
-            className="text-stone-300 p-4 rounded-lg transition-all duration-200"
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
               border: '1px solid #8b7355',
@@ -167,7 +167,7 @@ const MainDashboard = () => {
           
           <button
             onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=FF&E`) : alert('No projects available')}
-            className="text-stone-300 p-4 rounded-lg transition-all duration-200"
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
               border: '1px solid #8b7355',
@@ -180,15 +180,41 @@ const MainDashboard = () => {
 
           <button
             onClick={() => handleNavigation('/power-features')}
-            className="text-white p-4 rounded-lg transition-all duration-200"
+            className="text-stone-300 p-4 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
-              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
               border: '1px solid #8b7355',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
             }}
           >
             <div className="text-2xl mb-2">🧮</div>
             <div className="text-sm">Calculators</div>
+          </button>
+
+          <button
+            onClick={() => handleNavigation('/master-contacts')}
+            className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
+            style={{
+              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
+              border: '1px solid #d4af37',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            <div className="text-2xl mb-2">👥</div>
+            <div className="text-sm font-medium">Master Contacts</div>
+          </button>
+
+          <button
+            onClick={() => handleNavigation('/master-materials')}
+            className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
+            style={{
+              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
+              border: '1px solid #d4af37',
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            <div className="text-2xl mb-2">📦</div>
+            <div className="text-sm font-medium">Master Materials</div>
           </button>
         </div>
 
