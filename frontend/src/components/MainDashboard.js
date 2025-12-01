@@ -179,7 +179,7 @@ const MainDashboard = () => {
           </button>
 
           <button
-            onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=Calculators`) : alert('No projects available')}
+            onClick={() => handleNavigation('/calculators')}
             className="text-stone-300 p-4 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
