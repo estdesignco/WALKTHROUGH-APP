@@ -429,28 +429,58 @@ export default function ProjectDetailPage() {
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Renovation Address</label>
+                                    <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                        {answers.renovation_address || project.client_info?.address || 'Not specified'}
+                                    </div>
+                                </div>
+                                <div>
                                     <label className="block text-sm font-medium text-[#D4A574] mb-2">Working with Architect?</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                        {project.renovation_architect || 'Not specified'}
+                                        {answers.renovation_architect || 'Not specified'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Architect Phone</label>
+                                    <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                        {answers.renovation_architect_phone || 'Not specified'}
                                     </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-[#D4A574] mb-2">Working with Builder?</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                        {project.renovation_builder || 'Not specified'}
+                                        {answers.renovation_builder || 'Not specified'}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Square Footage Being Renovated</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Builder Phone</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                        {project.renovation_square_footage || 'Not specified'}
+                                        {answers.renovation_builder_phone || 'Not specified'}
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Changing Layout/Footprint?</label>
-                                    <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                        {project.renovation_layout_change || 'Not specified'}
-                                    </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Existing Condition</label>
+                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] min-h-[80px]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                    {answers.renovation_existing_condition || 'Not specified'}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Need New Furniture?</label>
+                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                    {answers.renovation_need_furniture || 'Not specified'}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Favorite Memories of Current Home</label>
+                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] min-h-[80px]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                    {answers.renovation_memories || 'Not specified'}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Scope Notes</label>
+                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] min-h-[80px]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                    {answers.renovation_scope_notes || 'Not specified'}
                                 </div>
                             </div>
                         </div>
