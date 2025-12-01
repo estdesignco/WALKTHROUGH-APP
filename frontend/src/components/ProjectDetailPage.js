@@ -852,9 +852,24 @@ export default function ProjectDetailPage() {
 
         { name: "Calculators", icon: Calculator, component: project ? (
             <div className="calculators-content">
-                <PowerFeaturesDashboard />
+                <CalculatorDashboard projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading calculators...</div> },
+        { name: "Budget", icon: DollarSign, component: project ? (
+            <div className="budget-content">
+                <BudgetTracker projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading budget...</div> },
+        { name: "Vendors", icon: Phone, component: project ? (
+            <div className="vendors-content">
+                <VendorContactManager projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading vendors...</div> },
+        { name: "Materials", icon: Package, component: project ? (
+            <div className="materials-content">
+                <MaterialLibrary projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading materials...</div> },
         { name: "Automation", icon: Zap, component: project ? (
             <div className="automation-content">
                 <AutomationDashboard projectId={projectId} />
