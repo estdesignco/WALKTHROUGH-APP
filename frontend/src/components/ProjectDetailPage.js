@@ -404,22 +404,40 @@ export default function ProjectDetailPage() {
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">New Build Address</label>
+                                    <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                        {answers.new_build_address || 'Not specified'}
+                                    </div>
+                                </div>
+                                <div>
                                     <label className="block text-sm font-medium text-[#D4A574] mb-2">Working with Architect?</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                        {project.new_build_architect || 'Not specified'}
+                                        {answers.new_build_architect || 'Not specified'}
                                     </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-[#D4A574] mb-2">Working with Builder?</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                        {project.new_build_builder || 'Not specified'}
+                                        {answers.new_build_builder || 'Not specified'}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Square Footage</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Process Stage</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                        {project.new_build_square_footage || 'Not specified'}
+                                        {answers.new_build_process_stage || 'Not specified'}
                                     </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Need New Furniture?</label>
+                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                    {answers.new_build_need_furniture || 'Not specified'}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Scope Notes</label>
+                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] min-h-[80px]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                    {answers.new_build_scope_notes || 'Not specified'}
                                 </div>
                             </div>
                         </div>
