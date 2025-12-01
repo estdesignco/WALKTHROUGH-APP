@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Home } from 'lucide-react';
 import CalculatorDashboard from './CalculatorDashboard';
 import VendorContactManager from './VendorContactManager';
 import MaterialLibrary from './MaterialLibrary';
@@ -7,6 +8,7 @@ import BudgetTracker from './BudgetTracker';
 
 const PowerFeaturesDashboard = () => {
   const { projectId } = useParams();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('calculators');
 
   const tabs = [
@@ -18,6 +20,24 @@ const PowerFeaturesDashboard = () => {
 
   return (
     <div style={styles.container}>
+      {/* Back Navigation */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={styles.backButton}
+        >
+          <ArrowLeft size={16} />
+          <span>Back</span>
+        </button>
+        <button
+          onClick={() => navigate('/')}
+          style={styles.backButton}
+        >
+          <Home size={16} />
+          <span>Home</span>
+        </button>
+      </div>
+
       <div style={styles.header}>
         <h1 style={styles.mainTitle}>✨ POWER FEATURES DASHBOARD ✨</h1>
         <p style={styles.subtitle}>All the tools you need in one place</p>
