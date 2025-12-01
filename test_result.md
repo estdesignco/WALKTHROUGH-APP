@@ -1694,3 +1694,41 @@ test_plan:
 
    -agent: "main"
    -message: "✅ QUESTIONNAIRE DISPLAY FIX VERIFIED - ALL FIELDS NOW DISPLAYING CORRECTLY! Fixed critical issue where ProjectDetailPage.js was reading questionnaire fields from wrong data source (project.* instead of answers.*). Changes made: 1) Added Spouse/Partner Name and Phone fields to Client Information section, 2) Fixed Best Time to Call, Preferred Communication, Designer Experience, Primary Decision Maker, Involvement Level, and Ideal Sofa Price to read from answers.*, 3) Fixed Total Scope of Work section (Property Type, Timeline, Budget Range, Project Priority) to read from answers.*, 4) Enhanced Renovation section with all relevant fields (Address, Architect, Builder, Phones, Existing Condition, Need Furniture, Memories, Scope Notes), 5) Enhanced New Build section similarly, 6) Fixed Furniture Refresh section. Test project 040b8992-2557-4305-a822-4296733b668b has ALL 67 fields filled and displays with ZERO 'Not specified' or 'Not provided' messages. Verified via API: questionnaire has 67 fields with data. Verified via screenshot: 0 'Not specified', 0 'Not provided' found on page. The earlier UI testing agent failure was due to Playwright having trouble filling React controlled form inputs, NOT a data saving/display issue. When data is properly submitted via the form or API, it saves and displays correctly."
+
+---
+## Diagnostic Results - Issues Reported by User
+
+### Issue 1: Cursor jumping in questionnaire
+**Status**: Needs further investigation
+**Analysis**: This is typically caused by React re-rendering on every keystroke. The form uses controlled inputs with onChange handlers that update state. Will need to investigate if there's a parent component causing unnecessary re-renders.
+
+### Issue 2: Questionnaire issues (address autocomplete, rooms)
+**Status**: PARTIALLY FIXED
+- Address autocomplete: Added fallback manual input and defaultValue. Google Maps API may have referrer restrictions.
+- Checkbox groups: Fixed IDs to be unique (added index to prevent collisions)
+- Added console logging to debug checkbox changes
+
+### Issue 3: Contacts not created
+**Status**: VERIFIED WORKING
+- Created test project with builder, architect, spouse, electrician, plumber contacts
+- All 6 contacts were created successfully and appear on Contacts tab
+- The issue was likely previous test data being wiped from volatile database
+
+### Issue 4: Walkthrough minimize/collapse issue
+**Status**: FIXED
+- Root cause: useEffect was resetting expanded states on every project change
+- Fix: Added `hasInitialized` ref to track initialization
+- Fix: Made localStorage keys project-specific to avoid cross-contamination
+- Fix: Reset initialization when project ID changes
+
+### Issue 5: Add calendar to birthdays
+**Status**: NOT YET IMPLEMENTED
+- Birthday field is a textarea for multiple family members
+- Anniversary field already has date picker
+- Will need to decide: single date picker or multiple date pickers for each family member
+
+### Issue 6: Clear labeled fields for builder/architect/electrician
+**Status**: FIXED
+- Added proper labels: "Builder Name", "Builder Phone", "Architect Name", "Architect Phone"
+- Added placeholders: "Enter builder name", "XXX-XXX-XXXX"
+- Applied to both Renovation and New Build sections
