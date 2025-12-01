@@ -22,15 +22,12 @@ const SimpleWalkthroughSpreadsheet = ({
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
   
-  // Load expanded states from localStorage
-  const [expandedRooms, setExpandedRooms] = useState(() => {
-    const saved = localStorage.getItem('walkthrough_expandedRooms');
-    return saved ? JSON.parse(saved) : {};
-  });
-  const [expandedCategories, setExpandedCategories] = useState(() => {
-    const saved = localStorage.getItem('walkthrough_expandedCategories');
-    return saved ? JSON.parse(saved) : {};
-  });
+  // Get project-specific storage keys
+  const getStorageKey = (suffix) => `walkthrough_${project?.id || 'default'}_${suffix}`;
+  
+  // Load expanded states from localStorage (project-specific)
+  const [expandedRooms, setExpandedRooms] = useState({});
+  const [expandedCategories, setExpandedCategories] = useState({});
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
