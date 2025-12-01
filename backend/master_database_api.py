@@ -319,9 +319,10 @@ async def autocomplete_materials(q: str, limit: int = 10):
     
     query = {
         "$or": [
-            {"name": {"$regex": f"^{q}", "$options": "i"}},
-            {"manufacturer": {"$regex": f"^{q}", "$options": "i"}},
-            {"sku": {"$regex": f"^{q}", "$options": "i"}}
+            {"name": {"$regex": q, "$options": "i"}},
+            {"manufacturer": {"$regex": q, "$options": "i"}},
+            {"sku": {"$regex": q, "$options": "i"}},
+            {"color": {"$regex": q, "$options": "i"}}
         ]
     }
     
