@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://estdesign-portal.preview.emergentagent.com
+https://interioreye-app.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://estdesign-portal.preview.emergentagent.com/mobile-app
+https://interioreye-app.preview.emergentagent.com/mobile-app
 
 ---
 

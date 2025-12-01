@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://estdesign-portal.preview.emergentagent.com/api
+https://interioreye-app.preview.emergentagent.com/api
 ```
 
 ---

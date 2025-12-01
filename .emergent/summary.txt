@@ -18880,7 +18880,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_test_products.py:243:11
     |
-241 |     base_url = "https://estdesign-portal.preview.emergentagent.com/api"
+241 |     base_url = "https://interioreye-app.preview.emergentagent.com/api"
 242 |     
 243 |     print(f"\n🔍 TESTING SEARCH FUNCTIONALITY")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -18905,7 +18905,7 @@ F541 [*] f-string without any placeholders
 297 |         
 298 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
     |
 help: Remove extraneous `f` prefix
@@ -18914,7 +18914,7 @@ F541 [*] f-string without any placeholders
    --> add_test_products.py:299:15
     |
 298 |         print(f"\n🔗 NEXT STEPS:")
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
 301 |         print(f"3. Test the category filters and price ranges")
@@ -18925,7 +18925,7 @@ F541 [*] f-string without any placeholders
    --> add_test_products.py:300:15
     |
 298 |         print(f"\n🔗 NEXT STEPS:")
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 301 |         print(f"3. Test the category filters and price ranges")
@@ -18936,7 +18936,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_test_products.py:301:15
     |
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
 301 |         print(f"3. Test the category filters and price ranges")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -19199,7 +19199,7 @@ F541 [*] f-string without any placeholders
 372 |         print(f"\n🎉 SUCCESS! Furniture catalog system populated and tested")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 373 |         print(f"\n🔗 NEXT STEPS:")
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -19209,7 +19209,7 @@ F541 [*] f-string without any placeholders
 372 |         print(f"\n🎉 SUCCESS! Furniture catalog system populated and tested")
 373 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 375 |         print(f"2. Product count should now show {count} instead of 17")
     |
 help: Remove extraneous `f` prefix
@@ -19219,7 +19219,7 @@ F541 [*] f-string without any placeholders
     |
 372 |         print(f"\n🎉 SUCCESS! Furniture catalog system populated and tested")
 373 |         print(f"\n🔗 NEXT STEPS:")
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 375 |         print(f"2. Product count should now show {count} instead of 17")
 376 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
@@ -19229,7 +19229,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_to_furniture_catalog.py:376:15
     |
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 375 |         print(f"2. Product count should now show {count} instead of 17")
 376 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -19339,7 +19339,7 @@ F541 [*] f-string without any placeholders
 277 |         print(f"\n🎉 SUCCESS! Furniture database populated with test products")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 278 |         print(f"\n🔗 NEXT STEPS:")
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -19350,7 +19350,7 @@ F541 [*] f-string without any placeholders
 277 |         print(f"\n🎉 SUCCESS! Furniture database populated with test products")
 278 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 280 |         print(f"2. Product count should now show {result['total']} instead of 17")
     |
 help: Remove extraneous `f` prefix
@@ -19360,7 +19360,7 @@ F541 [*] f-string without any placeholders
     |
 277 |         print(f"\n🎉 SUCCESS! Furniture database populated with test products")
 278 |         print(f"\n🔗 NEXT STEPS:")
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 280 |         print(f"2. Product count should now show {result['total']} instead of 17")
 281 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
@@ -19370,7 +19370,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_to_furniture_database.py:281:15
     |
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 280 |         print(f"2. Product count should now show {result['total']} instead of 17")
 281 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -21671,7 +21671,7 @@ F541 [*] f-string without any placeholders
     |
 256 |     print("🏠 HOUZZ PRO SCRAPER BACKEND TESTING")
 257 |     print("="*80)
-258 |     print(f"Testing against: https://estdesign-portal.preview.emergentagent.com")
+258 |     print(f"Testing against: https://interioreye-app.preview.emergentagent.com")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 259 |     print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 260 |     print("="*80)
@@ -23078,7 +23078,7 @@ F541 [*] f-string without any placeholders
 177 | print(f"   - Links to Four Hands ✓")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 178 | print(f"   - Images from Perigold ✓")
-179 | print(f"\nView: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+179 | print(f"\nView: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |
 help: Remove extraneous `f` prefix
 
@@ -23089,7 +23089,7 @@ F541 [*] f-string without any placeholders
 177 | print(f"   - Links to Four Hands ✓")
 178 | print(f"   - Images from Perigold ✓")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-179 | print(f"\nView: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+179 | print(f"\nView: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |
 help: Remove extraneous `f` prefix
 
@@ -23098,7 +23098,7 @@ F541 [*] f-string without any placeholders
     |
 177 | print(f"   - Links to Four Hands ✓")
 178 | print(f"   - Images from Perigold ✓")
-179 | print(f"\nView: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+179 | print(f"\nView: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 180 |
 181 | client.close()
@@ -24082,7 +24082,7 @@ F541 [*] f-string without any placeholders
 72 |         # VERIFICATION 2: Check backend logs for public URL
 73 |         print(f"\n🔍 VERIFICATION 2: Checking backend logs for public URL...")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-74 |         print(f"   Expected URL pattern: https://estdesign-portal.preview.emergentagent.com/customer/questionnaire")
+74 |         print(f"   Expected URL pattern: https://interioreye-app.preview.emergentagent.com/customer/questionnaire")
 75 |         print(f"   NOT expected: localhost")
    |
 help: Remove extraneous `f` prefix
@@ -24092,7 +24092,7 @@ F541 [*] f-string without any placeholders
    |
 72 |         # VERIFICATION 2: Check backend logs for public URL
 73 |         print(f"\n🔍 VERIFICATION 2: Checking backend logs for public URL...")
-74 |         print(f"   Expected URL pattern: https://estdesign-portal.preview.emergentagent.com/customer/questionnaire")
+74 |         print(f"   Expected URL pattern: https://interioreye-app.preview.emergentagent.com/customer/questionnaire")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 75 |         print(f"   NOT expected: localhost")
    |
@@ -24102,7 +24102,7 @@ F541 [*] f-string without any placeholders
   --> email_workflow_test.py:75:15
    |
 73 |         print(f"\n🔍 VERIFICATION 2: Checking backend logs for public URL...")
-74 |         print(f"   Expected URL pattern: https://estdesign-portal.preview.emergentagent.com/customer/questionnaire")
+74 |         print(f"   Expected URL pattern: https://interioreye-app.preview.emergentagent.com/customer/questionnaire")
 75 |         print(f"   NOT expected: localhost")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 76 |         
@@ -26099,7 +26099,7 @@ F541 [*] f-string without any placeholders
 109 |     print(f"🎆 ULTIMATE FURNITURE SYSTEM STATUS COMPLETE")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -26110,7 +26110,7 @@ F541 [*] f-string without any placeholders
 109 |     print(f"🎆 ULTIMATE FURNITURE SYSTEM STATUS COMPLETE")
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 112 |     print(f"2. Notice larger product images and enhanced interface")
     |
 help: Remove extraneous `f` prefix
@@ -26120,7 +26120,7 @@ F541 [*] f-string without any placeholders
     |
 109 |     print(f"🎆 ULTIMATE FURNITURE SYSTEM STATUS COMPLETE")
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 112 |     print(f"2. Notice larger product images and enhanced interface")
 113 |     print(f"3. Search for 'Cove' or 'chair' - should find products")
@@ -26131,7 +26131,7 @@ F541 [*] f-string without any placeholders
    --> final_status_check.py:112:11
     |
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 112 |     print(f"2. Notice larger product images and enhanced interface")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 113 |     print(f"3. Search for 'Cove' or 'chair' - should find products")
@@ -26142,7 +26142,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> final_status_check.py:113:11
     |
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 112 |     print(f"2. Notice larger product images and enhanced interface")
 113 |     print(f"3. Search for 'Cove' or 'chair' - should find products")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -26647,7 +26647,7 @@ F541 [*] f-string without any placeholders
 294 |         print(f"\n🎉 SUCCESS! Database fixed and tested")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 295 |         print(f"\n🔗 NEXT STEPS:")
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -26657,7 +26657,7 @@ F541 [*] f-string without any placeholders
 294 |         print(f"\n🎉 SUCCESS! Database fixed and tested")
 295 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 297 |         print(f"2. Product count should now show {count} instead of 17")
     |
 help: Remove extraneous `f` prefix
@@ -26667,7 +26667,7 @@ F541 [*] f-string without any placeholders
     |
 294 |         print(f"\n🎉 SUCCESS! Database fixed and tested")
 295 |         print(f"\n🔗 NEXT STEPS:")
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 297 |         print(f"2. Product count should now show {count} instead of 17")
 298 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
@@ -26677,7 +26677,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> fix_database_mismatch.py:298:15
     |
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 297 |         print(f"2. Product count should now show {count} instead of 17")
 298 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -26946,7 +26946,7 @@ F541 [*] f-string without any placeholders
 192 |         print(f"\n🎉 SUCCESS! Fixed {updated_count} products")
 193 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 195 |         print(f"2. Images should now display properly (base64 format)")
     |
 help: Remove extraneous `f` prefix
@@ -26956,7 +26956,7 @@ F541 [*] f-string without any placeholders
     |
 192 |         print(f"\n🎉 SUCCESS! Fixed {updated_count} products")
 193 |         print(f"\n🔗 NEXT STEPS:")
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 195 |         print(f"2. Images should now display properly (base64 format)")
 196 |         print(f"3. Clicking 'VIEW' should go to real vendor pages")
@@ -26967,7 +26967,7 @@ F541 [*] f-string without any placeholders
    --> fix_images_and_links.py:195:15
     |
 193 |         print(f"\n🔗 NEXT STEPS:")
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 195 |         print(f"2. Images should now display properly (base64 format)")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 196 |         print(f"3. Clicking 'VIEW' should go to real vendor pages")
@@ -26978,7 +26978,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> fix_images_and_links.py:196:15
     |
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 195 |         print(f"2. Images should now display properly (base64 format)")
 196 |         print(f"3. Clicking 'VIEW' should go to real vendor pages")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -27273,7 +27273,7 @@ F541 [*] f-string without any placeholders
     |
 208 |     print("="*80)
 209 |     print(f"✅ SUCCESS: {success}/{num_products} products!")
-210 |     print(f"🔗 https://estdesign-portal.preview.emergentagent.com/furniture-search")
+210 |     print(f"🔗 https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 211 |     print("="*80)
     |
@@ -27453,7 +27453,7 @@ F541 [*] f-string without any placeholders
     |
 314 |         print(f"✅ Success: {success}/{num_products}")
 315 |         print(f"❌ Failed: {failed}/{num_products}")
-316 |         print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+316 |         print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 317 |         print("="*80 + "\n")
     |
@@ -27617,7 +27617,7 @@ F541 [*] f-string without any placeholders
 392 |     print(f"🎉 COMPLETE!")
     |           ^^^^^^^^^^^^^^^
 393 |     print(f"✅ Successfully imported {clipped} products")
-394 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+394 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -27626,7 +27626,7 @@ F541 [*] f-string without any placeholders
     |
 392 |     print(f"🎉 COMPLETE!")
 393 |     print(f"✅ Successfully imported {clipped} products")
-394 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+394 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 395 |     print("="*80 + "\n")
     |
@@ -28525,7 +28525,7 @@ F541 [*] f-string without any placeholders
     |
 216 |     print(f"\n{'='*80}")
 217 |     print(f"✅ {success}/{num_products} products imported with HIGH QUALITY images!")
-218 |     print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+218 |     print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 219 |     
 220 |     client.close()
@@ -28974,7 +28974,7 @@ F541 [*] f-string without any placeholders
 267 |     
 268 |     print(f"\n🎉 DONE! Refresh the frontend to see real Four Hands products!")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-269 |     print(f"🔗 https://estdesign-portal.preview.emergentagent.com/furniture-search")
+269 |     print(f"🔗 https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -28982,7 +28982,7 @@ F541 [*] f-string without any placeholders
    --> import_fourhands_real.py:269:11
     |
 268 |     print(f"\n🎉 DONE! Refresh the frontend to see real Four Hands products!")
-269 |     print(f"🔗 https://estdesign-portal.preview.emergentagent.com/furniture-search")
+269 |     print(f"🔗 https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     |
 help: Remove extraneous `f` prefix
@@ -29006,7 +29006,7 @@ F541 [*] f-string without any placeholders
 83 | print(f"\n✅ Import complete!")
    |       ^^^^^^^^^^^^^^^^^^^^^^^^
 84 | print(f"📊 Total Four Hands in database: {total_fh}")
-85 | print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+85 | print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |
 help: Remove extraneous `f` prefix
 
@@ -29015,7 +29015,7 @@ F541 [*] f-string without any placeholders
    |
 83 | print(f"\n✅ Import complete!")
 84 | print(f"📊 Total Four Hands in database: {total_fh}")
-85 | print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+85 | print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 86 | print(f"\n💡 Next: Once this works, we can:")
 87 | print(f"   1. Scale to all {len(df_stock)} products")
@@ -29026,7 +29026,7 @@ F541 [*] f-string without any placeholders
   --> import_from_excel_only.py:86:7
    |
 84 | print(f"📊 Total Four Hands in database: {total_fh}")
-85 | print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+85 | print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
 86 | print(f"\n💡 Next: Once this works, we can:")
    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 87 | print(f"   1. Scale to all {len(df_stock)} products")
@@ -29216,7 +29216,7 @@ F541 [*] f-string without any placeholders
 55 |         print(f"\n🎉 ENHANCED GALLERY INTEGRATION COMPLETE!")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |
 help: Remove extraneous `f` prefix
 
@@ -29227,7 +29227,7 @@ F541 [*] f-string without any placeholders
 55 |         print(f"\n🎉 ENHANCED GALLERY INTEGRATION COMPLETE!")
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 58 |         print(f"2. Notice larger product images")
    |
 help: Remove extraneous `f` prefix
@@ -29237,7 +29237,7 @@ F541 [*] f-string without any placeholders
    |
 55 |         print(f"\n🎉 ENHANCED GALLERY INTEGRATION COMPLETE!")
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 58 |         print(f"2. Notice larger product images")
 59 |         print(f"3. Click on any product image (not VIEW button)")
@@ -29248,7 +29248,7 @@ F541 [*] f-string without any placeholders
   --> integrate_enhanced_gallery.py:58:15
    |
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 58 |         print(f"2. Notice larger product images")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 59 |         print(f"3. Click on any product image (not VIEW button)")
@@ -29259,7 +29259,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
   --> integrate_enhanced_gallery.py:59:15
    |
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 58 |         print(f"2. Notice larger product images")
 59 |         print(f"3. Click on any product image (not VIEW button)")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -29547,7 +29547,7 @@ F541 [*] f-string without any placeholders
     |
 280 | print(f"\n{'='*70}")
 281 | print(f"✅ {success}/3 succeeded with HIGH QUALITY images!")
-282 | print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+282 | print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 283 |
 284 | client.close()
@@ -29655,7 +29655,7 @@ F541 [*] f-string without any placeholders
 198 |         print(f"\n🎉 PHASE B SUCCESS!")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^
 199 |         print(f"\n🔗 USER TESTING:")
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -29665,7 +29665,7 @@ F541 [*] f-string without any placeholders
 198 |         print(f"\n🎉 PHASE B SUCCESS!")
 199 |         print(f"\n🔗 USER TESTING:")
     |               ^^^^^^^^^^^^^^^^^^^^^
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
     |
 help: Remove extraneous `f` prefix
@@ -29675,7 +29675,7 @@ F541 [*] f-string without any placeholders
     |
 198 |         print(f"\n🎉 PHASE B SUCCESS!")
 199 |         print(f"\n🔗 USER TESTING:")
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
 202 |         print(f"3. Click on the Four Hands chair image")
@@ -29686,7 +29686,7 @@ F541 [*] f-string without any placeholders
    --> phase_b_scale_skus.py:201:15
     |
 199 |         print(f"\n🔗 USER TESTING:")
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 202 |         print(f"3. Click on the Four Hands chair image")
@@ -29697,7 +29697,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> phase_b_scale_skus.py:202:15
     |
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
 202 |         print(f"3. Click on the Four Hands chair image")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -30802,7 +30802,7 @@ F541 [*] f-string without any placeholders
    --> proof_of_concept_import.py:135:7
     |
 134 | print(f"\n🎉 Done! {success}/5 succeeded")
-135 | print(f"Check: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+135 | print(f"Check: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 136 | client.close()
     |
@@ -30870,7 +30870,7 @@ F541 [*] f-string without any placeholders
     |
 200 |         print(f"\n{'='*80}")
 201 |         print(f"✅ Imported {imported} products from Houzz Pro!")
-202 |         print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+202 |         print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 203 |         print(f"{'='*80}\n")
     |
@@ -31598,7 +31598,7 @@ F541 [*] f-string without any placeholders
 291 |     print("="*80)
 292 |     print(f"🎉 TEST COMPLETE!")
     |           ^^^^^^^^^^^^^^^^^^^^
-293 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+293 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
 294 |     print("="*80 + "\n")
     |
 help: Remove extraneous `f` prefix
@@ -31608,7 +31608,7 @@ F541 [*] f-string without any placeholders
     |
 291 |     print("="*80)
 292 |     print(f"🎉 TEST COMPLETE!")
-293 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+293 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 294 |     print("="*80 + "\n")
     |
@@ -31678,7 +31678,7 @@ F541 [*] f-string without any placeholders
 260 |         print(f"\n✅ SUCCESS! {updated_count} products now have REAL images")
 261 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
     |
 help: Remove extraneous `f` prefix
@@ -31688,7 +31688,7 @@ F541 [*] f-string without any placeholders
     |
 260 |         print(f"\n✅ SUCCESS! {updated_count} products now have REAL images")
 261 |         print(f"\n🔗 NEXT STEPS:")
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
 264 |         print(f"3. These are the real product images, not generic stock photos")
@@ -31699,7 +31699,7 @@ F541 [*] f-string without any placeholders
    --> real_product_image_scraper.py:263:15
     |
 261 |         print(f"\n🔗 NEXT STEPS:")
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 264 |         print(f"3. These are the real product images, not generic stock photos")
@@ -31710,7 +31710,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> real_product_image_scraper.py:264:15
     |
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
 264 |         print(f"3. These are the real product images, not generic stock photos")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -31929,7 +31929,7 @@ F541 [*] f-string without any placeholders
 237 | print(f"✅ Success: {success}/5")
 238 | print(f"\nIf this works, we can scale to thousands!")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-239 | print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+239 | print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |
 help: Remove extraneous `f` prefix
 
@@ -31938,7 +31938,7 @@ F541 [*] f-string without any placeholders
     |
 237 | print(f"✅ Success: {success}/5")
 238 | print(f"\nIf this works, we can scale to thousands!")
-239 | print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+239 | print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 240 |
 241 | client.close()
@@ -35041,7 +35041,7 @@ F541 [*] f-string without any placeholders
 335 |     print(f"🎉 COMPLETE!")
     |           ^^^^^^^^^^^^^^^
 336 |     print(f"✅ Successfully imported {success}/{num_products} Uttermost products")
-337 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+337 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -35050,7 +35050,7 @@ F541 [*] f-string without any placeholders
     |
 335 |     print(f"🎉 COMPLETE!")
 336 |     print(f"✅ Successfully imported {success}/{num_products} Uttermost products")
-337 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+337 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 338 |     print("="*80 + "\n")
     |
@@ -56171,7 +56171,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_test_products.py:243:11
     |
-241 |     base_url = "https://estdesign-portal.preview.emergentagent.com/api"
+241 |     base_url = "https://interioreye-app.preview.emergentagent.com/api"
 242 |     
 243 |     print(f"\n🔍 TESTING SEARCH FUNCTIONALITY")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -56196,7 +56196,7 @@ F541 [*] f-string without any placeholders
 297 |         
 298 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
     |
 help: Remove extraneous `f` prefix
@@ -56205,7 +56205,7 @@ F541 [*] f-string without any placeholders
    --> add_test_products.py:299:15
     |
 298 |         print(f"\n🔗 NEXT STEPS:")
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
 301 |         print(f"3. Test the category filters and price ranges")
@@ -56216,7 +56216,7 @@ F541 [*] f-string without any placeholders
    --> add_test_products.py:300:15
     |
 298 |         print(f"\n🔗 NEXT STEPS:")
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 301 |         print(f"3. Test the category filters and price ranges")
@@ -56227,7 +56227,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_test_products.py:301:15
     |
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
 301 |         print(f"3. Test the category filters and price ranges")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -56490,7 +56490,7 @@ F541 [*] f-string without any placeholders
 372 |         print(f"\n🎉 SUCCESS! Furniture catalog system populated and tested")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 373 |         print(f"\n🔗 NEXT STEPS:")
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -56500,7 +56500,7 @@ F541 [*] f-string without any placeholders
 372 |         print(f"\n🎉 SUCCESS! Furniture catalog system populated and tested")
 373 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 375 |         print(f"2. Product count should now show {count} instead of 17")
     |
 help: Remove extraneous `f` prefix
@@ -56510,7 +56510,7 @@ F541 [*] f-string without any placeholders
     |
 372 |         print(f"\n🎉 SUCCESS! Furniture catalog system populated and tested")
 373 |         print(f"\n🔗 NEXT STEPS:")
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 375 |         print(f"2. Product count should now show {count} instead of 17")
 376 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
@@ -56520,7 +56520,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_to_furniture_catalog.py:376:15
     |
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 375 |         print(f"2. Product count should now show {count} instead of 17")
 376 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -56630,7 +56630,7 @@ F541 [*] f-string without any placeholders
 277 |         print(f"\n🎉 SUCCESS! Furniture database populated with test products")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 278 |         print(f"\n🔗 NEXT STEPS:")
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -56641,7 +56641,7 @@ F541 [*] f-string without any placeholders
 277 |         print(f"\n🎉 SUCCESS! Furniture database populated with test products")
 278 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 280 |         print(f"2. Product count should now show {result['total']} instead of 17")
     |
 help: Remove extraneous `f` prefix
@@ -56651,7 +56651,7 @@ F541 [*] f-string without any placeholders
     |
 277 |         print(f"\n🎉 SUCCESS! Furniture database populated with test products")
 278 |         print(f"\n🔗 NEXT STEPS:")
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 280 |         print(f"2. Product count should now show {result['total']} instead of 17")
 281 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
@@ -56661,7 +56661,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_to_furniture_database.py:281:15
     |
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 280 |         print(f"2. Product count should now show {result['total']} instead of 17")
 281 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -58962,7 +58962,7 @@ F541 [*] f-string without any placeholders
     |
 256 |     print("🏠 HOUZZ PRO SCRAPER BACKEND TESTING")
 257 |     print("="*80)
-258 |     print(f"Testing against: https://estdesign-portal.preview.emergentagent.com")
+258 |     print(f"Testing against: https://interioreye-app.preview.emergentagent.com")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 259 |     print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 260 |     print("="*80)
@@ -60369,7 +60369,7 @@ F541 [*] f-string without any placeholders
 177 | print(f"   - Links to Four Hands ✓")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 178 | print(f"   - Images from Perigold ✓")
-179 | print(f"\nView: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+179 | print(f"\nView: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |
 help: Remove extraneous `f` prefix
 
@@ -60380,7 +60380,7 @@ F541 [*] f-string without any placeholders
 177 | print(f"   - Links to Four Hands ✓")
 178 | print(f"   - Images from Perigold ✓")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-179 | print(f"\nView: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+179 | print(f"\nView: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |
 help: Remove extraneous `f` prefix
 
@@ -60389,7 +60389,7 @@ F541 [*] f-string without any placeholders
     |
 177 | print(f"   - Links to Four Hands ✓")
 178 | print(f"   - Images from Perigold ✓")
-179 | print(f"\nView: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+179 | print(f"\nView: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 180 |
 181 | client.close()
@@ -61373,7 +61373,7 @@ F541 [*] f-string without any placeholders
 72 |         # VERIFICATION 2: Check backend logs for public URL
 73 |         print(f"\n🔍 VERIFICATION 2: Checking backend logs for public URL...")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-74 |         print(f"   Expected URL pattern: https://estdesign-portal.preview.emergentagent.com/customer/questionnaire")
+74 |         print(f"   Expected URL pattern: https://interioreye-app.preview.emergentagent.com/customer/questionnaire")
 75 |         print(f"   NOT expected: localhost")
    |
 help: Remove extraneous `f` prefix
@@ -61383,7 +61383,7 @@ F541 [*] f-string without any placeholders
    |
 72 |         # VERIFICATION 2: Check backend logs for public URL
 73 |         print(f"\n🔍 VERIFICATION 2: Checking backend logs for public URL...")
-74 |         print(f"   Expected URL pattern: https://estdesign-portal.preview.emergentagent.com/customer/questionnaire")
+74 |         print(f"   Expected URL pattern: https://interioreye-app.preview.emergentagent.com/customer/questionnaire")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 75 |         print(f"   NOT expected: localhost")
    |
@@ -61393,7 +61393,7 @@ F541 [*] f-string without any placeholders
   --> email_workflow_test.py:75:15
    |
 73 |         print(f"\n🔍 VERIFICATION 2: Checking backend logs for public URL...")
-74 |         print(f"   Expected URL pattern: https://estdesign-portal.preview.emergentagent.com/customer/questionnaire")
+74 |         print(f"   Expected URL pattern: https://interioreye-app.preview.emergentagent.com/customer/questionnaire")
 75 |         print(f"   NOT expected: localhost")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 76 |         
@@ -63390,7 +63390,7 @@ F541 [*] f-string without any placeholders
 109 |     print(f"🎆 ULTIMATE FURNITURE SYSTEM STATUS COMPLETE")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -63401,7 +63401,7 @@ F541 [*] f-string without any placeholders
 109 |     print(f"🎆 ULTIMATE FURNITURE SYSTEM STATUS COMPLETE")
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 112 |     print(f"2. Notice larger product images and enhanced interface")
     |
 help: Remove extraneous `f` prefix
@@ -63411,7 +63411,7 @@ F541 [*] f-string without any placeholders
     |
 109 |     print(f"🎆 ULTIMATE FURNITURE SYSTEM STATUS COMPLETE")
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 112 |     print(f"2. Notice larger product images and enhanced interface")
 113 |     print(f"3. Search for 'Cove' or 'chair' - should find products")
@@ -63422,7 +63422,7 @@ F541 [*] f-string without any placeholders
    --> final_status_check.py:112:11
     |
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 112 |     print(f"2. Notice larger product images and enhanced interface")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 113 |     print(f"3. Search for 'Cove' or 'chair' - should find products")
@@ -63433,7 +63433,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> final_status_check.py:113:11
     |
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 112 |     print(f"2. Notice larger product images and enhanced interface")
 113 |     print(f"3. Search for 'Cove' or 'chair' - should find products")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -63938,7 +63938,7 @@ F541 [*] f-string without any placeholders
 294 |         print(f"\n🎉 SUCCESS! Database fixed and tested")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 295 |         print(f"\n🔗 NEXT STEPS:")
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -63948,7 +63948,7 @@ F541 [*] f-string without any placeholders
 294 |         print(f"\n🎉 SUCCESS! Database fixed and tested")
 295 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 297 |         print(f"2. Product count should now show {count} instead of 17")
     |
 help: Remove extraneous `f` prefix
@@ -63958,7 +63958,7 @@ F541 [*] f-string without any placeholders
     |
 294 |         print(f"\n🎉 SUCCESS! Database fixed and tested")
 295 |         print(f"\n🔗 NEXT STEPS:")
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 297 |         print(f"2. Product count should now show {count} instead of 17")
 298 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
@@ -63968,7 +63968,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> fix_database_mismatch.py:298:15
     |
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 297 |         print(f"2. Product count should now show {count} instead of 17")
 298 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -64237,7 +64237,7 @@ F541 [*] f-string without any placeholders
 192 |         print(f"\n🎉 SUCCESS! Fixed {updated_count} products")
 193 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 195 |         print(f"2. Images should now display properly (base64 format)")
     |
 help: Remove extraneous `f` prefix
@@ -64247,7 +64247,7 @@ F541 [*] f-string without any placeholders
     |
 192 |         print(f"\n🎉 SUCCESS! Fixed {updated_count} products")
 193 |         print(f"\n🔗 NEXT STEPS:")
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 195 |         print(f"2. Images should now display properly (base64 format)")
 196 |         print(f"3. Clicking 'VIEW' should go to real vendor pages")
@@ -64258,7 +64258,7 @@ F541 [*] f-string without any placeholders
    --> fix_images_and_links.py:195:15
     |
 193 |         print(f"\n🔗 NEXT STEPS:")
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 195 |         print(f"2. Images should now display properly (base64 format)")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 196 |         print(f"3. Clicking 'VIEW' should go to real vendor pages")
@@ -64269,7 +64269,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> fix_images_and_links.py:196:15
     |
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 195 |         print(f"2. Images should now display properly (base64 format)")
 196 |         print(f"3. Clicking 'VIEW' should go to real vendor pages")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -64564,7 +64564,7 @@ F541 [*] f-string without any placeholders
     |
 208 |     print("="*80)
 209 |     print(f"✅ SUCCESS: {success}/{num_products} products!")
-210 |     print(f"🔗 https://estdesign-portal.preview.emergentagent.com/furniture-search")
+210 |     print(f"🔗 https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 211 |     print("="*80)
     |
@@ -64744,7 +64744,7 @@ F541 [*] f-string without any placeholders
     |
 314 |         print(f"✅ Success: {success}/{num_products}")
 315 |         print(f"❌ Failed: {failed}/{num_products}")
-316 |         print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+316 |         print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 317 |         print("="*80 + "\n")
     |
@@ -64908,7 +64908,7 @@ F541 [*] f-string without any placeholders
 392 |     print(f"🎉 COMPLETE!")
     |           ^^^^^^^^^^^^^^^
 393 |     print(f"✅ Successfully imported {clipped} products")
-394 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+394 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -64917,7 +64917,7 @@ F541 [*] f-string without any placeholders
     |
 392 |     print(f"🎉 COMPLETE!")
 393 |     print(f"✅ Successfully imported {clipped} products")
-394 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+394 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 395 |     print("="*80 + "\n")
     |
@@ -65816,7 +65816,7 @@ F541 [*] f-string without any placeholders
     |
 216 |     print(f"\n{'='*80}")
 217 |     print(f"✅ {success}/{num_products} products imported with HIGH QUALITY images!")
-218 |     print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+218 |     print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 219 |     
 220 |     client.close()
@@ -66265,7 +66265,7 @@ F541 [*] f-string without any placeholders
 267 |     
 268 |     print(f"\n🎉 DONE! Refresh the frontend to see real Four Hands products!")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-269 |     print(f"🔗 https://estdesign-portal.preview.emergentagent.com/furniture-search")
+269 |     print(f"🔗 https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -66273,7 +66273,7 @@ F541 [*] f-string without any placeholders
    --> import_fourhands_real.py:269:11
     |
 268 |     print(f"\n🎉 DONE! Refresh the frontend to see real Four Hands products!")
-269 |     print(f"🔗 https://estdesign-portal.preview.emergentagent.com/furniture-search")
+269 |     print(f"🔗 https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     |
 help: Remove extraneous `f` prefix
@@ -66297,7 +66297,7 @@ F541 [*] f-string without any placeholders
 83 | print(f"\n✅ Import complete!")
    |       ^^^^^^^^^^^^^^^^^^^^^^^^
 84 | print(f"📊 Total Four Hands in database: {total_fh}")
-85 | print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+85 | print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |
 help: Remove extraneous `f` prefix
 
@@ -66306,7 +66306,7 @@ F541 [*] f-string without any placeholders
    |
 83 | print(f"\n✅ Import complete!")
 84 | print(f"📊 Total Four Hands in database: {total_fh}")
-85 | print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+85 | print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 86 | print(f"\n💡 Next: Once this works, we can:")
 87 | print(f"   1. Scale to all {len(df_stock)} products")
@@ -66317,7 +66317,7 @@ F541 [*] f-string without any placeholders
   --> import_from_excel_only.py:86:7
    |
 84 | print(f"📊 Total Four Hands in database: {total_fh}")
-85 | print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+85 | print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
 86 | print(f"\n💡 Next: Once this works, we can:")
    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 87 | print(f"   1. Scale to all {len(df_stock)} products")
@@ -66507,7 +66507,7 @@ F541 [*] f-string without any placeholders
 55 |         print(f"\n🎉 ENHANCED GALLERY INTEGRATION COMPLETE!")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |
 help: Remove extraneous `f` prefix
 
@@ -66518,7 +66518,7 @@ F541 [*] f-string without any placeholders
 55 |         print(f"\n🎉 ENHANCED GALLERY INTEGRATION COMPLETE!")
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 58 |         print(f"2. Notice larger product images")
    |
 help: Remove extraneous `f` prefix
@@ -66528,7 +66528,7 @@ F541 [*] f-string without any placeholders
    |
 55 |         print(f"\n🎉 ENHANCED GALLERY INTEGRATION COMPLETE!")
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 58 |         print(f"2. Notice larger product images")
 59 |         print(f"3. Click on any product image (not VIEW button)")
@@ -66539,7 +66539,7 @@ F541 [*] f-string without any placeholders
   --> integrate_enhanced_gallery.py:58:15
    |
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 58 |         print(f"2. Notice larger product images")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 59 |         print(f"3. Click on any product image (not VIEW button)")
@@ -66550,7 +66550,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
   --> integrate_enhanced_gallery.py:59:15
    |
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 58 |         print(f"2. Notice larger product images")
 59 |         print(f"3. Click on any product image (not VIEW button)")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -66838,7 +66838,7 @@ F541 [*] f-string without any placeholders
     |
 280 | print(f"\n{'='*70}")
 281 | print(f"✅ {success}/3 succeeded with HIGH QUALITY images!")
-282 | print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+282 | print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 283 |
 284 | client.close()
@@ -66946,7 +66946,7 @@ F541 [*] f-string without any placeholders
 198 |         print(f"\n🎉 PHASE B SUCCESS!")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^
 199 |         print(f"\n🔗 USER TESTING:")
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -66956,7 +66956,7 @@ F541 [*] f-string without any placeholders
 198 |         print(f"\n🎉 PHASE B SUCCESS!")
 199 |         print(f"\n🔗 USER TESTING:")
     |               ^^^^^^^^^^^^^^^^^^^^^
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
     |
 help: Remove extraneous `f` prefix
@@ -66966,7 +66966,7 @@ F541 [*] f-string without any placeholders
     |
 198 |         print(f"\n🎉 PHASE B SUCCESS!")
 199 |         print(f"\n🔗 USER TESTING:")
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
 202 |         print(f"3. Click on the Four Hands chair image")
@@ -66977,7 +66977,7 @@ F541 [*] f-string without any placeholders
    --> phase_b_scale_skus.py:201:15
     |
 199 |         print(f"\n🔗 USER TESTING:")
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 202 |         print(f"3. Click on the Four Hands chair image")
@@ -66988,7 +66988,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> phase_b_scale_skus.py:202:15
     |
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
 202 |         print(f"3. Click on the Four Hands chair image")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -68093,7 +68093,7 @@ F541 [*] f-string without any placeholders
    --> proof_of_concept_import.py:135:7
     |
 134 | print(f"\n🎉 Done! {success}/5 succeeded")
-135 | print(f"Check: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+135 | print(f"Check: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 136 | client.close()
     |
@@ -68161,7 +68161,7 @@ F541 [*] f-string without any placeholders
     |
 200 |         print(f"\n{'='*80}")
 201 |         print(f"✅ Imported {imported} products from Houzz Pro!")
-202 |         print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+202 |         print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 203 |         print(f"{'='*80}\n")
     |
@@ -68889,7 +68889,7 @@ F541 [*] f-string without any placeholders
 291 |     print("="*80)
 292 |     print(f"🎉 TEST COMPLETE!")
     |           ^^^^^^^^^^^^^^^^^^^^
-293 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+293 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
 294 |     print("="*80 + "\n")
     |
 help: Remove extraneous `f` prefix
@@ -68899,7 +68899,7 @@ F541 [*] f-string without any placeholders
     |
 291 |     print("="*80)
 292 |     print(f"🎉 TEST COMPLETE!")
-293 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+293 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 294 |     print("="*80 + "\n")
     |
@@ -68969,7 +68969,7 @@ F541 [*] f-string without any placeholders
 260 |         print(f"\n✅ SUCCESS! {updated_count} products now have REAL images")
 261 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
     |
 help: Remove extraneous `f` prefix
@@ -68979,7 +68979,7 @@ F541 [*] f-string without any placeholders
     |
 260 |         print(f"\n✅ SUCCESS! {updated_count} products now have REAL images")
 261 |         print(f"\n🔗 NEXT STEPS:")
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
 264 |         print(f"3. These are the real product images, not generic stock photos")
@@ -68990,7 +68990,7 @@ F541 [*] f-string without any placeholders
    --> real_product_image_scraper.py:263:15
     |
 261 |         print(f"\n🔗 NEXT STEPS:")
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 264 |         print(f"3. These are the real product images, not generic stock photos")
@@ -69001,7 +69001,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> real_product_image_scraper.py:264:15
     |
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
 264 |         print(f"3. These are the real product images, not generic stock photos")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -69220,7 +69220,7 @@ F541 [*] f-string without any placeholders
 237 | print(f"✅ Success: {success}/5")
 238 | print(f"\nIf this works, we can scale to thousands!")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-239 | print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+239 | print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |
 help: Remove extraneous `f` prefix
 
@@ -69229,7 +69229,7 @@ F541 [*] f-string without any placeholders
     |
 237 | print(f"✅ Success: {success}/5")
 238 | print(f"\nIf this works, we can scale to thousands!")
-239 | print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+239 | print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 240 |
 241 | client.close()
@@ -72332,7 +72332,7 @@ F541 [*] f-string without any placeholders
 335 |     print(f"🎉 COMPLETE!")
     |           ^^^^^^^^^^^^^^^
 336 |     print(f"✅ Successfully imported {success}/{num_products} Uttermost products")
-337 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+337 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -72341,7 +72341,7 @@ F541 [*] f-string without any placeholders
     |
 335 |     print(f"🎉 COMPLETE!")
 336 |     print(f"✅ Successfully imported {success}/{num_products} Uttermost products")
-337 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+337 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 338 |     print("="*80 + "\n")
     |
@@ -91369,7 +91369,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_test_products.py:243:11
     |
-241 |     base_url = "https://estdesign-portal.preview.emergentagent.com/api"
+241 |     base_url = "https://interioreye-app.preview.emergentagent.com/api"
 242 |     
 243 |     print(f"\n🔍 TESTING SEARCH FUNCTIONALITY")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -91394,7 +91394,7 @@ F541 [*] f-string without any placeholders
 297 |         
 298 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
     |
 help: Remove extraneous `f` prefix
@@ -91403,7 +91403,7 @@ F541 [*] f-string without any placeholders
    --> add_test_products.py:299:15
     |
 298 |         print(f"\n🔗 NEXT STEPS:")
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
 301 |         print(f"3. Test the category filters and price ranges")
@@ -91414,7 +91414,7 @@ F541 [*] f-string without any placeholders
    --> add_test_products.py:300:15
     |
 298 |         print(f"\n🔗 NEXT STEPS:")
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 301 |         print(f"3. Test the category filters and price ranges")
@@ -91425,7 +91425,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_test_products.py:301:15
     |
-299 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+299 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 300 |         print(f"2. Try searching for: 'chair', 'table', 'Four Hands', 'Uttermost'")
 301 |         print(f"3. Test the category filters and price ranges")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -91688,7 +91688,7 @@ F541 [*] f-string without any placeholders
 372 |         print(f"\n🎉 SUCCESS! Furniture catalog system populated and tested")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 373 |         print(f"\n🔗 NEXT STEPS:")
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -91698,7 +91698,7 @@ F541 [*] f-string without any placeholders
 372 |         print(f"\n🎉 SUCCESS! Furniture catalog system populated and tested")
 373 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 375 |         print(f"2. Product count should now show {count} instead of 17")
     |
 help: Remove extraneous `f` prefix
@@ -91708,7 +91708,7 @@ F541 [*] f-string without any placeholders
     |
 372 |         print(f"\n🎉 SUCCESS! Furniture catalog system populated and tested")
 373 |         print(f"\n🔗 NEXT STEPS:")
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 375 |         print(f"2. Product count should now show {count} instead of 17")
 376 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
@@ -91718,7 +91718,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_to_furniture_catalog.py:376:15
     |
-374 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+374 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 375 |         print(f"2. Product count should now show {count} instead of 17")
 376 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -91828,7 +91828,7 @@ F541 [*] f-string without any placeholders
 277 |         print(f"\n🎉 SUCCESS! Furniture database populated with test products")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 278 |         print(f"\n🔗 NEXT STEPS:")
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -91839,7 +91839,7 @@ F541 [*] f-string without any placeholders
 277 |         print(f"\n🎉 SUCCESS! Furniture database populated with test products")
 278 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 280 |         print(f"2. Product count should now show {result['total']} instead of 17")
     |
 help: Remove extraneous `f` prefix
@@ -91849,7 +91849,7 @@ F541 [*] f-string without any placeholders
     |
 277 |         print(f"\n🎉 SUCCESS! Furniture database populated with test products")
 278 |         print(f"\n🔗 NEXT STEPS:")
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 280 |         print(f"2. Product count should now show {result['total']} instead of 17")
 281 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
@@ -91859,7 +91859,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> add_to_furniture_database.py:281:15
     |
-279 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+279 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 280 |         print(f"2. Product count should now show {result['total']} instead of 17")
 281 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -94160,7 +94160,7 @@ F541 [*] f-string without any placeholders
     |
 256 |     print("🏠 HOUZZ PRO SCRAPER BACKEND TESTING")
 257 |     print("="*80)
-258 |     print(f"Testing against: https://estdesign-portal.preview.emergentagent.com")
+258 |     print(f"Testing against: https://interioreye-app.preview.emergentagent.com")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 259 |     print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 260 |     print("="*80)
@@ -95567,7 +95567,7 @@ F541 [*] f-string without any placeholders
 177 | print(f"   - Links to Four Hands ✓")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 178 | print(f"   - Images from Perigold ✓")
-179 | print(f"\nView: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+179 | print(f"\nView: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |
 help: Remove extraneous `f` prefix
 
@@ -95578,7 +95578,7 @@ F541 [*] f-string without any placeholders
 177 | print(f"   - Links to Four Hands ✓")
 178 | print(f"   - Images from Perigold ✓")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-179 | print(f"\nView: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+179 | print(f"\nView: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |
 help: Remove extraneous `f` prefix
 
@@ -95587,7 +95587,7 @@ F541 [*] f-string without any placeholders
     |
 177 | print(f"   - Links to Four Hands ✓")
 178 | print(f"   - Images from Perigold ✓")
-179 | print(f"\nView: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+179 | print(f"\nView: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 180 |
 181 | client.close()
@@ -96571,7 +96571,7 @@ F541 [*] f-string without any placeholders
 72 |         # VERIFICATION 2: Check backend logs for public URL
 73 |         print(f"\n🔍 VERIFICATION 2: Checking backend logs for public URL...")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-74 |         print(f"   Expected URL pattern: https://estdesign-portal.preview.emergentagent.com/customer/questionnaire")
+74 |         print(f"   Expected URL pattern: https://interioreye-app.preview.emergentagent.com/customer/questionnaire")
 75 |         print(f"   NOT expected: localhost")
    |
 help: Remove extraneous `f` prefix
@@ -96581,7 +96581,7 @@ F541 [*] f-string without any placeholders
    |
 72 |         # VERIFICATION 2: Check backend logs for public URL
 73 |         print(f"\n🔍 VERIFICATION 2: Checking backend logs for public URL...")
-74 |         print(f"   Expected URL pattern: https://estdesign-portal.preview.emergentagent.com/customer/questionnaire")
+74 |         print(f"   Expected URL pattern: https://interioreye-app.preview.emergentagent.com/customer/questionnaire")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 75 |         print(f"   NOT expected: localhost")
    |
@@ -96591,7 +96591,7 @@ F541 [*] f-string without any placeholders
   --> email_workflow_test.py:75:15
    |
 73 |         print(f"\n🔍 VERIFICATION 2: Checking backend logs for public URL...")
-74 |         print(f"   Expected URL pattern: https://estdesign-portal.preview.emergentagent.com/customer/questionnaire")
+74 |         print(f"   Expected URL pattern: https://interioreye-app.preview.emergentagent.com/customer/questionnaire")
 75 |         print(f"   NOT expected: localhost")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 76 |         
@@ -98588,7 +98588,7 @@ F541 [*] f-string without any placeholders
 109 |     print(f"🎆 ULTIMATE FURNITURE SYSTEM STATUS COMPLETE")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -98599,7 +98599,7 @@ F541 [*] f-string without any placeholders
 109 |     print(f"🎆 ULTIMATE FURNITURE SYSTEM STATUS COMPLETE")
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 112 |     print(f"2. Notice larger product images and enhanced interface")
     |
 help: Remove extraneous `f` prefix
@@ -98609,7 +98609,7 @@ F541 [*] f-string without any placeholders
     |
 109 |     print(f"🎆 ULTIMATE FURNITURE SYSTEM STATUS COMPLETE")
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 112 |     print(f"2. Notice larger product images and enhanced interface")
 113 |     print(f"3. Search for 'Cove' or 'chair' - should find products")
@@ -98620,7 +98620,7 @@ F541 [*] f-string without any placeholders
    --> final_status_check.py:112:11
     |
 110 |     print(f"\n🔗 USER TESTING CHECKLIST:")
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 112 |     print(f"2. Notice larger product images and enhanced interface")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 113 |     print(f"3. Search for 'Cove' or 'chair' - should find products")
@@ -98631,7 +98631,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> final_status_check.py:113:11
     |
-111 |     print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+111 |     print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 112 |     print(f"2. Notice larger product images and enhanced interface")
 113 |     print(f"3. Search for 'Cove' or 'chair' - should find products")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -99136,7 +99136,7 @@ F541 [*] f-string without any placeholders
 294 |         print(f"\n🎉 SUCCESS! Database fixed and tested")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 295 |         print(f"\n🔗 NEXT STEPS:")
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -99146,7 +99146,7 @@ F541 [*] f-string without any placeholders
 294 |         print(f"\n🎉 SUCCESS! Database fixed and tested")
 295 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 297 |         print(f"2. Product count should now show {count} instead of 17")
     |
 help: Remove extraneous `f` prefix
@@ -99156,7 +99156,7 @@ F541 [*] f-string without any placeholders
     |
 294 |         print(f"\n🎉 SUCCESS! Database fixed and tested")
 295 |         print(f"\n🔗 NEXT STEPS:")
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 297 |         print(f"2. Product count should now show {count} instead of 17")
 298 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
@@ -99166,7 +99166,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> fix_database_mismatch.py:298:15
     |
-296 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+296 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 297 |         print(f"2. Product count should now show {count} instead of 17")
 298 |         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -99435,7 +99435,7 @@ F541 [*] f-string without any placeholders
 192 |         print(f"\n🎉 SUCCESS! Fixed {updated_count} products")
 193 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 195 |         print(f"2. Images should now display properly (base64 format)")
     |
 help: Remove extraneous `f` prefix
@@ -99445,7 +99445,7 @@ F541 [*] f-string without any placeholders
     |
 192 |         print(f"\n🎉 SUCCESS! Fixed {updated_count} products")
 193 |         print(f"\n🔗 NEXT STEPS:")
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 195 |         print(f"2. Images should now display properly (base64 format)")
 196 |         print(f"3. Clicking 'VIEW' should go to real vendor pages")
@@ -99456,7 +99456,7 @@ F541 [*] f-string without any placeholders
    --> fix_images_and_links.py:195:15
     |
 193 |         print(f"\n🔗 NEXT STEPS:")
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 195 |         print(f"2. Images should now display properly (base64 format)")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 196 |         print(f"3. Clicking 'VIEW' should go to real vendor pages")
@@ -99467,7 +99467,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> fix_images_and_links.py:196:15
     |
-194 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+194 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 195 |         print(f"2. Images should now display properly (base64 format)")
 196 |         print(f"3. Clicking 'VIEW' should go to real vendor pages")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -99762,7 +99762,7 @@ F541 [*] f-string without any placeholders
     |
 208 |     print("="*80)
 209 |     print(f"✅ SUCCESS: {success}/{num_products} products!")
-210 |     print(f"🔗 https://estdesign-portal.preview.emergentagent.com/furniture-search")
+210 |     print(f"🔗 https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 211 |     print("="*80)
     |
@@ -99942,7 +99942,7 @@ F541 [*] f-string without any placeholders
     |
 314 |         print(f"✅ Success: {success}/{num_products}")
 315 |         print(f"❌ Failed: {failed}/{num_products}")
-316 |         print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+316 |         print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 317 |         print("="*80 + "\n")
     |
@@ -100106,7 +100106,7 @@ F541 [*] f-string without any placeholders
 392 |     print(f"🎉 COMPLETE!")
     |           ^^^^^^^^^^^^^^^
 393 |     print(f"✅ Successfully imported {clipped} products")
-394 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+394 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -100115,7 +100115,7 @@ F541 [*] f-string without any placeholders
     |
 392 |     print(f"🎉 COMPLETE!")
 393 |     print(f"✅ Successfully imported {clipped} products")
-394 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+394 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 395 |     print("="*80 + "\n")
     |
@@ -101014,7 +101014,7 @@ F541 [*] f-string without any placeholders
     |
 216 |     print(f"\n{'='*80}")
 217 |     print(f"✅ {success}/{num_products} products imported with HIGH QUALITY images!")
-218 |     print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+218 |     print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 219 |     
 220 |     client.close()
@@ -101463,7 +101463,7 @@ F541 [*] f-string without any placeholders
 267 |     
 268 |     print(f"\n🎉 DONE! Refresh the frontend to see real Four Hands products!")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-269 |     print(f"🔗 https://estdesign-portal.preview.emergentagent.com/furniture-search")
+269 |     print(f"🔗 https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -101471,7 +101471,7 @@ F541 [*] f-string without any placeholders
    --> import_fourhands_real.py:269:11
     |
 268 |     print(f"\n🎉 DONE! Refresh the frontend to see real Four Hands products!")
-269 |     print(f"🔗 https://estdesign-portal.preview.emergentagent.com/furniture-search")
+269 |     print(f"🔗 https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     |
 help: Remove extraneous `f` prefix
@@ -101495,7 +101495,7 @@ F541 [*] f-string without any placeholders
 83 | print(f"\n✅ Import complete!")
    |       ^^^^^^^^^^^^^^^^^^^^^^^^
 84 | print(f"📊 Total Four Hands in database: {total_fh}")
-85 | print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+85 | print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |
 help: Remove extraneous `f` prefix
 
@@ -101504,7 +101504,7 @@ F541 [*] f-string without any placeholders
    |
 83 | print(f"\n✅ Import complete!")
 84 | print(f"📊 Total Four Hands in database: {total_fh}")
-85 | print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+85 | print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 86 | print(f"\n💡 Next: Once this works, we can:")
 87 | print(f"   1. Scale to all {len(df_stock)} products")
@@ -101515,7 +101515,7 @@ F541 [*] f-string without any placeholders
   --> import_from_excel_only.py:86:7
    |
 84 | print(f"📊 Total Four Hands in database: {total_fh}")
-85 | print(f"\n🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+85 | print(f"\n🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
 86 | print(f"\n💡 Next: Once this works, we can:")
    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 87 | print(f"   1. Scale to all {len(df_stock)} products")
@@ -101705,7 +101705,7 @@ F541 [*] f-string without any placeholders
 55 |         print(f"\n🎉 ENHANCED GALLERY INTEGRATION COMPLETE!")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |
 help: Remove extraneous `f` prefix
 
@@ -101716,7 +101716,7 @@ F541 [*] f-string without any placeholders
 55 |         print(f"\n🎉 ENHANCED GALLERY INTEGRATION COMPLETE!")
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 58 |         print(f"2. Notice larger product images")
    |
 help: Remove extraneous `f` prefix
@@ -101726,7 +101726,7 @@ F541 [*] f-string without any placeholders
    |
 55 |         print(f"\n🎉 ENHANCED GALLERY INTEGRATION COMPLETE!")
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 58 |         print(f"2. Notice larger product images")
 59 |         print(f"3. Click on any product image (not VIEW button)")
@@ -101737,7 +101737,7 @@ F541 [*] f-string without any placeholders
   --> integrate_enhanced_gallery.py:58:15
    |
 56 |         print(f"\n📱 TEST THE ENHANCEMENTS:")
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 58 |         print(f"2. Notice larger product images")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 59 |         print(f"3. Click on any product image (not VIEW button)")
@@ -101748,7 +101748,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
   --> integrate_enhanced_gallery.py:59:15
    |
-57 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+57 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 58 |         print(f"2. Notice larger product images")
 59 |         print(f"3. Click on any product image (not VIEW button)")
    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -102036,7 +102036,7 @@ F541 [*] f-string without any placeholders
     |
 280 | print(f"\n{'='*70}")
 281 | print(f"✅ {success}/3 succeeded with HIGH QUALITY images!")
-282 | print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+282 | print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 283 |
 284 | client.close()
@@ -102144,7 +102144,7 @@ F541 [*] f-string without any placeholders
 198 |         print(f"\n🎉 PHASE B SUCCESS!")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^
 199 |         print(f"\n🔗 USER TESTING:")
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -102154,7 +102154,7 @@ F541 [*] f-string without any placeholders
 198 |         print(f"\n🎉 PHASE B SUCCESS!")
 199 |         print(f"\n🔗 USER TESTING:")
     |               ^^^^^^^^^^^^^^^^^^^^^
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
     |
 help: Remove extraneous `f` prefix
@@ -102164,7 +102164,7 @@ F541 [*] f-string without any placeholders
     |
 198 |         print(f"\n🎉 PHASE B SUCCESS!")
 199 |         print(f"\n🔗 USER TESTING:")
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
 202 |         print(f"3. Click on the Four Hands chair image")
@@ -102175,7 +102175,7 @@ F541 [*] f-string without any placeholders
    --> phase_b_scale_skus.py:201:15
     |
 199 |         print(f"\n🔗 USER TESTING:")
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 202 |         print(f"3. Click on the Four Hands chair image")
@@ -102186,7 +102186,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> phase_b_scale_skus.py:202:15
     |
-200 |         print(f"1. Go to: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+200 |         print(f"1. Go to: https://interioreye-app.preview.emergentagent.com/furniture-search")
 201 |         print(f"2. Search for 'Cove' or '248606-001'")
 202 |         print(f"3. Click on the Four Hands chair image")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -103291,7 +103291,7 @@ F541 [*] f-string without any placeholders
    --> proof_of_concept_import.py:135:7
     |
 134 | print(f"\n🎉 Done! {success}/5 succeeded")
-135 | print(f"Check: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+135 | print(f"Check: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 136 | client.close()
     |
@@ -103359,7 +103359,7 @@ F541 [*] f-string without any placeholders
     |
 200 |         print(f"\n{'='*80}")
 201 |         print(f"✅ Imported {imported} products from Houzz Pro!")
-202 |         print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+202 |         print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 203 |         print(f"{'='*80}\n")
     |
@@ -104087,7 +104087,7 @@ F541 [*] f-string without any placeholders
 291 |     print("="*80)
 292 |     print(f"🎉 TEST COMPLETE!")
     |           ^^^^^^^^^^^^^^^^^^^^
-293 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+293 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
 294 |     print("="*80 + "\n")
     |
 help: Remove extraneous `f` prefix
@@ -104097,7 +104097,7 @@ F541 [*] f-string without any placeholders
     |
 291 |     print("="*80)
 292 |     print(f"🎉 TEST COMPLETE!")
-293 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+293 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 294 |     print("="*80 + "\n")
     |
@@ -104167,7 +104167,7 @@ F541 [*] f-string without any placeholders
 260 |         print(f"\n✅ SUCCESS! {updated_count} products now have REAL images")
 261 |         print(f"\n🔗 NEXT STEPS:")
     |               ^^^^^^^^^^^^^^^^^^^
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
     |
 help: Remove extraneous `f` prefix
@@ -104177,7 +104177,7 @@ F541 [*] f-string without any placeholders
     |
 260 |         print(f"\n✅ SUCCESS! {updated_count} products now have REAL images")
 261 |         print(f"\n🔗 NEXT STEPS:")
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
 264 |         print(f"3. These are the real product images, not generic stock photos")
@@ -104188,7 +104188,7 @@ F541 [*] f-string without any placeholders
    --> real_product_image_scraper.py:263:15
     |
 261 |         print(f"\n🔗 NEXT STEPS:")
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 264 |         print(f"3. These are the real product images, not generic stock photos")
@@ -104199,7 +104199,7 @@ help: Remove extraneous `f` prefix
 F541 [*] f-string without any placeholders
    --> real_product_image_scraper.py:264:15
     |
-262 |         print(f"1. Refresh: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+262 |         print(f"1. Refresh: https://interioreye-app.preview.emergentagent.com/furniture-search")
 263 |         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
 264 |         print(f"3. These are the real product images, not generic stock photos")
     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -104418,7 +104418,7 @@ F541 [*] f-string without any placeholders
 237 | print(f"✅ Success: {success}/5")
 238 | print(f"\nIf this works, we can scale to thousands!")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-239 | print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+239 | print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |
 help: Remove extraneous `f` prefix
 
@@ -104427,7 +104427,7 @@ F541 [*] f-string without any placeholders
     |
 237 | print(f"✅ Success: {success}/5")
 238 | print(f"\nIf this works, we can scale to thousands!")
-239 | print(f"View: https://estdesign-portal.preview.emergentagent.com/furniture-search\n")
+239 | print(f"View: https://interioreye-app.preview.emergentagent.com/furniture-search\n")
     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 240 |
 241 | client.close()
@@ -107530,7 +107530,7 @@ F541 [*] f-string without any placeholders
 335 |     print(f"🎉 COMPLETE!")
     |           ^^^^^^^^^^^^^^^
 336 |     print(f"✅ Successfully imported {success}/{num_products} Uttermost products")
-337 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+337 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |
 help: Remove extraneous `f` prefix
 
@@ -107539,7 +107539,7 @@ F541 [*] f-string without any placeholders
     |
 335 |     print(f"🎉 COMPLETE!")
 336 |     print(f"✅ Successfully imported {success}/{num_products} Uttermost products")
-337 |     print(f"🔗 View: https://estdesign-portal.preview.emergentagent.com/furniture-search")
+337 |     print(f"🔗 View: https://interioreye-app.preview.emergentagent.com/furniture-search")
     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 338 |     print("="*80 + "\n")
     |

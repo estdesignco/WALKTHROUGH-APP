@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://estdesign-portal.preview.emergentagent.com';
+const BACKEND_URL = 'https://interioreye-app.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings
