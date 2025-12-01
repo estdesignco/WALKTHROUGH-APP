@@ -508,16 +508,22 @@ export default function ProjectDetailPage() {
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Square Footage Being Refreshed</label>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Condition of Current Furniture</label>
                                     <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-                                        {project.furniture_refresh_square_footage || 'Not specified'}
+                                        {answers.furniture_refresh_condition || 'Not specified'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#D4A574] mb-2">Move-in Date</label>
+                                    <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                        {answers.furniture_move_in_date || 'Not specified'}
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Keeping Any Existing Pieces?</label>
-                                <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[80px]">
-                                    {project.furniture_refresh_keeping_pieces || 'Not specified'}
+                                <label className="block text-sm font-medium text-[#D4A574] mb-2">Scope Notes</label>
+                                <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] min-h-[80px]" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                                    {answers.furniture_scope_notes || 'Not specified'}
                                 </div>
                             </div>
                         </div>
