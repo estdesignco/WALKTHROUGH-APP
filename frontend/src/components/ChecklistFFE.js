@@ -26,6 +26,11 @@ const ChecklistFFE = ({
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
 
+  // Calculator Popup State
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calculatorItem, setCalculatorItem] = useState(null);
+  const [calculatorCategory, setCalculatorCategory] = useState('');
+
   // FILTER STATE - MAKE IT ACTUALLY WORK
   const [filteredProject, setFilteredProject] = useState(project);
   
