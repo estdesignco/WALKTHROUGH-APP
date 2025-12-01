@@ -775,14 +775,26 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                             </FieldWrapper>
                             <FieldWrapper label="Do you have an Architect?">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <input className={inputStyles} placeholder="Architect Name" value={formData.new_build_architect || ''} onChange={(e) => handleFormChange('new_build_architect', e.target.value)} />
-                                    <input className={inputStyles} placeholder="Architect Phone" value={formData.new_build_architect_phone || ''} onChange={(e) => handleFormChange('new_build_architect_phone', e.target.value)} />
+                                    <div className="space-y-1">
+                                        <label className="text-sm text-[#B49B7E]">Architect Name</label>
+                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="Enter architect name" value={formData.new_build_architect || ''} onChange={(e) => handleFormChange('new_build_architect', e.target.value)} />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-sm text-[#B49B7E]">Architect Phone</label>
+                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="XXX-XXX-XXXX" value={formData.new_build_architect_phone || ''} onChange={(e) => handleFormChange('new_build_architect_phone', e.target.value)} />
+                                    </div>
                                 </div>
                             </FieldWrapper>
                             <FieldWrapper label="Do you have a Builder?">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <input className={inputStyles} placeholder="Builder Name" value={formData.new_build_builder || ''} onChange={(e) => handleFormChange('new_build_builder', e.target.value)} />
-                                    <input className={inputStyles} placeholder="Builder Phone" value={formData.new_build_builder_phone || ''} onChange={(e) => handleFormChange('new_build_builder_phone', e.target.value)} />
+                                    <div className="space-y-1">
+                                        <label className="text-sm text-[#B49B7E]">Builder Name</label>
+                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="Enter builder name" value={formData.new_build_builder || ''} onChange={(e) => handleFormChange('new_build_builder', e.target.value)} />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-sm text-[#B49B7E]">Builder Phone</label>
+                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="XXX-XXX-XXXX" value={formData.new_build_builder_phone || ''} onChange={(e) => handleFormChange('new_build_builder_phone', e.target.value)} />
+                                    </div>
                                 </div>
                             </FieldWrapper>
                             
