@@ -101,6 +101,9 @@ const FieldWrapper = ({ label, children, required }) => (
 
 const inputStyles = "bg-black/40 border-[#B49B7E]/30 text-[#F5F5DC] focus:border-[#B49B7E] focus:bg-black/60 placeholder:text-[#B49B7E]/50 transition-all duration-300 min-h-[120px] p-4 text-base";
 
+// Full-width textarea style for long-form answers
+const textareaStyles = "w-full min-h-[150px] rounded-md border border-gray-600 bg-gray-700 px-4 py-3 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400 resize-y text-base";
+
 // New InputField component
 const InputField = ({ label, id, value, onChange, required = false, type = "text", placeholder = "" }) => (
     <div className="space-y-3">
