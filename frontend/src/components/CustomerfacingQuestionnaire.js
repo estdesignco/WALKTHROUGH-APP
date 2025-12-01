@@ -482,6 +482,44 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     completed_at: new Date().toISOString()
                 });
                 console.log('✅ Questionnaire answers saved!');
+                
+                // Auto-sync contacts to master database
+                if (formData.renovation_builder) {
+                    await autoSyncContact({
+                        name: formData.renovation_builder,
+                        phone: formData.renovation_builder_phone || '',
+                        role: 'Builder/General Contractor'
+                    }, newProject.id);
+                    console.log('✅ Builder contact synced to master database');
+                }
+                
+                if (formData.renovation_architect) {
+                    await autoSyncContact({
+                        name: formData.renovation_architect,
+                        phone: formData.renovation_architect_phone || '',
+                        role: 'Architect'
+                    }, newProject.id);
+                    console.log('✅ Architect contact synced to master database');
+                }
+                
+                if (formData.new_build_builder) {
+                    await autoSyncContact({
+                        name: formData.new_build_builder,
+                        phone: '',
+                        role: 'Builder/General Contractor'
+                    }, newProject.id);
+                    console.log('✅ New build builder contact synced to master database');
+                }
+                
+                if (formData.new_build_architect) {
+                    await autoSyncContact({
+                        name: formData.new_build_architect,
+                        phone: '',
+                        role: 'Architect'
+                    }, newProject.id);
+                    console.log('✅ New build architect contact synced to master database');
+                }
+                
             } catch (saveError) {
                 console.error('❌ Failed to save questionnaire answers:', saveError);
                 alert('Warning: Questionnaire data may not have saved completely. Error: ' + saveError.message);
