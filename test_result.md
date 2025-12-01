@@ -1752,3 +1752,55 @@ agent_communication:
 - Added proper labels: "Builder Name", "Builder Phone", "Architect Name", "Architect Phone"
 - Added placeholders: "Enter builder name", "XXX-XXX-XXXX"
 - Applied to both Renovation and New Build sections
+
+---
+## Testing Update - December 2024
+
+### Backend API Testing - ALL PASSED ✅
+
+1. **Project Creation API** - POST /api/projects ✅
+   - Creates projects successfully with ID and data
+
+2. **Questionnaire Save API** - POST /api/questionnaire/{project_id} ✅
+   - Saves questionnaire with new family_birthdays array format
+   - Format: [{"name": "John", "date": "1985-03-15"}, ...]
+
+3. **Questionnaire Retrieve API** - GET /api/questionnaire/{project_id} ✅
+   - Returns all saved data correctly
+   - Preserves family_birthdays array format
+
+4. **Project Detail API** - GET /api/projects/{project_id} ✅
+   - Returns project and client_info with rooms
+
+5. **Rooms API** - POST /api/rooms ✅
+   - Creates rooms with auto-population (73 items, 7 categories per room)
+
+### Features Implemented This Session
+
+1. **Birthday Calendar Feature** ✅
+   - Added BirthdayEntryList component with date pickers
+   - Allows adding multiple family member birthdays
+   - Each entry has name field + date picker
+   - "Add another family member" button for multiple entries
+   - Backward compatible with old string format
+
+2. **Room Selection Checkboxes** ✅
+   - Verified working correctly
+   - Checkboxes toggle properly in UI
+
+3. **Full-width Textareas** ✅
+   - Already implemented from previous session
+   - All 40+ textareas are full-width
+
+4. **Cursor Jumping Fix** ✅
+   - Already implemented from previous session
+   - Phone number inputs maintain cursor position
+
+5. **Builder/Architect Labels** ✅
+   - Already implemented from previous session
+   - Clear labels and placeholders for contact fields
+
+### Test Projects Created
+
+1. `d1b17a1d-6950-4bcd-b9cb-b4f3e797fce4` - Test Project Complete (4 rooms)
+2. `7af6ef9d-4e3f-4e77-a87d-8f99fc0e6af2` - Birthday Calendar Test (new format birthdays)
