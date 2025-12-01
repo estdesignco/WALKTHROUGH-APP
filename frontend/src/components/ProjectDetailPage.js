@@ -275,11 +275,27 @@ export default function ProjectDetailPage() {
                             )}
                         </div>
                         <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Spouse/Partner Name</label>
+                            <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
+                                background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
+                            }}>
+                                {answers.spouse_partner_name || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Spouse/Partner Phone</label>
+                            <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
+                                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                            }}>
+                                {answers.spouse_partner_phone || 'Not provided'}
+                            </div>
+                        </div>
+                        <div>
                             <label className="block text-sm font-medium text-[#D4A574] mb-2">Best Time to Call</label>
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
-                                {project.best_time_to_call || 'Not specified'}
+                                {answers.best_time_to_call || 'Not specified'}
                             </div>
                         </div>
                         <div>
@@ -287,7 +303,7 @@ export default function ProjectDetailPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
-                                {Array.isArray(project.contact_preferences) ? project.contact_preferences.join(', ') : project.contact_preferences || 'Not specified'}
+                                {Array.isArray(answers.contact_preferences) ? answers.contact_preferences.join(', ') : answers.contact_preferences || 'Not specified'}
                             </div>
                         </div>
                         <div className="md:col-span-2">
@@ -295,7 +311,7 @@ export default function ProjectDetailPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9] min-h-[80px]" style={{
                                 background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
-                                {project.worked_with_designer_before || 'Not provided'}
+                                {answers.worked_with_designer_before || 'Not provided'}
                             </div>
                         </div>
                         <div>
@@ -303,7 +319,7 @@ export default function ProjectDetailPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
-                                {project.primary_decision_maker || 'Not specified'}
+                                {answers.primary_decision_maker || 'Not specified'}
                             </div>
                         </div>
                         <div>
@@ -311,7 +327,7 @@ export default function ProjectDetailPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 15, 0.95) 70%, rgba(10, 10, 10, 0.95) 100%)'
                             }}>
-                                {project.involvement_level || 'Not specified'}
+                                {answers.involvement_level || 'Not specified'}
                             </div>
                         </div>
                         <div>
@@ -319,7 +335,7 @@ export default function ProjectDetailPage() {
                             <div className="p-3 border border-[#D4A574]/50 rounded text-[#D4C5A9]" style={{
                                 background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                             }}>
-                                {project.ideal_sofa_price || 'Not specified'}
+                                {answers.ideal_sofa_price || 'Not specified'}
                             </div>
                         </div>
                     </div>
