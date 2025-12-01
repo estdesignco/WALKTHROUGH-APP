@@ -59,32 +59,37 @@ const CalculatorPopup = ({
   });
 
   // Auto-detect calculator type from category/item name
-  useEffect(() => {
+  const detectedType = React.useMemo(() => {
     const itemLower = itemName.toLowerCase();
     const categoryLower = categoryName.toLowerCase();
     
     if (itemLower.includes('wallpaper') || itemLower.includes('wall covering') || 
         categoryLower.includes('wall treatment') || categoryLower.includes('wallpaper')) {
-      setCalculatorType('wallpaper');
+      return 'wallpaper';
     } else if (itemLower.includes('drapery') || itemLower.includes('drape') || 
                itemLower.includes('curtain') || itemLower.includes('fabric') ||
                categoryLower.includes('window') || categoryLower.includes('textile') ||
                categoryLower.includes('soft good')) {
-      setCalculatorType('drapery');
+      return 'drapery';
     } else if (itemLower.includes('paint') || categoryLower.includes('paint')) {
-      setCalculatorType('paint');
+      return 'paint';
     } else if (itemLower.includes('tile') || itemLower.includes('flooring') || 
                itemLower.includes('floor') || itemLower.includes('carpet') ||
                categoryLower.includes('flooring') || categoryLower.includes('tile')) {
-      setCalculatorType('tile');
+      return 'tile';
     } else if (itemLower.includes('hardware') || itemLower.includes('knob') || 
                itemLower.includes('pull') || itemLower.includes('handle') ||
                categoryLower.includes('hardware')) {
-      setCalculatorType('hardware');
+      return 'hardware';
     } else {
-      setCalculatorType('general');
+      return 'general';
     }
   }, [itemName, categoryName]);
+  
+  // Set calculator type when detected type changes
+  useEffect(() => {
+    setCalculatorType(detectedType);
+  }, [detectedType]);
 
   // Calculate cost based on calculator type
   const calculate = () => {
