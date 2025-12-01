@@ -704,9 +704,21 @@ export default function ProjectDetailPage() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[#D4A574] mb-2">When are your families Birthdays?</label>
+                            <label className="block text-sm font-medium text-[#D4A574] mb-2">Family Birthdays</label>
                             <div className="p-3 bg-stone-700 border border-stone-600 rounded text-[#D4C5A9] min-h-[100px]">
-                                {answers.know_you_family_birthdays || 'Not provided'}
+                                {/* Handle both old string format and new array format */}
+                                {answers.family_birthdays && Array.isArray(answers.family_birthdays) && answers.family_birthdays.length > 0 ? (
+                                    <ul className="list-none space-y-1">
+                                        {answers.family_birthdays.filter(b => b.name || b.date).map((birthday, idx) => (
+                                            <li key={idx} className="flex items-center gap-2">
+                                                <span className="font-medium">{birthday.name || 'Unknown'}</span>
+                                                {birthday.date && <span className="text-[#B49B7E]">- {new Date(birthday.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</span>}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : answers.know_you_family_birthdays ? (
+                                    answers.know_you_family_birthdays
+                                ) : 'Not provided'}
                             </div>
                         </div>
                         <div>
