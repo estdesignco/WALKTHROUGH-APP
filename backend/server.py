@@ -9605,6 +9605,7 @@ contacts_api.set_db(db)
 app.include_router(calculator_router)
 app.include_router(power_features_router)
 app.include_router(moodboard_router)
+app.include_router(master_database_router)
 
 # HOUZZ CLIPPER WEBHOOK - Intercepts data on its way to Houzz
 # REMOVED HOUZZ FUNCTION: @app.post("/api/houzz-clipper-webhook")
