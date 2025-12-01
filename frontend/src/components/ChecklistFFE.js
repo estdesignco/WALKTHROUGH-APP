@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
+import CalculatorPopup from './CalculatorPopup';
 
 const ChecklistFFE = ({ 
   project, 
