@@ -319,6 +319,14 @@ const App = () => {
                       path="/power-features/:projectId" 
                       element={<PowerFeaturesDashboard />}
                     />
+                    <Route 
+                      path="/master-contacts" 
+                      element={<MasterContactsPage />}
+                    />
+                    <Route 
+                      path="/master-materials" 
+                      element={<MasterMaterialsPage />}
+                    />
                   </Routes>
                 </main>
               </>
