@@ -618,9 +618,9 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         <InputField label="Full Name" id="client_name" value={formData.client_name || ''} onChange={(e) => handleFormChange('client_name', e.target.value)} required />
                         <InputField label="Project Name" id="name" value={formData.name || ''} onChange={(e) => handleFormChange('name', e.target.value)} required />
                         <InputField label="Email Address" id="email" type="email" value={formData.email || ''} onChange={(e) => handleFormChange('email', e.target.value)} />
-                        <InputField label="Phone Number" id="phone" type="tel" value={formData.phone || ''} onChange={(e) => handleFormChange('phone', e.target.value)} />
+                        <InputField label="Phone Number" id="phone" type="tel" value={formData.phone || ''} onChange={(e) => handleFormChange('phone', e.target.value, e)} />
                         <InputField label="Spouse / Partner Name" id="spouse_partner_name" value={formData.spouse_partner_name || ''} onChange={(e) => handleFormChange('spouse_partner_name', e.target.value)} />
-                        <InputField label="Spouse / Partner Phone" id="spouse_partner_phone" type="tel" value={formData.spouse_partner_phone || ''} onChange={(e) => handleFormChange('spouse_partner_phone', e.target.value)} />
+                        <InputField label="Spouse / Partner Phone" id="spouse_partner_phone" type="tel" value={formData.spouse_partner_phone || ''} onChange={(e) => handleFormChange('spouse_partner_phone', e.target.value, e)} />
                         <FieldWrapper label="Project Address">
                             <Autocomplete
                                 apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
@@ -806,7 +806,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm text-[#B49B7E]">Architect Phone</label>
-                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="XXX-XXX-XXXX" value={formData.new_build_architect_phone || ''} onChange={(e) => handleFormChange('new_build_architect_phone', e.target.value)} />
+                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="XXX-XXX-XXXX" value={formData.new_build_architect_phone || ''} onChange={(e) => handleFormChange('new_build_architect_phone', e.target.value, e)} />
                                     </div>
                                 </div>
                             </FieldWrapper>
@@ -818,7 +818,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm text-[#B49B7E]">Builder Phone</label>
-                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="XXX-XXX-XXXX" value={formData.new_build_builder_phone || ''} onChange={(e) => handleFormChange('new_build_builder_phone', e.target.value)} />
+                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="XXX-XXX-XXXX" value={formData.new_build_builder_phone || ''} onChange={(e) => handleFormChange('new_build_builder_phone', e.target.value, e)} />
                                     </div>
                                 </div>
                             </FieldWrapper>
@@ -925,7 +925,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm text-[#B49B7E]">Builder Phone</label>
-                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="XXX-XXX-XXXX" value={formData.renovation_builder_phone || ''} onChange={(e) => handleFormChange('renovation_builder_phone', e.target.value)} />
+                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="XXX-XXX-XXXX" value={formData.renovation_builder_phone || ''} onChange={(e) => handleFormChange('renovation_builder_phone', e.target.value, e)} />
                                     </div>
                                 </div>
                             </FieldWrapper>
@@ -938,7 +938,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm text-[#B49B7E]">Architect Phone</label>
-                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="XXX-XXX-XXXX" value={formData.renovation_architect_phone || ''} onChange={(e) => handleFormChange('renovation_architect_phone', e.target.value)} />
+                                        <input className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400" placeholder="XXX-XXX-XXXX" value={formData.renovation_architect_phone || ''} onChange={(e) => handleFormChange('renovation_architect_phone', e.target.value, e)} />
                                     </div>
                                 </div>
                             </FieldWrapper>
