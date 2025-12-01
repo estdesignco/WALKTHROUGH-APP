@@ -702,10 +702,14 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
         <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black p-4 sm:p-6 lg:p-8" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
             <div className="max-w-4xl mx-auto bg-gradient-to-br from-black/60 to-gray-900/80 p-8 rounded-3xl shadow-2xl border border-[#B49B7E]/20 backdrop-blur-sm">
                 {/* Back Button */}
-                <div className="mb-8">
-                    <Link to={editProjectId ? `/customer/project/${editProjectId}` : "/customer"} className="flex items-center text-[#B49B7E]/70 hover:text-[#B49B7E] transition-all duration-300">
+                <div className="mb-8 flex items-center gap-3">
+                    <Link to={editProjectId ? `/customer/project/${editProjectId}` : "/customer"} className="flex items-center text-[#B49B7E]/70 hover:text-[#B49B7E] transition-all duration-300 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-[#B49B7E]/30">
                         <ArrowLeft className="w-5 h-5 mr-2" />
-                        {editProjectId ? 'Back to Project' : 'Back to Home'}
+                        {editProjectId ? 'Back to Project' : 'Back'}
+                    </Link>
+                    <Link to="/" className="flex items-center text-[#B49B7E]/70 hover:text-[#B49B7E] transition-all duration-300 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-[#B49B7E]/30">
+                        <Home className="w-5 h-5 mr-2" />
+                        Home
                     </Link>
                 </div>
 
