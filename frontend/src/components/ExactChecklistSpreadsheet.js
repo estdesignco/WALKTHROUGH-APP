@@ -153,6 +153,42 @@ const ExactChecklistSpreadsheet = ({
     }
   };
 
+  // Handle calculator popup open
+  const openCalculator = (item, categoryName) => {
+    setCalculatorItem(item);
+    setCalculatorCategory(categoryName);
+    setShowCalculator(true);
+  };
+
+  // Handle cost update from calculator
+  const handleCostCalculated = async (newCost) => {
+    if (!calculatorItem) return;
+    
+    try {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/items/${calculatorItem.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cost: newCost })
+      });
+      
+      if (response.ok) {
+        console.log('✅ Cost updated successfully:', newCost);
+        // Refresh the page to show updated cost
+        if (onReload) {
+          onReload();
+        } else {
+          window.location.reload();
+        }
+      } else {
+        console.error('❌ Failed to update cost');
+        alert('Failed to update cost');
+      }
+    } catch (error) {
+      console.error('❌ Error updating cost:', error);
+      alert('Error updating cost: ' + error.message);
+    }
+  };
+
   // APPLY FILTERS - ENHANCED COMBINATION FILTER LOGIC
   useEffect(() => {
     console.log('🔍 Enhanced Checklist Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus });
