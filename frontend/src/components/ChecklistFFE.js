@@ -977,15 +977,15 @@ const ChecklistFFE = ({
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* Cost/Price - EDITABLE INLINE */}
+                                                          {/* Cost/Price - CLICK TO OPEN CALCULATOR */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Cost updated:', e.target.textContent)}
+                                                              className="w-full bg-transparent text-white text-sm outline-none cursor-pointer hover:bg-[#8B7355]/20 rounded px-1 py-0.5 flex items-center justify-between group"
+                                                              onClick={() => openCalculator(item, category.name)}
+                                                              title="Click to open calculator"
                                                             >
-                                                              {item.cost ? `$${item.cost}` : ''}
+                                                              <span>{item.cost ? `$${item.cost}` : '—'}</span>
+                                                              <span className="text-[#8B7355] opacity-0 group-hover:opacity-100 text-xs ml-1">🧮</span>
                                                             </div>
                                                           </td>
                                                           
