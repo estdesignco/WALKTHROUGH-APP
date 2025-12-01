@@ -1144,7 +1144,7 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         <InputField label="Do you have social media pages that you would mind sharing with us?" id="know_you_social_media" value={formData.know_you_social_media || ''} onChange={(e) => handleFormChange('know_you_social_media', e.target.value)} />
                         <FieldWrapper label="Tell us about your hobbies">
                             <div className="space-y-2">
-                                <p className="text-[#F5F5DC] text-sm italic">Don't be shy, tell us about you and your spouse, and your kids' favorite hobbies!</p>
+                                <p className="text-[#F5F5DC] text-sm italic">Don&apos;t be shy, tell us about you and your spouse, and your kids&apos; favorite hobbies!</p>
                                 <textarea id="know_you_hobbies" className={inputStyles} value={formData.know_you_hobbies || ''} onChange={(e) => handleFormChange('know_you_hobbies', e.target.value)}></textarea>
                             </div>
                         </FieldWrapper>
