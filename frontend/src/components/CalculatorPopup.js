@@ -129,6 +129,7 @@ const CalculatorPopup = ({
     let total = 0;
     let qty = 0;
     let unitLabel = 'units';
+    let sizeStr = '';
     
     switch (calculatorType) {
       case 'wallpaper':
@@ -138,16 +139,26 @@ const CalculatorPopup = ({
         qty = rollsNeeded;
         unitLabel = 'rolls';
         total = rollsNeeded * parseValue(formData.pricePerRoll);
+        sizeStr = `${parseValue(formData.wallWidth)}' × ${parseValue(formData.wallHeight)}'`;
         break;
         
       case 'drapery':
         const widthYards = (parseValue(formData.windowWidth) * parseValue(formData.fullness, 2.5)) / 36;
         const heightYards = (parseValue(formData.windowHeight) + 12) / 36; // Add 12" for hems
-        const panels = Math.ceil(widthYards * 36 / parseValue(formData.fabricWidth, 54));
-        const yardsNeeded = Math.ceil(panels * heightYards) || 0;
-        qty = yardsNeeded;
-        unitLabel = 'yards';
-        total = yardsNeeded * parseValue(formData.pricePerYard);
+        const panelsCalc = Math.ceil(widthYards * 36 / parseValue(formData.fabricWidth, 54));
+        const yardsNeeded = Math.ceil(panelsCalc * heightYards) || 0;
+        
+        // For drapery: qty = panels, size = yards
+        qty = panelsCalc;
+        unitLabel = 'panels';
+        sizeStr = `${yardsNeeded} yards fabric`;
+        
+        // Price can be per yard OR per panel
+        if (formData.pricePerPanel && parseValue(formData.pricePerPanel) > 0) {
+          total = panelsCalc * parseValue(formData.pricePerPanel);
+        } else {
+          total = yardsNeeded * parseValue(formData.pricePerYard);
+        }
         break;
         
       case 'paint':
