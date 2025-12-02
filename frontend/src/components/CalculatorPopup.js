@@ -549,6 +549,85 @@ const CalculatorPopup = ({
               </div>
             </div>
           )}
+
+          {calculatorType === 'upholstery' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <label className={labelClass}>Piece Type</label>
+                <select
+                  value={formData.pieceType}
+                  onChange={(e) => setFormData({...formData, pieceType: e.target.value})}
+                  className={inputClass}
+                >
+                  <option value="sofa">Sofa</option>
+                  <option value="chair">Armchair</option>
+                  <option value="ottoman">Ottoman</option>
+                  <option value="loveseat">Loveseat</option>
+                  <option value="sectional">Sectional</option>
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>Width (in)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={formData.pieceWidth}
+                  onChange={(e) => setFormData({...formData, pieceWidth: e.target.value})}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Depth (in)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={formData.pieceDepth}
+                  onChange={(e) => setFormData({...formData, pieceDepth: e.target.value})}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Height (in)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={formData.pieceHeight}
+                  onChange={(e) => setFormData({...formData, pieceHeight: e.target.value})}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Number of Cushions</label>
+                <input
+                  type="number"
+                  value={formData.cushionCount}
+                  onChange={(e) => setFormData({...formData, cushionCount: e.target.value})}
+                  className={inputClass}
+                />
+              </div>
+              <div className="col-span-2">
+                <label className={labelClass}>Fabric Price Per Yard ($)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.fabricPricePerYard}
+                  onChange={(e) => setFormData({...formData, fabricPricePerYard: e.target.value})}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          )}
+          
+          {/* Remarks Field - Shows for ALL calculator types */}
+          <div className="mt-4">
+            <label className={labelClass}>Remarks / Notes</label>
+            <textarea
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              className={`${inputClass} min-h-[60px] resize-none`}
+              placeholder="Add any notes or special instructions..."
+            />
+          </div>
         </div>
 
         {/* Calculate Button and Result */}
