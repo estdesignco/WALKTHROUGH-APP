@@ -260,15 +260,19 @@ frontend:
 
   - task: "Calculator Popup Feature in ExactChecklistSpreadsheet"
     implemented: true
-    working: "NA"
+    working: true
     file: "frontend/src/components/CalculatorPopup.js, frontend/src/components/ExactChecklistSpreadsheet.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         -working: "NA"
         -agent: "main"
         -comment: "🔧 CALCULATOR POPUP BUG FIX COMPLETED: Fixed critical input reset issue in CalculatorPopup.js where decimal values were being lost during typing. Changed all formData fields from numbers to strings to prevent parseFloat('12.') → 12 conversion that was causing input fields to appear to reset. Now stores values as strings and only parses when calculating. Auto-detection logic improved for wallpaper, paint, drapery, tile, and hardware items based on item name and category. Ready for comprehensive testing of decimal input handling, calculator type detection, and cost/quantity calculations."
+        
+        -working: true
+        -agent: "testing"
+        -comment: "🎉 CALCULATOR POPUP TESTING COMPLETED SUCCESSFULLY - ALL FUNCTIONALITY VERIFIED! Conducted comprehensive testing of Calculator Popup Feature in ExactChecklistSpreadsheet with focus on the decimal input bug fix. ✅ CALCULATOR POPUP OPENS: Successfully opens when clicking COST cells in checklist spreadsheet, displays proper 'Cost Calculator' modal with calculator icon and item name. ✅ DECIMAL INPUT BUG FIX WORKING PERFECTLY: Tested typing '12.5' character by character - value maintained correctly without resetting. Second test with '8.75' also passed. The string-based formData storage fix is working as intended. ✅ CALCULATOR TYPE AUTO-DETECTION: Found General, Wallpaper, Paint, Drapery/Fabric, Tile/Flooring, and Hardware calculator types available. Wallpaper calculator correctly selected when testing wallpaper items. ✅ COMPREHENSIVE FORM FIELDS: Wallpaper calculator shows Wall Width, Wall Height, Roll Width, Roll Length, Pattern Repeat, and Price Per Roll fields - all accepting decimal values properly. ✅ ACCURATE CALCULATIONS: Tested with Wall Width: 12.5ft, Wall Height: 8.75ft, Price Per Roll: $89.99 - calculated 2 rolls needed with Total Cost: $179.98. Math is correct and displays properly. ✅ APPLY TO ITEM FUNCTIONALITY: 'Apply to Item' button successfully updates cost and quantity in spreadsheet and closes calculator popup. ✅ TEST ITEMS VERIFIED: Both 'Designer Wallpaper - Floral Pattern' and 'Premium Paint - Accent Wall' items found in Window Treatments category and calculator opens correctly for both. The calculator popup feature is production-ready and the decimal input reset bug has been completely resolved!"
     priority: "high"
     needs_retesting: false
     status_history:
