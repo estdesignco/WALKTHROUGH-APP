@@ -403,7 +403,7 @@ const CalculatorPopup = ({
                   className={inputClass}
                 />
               </div>
-              <div className="col-span-2">
+              <div>
                 <label className={labelClass}>Price Per Yard ($)</label>
                 <input
                   type="number"
@@ -411,6 +411,18 @@ const CalculatorPopup = ({
                   value={formData.pricePerYard}
                   onChange={(e) => setFormData({...formData, pricePerYard: e.target.value})}
                   className={inputClass}
+                  placeholder="Fabric cost"
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Price Per Panel ($) <span className="text-xs text-stone-500">(Optional)</span></label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.pricePerPanel}
+                  onChange={(e) => setFormData({...formData, pricePerPanel: e.target.value})}
+                  className={inputClass}
+                  placeholder="If pricing by panel"
                 />
               </div>
             </div>
