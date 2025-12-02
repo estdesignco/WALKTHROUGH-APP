@@ -373,7 +373,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.1"
                   value={formData.roomLength}
-                  onChange={(e) => setFormData({...formData, roomLength: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, roomLength: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -383,7 +383,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.1"
                   value={formData.roomWidth}
-                  onChange={(e) => setFormData({...formData, roomWidth: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, roomWidth: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -393,7 +393,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.1"
                   value={formData.ceilingHeight}
-                  onChange={(e) => setFormData({...formData, ceilingHeight: parseFloat(e.target.value) || 8})}
+                  onChange={(e) => setFormData({...formData, ceilingHeight: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -402,7 +402,7 @@ const CalculatorPopup = ({
                 <input
                   type="number"
                   value={formData.coats}
-                  onChange={(e) => setFormData({...formData, coats: parseInt(e.target.value) || 2})}
+                  onChange={(e) => setFormData({...formData, coats: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -412,7 +412,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.01"
                   value={formData.pricePerGallon}
-                  onChange={(e) => setFormData({...formData, pricePerGallon: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, pricePerGallon: e.target.value})}
                   className={inputClass}
                 />
               </div>
