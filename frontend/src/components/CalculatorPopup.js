@@ -94,12 +94,16 @@ const CalculatorPopup = ({
   // Calculate cost based on calculator type
   const calculate = () => {
     let total = 0;
+    let qty = 0;
+    let unitLabel = 'units';
     
     switch (calculatorType) {
       case 'wallpaper':
         const wallArea = formData.wallWidth * formData.wallHeight;
         const usableRollArea = (formData.rollWidth / 12) * (formData.rollLength - formData.patternRepeat);
         const rollsNeeded = Math.ceil(wallArea / usableRollArea);
+        qty = rollsNeeded;
+        unitLabel = 'rolls';
         total = rollsNeeded * formData.pricePerRoll;
         break;
         
@@ -107,38 +111,50 @@ const CalculatorPopup = ({
         const widthYards = (formData.windowWidth * formData.fullness) / 36;
         const heightYards = (formData.windowHeight + 12) / 36; // Add 12" for hems
         const panels = Math.ceil(widthYards * 36 / formData.fabricWidth);
-        const yardsNeeded = panels * heightYards;
-        total = Math.ceil(yardsNeeded) * formData.pricePerYard;
+        const yardsNeeded = Math.ceil(panels * heightYards);
+        qty = yardsNeeded;
+        unitLabel = 'yards';
+        total = yardsNeeded * formData.pricePerYard;
         break;
         
       case 'paint':
         const wallSqFt = 2 * (formData.roomLength + formData.roomWidth) * formData.ceilingHeight;
         const sqFtPerGallon = 350;
         const gallonsNeeded = Math.ceil((wallSqFt * formData.coats) / sqFtPerGallon);
+        qty = gallonsNeeded;
+        unitLabel = 'gallons';
         total = gallonsNeeded * formData.pricePerGallon;
         break;
         
       case 'tile':
         const areaSqFt = formData.areaLength * formData.areaWidth;
-        const withWaste = areaSqFt * (1 + formData.wasteFactor / 100);
+        const withWaste = Math.ceil(areaSqFt * (1 + formData.wasteFactor / 100));
+        qty = withWaste;
+        unitLabel = 'sq ft';
         total = withWaste * formData.pricePerSqFt;
         break;
         
       case 'hardware':
+        qty = formData.numberOfPieces;
+        unitLabel = 'pieces';
         total = formData.numberOfPieces * formData.pricePerPiece;
         break;
         
       default: // general
+        qty = formData.quantity;
+        unitLabel = 'units';
         total = formData.costPerUnit * formData.quantity;
     }
     
     setCalculatedCost(Math.round(total * 100) / 100);
-    return Math.round(total * 100) / 100;
+    setCalculatedQty(qty);
+    setQtyLabel(unitLabel);
+    return { cost: Math.round(total * 100) / 100, qty, unitLabel };
   };
 
   const handleApply = () => {
-    const total = calculate();
-    onCalculate(total);
+    const result = calculate();
+    onCalculate(result.cost, result.qty);
     onClose();
   };
 
