@@ -1838,3 +1838,35 @@ agent_communication:
 
 1. `d1b17a1d-6950-4bcd-b9cb-b4f3e797fce4` - Test Project Complete (4 rooms)
 2. `7af6ef9d-4e3f-4e77-a87d-8f99fc0e6af2` - Birthday Calendar Test (new format birthdays)
+
+## 🧮 Calculator Popup Bug Fix - COMPLETED ✅ (December 2024)
+
+### Issue Description
+Calculator input values were resetting when users typed decimal values (e.g., "12." would immediately become "12", losing the decimal point). This made the calculator feature unusable.
+
+### Root Cause
+Controlled inputs were immediately parsing string values to numbers using `parseFloat(e.target.value) || 0`. This caused:
+- `parseFloat("12.")` → `12` (decimal point lost)
+- `parseFloat("")` → `NaN || 0` → `0` (empty inputs reset to 0)
+- Input state constantly fighting with user typing
+
+### Solution Implemented
+Changed formData state management to store raw string values instead of parsed numbers:
+- All formData fields now store strings: `costPerUnit: ''` instead of `costPerUnit: 0`
+- Created helper functions `parseValue()` and `parseIntValue()` to parse only when calculating
+- Updated all input onChange handlers to use `e.target.value` directly (no parsing)
+- Updated calculate() function to parse values using helpers
+
+### Testing Results ✅
+- Decimal inputs ("12.5", "8.75") maintain correctly without reset
+- Calculator popup opens on COST cell clicks
+- Auto-detection of calculator type works (wallpaper, paint, etc.)
+- Accurate calculations: 12.5ft x 8.75ft = 2 rolls, $179.98 total
+- Apply to Item successfully updates cost AND quantity in spreadsheet
+
+### Files Modified
+- `/app/frontend/src/components/CalculatorPopup.js`
+
+### Next Priority Tasks
+1. Refactor ProjectDetailPage.js (extract nested CompleteFilledQuestionnaire component)
+2. Fix Address Autocomplete in questionnaire
