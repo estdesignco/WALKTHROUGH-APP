@@ -248,6 +248,24 @@ frontend:
     working: true
     file: "frontend/src/components/MainDashboard.js, frontend/src/components/StudioLandingPage.js, backend/server.py"
     stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        -working: true
+        -agent: "testing"
+        -comment: "✅ EMAIL NEW CLIENT FLOW FULLY OPERATIONAL! Conducted comprehensive end-to-end testing of email sending functionality with configured email credentials. ✅ HOMEPAGE LOADS CORRECTLY: MainDashboard displays with ESTABLISHED DESIGN CO. logo, navigation buttons (Walkthrough, Checklist, FF&E, Calculators), and three main action buttons (New Client, Email New Client, Full Questionnaire). ✅ EMAIL MODAL WORKING: Clicking 'Email New Client' button successfully opens modal with title 'Email Client Questionnaire' and two input fields (Client Name, Email Address). ✅ FORM SUBMISSION SUCCESSFUL: Filled form with test data (Client Name: 'Neil Test Client', Email: 'info@estdesignco.com') and clicked 'Send Questionnaire' button. Alert dialog appeared with success message: 'Success! Questionnaire email sent to Neil Test Client at info@estdesignco.com'. ✅ MODAL CLOSES AFTER SEND: Modal properly closes after successful email send, returning to homepage. ✅ BACKEND API WORKING: Backend logs confirm POST /api/send-questionnaire returned 200 OK status. Email credentials are properly configured in backend/.env (SMTP_SERVER=smtp-mail.outlook.com, SMTP_PORT=587, SENDER_EMAIL=info@estdesignco.com). ✅ NO PROJECT CREATED: Correctly verified that NO project was created on homepage after sending email - this feature ONLY sends email and does not create a project, which is the expected behavior. ✅ EMAIL TEMPLATE: Backend server.py contains beautiful HTML email template (lines 1075-1165) with ESTABLISHED branding, gold header gradient, personal greeting, call-to-action button, and professional footer. Email uses MIMEMultipart with both plain text and HTML parts. ✅ PUBLIC URL CONFIGURED: FRONTEND_URL environment variable is set to production domain ensuring email links use public URL. COMPLETE WORKFLOW VERIFIED: Homepage → Click Email New Client → Fill Form → Send → Success Message → Modal Closes → No Project Created. All steps working perfectly!"
+
+  - task: "Calculator Popup Feature in ExactChecklistSpreadsheet"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/CalculatorPopup.js, frontend/src/components/ExactChecklistSpreadsheet.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "🔧 CALCULATOR POPUP BUG FIX COMPLETED: Fixed critical input reset issue in CalculatorPopup.js where decimal values were being lost during typing. Changed all formData fields from numbers to strings to prevent parseFloat('12.') → 12 conversion that was causing input fields to appear to reset. Now stores values as strings and only parses when calculating. Auto-detection logic improved for wallpaper, paint, drapery, tile, and hardware items based on item name and category. Ready for comprehensive testing of decimal input handling, calculator type detection, and cost/quantity calculations."
     priority: "high"
     needs_retesting: false
     status_history:
