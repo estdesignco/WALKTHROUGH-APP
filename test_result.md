@@ -1749,6 +1749,16 @@ agent_communication:
    -agent: "testing"
    -message: "🎉 QUESTIONNAIRE API COMPREHENSIVE TESTING COMPLETED - 100% SUCCESS RATE! Conducted thorough testing of all questionnaire functionality requested in review at https://interioriq-2.preview.emergentagent.com. ✅ ALL 5 API ENDPOINTS WORKING PERFECTLY: 1) POST /api/projects creates projects with proper structure ✅, 2) POST /api/questionnaire/{project_id} saves questionnaire with family_birthdays array format [{name, date}] ✅, 3) GET /api/questionnaire/{project_id} retrieves data with format preserved ✅, 4) GET /api/projects/{project_id} returns project details and client_info ✅, 5) POST /api/rooms creates rooms with auto-population (73 items, 7 categories) accessible via project endpoint ✅. ✅ FAMILY BIRTHDAYS FORMAT VERIFIED: New array format [{'name': 'John', 'date': '1985-03-15'}, {'name': 'Jane', 'date': '1987-07-22'}, {'name': 'Emma', 'date': '2015-12-10'}, {'name': 'Liam', 'date': '2018-05-03'}] saves and retrieves correctly. ✅ EXISTING PROJECT ACCESSIBLE: Test project d1b17a1d-6950-4bcd-b9cb-b4f3e797fce4 confirmed accessible with 4 rooms and questionnaire data. ✅ API FORMAT IDENTIFIED: Questionnaire data must be wrapped in 'answers' object for proper saving/retrieval. ✅ COMPREHENSIVE DATA TESTING: 25 questionnaire fields including client info, design preferences, lifestyle questions all save with 100% completion rate. ✅ ROOM AUTO-POPULATION: Living room creation generates 73 items across 7 categories (Lighting, Furniture, Decor & Accessories, Paint/Wallpaper/Finishes, Millwork/Architectural Elements, HVAC & Mechanical, Window Treatments) as expected. The questionnaire functionality is production-ready and meets all requirements from the review request!"
 
+   -agent: "testing"
+   -message: "🎉 ENHANCED CALCULATOR FEATURES TESTING COMPLETE! ✅ All new features verified working:
+    1. ✅ Drapery Calculator - Enhanced with Panel pricing option and Remarks field
+    2. ✅ Upholstery Calculator - NEW FEATURE confirmed working (Width, Depth, Height, Cushions, Fabric Price inputs)
+    3. ✅ Remarks Field - Available and working in all calculators (tested with 'Custom lined panels' and 'Performance fabric required')
+    4. ✅ Spreadsheet Transfer - SIZE, QUANTITY, COST, and REMARKS all transfer correctly to spreadsheet
+    5. ✅ Calculator Popup Integration - Opens correctly when clicking COST cells in project checklist
+    
+    Test Results: All enhanced calculator features are production-ready and working as specified in the review request. The calculator now properly transfers all required fields (SIZE, QUANTITY, COST, REMARKS) to the spreadsheet, and the new Upholstery calculator provides comprehensive furniture calculation capabilities."
+
 ---
 ## Diagnostic Results - Issues Reported by User
 
