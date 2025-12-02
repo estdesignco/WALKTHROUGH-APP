@@ -1889,7 +1889,7 @@ async def create_room(room_data: RoomCreate):
     """Create a new room - auto-populate ONLY if walkthrough sheet_type"""
     try:
         room_name_lower = room_data.name.lower().strip()
-        print(f"🏠 CREATING ROOM: {room_name_lower}")
+        print(f"🏠 🆕🆕🆕 CREATING ROOM WITH NEW CODE VERSION: {room_name_lower}")
         
         # Map room names to structure keys
         room_name_mapping = {
