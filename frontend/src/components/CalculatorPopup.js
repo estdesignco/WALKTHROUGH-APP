@@ -114,51 +114,51 @@ const CalculatorPopup = ({
     
     switch (calculatorType) {
       case 'wallpaper':
-        const wallArea = formData.wallWidth * formData.wallHeight;
-        const usableRollArea = (formData.rollWidth / 12) * (formData.rollLength - formData.patternRepeat);
-        const rollsNeeded = Math.ceil(wallArea / usableRollArea);
+        const wallArea = parseValue(formData.wallWidth) * parseValue(formData.wallHeight);
+        const usableRollArea = (parseValue(formData.rollWidth) / 12) * (parseValue(formData.rollLength) - parseValue(formData.patternRepeat));
+        const rollsNeeded = Math.ceil(wallArea / usableRollArea) || 0;
         qty = rollsNeeded;
         unitLabel = 'rolls';
-        total = rollsNeeded * formData.pricePerRoll;
+        total = rollsNeeded * parseValue(formData.pricePerRoll);
         break;
         
       case 'drapery':
-        const widthYards = (formData.windowWidth * formData.fullness) / 36;
-        const heightYards = (formData.windowHeight + 12) / 36; // Add 12" for hems
-        const panels = Math.ceil(widthYards * 36 / formData.fabricWidth);
-        const yardsNeeded = Math.ceil(panels * heightYards);
+        const widthYards = (parseValue(formData.windowWidth) * parseValue(formData.fullness, 2.5)) / 36;
+        const heightYards = (parseValue(formData.windowHeight) + 12) / 36; // Add 12" for hems
+        const panels = Math.ceil(widthYards * 36 / parseValue(formData.fabricWidth, 54));
+        const yardsNeeded = Math.ceil(panels * heightYards) || 0;
         qty = yardsNeeded;
         unitLabel = 'yards';
-        total = yardsNeeded * formData.pricePerYard;
+        total = yardsNeeded * parseValue(formData.pricePerYard);
         break;
         
       case 'paint':
-        const wallSqFt = 2 * (formData.roomLength + formData.roomWidth) * formData.ceilingHeight;
+        const wallSqFt = 2 * (parseValue(formData.roomLength) + parseValue(formData.roomWidth)) * parseValue(formData.ceilingHeight, 8);
         const sqFtPerGallon = 350;
-        const gallonsNeeded = Math.ceil((wallSqFt * formData.coats) / sqFtPerGallon);
+        const gallonsNeeded = Math.ceil((wallSqFt * parseIntValue(formData.coats, 2)) / sqFtPerGallon) || 0;
         qty = gallonsNeeded;
         unitLabel = 'gallons';
-        total = gallonsNeeded * formData.pricePerGallon;
+        total = gallonsNeeded * parseValue(formData.pricePerGallon);
         break;
         
       case 'tile':
-        const areaSqFt = formData.areaLength * formData.areaWidth;
-        const withWaste = Math.ceil(areaSqFt * (1 + formData.wasteFactor / 100));
+        const areaSqFt = parseValue(formData.areaLength) * parseValue(formData.areaWidth);
+        const withWaste = Math.ceil(areaSqFt * (1 + parseValue(formData.wasteFactor, 10) / 100)) || 0;
         qty = withWaste;
         unitLabel = 'sq ft';
-        total = withWaste * formData.pricePerSqFt;
+        total = withWaste * parseValue(formData.pricePerSqFt);
         break;
         
       case 'hardware':
-        qty = formData.numberOfPieces;
+        qty = parseIntValue(formData.numberOfPieces, 1);
         unitLabel = 'pieces';
-        total = formData.numberOfPieces * formData.pricePerPiece;
+        total = qty * parseValue(formData.pricePerPiece);
         break;
         
       default: // general
-        qty = formData.quantity;
+        qty = parseIntValue(formData.quantity, 1);
         unitLabel = 'units';
-        total = formData.costPerUnit * formData.quantity;
+        total = parseValue(formData.costPerUnit) * qty;
     }
     
     setCalculatedCost(Math.round(total * 100) / 100);
