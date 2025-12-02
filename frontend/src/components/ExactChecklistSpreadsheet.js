@@ -161,14 +161,23 @@ const ExactChecklistSpreadsheet = ({
   };
 
   // Handle cost update from calculator - NOW ALSO UPDATES QTY
-  const handleCostCalculated = async (newCost, newQty) => {
+  const handleCostCalculated = async (newCost, newQty, newSize, newRemarks) => {
     if (!calculatorItem) return;
     
     try {
-      // Update BOTH cost AND quantity
+      // Update ALL fields from calculator: cost, quantity, size, and remarks
       const updateData = { cost: newCost };
+      
       if (newQty !== undefined && newQty > 0) {
         updateData.quantity = newQty;
+      }
+      
+      if (newSize) {
+        updateData.size = newSize;
+      }
+      
+      if (newRemarks) {
+        updateData.remarks = newRemarks;
       }
       
       const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/items/${calculatorItem.id}`, {
@@ -178,7 +187,7 @@ const ExactChecklistSpreadsheet = ({
       });
       
       if (response.ok) {
-        console.log('✅ Cost & Qty updated successfully:', { cost: newCost, qty: newQty });
+        console.log('✅ All fields updated successfully:', { cost: newCost, qty: newQty, size: newSize, remarks: newRemarks });
         // Refresh the page to show updated values
         if (onReload) {
           onReload();
@@ -186,11 +195,11 @@ const ExactChecklistSpreadsheet = ({
           window.location.reload();
         }
       } else {
-        console.error('❌ Failed to update cost/qty');
-        alert('Failed to update cost and quantity');
+        console.error('❌ Failed to update fields');
+        alert('Failed to update item');
       }
     } catch (error) {
-      console.error('❌ Error updating cost/qty:', error);
+      console.error('❌ Error updating item:', error);
       alert('Error updating: ' + error.message);
     }
   };
