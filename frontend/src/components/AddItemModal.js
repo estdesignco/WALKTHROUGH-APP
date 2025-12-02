@@ -437,6 +437,16 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         onClose={() => setShowBarcodeScanner(false)}
         onScanResult={handleBarcodeResult}
       />
+      
+      {/* Calculator Popup */}
+      <CalculatorPopup
+        isOpen={showCalculator}
+        onClose={() => setShowCalculator(false)}
+        onCalculate={handleCalculatorResult}
+        itemName={formData.name}
+        categoryName=""
+        currentCost={formData.cost}
+      />
     </div>
   );
 };
