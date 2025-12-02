@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import BarcodeScannerModal from './BarcodeScannerModal';
+import CalculatorPopup from './CalculatorPopup';
 
 const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], loading }) => {
   const [formData, setFormData] = useState({
@@ -21,6 +22,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
   const [scrapeError, setScrapeError] = useState('');
   const [autoClipToHouzz, setAutoClipToHouzz] = useState(true); // Auto-clip to Houzz Pro by default
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
 
   const handleBarcodeResult = (productData) => {
     console.log('📷 Barcode scan result:', productData);
