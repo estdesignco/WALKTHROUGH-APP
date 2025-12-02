@@ -100,28 +100,34 @@ const ChecklistFFE = ({
     setShowCalculator(true);
   };
 
-  // Handle cost update from calculator
-  const handleCostCalculated = async (newCost) => {
+  // Handle cost update from calculator - NOW ALSO UPDATES QTY
+  const handleCostCalculated = async (newCost, newQty) => {
     if (!calculatorItem) return;
     
     try {
+      // Update BOTH cost AND quantity
+      const updateData = { cost: newCost };
+      if (newQty !== undefined && newQty > 0) {
+        updateData.quantity = newQty;
+      }
+      
       const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/items/${calculatorItem.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cost: newCost })
+        body: JSON.stringify(updateData)
       });
       
       if (response.ok) {
-        console.log('✅ Cost updated successfully:', newCost);
-        // Refresh the page to show updated cost
+        console.log('✅ Cost & Qty updated successfully:', { cost: newCost, qty: newQty });
+        // Refresh the page to show updated values
         window.location.reload();
       } else {
-        console.error('❌ Failed to update cost');
-        alert('Failed to update cost');
+        console.error('❌ Failed to update cost/qty');
+        alert('Failed to update cost and quantity');
       }
     } catch (error) {
-      console.error('❌ Error updating cost:', error);
-      alert('Error updating cost: ' + error.message);
+      console.error('❌ Error updating cost/qty:', error);
+      alert('Error updating: ' + error.message);
     }
   };
 
