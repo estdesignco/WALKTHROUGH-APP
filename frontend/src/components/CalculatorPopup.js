@@ -232,7 +232,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.01"
                   value={formData.costPerUnit}
-                  onChange={(e) => setFormData({...formData, costPerUnit: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, costPerUnit: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -241,7 +241,7 @@ const CalculatorPopup = ({
                 <input
                   type="number"
                   value={formData.quantity}
-                  onChange={(e) => setFormData({...formData, quantity: parseInt(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, quantity: e.target.value})}
                   className={inputClass}
                 />
               </div>
