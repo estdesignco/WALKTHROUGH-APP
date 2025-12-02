@@ -16,6 +16,8 @@ const CalculatorPopup = ({
 }) => {
   const [calculatorType, setCalculatorType] = useState('general');
   const [calculatedCost, setCalculatedCost] = useState(currentCost || 0);
+  const [calculatedQty, setCalculatedQty] = useState(0);
+  const [qtyLabel, setQtyLabel] = useState('units');
   
   // Form fields for different calculators
   const [formData, setFormData] = useState({
