@@ -640,8 +640,14 @@ const CalculatorPopup = ({
             Calculate
           </button>
           
-          {/* Results - Show Quantity AND Cost */}
+          {/* Results - Show Size, Quantity AND Cost */}
           <div className="space-y-2">
+            {calculatedSize && (
+              <div className="flex items-center justify-between bg-[#9B8365]/20 rounded-lg p-3 border border-[#9B8365]/30">
+                <span className="text-stone-400">Size:</span>
+                <span className="text-lg font-bold text-[#D4C5A9]">{calculatedSize}</span>
+              </div>
+            )}
             {calculatedQty > 0 && (
               <div className="flex items-center justify-between bg-[#4a90a4]/20 rounded-lg p-3 border border-[#4a90a4]/30">
                 <span className="text-stone-400">Quantity Needed:</span>
