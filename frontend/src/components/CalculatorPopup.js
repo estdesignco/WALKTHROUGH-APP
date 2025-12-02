@@ -18,6 +18,8 @@ const CalculatorPopup = ({
   const [calculatedCost, setCalculatedCost] = useState(currentCost || 0);
   const [calculatedQty, setCalculatedQty] = useState(0);
   const [qtyLabel, setQtyLabel] = useState('units');
+  const [calculatedSize, setCalculatedSize] = useState('');
+  const [remarks, setRemarks] = useState('');
   
   // Form fields for different calculators - store as strings to avoid input reset issues
   const [formData, setFormData] = useState({
