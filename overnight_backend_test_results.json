@@ -1,0 +1,261 @@
+[
+  {
+    "test_name": "GET /api/projects",
+    "success": true,
+    "details": "Retrieved 4 projects, Status: 200",
+    "timestamp": "2025-12-02T06:06:22.474251",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/projects/6dd19c44-a527-4d73-9d5f-27e70fec226e",
+    "success": true,
+    "details": "Retrieved project with 2 rooms, 24 subcategories",
+    "timestamp": "2025-12-02T06:06:22.559740",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/projects/1b66b1d9-4e0b-4a37-a371-37130192dbc6",
+    "success": true,
+    "details": "Retrieved project with 2 rooms, 30 subcategories",
+    "timestamp": "2025-12-02T06:06:22.641829",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/projects",
+    "success": true,
+    "details": "Created project 6d31d901-3406-4a9e-a08a-adefbb82d779",
+    "timestamp": "2025-12-02T06:06:22.676540",
+    "response_data": null
+  },
+  {
+    "test_name": "PUT /api/projects/{id}",
+    "success": true,
+    "details": "Update project status: 200",
+    "timestamp": "2025-12-02T06:06:22.714773",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/rooms (auto-populate)",
+    "success": true,
+    "details": "Created Kitchen with 8 categories, 113 items",
+    "timestamp": "2025-12-02T06:06:22.850852",
+    "response_data": null
+  },
+  {
+    "test_name": "GET rooms via project",
+    "success": true,
+    "details": "Retrieved 1 rooms",
+    "timestamp": "2025-12-02T06:06:22.921658",
+    "response_data": null
+  },
+  {
+    "test_name": "PUT /api/rooms/{id}",
+    "success": true,
+    "details": "Update room status: 200",
+    "timestamp": "2025-12-02T06:06:23.000913",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/categories",
+    "success": true,
+    "details": "Created category a2322dcb-d5b7-4fea-8ec9-1a1202a572ee",
+    "timestamp": "2025-12-02T06:06:23.039217",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/categories",
+    "success": false,
+    "details": "Failed with status 405",
+    "timestamp": "2025-12-02T06:06:23.074250",
+    "response_data": null
+  },
+  {
+    "test_name": "PUT /api/categories/{id}",
+    "success": true,
+    "details": "Update category status: 200",
+    "timestamp": "2025-12-02T06:06:23.116061",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/items (single)",
+    "success": true,
+    "details": "Created item 8881e730-a336-4195-a2d6-adda758a6c66",
+    "timestamp": "2025-12-02T06:06:23.219431",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/items/bulk",
+    "success": false,
+    "details": "Failed with status 422",
+    "timestamp": "2025-12-02T06:06:23.252133",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/items",
+    "success": false,
+    "details": "Failed with status 405",
+    "timestamp": "2025-12-02T06:06:23.286645",
+    "response_data": null
+  },
+  {
+    "test_name": "PUT /api/items/{id} (update)",
+    "success": true,
+    "details": "Update item status: 200",
+    "timestamp": "2025-12-02T06:06:23.324303",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/questionnaire/{project_id}",
+    "success": true,
+    "details": "Saved questionnaire data, status: 200",
+    "timestamp": "2025-12-02T06:06:23.386558",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/questionnaire/{project_id}",
+    "success": true,
+    "details": "Retrieved questionnaire with 17 answers",
+    "timestamp": "2025-12-02T06:06:23.427748",
+    "response_data": null
+  },
+  {
+    "test_name": "PUT /api/questionnaire/{project_id}",
+    "success": false,
+    "details": "Update questionnaire status: 405",
+    "timestamp": "2025-12-02T06:06:23.467553",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/contacts",
+    "success": true,
+    "details": "Created contact e739b73b-913d-4a84-8550-eed6c395c074",
+    "timestamp": "2025-12-02T06:06:23.509819",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/contacts/project/{id}",
+    "success": true,
+    "details": "Retrieved 2 contacts",
+    "timestamp": "2025-12-02T06:06:23.544385",
+    "response_data": null
+  },
+  {
+    "test_name": "PUT /api/contacts/{id}",
+    "success": true,
+    "details": "Update contact status: 200",
+    "timestamp": "2025-12-02T06:06:23.580062",
+    "response_data": null
+  },
+  {
+    "test_name": "DELETE /api/contacts/{id}",
+    "success": true,
+    "details": "Delete contact status: 200",
+    "timestamp": "2025-12-02T06:06:23.656454",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/materials",
+    "success": true,
+    "details": "Retrieved 0 materials",
+    "timestamp": "2025-12-02T06:06:23.694102",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/scrape-product",
+    "success": false,
+    "details": "Failed with status 400",
+    "timestamp": "2025-12-02T06:06:24.319042",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/scan-barcode",
+    "success": false,
+    "details": "Barcode scan status: 404",
+    "timestamp": "2025-12-02T06:06:24.352685",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/canva/export",
+    "success": false,
+    "details": "Canva export status: 404",
+    "timestamp": "2025-12-02T06:06:24.387939",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/export/pdf/{project_id}",
+    "success": false,
+    "details": "PDF export status: 404",
+    "timestamp": "2025-12-02T06:06:24.421545",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/export/excel/{project_id}",
+    "success": false,
+    "details": "Excel export status: 404",
+    "timestamp": "2025-12-02T06:06:24.457747",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/export/csv/{project_id}",
+    "success": false,
+    "details": "CSV export status: 404",
+    "timestamp": "2025-12-02T06:06:24.493400",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/projects/invalid-id",
+    "success": true,
+    "details": "Invalid ID handling: 404",
+    "timestamp": "2025-12-02T06:06:24.568850",
+    "response_data": null
+  },
+  {
+    "test_name": "POST /api/projects (invalid data)",
+    "success": true,
+    "details": "Invalid data handling: 422",
+    "timestamp": "2025-12-02T06:06:24.602787",
+    "response_data": null
+  },
+  {
+    "test_name": "GET /api/nonexistent",
+    "success": true,
+    "details": "Non-existent endpoint: 404",
+    "timestamp": "2025-12-02T06:06:24.634165",
+    "response_data": null
+  },
+  {
+    "test_name": "Cascading Delete Test",
+    "success": true,
+    "details": "Room and 9 categories properly deleted",
+    "timestamp": "2025-12-02T06:06:24.813891",
+    "response_data": null
+  },
+  {
+    "test_name": "Large Dataset Performance",
+    "success": true,
+    "details": "Retrieved 5 rooms, 34 categories, 329 items in 0.42s",
+    "timestamp": "2025-12-02T06:06:25.233597",
+    "response_data": null
+  },
+  {
+    "test_name": "DELETE item 8881e730-a336-4195-a2d6-adda758a6c66",
+    "success": false,
+    "details": "Cleanup status: 404",
+    "timestamp": "2025-12-02T06:06:25.506558",
+    "response_data": null
+  },
+  {
+    "test_name": "DELETE category a2322dcb-d5b7-4fea-8ec9-1a1202a572ee",
+    "success": false,
+    "details": "Cleanup status: 500",
+    "timestamp": "2025-12-02T06:06:25.541756",
+    "response_data": null
+  },
+  {
+    "test_name": "DELETE project 6d31d901-3406-4a9e-a08a-adefbb82d779",
+    "success": true,
+    "details": "Cleanup status: 200",
+    "timestamp": "2025-12-02T06:06:25.575718",
+    "response_data": null
+  }
+]
