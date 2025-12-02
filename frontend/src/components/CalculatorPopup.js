@@ -110,6 +110,10 @@ const CalculatorPopup = ({
                itemLower.includes('pull') || itemLower.includes('handle') ||
                categoryLower.includes('hardware')) {
       return 'hardware';
+    } else if (itemLower.includes('sofa') || itemLower.includes('chair') || 
+               itemLower.includes('ottoman') || itemLower.includes('upholster') ||
+               itemLower.includes('reupholster') || categoryLower.includes('furniture')) {
+      return 'upholstery';
     } else {
       return 'general';
     }
