@@ -2056,7 +2056,11 @@ async def create_room(room_data: RoomCreate):
                 "updated_at": category_data["updated_at"]
             }
             
-            await db.categories.insert_one(category_basic)
+            try:
+                result = await db.categories.insert_one(category_basic)
+                print(f"    ✅ Inserted category {category_data['name']}, result: {result.inserted_id is not None}")
+            except Exception as e:
+                print(f"    ❌ Failed to insert category {category_data['name']}: {e}")
             
             # Insert subcategories
             for subcategory_data in category_data.get("subcategories", []):
