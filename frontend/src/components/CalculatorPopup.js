@@ -485,9 +485,18 @@ const CalculatorPopup = ({
             Calculate
           </button>
           
-          <div className="flex items-center justify-between bg-gradient-to-r from-[#8B7355]/20 to-[#6B5745]/20 rounded-lg p-4 border border-[#8B7355]/30">
-            <span className="text-stone-400">Total Cost:</span>
-            <span className="text-2xl font-bold text-[#D4C5A9]">${calculatedCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+          {/* Results - Show Quantity AND Cost */}
+          <div className="space-y-2">
+            {calculatedQty > 0 && (
+              <div className="flex items-center justify-between bg-[#4a90a4]/20 rounded-lg p-3 border border-[#4a90a4]/30">
+                <span className="text-stone-400">Quantity Needed:</span>
+                <span className="text-xl font-bold text-[#4a90a4]">{calculatedQty} {qtyLabel}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between bg-gradient-to-r from-[#8B7355]/20 to-[#6B5745]/20 rounded-lg p-3 border border-[#8B7355]/30">
+              <span className="text-stone-400">Total Cost:</span>
+              <span className="text-xl font-bold text-[#D4C5A9]">${calculatedCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+            </div>
           </div>
         </div>
 
@@ -503,7 +512,7 @@ const CalculatorPopup = ({
             onClick={handleApply}
             className="flex-1 px-4 py-2 bg-gradient-to-r from-[#8B7355] to-[#6B5745] hover:from-[#9B8365] hover:to-[#7B6755] text-white rounded-lg transition-colors font-medium"
           >
-            Apply Cost
+            Apply to Item
           </button>
         </div>
       </div>
