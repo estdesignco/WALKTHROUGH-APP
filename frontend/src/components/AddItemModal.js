@@ -302,15 +302,25 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Cost (Optional)
                 </label>
-                <input
-                  type="number"
-                  value={formData.cost}
-                  onChange={(e) => setFormData({ ...formData, cost: parseFloat(e.target.value) || 0 })}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    value={formData.cost}
+                    onChange={(e) => setFormData({ ...formData, cost: parseFloat(e.target.value) || 0 })}
+                    className="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCalculator(true)}
+                    className="bg-[#8B7355] hover:bg-[#9B8365] text-white px-4 py-3 rounded-lg transition-colors font-medium whitespace-nowrap"
+                    title="Use calculator to calculate cost, size, and quantity"
+                  >
+                    🧮 Calc
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
