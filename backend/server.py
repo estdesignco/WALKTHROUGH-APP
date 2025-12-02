@@ -2044,6 +2044,7 @@ async def create_room(room_data: RoomCreate):
         # Then insert categories, subcategories, and items separately
         print(f"🔍 DEBUG: room_dict has {len(room_dict['categories'])} categories to insert")
         for category_data in room_dict["categories"]:
+            print(f"  🔍 Category: {category_data['name']}, subcats: {len(category_data.get('subcategories', []))}")
             category_basic = {
                 "id": category_data["id"],
                 "room_id": room_id,
@@ -2058,7 +2059,7 @@ async def create_room(room_data: RoomCreate):
             await db.categories.insert_one(category_basic)
             
             # Insert subcategories
-            for subcategory_data in category_data["subcategories"]:
+            for subcategory_data in category_data.get("subcategories", []):
                 subcategory_basic = {
                     "id": subcategory_data["id"],
                     "category_id": category_data["id"],
