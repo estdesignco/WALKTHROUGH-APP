@@ -1714,7 +1714,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Questionnaire API Functionality Testing - COMPLETED"
+    - "Calculator Popup Feature in ExactChecklistSpreadsheet"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
