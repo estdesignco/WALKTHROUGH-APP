@@ -256,7 +256,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.1"
                   value={formData.wallWidth}
-                  onChange={(e) => setFormData({...formData, wallWidth: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, wallWidth: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -266,7 +266,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.1"
                   value={formData.wallHeight}
-                  onChange={(e) => setFormData({...formData, wallHeight: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, wallHeight: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -275,7 +275,7 @@ const CalculatorPopup = ({
                 <input
                   type="number"
                   value={formData.rollWidth}
-                  onChange={(e) => setFormData({...formData, rollWidth: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, rollWidth: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -284,7 +284,7 @@ const CalculatorPopup = ({
                 <input
                   type="number"
                   value={formData.rollLength}
-                  onChange={(e) => setFormData({...formData, rollLength: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, rollLength: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -294,7 +294,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.1"
                   value={formData.patternRepeat}
-                  onChange={(e) => setFormData({...formData, patternRepeat: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, patternRepeat: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -304,7 +304,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.01"
                   value={formData.pricePerRoll}
-                  onChange={(e) => setFormData({...formData, pricePerRoll: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, pricePerRoll: e.target.value})}
                   className={inputClass}
                 />
               </div>
