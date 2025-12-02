@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://intake-flow-3.preview.emergentagent.com/*"
+    "https://interioriq-2.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

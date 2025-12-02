@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://intake-flow-3.preview.emergentagent.com';
+const BACKEND_URL = 'https://interioriq-2.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

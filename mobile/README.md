@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://intake-flow-3.preview.emergentagent.com
-API_URL=https://intake-flow-3.preview.emergentagent.com/api
+BACKEND_URL=https://interioriq-2.preview.emergentagent.com
+API_URL=https://interioriq-2.preview.emergentagent.com/api
 ```
 
 ### App Configuration

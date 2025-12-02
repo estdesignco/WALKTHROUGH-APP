@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://intake-flow-3.preview.emergentagent.com/api
+https://interioriq-2.preview.emergentagent.com/api
 ```
 
 ---

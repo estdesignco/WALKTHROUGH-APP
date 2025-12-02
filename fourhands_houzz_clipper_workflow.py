@@ -391,7 +391,7 @@ async def main():
     print("="*80)
     print(f"🎉 COMPLETE!")
     print(f"✅ Successfully imported {clipped} products")
-    print(f"🔗 View: https://intake-flow-3.preview.emergentagent.com/furniture-search")
+    print(f"🔗 View: https://interioriq-2.preview.emergentagent.com/furniture-search")
     print("="*80 + "\n")
     
     client.close()
