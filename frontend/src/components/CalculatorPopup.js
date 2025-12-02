@@ -427,7 +427,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.1"
                   value={formData.areaLength}
-                  onChange={(e) => setFormData({...formData, areaLength: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, areaLength: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -437,7 +437,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.1"
                   value={formData.areaWidth}
-                  onChange={(e) => setFormData({...formData, areaWidth: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, areaWidth: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -446,7 +446,7 @@ const CalculatorPopup = ({
                 <input
                   type="number"
                   value={formData.wasteFactor}
-                  onChange={(e) => setFormData({...formData, wasteFactor: parseFloat(e.target.value) || 10})}
+                  onChange={(e) => setFormData({...formData, wasteFactor: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -456,7 +456,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.01"
                   value={formData.pricePerSqFt}
-                  onChange={(e) => setFormData({...formData, pricePerSqFt: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, pricePerSqFt: e.target.value})}
                   className={inputClass}
                 />
               </div>
