@@ -147,11 +147,12 @@ const CalculatorPopup = ({
         const heightYards = (parseValue(formData.windowHeight) + 12) / 36; // Add 12" for hems
         const panelsCalc = Math.ceil(widthYards * 36 / parseValue(formData.fabricWidth, 54));
         const yardsNeeded = Math.ceil(panelsCalc * heightYards) || 0;
+        const yardsPerPanel = panelsCalc > 0 ? (yardsNeeded / panelsCalc).toFixed(1) : 0;
         
-        // For drapery: qty = panels, size = yards
+        // For drapery: qty = panels, size = yards breakdown
         qty = panelsCalc;
         unitLabel = 'panels';
-        sizeStr = `${yardsNeeded} yards fabric`;
+        sizeStr = `${yardsPerPanel} yds/panel (${yardsNeeded} yds total)`;
         
         // Price can be per yard OR per panel
         if (formData.pricePerPanel && parseValue(formData.pricePerPanel) > 0) {
