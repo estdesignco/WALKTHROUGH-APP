@@ -59,7 +59,19 @@ const CalculatorPopup = ({
     
     // Hardware
     numberOfPieces: '1',
-    pricePerPiece: ''
+    pricePerPiece: '',
+    
+    // Upholstery
+    pieceType: 'sofa',
+    pieceWidth: '',
+    pieceDepth: '',
+    pieceHeight: '',
+    cushionCount: '3',
+    fabricPricePerYard: '',
+    
+    // Drapery - additional fields
+    panelsNeeded: '',
+    pricePerPanel: ''
   });
 
   // Helper function to safely parse numeric values
