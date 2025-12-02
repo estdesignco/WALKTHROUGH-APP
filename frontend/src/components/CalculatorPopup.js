@@ -168,6 +168,7 @@ const CalculatorPopup = ({
         qty = gallonsNeeded;
         unitLabel = 'gallons';
         total = gallonsNeeded * parseValue(formData.pricePerGallon);
+        sizeStr = `${Math.round(wallSqFt)} sq ft`;
         break;
         
       case 'tile':
@@ -176,12 +177,31 @@ const CalculatorPopup = ({
         qty = withWaste;
         unitLabel = 'sq ft';
         total = withWaste * parseValue(formData.pricePerSqFt);
+        sizeStr = `${parseValue(formData.areaLength)}' × ${parseValue(formData.areaWidth)}'`;
         break;
         
       case 'hardware':
         qty = parseIntValue(formData.numberOfPieces, 1);
         unitLabel = 'pieces';
         total = qty * parseValue(formData.pricePerPiece);
+        break;
+        
+      case 'upholstery':
+        // Upholstery calculation: estimate fabric needed to cover furniture
+        const width = parseValue(formData.pieceWidth);
+        const depth = parseValue(formData.pieceDepth);
+        const height = parseValue(formData.pieceHeight);
+        const cushions = parseIntValue(formData.cushionCount, 3);
+        
+        // Rough estimate: (W+D)*2 + H*2 for body, plus cushion coverage
+        const bodyYards = ((width + depth) * 2 + height * 2) / 36;
+        const cushionYards = (cushions * width * depth) / 1296; // sq in to sq yards
+        const totalYardsUpholstery = Math.ceil((bodyYards + cushionYards) * 1.2) || 0; // 20% waste
+        
+        qty = totalYardsUpholstery;
+        unitLabel = 'yards';
+        total = totalYardsUpholstery * parseValue(formData.fabricPricePerYard);
+        sizeStr = `${width}" × ${depth}" × ${height}"`;
         break;
         
       default: // general
@@ -193,7 +213,8 @@ const CalculatorPopup = ({
     setCalculatedCost(Math.round(total * 100) / 100);
     setCalculatedQty(qty);
     setQtyLabel(unitLabel);
-    return { cost: Math.round(total * 100) / 100, qty, unitLabel };
+    setCalculatedSize(sizeStr);
+    return { cost: Math.round(total * 100) / 100, qty, unitLabel, size: sizeStr, remarks };
   };
 
   const handleApply = () => {
