@@ -319,7 +319,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.1"
                   value={formData.windowWidth}
-                  onChange={(e) => setFormData({...formData, windowWidth: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, windowWidth: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -329,7 +329,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.1"
                   value={formData.windowHeight}
-                  onChange={(e) => setFormData({...formData, windowHeight: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, windowHeight: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -339,7 +339,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.5"
                   value={formData.fullness}
-                  onChange={(e) => setFormData({...formData, fullness: parseFloat(e.target.value) || 2.5})}
+                  onChange={(e) => setFormData({...formData, fullness: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -348,7 +348,7 @@ const CalculatorPopup = ({
                 <input
                   type="number"
                   value={formData.fabricWidth}
-                  onChange={(e) => setFormData({...formData, fabricWidth: parseFloat(e.target.value) || 54})}
+                  onChange={(e) => setFormData({...formData, fabricWidth: e.target.value})}
                   className={inputClass}
                 />
               </div>
@@ -358,7 +358,7 @@ const CalculatorPopup = ({
                   type="number"
                   step="0.01"
                   value={formData.pricePerYard}
-                  onChange={(e) => setFormData({...formData, pricePerYard: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setFormData({...formData, pricePerYard: e.target.value})}
                   className={inputClass}
                 />
               </div>
