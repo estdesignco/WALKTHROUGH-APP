@@ -255,7 +255,8 @@ const CalculatorPopup = ({
               { id: 'drapery', label: '🪟 Drapery/Fabric' },
               { id: 'paint', label: '🎨 Paint' },
               { id: 'tile', label: '🔲 Tile/Flooring' },
-              { id: 'hardware', label: '🔩 Hardware' }
+              { id: 'hardware', label: '🔩 Hardware' },
+              { id: 'upholstery', label: '🛋️ Upholstery' }
             ].map(type => (
               <button
                 key={type.id}
