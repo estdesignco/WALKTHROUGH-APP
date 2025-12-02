@@ -219,7 +219,7 @@ const CalculatorPopup = ({
 
   const handleApply = () => {
     const result = calculate();
-    onCalculate(result.cost, result.qty);
+    onCalculate(result.cost, result.qty, result.size, result.remarks);
     onClose();
   };
 
