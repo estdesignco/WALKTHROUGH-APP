@@ -19,46 +19,59 @@ const CalculatorPopup = ({
   const [calculatedQty, setCalculatedQty] = useState(0);
   const [qtyLabel, setQtyLabel] = useState('units');
   
-  // Form fields for different calculators
+  // Form fields for different calculators - store as strings to avoid input reset issues
   const [formData, setFormData] = useState({
     // General
-    costPerUnit: 0,
-    quantity: 1,
+    costPerUnit: '',
+    quantity: '1',
     
     // Wallpaper
-    wallWidth: 0,
-    wallHeight: 0,
-    rollWidth: 27,
-    rollLength: 27,
-    patternRepeat: 0,
-    pricePerRoll: 0,
+    wallWidth: '',
+    wallHeight: '',
+    rollWidth: '27',
+    rollLength: '27',
+    patternRepeat: '',
+    pricePerRoll: '',
     
     // Drapery/Fabric
-    windowWidth: 0,
-    windowHeight: 0,
-    fullness: 2.5,
-    fabricWidth: 54,
-    pricePerYard: 0,
+    windowWidth: '',
+    windowHeight: '',
+    fullness: '2.5',
+    fabricWidth: '54',
+    pricePerYard: '',
     
     // Paint
-    roomLength: 0,
-    roomWidth: 0,
-    ceilingHeight: 8,
-    coats: 2,
-    pricePerGallon: 0,
+    roomLength: '',
+    roomWidth: '',
+    ceilingHeight: '8',
+    coats: '2',
+    pricePerGallon: '',
     
     // Tile/Flooring
-    areaLength: 0,
-    areaWidth: 0,
-    tileSize: 12,
-    groutWidth: 0.125,
-    wasteFactor: 10,
-    pricePerSqFt: 0,
+    areaLength: '',
+    areaWidth: '',
+    tileSize: '12',
+    groutWidth: '0.125',
+    wasteFactor: '10',
+    pricePerSqFt: '',
     
     // Hardware
-    numberOfPieces: 1,
-    pricePerPiece: 0
+    numberOfPieces: '1',
+    pricePerPiece: ''
   });
+
+  // Helper function to safely parse numeric values
+  const parseValue = (value, defaultValue = 0) => {
+    if (value === '' || value === null || value === undefined) return defaultValue;
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? defaultValue : parsed;
+  };
+  
+  const parseIntValue = (value, defaultValue = 0) => {
+    if (value === '' || value === null || value === undefined) return defaultValue;
+    const parsed = parseInt(value);
+    return isNaN(parsed) ? defaultValue : parsed;
+  };
 
   // Auto-detect calculator type from category/item name
   const detectedType = React.useMemo(() => {
