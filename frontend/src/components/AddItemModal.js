@@ -126,6 +126,17 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
     }
   };
 
+  const handleCalculatorResult = (cost, qty, size, remarks) => {
+    setFormData(prev => ({
+      ...prev,
+      cost: cost || prev.cost,
+      quantity: qty || prev.quantity,
+      size: size || prev.size,
+      remarks: remarks || prev.remarks
+    }));
+    setShowCalculator(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
