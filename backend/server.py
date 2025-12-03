@@ -62,6 +62,15 @@ db = client[os.environ['DB_NAME']]
 # Create the main app without a prefix
 app = FastAPI(title="Interior Design Management System", version="1.0.0")
 
+# Startup event to ensure test projects exist
+@app.on_event("startup")
+async def startup_event():
+    """Run on application startup"""
+    try:
+        from auto_populate_projects import ensure_test_projects_exist
+        await ensure_test_projects_exist()
+    except Exception as e:
+        logger.error(f"Error in startup auto-population: {e}")
 
 # CORS Configuration
 CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*').split(',')
