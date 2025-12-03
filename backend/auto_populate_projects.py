@@ -89,7 +89,7 @@ async def create_full_room_with_items(db, project_id, room_name, color="#8B7355"
                         "price": item_obj.get("price", 0.0),
                         "cost": item_obj.get("cost", 0.0),
                         "vendor": item_obj.get("vendor", ""),
-                        "status": item_obj.get("status", "Needs Selection"),
+                        "status": item_obj.get("status", "TO BE SELECTED"),
                         "sku": "",
                         "remarks": "",
                         "link": "",
