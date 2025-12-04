@@ -881,6 +881,18 @@ frontend:
         agent: "testing"
         comment: "🎉 CRITICAL CHECKBOX STATE MANAGEMENT TESTING COMPLETED - TRANSFER FUNCTIONALITY WORKING CORRECTLY! Conducted comprehensive testing of the urgent walkthrough checkbox transfer issue as requested. ✅ WALKTHROUGH PAGE ACCESS: Successfully loaded project 106acca5-37e9-42f3-88c6-2c6de6a02236 with 'TRANSFER TEST PROJECT' showing 8 rooms and 687 total checkboxes. ✅ CHECKBOX STATE MANAGEMENT: Successfully checked 3 specific items (Pendant Lights, Recessed Lighting, Under Cabinet Lighting) - all checkboxes visually showed as checked and state was properly maintained. ✅ TRANSFER BUTTON FUNCTIONALITY: Found and clicked 'TRANSFER TO CHECKLIST' button - system correctly detected 3 checked items with proper debug logging. ✅ CONSOLE DEBUG VERIFICATION: Console logs confirm perfect functionality: 'checkedItems.size: 3', 'Array.from(checkedItems): [da59315f-8eea-4d11-bbc5-ff29d46a0281, e5a413b4-67b0-43b9-9a95-b898d43b440c, db21f1d2-adff-4c5f-803b-b797c163a6e4]', '✅ CHECKED ITEM: Pendant Lights (Island/Bar)', '✅ CHECKED ITEM: Recessed Lighting', '✅ CHECKED ITEM: Under Cabinet Lighting', and hundreds of '❌ SKIPPED: [item name] (not checked)' messages. ✅ TRANSFER LOGIC VERIFICATION: System correctly identified only the 3 checked items for transfer and skipped all unchecked items. Final count shows '🎯 FINAL COUNT: 3 items to transfer' - exactly matching the checked items. ✅ USER ISSUE RESOLVED: The reported problem of 'transfer moving ALL items instead of only checked items' is NOT occurring - the system is working correctly and only transferring checked items as designed. The checkbox state management and transfer functionality is production-ready and working perfectly!"
 
+  - task: "Enhanced Wallpaper Calculator with Roll Width"
+    implemented: false
+    working: false
+    file: "CalculatorPopup.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ ENHANCEMENT NOT IMPLEMENTED: Tested wallpaper calculator at /calculators and found it is the OLD version missing all requested enhancements. Current calculator only has: Wall Width (feet), Wall Height (feet), Pattern Repeat (inches), and Cost Per Double Roll ($). MISSING FEATURES: Roll Width field with prominence, Roll Length field, helper text showing standard sizes (20.5\", 27\", 52\"), enhanced size display format '12' × 8' wall | 27\" wide rolls (96 sq ft)', and roll width inclusion in spreadsheet SIZE column. The enhanced functionality described in the test specification has not been implemented. Main agent needs to add Roll Width and Roll Length fields, implement helper text for standard roll sizes, update the size calculation display format, and ensure roll width details transfer to the spreadsheet SIZE column when applied to items."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
