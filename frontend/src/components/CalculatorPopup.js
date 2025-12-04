@@ -329,22 +329,26 @@ const CalculatorPopup = ({
                 />
               </div>
               <div>
-                <label className={labelClass}>Roll Width (in)</label>
+                <label className={labelClass}>Roll Width (in) <span className="text-[#D4C5A9]">*</span></label>
                 <input
                   type="number"
                   value={formData.rollWidth}
                   onChange={(e) => setFormData({...formData, rollWidth: e.target.value})}
                   className={inputClass}
+                  placeholder="27"
                 />
+                <p className="text-xs text-stone-500 mt-1">Standard: 20.5", 27", or 52"</p>
               </div>
               <div>
-                <label className={labelClass}>Roll Length (ft)</label>
+                <label className={labelClass}>Roll Length (ft) <span className="text-[#D4C5A9]">*</span></label>
                 <input
                   type="number"
                   value={formData.rollLength}
                   onChange={(e) => setFormData({...formData, rollLength: e.target.value})}
                   className={inputClass}
+                  placeholder="27"
                 />
+                <p className="text-xs text-stone-500 mt-1">Usually 13.5', 16.5', or 27'</p>
               </div>
               <div>
                 <label className={labelClass}>Pattern Repeat (in)</label>
