@@ -903,6 +903,7 @@ test_plan:
   current_focus:
     - "Customer Questionnaire Form Submission"
     - "Edit Questionnaire Page - Blank Screen Issue"
+    - "Enhanced Wallpaper Calculator with Roll Width"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
