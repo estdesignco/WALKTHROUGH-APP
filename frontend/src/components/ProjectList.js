@@ -33,23 +33,6 @@ const ProjectList = ({ onSelectProject, isOffline }) => {
     }
   };
 
-  const handleDeleteProject = async (projectId, projectName, e) => {
-    e.stopPropagation(); // Prevent project selection when clicking delete
-    
-    if (!window.confirm(`Are you sure you want to delete "${projectName}"?\n\nThis will delete ALL rooms, items, and data. This cannot be undone!`)) {
-      return;
-    }
-    
-    try {
-      await projectAPI.delete(projectId);
-      alert('✅ Project deleted successfully!');
-      loadProjects(); // Refresh list
-    } catch (error) {
-      alert('❌ Failed to delete project: ' + error.message);
-      console.error('Delete error:', error);
-    }
-  };
-
   const handleSelectProject = (project) => {
     onSelectProject(project);
     // Cache project for offline use
@@ -144,18 +127,9 @@ const ProjectList = ({ onSelectProject, isOffline }) => {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white">{project.name}</h3>
-                <div className="flex items-center gap-2">
-                  <span className="bg-blue-600 text-white px-2 py-1 rounded text-sm">
-                    {project.project_type}
-                  </span>
-                  <button
-                    onClick={(e) => handleDeleteProject(project.id, project.name, e)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold transition-colors"
-                    title="Delete Project"
-                  >
-                    🗑️
-                  </button>
-                </div>
+                <span className="bg-blue-600 text-white px-2 py-1 rounded text-sm">
+                  {project.project_type}
+                </span>
               </div>
               
               <div className="space-y-2">

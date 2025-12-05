@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
-import CalculatorPopup from './CalculatorPopup';
 
 const ChecklistFFE = ({ 
   project, 
@@ -26,11 +25,6 @@ const ChecklistFFE = ({
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
 
-  // Calculator Popup State
-  const [showCalculator, setShowCalculator] = useState(false);
-  const [calculatorItem, setCalculatorItem] = useState(null);
-  const [calculatorCategory, setCalculatorCategory] = useState('');
-
   // FILTER STATE - MAKE IT ACTUALLY WORK
   const [filteredProject, setFilteredProject] = useState(project);
   
@@ -47,7 +41,7 @@ const ChecklistFFE = ({
     console.log('🔄 Status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -73,7 +67,7 @@ const ChecklistFFE = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
@@ -90,44 +84,6 @@ const ChecklistFFE = ({
     } catch (error) {
       console.error('❌ Carrier update error:', error);
       alert(`Error updating carrier: ${error.message}`);
-    }
-  };
-
-  // Handle calculator popup open
-  const openCalculator = (item, categoryName) => {
-    setCalculatorItem(item);
-    setCalculatorCategory(categoryName);
-    setShowCalculator(true);
-  };
-
-  // Handle cost update from calculator - NOW ALSO UPDATES QTY
-  const handleCostCalculated = async (newCost, newQty) => {
-    if (!calculatorItem) return;
-    
-    try {
-      // Update BOTH cost AND quantity
-      const updateData = { cost: newCost };
-      if (newQty !== undefined && newQty > 0) {
-        updateData.quantity = newQty;
-      }
-      
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/items/${calculatorItem.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
-      });
-      
-      if (response.ok) {
-        console.log('✅ Cost & Qty updated successfully:', { cost: newCost, qty: newQty });
-        // Refresh the page to show updated values
-        window.location.reload();
-      } else {
-        console.error('❌ Failed to update cost/qty');
-        alert('Failed to update cost and quantity');
-      }
-    } catch (error) {
-      console.error('❌ Error updating cost/qty:', error);
-      alert('Error updating: ' + error.message);
     }
   };
 
@@ -208,7 +164,7 @@ const ChecklistFFE = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -271,7 +227,7 @@ const ChecklistFFE = ({
         return;
       }
 
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
       const newItem = {
         ...itemData,
@@ -317,7 +273,7 @@ const ChecklistFFE = ({
     }
 
     try {
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
@@ -341,7 +297,7 @@ const ChecklistFFE = ({
     }
 
     try {
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'DELETE'
       });
@@ -381,7 +337,7 @@ const ChecklistFFE = ({
       console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
       
       // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms`, {
+      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -408,7 +364,7 @@ const ChecklistFFE = ({
             id: undefined // Let backend generate new ID
           };
           
-          const addResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories`, {
+          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(categoryData)
@@ -418,7 +374,7 @@ const ChecklistFFE = ({
             console.log('✅ Comprehensive category added successfully');
             
             // Delete the temp room
-            await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${tempRoom.id}`, {
+            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
@@ -428,7 +384,7 @@ const ChecklistFFE = ({
         }
         
         // Clean up temp room regardless
-        await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${tempRoom.id}`, {
+        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
           method: 'DELETE'
         });
       } else {
@@ -453,7 +409,7 @@ const ChecklistFFE = ({
       
       // Update backend room order
       try {
-        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/reorder`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -479,7 +435,7 @@ const ChecklistFFE = ({
       // Update backend category order  
       try {
         const roomId = source.droppableId.replace('categories-', '');
-        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/reorder`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -523,7 +479,7 @@ const ChecklistFFE = ({
     }
 
     try {
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {
@@ -685,7 +641,7 @@ const ChecklistFFE = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none placeholder-[#D4A574]/70"
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
           
@@ -983,15 +939,15 @@ const ChecklistFFE = ({
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* Cost/Price - CLICK TO OPEN CALCULATOR */}
+                                                          {/* Cost/Price - EDITABLE INLINE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             <div 
-                                                              className="w-full bg-transparent text-white text-sm outline-none cursor-pointer hover:bg-[#8B7355]/20 rounded px-1 py-0.5 flex items-center justify-between group"
-                                                              onClick={() => openCalculator(item, category.name)}
-                                                              title="Click to open calculator"
+                                                              contentEditable={true}
+                                                              suppressContentEditableWarning={true}
+                                                              className="w-full bg-transparent text-white text-sm outline-none"
+                                                              onBlur={(e) => console.log('Cost updated:', e.target.textContent)}
                                                             >
-                                                              <span>{item.cost ? `$${item.cost}` : '—'}</span>
-                                                              <span className="text-[#8B7355] opacity-0 group-hover:opacity-100 text-xs ml-1">🧮</span>
+                                                              {item.cost ? `$${item.cost}` : ''}
                                                             </div>
                                                           </td>
                                                           
@@ -1277,19 +1233,6 @@ const ChecklistFFE = ({
           loading={false}
         />
       )}
-
-      {/* CALCULATOR POPUP */}
-      <CalculatorPopup
-        isOpen={showCalculator}
-        onClose={() => {
-          setShowCalculator(false);
-          setCalculatorItem(null);
-        }}
-        onCalculate={handleCostCalculated}
-        itemName={calculatorItem?.name || ''}
-        categoryName={calculatorCategory}
-        currentCost={calculatorItem?.cost || 0}
-      />
     </div>
   );
 };

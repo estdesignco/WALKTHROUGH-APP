@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
-import { getRoomColor, getCategoryColor } from '../utils/roomColors';
-import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 
 const ExactFFESpreadsheet = ({ 
   project, 
@@ -24,18 +22,8 @@ const ExactFFESpreadsheet = ({
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
-  
-  // Load expanded states from localStorage
-  const [expandedRooms, setExpandedRooms] = useState(() => {
-    const saved = localStorage.getItem('ffe_expandedRooms');
-    return saved ? JSON.parse(saved) : {};
-  });
-  const [expandedCategories, setExpandedCategories] = useState(() => {
-    const saved = localStorage.getItem('ffe_expandedCategories');
-    return saved ? JSON.parse(saved) : {};
-  });
-  
-  const [expandedImage, setExpandedImage] = useState(null);  // For image modal
+  const [expandedRooms, setExpandedRooms] = useState({});
+  const [expandedCategories, setExpandedCategories] = useState({});
 
   // FILTER STATE - MAKE IT ACTUALLY WORK
   const [filteredProject, setFilteredProject] = useState(project);
@@ -49,68 +37,38 @@ const ExactFFESpreadsheet = ({
   const [selectedCarrier, setSelectedCarrier] = useState('');
 
   // ACTUAL API CALLS - WITH PROPER ERROR HANDLING
+  // Handle status change with improved error handling
   const handleStatusChange = async (itemId, newStatus) => {
-    console.log('🔄 Status change request:', { itemId, newStatus });
-    
-    // Save scroll position before update
-    const scrollY = window.scrollY || window.pageYOffset;
-    console.log('💾 Saving scroll position:', scrollY);
+    console.log('🔄 FFE status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      console.log('🌐 Using backend URL:', backendUrl);
+      
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
       
-      console.log('📡 Status change response:', response.status, response.statusText);
+      console.log('📡 Response status:', response.status, response.statusText);
       
       if (response.ok) {
-        console.log('✅ Status updated successfully');
-        
-        // Update local state to avoid scroll jump - create proper deep copy
-        const updatedProject = JSON.parse(JSON.stringify(filteredProject));
-        let itemFound = false;
-        
-        updatedProject.rooms?.forEach(room => {
-          room.categories?.forEach(category => {
-            category.subcategories?.forEach(subcategory => {
-              subcategory.items?.forEach(item => {
-                if (item.id === itemId) {
-                  item.status = newStatus;
-                  itemFound = true;
-                  console.log('✅ Updated item status in local state:', item.name, '→', newStatus);
-                }
-              });
-            });
-          });
-        });
-        
-        if (itemFound) {
-          setFilteredProject(updatedProject);
-          // Restore scroll position after state update
-          setTimeout(() => {
-            window.scrollTo(0, scrollY);
-            console.log('📜 Restored scroll position:', scrollY);
-          }, 0);
+        console.log('✅ FFE status updated successfully');
+        // Use onReload instead of window.location.reload to prevent navigation issues
+        if (onReload) {
+          console.log('🔄 Calling onReload function');
+          onReload();
         } else {
-          console.warn('⚠️ Item not found in local state, calling onReload');
-          if (onReload) {
-            onReload();
-          }
-          // Restore scroll position after reload
-          setTimeout(() => {
-            window.scrollTo(0, scrollY);
-            console.log('📜 Restored scroll position after reload:', scrollY);
-          }, 100);
+          console.warn('⚠️ No onReload function provided');
         }
       } else {
         const errorData = await response.text();
-        console.error('❌ Status update failed:', response.status, errorData);
-        alert(`Failed to update status: ${response.status} ${response.statusText}\n${errorData}`);
+        console.error('❌ FFE status update failed:', response.status, errorData);
+        alert(`Failed to update status: ${response.status} ${errorData}`);
       }
     } catch (error) {
-      console.error('❌ Status update error:', error);
+      console.error('❌ FFE status update error:', error);
       alert(`Error updating status: ${error.message}`);
     }
   };
@@ -119,49 +77,25 @@ const ExactFFESpreadsheet = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
       });
       
       if (response.ok) {
-        console.log('✅ Carrier updated successfully');
-        
-        // Update local state to avoid scroll jump - create proper deep copy
-        const updatedProject = JSON.parse(JSON.stringify(filteredProject));
-        let itemFound = false;
-        
-        updatedProject.rooms?.forEach(room => {
-          room.categories?.forEach(category => {
-            category.subcategories?.forEach(subcategory => {
-              subcategory.items?.forEach(item => {
-                if (item.id === itemId) {
-                  item.carrier = newCarrier;
-                  itemFound = true;
-                  console.log('✅ Updated item carrier in local state:', item.name, '→', newCarrier);
-                }
-              });
-            });
-          });
-        });
-        
-        if (itemFound) {
-          setFilteredProject(updatedProject);
-        } else {
-          console.warn('⚠️ Item not found in local state, calling onReload');
-          if (onReload) {
-            onReload();
-          }
+        console.log('✅ Carrier updated successfully, reloading...');
+        if (onReload) {
+          onReload();
         }
       } else {
         const errorData = await response.text();
         console.error('❌ Carrier update failed:', response.status, errorData);
-        alert(`Failed to update carrier: ${response.status} ${response.statusText}`);
+        console.error(`Failed to update carrier: ${response.status} ${response.statusText}`);
       }
     } catch (error) {
       console.error('❌ Carrier update error:', error);
-      alert(`Error updating carrier: ${error.message}`);
+      console.error(`Error updating carrier: ${error.message}`);
     }
   };
 
@@ -242,7 +176,7 @@ const ExactFFESpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -278,63 +212,6 @@ const ExactFFESpreadsheet = ({
     }
   }, [project]);
 
-  // Handle scraping product information
-  const handleScrapeProduct = async (productLink, itemId) => {
-    if (!productLink?.trim()) {
-      alert('Please enter a product URL first');
-      return;
-    }
-
-    try {
-      console.log('🔍 FFE: Scraping product from:', productLink);
-      
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-      const response = await fetch(`${backendUrl}/api/scrape-product`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: productLink })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('✅ FFE: Scraping successful:', result);
-
-        // Update the item with scraped data
-        const updateData = {
-          ...result.data,
-          link: productLink // Ensure link is preserved
-        };
-
-        // Remove fields we don't want to overwrite if they're empty
-        if (!updateData.name) delete updateData.name;
-        
-        const updateResponse = await fetch(`${backendUrl}/api/items/${itemId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updateData)
-        });
-
-        if (updateResponse.ok) {
-          console.log('✅ FFE: Item updated with scraped data');
-          alert(`✅ Successfully scraped: ${result.data.name || 'Product information'}`);
-          if (onReload) {
-            onReload();
-          }
-        } else {
-          console.error('❌ FFE: Failed to update item with scraped data');
-          alert('❌ Failed to update item with scraped data');
-        }
-      } else {
-        const errorData = await response.json();
-        console.error('❌ FFE: Scraping failed:', errorData);
-        alert(`❌ Scraping failed: ${errorData.message || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error('❌ FFE: Scraping error:', error);
-      alert(`❌ Error during scraping: ${error.message}`);
-    }
-  };
-
   // Handle adding new items - FIX THE SUBCATEGORY SELECTION
   const handleAddItem = async (itemData) => {
     try {
@@ -358,11 +235,11 @@ const ExactFFESpreadsheet = ({
       }
 
       if (!subcategoryId) {
-        alert('Please expand a category first to add items to it.');
+        console.error('Please expand a category first to add items to it.');
         return;
       }
 
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
       const newItem = {
         ...itemData,
@@ -383,7 +260,7 @@ const ExactFFESpreadsheet = ({
       if (response.ok) {
         console.log('✅ Item added successfully');
         setShowAddItem(false);
-        // Use onReload prop instead of window.location.reload to prevent page jump
+        // Force reload to show the new item
         if (onReload) {
           onReload();
         }
@@ -394,7 +271,7 @@ const ExactFFESpreadsheet = ({
       }
     } catch (error) {
       console.error('❌ Error adding item:', error);
-      alert(`Failed to add item: ${error.message}`);
+      console.error(`Failed to add item: ${error.message}`);
     }
   };
 
@@ -410,7 +287,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
@@ -436,27 +313,37 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      console.log('🗑️ FFE DELETING ITEM:', itemId);
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      console.log('🌐 Using backend URL:', backendUrl);
+
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
+      console.log('📡 Delete response status:', response.status, response.statusText);
+
       if (response.ok) {
-        console.log('✅ Item deleted successfully');
-        alert('Item deleted successfully!');
+        console.log('✅ FFE item deleted successfully');
+        alert('✅ Item deleted successfully!');
+        
         // Force reload to show updated data
         if (onReload) {
-          onReload();
+          console.log('🔄 Calling onReload after successful FFE delete');
+          await onReload();
         }
       } else {
-        console.error('❌ Delete failed with status:', response.status);
-        alert(`Delete failed: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ FFE Delete failed with status:', response.status, errorText);
+        alert(`❌ Delete failed: ${response.status} - ${errorText}`);
         throw new Error(`HTTP ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ Error deleting item:', error);
-      alert(`Delete error: ${error.message}`);
-      alert('Failed to delete item. Please try again.');
+      console.error('❌ Error deleting FFE item:', error);
+      alert('❌ Failed to delete item: ' + error.message);
     }
   };
 
@@ -478,7 +365,7 @@ const ExactFFESpreadsheet = ({
       console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
       
       // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms`, {
+      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -505,7 +392,7 @@ const ExactFFESpreadsheet = ({
             id: undefined // Let backend generate new ID
           };
           
-          const addResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories`, {
+          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(categoryData)
@@ -515,7 +402,7 @@ const ExactFFESpreadsheet = ({
             console.log('✅ Comprehensive category added successfully');
             
             // Delete the temp room
-            await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${tempRoom.id}`, {
+            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
@@ -527,7 +414,7 @@ const ExactFFESpreadsheet = ({
         }
         
         // Clean up temp room regardless
-        await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${tempRoom.id}`, {
+        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
           method: 'DELETE'
         });
       } else {
@@ -535,7 +422,7 @@ const ExactFFESpreadsheet = ({
       }
     } catch (error) {
       console.error('❌ Error adding comprehensive category:', error);
-      alert('Failed to add category with items. Please try again.');
+      console.error('Failed to add category with items. Please try again.');
     }
   };
 
@@ -543,96 +430,111 @@ const ExactFFESpreadsheet = ({
 
   // Handle drag and drop for rooms and categories
   const handleDragEnd = async (result) => {
-    console.log('🎯 FFE DRAG END CALLED!', result);
-    if (!result.destination) {
-      console.log('❌ No destination');
-      return;
-    }
+    if (!result.destination) return;
 
     const { source, destination, type } = result;
 
-    try {
-      if (type === 'room') {
-        // Create deep copy of project
-        const updatedProject = {...project};
-        const newRooms = Array.from(updatedProject.rooms);
-        const [removed] = newRooms.splice(source.index, 1);
-        newRooms.splice(destination.index, 0, removed);
-        
-        updatedProject.rooms = newRooms;
-        
-        console.log('🔄 FFE: Moving room from', source.index, 'to', destination.index);
-        console.log('📦 FFE: New room order:', newRooms.map(r => r.name));
-        
-        // Force React to re-render
-        setFilteredProject(updatedProject);
-
-        // Update backend silently
-        Promise.all(newRooms.map((room, i) => 
-          fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${room.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_index: i })
+    if (type === 'room') {
+      console.log('🔄 Reordering rooms...');
+      
+      // Update backend room order
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/reorder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            source_index: source.index,
+            destination_index: destination.index,
+            project_id: project.id
           })
-        ));
-
-        console.log('✅ FFE: Rooms reordered!');
-      } else if (type === 'category') {
-        // Create deep copy of project
-        const updatedProject = {...project};
-        const roomId = source.droppableId.replace('categories-', '');
-        const room = updatedProject.rooms.find(r => r.id === roomId);
-        if (!room) return;
-
-        const newCategories = Array.from(room.categories);
-        const [removed] = newCategories.splice(source.index, 1);
-        newCategories.splice(destination.index, 0, removed);
+        });
         
-        room.categories = newCategories;
-        
-        console.log('🔄 FFE: Moving category from', source.index, 'to', destination.index);
-        
-        // Force React to re-render
-        setFilteredProject(updatedProject);
-
-        // Update backend silently
-        Promise.all(newCategories.map((category, i) => 
-          fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/${category.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_index: i })
-          })
-        ));
-
-        console.log('✅ FFE: Categories reordered!');
+        if (response.ok) {
+          console.log('✅ Room order updated');
+          // Reload to show changes
+          if (onReload) onReload();
+        }
+      } catch (err) {
+        console.error('❌ Error updating room order:', err);
       }
-    } catch (error) {
-      console.error('❌ Drag error:', error);
+    }
+    
+    if (type === 'category') {
+      console.log('🔄 Reordering categories...');
+      
+      // Update backend category order  
+      try {
+        const roomId = source.droppableId.replace('categories-', '');
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/reorder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            room_id: roomId,
+            source_index: source.index,
+            destination_index: destination.index
+          })
+        });
+        
+        if (response.ok) {
+          console.log('✅ Category order updated');
+          if (onReload) onReload();
+        }
+      } catch (err) {
+        console.error('❌ Error updating category order:', err);
+      }
     }
   };
 
   // Toggle room expansion
   const toggleRoomExpansion = (roomId) => {
-    setExpandedRooms(prev => {
-      const newState = {
-        ...prev,
-        [roomId]: !prev[roomId]
-      };
-      localStorage.setItem('ffe_expandedRooms', JSON.stringify(newState));
-      return newState;
-    });
+    setExpandedRooms(prev => ({
+      ...prev,
+      [roomId]: !prev[roomId]
+    }));
   };
 
   // Toggle category expansion
   const toggleCategoryExpansion = (categoryId) => {
-    setExpandedCategories(prev => {
-      const newState = {
-        ...prev,
-        [categoryId]: !prev[categoryId]
-      };
-      localStorage.setItem('ffe_expandedCategories', JSON.stringify(newState));
-      return newState;
-    });
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }));
+  };
+
+  // Handle item field changes - FIXES CURSOR JUMPING BUG
+  const handleItemFieldChange = async (itemId, field, value) => {
+    console.log('🔄 Item field change request:', { itemId, field, value });
+    
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      console.log('🌐 Using backend URL:', backendUrl);
+      
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value })
+      });
+      
+      console.log('📡 Response status:', response.status, response.statusText);
+      
+      if (response.ok) {
+        console.log(`✅ Item ${field} updated successfully`);
+        // Use onReload instead of window.location.reload to prevent navigation issues
+        if (onReload) {
+          console.log('🔄 Calling onReload function');
+          onReload();
+        } else {
+          console.warn('⚠️ No onReload function provided');
+        }
+      } else {
+        const errorData = await response.text();
+        console.error(`❌ Item ${field} update failed:`, response.status, errorData);
+        alert(`Failed to update ${field}: ${response.status} ${errorData}`);
+      }
+    } catch (error) {
+      console.error(`❌ Item ${field} update error:`, error);
+      alert(`Error updating ${field}: ${error.message}`);
+    }
   };
 
   // Handle tracking items
@@ -643,7 +545,7 @@ const ExactFFESpreadsheet = ({
     }
 
     try {
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {
@@ -666,10 +568,64 @@ const ExactFFESpreadsheet = ({
     }
   };
 
-  const getMainHeaderColor = () => '#8B4444';  // Dark red for main headers
-  const getAdditionalInfoColor = () => '#8B4444';  // Brown for ADDITIONAL INFO.
+  // MUTED ROOM COLORS FOR FFE - CONSISTENT WITH OTHER SHEETS
+  const getRoomColor = (roomName, index = 0) => {
+    const mutedColors = [
+      '#8B5A6B',  // Muted rose
+      '#6B7C93',  // Muted blue  
+      '#7A8B5A',  // Muted olive
+      '#9B6B8B',  // Muted purple
+      '#8B7A5A',  // Muted brown
+      '#5A8B7A',  // Muted teal
+      '#8B5A7A',  // Muted mauve
+      '#7A5A8B',  // Muted violet
+      '#5A7A8B',  // Muted slate
+      '#8B6B5A'   // Muted tan
+    ];
+    
+    // Use room name hash for consistent color per room
+    let hash = 0;
+    for (let i = 0; i < roomName.length; i++) {
+      hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return mutedColors[Math.abs(hash) % mutedColors.length];
+  };
+
+  const getCategoryColor = () => '#065F46';  // Dark green
+  const getMainHeaderColor = () => '#7F1D1D';  // Dark red for main headers
+  const getAdditionalInfoColor = () => '#92400E';  // Brown for ADDITIONAL INFO.
   const getShippingInfoColor = () => '#6B21A8';  // Purple for SHIPPING INFO.
-  const getNotesActionsColor = () => '#8B4444';  // Red for NOTES and ACTIONS
+  const getNotesActionsColor = () => '#7F1D1D';  // Red for NOTES and ACTIONS
+
+  // Get status color
+  const getStatusColor = (status) => {
+    const colors = {
+      '': '#6B7280',                        // Gray for blank/default
+      'TO BE SELECTED': '#6B7280',          // Gray
+      'RESEARCHING': '#3B82F6',             // Blue
+      'PENDING APPROVAL': '#F59E0B',        // Amber
+      'APPROVED': '#10B981',                // Emerald
+      'ORDERED': '#10B981',                 // Emerald
+      'PICKED': '#FFD700',                  // Gold - but user wants this NOT as default
+      'CONFIRMED': '#10B981',               // Emerald
+      'IN PRODUCTION': '#F97316',           // Orange
+      'SHIPPED': '#3B82F6',                 // Blue
+      'IN TRANSIT': '#3B82F6',              // Blue  
+      'OUT FOR DELIVERY': '#3B82F6',        // Blue
+      'DELIVERED TO RECEIVER': '#8B5CF6',   // Violet
+      'DELIVERED TO JOB SITE': '#8B5CF6',   // Violet
+      'RECEIVED': '#8B5CF6',                // Violet
+      'READY FOR INSTALL': '#10B981',       // Emerald
+      'INSTALLING': '#10B981',              // Emerald
+      'INSTALLED': '#10B981',               // Emerald
+      'ON HOLD': '#EF4444',                 // Red
+      'BACKORDERED': '#EF4444',             // Red
+      'DAMAGED': '#EF4444',                 // Red
+      'RETURNED': '#EF4444',                // Red
+      'CANCELLED': '#EF4444'                // Red
+    };
+    return colors[status] || '#6B7280';
+  };
 
   // Get carrier color to match header colors
   const getCarrierColor = (carrier) => {
@@ -710,17 +666,6 @@ const ExactFFESpreadsheet = ({
     return shipToColors[shipTo] || '#FEF08A';
   };
 
-  const getStockStatusColor = (stockStatus) => {
-    const stockColors = {
-      'IN STOCK': '#10B981',        // Green
-      'LOW STOCK': '#F59E0B',       // Orange
-      'OUT OF STOCK': '#EF4444',    // Red
-      'BACKORDERED': '#DC2626',     // Dark Red
-      'DISCONTINUED': '#991B1B'     // Very Dark Red
-    };
-    return stockColors[stockStatus] || 'transparent';
-  };
-
   const getDeliveryStatusColor = (status) => {
     const deliveryColors = {
       'PENDING': '#FEF08A',
@@ -736,19 +681,55 @@ const ExactFFESpreadsheet = ({
       'EXCEPTION': '#DC2626',
       'DAMAGED': '#B91C1C',
       'LOST': '#991B1B',
-      'RETURNED TO SENDER': '#8B4444'
+      'RETURNED TO SENDER': '#7F1D1D'
     };
     return deliveryColors[status] || '#FEF08A';
   };
 
-  if (!project || !project.rooms || project.rooms.length === 0) {
+  // FORCE VISIBLE DEBUG - Show component is rendering
+  console.log('🔍 ExactFFESpreadsheet rendering with:', { project, roomsCount: project?.rooms?.length });
+
+  // ALWAYS show debug info temporarily
+  if (!project) {
     return (
-      <div className="text-center text-gray-400 py-8">
-        <p className="text-lg">Loading FF&E data...</p>
-        <p className="text-sm mt-2">Please wait while we load your project information.</p>
+      <div className="text-center text-red-400 py-8 bg-red-900 m-4 p-4 rounded">
+        <p className="text-lg">🚨 ExactFFESpreadsheet: NO PROJECT DATA</p>
+        <p className="text-sm mt-2">Component is rendering but project is null/undefined</p>
       </div>
     );
   }
+
+  if (!project.rooms) {
+    return (
+      <div className="text-center text-orange-400 py-8 bg-orange-900 m-4 p-4 rounded">
+        <p className="text-lg">🚨 ExactFFESpreadsheet: NO ROOMS PROPERTY</p>
+        <p className="text-sm mt-2">Project exists but has no 'rooms' property</p>
+        <p className="text-xs mt-1">Project keys: {Object.keys(project).join(', ')}</p>
+      </div>
+    );
+  }
+
+  if (project.rooms.length === 0) {
+    return (
+      <div className="w-full p-4" style={{ backgroundColor: '#0F172A' }}>
+        <div className="text-center text-yellow-400 py-8 bg-yellow-900 m-4 p-4 rounded">
+          <p className="text-lg">🏠 No Rooms Available</p>
+          <p className="text-sm mt-2">This project has {project.rooms?.length || 0} rooms</p>
+          <div className="mt-4">
+            <button 
+              onClick={handleAddRoom}
+              className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+            >
+              + ADD FIRST ROOM
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If we get here, we have valid data - show success message
+  console.log('✅ ExactFFESpreadsheet: Valid project data, proceeding to render spreadsheet');
 
   return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
@@ -763,11 +744,7 @@ const ExactFFESpreadsheet = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-[#B49B7E] text-white focus:outline-none placeholder-[#D4C5A9]/70"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
-                boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 30px rgba(212, 165, 116, 0.08)'
-              }}
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
           
@@ -776,11 +753,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
-                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
-              }}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Rooms</option>
               {project.rooms.map(room => (
@@ -791,11 +764,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
-                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
-              }}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Categories</option>
               {availableCategories.map(category => (
@@ -806,11 +775,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedVendor}
               onChange={(e) => setSelectedVendor(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
-                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
-              }}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Vendors</option>
               <option value="Visual Comfort">Visual Comfort</option>
@@ -826,11 +791,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
-                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
-              }}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Status</option>
               <option value="TO BE SELECTED">TO BE SELECTED</option>
@@ -860,11 +821,7 @@ const ExactFFESpreadsheet = ({
             <select 
               value={selectedCarrier}
               onChange={(e) => setSelectedCarrier(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-[#B49B7E] text-[#D4C5A9] focus:outline-none"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
-                boxShadow: '0 0 15px rgba(212, 165, 116, 0.2), inset 0 0 25px rgba(212, 165, 116, 0.06)'
-              }}
+              className="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Carriers</option>
               <option value="FedEx" style={{ backgroundColor: '#FF6600', color: 'white' }}>FedEx</option>
@@ -903,13 +860,24 @@ const ExactFFESpreadsheet = ({
             </button>
           </div>
           
-          {/* Add Room Button - GOLD/AMBER COLOR */}
-          <button 
-            onClick={handleAddRoom}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
-          >
-            ✚ ADD ROOM
-          </button>
+          {/* Action Buttons - ADD ROOM AND TRANSFER */}
+          <div className="flex gap-3">
+            <button 
+              onClick={handleAddRoom}
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+            >
+              ✚ ADD ROOM
+            </button>
+            <button 
+              onClick={() => {
+                console.log('🚀 FF&E Filter Transfer button clicked');
+                alert('Transfer functionality will be implemented next.');
+              }}
+              className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
+            >
+              → TRANSFER FROM CHECKLIST
+            </button>
+          </div>
         </div>
       </div>
 
@@ -918,56 +886,36 @@ const ExactFFESpreadsheet = ({
         <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
           
           <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
-            <table className="w-full border-collapse border border-[#B49B7E]">
+            <table className="w-full border-collapse border border-gray-400">
                   
                   <thead>
                     {/* EMPTY HEADER FOR STRUCTURE */}
                   </thead>
 
-                  {/* TABLE BODY WITH SMOOTH DRAG AND DROP */}
-                  <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="ffe-rooms" type="room">
-                    {(provided) => (
-                      <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                  {/* TABLE BODY - Keep original hierarchical structure */}
+                  <tbody>
                 {/* USE FILTERED PROJECT DATA */}
                 {(filteredProject || project).rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
                   console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
                   
                   return (
-                    <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
-                      {(provided, snapshot) => (
-                        <>
-                          <tr
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{
-                              ...provided.draggableProps.style,
-                              display: snapshot.isDragging ? 'table' : '',
-                              backgroundColor: snapshot.isDragging ? 'rgba(212, 165, 116, 0.3)' : ''
-                            }}
-                          >
-                            <td colSpan="12" 
-                                className="border border-[#B49B7E] px-3 py-2 text-white text-sm font-bold"
-                                style={{ 
-                                  background: `linear-gradient(135deg, ${getRoomColor(room.name)}FF 0%, ${getRoomColor(room.name)}AA 20%, ${getRoomColor(room.name)} 40%, ${getRoomColor(room.name)}AA 80%, ${getRoomColor(room.name)}FF 100%)`,
-                                  boxShadow: `0 0 35px ${getRoomColor(room.name)}80, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5)`,
-                                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.4)'
-                                }}>
-                              <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                  <div className="cursor-move text-white hover:text-gray-200 px-2">
-                                    ⋮⋮
-                                  </div>
-                                  <button
-                                    onClick={() => toggleRoomExpansion(room.id)}
-                                    className="text-white hover:text-gray-200"
-                                  >
-                                    {isRoomExpanded ? '▼' : '▶'}
-                                  </button>
-                                  <span>{room.name.toUpperCase()}</span>
-                                </div>
+                              <React.Fragment key={room.id}>
+                                {/* ROOM HEADER ROW - Full width like your screenshots */}
+                                <tr>
+                                  <td colSpan="12" 
+                                      className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
+                                      style={{ backgroundColor: getRoomColor(room.name) }}>
+                                    <div className="flex justify-between items-center">
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          onClick={() => toggleRoomExpansion(room.id)}
+                                          className="text-white hover:text-gray-200"
+                                        >
+                                          {isRoomExpanded ? '▼' : '▶'}
+                                        </button>
+                                        <span>{room.name.toUpperCase()}</span>
+                                      </div>
                                       <button
                                         onClick={() => handleDeleteRoom(room.id)}
                                         className="text-red-300 hover:text-red-100 text-lg ml-2"
@@ -977,12 +925,8 @@ const ExactFFESpreadsheet = ({
                                       </button>
                                     </div>
                                   </td>
-                                  <td className="border border-[#B49B7E] px-2 py-2 text-center rounded-lg text-[#D4C5A9]"
-                                      style={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
-                                        borderTop: `4px solid ${getRoomColor(room.name)}`,
-                                        boxShadow: `0 0 15px ${getRoomColor(room.name)}40, inset 0 0 30px rgba(212, 165, 116, 0.04)`
-                                      }}>
+                                  <td className="border border-gray-400 px-2 py-2 text-center"
+                                      style={{ backgroundColor: getRoomColor(room.name) }}>
                                     <button
                                       onClick={() => handleAddRoom()}
                                       className="text-green-300 hover:text-green-100 text-sm font-bold"
@@ -993,44 +937,21 @@ const ExactFFESpreadsheet = ({
                                   </td>
                                 </tr>
 
-                                {/* ROOM CATEGORIES WITH SMOOTH DRAG DROP */}
+                                {/* ROOM CATEGORIES - Only show when expanded */}
                                 {isRoomExpanded && (
-                                  <Droppable droppableId={`categories-${room.id}`} type="category">
-                                    {(provided) => (
-                                      <>
-                                        <tr ref={provided.innerRef} {...provided.droppableProps} style={{ display: 'none' }}>
-                                          <td></td>
-                                        </tr>
+                                      <React.Fragment>
                                         {room.categories?.map((category, catIndex) => {
                                           const isCategoryExpanded = expandedCategories[category.id];
                                           console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
                                           
                                           return (
-                                            <Draggable key={category.id} draggableId={category.id} index={catIndex}>
-                                              {(provided, snapshot) => (
-                                                <>
+                                                <React.Fragment key={category.id}>
                                                   {/* CATEGORY HEADER ROW */}
-                                                  <tr
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                    style={{
-                                                      ...provided.draggableProps.style,
-                                                      display: snapshot.isDragging ? 'table' : '',
-                                                      backgroundColor: snapshot.isDragging ? 'rgba(212, 165, 116, 0.3)' : ''
-                                                    }}
-                                                  >
+                                                  <tr>
                                                     <td colSpan="14" 
-                                                        className="border border-[#B49B7E] px-4 py-2 text-white text-sm font-bold"
-                                                        style={{ 
-                                                          background: `linear-gradient(135deg, ${getCategoryColor()} 0%, ${getCategoryColor()}DD 50%, ${getCategoryColor()} 100%)`,
-                                                          boxShadow: `0 0 22px ${getCategoryColor()}55, inset 0 0 45px rgba(255, 255, 255, 0.12), inset 0 0 85px rgba(0, 0, 0, 0.4)`,
-                                                          textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 14px rgba(255, 255, 255, 0.3)'
-                                                        }}>
+                                                        className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
+                                                        style={{ backgroundColor: getCategoryColor() }}>
                                                       <div className="flex items-center gap-2">
-                                                        <div className="cursor-move text-white hover:text-gray-200 px-1">
-                                                          ⋮⋮
-                                                        </div>
                                                         <button
                                                           onClick={() => toggleCategoryExpansion(category.id)}
                                                           className="text-white hover:text-gray-200"
@@ -1045,337 +966,142 @@ const ExactFFESpreadsheet = ({
                                                   {/* SUBCATEGORIES - Only show when category expanded */}
                                                   {isCategoryExpanded && (
                                                     <React.Fragment>
-                                                      {/* SECTION HEADER - GROUPS COLUMNS */}
+                                                      {/* RED HEADER GOES AFTER CATEGORY - LAST IN HIERARCHY */}
                                                       <tr>
                                                         <td colSpan="4" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#8B4444', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+                                                            style={{ backgroundColor: '#7F1D1D', borderLeft: '1px solid #9CA3AF', borderRight: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
                                                         </td>
-                                                        <td colSpan="3" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center rounded" 
-                                                            style={{ 
-                                                              background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
-                                                              boxShadow: '0 0 25px #8B451360, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
-                                                              textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
-                                                            }}>
+                                                        <td colSpan="3" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                            style={{ backgroundColor: '#8B4513' }}>
                                                           ADDITIONAL INFO.
                                                         </td>
-                                                        <td colSpan="2" className="border border-[#D4A574] px-2 py-1 text-xs font-bold text-white text-center rounded" 
-                                                            style={{ 
-                                                              background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
-                                                              boxShadow: '0 0 25px #D4A57460, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
-                                                              textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
-                                                            }}>
-                                                          STOCK INFO.
-                                                        </td>
-                                                        <td colSpan="6" className="border border-[#B49B7E] px-2 py-1 text-xs font-bold text-white text-center rounded" 
-                                                            style={{ 
-                                                              background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
-                                                              boxShadow: '0 0 25px #6B46C160, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.45)',
-                                                              textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
-                                                            }}>
+                                                        <td colSpan="5" className="border border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
+                                                            style={{ backgroundColor: '#6B46C1' }}>
                                                           SHIPPING INFO.
                                                         </td>
                                                         <td colSpan="2" className="border-gray-400 px-2 py-1 text-xs font-bold text-white text-center" 
-                                                            style={{ backgroundColor: '#8B4444', borderRight: '1px solid #9CA3AF', borderLeft: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+                                                            style={{ backgroundColor: '#7F1D1D', borderRight: '1px solid #9CA3AF', borderLeft: 'none', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
                                                         </td>
                                                       </tr>
                                                       
-                                                      {/* MAIN RED HEADER ROW - PERFECTLY ALIGNED WITH DATA COLUMNS */}
+                                                      {/* MAIN RED HEADER ROW */}
                                                       <tr>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>INSTALLED</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>VENDOR/SKU</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>QTY</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>SIZE</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
-                                    boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>FINISH/COLOR</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
-                                    boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>COST/PRICE</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4513FF 0%, #8B4513AA 20%, #8B4513 40%, #8B4513AA 80%, #8B4513FF 100%)',
-                                    boxShadow: '0 0 20px #8B451350, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>IMAGE</td>
-                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
-                                    boxShadow: '0 0 20px #D4A57450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>STOCK STATUS/QTY</td>
-                                                        <td className="border border-[#D4A574] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
-                                    boxShadow: '0 0 20px #D4A57450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>RESTOCK/LEAD TIME</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
-                                    boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>ORDER DATE</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
-                                    boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>STATUS/ORDER#</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
-                                    boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>EST. DATES</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
-                                    boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>INSTALL/SHIP TO</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
-                                    boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>TRACKING/CARRIER</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
-                                    boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>NOTES</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>LINK</td>
-                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>DELETE</td>
+                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>INSTALLED</td>
+                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>VENDOR/SKU</td>
+                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>QTY</td>
+                                                        <td className="border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>SIZE</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>FINISH/Color</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>Cost/Price</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#8B4513' }}>Image</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Order Date</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Order Status<br/>Order Number</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Estimated Ship Date<br/>Estimated Delivery Date</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Install Date<br/>Ship To</td>
+                                                        <td className="border border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#6B46C1' }}>Tracking<br/>Carrier</td>
+                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>NOTES</td>
+                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>LINK</td>
+                                                        <td className="border-l border-r border-b border-gray-400 px-3 py-2 text-xs font-bold text-white" style={{ backgroundColor: '#7F1D1D' }}>ACTIONS</td>
                                                       </tr>
                                                       
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
                                                       {/* ACTUAL INSTALLEDS FROM BACKEND DATA */}
                                                       {category.subcategories?.map((subcategory) => (
                                                         subcategory.items?.map((item, itemIndex) => (
-                                                        <tr key={item.id} style={{ 
-                                                          background: itemIndex % 2 === 0 
-                                                            ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
-                                                            : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
-                                                        }}>
+                                                        <tr key={item.id} className={itemIndex % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
                                                           {/* INSTALLED - INSTALLED NAME GOES HERE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             {item.name}
                                                           </td>
                                                           
-                                                          {/* VENDOR/SKU - EDITABLE INLINE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Vendor updated:', e.target.textContent)}
-                                                            >
-                                                              {item.vendor || ''}
-                                                            </div>
+                                                          {/* VENDOR/SKU - PROPER INPUT FIELD */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            <input 
+                                                              type="text" 
+                                                              value={item.vendor || ''}
+                                                              placeholder="Vendor/SKU"
+                                                              className="w-full bg-transparent text-white text-sm outline-none border-none"
+                                                              onChange={(e) => {
+                                                                handleItemFieldChange(item.id, 'vendor', e.target.value);
+                                                              }}
+                                                              onBlur={(e) => console.log('Vendor updated:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
-                                                          {/* QTY - EDITABLE INLINE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-center text-white">
+                                                          {/* QTY */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-center text-white">
                                                             <div 
-                                                              contentEditable={true}
+                                                              contentEditable
                                                               suppressContentEditableWarning={true}
                                                               className="w-full bg-transparent text-white text-sm text-center outline-none"
-                                                              onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
+                                                              onBlur={(e) => handleItemFieldChange(item.id, 'quantity', parseInt(e.target.textContent) || 1)}
                                                             >
-                                                              {item.quantity || ''}
+                                                              {item.quantity || 1}
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* SIZE - EDITABLE INLINE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
+                                                          {/* SIZE */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             <div 
-                                                              contentEditable={true}
+                                                              contentEditable
                                                               suppressContentEditableWarning={true}
                                                               className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Size updated:', e.target.textContent)}
+                                                              onBlur={(e) => handleItemFieldChange(item.id, 'size', e.target.textContent)}
                                                             >
                                                               {item.size || ''}
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* FINISH/Color - EDITABLE INLINE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
+                                                          {/* FINISH/Color */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             <div 
-                                                              contentEditable={true}
+                                                              contentEditable
                                                               suppressContentEditableWarning={true}
                                                               className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
+                                                              onBlur={(e) => handleItemFieldChange(item.id, 'finish_color', e.target.textContent)}
                                                             >
                                                               {item.finish_color || ''}
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* Cost/Price - EDITABLE INLINE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Cost updated:', e.target.textContent)}
-                                                            >
-                                                              {item.cost ? `$${item.cost}` : ''}
-                                                            </div>
+                                                          {/* Cost/Price - PROPER INPUT FIELD */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            <input 
+                                                              type="number" 
+                                                              value={item.cost || ''}
+                                                              placeholder="Cost"
+                                                              className="w-full bg-transparent text-white text-sm outline-none border-none"
+                                                              onChange={(e) => {
+                                                                handleItemFieldChange(item.id, 'cost', parseFloat(e.target.value) || 0);
+                                                              }}
+                                                              onBlur={(e) => console.log('Cost updated:', e.target.value)}
+                                                            />
                                                           </td>
                                                           
-                                                          {/* Image - SCRAPED AUTOMATICALLY - CLICKABLE TO EXPAND */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-center text-white">
+                                                          {/* Image - SCRAPED AUTOMATICALLY */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-center text-white">
                                                             {item.image_url ? (
-                                                              <img 
-                                                                src={item.image_url} 
-                                                                alt={item.name} 
-                                                                className="w-16 h-16 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity" 
-                                                                onClick={() => setExpandedImage(item.image_url)}
-                                                                title="Click to expand"
-                                                              />
+                                                              <img src={item.image_url} alt={item.name} className="w-8 h-8 object-cover rounded" />
                                                             ) : (
-                                                              <div className="w-16 h-16 bg-gray-700 rounded flex items-center justify-center text-xs">No Image</div>
+                                                              ''
                                                             )}
-                                                          </td>
-                                                          
-                                                          {/* STOCK STATUS/QTY - STACKED - COLORED BY STOCK STATUS */}
-                                                          <td className="border border-[#D4A574] px-1 py-1 text-sm" style={{
-                                                            background: item.stock_status ? `linear-gradient(135deg, ${getStockStatusColor(item.stock_status)}FF 0%, ${getStockStatusColor(item.stock_status)}AA 20%, ${getStockStatusColor(item.stock_status)} 40%, ${getStockStatusColor(item.stock_status)}AA 80%, ${getStockStatusColor(item.stock_status)}FF 100%)` : 'transparent',
-                                                            boxShadow: item.stock_status ? `0 0 15px ${getStockStatusColor(item.stock_status)}40, inset 0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)` : 'none'
-                                                          }}>
-                                                            <div className="flex flex-col h-full">
-                                                              <div className="h-6 mb-1">
-                                                                <select 
-                                                                  value={item.stock_status || ''}
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={async (e) => {
-                                                                    try {
-                                                                      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-                                                                      const response = await fetch(`${backendUrl}/api/items/${item.id}`, {
-                                                                        method: 'PUT',
-                                                                        headers: { 'Content-Type': 'application/json' },
-                                                                        body: JSON.stringify({ stock_status: e.target.value })
-                                                                      });
-                                                                      
-                                                                      if (response.ok) {
-                                                                        console.log('✅ Stock status saved:', e.target.value);
-                                                                        // Update local state and reload
-                                                                        item.stock_status = e.target.value;
-                                                                        if (onReload) {
-                                                                          onReload();
-                                                                        }
-                                                                      } else {
-                                                                        console.error('❌ Failed to save stock status');
-                                                                        alert('Failed to save stock status');
-                                                                      }
-                                                                    } catch (error) {
-                                                                      console.error('❌ Error saving stock status:', error);
-                                                                      alert('Error saving stock status');
-                                                                    }
-                                                                  }}
-                                                                >
-                                                                  <option value="">—</option>
-                                                                  <option value="IN STOCK">✅ IN STOCK</option>
-                                                                  <option value="LOW STOCK">⚠️ LOW STOCK</option>
-                                                                  <option value="OUT OF STOCK">❌ OUT OF STOCK</option>
-                                                                  <option value="BACKORDERED">⏳ BACKORDERED</option>
-                                                                  <option value="DISCONTINUED">🚫 DISCONTINUED</option>
-                                                                </select>
-                                                              </div>
-                                                              <div className="h-6">
-                                                                <input 
-                                                                  type="number" 
-                                                                  defaultValue={item.stock_quantity || ''}
-                                                                  placeholder="Stock Qty"
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs text-center p-0"
-                                                                  onBlur={async (e) => {
-                                                                    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-                                                                    await fetch(`${backendUrl}/api/items/${item.id}`, {
-                                                                      method: 'PUT',
-                                                                      headers: { 'Content-Type': 'application/json' },
-                                                                      body: JSON.stringify({ stock_quantity: parseInt(e.target.value) || 0 })
-                                                                    });
-                                                                    console.log('Stock qty saved:', e.target.value);
-                                                                  }}
-                                                                />
-                                                              </div>
-                                                            </div>
-                                                          </td>
-                                                          
-                                                          {/* RESTOCK DATE/LEAD TIME - STACKED */}
-                                                          <td className="border border-[#D4A574] px-1 py-1 text-sm">
-                                                            <div className="flex flex-col h-full">
-                                                              <div className="h-6 mb-1">
-                                                                <input 
-                                                                  type="date"
-                                                                  defaultValue={item.restock_date || ''}
-                                                                  className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onBlur={async (e) => {
-                                                                    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-                                                                    await fetch(`${backendUrl}/api/items/${item.id}`, {
-                                                                      method: 'PUT',
-                                                                      headers: { 'Content-Type': 'application/json' },
-                                                                      body: JSON.stringify({ restock_date: e.target.value })
-                                                                    });
-                                                                    console.log('Restock date saved:', e.target.value);
-                                                                  }}
-                                                                />
-                                                              </div>
-                                                              <div className="h-6">
-                                                                <input 
-                                                                  type="number"
-                                                                  defaultValue={item.lead_time_weeks || ''}
-                                                                  placeholder="Lead (wks)"
-                                                                  className="w-full h-full bg-transparent border-none text-[#D4A574] text-xs text-center p-0"
-                                                                  onBlur={async (e) => {
-                                                                    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-                                                                    await fetch(`${backendUrl}/api/items/${item.id}`, {
-                                                                      method: 'PUT',
-                                                                      headers: { 'Content-Type': 'application/json' },
-                                                                      body: JSON.stringify({ lead_time_weeks: e.target.value })
-                                                                    });
-                                                                    console.log('Lead time saved:', e.target.value);
-                                                                  }}
-                                                                />
-                                                              </div>
-                                                            </div>
                                                           </td>
                                                           
                                                           {/* RIGHT SIDE - STACKED COLUMNS AS USER SPECIFIED */}
                                                           
                                                           {/* Order Date (ALONE) */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             <input 
                                                               type="date" 
+                                                              value={item.order_date || ''}
                                                               className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Order date changed:', e.target.value)}
+                                                              onChange={(e) => {
+                                                                handleItemFieldChange(item.id, 'order_date', e.target.value);
+                                                              }}
                                                             />
                                                           </td>
                                                           
-                                                          {/* Order Status/Order Number (STACKED VERTICALLY) - COLORED BY STATUS */}
-                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm" style={{
-                                                            background: item.status ? `linear-gradient(135deg, ${getStatusColor(item.status)}FF 0%, ${getStatusColor(item.status)}AA 20%, ${getStatusColor(item.status)} 40%, ${getStatusColor(item.status)}AA 80%, ${getStatusColor(item.status)}FF 100%)` : 'transparent',
-                                                            boxShadow: item.status ? `0 0 15px ${getStatusColor(item.status)}40, inset 0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)` : 'none'
-                                                          }}>
+                                                          {/* Order Status/Order Number (STACKED VERTICALLY) */}
+                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <select 
@@ -1387,44 +1113,47 @@ const ExactFFESpreadsheet = ({
                                                                     handleStatusChange(item.id, newStatus);
                                                                   }}
                                                                 >
-                                                                  <option value="" style={{ background: 'linear-gradient(135deg, #6B7280FF 0%, #6B7280AA 50%, #6B7280FF 100%)', color: 'white' }}>—</option>
-                                                                  <option value="TO BE SELECTED" style={{ background: 'linear-gradient(135deg, #94A3B8FF 0%, #94A3B8AA 50%, #94A3B8FF 100%)', color: 'white' }}>⚪ TO BE SELECTED</option>
-                                                                  <option value="RESEARCHING" style={{ background: 'linear-gradient(135deg, #3B82F6FF 0%, #3B82F6AA 50%, #3B82F6FF 100%)', color: 'white' }}>🔵 RESEARCHING</option>
-                                                                  <option value="PENDING APPROVAL" style={{ background: 'linear-gradient(135deg, #F59E0BFF 0%, #F59E0BAA 50%, #F59E0BFF 100%)', color: 'white' }}>🟡 PENDING APPROVAL</option>
-                                                                  <option value="APPROVED" style={{ background: 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)', color: 'white' }}>🟢 APPROVED</option>
-                                                                  <option value="ORDERED" style={{ background: 'linear-gradient(135deg, #06B6D4FF 0%, #06B6D4AA 50%, #06B6D4FF 100%)', color: 'white' }}>🔷 ORDERED</option>
-                                                                  <option value="PICKED" style={{ background: 'linear-gradient(135deg, #FFD700FF 0%, #FFD700AA 50%, #FFD700FF 100%)', color: 'black' }}>⭐ PICKED</option>
-                                                                  <option value="CONFIRMED" style={{ background: 'linear-gradient(135deg, #84CC16FF 0%, #84CC16AA 50%, #84CC16FF 100%)', color: 'white' }}>🟩 CONFIRMED</option>
-                                                                  <option value="IN PRODUCTION" style={{ background: 'linear-gradient(135deg, #F97316FF 0%, #F97316AA 50%, #F97316FF 100%)', color: 'white' }}>🟠 IN PRODUCTION</option>
-                                                                  <option value="SHIPPED" style={{ background: 'linear-gradient(135deg, #0EA5E9FF 0%, #0EA5E9AA 50%, #0EA5E9FF 100%)', color: 'white' }}>🚢 SHIPPED</option>
-                                                                  <option value="IN TRANSIT" style={{ background: 'linear-gradient(135deg, #8B5CF6FF 0%, #8B5CF6AA 50%, #8B5CF6FF 100%)', color: 'white' }}>🟣 IN TRANSIT</option>
-                                                                  <option value="OUT FOR DELIVERY" style={{ background: 'linear-gradient(135deg, #6366F1FF 0%, #6366F1AA 50%, #6366F1FF 100%)', color: 'white' }}>📦 OUT FOR DELIVERY</option>
-                                                                  <option value="DELIVERED TO RECEIVER" style={{ background: 'linear-gradient(135deg, #A855F7FF 0%, #A855F7AA 50%, #A855F7FF 100%)', color: 'white' }}>💜 DELIVERED TO RECEIVER</option>
-                                                                  <option value="DELIVERED TO JOB SITE" style={{ background: 'linear-gradient(135deg, #EC4899FF 0%, #EC4899AA 50%, #EC4899FF 100%)', color: 'white' }}>💗 DELIVERED TO JOB SITE</option>
-                                                                  <option value="RECEIVED" style={{ background: 'linear-gradient(135deg, #D946EFFF 0%, #D946EFAA 50%, #D946EFFF 100%)', color: 'white' }}>📥 RECEIVED</option>
-                                                                  <option value="READY FOR INSTALL" style={{ background: 'linear-gradient(135deg, #14B8A6FF 0%, #14B8A6AA 50%, #14B8A6FF 100%)', color: 'white' }}>🔧 READY FOR INSTALL</option>
-                                                                  <option value="INSTALLING" style={{ background: 'linear-gradient(135deg, #22C55EFF 0%, #22C55EAA 50%, #22C55EFF 100%)', color: 'white' }}>🛠️ INSTALLING</option>
-                                                                  <option value="INSTALLED" style={{ background: 'linear-gradient(135deg, #65A30DFF 0%, #65A30DAA 50%, #65A30DFF 100%)', color: 'white' }}>✅ INSTALLED</option>
-                                                                  <option value="ON HOLD" style={{ background: 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)', color: 'white' }}>⏸️ ON HOLD</option>
-                                                                  <option value="BACKORDERED" style={{ background: 'linear-gradient(135deg, #DC2626FF 0%, #DC2626AA 50%, #DC2626FF 100%)', color: 'white' }}>⏳ BACKORDERED</option>
-                                                                  <option value="DAMAGED" style={{ background: 'linear-gradient(135deg, #991B1BFF 0%, #991B1BAA 50%, #991B1BFF 100%)', color: 'white' }}>💔 DAMAGED</option>
-                                                                  <option value="RETURNED" style={{ background: 'linear-gradient(135deg, #FB923CFF 0%, #FB923CAA 50%, #FB923CFF 100%)', color: 'white' }}>↩️ RETURNED</option>
-                                                                  <option value="CANCELLED" style={{ background: 'linear-gradient(135deg, #7C2D12FF 0%, #7C2D12AA 50%, #7C2D12FF 100%)', color: 'white' }}>❌ CANCELLED</option>
+                                                                  <option value="" style={{ backgroundColor: '#6B7280', color: 'white' }}>—</option>
+                                                                  <option value="TO BE SELECTED" style={{ backgroundColor: '#6B7280', color: 'white' }}>🔵 TO BE SELECTED</option>
+                                                                  <option value="RESEARCHING" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 RESEARCHING</option>
+                                                                  <option value="PENDING APPROVAL" style={{ backgroundColor: '#F59E0B', color: 'white' }}>🟡 PENDING APPROVAL</option>
+                                                                  <option value="APPROVED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 APPROVED</option>
+                                                                  <option value="ORDERED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 ORDERED</option>
+                                                                  <option value="PICKED" style={{ backgroundColor: '#FFD700', color: 'black' }}>🟡 PICKED</option>
+                                                                  <option value="CONFIRMED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 CONFIRMED</option>
+                                                                  <option value="IN PRODUCTION" style={{ backgroundColor: '#F97316', color: 'white' }}>🟠 IN PRODUCTION</option>
+                                                                  <option value="SHIPPED" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 SHIPPED</option>
+                                                                  <option value="IN TRANSIT" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 IN TRANSIT</option>
+                                                                  <option value="OUT FOR DELIVERY" style={{ backgroundColor: '#3B82F6', color: 'white' }}>🔵 OUT FOR DELIVERY</option>
+                                                                  <option value="DELIVERED TO RECEIVER" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 DELIVERED TO RECEIVER</option>
+                                                                  <option value="DELIVERED TO JOB SITE" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 DELIVERED TO JOB SITE</option>
+                                                                  <option value="RECEIVED" style={{ backgroundColor: '#8B5CF6', color: 'white' }}>🟣 RECEIVED</option>
+                                                                  <option value="READY FOR INSTALL" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 READY FOR INSTALL</option>
+                                                                  <option value="INSTALLING" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 INSTALLING</option>
+                                                                  <option value="INSTALLED" style={{ backgroundColor: '#10B981', color: 'white' }}>🟢 INSTALLED</option>
+                                                                  <option value="ON HOLD" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 ON HOLD</option>
+                                                                  <option value="BACKORDERED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 BACKORDERED</option>
+                                                                  <option value="DAMAGED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 DAMAGED</option>
+                                                                  <option value="RETURNED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 RETURNED</option>
+                                                                  <option value="CANCELLED" style={{ backgroundColor: '#EF4444', color: 'white' }}>🔴 CANCELLED</option>
                                                                 </select>
                                                               </div>
                                                               <div className="h-6">
                                                                 <input 
                                                                   type="text" 
+                                                                  value={item.order_number || ''}
                                                                   placeholder="Order #"
                                                                   className="w-full h-full bg-transparent border-none text-white text-xs p-0"
-                                                                  onChange={(e) => console.log('Order number changed:', e.target.value)}
+                                                                  onChange={(e) => {
+                                                                    handleItemFieldChange(item.id, 'order_number', e.target.value);
+                                                                  }}
                                                                 />
                                                               </div>
                                                             </div>
                                                           </td>
                                                           
                                                           {/* Estimated Ship Date/Estimated Delivery Date (STACKED VERTICALLY) */}
-                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm">
+                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <input 
@@ -1444,7 +1173,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* Install Date/Ship To (STACKED VERTICALLY) */}
-                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm">
+                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <input 
@@ -1472,11 +1201,8 @@ const ExactFFESpreadsheet = ({
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* Tracking/Carrier (STACKED VERTICALLY) - COLORED BY CARRIER */}
-                                                          <td className="border border-[#B49B7E] px-1 py-1 text-sm" style={{
-                                                            background: item.carrier ? `linear-gradient(135deg, ${getCarrierColor(item.carrier)}FF 0%, ${getCarrierColor(item.carrier)}AA 20%, ${getCarrierColor(item.carrier)} 40%, ${getCarrierColor(item.carrier)}AA 80%, ${getCarrierColor(item.carrier)}FF 100%)` : 'transparent',
-                                                            boxShadow: item.carrier ? `0 0 15px ${getCarrierColor(item.carrier)}40, inset 0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)` : 'none'
-                                                          }}>
+                                                          {/* Tracking/Carrier (STACKED VERTICALLY) */}
+                                                          <td className="border border-gray-400 px-1 py-1 text-sm">
                                                             <div className="flex flex-col h-full">
                                                               <div className="h-6 mb-1">
                                                                 <input 
@@ -1520,7 +1246,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* NOTES */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
                                                             <input 
                                                               type="text" 
                                                               placeholder="Notes"
@@ -1529,47 +1255,25 @@ const ExactFFESpreadsheet = ({
                                                             />
                                                           </td>
                                                           
-                                                          {/* LINK WITH CLICKABLE OPEN BUTTON AND SCRAPE */}
-                                                          <td className="border border-[#B49B7E] px-1 py-1 text-white w-32">
-                                                            <div className="flex flex-col gap-1">
-                                                              <input 
-                                                                type="text" 
-                                                                value={item.link || item.link_url || ''}
-                                                                placeholder="Product URL"
-                                                                className="w-full bg-transparent text-blue-400 text-xs outline-none border border-gray-600 rounded px-1"
-                                                                onChange={(e) => {
-                                                                  // Update item link immediately for scraping
-                                                                  item.link = e.target.value;
-                                                                  item.link_url = e.target.value;
-                                                                }}
-                                                                onBlur={(e) => console.log('Link updated:', e.target.value)}
-                                                              />
-                                                              <div className="flex gap-1">
-                                                                {(item.link || item.link_url) && (
-                                                                  <a
-                                                                    href={item.link || item.link_url}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded text-center font-bold"
-                                                                    title="Open product link in new tab"
-                                                                  >
-                                                                    🔗 OPEN
-                                                                  </a>
-                                                                )}
-                                                                <button
-                                                                  onClick={() => handleScrapeProduct(item.link || item.link_url, item.id)}
-                                                                  className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded"
-                                                                  disabled={!item.link && !item.link_url}
-                                                                  title="Scrape product information from URL"
-                                                                >
-                                                                  SCRAPE
-                                                                </button>
-                                                              </div>
-                                                            </div>
+                                                          {/* LINK */}
+                                                          <td className="border border-gray-400 px-2 py-2 text-sm text-white">
+                                                            {item.link ? (
+                                                              <a 
+                                                                href={item.link} 
+                                                                target="_blank" 
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-400 hover:text-blue-300 text-xs underline"
+                                                                title="View Product Link"
+                                                              >
+                                                                🔗 LINK
+                                                              </a>
+                                                            ) : (
+                                                              <span className="text-gray-500 text-xs">No Link</span>
+                                                            )}
                                                           </td>
                                                           
                                                           {/* ACTIONS - DELETE INSTALLED */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-center">
+                                                          <td className="border border-gray-400 px-2 py-2 text-center">
                                                             <button 
                                                               onClick={() => handleDeleteItem(item.id)}
                                                               className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
@@ -1584,46 +1288,25 @@ const ExactFFESpreadsheet = ({
                                                       
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
                                                       <tr>
-                                                        <td colSpan="7" className="border border-[#B49B7E] px-6 py-2 bg-slate-900">
+                                                        <td colSpan="15" className="border border-gray-400 px-6 py-2 bg-slate-900">
                                                           <div className="flex justify-start items-center space-x-4">
-                                                            {/* Add Item Button - GOLD/AMBER COLOR */}
+                                                            {/* Add Item Button - FIXED */}
                                                             <button
-                                                              onClick={() => setShowAddItem(true)}
+                                                              onClick={() => {
+                                                                if (category.subcategories?.length > 0) {
+                                                                  setSelectedSubCategoryId(category.subcategories[0].id);
+                                                                  setShowAddItem(true);
+                                                                  console.log('🎯 Selected subcategory for FFE item:', category.subcategories[0].id);
+                                                                } else {
+                                                                  alert('This category has no subcategories. Please contact support.');
+                                                                }
+                                                              }}
                                                               className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium"
                                                             >
                                                               ✚ Add Item
                                                             </button>
                                                             
-                                                            {/* Add Category Dropdown - GOLD/AMBER COLOR */}
-                                                            <select
-                                                              value=""
-                                                              onChange={(e) => {
-                                                                if (e.target.value === 'CREATE_NEW') {
-                                                                  const categoryName = prompt('Enter new category name:');
-                                                                  if (categoryName && categoryName.trim()) {
-                                                                    handleAddCategory(room.id, categoryName.trim());
-                                                                  }
-                                                                } else if (e.target.value) {
-                                                                  handleAddCategory(room.id, e.target.value);
-                                                                }
-                                                              }}
-                                                              className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-medium border-none outline-none"
-                                                            >
-                                                              <option value="">Add Category ▼</option>
-                                                              <option value="Lighting">Lighting</option>
-                                                              <option value="Furniture">Furniture</option>
-                                                              <option value="Decor & Accessories">Decor & Accessories</option>
-                                                              <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
-                                                              <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
-                                                              <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
-                                                              <option value="Furniture & Storage">Furniture & Storage</option>
-                                                              <option value="Equipment & Furniture">Equipment & Furniture</option>
-                                                              <option value="Electronics & Technology">Electronics & Technology</option>
-                                                              <option value="Appliances">Appliances</option>
-                                                              <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
-                                                              <option value="Surfaces & Materials">Surfaces & Materials</option>
-                                                              <option value="CREATE_NEW">+ Create New Category</option>
-                                                            </select>
+
                                                             
                                                             {/* Delete Section Button - RED COLOR */}
                                                             <button
@@ -1637,32 +1320,125 @@ const ExactFFESpreadsheet = ({
                                                       </tr>
                                                     </React.Fragment>
                                                   )}
-                                                </>
-                                              )}
-                                            </Draggable>
+                                                </React.Fragment>
                                           );
                                         })}
-                                        {provided.placeholder}
-                                      </>
-                                    )}
-                                  </Droppable>
+                                      </React.Fragment>
                                 )}
-                        </>
-                      )}
-                    </Draggable>
-                  );
-                })}
-                        {provided.placeholder}
-                      </tbody>
-                    )}
-                  </Droppable>
-                </DragDropContext>
+                              </React.Fragment>
+                        );
+                      })}
+                  </tbody>
                 </table>
             </div>
           </div>
         </div>
 
+        {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS - MATCHING WALKTHROUGH */}
+        <div className="mt-6 flex gap-3">
+          <select
+            value=""
+            onChange={(e) => {
+              // Find first room to add category to
+              const firstRoom = project?.rooms?.[0];
+              if (firstRoom) {
+                if (e.target.value === 'CREATE_NEW') {
+                  const categoryName = window.prompt('Enter new category name:');
+                  if (categoryName && categoryName.trim()) {
+                    handleAddCategory(firstRoom.id, categoryName.trim());
+                  }
+                } else if (e.target.value) {
+                  handleAddCategory(firstRoom.id, e.target.value);
+                }
+              } else {
+                console.error('❌ No rooms available. Please add a room first.');
+                alert('Please add a room first before adding categories.');
+              }
+            }}
+            className="text-white px-4 py-2 rounded font-medium border-none outline-none" 
+            style={{ backgroundColor: '#8b7355' }}
+          >
+            <option value="">+ ADD CATEGORY ▼</option>
+            <option value="Lighting">Lighting</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Decor & Accessories">Decor & Accessories</option>
+            <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
+            <option value="Millwork, Trim, and Architectural Elements">Millwork, Trim, and Architectural Elements</option>
+            <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
+            <option value="Furniture & Storage">Furniture & Storage</option>
+            <option value="Equipment & Furniture">Equipment & Furniture</option>
+            <option value="Electronics & Technology">Electronics & Technology</option>
+            <option value="Appliances">Appliances</option>
+            <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
+            <option value="Surfaces & Materials">Surfaces & Materials</option>
+            <option value="CREATE_NEW">+ Create New Category</option>
+          </select>
+          <button 
+            onClick={() => {
+              console.log('🚀 FF&E Transfer button clicked');
+              alert('Transfer functionality will be implemented next.');
+            }}
+            className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-medium"
+          >
+            → TRANSFER TO CHECKLIST
+          </button>
+          <button 
+            onClick={() => {
+              // Find first available subcategory to add item to
+              const firstRoom = project?.rooms?.[0];
+              const firstCategory = firstRoom?.categories?.[0];
+              const firstSubcategory = firstCategory?.subcategories?.[0];
+              
+              if (firstSubcategory) {
+                setSelectedSubCategoryId(firstSubcategory.id);
+                setShowAddItem(true);
+                console.log('🎯 Adding item to first available subcategory:', firstSubcategory.id);
+              } else {
+                alert('Please add a category first before adding items.');
+              }
+            }}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-medium"
+          >
+            + ADD ITEM
+          </button>
+        </div>
+
       {/* ADD INSTALLED MODAL */}
+      {/* FOOTER SECTION - ADD CATEGORY */}
+      <div className="mt-8 p-4 border-t-2 border-gray-600">
+        <div className="flex gap-3 justify-center">
+          <select
+            value=""
+            onChange={(e) => {
+              const firstRoom = project?.rooms?.[0];
+              if (firstRoom) {
+                if (e.target.value === 'CREATE_NEW') {
+                  const categoryName = window.prompt('Enter new category name:');
+                  if (categoryName && categoryName.trim()) {
+                    console.log('FFE Add new category:', categoryName);
+                  }
+                } else if (e.target.value) {
+                  console.log('FFE Add existing category:', e.target.value);
+                }
+              } else {
+                alert('Please add a room first before adding categories.');
+              }
+            }}
+            className="text-white px-6 py-3 rounded font-bold border-none outline-none text-lg" 
+            style={{ backgroundColor: '#8b7355' }}
+          >
+            <option value="">+ ADD CATEGORY ▼</option>
+            <option value="Lighting">Lighting</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Decor & Accessories">Decor & Accessories</option>
+            <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
+            <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
+            <option value="Appliances">Appliances</option>
+            <option value="CREATE_NEW">+ Create New Category</option>
+          </select>
+        </div>
+      </div>
+
       {showAddItem && (
         <AddItemModal
           onClose={() => setShowAddItem(false)}
@@ -1671,30 +1447,6 @@ const ExactFFESpreadsheet = ({
           vendorTypes={vendorTypes}
           loading={false}
         />
-      )}
-
-      {/* IMAGE EXPANSION MODAL */}
-      {expandedImage && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-90 flex items-start justify-center z-50 p-4 overflow-y-auto"
-          onClick={() => setExpandedImage(null)}
-        >
-          <div className="relative max-w-4xl max-h-screen mt-4">
-            <button
-              onClick={() => setExpandedImage(null)}
-              className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold z-10"
-              title="Close"
-            >
-              ×
-            </button>
-            <img 
-              src={expandedImage} 
-              alt="Expanded view" 
-              className="max-w-full max-h-screen object-contain rounded-lg"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        </div>
       )}
     </div>
   );

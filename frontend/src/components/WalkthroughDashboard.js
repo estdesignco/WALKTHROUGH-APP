@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import { useParams } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
 import SimpleWalkthroughSpreadsheet from './SimpleWalkthroughSpreadsheet';
 import StatusOverview from './StatusOverview';
-import PhotoManagerModal from './PhotoManagerModal';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
-import CompletePageLayout from './CompletePageLayout';
 
 const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.log("🚀 WALKTHROUGH DASHBOARD IS LOADING");
@@ -24,22 +22,16 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
   
-  // PHOTO MANAGEMENT STATE
-  const [showPhotoManager, setShowPhotoManager] = useState(false);
-  const [selectedRoomForPhotos, setSelectedRoomForPhotos] = useState(null);
-  const [roomPhotos, setRoomPhotos] = useState({});  // {roomId: [{photo, measurements}]}
-  const [leicaConnected, setLeicaConnected] = useState(false);
-  
   useEffect(() => {
     if (projectId) {
       console.log('🚀 Loading project:', projectId);
       
       const loadProjectData = async () => {
         try {
-          const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+          const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
           console.log('🌐 Using backend URL:', backendUrl);
           
-          const response = await fetch(`${backendUrl}/api/projects/${projectId}?sheet_type=walkthrough`, {
+          const response = await fetch(`${backendUrl}/api/projects/${projectId}`, {
             headers: {
               'Content-Type': 'application/json'
             }
@@ -65,10 +57,6 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
       };
       
       loadProjectData();
-      
-      // AUTO-REFRESH: Reload project data every 30 seconds
-      const interval = setInterval(loadProjectData, 30000);
-      return () => clearInterval(interval);
     } else {
       setLoading(false);
       setError('No project ID provided');
@@ -79,7 +67,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
     try {
       console.log('🚀 Loading project data for:', projectId);
       
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/projects/${projectId}?sheet_type=walkthrough`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}`);
       
       if (response.ok) {
         const projectData = await response.json();
@@ -118,7 +106,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
         ...roomData,
         project_id: projectId,
         order_index: project.rooms.length,
-        sheet_type: 'walkthrough'  // Make rooms independent per sheet
+        // sheet_type: 'walkthrough'  // Removed for now to fix room display
       };
       
       console.log('🏠 Creating room with data:', newRoom);
@@ -235,160 +223,129 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
   };
 
   return (
-    <CompletePageLayout 
-      projectId={projectId}
-      activeTab="walkthrough"
-      title="WALKTHROUGH - GREENE"
-      onAddRoom={() => setShowAddRoom(true)}
-    >
-      {/* EXISTING WALKTHROUGH CONTENT - UNCHANGED */}
-      <div>
+    <div className="max-w-full mx-auto bg-gray-950 min-h-screen">
+      {/* TOP HEADER */}
+      <div className="mb-6">
+        <div className="text-center mb-4">
+          <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
+          <p className="text-gray-300">Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
+        </div>
+
         {!hideNavigation && (
           <>
-            {/* Search and Controls - Already exists in new layout, so hiding this */}
-            {/* The new layout already has search controls, so we hide the duplicate */}
+            {/* Navigation Tabs */}
+            <div className="flex justify-center space-x-8 mb-6">
+              <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>📋</span>
+                <span>Questionnaire</span>
+              </a>
+              <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>🚶</span>
+                <span>Walkthrough</span>
+              </a>
+              <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>✅</span>
+                <span>Checklist</span>
+              </a>
+              <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
+                <span>📊</span>
+                <span className="font-semibold">FF&E</span>
+              </div>
+            </div>
           </>
         )}
 
-        {/* DIVIDER LINE */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#B49B7E]/20 to-transparent my-1"></div>
-        
-        {/* PHOTO MANAGEMENT HEADER - Replaces status/shipping for Walkthrough */}
-        <div className="mb-6 p-6 rounded-2xl shadow-xl backdrop-blur-sm border border-[#D4A574]/60 mx-6" 
-             style={{
-               background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
-             }}>
-          <h2 className="text-2xl font-bold text-[#D4A574] mb-6">📸 PHOTO MANAGEMENT</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            {/* Photos Captured */}
-            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-              <div className="text-[#D4A574] text-sm mb-1">Photos Captured</div>
-              <div className="text-3xl font-bold text-[#D4C5A9]">
-                {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.length, 0)}
+        {/* LOGO BANNER */}
+        <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}>
+          <img 
+            src="/established-logo.png" 
+            alt="Established Design Co. Logo" 
+            style={{ height: '200px', width: 'auto', objectFit: 'contain', display: 'block' }}
+          />
+        </div>
+
+        {!hideNavigation && (
+          <>
+            {/* FF&E TITLE WITH EXPORT BUTTONS */}
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>WALKTHROUGH - GREENE</h3>
+              <div className="flex space-x-4">
+                <button
+                  style={{ backgroundColor: '#8b7355' }}
+                  className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
+                >
+                  <span>📥</span>
+                  <span>Export FF&E</span>
+                </button>
+                <button
+                  style={{ backgroundColor: '#8b7355' }}
+                  className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
+                >
+                  <span>📋</span>
+                  <span>Spec Sheet</span>
+                </button>
               </div>
             </div>
-            
-            {/* Measurements Added */}
-            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-              <div className="text-[#D4A574] text-sm mb-1">Measurements Added</div>
-              <div className="text-3xl font-bold text-[#D4C5A9]">
-                {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.filter(p => p.measurements?.length > 0).length, 0)}
+
+            {/* SEARCH BAR AND ADD ROOM BUTTON */}
+            <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
+              <div className="flex items-center space-x-4 flex-1">
+                <input
+                  type="text"
+                  placeholder="Search Items..."
+                  className="flex-1 bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500"
+                />
+                <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+                  <option>All Rooms</option>
+                </select>
+                <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+                  <option>All Statuses</option>
+                </select>
               </div>
-            </div>
-            
-            {/* Rooms Photographed */}
-            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-              <div className="text-[#D4A574] text-sm mb-1">Rooms Photographed</div>
-              <div className="text-3xl font-bold text-[#D4C5A9]">
-                {Object.keys(roomPhotos).length} / {project?.rooms?.length || 0}
-              </div>
-            </div>
-            
-            {/* Leica D5 Status */}
-            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-              <div className="text-[#D4A574] text-sm mb-1">Leica D5 Status</div>
-              <div className={`text-xl font-bold ${leicaConnected ? 'text-green-400' : 'text-red-400'}`}>
-                {leicaConnected ? '✓ Connected' : '✗ Not Connected'}
-              </div>
-              <button 
-                onClick={() => {
-                  setLeicaConnected(!leicaConnected);
-                  if (!leicaConnected) {
-                    alert('Leica D5 Connected! (Simulated - real Bluetooth integration coming soon)');
-                  }
-                }}
-                className="mt-2 px-3 py-1 bg-[#D4A574] hover:bg-[#C49564] text-black rounded text-sm font-medium"
+              <button
+                onClick={() => setShowAddRoom(true)}
+                style={{ backgroundColor: '#8b7355' }}
+                className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors ml-4"
               >
-                {leicaConnected ? 'Disconnect' : 'Connect Leica D5'}
+                ➕ Add Room
               </button>
             </div>
-          </div>
-          
-          {/* Room Photo Folders */}
-          <div className="border-t border-[#D4A574]/30 pt-4">
-            <h3 className="text-lg font-bold text-[#D4A574] mb-3">📁 Photos by Room</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {project?.rooms?.map(room => (
-                <button
-                  key={room.id}
-                  onClick={() => {
-                    setSelectedRoomForPhotos(room);
-                    setShowPhotoManager(true);
-                  }}
-                  className="p-3 border border-[#D4A574]/50 rounded hover:bg-[#D4A574]/20 transition-colors"
-                  style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%)' }}
-                >
-                  <div className="text-2xl mb-1">📁</div>
-                  <div className="text-sm text-[#D4C5A9] font-medium truncate">{room.name}</div>
-                  <div className="text-xs text-[#D4A574]">
-                    {roomPhotos[room.id]?.length || 0} photos
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* DIVIDER LINE */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#B49B7E]/20 to-transparent my-1"></div>
-
-        {/* FF&E Spreadsheet - ZERO SPACING */}
-        <div className="px-6 mt-1 border border-[#B49B7E]/20 rounded-2xl bg-gradient-to-b from-black via-gray-900 to-black">
-          <SimpleWalkthroughSpreadsheet
-            project={project}
-            roomColors={roomColors}
-            categoryColors={categoryColors}
-            itemStatuses={itemStatuses}
-            vendorTypes={vendorTypes}
-            carrierTypes={carrierTypes}
-            onDeleteRoom={handleDeleteRoom}
-            onAddRoom={() => setShowAddRoom(true)}
-            onReload={loadSimpleProject}
-          />
-        </div>
-
-        {/* Add Room Modal */}
-        {showAddRoom && (
-          <AddRoomModal
-            onClose={() => setShowAddRoom(false)}
-            onSubmit={handleAddRoom}
-            roomColors={roomColors}
-          />
+          </>
         )}
+
+        {/* PIE CHART AND STATUS BREAKDOWN - ALWAYS VISIBLE */}
+        <StatusOverview
+          totalItems={getTotalItems()}
+          statusBreakdown={getStatusBreakdown()}
+          carrierBreakdown={getCarrierBreakdown()}
+          itemStatuses={itemStatuses}
+        />
       </div>
-      
-      {/* Photo Manager Modal */}
-      {showPhotoManager && selectedRoomForPhotos && (
-        <PhotoManagerModal
-          room={selectedRoomForPhotos}
-          photos={roomPhotos[selectedRoomForPhotos.id] || []}
-          onClose={() => {
-            setShowPhotoManager(false);
-            setSelectedRoomForPhotos(null);
-          }}
-          onSavePhotos={(roomId, photos) => {
-            setRoomPhotos(prev => ({
-              ...prev,
-              [roomId]: photos
-            }));
-            // TODO: Save to backend API
-            console.log('📸 Photos saved for room:', roomId, photos.length, 'photos');
-          }}
-          leicaConnected={leicaConnected}
-          onConnectLeica={async () => {
-            try {
-              // TODO: Implement real Leica D5 Bluetooth connection
-              setLeicaConnected(true);
-              alert('Leica D5 Connected! You can now use laser measurements on photos.');
-            } catch (error) {
-              console.error('Failed to connect to Leica D5:', error);
-              alert('Failed to connect to Leica D5. Please try again.');
-            }
-          }}
+
+      {/* FF&E Spreadsheet */}
+      <div className="px-6 mt-4">
+        <SimpleWalkthroughSpreadsheet
+          project={project}
+          roomColors={roomColors}
+          categoryColors={categoryColors}
+          itemStatuses={itemStatuses}
+          vendorTypes={vendorTypes}
+          carrierTypes={carrierTypes}
+          onDeleteRoom={handleDeleteRoom}
+          onAddRoom={() => setShowAddRoom(true)}
+          onReload={loadSimpleProject}
+        />
+      </div>
+
+      {/* Add Room Modal */}
+      {showAddRoom && (
+        <AddRoomModal
+          onClose={() => setShowAddRoom(false)}
+          onSubmit={handleAddRoom}
+          roomColors={roomColors}
         />
       )}
-    </CompletePageLayout>
+    </div>
   );
 };
 

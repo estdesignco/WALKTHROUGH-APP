@@ -40,12 +40,52 @@ const Navigation = ({ currentProject, isOffline }) => {
                 >
                   📋 Questionnaire
                 </Link>
-                {/* Navigation tabs removed per user request */}
+                <Link
+                  to={`/project/${currentProject.id}/walkthrough`}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    location.pathname.includes('/walkthrough') 
+                      ? 'bg-green-600 text-white' 
+                      : 'text-gray-300 hover:bg-gray-700'
+                  }`}
+                >
+                  🚶 Walkthrough
+                </Link>
+                <Link
+                  to={`/project/${currentProject.id}/checklist`}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    location.pathname.includes('/checklist') 
+                      ? 'bg-yellow-600 text-white' 
+                      : 'text-gray-300 hover:bg-gray-700'  
+                  }`}
+                >
+                  ✅ Checklist
+                </Link>
+                <Link
+                  to={`/project/${currentProject.id}/ffe`}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    location.pathname.includes('/ffe') 
+                      ? 'bg-purple-600 text-white' 
+                      : 'text-gray-300 hover:bg-gray-700'
+                  }`}
+                >
+                  📦 FF&E
+                </Link>
               </div>
             </div>
           )}
 
-          {/* Actions removed per user request */}
+          {/* Actions */}
+          <div className="flex items-center space-x-4">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+              📤 Export FF&E
+            </button>
+            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+              📊 Spec Sheet  
+            </button>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+              ➕ Add Room
+            </button>
+          </div>
         </div>
       </div>
     </nav>

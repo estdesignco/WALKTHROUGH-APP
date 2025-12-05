@@ -44,7 +44,7 @@ const StudioLandingPage = () => {
 
   const handleSendEmail = async () => {
     try {
-      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
       const response = await fetch(`${BACKEND_URL}/api/send-questionnaire`, {
         method: 'POST',
         headers: {
@@ -109,10 +109,10 @@ const StudioLandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {/* Header with Large Logo */}
+      {/* Header with Logo */}
       <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-2 py-2">
-          <h1 className="text-8xl font-bold text-white tracking-wider text-center">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <h1 className="text-4xl font-bold text-white tracking-wider text-center">
             ESTABLISHED DESIGN CO.
           </h1>
         </div>
@@ -188,10 +188,9 @@ const StudioLandingPage = () => {
                         <span className="text-sm text-gray-400">Last Updated</span>
                         <button
                           onClick={(e) => handleDeleteProject(project.id, e)}
-                          className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded hover:bg-red-900/20 flex items-center justify-center"
-                          title="Delete Project"
+                          className="text-gray-400 hover:text-red-400 transition-colors"
                         >
-                          <span className="text-lg">🗑️</span>
+                          🗑️
                         </button>
                       </div>
                     </div>
@@ -220,6 +219,11 @@ const StudioLandingPage = () => {
       {/* Teams Integration Section */}
       <div className="mb-8">
         <TeamsIntegration />
+      </div>
+
+      {/* Unified Furniture Search - THE DREAM! */}
+      <div className="mb-8">
+        <UnifiedFurnitureSearch />
       </div>
 
       {/* Email Modal */}

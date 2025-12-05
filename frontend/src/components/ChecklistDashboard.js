@@ -1,23 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
-import ExactChecklistSpreadsheet from './ExactChecklistSpreadsheet';
+import SimpleChecklistSpreadsheet from './SimpleChecklistSpreadsheet';
 import ChecklistStatusOverview from './ChecklistStatusOverview';
 import AddRoomModal from './AddRoomModal';
 import AddItemModal from './AddItemModal';
-import CompletePageLayout from './CompletePageLayout';
-import RoomSpecificCanvaImporter from './RoomSpecificCanvaImporter';
 
 const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
-  console.log("📋 Checklist Dashboard initializing...");
+  console.error("🚨 CHECKLIST DASHBOARD IS LOADING!");
   const { projectId: paramProjectId } = useParams();
   const projectId = propProjectId || paramProjectId;
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddRoom, setShowAddRoom] = useState(false);
-  const [roomCanvaImports, setRoomCanvaImports] = useState({}); // Track which room's import modal is open
   const [roomColors, setRoomColors] = useState({});
   const [categoryColors, setCategoryColors] = useState({});
   const [itemStatuses, setItemStatuses] = useState([]);
@@ -27,16 +24,11 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   useEffect(() => {
     if (projectId) {
       console.log('🚀 Loading project:', projectId);
-      console.log('📍 Current URL:', window.location.href);
-      console.log('📍 Pathname:', window.location.pathname);
       
-      // IMMEDIATE TEST - Force load project data WITH CHECKLIST SHEET_TYPE
-      const apiUrl = `${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`;
-      console.log('📞 Fetching from:', apiUrl);
-      
-      fetch(apiUrl)
+      // IMMEDIATE TEST - Force load project data
+      fetch(`${process.env.REACT_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`)
         .then(response => {
-          console.log('📡 Checklist Response received:', response.status);
+          console.log('📡 Response received:', response.status);
           if (response.ok) {
             return response.json();
           } else {
@@ -44,27 +36,23 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           }
         })
         .then(projectData => {
-          console.log('✅ SUCCESS - Checklist Project data:', projectData.name);
+          console.log('✅ SUCCESS - Project data:', projectData.name);
           setProject(projectData);
           setLoading(false);
         })
         .catch(err => {
-          console.error('❌ ERROR loading checklist project:', err);
+          console.error('❌ ERROR loading project:', err);
           setError('Failed to load project: ' + err.message);
           setLoading(false);
         });
-    } else {
-      console.warn('⚠️ No projectId available!');
-      console.log('📍 useParams projectId:', paramProjectId);
-      console.log('📍 prop projectId:', propProjectId);
     }
-  }, [projectId, paramProjectId, propProjectId]);
+  }, [projectId]);
 
   const loadSimpleProject = async () => {
     try {
-      console.log('🚀 Loading CHECKLIST project data for:', projectId);
+      console.log('🚀 Loading project data for:', projectId);
       
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`);
       
       if (response.ok) {
         const projectData = await response.json();
@@ -84,7 +72,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       
       // Load dynamic checklist statuses from API instead of hardcoded values
       try {
-        const statusResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/item-statuses`);
+        const statusResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/item-statuses`);
         if (statusResponse.ok) {
           const statusData = await statusResponse.json();
           const statusList = statusData.map(status => status.status || status);
@@ -134,39 +122,6 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       setError('Failed to create room');
       console.error('Error creating room:', err);
     }
-  };
-
-  const handleRoomCanvaImportComplete = async (roomName, importResults) => {
-    try {
-      console.log(`🎨 Canva import completed for ${roomName}:`, importResults);
-      
-      // Reload the project to show newly imported items
-      const updatedProject = await projectAPI.get(projectId, 'checklist');
-      setProject(updatedProject);
-      
-      // Close the modal for this room
-      setRoomCanvaImports(prev => ({
-        ...prev,
-        [roomName]: false
-      }));
-      
-    } catch (error) {
-      console.error('❌ Error reloading after Canva import:', error);
-    }
-  };
-
-  const openRoomCanvaImport = (roomName) => {
-    setRoomCanvaImports(prev => ({
-      ...prev,
-      [roomName]: true
-    }));
-  };
-
-  const closeRoomCanvaImport = (roomName) => {
-    setRoomCanvaImports(prev => ({
-      ...prev,
-      [roomName]: false
-    }));
   };
 
   const handleDeleteRoom = async (roomId) => {
@@ -241,7 +196,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       room.categories.forEach(category => {
         (category.subcategories || []).forEach(subcategory => {
           (subcategory.items || []).forEach(item => {
-            const status = item.status || 'TO BE PICKED';
+            const status = item.status || 'TO BE SELECTED';
             breakdown[status] = (breakdown[status] || 0) + 1;
           });
         });
@@ -270,35 +225,119 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   };
 
   return (
-    <div className="relative">
-      <CompletePageLayout 
-        projectId={projectId}
-        activeTab="checklist"
-        title="CHECKLIST - GREENE"
-        hideNavigation={hideNavigation}
-        onAddRoom={() => setShowAddRoom(true)}
-      >
-      {/* STATUS OVERVIEW SECTION */}
-      <ChecklistStatusOverview
-        totalItems={getTotalItems()}
-        statusBreakdown={getStatusBreakdown()}
-        carrierBreakdown={getCarrierBreakdown()}
-        itemStatuses={itemStatuses}
-      />
+    <div className="max-w-full mx-auto bg-gray-950 min-h-screen">
+      {/* TOP HEADER */}
+      <div className="mb-6">
+        <div className="text-center mb-4">
+          <h1 className="text-4xl font-bold text-white mb-2" style={{ color: '#8b7355' }}>GREENE</h1>
+          <p className="text-gray-300">Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506</p>
+        </div>
 
-      {/* CHECKLIST SPREADSHEET */}
-      <ExactChecklistSpreadsheet
-        project={project}
-        roomColors={roomColors}
-        categoryColors={categoryColors}
-        itemStatuses={itemStatuses}
-        vendorTypes={vendorTypes}
-        carrierTypes={carrierTypes}
-        onDeleteRoom={(roomId) => handleDeleteRoom(roomId)}
-        onAddRoom={() => setShowAddRoom(true)}
-        onReload={loadSimpleProject}
-        onRoomCanvaImport={openRoomCanvaImport}
-      />
+        {!hideNavigation && (
+          <>
+            {/* Navigation Tabs */}
+            <div className="flex justify-center space-x-8 mb-6">
+              <a href={`/project/${projectId}/questionnaire`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>📋</span>
+                <span>Questionnaire</span>
+              </a>
+              <a href={`/project/${projectId}/walkthrough`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>🚶</span>
+                <span>Walkthrough</span>
+              </a>
+              <a href={`/project/${projectId}/checklist`} className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                <span>✅</span>
+                <span>Checklist</span>
+              </a>
+              <div className="flex items-center space-x-2" style={{ color: '#8b7355' }}>
+                <span>📊</span>
+                <span className="font-semibold">FF&E</span>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* LOGO BANNER */}
+        <div className="rounded-lg mb-6" style={{ backgroundColor: '#8b7355', padding: '1px 0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'fit-content' }}>
+          <img 
+            src="/established-logo.png" 
+            alt="Established Design Co. Logo" 
+            style={{ height: '200px', width: 'auto', objectFit: 'contain', display: 'block' }}
+          />
+        </div>
+
+        {!hideNavigation && (
+          <>
+            {/* FF&E TITLE WITH EXPORT BUTTONS */}
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>CHECKLIST - GREENE</h3>
+              <div className="flex space-x-4">
+                <button
+                  style={{ backgroundColor: '#8b7355' }}
+                  className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
+                >
+                  <span>📥</span>
+                  <span>Export FF&E</span>
+                </button>
+                <button
+                  style={{ backgroundColor: '#8b7355' }}
+                  className="hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors flex items-center space-x-2"
+                >
+                  <span>📋</span>
+                  <span>Spec Sheet</span>
+                </button>
+              </div>
+            </div>
+
+            {/* SEARCH BAR AND ADD ROOM BUTTON */}
+            <div className="flex items-center justify-between mt-6 p-4 bg-gray-800 rounded-lg">
+              <div className="flex items-center space-x-4 flex-1">
+                <input
+                  type="text"
+                  placeholder="Search Items..."
+                  className="flex-1 bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500"
+                />
+                <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+                  <option>All Rooms</option>
+                </select>
+                <select className="bg-gray-700 text-white px-3 py-2 rounded border border-gray-600">
+                  <option>All Statuses</option>
+                </select>
+              </div>
+              <button
+                onClick={() => setShowAddRoom(true)}
+                style={{ backgroundColor: '#8b7355' }}
+                className="hover:opacity-90 text-white px-6 py-2 rounded font-medium transition-colors ml-4"
+              >
+                ➕ Add Room
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* PIE CHART AND STATUS BREAKDOWN - ALWAYS VISIBLE */}
+        <ChecklistStatusOverview
+          totalItems={getTotalItems()}
+          statusBreakdown={getStatusBreakdown()}
+          carrierBreakdown={getCarrierBreakdown()}
+          itemStatuses={itemStatuses}
+        />
+      </div>
+
+      {/* FF&E Spreadsheet */}
+      <div className="px-6 mt-4">
+        <SimpleChecklistSpreadsheet
+          project={project}
+          roomColors={roomColors}
+          categoryColors={categoryColors}
+          itemStatuses={itemStatuses}
+          vendorTypes={vendorTypes}
+          carrierTypes={carrierTypes}
+          onDeleteRoom={handleDeleteRoom}
+          onAddRoom={() => setShowAddRoom(true)}
+          onReload={loadSimpleProject}
+        />
+      </div>
 
       {/* Add Room Modal */}
       {showAddRoom && (
@@ -308,23 +347,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           roomColors={roomColors}
         />
       )}
-
-      {/* Room-Specific Canva Import Modals */}
-      {project?.rooms?.map(room => (
-        <RoomSpecificCanvaImporter
-          key={room.id}
-          isOpen={roomCanvaImports[room.name] || false}
-          onClose={() => closeRoomCanvaImport(room.name)}
-          onImportComplete={(results) => handleRoomCanvaImportComplete(room.name, results)}
-          projectId={projectId}
-          roomName={room.name}
-          roomId={room.id}
-        />
-      ))}
-    </CompletePageLayout>
-
-    {/* No more floating action buttons - each room will have its own import button */}
-  </div>
+    </div>
   );
 };
 

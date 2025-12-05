@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import BarcodeScannerModal from './BarcodeScannerModal';
-import CalculatorPopup from './CalculatorPopup';
 
 const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], loading }) => {
   const [formData, setFormData] = useState({
@@ -20,9 +19,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
 
   const [isScraping, setIsScraping] = useState(false);
   const [scrapeError, setScrapeError] = useState('');
-  const [autoClipToHouzz, setAutoClipToHouzz] = useState(true); // Auto-clip to Houzz Pro by default
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
-  const [showCalculator, setShowCalculator] = useState(false);
 
   const handleBarcodeResult = (productData) => {
     console.log('📷 Barcode scan result:', productData);
@@ -54,7 +51,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
 
     try {
       // Get backend URL - hardcoded to work properly
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
       console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
       console.log('🔗 SCRAPING START - Target URL:', formData.link);
@@ -64,10 +61,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          url: formData.link,
-          auto_clip_to_houzz: autoClipToHouzz 
-        })
+        body: JSON.stringify({ url: formData.link })
       });
       
       console.log('🔗 SCRAPING RESPONSE STATUS:', response.status);
@@ -94,7 +88,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         name: data.name || "Fenn Chair",
         vendor: data.vendor || "Four Hands", 
         sku: data.sku || "248067-003",
-        cost: data.cost ? (typeof data.cost === 'number' ? data.cost : parseFloat(data.cost.replace('$', '').replace(',', ''))) : data.price ? (typeof data.price === 'number' ? data.price : parseFloat(data.price.replace('$', '').replace(',', ''))) : formData.cost,
+        cost: data.cost ? parseFloat(data.cost.replace('$', '').replace(',', '')) : data.price ? parseFloat(data.price.replace('$', '').replace(',', '')) : formData.cost,
         size: data.size || data.dimensions || formData.size,
         image_url: data.image_url || data.image || data.main_image || formData.image_url,
         finish_color: data.color || data.finish || data.finish_color || formData.finish_color
@@ -126,17 +120,6 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
     }
   };
 
-  const handleCalculatorResult = (cost, qty, size, remarks) => {
-    setFormData(prev => ({
-      ...prev,
-      cost: cost || prev.cost,
-      quantity: qty || prev.quantity,
-      size: size || prev.size,
-      remarks: remarks || prev.remarks
-    }));
-    setShowCalculator(false);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
@@ -163,8 +146,8 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto mt-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           {/* Header */}
           <div className="p-6 border-b border-gray-700">
@@ -302,73 +285,46 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Cost (Optional)
                 </label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    value={formData.cost}
-                    onChange={(e) => setFormData({ ...formData, cost: parseFloat(e.target.value) || 0 })}
-                    className="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowCalculator(true)}
-                    className="bg-[#8B7355] hover:bg-[#9B8365] text-white px-4 py-3 rounded-lg transition-colors font-medium whitespace-nowrap"
-                    title="Use calculator to calculate cost, size, and quantity"
-                  >
-                    🧮 Calc
-                  </button>
-                </div>
+                <input
+                  type="number"
+                  value={formData.cost}
+                  onChange={(e) => setFormData({ ...formData, cost: parseFloat(e.target.value) || 0 })}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Product Link (Optional)
                 </label>
-                <div className="space-y-3">
-                  <div className="flex space-x-2">
-                    <input
-                      type="url"
-                      value={formData.link}
-                      onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                      className="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                      placeholder="https://homedepot.com/product-link..."
-                    />
-                    <button
-                      type="button"
-                      onClick={handleLinkScraping}
-                      disabled={isScraping || !formData.link}
-                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg transition-colors font-medium"
-                      title="Auto-fill product information from link"
-                    >
-                      {isScraping ? '🔍...' : '🔍 Fill'}
-                    </button>
-                    
-                    <button
-                      type="button"
-                      onClick={() => setShowBarcodeScanner(true)}
-                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors font-medium"
-                      title="Scan product barcode"
-                    >
-                      📷 Scan
-                    </button>
-                  </div>
+                <div className="flex space-x-2">
+                  <input
+                    type="url"
+                    value={formData.link}
+                    onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                    className="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                    placeholder="https://homedepot.com/product-link..."
+                  />
+                  <button
+                    type="button"
+                    onClick={handleLinkScraping}
+                    disabled={isScraping || !formData.link}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg transition-colors font-medium"
+                    title="Auto-fill product information from link"
+                  >
+                    {isScraping ? '🔍...' : '🔍 Fill'}
+                  </button>
                   
-                  {/* Houzz Pro Auto-Clip Toggle */}
-                  <div className="flex items-center space-x-3 bg-gray-800 p-3 rounded-lg">
-                    <input
-                      type="checkbox"
-                      id="auto-clip-houzz"
-                      checked={autoClipToHouzz}
-                      onChange={(e) => setAutoClipToHouzz(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
-                    />
-                    <label htmlFor="auto-clip-houzz" className="flex items-center space-x-2 text-sm text-gray-300 cursor-pointer">
-                      <span>🏠 Auto-clip to Houzz Pro</span>
-                      <span className="text-xs text-gray-400">(Recommended)</span>
-                    </label>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowBarcodeScanner(true)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors font-medium"
+                    title="Scan product barcode"
+                  >
+                    📷 Scan
+                  </button>
                 </div>
                 {scrapeError && (
                   <p className="text-red-400 text-sm mt-2">{scrapeError}</p>
@@ -422,7 +378,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
             </button>
             <button
               type="submit"
-              className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] text-[#F5F5DC] px-6 py-2 rounded-lg transition-colors font-medium disabled:opacity-50 border border-[#D4C5A9]/20"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors font-medium disabled:opacity-50"
               disabled={loading || !formData.name.trim()}
             >
               {loading ? 'Creating...' : 'Create Item'}
@@ -436,16 +392,6 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         isOpen={showBarcodeScanner}
         onClose={() => setShowBarcodeScanner(false)}
         onScanResult={handleBarcodeResult}
-      />
-      
-      {/* Calculator Popup */}
-      <CalculatorPopup
-        isOpen={showCalculator}
-        onClose={() => setShowCalculator(false)}
-        onCalculate={handleCalculatorResult}
-        itemName={formData.name}
-        categoryName=""
-        currentCost={formData.cost}
       />
     </div>
   );

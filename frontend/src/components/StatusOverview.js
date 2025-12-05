@@ -6,12 +6,41 @@ import {
   Legend
 } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemStatuses }) => {
+  // Status colors for pie chart and breakdown - MATCH ExactFFESpreadsheet colors
+  const getStatusColor = (status) => {
+    const colors = {
+      '': '#6B7280',                        // Gray for blank/default
+      'TO BE SELECTED': '#6B7280',          // Gray
+      'RESEARCHING': '#3B82F6',             // Blue
+      'PENDING APPROVAL': '#F59E0B',        // Amber
+      'APPROVED': '#10B981',                // Emerald
+      'ORDERED': '#10B981',                 // Emerald
+      'PICKED': '#FFD700',                  // Gold
+      'CONFIRMED': '#10B981',               // Emerald
+      'IN PRODUCTION': '#F97316',           // Orange
+      'SHIPPED': '#3B82F6',                 // Blue
+      'IN TRANSIT': '#3B82F6',              // Blue  
+      'OUT FOR DELIVERY': '#3B82F6',        // Blue
+      'DELIVERED TO RECEIVER': '#8B5CF6',   // Violet
+      'DELIVERED TO JOB SITE': '#8B5CF6',   // Violet
+      'RECEIVED': '#8B5CF6',                // Violet
+      'READY FOR INSTALL': '#10B981',       // Emerald
+      'INSTALLING': '#10B981',              // Emerald
+      'INSTALLED': '#10B981',               // Emerald
+      'ON HOLD': '#EF4444',                 // Red
+      'BACKORDERED': '#EF4444',             // Red
+      'DAMAGED': '#EF4444',                 // Red
+      'RETURNED': '#EF4444',                // Red
+      'CANCELLED': '#EF4444'                // Red
+    };
+    return colors[status] || '#6B7280';
+  };
+
   const getCarrierColor = (carrier) => {
     const colors = {
       'FedEx': '#FF6600',           // FedEx Orange
@@ -71,17 +100,14 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         backgroundColor: Object.keys(statusBreakdown)
           .filter(status => statusBreakdown[status] > 0)
           .map(status => getStatusColor(status)),
-        borderWidth: 3,
-        borderColor: Object.keys(statusBreakdown)
-          .filter(status => statusBreakdown[status] > 0)
-          .map(status => '#D4A574'),
-        hoverBorderWidth: 4,
-        hoverBorderColor: '#FFD700'
+        borderWidth: 0,
+        hoverBorderWidth: 2,
+        hoverBorderColor: '#ffffff'
       }
     ]
   };
 
-  // Prepare data for Carrier pie chart with shimmer
+  // Prepare data for Carrier pie chart
   const carrierPieData = {
     labels: Object.keys(carrierBreakdown).filter(carrier => carrierBreakdown[carrier] > 0),
     datasets: [
@@ -92,12 +118,9 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         backgroundColor: Object.keys(carrierBreakdown)
           .filter(carrier => carrierBreakdown[carrier] > 0)
           .map(carrier => getCarrierColor(carrier)),
-        borderWidth: 3,
-        borderColor: Object.keys(carrierBreakdown)
-          .filter(carrier => carrierBreakdown[carrier] > 0)
-          .map(carrier => '#D4A574'),
-        hoverBorderWidth: 4,
-        hoverBorderColor: '#FFD700'
+        borderWidth: 0,
+        hoverBorderWidth: 2,
+        hoverBorderColor: '#ffffff'
       }
     ]
   };
@@ -110,7 +133,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
       legend: {
         position: 'right',
         labels: {
-          color: '#D4A574',
+          color: '#ffffff',
           font: {
             size: 12
           },
@@ -132,8 +155,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                   strokeStyle: dataset.backgroundColor[i],
                   pointStyle: 'circle',
                   hidden: false,
-                  index: i,
-                  fontColor: '#D4A574'
+                  index: i
                 };
               });
             }
@@ -161,35 +183,27 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 border-t border-[#D4A574]/60 pt-4">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       
-      {/* LEFT COLUMN - STATUS PIE CHART with DIMMED BORDER */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold mb-4 border-b border-[#D4A574]/60 pb-2" style={{ color: '#D4A574' }}>Status Overview</h3>
+      {/* LEFT COLUMN - STATUS PIE CHART */}
+      <div className="bg-gray-800 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Status Overview</h3>
         
         {/* REAL PIE CHART WITH LABELS AND LINES */}
         <div className="h-64 mb-4">
           {totalItems > 0 ? (
             <Pie data={statusPieData} options={pieOptions} />
           ) : (
-            <div className="flex items-center justify-center h-full text-[#B49B7E]/60">
+            <div className="flex items-center justify-center h-full text-gray-400">
               No items to display
             </div>
           )}
         </div>
       </div>
 
-      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST with DIMMED BORDER */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold mb-4 border-b-2 border-[#D4A574] pb-2 text-white rounded-lg px-3 py-2" style={{ 
-          background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
-          boxShadow: '0 0 25px #D4A57460, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.4)',
-          textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
-        }}>Status Breakdown</h3>
+      {/* MIDDLE COLUMN - STATUS BREAKDOWN LIST */}
+      <div className="bg-gray-800 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Status Breakdown</h3>
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
@@ -206,26 +220,22 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
               <div key={status} className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div 
-                    className="w-3 h-3 rounded-full border border-[#D4A574]" 
-                    style={{ 
-                      background: `linear-gradient(135deg, ${getStatusColor(status)}FF 0%, ${getStatusColor(status)}AA 20%, ${getStatusColor(status)} 40%, ${getStatusColor(status)}AA 80%, ${getStatusColor(status)}FF 100%)`,
-                      boxShadow: `0 0 25px ${getStatusColor(status)}60, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.4)`
-                    }}
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: getStatusColor(status) }}
                   ></div>
-                  <span className="text-sm text-[#D4C5A9]">{status}</span>
+                  <span className="text-sm text-gray-300">{status}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="bg-black/40 rounded-full h-2 w-16">
+                  <div className="bg-gray-700 rounded-full h-2 w-16">
                     <div
                       className="h-2 rounded-full transition-all duration-300"
                       style={{
-                        background: `linear-gradient(90deg, ${getStatusColor(status)}FF 0%, ${getStatusColor(status)}AA 20%, ${getStatusColor(status)} 40%, ${getStatusColor(status)}AA 80%, ${getStatusColor(status)}FF 100%)`,
-                        boxShadow: `0 0 25px ${getStatusColor(status)}40, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.4)`,
+                        backgroundColor: getStatusColor(status),
                         width: `${percentage}%`
                       }}
                     />
                   </div>
-                  <span className="text-sm font-medium w-8 text-right text-[#D4A574]">
+                  <span className="text-sm font-medium text-white w-8 text-right">
                     {count}
                   </span>
                 </div>
@@ -235,27 +245,18 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         </div>
       </div>
 
-      {/* RIGHT COLUMN - SHIPPING SECTION with DIMMED BORDER */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/60" style={{
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-      }}>
-        <h3 className="text-lg font-semibold mb-4 border-b-2 border-[#D4A574] pb-2 text-white rounded-lg px-3 py-2" style={{ 
-          background: 'linear-gradient(135deg, #D4A574FF 0%, #D4A574AA 20%, #D4A574 40%, #D4A574AA 80%, #D4A574FF 100%)',
-          boxShadow: '0 0 25px #D4A57460, inset 0 0 50px rgba(255, 255, 255, 0.14), inset 0 0 80px rgba(0, 0, 0, 0.4)',
-          textShadow: '0 2px 6px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 255, 255, 0.35)'
-        }}>Shipping Information</h3>
+      {/* RIGHT COLUMN - SHIPPING SECTION */}
+      <div className="bg-gray-800 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Shipping Information</h3>
         
         {/* 1. CARRIER PIE CHART */}
         <div className="mb-6">
-          <h4 className="text-md font-medium mb-3 border-b border-[#D4A574]/60 pb-1" style={{ 
-            color: '#D4A574', 
-            opacity: '0.9'
-          }}>Carrier Distribution</h4>
+          <h4 className="text-md font-medium text-gray-300 mb-3">Carrier Distribution</h4>
           <div className="h-48">
             {Object.values(carrierBreakdown).reduce((a, b) => a + b, 0) > 0 ? (
               <Pie data={carrierPieData} options={pieOptions} />
             ) : (
-              <div className="flex items-center justify-center h-full text-[#B49B7E]/60">
+              <div className="flex items-center justify-center h-full text-gray-400">
                 No carrier data
               </div>
             )}
@@ -264,10 +265,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
 
         {/* 2. SHIPPING BREAKDOWN - EXACTLY LIKE STATUS BREAKDOWN! */}
         <div className="mb-6">
-          <h4 className="text-md font-medium mb-3 border-b border-[#D4A574]/60 pb-1" style={{ 
-            color: '#D4A574', 
-            opacity: '0.9'
-          }}>Shipping Breakdown</h4>
+          <h4 className="text-md font-medium text-gray-300 mb-3">Shipping Breakdown</h4>
           <div className="space-y-3 max-h-60 overflow-y-auto">{/*INCREASED HEIGHT*/}
             {[
               'FedEx', 'UPS', 'USPS', 'DHL', 'Brooks', 'Zenith', 'Sunbelt',
@@ -286,10 +284,10 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                       className="w-3 h-3 rounded-full" 
                       style={{ backgroundColor: getCarrierColor(carrier) }}
                     ></div>
-                    <span className="text-sm text-[#D4C5A9]">{carrier}</span>
+                    <span className="text-sm text-gray-300">{carrier}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="bg-black/40 rounded-full h-2 w-16">
+                    <div className="bg-gray-700 rounded-full h-2 w-16">
                       <div
                         className="h-2 rounded-full transition-all duration-300"
                         style={{
@@ -298,7 +296,7 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
                         }}
                       />
                     </div>
-                    <span className="text-sm font-medium w-8 text-right text-[#D4A574]">
+                    <span className="text-sm font-medium text-white w-8 text-right">
                       {count}
                     </span>
                   </div>
@@ -312,39 +310,27 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
         <div>
           <div className="grid grid-cols-2 gap-3">
             {/* Total Items */}
-            <div className="rounded-lg p-4 text-center border-2 border-[#D4A574]" style={{
-              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
-              boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 40px rgba(212, 165, 116, 0.08)'
-            }}>
-              <div className="text-2xl font-bold text-[#D4C5A9]">{totalItems}</div>
-              <div className="text-sm text-[#D4A574]">Total Items</div>
+            <div className="bg-gray-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-white">{totalItems}</div>
+              <div className="text-sm text-gray-400">Total Items</div>
             </div>
             
             {/* Delivered */}
-            <div className="rounded-lg p-4 text-center border-2 border-[#D4A574]" style={{
-              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
-              boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 40px rgba(212, 165, 116, 0.08)'
-            }}>
+            <div className="bg-gray-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">{getCompletedItems()}</div>
-              <div className="text-sm text-[#D4A574]">Delivered</div>
+              <div className="text-sm text-gray-400">Delivered</div>
             </div>
             
             {/* In Transit */}
-            <div className="rounded-lg p-4 text-center border-2 border-[#D4A574]" style={{
-              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
-              boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 40px rgba(212, 165, 116, 0.08)'
-            }}>
+            <div className="bg-gray-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-orange-400">{getInTransitItems()}</div>
-              <div className="text-sm text-[#D4A574]">In Transit</div>
+              <div className="text-sm text-gray-400">In Transit</div>
             </div>
             
             {/* On Hold */}
-            <div className="rounded-lg p-4 text-center border-2 border-[#D4A574]" style={{
-              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
-              boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 40px rgba(212, 165, 116, 0.08)'
-            }}>
+            <div className="bg-gray-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-red-400">{statusBreakdown['ON HOLD'] || 0}</div>
-              <div className="text-sm text-[#D4A574]">On Hold</div>
+              <div className="text-sm text-gray-400">On Hold</div>
             </div>
           </div>
         </div>

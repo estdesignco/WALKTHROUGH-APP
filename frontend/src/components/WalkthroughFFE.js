@@ -1,7 +1,7 @@
 // RED BANNER TEST
 import React, { useState, useEffect } from 'react';
 
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
 
@@ -43,7 +43,7 @@ const WalkthroughFFE = ({
     console.log('🔄 Status change request:', { itemId, newStatus });
     
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -69,7 +69,7 @@ const WalkthroughFFE = ({
     console.log('🔄 Carrier change request:', { itemId, newCarrier });
     
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrier: newCarrier })
@@ -166,7 +166,7 @@ const WalkthroughFFE = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
         const response = await fetch(`${backendUrl}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
@@ -229,7 +229,7 @@ const WalkthroughFFE = ({
         return;
       }
 
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
       const newItem = {
         ...itemData,
@@ -277,7 +277,7 @@ const WalkthroughFFE = ({
     }
 
     try {
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
@@ -301,7 +301,7 @@ const WalkthroughFFE = ({
     }
 
     try {
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'DELETE'
       });
@@ -332,7 +332,7 @@ const WalkthroughFFE = ({
     }
 
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/${categoryId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/${categoryId}`, {
         method: 'DELETE'
       });
 
@@ -370,7 +370,7 @@ const WalkthroughFFE = ({
       console.log('🔄 Creating comprehensive category:', categoryName, 'for room:', roomId);
       
       // DIRECT APPROACH: Create a new room with the category structure, then merge
-      const tempRoomResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms`, {
+      const tempRoomResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -397,7 +397,7 @@ const WalkthroughFFE = ({
             id: undefined // Let backend generate new ID
           };
           
-          const addResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories`, {
+          const addResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(categoryData)
@@ -407,7 +407,7 @@ const WalkthroughFFE = ({
             console.log('✅ Comprehensive category added successfully');
             
             // Delete the temp room
-            await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${tempRoom.id}`, {
+            await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
               method: 'DELETE'
             });
             
@@ -417,7 +417,7 @@ const WalkthroughFFE = ({
         }
         
         // Clean up temp room regardless
-        await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${tempRoom.id}`, {
+        await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${tempRoom.id}`, {
           method: 'DELETE'
         });
       } else {
@@ -442,7 +442,7 @@ const WalkthroughFFE = ({
       
       // Update backend room order
       try {
-        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/reorder`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -468,7 +468,7 @@ const WalkthroughFFE = ({
       // Update backend category order  
       try {
         const roomId = source.droppableId.replace('categories-', '');
-        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/reorder`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -512,7 +512,7 @@ const WalkthroughFFE = ({
     }
 
     try {
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/track-shipment`, {
         method: 'POST',
         headers: {
@@ -661,7 +661,7 @@ const WalkthroughFFE = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none placeholder-[#D4A574]/70"
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
           
@@ -777,11 +777,17 @@ const WalkthroughFFE = ({
             </button>
           </div>
           
-          {/* Add Room button removed per user request */}
+          {/* Add Room Button - GOLD/AMBER COLOR */}
+          <button 
+            onClick={handleAddRoom}
+            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+          >
+            ✚ ADD ROOM
+          </button>
         </div>
       </div>
 
-      {/* ORIGINAL TABLE STRUCTURE WITH DRAG AND DROP */}
+      {/* ORIGINAL TABLE STRUCTURE - DO NOT CHANGE */}
       <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
         <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
           
@@ -794,47 +800,28 @@ const WalkthroughFFE = ({
 
                   {/* TABLE BODY - Keep original hierarchical structure */}
                   <tbody>
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="walkthrough-rooms" type="room">
-                    {(provided) => (
-                      <React.Fragment>
-                        <tr ref={provided.innerRef} {...provided.droppableProps}>
-                          <td colSpan="6" style={{ padding: 0, border: 'none' }}>
-                            <table className="w-full border-collapse">
-                              <tbody>
                 {/* USE FILTERED PROJECT DATA */}
                 {(filteredProject || project).rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
                   console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
                   
                   return (
-                    <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
-                      {(provided, snapshot) => (
-                        <React.Fragment>
-                          <tr 
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            style={{
-                              ...provided.draggableProps.style,
-                              opacity: snapshot.isDragging ? 0.8 : 1
-                            }}
-                          >
-                            <td colSpan="5" 
-                                className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
-                                style={{ backgroundColor: getRoomColor(room.name) }}>
-                              <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                  <div {...provided.dragHandleProps} className="cursor-move text-white hover:text-gray-200 px-2">
-                                    ⋮⋮
-                                  </div>
-                                  <button
-                                    onClick={() => toggleRoomExpansion(room.id)}
-                                    className="text-white hover:text-gray-200"
-                                  >
-                                    {isRoomExpanded ? '▼' : '▶'}
-                                  </button>
-                                  <span>{room.name.toUpperCase()}</span>
-                                </div>
+                              <React.Fragment key={room.id}>
+                                {/* ROOM HEADER ROW - Full width like your screenshots */}
+                                <tr>
+                                  <td colSpan="5" 
+                                      className="border border-gray-400 px-3 py-2 text-white text-sm font-bold"
+                                      style={{ backgroundColor: getRoomColor(room.name) }}>
+                                    <div className="flex justify-between items-center">
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          onClick={() => toggleRoomExpansion(room.id)}
+                                          className="text-white hover:text-gray-200"
+                                        >
+                                          {isRoomExpanded ? '▼' : '▶'}
+                                        </button>
+                                        <span>{room.name.toUpperCase()}</span>
+                                      </div>
                                       <button
                                         onClick={() => handleDeleteRoom(room.id)}
                                         className="text-red-300 hover:text-red-100 text-lg ml-2"
@@ -856,40 +843,22 @@ const WalkthroughFFE = ({
                                   </td>
                                 </tr>
 
-                                {/* ROOM CATEGORIES - Only show when expanded WITH DRAG AND DROP */}
+                                {/* ROOM CATEGORIES - Only show when expanded */}
                                 {isRoomExpanded && (
-                                  <Droppable droppableId={`categories-${room.id}`} type="category">
-                                    {(provided) => (
                                       <React.Fragment>
-                                        <tr ref={provided.innerRef} {...provided.droppableProps}>
-                                          <td colSpan="6" style={{ padding: 0, border: 'none' }}>
-                                            <table className="w-full border-collapse">
-                                              <tbody>
                                         {room.categories?.map((category, catIndex) => {
                                           const isCategoryExpanded = expandedCategories[category.id];
                                           console.log(`📁 RENDERING CATEGORY ${catIndex}: ${category.name} with ${category.subcategories?.length || 0} subcategories`);
                                           
                                           return (
-                                            <Draggable key={category.id} draggableId={category.id} index={catIndex}>
-                                              {(provided, snapshot) => (
-                                                <React.Fragment>
+                                                <React.Fragment key={category.id}>
                                                   {/* CATEGORY HEADER ROW */}
-                                                  <tr
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    style={{
-                                                      ...provided.draggableProps.style,
-                                                      opacity: snapshot.isDragging ? 0.8 : 1
-                                                    }}
-                                                  >
+                                                  <tr>
                                                     <td colSpan="5" 
                                                         className="border border-gray-400 px-4 py-2 text-white text-sm font-bold"
                                                         style={{ backgroundColor: getCategoryColor() }}>
                                                       <div className="flex items-center justify-between">
                                                         <div className="flex items-center gap-2">
-                                                          <div {...provided.dragHandleProps} className="cursor-move text-white hover:text-gray-200 px-1">
-                                                            ⋮⋮
-                                                          </div>
                                                           <button
                                                             onClick={() => toggleCategoryExpansion(category.id)}
                                                             className="text-white hover:text-gray-200"
@@ -1044,33 +1013,13 @@ const WalkthroughFFE = ({
                                                     </React.Fragment>
                                                   )}
                                                 </React.Fragment>
-                                              )}
-                                            </Draggable>
                                           );
                                         })}
-                                              </tbody>
-                                            </table>
-                                          </td>
-                                        </tr>
-                                        {provided.placeholder}
                                       </React.Fragment>
-                                    )}
-                                  </Droppable>
                                 )}
                               </React.Fragment>
-                            )}
-                          </Draggable>
                   );
                       })}
-                              </tbody>
-                            </table>
-                          </td>
-                        </tr>
-                        {provided.placeholder}
-                      </React.Fragment>
-                    )}
-                  </Droppable>
-                </DragDropContext>
                   </tbody>
                 </table>
             </div>

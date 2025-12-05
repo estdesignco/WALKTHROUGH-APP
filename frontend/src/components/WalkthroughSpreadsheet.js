@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 
 import AddItemModal from './AddItemModal';
-import PhotoManagerModal from './PhotoManagerModal';
 
 const WalkthroughSpreadsheet = ({
   project,
@@ -20,12 +19,6 @@ const WalkthroughSpreadsheet = ({
   const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
-  
-  // PHOTO MANAGEMENT STATE
-  const [showPhotoManager, setShowPhotoManager] = useState(false);
-  const [selectedRoomForPhotos, setSelectedRoomForPhotos] = useState(null);
-  const [roomPhotos, setRoomPhotos] = useState({});  // {roomId: [{photo, measurements}]}
-  const [leicaConnected, setLeicaConnected] = useState(false);
 
   // FILTER STATE
   const [filteredProject, setFilteredProject] = useState(project);
@@ -49,7 +42,7 @@ const WalkthroughSpreadsheet = ({
         order_index: 0
       };
 
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItem)
@@ -73,7 +66,7 @@ const WalkthroughSpreadsheet = ({
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/items/${itemId}`, {
         method: 'DELETE'
       });
 
@@ -92,7 +85,7 @@ const WalkthroughSpreadsheet = ({
     if (!window.confirm('Are you sure you want to delete this room?')) return;
     
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${roomId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/rooms/${roomId}`, {
         method: 'DELETE'
       });
 
@@ -109,7 +102,7 @@ const WalkthroughSpreadsheet = ({
 
   const handleAddCategory = async (roomId, categoryName) => {
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -184,7 +177,7 @@ const WalkthroughSpreadsheet = ({
   useEffect(() => {
     const loadAvailableCategories = async () => {
       try {
-        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/available`);
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/categories/available`);
         if (response.ok) {
           const data = await response.json();
           setAvailableCategories(data.categories || []);
@@ -243,87 +236,13 @@ const WalkthroughSpreadsheet = ({
   const getCategoryColor = () => '#065F46';
 
   if (!project || !project.rooms || project.rooms.length === 0) {
-    return (
       <div className="text-center text-gray-400 py-8">
         <p className="text-lg">Loading Walkthrough data...</p>
       </div>
     );
   }
 
-  return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
-      
-      {/* PHOTO MANAGEMENT HEADER */}
-      <div className="mb-6 p-6 rounded-2xl shadow-xl backdrop-blur-sm border border-[#D4A574]/60" 
-           style={{
-             background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
-           }}>
-        <h2 className="text-2xl font-bold text-[#D4A574] mb-6">📸 PHOTO MANAGEMENT</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          {/* Photos Captured */}
-          <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-            <div className="text-[#D4A574] text-sm mb-1">Photos Captured</div>
-            <div className="text-3xl font-bold text-[#D4C5A9]">
-              {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.length, 0)}
-            </div>
-          </div>
-          
-          {/* Measurements Added */}
-          <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-            <div className="text-[#D4A574] text-sm mb-1">Measurements Added</div>
-            <div className="text-3xl font-bold text-[#D4C5A9]">
-              {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.filter(p => p.measurements?.length > 0).length, 0)}
-            </div>
-          </div>
-          
-          {/* Rooms Photographed */}
-          <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-            <div className="text-[#D4A574] text-sm mb-1">Rooms Photographed</div>
-            <div className="text-3xl font-bold text-[#D4C5A9]">
-              {Object.keys(roomPhotos).length} / {project?.rooms?.length || 0}
-            </div>
-          </div>
-          
-          {/* Leica D5 Status */}
-          <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-            <div className="text-[#D4A574] text-sm mb-1">Leica D5 Status</div>
-            <div className={`text-xl font-bold ${leicaConnected ? 'text-green-400' : 'text-red-400'}`}>
-              {leicaConnected ? '✓ Connected' : '✗ Not Connected'}
-            </div>
-            <button 
-              onClick={() => {/* TODO: Leica Bluetooth connection */}}
-              className="mt-2 px-3 py-1 bg-[#D4A574] hover:bg-[#C49564] text-black rounded text-sm font-medium"
-            >
-              {leicaConnected ? 'Disconnect' : 'Connect Leica D5'}
-            </button>
-          </div>
-        </div>
-        
-        {/* Room Photo Folders */}
-        <div className="border-t border-[#D4A574]/30 pt-4">
-          <h3 className="text-lg font-bold text-[#D4A574] mb-3">📁 Photos by Room</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {project?.rooms?.map(room => (
-              <button
-                key={room.id}
-                onClick={() => {
-                  setSelectedRoomForPhotos(room);
-                  setShowPhotoManager(true);
-                }}
-                className="p-3 border border-[#D4A574]/50 rounded hover:bg-[#D4A574]/20 transition-colors"
-                style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%)' }}
-              >
-                <div className="text-2xl mb-1">📁</div>
-                <div className="text-sm text-[#D4C5A9] font-medium truncate">{room.name}</div>
-                <div className="text-xs text-[#D4A574]">
-                  {roomPhotos[room.id]?.length || 0} photos
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
       
       {/* SEARCH AND FILTER SECTION */}
       <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
@@ -334,7 +253,7 @@ const WalkthroughSpreadsheet = ({
               placeholder="Search Items, Vendors, SKUs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-900/50 text-[#D4A574] border border-[#D4A574]/50 focus:border-[#D4A574] focus:outline-none placeholder-[#D4A574]/70"
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
           
@@ -512,18 +431,8 @@ const WalkthroughSpreadsheet = ({
                                         <option value="">Add Category ▼</option>
                                         <option value="Lighting">Lighting</option>
                                         <option value="Furniture">Furniture</option>
-                                        <option value="Window Treatments">Window Treatments</option>
-                                        <option value="Textiles & Soft Goods">Textiles & Soft Goods</option>
-                                        <option value="Art & Accessories">Art & Accessories</option>
-                                        <option value="Fireplace & Built-ins">Fireplace & Built-ins</option>
-                                        <option value="Paint, Wallpaper, and Finishes">Paint, Wallpaper, and Finishes</option>
-                                        <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
-                                        <option value="Furniture & Storage">Furniture & Storage</option>
-                                        <option value="Cabinets & Storage">Cabinets & Storage</option>
-                                        <option value="Cabinets, Built-ins, and Trim">Cabinets, Built-ins, and Trim</option>
-                                        <option value="Tile and Tops">Tile and Tops</option>
-                                        <option value="Appliances">Appliances</option>
                                         <option value="Decor & Accessories">Decor & Accessories</option>
+                                        <option value="Plumbing & Fixtures">Plumbing & Fixtures</option>
                                       </select>
                                     </div>
                                   </td>
@@ -550,38 +459,6 @@ const WalkthroughSpreadsheet = ({
           itemStatuses={itemStatuses}
           vendorTypes={vendorTypes}
           loading={false}
-        />
-      )}
-      
-      {/* Photo Manager Modal */}
-      {showPhotoManager && selectedRoomForPhotos && (
-        <PhotoManagerModal
-          room={selectedRoomForPhotos}
-          photos={roomPhotos[selectedRoomForPhotos.id] || []}
-          onClose={() => {
-            setShowPhotoManager(false);
-            setSelectedRoomForPhotos(null);
-          }}
-          onSavePhotos={(roomId, photos) => {
-            setRoomPhotos(prev => ({
-              ...prev,
-              [roomId]: photos
-            }));
-            // TODO: Save to backend
-            console.log('📸 Photos saved for room:', roomId, photos);
-          }}
-          leicaConnected={leicaConnected}
-          onConnectLeica={async () => {
-            try {
-              // TODO: Implement Leica D5 Bluetooth connection
-              // For now, simulate connection
-              setLeicaConnected(true);
-              alert('Leica D5 Connected! (Simulated - Bluetooth integration pending)');
-            } catch (error) {
-              console.error('Failed to connect to Leica D5:', error);
-              alert('Failed to connect to Leica D5. Please try again.');
-            }
-          }}
         />
       )}
     </div>
