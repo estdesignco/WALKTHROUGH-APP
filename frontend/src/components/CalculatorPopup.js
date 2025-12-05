@@ -306,68 +306,75 @@ const CalculatorPopup = ({
           )}
 
           {calculatorType === 'wallpaper' && (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>Wall Width (ft)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={formData.wallWidth}
-                  onChange={(e) => setFormData({...formData, wallWidth: e.target.value})}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>Wall Height (ft)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={formData.wallHeight}
-                  onChange={(e) => setFormData({...formData, wallHeight: e.target.value})}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>Roll Width (in) <span className="text-[#D4C5A9]">*</span></label>
+            <div className="space-y-4">
+              {/* ROLL WIDTH - TOP AND PROMINENT */}
+              <div className="bg-[#8B7355]/10 p-4 rounded-lg border-2 border-[#D4C5A9]/30">
+                <label className="block text-sm font-bold text-[#D4C5A9] mb-2">
+                  WALLPAPER ROLL WIDTH (inches) *
+                </label>
                 <input
                   type="number"
                   value={formData.rollWidth}
                   onChange={(e) => setFormData({...formData, rollWidth: e.target.value})}
-                  className={inputClass}
+                  className={`${inputClass} text-lg font-semibold`}
                   placeholder="27"
                 />
-                <p className="text-xs text-stone-500 mt-1">Standard: 20.5", 27", or 52"</p>
+                <p className="text-xs text-[#D4C5A9] mt-2 font-medium">Standard Sizes: 20.5", 27", or 52"</p>
               </div>
-              <div>
-                <label className={labelClass}>Roll Length (ft) <span className="text-[#D4C5A9]">*</span></label>
-                <input
-                  type="number"
-                  value={formData.rollLength}
-                  onChange={(e) => setFormData({...formData, rollLength: e.target.value})}
-                  className={inputClass}
-                  placeholder="27"
-                />
-                <p className="text-xs text-stone-500 mt-1">Usually 13.5', 16.5', or 27'</p>
-              </div>
-              <div>
-                <label className={labelClass}>Pattern Repeat (in)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={formData.patternRepeat}
-                  onChange={(e) => setFormData({...formData, patternRepeat: e.target.value})}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>Price Per Roll ($)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.pricePerRoll}
-                  onChange={(e) => setFormData({...formData, pricePerRoll: e.target.value})}
-                  className={inputClass}
-                />
+              
+              {/* Rest of fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Wall Width (ft)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={formData.wallWidth}
+                    onChange={(e) => setFormData({...formData, wallWidth: e.target.value})}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Wall Height (ft)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={formData.wallHeight}
+                    onChange={(e) => setFormData({...formData, wallHeight: e.target.value})}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Double Roll Length (ft)</label>
+                  <input
+                    type="number"
+                    value={formData.rollLength}
+                    onChange={(e) => setFormData({...formData, rollLength: e.target.value})}
+                    className={inputClass}
+                    placeholder="27"
+                  />
+                  <p className="text-xs text-stone-500 mt-1">Double rolls: typically 27'</p>
+                </div>
+                <div>
+                  <label className={labelClass}>Pattern Repeat (in)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={formData.patternRepeat}
+                    onChange={(e) => setFormData({...formData, patternRepeat: e.target.value})}
+                    className={inputClass}
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className={labelClass}>Price Per Double Roll ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.pricePerRoll}
+                    onChange={(e) => setFormData({...formData, pricePerRoll: e.target.value})}
+                    className={inputClass}
+                  />
+                </div>
               </div>
             </div>
           )}
