@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://interioriq-2.preview.emergentagent.com/api
+https://design-hub-120.preview.emergentagent.com/api
 ```
 
 ---

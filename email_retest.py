@@ -9,7 +9,7 @@ import json
 import sys
 
 # Backend URL from frontend/.env
-BACKEND_URL = "https://interioriq-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://design-hub-120.preview.emergentagent.com/api"
 
 def test_email_sending():
     """Test the send-questionnaire endpoint with exact data from review request"""

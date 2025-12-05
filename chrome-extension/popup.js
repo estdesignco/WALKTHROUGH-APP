@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://interioriq-2.preview.emergentagent.com';
+const BACKEND_URL = 'https://design-hub-120.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

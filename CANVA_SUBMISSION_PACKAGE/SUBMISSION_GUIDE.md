@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://interioriq-2.preview.emergentagent.com";
+const BACKEND_URL = "https://design-hub-120.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

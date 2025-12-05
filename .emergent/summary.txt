@@ -1,157 +1,171 @@
 <analysis>Here is the handover summary:
 
-**original_problem_statement:** The user's initial goal was to fix a buggy client questionnaire. After the agent completed extensive testing and fixes, the user provided a large set of new feature requests:
+**original_problem_statement:** The user's initial goal was to fix a buggy client questionnaire. After that was resolved, the user provided a large set of new feature requests which have been the focus of this session:
 1.  **Back to previous page button:** A universal back button on every page, plus a Home button.
-2.  **Master Databases:**
-    *   A Master Contacts list, globally accessible, with predictive text capabilities.
-    *   A Master Materials list, globally accessible, with the ability to upload a picture for each material.
-    *   An idea for an AI grab to find material information automatically.
-3.  **Contact Auto-Sync:** Any contact entered in any field (e.g., in the questionnaire) should be automatically saved to the Master Contacts database.
-4.  **Menu Reorganization:**
-    *   Initially, the user wanted Budget, Vendors, and Materials removed from the Calculators/Power Features section and moved into individual project tabs.
-    *   Then, they clarified that Calculators should also be accessible from the main menu, independent of any project.
-5.  **Automatic Calculator Pop-up:**
-    *   When a user clicks on a COST field within a project's item list (e.g., the Checklist/FF&E spreadsheet), a calculator should automatically pop up.
-    *   The calculator should be context-aware (e.g., show a Wallpaper calculator for a wallpaper item).
-    *   After calculation, the total cost should auto-fill the COST field.
-    *   The calculator should also calculate and display the quantity needed (e.g., 6 rolls) and auto-fill the item's QTY field.
+2.  **Master Databases:** For Contacts and Materials, globally accessible with specific features like predictive text and image uploads.
+3.  **Contact Auto-Sync:** Contacts entered anywhere should save to the Master Contacts database.
+4.  **Menu Reorganization:** Restructure main and project-level menus.
+5.  **Automatic Calculator Pop-up:** A context-aware calculator that pops up on COST fields, calculates cost and quantity, and auto-fills the results.
+6.  **Calculator Enhancements (from this session):**
+    *   Transfer all calculator fields (e.g., size, remarks) to the main spreadsheet.
+    *   Add a Remarks field to the calculator UI.
+    *   Add a new Upholstery calculator for furniture.
+    *   Solve a dilemma for drapery calculations, showing both price per panel and total yardage needed per panel.
+7.  **Add Item Modal Integration:** The calculator should be available when creating a new item.
+8.  **Wallpaper Calculator Specifics:** A very precise set of requests to add a user-editable Roll Width field to the wallpaper calculator equation and UI, while removing the Roll Length field (as it's a standard).
+9.  **Data Persistence:** A critical request to fix the blank projects issue caused by the volatile preview database.
+10. **Full System Test:** An overnight, comprehensive test of every feature in the application.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The agent has successfully implemented most of the user's new feature requests.
-*   The application now has a Master Contacts page and a Master Materials page, both accessible from the main dashboard. These pages have full CRUD functionality, search, and filtering, served by a new backend API ().
-*   A reusable  component has been created and added to numerous pages, along with a Home button on the questionnaire.
-*   The main menu and project-level navigation have been completely reorganized. Budget, Vendors, and Materials are now separate tabs within a project. A global Calculators page is also accessible from the main dashboard.
-*   Contact information entered for builders/architects in the client questionnaire is now automatically synced to the Master Contacts database upon submission.
-*   A context-aware calculator now pops up when a user clicks the COST field in the  component. It correctly detects the item type and displays the appropriate calculator (e.g., Wallpaper, Paint, General).
+The application is feature-rich and has been significantly stabilized. The calculator state reset bug from the previous session is fixed. The agent implemented a vast number of user requests:
+*   **Enhanced Calculators:** The calculator popup is heavily upgraded. It now includes a new **Upholstery** calculator, an improved **Drapery** calculator that shows yards-per-panel, and a **Remarks** field. It now transfers not just Cost and Qty, but also **Size** and **Remarks** back to the spreadsheet.
+*   **Wallpaper Calculator Fixed:** After many iterations, the wallpaper calculator was fixed in both the popup () and the standalone page (). It now correctly includes a user-editable Roll Width field in the UI and equation, and the Roll Length field has been removed in favor of a hardcoded standard value.
+*   **Add Item Integration:** The calculator is now available from the , allowing users to calculate and populate fields for new items.
+*   **Data Persistence Solution:** The agent resolved the user's biggest frustration (no projects to view) by creating a startup script (). This script runs every time the backend starts, ensuring that 3 fully populated test projects with thousands of items are always available.
+*   **Comprehensive Testing:** The agent performed an extensive overnight test of the application's features, documenting the process and results in several markdown files. This test identified 5 non-core features that are not fully functional.
 
 **Last working item**:
-*   **Last item agent was working**: Enhancing the calculator pop-up to not only calculate the total cost but also the **quantity required** (e.g., number of wallpaper rolls) and auto-filling both the COST and QTY fields in the checklist upon completion.
-*   **Status**: IN PROGRESS
-*   **Agent Testing Done**: N (Agent was testing and discovered a bug).
-*   **Which testing method agent to use?**: Frontend testing agent. The issue is a React state management bug within the  modal. A testing agent using Playwright would be ideal to replicate and diagnose the state reset issue upon user interaction.
-*   **User Testing Done**: N
+*   **Last item agent was working**: Fixing an  error on the standalone calculator page (). The agent identified this as a backend validation error caused by the frontend sending empty strings for required number fields.
+*   **Status**: USER VERIFICATION PENDING
+*   **Agent Testing Done**: N (The agent deployed a fix to show a better error message but did not test it or prevent the root cause).
+*   **Which testing method agent to use?**: Frontend testing agent. The agent should first add client-side validation to the form in  to prevent submission with empty fields, then use the testing agent to verify that the form works correctly with valid data and that the Calculate button is disabled or shows errors for invalid data.
+*   **User Testing Done**: Y (User reported the error).
 
 **All Pending/In progress Issue list**:
-*   **Issue 1: Calculator Popup State Reset Bug (P0)**
-    *   **Description**: While implementing the quantity needed feature, a new bug was introduced in . When a user fills in the calculator's input fields (e.g., Wall Width), the component state appears to reset after certain interactions (like clicking another input or button), clearing the entered values.
-    *   **Attempted fixes**: The agent was in the process of testing when the bug was observed. The last actions were updating the component to handle and display quantity.
+*   **Issue 1: Wallpaper Calculator Error on Standalone Page (P0)**
+    *   **Description**: The calculator at  shows an  error if the user tries to calculate with empty fields. The agent's last fix was to improve the error message, but it didn't prevent the invalid API call.
+    *   **Attempted fixes**: Updated  to display a more descriptive error message from the API response.
     *   **Next debug checklist**:
-        1.  Review . Examine the  hooks and state update logic. The bug where values got reset (mentioned in thought process) is a classic symptom of a misconfigured  dependency array or an unintentional re-render causing state initialization.
-        2.  Check the  function to ensure it's preserving the existing state correctly when updating a single field (e.g., using ).
-        3.  Use the browser's developer tools to inspect the component's state and props during interaction to see what triggers the reset.
-    *   **Why fix this issue and what will be achieved with the fix?**: This bug makes the new automatic calculator feature unusable. Fixing it will complete the user's most recent feature request.
+        1.  In , find the  function.
+        2.  Before the  call, add client-side validation to ensure fields like , , and  are filled and are numeric.
+        3.  Disable the Calculate button until all required fields have valid inputs.
+    *   **Why fix this issue and what will be achieved with the fix?**: This bug makes the standalone wallpaper calculator page unusable and confusing. Fixing it will provide a robust user experience.
     *   **Status**: IN PROGRESS
     *   **Is recurring issue?**: N
     *   **Should Test frontend/backend/both after fix?**: Frontend.
     *   **Blocked on other issue**: None.
+
+*   **Issue 2: Incomplete Optional Features (P2)**
+    *   **Description**: The overnight test revealed 5 non-functional features: Product Link Scraping, Barcode Scanning, Canva Integration, Export to PDF/Excel/CSV, and Bulk Item Creation. The UI buttons exist, but the backend APIs return errors (404/405/422).
+    *   **Attempted fixes**: None. These were only identified during testing.
+    *   **Next debug checklist**: Choose one feature (e.g., Export to CSV). Investigate the frontend component and the corresponding backend API endpoint. Implement the required logic on the backend and ensure the frontend sends the correct request and handles the response (e.g., file download).
+    *   **Why fix this issue and what will be achieved with the fix?**: To complete the application's functionality and meet user expectations set by the UI.
+    *   **Status**: NOT STARTED
+    *   **Is recurring issue?**: N
+    *   **Should Test frontend/backend/both after fix?**: Both.
 
 **In progress Task List**:
 None.
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks**:
-    *   (P1) **Refactor **: Extract the  component from the render function to resolve the React unstable nested components lint warning and improve performance. This was postponed from the previous session.
+    *   (P1) **Refactor **: Extract the  component from the render function to resolve the React unstable nested components lint warning and improve performance. This was postponed.
     *   (P2) **Address Autocomplete/Predictive Text**: The user's original request to fix the Google Maps address autocomplete in the questionnaire has not been addressed. This needs investigation, likely related to API key configuration.
 *   **Future Tasks**:
-    *   (P3) **AI Grab for Materials**: The user brainstormed a feature to automatically find material information using AI. This would be a new, large feature requiring further discussion and planning.
+    *   (P3) **AI Grab for Materials**: A user idea to automatically find material information using AI. This would be a new, large feature requiring further discussion and planning.
 
 **Completed work in this session**
-- **Client Questionnaire E2E Completion**:
-  - Implemented a multi-entry birthday picker with a calendar UI in .
-  - Conducted extensive backend and frontend testing to confirm the questionnaire is stable and saves all data correctly, finally satisfying the user's demand for thorough verification.
-- **Master Databases Implementation**:
-  - Created a new backend API () for global contacts and materials.
-  - Built  and  with full CRUD, search, and filter capabilities.
-- **Contact Auto-Sync**: Implemented logic in  to automatically add builder/architect contacts to the master database on submission.
-- **Universal Navigation**: Created a  component and deployed it across key pages (, , etc.) and added a  button to the questionnaire.
-- **Major UI/Menu Reorganization**:
-  - Moved Budget, Vendors, and Materials from a bundled Power Features section into their own dedicated tabs on the .
-  - Created a standalone  accessible from the main dashboard, while also keeping calculators available within projects.
-- **Automatic Calculator Popup**:
-  - Created a  modal.
-  - Modified  to trigger this popup when a user clicks the COST cell for an item.
-  - The popup is context-aware and automatically selects the correct calculator based on the item's category.
+- **Data Persistence Implemented**: Solved the blank projects issue by creating a backend startup script () that ensures test data is always present.
+- **Calculator Bug Fixed**: Resolved the decimal input state-reset bug in .
+- **Major Calculator Enhancements**:
+  - Implemented an **Upholstery Calculator**.
+  - Enhanced the **Drapery Calculator** to show a yards per panel breakdown.
+  - Added **Remarks** and **Size** fields that transfer to the spreadsheet.
+- ** Integration**: Added the calculator popup to the Add Item flow.
+- **Wallpaper Calculator Overhaul**: Completely reworked the wallpaper calculator in two separate components ( and ) to include a user-editable **Roll Width** and use a standard **Roll Length**, per user's exact specifications.
+- **Comprehensive System Testing**: Performed a full overnight test of backend and frontend features, documenting the process and identifying a list of non-critical but broken features.
 
 **Earlier issues found/mentioned but not fixed**
 *   **Issue 1: Address Predictive Text**: User noted it's not working in the questionnaire; agent identified it as a likely API key configuration issue but did not resolve it.
-*   **Issue 2: Refactor **: The agent identified the unstable nested components lint error but postponed the fix to prioritize user-facing features.
+*   **Issue 2: Refactor **: The agent identified the unstable nested components lint error but postponed the fix.
 
 **Known issue recurrence from previous fork**
 *   **Issue recurrence in previous fork**: Volatile Preview Database.
-*   **Recurrence count**: High (occurred multiple times this session).
-*   **Status**: NOT STARTED (This is a platform-level issue. The agent's workaround is to create test data on demand).
+*   **Recurrence count**: High.
+*   **Status**: RESOLVED. The new startup script () ensures data is always available, effectively fixing this long-standing problem for the user.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-*   **Dynamic Modals**: The  is a modal that is dynamically rendered and its content is context-aware based on the item clicked.
-*   **Component State and Callbacks**: The calculator popup communicates its result (cost and quantity) back to the parent component () using a callback function passed as a prop ().
-*   **Global vs. Project-Specific Data**: The architecture was expanded to support both global databases (Master Contacts/Materials) and project-specific data, with links between them.
-*   **API-Driven UI**: The new master list pages are driven by backend API calls for all data operations (fetch, create, update, delete, search).
-*   **Iterative Refactoring**: The agent correctly identified a lint issue (unstable nested components) but made a conscious decision to postpone the refactoring in favor of delivering user-requested features.
+*   **Backend Startup Events**: Using FastAPI's  to execute a data seeding script, which solved the critical data persistence issue in the preview environment.
+*   **Component Disambiguation**: A key challenge was realizing the user was interacting with a different UI component () than the one the agent was initially fixing (). This highlights the need to confirm the exact file/page the user is referring to.
+*   **Client-Side Validation**: The current pending issue requires adding client-side checks before making an API call to prevent  errors from the backend.
+*   **Denormalized Database Seeding**: The startup script correctly populates multiple related MongoDB collections (, , , , ) to construct the full data hierarchy for the application.
 
 **key DB schema**
-*   **projects**: 
-*   **questionnaires**: 
-*   **contacts**: 
-*   **master_contacts**: 
-*   **master_materials**: 
+No changes were made to the database schema in this session. The focus was on correctly populating the existing collections.
+*   **projects**, **rooms**, **categories**, **subcategories**, **items**, **master_contacts**, **master_materials**
 
 **changes in tech stack**
 None.
 
 **All files of reference**
-*   **/app/frontend/src/components/CalculatorPopup.js**: New file. The component for the automatic cost calculator. **Currently has a bug.**
-*   **/app/frontend/src/components/ExactChecklistSpreadsheet.js**: Heavily modified to integrate and trigger the .
-*   **/app/backend/master_database_api.py**: New file. The API powering the new global Master Contact and Material lists.
-*   **/app/frontend/src/components/MasterContactsPage.js**: New file. Frontend for the global contacts list.
-*   **/app/frontend/src/components/MasterMaterialsPage.js**: New file. Frontend for the global materials library.
-*   **/app/frontend/src/components/ProjectDetailPage.js**: Heavily modified to restructure the navigation tabs.
-*   **/app/frontend/src/components/MainDashboard.js**: Heavily modified to update the main menu navigation.
-*   **/app/frontend/src/components/CustomerfacingQuestionnaire.js**: Modified to add the birthday picker and auto-sync contacts.
-*   **/app/frontend/src/App.js**: Modified to add routes for the new master list and calculator pages.
+*   **/app/frontend/src/components/CalculatorPopup.js**: The popup calculator used in the spreadsheet. Heavily modified for bug fixes and new features.
+*   **/app/frontend/src/components/CalculatorDashboard.js**: The component for the standalone  page. Modified to fix the wallpaper calculator UI.
+*   **/app/backend/auto_populate_projects.py**: New crucial script that runs on backend startup to create test data.
+*   **/app/backend/server.py**: Modified to execute the startup script.
+*   **/app/frontend/src/components/AddItemModal.js**: Modified to integrate the calculator.
+*   **/app/OVERNIGHT_TESTING_REPORT.md**: New documentation summarizing the comprehensive test results.
+*   **/app/GOOD_MORNING_SUMMARY.md**: New documentation for the user summarizing the overnight work.
+
+**Areas that need refactoring**:
+*    contains a large nested component () that causes a React lint warning and should be extracted into its own file. This is tracked in Upcoming Tasks.
+
+**key api endpoints**
+*   : Used by the startup script to create fully populated rooms with items.
+*   : Used by the frontend to fetch all project data. Debugging this endpoint was key to solving the data persistence issue.
+*   : The standalone calculator endpoint that was causing a 422 error.
+*   The API endpoints for Scraping, Barcode Scanning, Canva, Export, and Bulk Items are currently not fully functional.
 
 **Critical Info for New Agent**
-*   **PRIORITY 1 is fixing the bug in **. The user loves the feature, but it's currently broken due to a state reset issue.
-*   The user provides feedback iteratively and often requests significant new features after seeing a visual change. Be prepared to implement large features based on short prompts.
-*   **The preview database IS NOT PERSISTENT.** It will be wiped. Be ready to use the scripts in  or create new ones to generate test projects and data for the user whenever they report there are no projects. Acknowledge this is a known issue with the preview environment.
-*   The unstable nested components lint error in  is a known technical debt that should be addressed when possible.
+*   **Data persistence is solved with a startup script.** The user's biggest pain point was projects disappearing. This is fixed by . If the user ever reports no projects, the first step should be to restart the backend (backend: stopped
+backend: started) and check its logs. Do not tamper with this script unless necessary.
+*   **There are two different wallpaper calculators.** The user may provide feedback on one, but the fix might be needed in another. Be sure to clarify if they are on the main  page () or using the popup from the spreadsheet ().
+*   The immediate priority is to fix the  error on the standalone calculator page by adding client-side validation to prevent submitting the form with empty fields.
+
+**documents created in this job**
+*   
+*   
+*   
+*   
 
 **Last 10 User Messages and any pending user messages**
-1.  **User**: Requested automatic calculator popups when clicking a COST field. (Status: IN PROGRESS, but buggy)
-2.  **User**: Stated there were no projects for them to test. (Status: Addressed, agent created test projects.)
-3.  **User**: Clarified that Calculators should be on the main menu AND within projects. (Status: Completed)
-4.  **User**: Requested Budget, Vendors, Materials be removed from calculators and put into project-specific tabs. (Status: Completed)
-5.  **User**: Provided a massive list of new features including Master lists, Back buttons, and contact auto-sync. (Status: Mostly Completed)
-6.  **User**: Expressed frustration about not being able to test until the agent has performed extensive testing. (Status: Addressed, agent performed extensive testing.)
-7.  **User**: HAVE YOU TESTED THESE EXTENSIVELY? (Status: Addressed)
-8.  **User**: yes, i am going to bed. please work on all, and dont stop! (Status: Acknowledged)
-9.  **User**: Loves the idea of the auto-calculator and wants it to also auto-fill the quantity of items needed (e.g., number of rolls). (Status: This is the  and is IN PROGRESS).
-10. **User**: Once again stated there are no projects to view the latest changes. (Status: Addressed, agent recreated projects.)
+1.  **what is the 5% that didnt work?**: User requested details on the untested features. (Status: Addressed)
+2.  **i need the projects to load every time!!!!!!!!!!!**: User expressed extreme frustration with the volatile database. (Status: Resolved via a new backend startup script)
+3.  **Will you please add the the wallpaper roll width field...**: User requested an editable width field for the wallpaper calculator. (Status: Completed)
+4.  **this doesnt need to be in the RESULTS!!!!**: User clarified that roll width is for the *equation*, not the display output. (Status: Completed)
+5.  **you have yet to put the the wallpaper width on the FRONT END**: User frustrated that the field wasn't appearing. (Status: Agent was editing the wrong file)
+6.  **i need to be able to ENTER THE SIZE...**: User explicitly demanded an input field for roll width. (Status: Completed)
+7.  **AGAIN, I DO NOT NEED THE DOUBLE ROLL LENGHT!**: User clarified that roll length is standard and the input field should be removed. (Status: Completed)
+8.  **WTF, still not there!**: User still not seeing the changes. (Status: Agent was still working on the wrong file)
+9.  **this is SIMPLE~!!!...it is still not there!**: User provided a screenshot, revealing the agent was fixing the wrong component. (Status: Addressed, agent found the correct file)
+10. **Error calculating wallpaper: [object Object]**: User reported the current bug on the standalone calculator page. (Status: IN PROGRESS, this is the last working item)
 
 **Project Health Check:**
 *   **Broken**:
-    *   The preview environment's database persistence.
-    *   The state management within the new  component.
-*   **Mocked**: N/A.
+    *   Standalone wallpaper calculator () throws an error if submitted with empty fields.
+    *   Five optional features are non-functional: Product Link Scraping, Barcode Scanning, Canva Integration, Export, and Bulk Item Creation.
+*   **Mocked**: N/A
 
-**3rd Party Integrations**
-None added or modified in this session.
+**3rd Party Integrations**:
+None added or modified.
 
 **Testing status**
-*   **Testing agent used after significant changes**: YES. The agent used both backend test scripts and the frontend (Playwright) testing agent multiple times to validate the questionnaire fixes, which was critical to gaining user confidence.
+*   **Testing agent used after significant changes**: YES. Agent used frontend and backend testing agents extensively for the overnight test.
 *   **Troubleshoot agent used after agent stuck in loop**: NO.
 *   **Test files created**:
-    *    to test the new master database APIs.
-    *   Various temporary shell scripts to create test projects via curl.
-*   **Known regressions**: A new bug was introduced in  causing form state to reset.
+    *    (serves as a data creation script)
+    *   
+    *   
+*   **Known regressions**: None.
 
 **Credentials to test flow:**
 *   **Email:** 
 *   **Password:** 
 
 **What agent forgot to execute**
-*   The agent did not fix the non-functional address autocomplete feature in the client questionnaire, which was a pending item from the previous fork.</analysis>
+*   The agent did not address the non-functional Google Maps address autocomplete in the client questionnaire.
+*   The agent did not refactor the  component to remove the nested component warning. Both items are tracked in the upcoming tasks list.</analysis>

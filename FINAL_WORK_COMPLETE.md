@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://interioriq-2.preview.emergentagent.com
+https://design-hub-120.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://interioriq-2.preview.emergentagent.com/mobile-app
+https://design-hub-120.preview.emergentagent.com/mobile-app
 
 ---
 
