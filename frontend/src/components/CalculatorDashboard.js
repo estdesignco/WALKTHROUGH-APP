@@ -298,15 +298,27 @@ const CalculatorDashboard = ({ projectId }) => {
               </div>
             </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Pattern Repeat (inches)</label>
-              <input
-                type="number"
-                value={wallpaperData.pattern_repeat}
-                onChange={(e) => setWallpaperData({...wallpaperData, pattern_repeat: parseFloat(e.target.value)})}
-                style={styles.input}
-                placeholder="24"
-              />
+            <div style={styles.formRow}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Roll Width (inches)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.roll_width}
+                  onChange={(e) => setWallpaperData({...wallpaperData, roll_width: parseFloat(e.target.value)})}
+                  style={styles.input}
+                  placeholder="27"
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Pattern Repeat (inches)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.pattern_repeat}
+                  onChange={(e) => setWallpaperData({...wallpaperData, pattern_repeat: parseFloat(e.target.value)})}
+                  style={styles.input}
+                  placeholder="24"
+                />
+              </div>
             </div>
 
 
