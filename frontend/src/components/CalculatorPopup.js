@@ -134,18 +134,17 @@ const CalculatorPopup = ({
     switch (calculatorType) {
       case 'wallpaper':
         const wallArea = parseValue(formData.wallWidth) * parseValue(formData.wallHeight);
-        const rollWidthFt = parseValue(formData.rollWidth) / 12; // Convert inches to feet
+        const rollWidthFt = parseValue(formData.rollWidth) / 12; // Convert inches to feet - CRITICAL for calculation
         const usableLength = parseValue(formData.rollLength) - parseValue(formData.patternRepeat);
-        const usableRollArea = rollWidthFt * usableLength;
+        const usableRollArea = rollWidthFt * usableLength; // Roll width determines coverage area
         const rollsNeeded = Math.ceil(wallArea / usableRollArea) || 0;
-        const totalWallpaperSqFt = Math.round(wallArea);
         
         qty = rollsNeeded;
         unitLabel = 'rolls';
         total = rollsNeeded * parseValue(formData.pricePerRoll);
         
-        // Show wall size + roll dimensions for clarity
-        sizeStr = `${parseValue(formData.wallWidth)}' × ${parseValue(formData.wallHeight)}' wall | ${parseValue(formData.rollWidth)}" wide rolls (${totalWallpaperSqFt} sq ft)`;
+        // Show just wall dimensions - roll width is used in calculation only
+        sizeStr = `${parseValue(formData.wallWidth)}' × ${parseValue(formData.wallHeight)}'`;
         break;
         
       case 'drapery':
