@@ -347,17 +347,7 @@ const CalculatorPopup = ({
                   className={inputClass}
                 />
               </div>
-              <div>
-                <label className={labelClass}>Double Roll Length (ft)</label>
-                <input
-                  type="number"
-                  value={formData.rollLength}
-                  onChange={(e) => setFormData({...formData, rollLength: e.target.value})}
-                  className={inputClass}
-                  placeholder="27"
-                />
-              </div>
-              <div>
+              <div className="col-span-2">
                 <label className={labelClass}>Price Per Double Roll ($)</label>
                 <input
                   type="number"
