@@ -195,21 +195,18 @@ frontend/node_modules/.cache/default-development/1.pack_
 # Removed duplicate .env blocks
 -e 
 # Environment files
-*.env
-*.env.*
 -e 
 # Environment files
-*.env
-*.env.*
 -e 
 # Environment files
-*.env
-*.env.*
 -e 
 # Environment files
-*.env
-*.env.*
 -e 
 # Environment files
-*.env
-*.env.*
+
+# Environment files - backend only (contains secrets)
+backend/.env
+backend/.env.*
+
+# Frontend .env is safe to commit (only contains public URLs)
+# frontend/.env is now tracked!
