@@ -73,6 +73,16 @@ const CalculatorDashboard = ({ projectId }) => {
   });
 
   const calculateWallpaper = async () => {
+    // Validate required fields
+    if (!wallpaperData.wall_width || !wallpaperData.wall_height) {
+      alert('Please enter Wall Width and Wall Height');
+      return;
+    }
+    if (!wallpaperData.roll_width) {
+      alert('Please enter Roll Width');
+      return;
+    }
+    
     setLoading(true);
     try {
       const res = await axios.post(`${API}/calculators/wallpaper`, wallpaperData);
@@ -90,7 +100,8 @@ const CalculatorDashboard = ({ projectId }) => {
       
       setResults(res.data);
     } catch (error) {
-      alert('Error calculating wallpaper: ' + (error.response?.data?.detail || error.message));
+      const errorMsg = error.response?.data?.detail?.[0]?.msg || error.response?.data?.detail || error.message;
+      alert('Error calculating wallpaper: ' + errorMsg);
     }
     setLoading(false);
   };
