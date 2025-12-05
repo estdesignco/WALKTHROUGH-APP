@@ -135,15 +135,16 @@ const CalculatorPopup = ({
       case 'wallpaper':
         const wallArea = parseValue(formData.wallWidth) * parseValue(formData.wallHeight);
         const rollWidthFt = parseValue(formData.rollWidth) / 12; // Convert inches to feet - CRITICAL for calculation
-        const usableLength = parseValue(formData.rollLength) - parseValue(formData.patternRepeat);
+        const standardDoubleRollLength = 27; // Standard double roll length in feet
+        const usableLength = standardDoubleRollLength - parseValue(formData.patternRepeat) / 12; // Convert pattern repeat to feet
         const usableRollArea = rollWidthFt * usableLength; // Roll width determines coverage area
         const rollsNeeded = Math.ceil(wallArea / usableRollArea) || 0;
         
         qty = rollsNeeded;
-        unitLabel = 'rolls';
+        unitLabel = 'double rolls';
         total = rollsNeeded * parseValue(formData.pricePerRoll);
         
-        // Show just wall dimensions - roll width is used in calculation only
+        // Show just wall dimensions
         sizeStr = `${parseValue(formData.wallWidth)}' × ${parseValue(formData.wallHeight)}'`;
         break;
         
