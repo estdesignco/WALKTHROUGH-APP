@@ -2492,6 +2492,90 @@ async def update_item(item_id: str, item_update: ItemUpdate):
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Item not found")
     
+    # AUTO-SYNC: Sync vendor to master contacts and project vendors
+    vendor_name = item_update.vendor or current_item_doc.get("vendor", "")
+    if vendor_name and vendor_name.strip():
+        try:
+            # Check if vendor exists in master_materials
+            existing_vendor = await db.master_materials.find_one({
+                "name": {"$regex": f"^{vendor_name}$", "$options": "i"},
+                "is_vendor": True
+            })
+            if not existing_vendor:
+                # Add to master_materials as vendor
+                vendor_doc = {
+                    "id": str(uuid.uuid4()),
+                    "name": vendor_name,
+                    "category": "vendor",
+                    "manufacturer": vendor_name,
+                    "vendor": vendor_name,
+                    "sku": "",
+                    "color": "",
+                    "color_code": "",
+                    "pattern": "",
+                    "width": None,
+                    "height": None,
+                    "repeat": None,
+                    "price_per_unit": None,
+                    "unit": "each",
+                    "lead_time": "",
+                    "photo_url": "",
+                    "photo_data": "",
+                    "notes": f"Auto-added from item: {current_item_doc.get('name', '')}",
+                    "tags": ["vendor", vendor_name.lower()],
+                    "is_vendor": True,
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                    "used_in_projects": []
+                }
+                await db.master_materials.insert_one(vendor_doc)
+                logging.info(f"🔄 Auto-synced vendor to master database: {vendor_name}")
+        except Exception as e:
+            logging.error(f"Failed to auto-sync vendor: {str(e)}")
+    
+    # AUTO-SYNC: Sync finish/color to master materials
+    finish_color = item_update.finish_color or current_item_doc.get("finish_color", "")
+    if finish_color and finish_color.strip() and "/" in finish_color:
+        # Parse finish/color like "Kravet/Blue Velvet"
+        try:
+            parts = finish_color.split("/", 1)
+            if len(parts) == 2:
+                material_vendor, material_name = parts[0].strip(), parts[1].strip()
+                if material_vendor and material_name:
+                    existing_material = await db.master_materials.find_one({
+                        "name": {"$regex": f"^{material_name}$", "$options": "i"},
+                        "manufacturer": {"$regex": f"^{material_vendor}$", "$options": "i"}
+                    })
+                    if not existing_material:
+                        material_doc = {
+                            "id": str(uuid.uuid4()),
+                            "name": material_name,
+                            "category": "fabric",
+                            "manufacturer": material_vendor,
+                            "vendor": material_vendor,
+                            "sku": "",
+                            "color": material_name,
+                            "color_code": "",
+                            "pattern": "",
+                            "width": None,
+                            "height": None,
+                            "repeat": None,
+                            "price_per_unit": None,
+                            "unit": "yard",
+                            "lead_time": "",
+                            "photo_url": "",
+                            "photo_data": "",
+                            "notes": f"Auto-added from item: {current_item_doc.get('name', '')}",
+                            "tags": ["fabric", material_vendor.lower(), material_name.lower()],
+                            "created_at": datetime.now(timezone.utc).isoformat(),
+                            "updated_at": datetime.now(timezone.utc).isoformat(),
+                            "used_in_projects": []
+                        }
+                        await db.master_materials.insert_one(material_doc)
+                        logging.info(f"🔄 Auto-synced material to master database: {material_vendor}/{material_name}")
+        except Exception as e:
+            logging.error(f"Failed to auto-sync material: {str(e)}")
+    
     # If status changed, create Teams to-do item
     if new_status != old_status and new_status:
         try:
