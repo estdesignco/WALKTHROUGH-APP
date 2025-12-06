@@ -239,9 +239,9 @@ class BackendVerificationTest:
                 "data": {
                     "room_length": 12,
                     "room_width": 10,
-                    "ceiling_height": 9,
-                    "doors": 2,
-                    "windows": 3
+                    "wall_height": 9,
+                    "coats": 2,
+                    "coverage_per_gallon": 350
                 }
             },
             {
