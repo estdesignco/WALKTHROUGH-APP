@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://decoresync.preview.emergentagent.com
+https://data-prefill.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://decoresync.preview.emergentagent.com/mobile-app
+https://data-prefill.preview.emergentagent.com/mobile-app
 
 ---
 

@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://decoresync.preview.emergentagent.com';
+const BACKEND_URL = 'https://data-prefill.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings
