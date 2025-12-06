@@ -9576,6 +9576,284 @@ async def get_questionnaire(project_id: str):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to get questionnaire: {str(e)}")
 
+# ============================================
+# PROJECT VENDORS MANAGEMENT
+# ============================================
+
+@api_router.get("/vendors")
+async def get_project_vendors(project_id: Optional[str] = None):
+    """Get vendors for a project or all vendors"""
+    try:
+        query = {}
+        if project_id:
+            query["project_id"] = project_id
+        
+        vendors = await db.project_vendors.find(query, {"_id": 0}).to_list(1000)
+        return vendors
+    except Exception as e:
+        logging.error(f"Error getting vendors: {str(e)}")
+        return []
+
+@api_router.post("/vendors")
+async def create_project_vendor(vendor: dict):
+    """Create a new vendor for a project"""
+    try:
+        vendor_doc = {
+            "id": str(uuid.uuid4()),
+            "name": vendor.get("name", ""),
+            "website": vendor.get("website", ""),
+            "email": vendor.get("email", ""),
+            "phone": vendor.get("phone", ""),
+            "username": vendor.get("username", ""),
+            "password": vendor.get("password", ""),
+            "notes": vendor.get("notes", ""),
+            "category": vendor.get("category", "furniture"),
+            "project_id": vendor.get("project_id"),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.project_vendors.insert_one(vendor_doc)
+        
+        # AUTO-SYNC: Also add to master contacts if has contact info
+        if vendor.get("name") and (vendor.get("email") or vendor.get("phone")):
+            existing_contact = await db.master_contacts.find_one({"name": vendor.get("name")})
+            if not existing_contact:
+                master_contact = {
+                    "id": str(uuid.uuid4()),
+                    "name": vendor.get("name"),
+                    "phone": vendor.get("phone", ""),
+                    "email": vendor.get("email", ""),
+                    "company": vendor.get("name"),
+                    "role": "Vendor/Supplier",
+                    "address": "",
+                    "website": vendor.get("website", ""),
+                    "notes": vendor.get("notes", ""),
+                    "tags": [vendor.get("category", "vendor")],
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                    "used_in_projects": [vendor.get("project_id")] if vendor.get("project_id") else []
+                }
+                await db.master_contacts.insert_one(master_contact)
+        
+        return {**vendor_doc, "_id": vendor_doc["id"]}
+    except Exception as e:
+        logging.error(f"Error creating vendor: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/vendors/{vendor_id}")
+async def update_project_vendor(vendor_id: str, updates: dict):
+    """Update a project vendor"""
+    try:
+        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+        result = await db.project_vendors.update_one({"id": vendor_id}, {"$set": updates})
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Vendor not found")
+        vendor = await db.project_vendors.find_one({"id": vendor_id}, {"_id": 0})
+        return vendor
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating vendor: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/vendors/{vendor_id}")
+async def delete_project_vendor(vendor_id: str):
+    """Delete a project vendor"""
+    try:
+        result = await db.project_vendors.delete_one({"id": vendor_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Vendor not found")
+        return {"message": "Vendor deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting vendor: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============================================
+# PROJECT MATERIALS MANAGEMENT
+# ============================================
+
+@api_router.get("/materials")
+async def get_project_materials(project_id: Optional[str] = None, category: Optional[str] = None, search: Optional[str] = None):
+    """Get materials for a project or all materials"""
+    try:
+        query = {}
+        if project_id:
+            query["project_id"] = project_id
+        if category:
+            query["category"] = {"$regex": category, "$options": "i"}
+        if search:
+            query["$or"] = [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"manufacturer": {"$regex": search, "$options": "i"}},
+                {"sku": {"$regex": search, "$options": "i"}}
+            ]
+        materials = await db.project_materials.find(query, {"_id": 0}).to_list(1000)
+        return materials
+    except Exception as e:
+        logging.error(f"Error getting materials: {str(e)}")
+        return []
+
+@api_router.post("/materials")
+async def create_project_material(material: dict):
+    """Create a new material for a project"""
+    try:
+        material_doc = {
+            "id": str(uuid.uuid4()),
+            "name": material.get("name", ""),
+            "category": material.get("category", "fabric"),
+            "manufacturer": material.get("manufacturer", ""),
+            "sku": material.get("sku", ""),
+            "color": material.get("color", ""),
+            "color_code": material.get("color_code", ""),
+            "pattern": material.get("pattern", ""),
+            "width": material.get("width"),
+            "repeat": material.get("repeat"),
+            "price_per_unit": material.get("price_per_unit"),
+            "unit": material.get("unit", "yard"),
+            "swatch_url": material.get("swatch_url", ""),
+            "notes": material.get("notes", ""),
+            "tags": material.get("tags", []),
+            "project_id": material.get("project_id"),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.project_materials.insert_one(material_doc)
+        
+        # AUTO-SYNC: Also add to master materials database
+        if material.get("name"):
+            existing = await db.master_materials.find_one({
+                "name": material.get("name"),
+                "manufacturer": material.get("manufacturer", "")
+            })
+            if not existing:
+                master_material = {
+                    "id": str(uuid.uuid4()),
+                    "name": material.get("name"),
+                    "category": material.get("category", "fabric"),
+                    "manufacturer": material.get("manufacturer", ""),
+                    "vendor": material.get("manufacturer", ""),
+                    "sku": material.get("sku", ""),
+                    "color": material.get("color", ""),
+                    "color_code": material.get("color_code", ""),
+                    "pattern": material.get("pattern", ""),
+                    "width": material.get("width"),
+                    "height": None,
+                    "repeat": material.get("repeat"),
+                    "price_per_unit": material.get("price_per_unit"),
+                    "unit": material.get("unit", "yard"),
+                    "lead_time": "",
+                    "photo_url": material.get("swatch_url", ""),
+                    "photo_data": "",
+                    "notes": material.get("notes", ""),
+                    "tags": material.get("tags", []) + [material.get("category", "fabric")],
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                    "used_in_projects": [material.get("project_id")] if material.get("project_id") else []
+                }
+                await db.master_materials.insert_one(master_material)
+        
+        return {**material_doc, "_id": material_doc["id"]}
+    except Exception as e:
+        logging.error(f"Error creating material: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/materials/{material_id}")
+async def update_project_material(material_id: str, updates: dict):
+    """Update a project material"""
+    try:
+        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+        result = await db.project_materials.update_one({"id": material_id}, {"$set": updates})
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Material not found")
+        material = await db.project_materials.find_one({"id": material_id}, {"_id": 0})
+        return material
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating material: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/materials/{material_id}")
+async def delete_project_material(material_id: str):
+    """Delete a project material"""
+    try:
+        result = await db.project_materials.delete_one({"id": material_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Material not found")
+        return {"message": "Material deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting material: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============================================
+# AUTOCOMPLETE / PREDICTIVE TEXT ENDPOINTS
+# ============================================
+
+@api_router.get("/autocomplete/vendors")
+async def autocomplete_vendors(q: str, category: Optional[str] = None, limit: int = 10):
+    """Get vendor suggestions for autocomplete"""
+    try:
+        if len(q) < 1:
+            return []
+        query = {"$or": [{"name": {"$regex": q, "$options": "i"}}, {"manufacturer": {"$regex": q, "$options": "i"}}]}
+        if category:
+            query["category"] = {"$regex": category, "$options": "i"}
+        results = await db.master_materials.find(query, {"_id": 0, "photo_data": 0}).limit(limit).to_list(limit)
+        return results
+    except Exception as e:
+        logging.error(f"Error in autocomplete: {str(e)}")
+        return []
+
+@api_router.get("/autocomplete/materials")
+async def autocomplete_materials(q: str, category: Optional[str] = None, limit: int = 10):
+    """Get material suggestions for autocomplete"""
+    try:
+        if len(q) < 1:
+            return []
+        query = {"$or": [{"name": {"$regex": q, "$options": "i"}}, {"manufacturer": {"$regex": q, "$options": "i"}}, {"color": {"$regex": q, "$options": "i"}}, {"sku": {"$regex": q, "$options": "i"}}]}
+        if category:
+            query["category"] = {"$regex": category, "$options": "i"}
+        results = await db.master_materials.find(query, {"_id": 0, "photo_data": 0}).limit(limit).to_list(limit)
+        return results
+    except Exception as e:
+        logging.error(f"Error in autocomplete: {str(e)}")
+        return []
+
+@api_router.get("/autocomplete/contacts")
+async def autocomplete_contacts(q: str, role: Optional[str] = None, limit: int = 10):
+    """Get contact suggestions for autocomplete"""
+    try:
+        if len(q) < 1:
+            return []
+        query = {"$or": [{"name": {"$regex": q, "$options": "i"}}, {"company": {"$regex": q, "$options": "i"}}, {"email": {"$regex": q, "$options": "i"}}]}
+        if role:
+            query["role"] = {"$regex": role, "$options": "i"}
+        results = await db.master_contacts.find(query, {"_id": 0}).limit(limit).to_list(limit)
+        return results
+    except Exception as e:
+        logging.error(f"Error in autocomplete: {str(e)}")
+        return []
+
+@api_router.get("/autocomplete/paint-colors")
+async def autocomplete_paint_colors(q: str, manufacturer: Optional[str] = None, limit: int = 20):
+    """Get paint color suggestions for autocomplete"""
+    try:
+        if len(q) < 1:
+            return []
+        query = {"category": "paint", "$or": [{"name": {"$regex": q, "$options": "i"}}, {"sku": {"$regex": q, "$options": "i"}}, {"manufacturer": {"$regex": q, "$options": "i"}}]}
+        if manufacturer:
+            query["manufacturer"] = {"$regex": manufacturer, "$options": "i"}
+        results = await db.master_materials.find(query, {"_id": 0, "photo_data": 0}).limit(limit).to_list(limit)
+        return results
+    except Exception as e:
+        logging.error(f"Error in paint autocomplete: {str(e)}")
+        return []
 # PRODUCT CLIPPER ENDPOINTS
 @api_router.post("/clipper/save-to-app")
 async def save_clipped_product_to_app(data: dict):
