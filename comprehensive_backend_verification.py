@@ -44,8 +44,8 @@ class BackendTester:
         print("\n🔍 DATABASE VERIFICATION")
         
         try:
-            # Test master materials count (correct endpoint)
-            response = requests.get(f"{BACKEND_URL}/master/materials")
+            # Test master materials count (correct endpoint with high limit)
+            response = requests.get(f"{BACKEND_URL}/master/materials?limit=2000")
             if response.status_code == 200:
                 materials = response.json()
                 total_count = len(materials)
