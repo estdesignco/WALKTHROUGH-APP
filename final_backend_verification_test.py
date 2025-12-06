@@ -36,6 +36,9 @@ class BackendVerificationTest:
             "passed_tests": 0,
             "failed_tests": 0
         }
+        self.total_tests = 0
+        self.passed_tests = 0
+        self.failed_tests = 0
         
     def log(self, message: str, level: str = "INFO"):
         """Log test messages"""
