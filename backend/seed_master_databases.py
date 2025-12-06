@@ -257,7 +257,7 @@ HARDWARE_VENDORS = [
     {
         "name": "Schaub + Company",
         "category": "hardware",
-        "website": "https://www.?"
+        "website": "https://www.?"schaubandcompany.com",
         "notes": "Cabinet hardware specialist"
     },
     {
@@ -269,7 +269,7 @@ HARDWARE_VENDORS = [
     {
         "name": "Rocky Mountain Hardware",
         "category": "hardware",
-        "website": "https://www.?"
+        "website": "https://www.?"rockymountainhardware.com",
         "notes": "Bronze hardware - handcrafted in USA"
     },
 ]
