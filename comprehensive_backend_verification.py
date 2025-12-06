@@ -191,64 +191,61 @@ class BackendTester:
         material_id = None
         
         try:
-            # 1. GET /api/materials - List all materials
-            response = requests.get(f"{BACKEND_URL}/materials")
+            # 1. GET /api/master/materials - List all materials
+            response = requests.get(f"{BACKEND_URL}/master/materials")
             if response.status_code == 200:
                 materials = response.json()
-                self.log_result("GET /api/materials - List all materials", True, f"Found {len(materials)} materials")
+                self.log_result("GET /api/master/materials - List all materials", True, f"Found {len(materials)} materials")
             else:
-                self.log_result("GET /api/materials - List all materials", False, error=f"HTTP {response.status_code}")
+                self.log_result("GET /api/master/materials - List all materials", False, error=f"HTTP {response.status_code}")
             
-            # 2. POST /api/materials - Create material
+            # 2. POST /api/master/materials - Create material
             material_data = {
                 "name": "Test Material Backend",
                 "category": "testing",
                 "manufacturer": "Test Manufacturer",
                 "sku": "TEST-001",
-                "price": 99.99,
-                "description": "Created by backend test",
+                "price_per_unit": 99.99,
                 "color": "Test Blue",
-                "finish": "Matte",
-                "dimensions": "12x12",
-                "availability": "In Stock"
+                "notes": "Created by backend test"
             }
             
-            response = requests.post(f"{BACKEND_URL}/materials", json=material_data)
+            response = requests.post(f"{BACKEND_URL}/master/materials", json=material_data)
             if response.status_code == 200:
                 material = response.json()
                 material_id = material.get('id')
-                self.log_result("POST /api/materials - Create material", True, f"Created material ID: {material_id}")
+                self.log_result("POST /api/master/materials - Create material", True, f"Created material ID: {material_id}")
                 
-                # Verify it auto-syncs to master_materials
+                # Verify it appears in master_materials
                 time.sleep(1)  # Give it a moment to sync
-                materials_response = requests.get(f"{BACKEND_URL}/materials")
+                materials_response = requests.get(f"{BACKEND_URL}/master/materials")
                 if materials_response.status_code == 200:
                     materials = materials_response.json()
                     found_material = any(m.get('name') == 'Test Material Backend' for m in materials)
-                    self.log_result("Material auto-sync to master_materials", found_material, "Material synced to master list")
+                    self.log_result("Material appears in master_materials", found_material, "Material synced to master list")
                 
             else:
-                self.log_result("POST /api/materials - Create material", False, error=f"HTTP {response.status_code}")
+                self.log_result("POST /api/master/materials - Create material", False, error=f"HTTP {response.status_code}")
             
-            # 3. PUT /api/materials/{id} - Update material
+            # 3. PUT /api/master/materials/{id} - Update material
             if material_id:
                 update_data = {
                     "name": "Test Material Backend Updated",
-                    "price": 149.99
+                    "price_per_unit": 149.99
                 }
-                response = requests.put(f"{BACKEND_URL}/materials/{material_id}", json=update_data)
+                response = requests.put(f"{BACKEND_URL}/master/materials/{material_id}", json=update_data)
                 if response.status_code == 200:
-                    self.log_result("PUT /api/materials/{id} - Update material", True, "Material updated successfully")
+                    self.log_result("PUT /api/master/materials/{id} - Update material", True, "Material updated successfully")
                 else:
-                    self.log_result("PUT /api/materials/{id} - Update material", False, error=f"HTTP {response.status_code}")
+                    self.log_result("PUT /api/master/materials/{id} - Update material", False, error=f"HTTP {response.status_code}")
             
-            # 4. DELETE /api/materials/{id} - Delete material
+            # 4. DELETE /api/master/materials/{id} - Delete material
             if material_id:
-                response = requests.delete(f"{BACKEND_URL}/materials/{material_id}")
+                response = requests.delete(f"{BACKEND_URL}/master/materials/{material_id}")
                 if response.status_code == 200:
-                    self.log_result("DELETE /api/materials/{id} - Delete material", True, "Material deleted successfully")
+                    self.log_result("DELETE /api/master/materials/{id} - Delete material", True, "Material deleted successfully")
                 else:
-                    self.log_result("DELETE /api/materials/{id} - Delete material", False, error=f"HTTP {response.status_code}")
+                    self.log_result("DELETE /api/master/materials/{id} - Delete material", False, error=f"HTTP {response.status_code}")
                     
         except Exception as e:
             self.log_result("Materials CRUD operations", False, error=str(e))
