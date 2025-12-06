@@ -1,14 +1,14 @@
 {
-  "success_rate": 57.14285714285714,
+  "success_rate": 85.71428571428571,
   "total_tests": 7,
-  "passed_tests": 4,
-  "failed_tests": 3,
+  "passed_tests": 6,
+  "failed_tests": 1,
   "results": {
     "database_counts": {
-      "vendors": 2,
-      "materials": 2,
+      "vendors": 3,
+      "materials": 3,
       "projects": 3,
-      "total": 7
+      "total": 9
     },
     "autocomplete_tests": {
       "passed": 9,
@@ -16,7 +16,7 @@
     },
     "crud_tests": {},
     "calculator_tests": {
-      "passed": 3,
+      "passed": 4,
       "total": 4
     },
     "project_tests": {},
