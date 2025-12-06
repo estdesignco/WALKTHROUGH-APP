@@ -214,11 +214,12 @@ class BackendVerificationTest:
                 "name": "Wallpaper Calculator",
                 "endpoint": "/calculators/wallpaper",
                 "data": {
+                    "wallpaper_type": "double_roll",
                     "wall_width": 12,
                     "wall_height": 8,
                     "roll_width": 27,
                     "pattern_repeat": 0,
-                    "cost_per_roll": 89.99
+                    "cost_per_unit": 89.99
                 }
             },
             {
