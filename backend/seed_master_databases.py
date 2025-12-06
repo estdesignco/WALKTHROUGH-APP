@@ -257,7 +257,7 @@ HARDWARE_VENDORS = [
     {
         "name": "Schaub + Company",
         "category": "hardware",
-        "website": "https://www.?"schaubandcompany.com",
+        "website": "https://www.example.com",schaubandcompany.com",
         "notes": "Cabinet hardware specialist"
     },
     {
@@ -269,7 +269,7 @@ HARDWARE_VENDORS = [
     {
         "name": "Rocky Mountain Hardware",
         "category": "hardware",
-        "website": "https://www.?"rockymountainhardware.com",
+        "website": "https://www.example.com",rockymountainhardware.com",
         "notes": "Bronze hardware - handcrafted in USA"
     },
 ]
@@ -311,7 +311,7 @@ APPLIANCE_VENDORS = [
     {
         "name": "Viking",
         "category": "appliances",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Professional-style appliances"
     },
     {
@@ -335,7 +335,7 @@ APPLIANCE_VENDORS = [
     {
         "name": "GE Profile",
         "category": "appliances",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Smart home integration"
     },
     {
@@ -347,25 +347,25 @@ APPLIANCE_VENDORS = [
     {
         "name": "Fisher & Paykel",
         "category": "appliances",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "New Zealand innovation"
     },
     {
         "name": "Gaggenau",
         "category": "appliances",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Ultra-luxury German appliances"
     },
     {
         "name": "BlueStar",
         "category": "appliances",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Custom color ranges"
     },
     {
         "name": "La Cornue",
         "category": "appliances",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "French artisan ranges"
     },
 ]
@@ -377,19 +377,19 @@ TILE_VENDORS = [
     {
         "name": "Ann Sacks",
         "category": "tile",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Luxury stone and tile"
     },
     {
         "name": "Walker Zanger",
         "category": "tile",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Artisan tile and stone"
     },
     {
         "name": "Artistic Tile",
         "category": "tile",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Designer tile collections"
     },
     {
@@ -401,13 +401,13 @@ TILE_VENDORS = [
     {
         "name": "Clé Tile",
         "category": "tile",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Zellige and cement tiles"
     },
     {
         "name": "Fireclay Tile",
         "category": "tile",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Handcrafted ceramic tile"
     },
     {
@@ -419,13 +419,13 @@ TILE_VENDORS = [
     {
         "name": "Emser Tile",
         "category": "tile",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Natural stone and porcelain"
     },
     {
         "name": "Porcelanosa",
         "category": "tile",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Spanish luxury tile"
     },
     {
@@ -437,13 +437,13 @@ TILE_VENDORS = [
     {
         "name": "Bedrosians",
         "category": "tile",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Tile and stone - since 1948"
     },
     {
         "name": "The Tile Shop",
         "category": "tile",
-        "website": "https://www.?"
+        "website": "https://www.example.com",
         "notes": "Wide retail selection"
     },
 ]
@@ -583,18 +583,18 @@ BEHR_COLORS = [
 # LIGHTING VENDORS
 # ============================================
 LIGHTING_VENDORS = [
-    {"name": "Visual Comfort", "category": "lighting", "website": "https://www.?"notes": "Designer lighting - Studio McGee, Kelly Wearstler"},
-    {"name": "Currey and Company", "category": "lighting", "website": "https://www.?"notes": "Artisan chandeliers and lamps"},
-    {"name": "Hudson Valley Lighting", "category": "lighting", "website": "https://www.?"notes": "Troy Lighting, Mitzi collections"},
-    {"name": "Regina Andrew", "category": "lighting", "website": "https://www.?"notes": "Statement lighting pieces"},
-    {"name": "Arteriors", "category": "lighting", "website": "https://www.?"notes": "Modern luxury lighting"},
-    {"name": "Circa Lighting", "category": "lighting", "website": "https://www.?"notes": "Part of Visual Comfort"},
-    {"name": "Progress Lighting", "category": "lighting", "website": "https://www.?"notes": "Wide range of styles"},
-    {"name": "Kichler", "category": "lighting", "website": "https://www.?"notes": "Traditional to contemporary"},
-    {"name": "Generation Lighting", "category": "lighting", "website": "https://www.?"notes": "Monte Carlo fans, Feiss"},
-    {"name": "Hinkley Lighting", "category": "lighting", "website": "https://www.?"notes": "Indoor and outdoor lighting"},
-    {"name": "Capital Lighting", "category": "lighting", "website": "https://www.?"notes": "Value-oriented designer styles"},
-    {"name": "Savoy House", "category": "lighting", "website": "https://www.?"notes": "Classic and transitional"},
+    {"name": "Visual Comfort", "category": "lighting", "website": "https://www.example.com",notes": "Designer lighting - Studio McGee, Kelly Wearstler"},
+    {"name": "Currey and Company", "category": "lighting", "website": "https://www.example.com",notes": "Artisan chandeliers and lamps"},
+    {"name": "Hudson Valley Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Troy Lighting, Mitzi collections"},
+    {"name": "Regina Andrew", "category": "lighting", "website": "https://www.example.com",notes": "Statement lighting pieces"},
+    {"name": "Arteriors", "category": "lighting", "website": "https://www.example.com",notes": "Modern luxury lighting"},
+    {"name": "Circa Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Part of Visual Comfort"},
+    {"name": "Progress Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Wide range of styles"},
+    {"name": "Kichler", "category": "lighting", "website": "https://www.example.com",notes": "Traditional to contemporary"},
+    {"name": "Generation Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Monte Carlo fans, Feiss"},
+    {"name": "Hinkley Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Indoor and outdoor lighting"},
+    {"name": "Capital Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Value-oriented designer styles"},
+    {"name": "Savoy House", "category": "lighting", "website": "https://www.example.com",notes": "Classic and transitional"},
 ]
 
 async def seed_vendors():
