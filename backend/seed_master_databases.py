@@ -583,18 +583,18 @@ BEHR_COLORS = [
 # LIGHTING VENDORS
 # ============================================
 LIGHTING_VENDORS = [
-    {"name": "Visual Comfort", "category": "lighting", "website": "https://www.example.com",notes": "Designer lighting - Studio McGee, Kelly Wearstler"},
-    {"name": "Currey and Company", "category": "lighting", "website": "https://www.example.com",notes": "Artisan chandeliers and lamps"},
-    {"name": "Hudson Valley Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Troy Lighting, Mitzi collections"},
-    {"name": "Regina Andrew", "category": "lighting", "website": "https://www.example.com",notes": "Statement lighting pieces"},
-    {"name": "Arteriors", "category": "lighting", "website": "https://www.example.com",notes": "Modern luxury lighting"},
-    {"name": "Circa Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Part of Visual Comfort"},
-    {"name": "Progress Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Wide range of styles"},
-    {"name": "Kichler", "category": "lighting", "website": "https://www.example.com",notes": "Traditional to contemporary"},
-    {"name": "Generation Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Monte Carlo fans, Feiss"},
-    {"name": "Hinkley Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Indoor and outdoor lighting"},
-    {"name": "Capital Lighting", "category": "lighting", "website": "https://www.example.com",notes": "Value-oriented designer styles"},
-    {"name": "Savoy House", "category": "lighting", "website": "https://www.example.com",notes": "Classic and transitional"},
+    {"name": "Visual Comfort", "category": "lighting", "website": "https://www.visualcomfort.com", "notes": "Designer lighting - Studio McGee, Kelly Wearstler"},
+    {"name": "Currey and Company", "category": "lighting", "website": "https://www.?"curreyandcompany.com", "notes": "Artisan chandeliers and lamps"},
+    {"name": "Hudson Valley Lighting", "category": "lighting", "website": "https://www.?"?"hvlgroup.com", "notes": "Troy Lighting, Mitzi collections"},
+    {"name": "Regina Andrew", "category": "lighting", "website": "https://www.?"reginaandrew.com", "notes": "Statement lighting pieces"},
+    {"name": "Arteriors", "category": "lighting", "website": "https://www.?"arteriorshome.com", "notes": "Modern luxury lighting"},
+    {"name": "Circa Lighting", "category": "lighting", "website": "https://www.?"?"?"circalighting.com", "notes": "Part of Visual Comfort"},
+    {"name": "Progress Lighting", "category": "lighting", "website": "https://www.?"?"progresslighting.com", "notes": "Wide range of styles"},
+    {"name": "Kichler", "category": "lighting", "website": "https://www.?"kichler.com", "notes": "Traditional to contemporary"},
+    {"name": "Generation Lighting", "category": "lighting", "website": "https://www.?"?"?"?"?"generationlighting.com", "notes": "Monte Carlo fans, Feiss"},
+    {"name": "Hinkley Lighting", "category": "lighting", "website": "https://www.?"hinkley.com", "notes": "Indoor and outdoor lighting"},
+    {"name": "Capital Lighting", "category": "lighting", "website": "https://www.?"?"?"?"?"?"capitallightingfixture.com", "notes": "Value-oriented designer styles"},
+    {"name": "Savoy House", "category": "lighting", "website": "https://www.?"savoyhouse.com", "notes": "Classic and transitional"},
 ]
 
 async def seed_vendors():
