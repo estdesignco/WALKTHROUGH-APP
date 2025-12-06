@@ -5,10 +5,10 @@
   "failed_tests": 3,
   "results": {
     "database_counts": {
-      "vendors": 1,
-      "materials": 1,
+      "vendors": 2,
+      "materials": 2,
       "projects": 3,
-      "total": 5
+      "total": 7
     },
     "autocomplete_tests": {
       "passed": 9,
@@ -16,7 +16,7 @@
     },
     "crud_tests": {},
     "calculator_tests": {
-      "passed": 1,
+      "passed": 3,
       "total": 4
     },
     "project_tests": {},
