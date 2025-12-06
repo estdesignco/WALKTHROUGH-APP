@@ -227,11 +227,10 @@ class BackendVerificationTest:
                 "endpoint": "/calculators/drapery",
                 "data": {
                     "window_width": 60,
-                    "window_height": 84,
                     "finished_length": 96,
-                    "pleat_type": "pinch",
+                    "pleat_type": "pinch_pleat",
                     "fabric_width": 54,
-                    "cost_per_yard": 45.00
+                    "fullness_ratio": 2.5
                 }
             },
             {
@@ -242,18 +241,15 @@ class BackendVerificationTest:
                     "room_width": 10,
                     "ceiling_height": 9,
                     "doors": 2,
-                    "windows": 3,
-                    "coverage_per_gallon": 350
+                    "windows": 3
                 }
             },
             {
-                "name": "Tile Calculator",
-                "endpoint": "/calculators/tile",
+                "name": "Flooring Calculator",
+                "endpoint": "/calculators/flooring",
                 "data": {
                     "room_length": 10,
                     "room_width": 8,
-                    "tile_length": 12,
-                    "tile_width": 12,
                     "waste_factor": 10
                 }
             }
