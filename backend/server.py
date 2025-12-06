@@ -9358,6 +9358,42 @@ async def save_questionnaire(project_id: str, data: dict):
         answers = data.get("answers", {})
         contacts_created = []
         
+        # Helper function to also sync to master_contacts (GLOBAL)
+        async def sync_to_master_contacts(name, role, phone="", email="", company="", notes=""):
+            """Sync contact to GLOBAL master_contacts database"""
+            if not name or not name.strip():
+                return
+            try:
+                existing = await db.master_contacts.find_one({
+                    "name": {"$regex": f"^{name.strip()}$", "$options": "i"}
+                })
+                if not existing:
+                    master_contact = {
+                        "id": str(uuid.uuid4()),
+                        "name": name.strip(),
+                        "phone": phone or "",
+                        "email": email or "",
+                        "company": company or "",
+                        "role": role or "Contact",
+                        "address": "",
+                        "website": "",
+                        "notes": notes or f"Auto-added from questionnaire",
+                        "tags": [role.lower()] if role else ["contact"],
+                        "created_at": datetime.now(timezone.utc).isoformat(),
+                        "updated_at": datetime.now(timezone.utc).isoformat(),
+                        "used_in_projects": [project_id]
+                    }
+                    await db.master_contacts.insert_one(master_contact)
+                    logging.info(f"🔄 Auto-synced contact to GLOBAL master database: {name} ({role})")
+                else:
+                    # Update used_in_projects
+                    await db.master_contacts.update_one(
+                        {"id": existing["id"]},
+                        {"$addToSet": {"used_in_projects": project_id}}
+                    )
+            except Exception as e:
+                logging.error(f"Failed to sync contact to master: {str(e)}")
+        
         # Helper function to parse contact info (Name: phone)
         def parse_contact_info(text):
             """Extract name and phone from text like 'John Doe: 555-1234'"""
@@ -10205,6 +10241,42 @@ async def export_ffe_to_pdf(data: dict):
         # AUTO-CREATE CONTACTS FROM QUESTIONNAIRE
         answers = data.get("answers", {})
         contacts_created = []
+        
+        # Helper function to also sync to master_contacts (GLOBAL)
+        async def sync_to_master_contacts(name, role, phone="", email="", company="", notes=""):
+            """Sync contact to GLOBAL master_contacts database"""
+            if not name or not name.strip():
+                return
+            try:
+                existing = await db.master_contacts.find_one({
+                    "name": {"$regex": f"^{name.strip()}$", "$options": "i"}
+                })
+                if not existing:
+                    master_contact = {
+                        "id": str(uuid.uuid4()),
+                        "name": name.strip(),
+                        "phone": phone or "",
+                        "email": email or "",
+                        "company": company or "",
+                        "role": role or "Contact",
+                        "address": "",
+                        "website": "",
+                        "notes": notes or f"Auto-added from questionnaire",
+                        "tags": [role.lower()] if role else ["contact"],
+                        "created_at": datetime.now(timezone.utc).isoformat(),
+                        "updated_at": datetime.now(timezone.utc).isoformat(),
+                        "used_in_projects": [project_id]
+                    }
+                    await db.master_contacts.insert_one(master_contact)
+                    logging.info(f"🔄 Auto-synced contact to GLOBAL master database: {name} ({role})")
+                else:
+                    # Update used_in_projects
+                    await db.master_contacts.update_one(
+                        {"id": existing["id"]},
+                        {"$addToSet": {"used_in_projects": project_id}}
+                    )
+            except Exception as e:
+                logging.error(f"Failed to sync contact to master: {str(e)}")
         
         # Helper function to parse contact info (Name: phone)
         def parse_contact_info(text):
