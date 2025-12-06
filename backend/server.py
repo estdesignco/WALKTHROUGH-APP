@@ -10321,6 +10321,7 @@ async def export_ffe_to_pdf(data: dict):
                 "updated_at": datetime.utcnow()
             }
             await db.contacts.insert_one(contact_doc)
+            await sync_to_master_contacts(client_name, "Client", client_phone, client_email)
             contacts_created.append("Client")
 
         
