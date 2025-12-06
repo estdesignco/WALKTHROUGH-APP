@@ -192,7 +192,7 @@ class BackendTester:
         
         try:
             # 1. GET /api/master/materials - List all materials
-            response = requests.get(f"{BACKEND_URL}/master/materials")
+            response = requests.get(f"{BACKEND_URL}/master/materials?limit=2000")
             if response.status_code == 200:
                 materials = response.json()
                 self.log_result("GET /api/master/materials - List all materials", True, f"Found {len(materials)} materials")
