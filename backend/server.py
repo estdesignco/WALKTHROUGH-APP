@@ -930,6 +930,7 @@ class ItemUpdate(BaseModel):
     stock_quantity: Optional[int] = None
     restock_date: Optional[datetime] = None
     lead_time_weeks: Optional[int] = None
+    finish_color: Optional[str] = None
 
 class Item(ItemBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
