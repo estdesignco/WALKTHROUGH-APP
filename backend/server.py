@@ -5194,8 +5194,8 @@ async def sync_canva_to_project(data: dict):
 @api_router.post("/scrape-product")
 async def scrape_product_advanced(data: dict):
     """
-    Advanced product scraping endpoint using Playwright
-    Handles JavaScript-rendered wholesale sites like Four Hands, Uttermost, etc.
+    Advanced product scraping endpoint
+    Uses requests + BeautifulSoup as fallback when Playwright unavailable
     """
     url = data.get('url', '')
     
@@ -5204,14 +5204,133 @@ async def scrape_product_advanced(data: dict):
     
     try:
         print(f"🔍 Scraping product from: {url}")
-        product_info = await scrape_product_with_playwright(url)
+        
+        # Try BeautifulSoup approach first (more reliable in containers)
+        import requests
+        from bs4 import BeautifulSoup
+        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+        }
+        
+        response = requests.get(url, headers=headers, timeout=15)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Extract product info using common patterns
+        product_info = {
+            "title": None,
+            "price": None,
+            "description": None,
+            "image_url": None,
+            "vendor": None,
+            "sku": None,
+            "dimensions": None,
+            "material": None
+        }
+        
+        # Try multiple selectors for title
+        title_selectors = [
+            'h1[class*="product"]', 'h1[class*="title"]', 'h1[itemprop="name"]',
+            '[class*="product-title"]', '[class*="product-name"]', 'h1'
+        ]
+        for selector in title_selectors:
+            el = soup.select_one(selector)
+            if el and el.get_text(strip=True):
+                product_info["title"] = el.get_text(strip=True)
+                break
+        
+        # Try multiple selectors for price
+        price_selectors = [
+            '[class*="price"]', '[itemprop="price"]', '[data-price]',
+            '.price', '#price', '[class*="cost"]'
+        ]
+        for selector in price_selectors:
+            el = soup.select_one(selector)
+            if el:
+                price_text = el.get_text(strip=True)
+                # Extract numeric price
+                import re
+                price_match = re.search(r'\$?[\d,]+\.?\d*', price_text)
+                if price_match:
+                    product_info["price"] = price_match.group()
+                    break
+        
+        # Try multiple selectors for description
+        desc_selectors = [
+            '[class*="description"]', '[itemprop="description"]',
+            '[class*="product-detail"]', '.description', '#description'
+        ]
+        for selector in desc_selectors:
+            el = soup.select_one(selector)
+            if el and el.get_text(strip=True):
+                product_info["description"] = el.get_text(strip=True)[:500]
+                break
+        
+        # Try to find product image
+        img_selectors = [
+            '[class*="product"] img', '[class*="gallery"] img',
+            '[itemprop="image"]', 'img[class*="main"]', 'img[class*="product"]'
+        ]
+        for selector in img_selectors:
+            el = soup.select_one(selector)
+            if el and el.get('src'):
+                img_src = el.get('src')
+                if img_src.startswith('//'):
+                    img_src = 'https:' + img_src
+                elif img_src.startswith('/'):
+                    from urllib.parse import urlparse
+                    parsed = urlparse(url)
+                    img_src = f"{parsed.scheme}://{parsed.netloc}{img_src}"
+                product_info["image_url"] = img_src
+                break
+        
+        # Try to find SKU
+        sku_selectors = [
+            '[class*="sku"]', '[itemprop="sku"]', '[data-sku]',
+            '[class*="product-id"]', '[class*="item-number"]'
+        ]
+        for selector in sku_selectors:
+            el = soup.select_one(selector)
+            if el and el.get_text(strip=True):
+                product_info["sku"] = el.get_text(strip=True)
+                break
+        
+        # Extract vendor from domain
+        from urllib.parse import urlparse
+        domain = urlparse(url).netloc.replace('www.', '')
+        product_info["vendor"] = domain.split('.')[0].title()
+        
+        # Try meta tags for missing info
+        if not product_info["title"]:
+            og_title = soup.select_one('meta[property="og:title"]')
+            if og_title:
+                product_info["title"] = og_title.get('content')
+        
+        if not product_info["description"]:
+            og_desc = soup.select_one('meta[property="og:description"]')
+            if og_desc:
+                product_info["description"] = og_desc.get('content')
+        
+        if not product_info["image_url"]:
+            og_image = soup.select_one('meta[property="og:image"]')
+            if og_image:
+                product_info["image_url"] = og_image.get('content')
+        
+        print(f"✅ Scraped product: {product_info.get('title', 'Unknown')}")
         
         return {"success": True, "data": product_info}
+        
+    except requests.RequestException as e:
+        logging.error(f"❌ Request error scraping {url}: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Failed to fetch URL: {str(e)}")
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
         logging.error(f"❌ SCRAPE ERROR for {url}: {str(e)}\n{error_details}")
-        print(f"❌ SCRAPE ERROR DETAILS:\n{error_details}")
         raise HTTPException(status_code=400, detail=f"Failed to scrape URL: {str(e)}")
 
 # REMOVED HOUZZ FUNCTION: async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
