@@ -218,7 +218,7 @@ class BackendTester:
                 
                 # Verify it appears in master_materials
                 time.sleep(1)  # Give it a moment to sync
-                materials_response = requests.get(f"{BACKEND_URL}/master/materials")
+                materials_response = requests.get(f"{BACKEND_URL}/master/materials?limit=2000")
                 if materials_response.status_code == 200:
                     materials = materials_response.json()
                     found_material = any(m.get('name') == 'Test Material Backend' for m in materials)
