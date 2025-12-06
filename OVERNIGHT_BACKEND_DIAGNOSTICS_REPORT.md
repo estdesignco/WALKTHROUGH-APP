@@ -1,6 +1,6 @@
 # COMPREHENSIVE OVERNIGHT BACKEND DIAGNOSTICS - FINAL REPORT
 ## Test Date: 2025-10-28
-## Backend URL: https://design-hub-120.preview.emergentagent.com/api
+## Backend URL: https://decoresync.preview.emergentagent.com/api
 
 ---
 

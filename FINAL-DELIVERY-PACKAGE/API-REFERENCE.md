@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://design-hub-120.preview.emergentagent.com/api
+https://decoresync.preview.emergentagent.com/api
 ```
 
 ---

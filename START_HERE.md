@@ -9,7 +9,7 @@ I've completed **EVERYTHING** you asked for while you were offline! The mobile a
 ## 🚀 QUICK ACCESS
 
 ### Live App
-**https://design-hub-120.preview.emergentagent.com/mobile-app**
+**https://decoresync.preview.emergentagent.com/mobile-app**
 
 ### Key Documentation
 1. **`README_COMPLETE_FEATURES.md`** - Complete feature list & quick reference
@@ -67,7 +67,7 @@ I've completed **EVERYTHING** you asked for while you were offline! The mobile a
 3. Check integration guide for bonus features
 
 ### Option 3: START USING IT 🚀
-1. Go to: https://design-hub-120.preview.emergentagent.com/mobile-app
+1. Go to: https://decoresync.preview.emergentagent.com/mobile-app
 2. Select a project
 3. Start working!
 

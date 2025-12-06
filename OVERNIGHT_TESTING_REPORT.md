@@ -3,7 +3,7 @@
 
 **Testing Date**: December 2, 2024  
 **Testing Duration**: Comprehensive overnight testing session  
-**System URL**: https://design-hub-120.preview.emergentagent.com
+**System URL**: https://decoresync.preview.emergentagent.com
 
 ---
 

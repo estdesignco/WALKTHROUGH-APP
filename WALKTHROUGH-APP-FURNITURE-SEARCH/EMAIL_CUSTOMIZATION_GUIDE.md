@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://design-hub-120.preview.emergentagent.com/email-template.html
+https://decoresync.preview.emergentagent.com/email-template.html
 
 ---
 

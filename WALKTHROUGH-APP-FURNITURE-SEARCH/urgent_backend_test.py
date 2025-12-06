@@ -9,8 +9,8 @@ class UrgentAPITester:
     def __init__(self):
         # Test both URLs mentioned
         self.backend_urls = [
-            "https://design-hub-120.preview.emergentagent.com",  # From frontend .env
-            "https://design-hub-120.preview.emergentagent.com"  # User mentioned URL
+            "https://decoresync.preview.emergentagent.com",  # From frontend .env
+            "https://decoresync.preview.emergentagent.com"  # User mentioned URL
         ]
         self.working_url = None
         self.tests_run = 0
