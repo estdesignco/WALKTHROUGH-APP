@@ -1815,7 +1815,12 @@ const ExactChecklistSpreadsheet = ({
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
                                       className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
-                                      onBlur={(e) => console.log('Vendor/SKU updated:', e.target.textContent)}
+                                      onBlur={(e) => {
+                                        const newValue = e.target.textContent;
+                                        if (newValue !== item.vendor) {
+                                          handleUpdateItemField(item.id, 'vendor', newValue);
+                                        }
+                                      }}
                                     >
                                       {item.vendor ? `${item.vendor}${item.sku ? ` / ${item.sku}` : ''}` : item.sku || ''}
                                     </div>
@@ -1827,7 +1832,12 @@ const ExactChecklistSpreadsheet = ({
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
                                       className="w-full bg-transparent text-[#B49B7E] text-sm text-center outline-none"
-                                      onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
+                                      onBlur={(e) => {
+                                        const newValue = parseInt(e.target.textContent) || 0;
+                                        if (newValue !== item.quantity) {
+                                          handleUpdateItemField(item.id, 'quantity', newValue);
+                                        }
+                                      }}
                                     >
                                       {item.quantity || ''}
                                     </div>
@@ -1839,7 +1849,12 @@ const ExactChecklistSpreadsheet = ({
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
                                       className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
-                                      onBlur={(e) => console.log('Size updated:', e.target.textContent)}
+                                      onBlur={(e) => {
+                                        const newValue = e.target.textContent;
+                                        if (newValue !== item.size) {
+                                          handleUpdateItemField(item.id, 'size', newValue);
+                                        }
+                                      }}
                                     >
                                       {item.size || ''}
                                     </div>
@@ -1851,7 +1866,12 @@ const ExactChecklistSpreadsheet = ({
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
                                       className="w-full bg-transparent text-[#D4C5A9] text-sm outline-none"
-                                      onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
+                                      onBlur={(e) => {
+                                        const newValue = e.target.textContent;
+                                        if (newValue !== item.finish_color) {
+                                          handleUpdateItemField(item.id, 'finish_color', newValue);
+                                        }
+                                      }}
                                     >
                                       {item.finish_color || ''}
                                     </div>
