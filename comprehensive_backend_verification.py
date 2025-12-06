@@ -326,12 +326,13 @@ class BackendTester:
         
         calculator_tests = [
             ("wallpaper", {
+                "wallpaper_type": "double_roll",
                 "wall_width": 12,
                 "wall_height": 8,
                 "roll_width": 27,
                 "roll_length": 15,
                 "pattern_repeat": 24,
-                "price_per_roll": 89.99
+                "cost_per_unit": 89.99
             }),
             ("drapery", {
                 "window_width": 60,
@@ -350,7 +351,7 @@ class BackendTester:
                 "windows": 4,
                 "price_per_gallon": 65.00
             }),
-            ("tile", {
+            ("flooring", {  # Changed from "tile" to "flooring"
                 "room_length": 10,
                 "room_width": 8,
                 "tile_size": "12x12",
@@ -364,9 +365,9 @@ class BackendTester:
                 response = requests.post(f"{BACKEND_URL}/calculators/{calc_type}", json=test_data)
                 if response.status_code == 200:
                     result = response.json()
-                    self.log_result(f"Calculator: {calc_type}", True, f"Calculation successful: {result}")
+                    self.log_result(f"Calculator: {calc_type}", True, f"Calculation successful")
                 else:
-                    self.log_result(f"Calculator: {calc_type}", False, error=f"HTTP {response.status_code}")
+                    self.log_result(f"Calculator: {calc_type}", False, error=f"HTTP {response.status_code}: {response.text[:100]}")
             except Exception as e:
                 self.log_result(f"Calculator: {calc_type}", False, error=str(e))
     
