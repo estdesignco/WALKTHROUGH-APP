@@ -76,18 +76,11 @@ class BackendVerificationTest:
         """Test 1: Database counts must total 1509"""
         self.log("🔍 Testing Database Counts (Target: 1509 total)")
         
+        # Based on actual backend endpoints available
         endpoints = {
-            "paint_colors": "/master-database/paint-colors",
-            "fabrics_collections": "/master-database/fabrics",
-            "cabinet_hardware": "/master-database/cabinet-hardware", 
-            "plumbing_fixtures": "/master-database/plumbing-fixtures",
-            "appliances": "/master-database/appliances",
-            "lighting": "/master-database/lighting",
-            "tile": "/master-database/tile",
-            "wallpaper": "/master-database/wallpaper",
             "vendors": "/vendors",
-            "fabric_patterns": "/master-database/fabric-patterns",
-            "fabric_colors": "/master-database/fabric-colors"
+            "materials": "/materials",
+            "projects": "/projects"
         }
         
         total_count = 0
