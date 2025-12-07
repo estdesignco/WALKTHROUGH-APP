@@ -1865,15 +1865,18 @@ const ExactChecklistSpreadsheet = ({
                                               }
                                             }}
                                             onProductSelect={(product) => {
-                                              // Auto-fill all fields when product is selected
+                                              // Auto-fill all fields when product is selected using batch update
                                               console.log('🎯 Product selected from autocomplete:', product);
-                                              handleUpdateItemField(item.id, 'name', product.name);
-                                              handleUpdateItemField(item.id, 'vendor', product.vendor);
-                                              handleUpdateItemField(item.id, 'sku', product.sku);
-                                              handleUpdateItemField(item.id, 'cost', product.cost || product.price || 0);
+                                              const updates = {
+                                                name: product.name,
+                                                vendor: product.vendor,
+                                                sku: product.sku,
+                                                cost: product.cost || product.price || 0
+                                              };
                                               if (product.image_url) {
-                                                handleUpdateItemField(item.id, 'image_url', product.image_url);
+                                                updates.image_url = product.image_url;
                                               }
+                                              handleBatchUpdateItem(item.id, updates);
                                             }}
                                             placeholder="Type to search products..."
                                             className="text-[#B49B7E] text-sm"
