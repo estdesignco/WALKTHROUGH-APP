@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import BarcodeScannerModal from './BarcodeScannerModal';
 import CalculatorPopup from './CalculatorPopup';
 
@@ -7,7 +7,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
     name: '',
     quantity: 1,
     size: '',
-    status: '',          // ✅ CHANGED TO BLANK DEFAULT
+    status: '',
     vendor: '',
     sku: '',
     remarks: '',
@@ -20,9 +20,111 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
 
   const [isScraping, setIsScraping] = useState(false);
   const [scrapeError, setScrapeError] = useState('');
-  const [autoClipToHouzz, setAutoClipToHouzz] = useState(true); // Auto-clip to Houzz Pro by default
+  const [autoClipToHouzz, setAutoClipToHouzz] = useState(true);
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
+  
+  // Vendor autocomplete states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [vendors, setVendors] = useState([]);
+  const [selectedVendorFilter, setSelectedVendorFilter] = useState('');
+  const suggestionsRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
+
+  // Fetch vendor list on mount
+  useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+        const response = await fetch(`${backendUrl}/api/autocomplete/vendors`);
+        const data = await response.json();
+        if (data.success) {
+          setVendors(data.vendors);
+        }
+      } catch (error) {
+        console.error('Error fetching vendors:', error);
+      }
+    };
+    fetchVendors();
+  }, []);
+
+  // Search products with debounce
+  const searchProducts = useCallback(async (query) => {
+    if (!query || query.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      let url = `${backendUrl}/api/autocomplete/products?query=${encodeURIComponent(query)}&limit=10`;
+      if (selectedVendorFilter) {
+        url += `&vendor=${encodeURIComponent(selectedVendorFilter)}`;
+      }
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (data.success && data.products) {
+        setSuggestions(data.products);
+        setShowSuggestions(true);
+      }
+    } catch (error) {
+      console.error('Error searching products:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, [selectedVendorFilter]);
+
+  // Handle search input change with debounce
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    setFormData(prev => ({ ...prev, name: query }));
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Debounce search
+    searchTimeoutRef.current = setTimeout(() => {
+      searchProducts(query);
+    }, 300);
+  };
+
+  // Handle product selection from suggestions
+  const handleSelectProduct = (product) => {
+    setFormData({
+      ...formData,
+      name: product.name || '',
+      vendor: product.vendor || '',
+      sku: product.sku || '',
+      cost: product.cost || product.price || 0,
+      size: product.size || '',
+      finish_color: product.finish_color || product.color || '',
+      image_url: product.image_url || '',
+      link: product.link || product.product_url || ''
+    });
+    setSearchQuery(product.name);
+    setShowSuggestions(false);
+    setSuggestions([]);
+  };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleBarcodeResult = (productData) => {
     console.log('📷 Barcode scan result:', productData);
@@ -36,8 +138,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         sku: data.sku || data.upc || prev.sku,
         image_url: data.image_url || prev.image_url
       }));
-      
-      console.log('✅ Form populated from barcode scan');
+      setSearchQuery(data.name || '');
     }
     
     setShowBarcodeScanner(false);
@@ -53,74 +154,40 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
     setScrapeError('');
 
     try {
-      // Get backend URL - hardcoded to work properly
-      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-      
-      console.log('🔗 SCRAPING START - Backend URL:', backendUrl);
-      console.log('🔗 SCRAPING START - Target URL:', formData.link);
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       
       const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           url: formData.link,
           auto_clip_to_houzz: autoClipToHouzz 
         })
       });
       
-      console.log('🔗 SCRAPING RESPONSE STATUS:', response.status);
-      
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+        throw new Error(`HTTP ${response.status}`);
       }
       
       const responseData = await response.json();
-      console.log('🔗 SCRAPING SUCCESS - Data received:', responseData);
-      
-      // Extract the actual product data from the backend response structure
       const data = responseData.success ? responseData.data : responseData;
-      console.log('🔗 EXTRACTED PRODUCT DATA:', data);
       
-      // AGGRESSIVE FORM POPULATION - FORCE EVERY FIELD  
-      console.log('🔗 SCRAPING RESPONSE:', responseData);
-      console.log('🔗 EXTRACTED DATA:', data);
+      setFormData(prev => ({
+        ...prev,
+        name: data.name || prev.name,
+        vendor: data.vendor || prev.vendor, 
+        sku: data.sku || prev.sku,
+        cost: data.cost || data.price || prev.cost,
+        size: data.size || data.dimensions || prev.size,
+        image_url: data.image_url || data.image || prev.image_url,
+        finish_color: data.color || data.finish || prev.finish_color
+      }));
       
-      // DIRECTLY SET EACH FIELD TO FORCE REACT UPDATE
-      const newFormData = {
-        ...formData,
-        name: data.name || "Fenn Chair",
-        vendor: data.vendor || "Four Hands", 
-        sku: data.sku || "248067-003",
-        cost: data.cost ? (typeof data.cost === 'number' ? data.cost : parseFloat(data.cost.replace('$', '').replace(',', ''))) : data.price ? (typeof data.price === 'number' ? data.price : parseFloat(data.price.replace('$', '').replace(',', ''))) : formData.cost,
-        size: data.size || data.dimensions || formData.size,
-        image_url: data.image_url || data.image || data.main_image || formData.image_url,
-        finish_color: data.color || data.finish || data.finish_color || formData.finish_color
-      };
-      
-      console.log('🚀 FORCING COMPLETE FORM UPDATE:', newFormData);
-      setFormData(newFormData);
-      
-      // TRIPLE FORCE UPDATE with staggered timing
-      setTimeout(() => {
-        setFormData(prev => ({ ...prev, name: data.name || "Fenn Chair" }));
-      }, 100);
-      
-      setTimeout(() => {
-        setFormData(prev => ({ ...prev, vendor: data.vendor || "Four Hands" }));
-      }, 200);
-      
-      setTimeout(() => {
-        setFormData(prev => ({ ...prev, sku: data.sku || "248067-003" }));
-      }, 300);
-      
-      setScrapeError('');
+      if (data.name) setSearchQuery(data.name);
       
     } catch (error) {
-      console.error('🔗 SCRAPING ERROR:', error);
-      setScrapeError('SCRAPING FAILED: ' + error.message);
+      console.error('Scraping error:', error);
+      setScrapeError('Failed to scrape: ' + error.message);
     } finally {
       setIsScraping(false);
     }
@@ -150,14 +217,14 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
 
   const getStatusColor = (status) => {
     const colors = {
-      'PICKED': '#FFD966',     // Yellow
-      'ORDERED': '#3B82F6',    // Blue  
-      'SHIPPED': '#F97316',    // Orange
-      'DELIVERED': '#10B981',  // Green
-      'INSTALLED': '#22C55E',  // Bright Green
-      'PARTIALLY_DELIVERED': '#8B5CF6', // Purple
-      'ON_HOLD': '#EF4444',    // Red
-      'CANCELLED': '#6B7280'   // Gray
+      'PICKED': '#FFD966',
+      'ORDERED': '#3B82F6',
+      'SHIPPED': '#F97316',
+      'DELIVERED': '#10B981',
+      'INSTALLED': '#22C55E',
+      'PARTIALLY_DELIVERED': '#8B5CF6',
+      'ON_HOLD': '#EF4444',
+      'CANCELLED': '#6B7280'
     };
     return colors[status] || '#6B7280';
   };
@@ -182,20 +249,97 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
 
           {/* Content */}
           <div className="p-6 space-y-6">
-            {/* Item Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Item Name *
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                placeholder="e.g., Table Lamp, Sofa, Chandelier..."
-                required
-              />
+            
+            {/* VENDOR FILTER - NEW */}
+            <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 p-4 rounded-lg border border-blue-500/30">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-blue-400">🔍</span>
+                <span className="text-sm font-medium text-blue-300">Search from {suggestions.length > 0 ? `${suggestions.length}+` : '15,000+'} vendor products</span>
+              </div>
+              
+              {/* Vendor Filter Dropdown */}
+              <div className="mb-3">
+                <select
+                  value={selectedVendorFilter}
+                  onChange={(e) => setSelectedVendorFilter(e.target.value)}
+                  className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none text-sm"
+                >
+                  <option value="">All Vendors</option>
+                  {vendors.map(vendor => (
+                    <option key={vendor} value={vendor}>{vendor}</option>
+                  ))}
+                </select>
+              </div>
             </div>
+
+            {/* Item Name with Autocomplete */}
+            <div className="relative" ref={suggestionsRef}>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Item Name * <span className="text-blue-400 text-xs">(Type to search vendor products)</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  placeholder="Start typing to search... (e.g., 'chair', 'sofa', 'mirror')"
+                  required
+                />
+                {isSearching && (
+                  <div className="absolute right-3 top-3">
+                    <div className="animate-spin h-5 w-5 border-2 border-blue-500 rounded-full border-t-transparent"></div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl max-h-80 overflow-y-auto">
+                  {suggestions.map((product, index) => (
+                    <div
+                      key={`${product.sku}-${index}`}
+                      onClick={() => handleSelectProduct(product)}
+                      className="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-700 last:border-b-0"
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Product Image Placeholder */}
+                        <div className="w-12 h-12 bg-gray-600 rounded flex-shrink-0 flex items-center justify-center">
+                          {product.image_url ? (
+                            <img src={product.image_url} alt="" className="w-full h-full object-cover rounded" />
+                          ) : (
+                            <span className="text-gray-400 text-xs">📦</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-white font-medium truncate">{product.name}</div>
+                          <div className="text-sm text-gray-400">
+                            <span className="text-blue-400">{product.vendor}</span>
+                            <span className="mx-2">•</span>
+                            <span>SKU: {product.sku}</span>
+                          </div>
+                          <div className="text-sm text-green-400 font-medium">
+                            ${(product.price || product.cost || 0).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Selected Product Preview */}
+            {formData.sku && (
+              <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3">
+                <div className="flex items-center gap-2 text-green-400 text-sm">
+                  <span>✓</span>
+                  <span>Selected: {formData.name}</span>
+                  <span className="text-gray-400">({formData.vendor} - {formData.sku})</span>
+                </div>
+              </div>
+            )}
 
             {/* Quantity, Size, and Finish/Color */}
             <div className="grid grid-cols-3 gap-4">
@@ -256,22 +400,21 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
                 ))}
               </select>
               
-              {/* Status Preview */}
-              <div className="mt-2 flex items-center space-x-2">
-                <div 
-                  className="w-4 h-4 rounded"
-                  style={{ backgroundColor: getStatusColor(formData.status) }}
-                ></div>
-                <span className="text-sm text-gray-400">
-                  Status color: {getStatusColor(formData.status)}
-                </span>
-              </div>
+              {formData.status && (
+                <div className="mt-2 flex items-center space-x-2">
+                  <div 
+                    className="w-4 h-4 rounded"
+                    style={{ backgroundColor: getStatusColor(formData.status) }}
+                  ></div>
+                  <span className="text-sm text-gray-400">Status color</span>
+                </div>
+              )}
             </div>
 
-            {/* Vendor - CHANGED TO TEXT INPUT TO ACCEPT SCRAPED VALUES */}
+            {/* Vendor */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Vendor (Optional)
+                Vendor
               </label>
               <input
                 type="text"
@@ -282,10 +425,10 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
               />
             </div>
 
-            {/* ✅ SKU FIELD ADDED AS REQUESTED */}
+            {/* SKU */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                SKU / Model Number (Optional)
+                SKU / Model Number
               </label>
               <input
                 type="text"
@@ -300,7 +443,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Cost (Optional)
+                  Cost
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -316,7 +459,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
                     type="button"
                     onClick={() => setShowCalculator(true)}
                     className="bg-[#8B7355] hover:bg-[#9B8365] text-white px-4 py-3 rounded-lg transition-colors font-medium whitespace-nowrap"
-                    title="Use calculator to calculate cost, size, and quantity"
+                    title="Use calculator"
                   >
                     🧮 Calc
                   </button>
@@ -333,14 +476,14 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
                       value={formData.link}
                       onChange={(e) => setFormData({ ...formData, link: e.target.value })}
                       className="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                      placeholder="https://homedepot.com/product-link..."
+                      placeholder="https://..."
                     />
                     <button
                       type="button"
                       onClick={handleLinkScraping}
                       disabled={isScraping || !formData.link}
                       className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg transition-colors font-medium"
-                      title="Auto-fill product information from link"
+                      title="Auto-fill from link"
                     >
                       {isScraping ? '🔍...' : '🔍 Fill'}
                     </button>
@@ -349,32 +492,28 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
                       type="button"
                       onClick={() => setShowBarcodeScanner(true)}
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors font-medium"
-                      title="Scan product barcode"
+                      title="Scan barcode"
                     >
-                      📷 Scan
+                      📷
                     </button>
                   </div>
                   
-                  {/* Houzz Pro Auto-Clip Toggle */}
+                  {/* Houzz Pro Toggle */}
                   <div className="flex items-center space-x-3 bg-gray-800 p-3 rounded-lg">
                     <input
                       type="checkbox"
                       id="auto-clip-houzz"
                       checked={autoClipToHouzz}
                       onChange={(e) => setAutoClipToHouzz(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded"
                     />
                     <label htmlFor="auto-clip-houzz" className="flex items-center space-x-2 text-sm text-gray-300 cursor-pointer">
                       <span>🏠 Auto-clip to Houzz Pro</span>
-                      <span className="text-xs text-gray-400">(Recommended)</span>
                     </label>
                   </div>
                 </div>
                 {scrapeError && (
                   <p className="text-red-400 text-sm mt-2">{scrapeError}</p>
-                )}
-                {isScraping && (
-                  <p className="text-blue-400 text-sm mt-2">🔍 Scraping product information...</p>
                 )}
               </div>
             </div>
@@ -389,7 +528,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
                 onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
                 className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none resize-none"
                 rows="3"
-                placeholder="Add any special notes, installation requirements, or other details..."
+                placeholder="Add any special notes..."
               />
             </div>
 
@@ -397,7 +536,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
             {(formData.status === 'SHIPPED' || formData.status === 'DELIVERED') && (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Tracking Number (Optional)
+                  Tracking Number
                 </label>
                 <input
                   type="text"
