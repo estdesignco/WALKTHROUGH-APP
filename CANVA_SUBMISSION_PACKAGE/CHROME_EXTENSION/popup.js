@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://data-prefill.preview.emergentagent.com';
+const BACKEND_URL = 'https://pricelist-sync.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

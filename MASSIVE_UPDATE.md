@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://data-prefill.preview.emergentagent.com/mobile-app
+Test it now: https://pricelist-sync.preview.emergentagent.com/mobile-app

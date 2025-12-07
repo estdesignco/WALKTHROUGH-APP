@@ -12,7 +12,7 @@ I successfully completed **Phases 4, 5, and 6** without touching your existing a
 
 **File:** `/app/frontend/public/INTERIOR-DESIGN-HUB-V3-COMPLETE.zip`
 
-**Download URL:** `https://data-prefill.preview.emergentagent.com/INTERIOR-DESIGN-HUB-V3-COMPLETE.zip`
+**Download URL:** `https://pricelist-sync.preview.emergentagent.com/INTERIOR-DESIGN-HUB-V3-COMPLETE.zip`
 
 This ONE file contains EVERYTHING:
 - Chrome Extension (Phase 1)
@@ -386,17 +386,17 @@ useEffect(() => {
 
 **Download Everything:**
 ```
-https://data-prefill.preview.emergentagent.com/INTERIOR-DESIGN-HUB-V3-COMPLETE.zip
+https://pricelist-sync.preview.emergentagent.com/INTERIOR-DESIGN-HUB-V3-COMPLETE.zip
 ```
 
 **View Keyboard Shortcuts:**
 ```
-https://data-prefill.preview.emergentagent.com/keyboard-shortcuts.html
+https://pricelist-sync.preview.emergentagent.com/keyboard-shortcuts.html
 ```
 
 **View Scanner Guide:**
 ```
-https://data-prefill.preview.emergentagent.com/canva-scanner-guide.html
+https://pricelist-sync.preview.emergentagent.com/canva-scanner-guide.html
 ```
 
 ---

@@ -290,7 +290,7 @@ async def main():
     
     print("="*80)
     print(f"🎉 TEST COMPLETE!")
-    print(f"🔗 View: https://data-prefill.preview.emergentagent.com/furniture-search")
+    print(f"🔗 View: https://pricelist-sync.preview.emergentagent.com/furniture-search")
     print("="*80 + "\n")
     
     client.close()

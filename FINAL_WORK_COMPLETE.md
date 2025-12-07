@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://data-prefill.preview.emergentagent.com
+https://pricelist-sync.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://data-prefill.preview.emergentagent.com/mobile-app
+https://pricelist-sync.preview.emergentagent.com/mobile-app
 
 ---
 

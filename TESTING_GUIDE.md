@@ -6,7 +6,7 @@
 
 ## 📱 ACCESS THE APP
 
-**Live URL:** https://data-prefill.preview.emergentagent.com/mobile-app
+**Live URL:** https://pricelist-sync.preview.emergentagent.com/mobile-app
 
 ---
 
@@ -483,7 +483,7 @@ After testing, grade each area:
 
 ## 🚀 READY TO TEST!
 
-**Start here:** https://data-prefill.preview.emergentagent.com/mobile-app
+**Start here:** https://pricelist-sync.preview.emergentagent.com/mobile-app
 
 **Estimated time:** 30-60 minutes for full testing
 

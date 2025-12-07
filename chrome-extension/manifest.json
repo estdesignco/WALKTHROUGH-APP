@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://data-prefill.preview.emergentagent.com/*"
+    "https://pricelist-sync.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

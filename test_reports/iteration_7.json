@@ -15,7 +15,7 @@
         "affected_routes": ["/mobile-app"],
         "fix_priority": "CRITICAL",
         "workaround": "Manual JavaScript navigation (window.history.pushState + popstate event or window.location.href) successfully loads the mobile app",
-        "evidence": "When navigating to https://data-prefill.preview.emergentagent.com/mobile-app, the URL changes to https://data-prefill.preview.emergentagent.com/ and shows desktop homepage instead of mobile app"
+        "evidence": "When navigating to https://pricelist-sync.preview.emergentagent.com/mobile-app, the URL changes to https://pricelist-sync.preview.emergentagent.com/ and shows desktop homepage instead of mobile app"
       }
     ],
     "design_issues": []

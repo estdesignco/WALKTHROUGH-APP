@@ -132,5 +132,5 @@ for i in range(5):
     time.sleep(3)
 
 print(f"\n🎉 Done! {success}/5 succeeded")
-print(f"Check: https://data-prefill.preview.emergentagent.com/furniture-search\n")
+print(f"Check: https://pricelist-sync.preview.emergentagent.com/furniture-search\n")
 client.close()
