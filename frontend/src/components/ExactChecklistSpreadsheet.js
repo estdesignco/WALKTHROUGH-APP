@@ -391,6 +391,44 @@ const ExactChecklistSpreadsheet = ({
     }
   };
 
+  // Handle batch update of multiple item fields at once (avoids race conditions)
+  const handleBatchUpdateItem = async (itemId, updates) => {
+    console.log('🔄 Batch updating item fields:', { itemId, updates });
+    
+    try {
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+      
+      if (response.ok) {
+        console.log('✅ Item batch updated successfully:', updates);
+        
+        // Update local state with all fields at once
+        const updatedProject = JSON.parse(JSON.stringify(filteredProject));
+        updatedProject.rooms?.forEach(room => {
+          room.categories?.forEach(category => {
+            category.subcategories?.forEach(subcategory => {
+              subcategory.items?.forEach(item => {
+                if (item.id === itemId) {
+                  Object.assign(item, updates);
+                }
+              });
+            });
+          });
+        });
+        setFilteredProject(updatedProject);
+      } else {
+        console.error('❌ Failed to batch update item:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error batch updating item:', error);
+    }
+  };
+
   // Handle status change with improved error handling
   const handleStatusChange = async (itemId, newStatus) => {
     console.log('🔄 Checklist status change request:', { itemId, newStatus });
