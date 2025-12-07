@@ -1876,6 +1876,13 @@ const ExactChecklistSpreadsheet = ({
                                               if (product.image_url) {
                                                 updates.image_url = product.image_url;
                                               }
+                                              // Also save dimensions (size) and product link if available
+                                              if (product.dimensions) {
+                                                updates.size = product.dimensions;
+                                              }
+                                              if (product.product_link) {
+                                                updates.product_link = product.product_link;
+                                              }
                                               handleBatchUpdateItem(item.id, updates);
                                             }}
                                             placeholder="Type to search products..."
