@@ -135,9 +135,9 @@ const InlineProductAutocomplete = ({
             >
               <div className="flex items-center gap-2">
                 {product.image_url ? (
-                  <img src={product.image_url} alt="" className="w-8 h-8 object-cover rounded" />
+                  <img src={product.image_url} alt="" className="w-10 h-10 object-cover rounded" />
                 ) : (
-                  <div className="w-8 h-8 bg-gray-600 rounded flex items-center justify-center text-xs">📦</div>
+                  <div className="w-10 h-10 bg-gray-600 rounded flex items-center justify-center text-xs">📦</div>
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="text-white text-sm truncate">{product.name}</div>
@@ -146,8 +146,20 @@ const InlineProductAutocomplete = ({
                     <span className="mx-1">•</span>
                     <span>{product.sku}</span>
                     <span className="mx-1">•</span>
-                    <span className="text-green-400">${(product.cost || product.price || 0).toLocaleString()}</span>
+                    <span className="text-green-400 font-medium">${(product.cost || product.price || 0).toLocaleString()}</span>
                   </div>
+                  {/* Show dimensions and link if available */}
+                  {(product.dimensions || product.product_link) && (
+                    <div className="text-xs text-gray-500 mt-0.5">
+                      {product.dimensions && (
+                        <span className="text-yellow-400">📐 {product.dimensions}</span>
+                      )}
+                      {product.dimensions && product.product_link && <span className="mx-1">•</span>}
+                      {product.product_link && (
+                        <span className="text-purple-400">🔗 Link available</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
