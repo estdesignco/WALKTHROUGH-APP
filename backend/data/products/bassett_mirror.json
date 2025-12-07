@@ -1,1 +1,67 @@
-[{"sku": "LUMA", "vendor": "Bassett Mirror", "category": "Mirrors & Decor", "cost": 17.0, "created_at": "2025-12-07T19:23:08.574934+00:00", "id": "38da04b4-e2fc-49ee-adcb-616ac254acdf", "image_url": "", "name": "FIBER DOWN ALTERNATIVE, 100% LUMA SUSTAINABLE FIBER Add'l", "price": 34.0, "updated_at": "2025-12-07T19:23:08.574945+00:00", "vendor_code": "BASSETTMIRROR"}, {"sku": "DOWN", "vendor": "Bassett Mirror", "category": "Mirrors & Decor", "cost": 8.5, "created_at": "2025-12-07T19:23:08.574955+00:00", "id": "209b6636-9d12-4112-a9bc-36e6bcb93cf5", "image_url": "", "name": "PLUS SINGLE(CLOUD PLUS) 95% FEATHER / 5% DOWN Add'l", "price": 17.0, "updated_at": "2025-12-07T19:23:08.574957+00:00", "vendor_code": "BASSETTMIRROR"}, {"sku": "FLANGE", "vendor": "Bassett Mirror", "category": "Mirrors & Decor", "cost": 17.0, "created_at": "2025-12-07T19:23:08.574963+00:00", "id": "15a8e270-29ae-4533-8f6b-b480d22ee467", "image_url": "", "name": "Add'l", "price": 34.0, "updated_at": "2025-12-07T19:23:08.574964+00:00", "vendor_code": "BASSETTMIRROR"}, {"sku": "SELF", "vendor": "Bassett Mirror", "category": "Mirrors & Decor", "cost": 8.5, "created_at": "2025-12-07T19:23:08.574970+00:00", "id": "a9f5f830-238d-40d9-b605-1bb39195971a", "image_url": "", "name": "WELT Add'l", "price": 17.0, "updated_at": "2025-12-07T19:23:08.574971+00:00", "vendor_code": "BASSETTMIRROR"}, {"sku": "CONTRAST", "vendor": "Bassett Mirror", "category": "Mirrors & Decor", "cost": 21.25, "created_at": "2025-12-07T19:23:08.574980+00:00", "id": "bb8e8a0a-51a2-4d15-9066-18e9ea83bef1", "image_url": "", "name": "WELT SINGLE Add'l", "price": 42.5, "updated_at": "2025-12-07T19:23:08.574981+00:00", "vendor_code": "BASSETTMIRROR"}]
+[
+  {
+    "sku": "LUMA",
+    "vendor": "Bassett Mirror",
+    "category": "Mirrors & Decor",
+    "cost": 17.0,
+    "created_at": "2025-12-07T19:23:08.574934+00:00",
+    "id": "38da04b4-e2fc-49ee-adcb-616ac254acdf",
+    "image_url": "",
+    "name": "FIBER DOWN ALTERNATIVE, 100% LUMA SUSTAINABLE FIBER Add'l",
+    "price": 34.0,
+    "updated_at": "2025-12-07T19:23:08.574945+00:00",
+    "vendor_code": "BASSETTMIRROR"
+  },
+  {
+    "sku": "DOWN",
+    "vendor": "Bassett Mirror",
+    "category": "Mirrors & Decor",
+    "cost": 8.5,
+    "created_at": "2025-12-07T19:23:08.574955+00:00",
+    "id": "209b6636-9d12-4112-a9bc-36e6bcb93cf5",
+    "image_url": "",
+    "name": "PLUS SINGLE(CLOUD PLUS) 95% FEATHER / 5% DOWN Add'l",
+    "price": 17.0,
+    "updated_at": "2025-12-07T19:23:08.574957+00:00",
+    "vendor_code": "BASSETTMIRROR"
+  },
+  {
+    "sku": "FLANGE",
+    "vendor": "Bassett Mirror",
+    "category": "Mirrors & Decor",
+    "cost": 17.0,
+    "created_at": "2025-12-07T19:23:08.574963+00:00",
+    "id": "15a8e270-29ae-4533-8f6b-b480d22ee467",
+    "image_url": "",
+    "name": "Add'l",
+    "price": 34.0,
+    "updated_at": "2025-12-07T19:23:08.574964+00:00",
+    "vendor_code": "BASSETTMIRROR"
+  },
+  {
+    "sku": "SELF",
+    "vendor": "Bassett Mirror",
+    "category": "Mirrors & Decor",
+    "cost": 8.5,
+    "created_at": "2025-12-07T19:23:08.574970+00:00",
+    "id": "a9f5f830-238d-40d9-b605-1bb39195971a",
+    "image_url": "",
+    "name": "WELT Add'l",
+    "price": 17.0,
+    "updated_at": "2025-12-07T19:23:08.574971+00:00",
+    "vendor_code": "BASSETTMIRROR"
+  },
+  {
+    "sku": "CONTRAST",
+    "vendor": "Bassett Mirror",
+    "category": "Mirrors & Decor",
+    "cost": 21.25,
+    "created_at": "2025-12-07T19:23:08.574980+00:00",
+    "id": "bb8e8a0a-51a2-4d15-9066-18e9ea83bef1",
+    "image_url": "",
+    "name": "WELT SINGLE Add'l",
+    "price": 42.5,
+    "updated_at": "2025-12-07T19:23:08.574981+00:00",
+    "vendor_code": "BASSETTMIRROR"
+  }
+]
