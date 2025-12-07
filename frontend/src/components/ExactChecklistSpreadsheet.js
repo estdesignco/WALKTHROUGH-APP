@@ -2076,13 +2076,18 @@ const ExactChecklistSpreadsheet = ({
                             <option value="ADD_NEW">+ ADD NEW CATEGORY</option>
                           </select>
                           <button 
-                            onClick={() => {
-                              if (category.subcategories?.length > 0) {
-                                setSelectedSubCategoryId(category.subcategories[0].id);
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              console.log('🎯 ADD ITEM clicked for category:', category?.name);
+                              console.log('🎯 Subcategories:', category?.subcategories);
+                              if (category?.subcategories?.length > 0) {
+                                const subId = category.subcategories[0].id;
+                                console.log('🎯 Setting subcategory ID:', subId);
+                                setSelectedSubCategoryId(subId);
                                 setShowAddItem(true);
-                                console.log('🎯 Selected subcategory for checklist item:', category.subcategories[0].id);
                               } else {
-                                alert('This category has no subcategories. Please contact support.');
+                                alert('This category has no subcategories. Please add a subcategory first or contact support.');
                               }
                             }}
                             className="bg-blue-600 hover:bg-blue-500 text-[#D4C5A9] px-4 py-2 rounded text-sm"
