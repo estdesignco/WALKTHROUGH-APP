@@ -1,6 +1,6 @@
 # COMPREHENSIVE OVERNIGHT BACKEND DIAGNOSTICS - FINAL REPORT
 ## Test Date: 2025-10-28
-## Backend URL: https://pricelist-sync.preview.emergentagent.com/api
+## Backend URL: https://pricelistmaster.preview.emergentagent.com/api
 
 ---
 

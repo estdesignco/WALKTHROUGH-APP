@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://pricelist-sync.preview.emergentagent.com
-API_URL=https://pricelist-sync.preview.emergentagent.com/api
+BACKEND_URL=https://pricelistmaster.preview.emergentagent.com
+API_URL=https://pricelistmaster.preview.emergentagent.com/api
 ```
 
 ### App Configuration

@@ -1,5 +1,5 @@
 // Runtime configuration - injected at deployment
 window.ENV = {
-  REACT_APP_BACKEND_URL: 'https://pricelist-sync.preview.emergentagent.com'
+  REACT_APP_BACKEND_URL: 'https://pricelistmaster.preview.emergentagent.com'
 };
 console.log('✅ Runtime config loaded:', window.ENV);

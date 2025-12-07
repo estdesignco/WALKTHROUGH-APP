@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://pricelist-sync.preview.emergentagent.com/api
+https://pricelistmaster.preview.emergentagent.com/api
 ```
 
 ---

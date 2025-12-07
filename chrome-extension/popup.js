@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://pricelist-sync.preview.emergentagent.com';
+const BACKEND_URL = 'https://pricelistmaster.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

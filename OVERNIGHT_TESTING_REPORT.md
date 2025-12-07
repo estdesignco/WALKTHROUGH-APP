@@ -3,7 +3,7 @@
 
 **Testing Date**: December 2, 2024  
 **Testing Duration**: Comprehensive overnight testing session  
-**System URL**: https://pricelist-sync.preview.emergentagent.com
+**System URL**: https://pricelistmaster.preview.emergentagent.com
 
 ---
 
