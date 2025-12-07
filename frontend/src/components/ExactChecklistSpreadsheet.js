@@ -1817,16 +1817,29 @@ const ExactChecklistSpreadsheet = ({
                                             }}
                                           />
                                         </td>
-                                        {/* ITEM - EDITABLE */}
+                                        {/* ITEM - EDITABLE WITH AUTOCOMPLETE */}
                                         <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
-                                          <div 
-                                            contentEditable={true}
-                                            suppressContentEditableWarning={true}
-                                            className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
-                                            onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
-                                          >
-                                            {item.name}
-                                          </div>
+                                          <InlineProductAutocomplete
+                                            value={item.name}
+                                            onChange={(newName) => {
+                                              if (newName !== item.name) {
+                                                handleUpdateItemField(item.id, 'name', newName);
+                                              }
+                                            }}
+                                            onProductSelect={(product) => {
+                                              // Auto-fill all fields when product is selected
+                                              console.log('🎯 Product selected from autocomplete:', product);
+                                              handleUpdateItemField(item.id, 'name', product.name);
+                                              handleUpdateItemField(item.id, 'vendor', product.vendor);
+                                              handleUpdateItemField(item.id, 'sku', product.sku);
+                                              handleUpdateItemField(item.id, 'cost', product.cost || product.price || 0);
+                                              if (product.image_url) {
+                                                handleUpdateItemField(item.id, 'image_url', product.image_url);
+                                              }
+                                            }}
+                                            placeholder="Type to search products..."
+                                            className="text-[#B49B7E] text-sm"
+                                          />
                                         </td>
                                   
                                   {/* VENDOR/SKU - EDITABLE */}
