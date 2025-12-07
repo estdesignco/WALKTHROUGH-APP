@@ -71,6 +71,14 @@ async def startup_event():
         await ensure_test_projects_exist()
     except Exception as e:
         logger.error(f"Error in startup auto-population: {e}")
+    
+    # Seed vendor products from JSON files
+    try:
+        from database_seeder import run_seeder
+        product_count = await run_seeder()
+        logger.info(f"Vendor products seeded: {product_count} products available")
+    except Exception as e:
+        logger.error(f"Error seeding vendor products: {e}")
 
 # CORS Configuration
 CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*').split(',')
