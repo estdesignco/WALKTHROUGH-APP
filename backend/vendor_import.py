@@ -26,7 +26,8 @@ VENDOR_IMAGE_PATTERNS = {
 async def get_db():
     """Get MongoDB database connection"""
     client = AsyncIOMotorClient(MONGO_URL)
-    return client.decor_sync
+    db_name = os.environ.get('DB_NAME', 'interior_design_db')
+    return client[db_name]
 
 async def fetch_image_url(session, vendor, sku, product_name):
     """Try to construct or fetch image URL for a product"""
