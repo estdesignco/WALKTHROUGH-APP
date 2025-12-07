@@ -2616,6 +2616,104 @@ async def delete_item(item_id: str):
     return {"message": "Item deleted successfully"}
 
 # ==========================================
+# PRODUCT AUTOCOMPLETE FROM VENDOR DATA
+# ==========================================
+
+@api_router.get("/autocomplete/products")
+async def autocomplete_products(
+    query: str = Query("", min_length=0, description="Search query"),
+    vendor: Optional[str] = Query(None, description="Filter by vendor"),
+    category: Optional[str] = Query(None, description="Filter by category"),
+    limit: int = Query(20, ge=1, le=100, description="Max results to return")
+):
+    """
+    Search vendor products for autocomplete in the Add Item workflow.
+    Returns matching products from the master_products collection.
+    """
+    try:
+        # Build search filter
+        search_filter = {}
+        
+        if query:
+            # Search in name, sku, and description
+            search_filter["$or"] = [
+                {"name": {"$regex": query, "$options": "i"}},
+                {"sku": {"$regex": query, "$options": "i"}},
+                {"collection": {"$regex": query, "$options": "i"}}
+            ]
+        
+        if vendor:
+            search_filter["vendor"] = {"$regex": vendor, "$options": "i"}
+        
+        if category:
+            search_filter["category"] = {"$regex": category, "$options": "i"}
+        
+        # Get products
+        cursor = db.master_products.find(
+            search_filter,
+            {"_id": 0}  # Exclude MongoDB _id
+        ).limit(limit)
+        
+        products = await cursor.to_list(limit)
+        
+        return {
+            "success": True,
+            "query": query,
+            "count": len(products),
+            "products": products
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in product autocomplete: {e}")
+        return {
+            "success": False,
+            "error": str(e),
+            "products": []
+        }
+
+@api_router.get("/autocomplete/vendors")
+async def get_vendor_list():
+    """Get list of all available vendors"""
+    try:
+        vendors = await db.master_products.distinct("vendor")
+        return {
+            "success": True,
+            "vendors": vendors
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e), "vendors": []}
+
+@api_router.get("/autocomplete/categories")
+async def get_category_list(vendor: Optional[str] = None):
+    """Get list of all product categories, optionally filtered by vendor"""
+    try:
+        filter_query = {"vendor": vendor} if vendor else {}
+        categories = await db.master_products.distinct("category", filter_query)
+        return {
+            "success": True,
+            "categories": [c for c in categories if c]  # Filter out empty categories
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e), "categories": []}
+
+@api_router.get("/autocomplete/product/{sku}")
+async def get_product_by_sku(sku: str, vendor: Optional[str] = None):
+    """Get full product details by SKU"""
+    try:
+        filter_query = {"sku": sku}
+        if vendor:
+            filter_query["vendor"] = vendor
+        
+        product = await db.master_products.find_one(filter_query, {"_id": 0})
+        
+        if product:
+            return {"success": True, "product": product}
+        else:
+            return {"success": False, "error": "Product not found"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+# ==========================================
 # BIDIRECTIONAL SYNC ENDPOINTS (Phase 2)
 # ==========================================
 
