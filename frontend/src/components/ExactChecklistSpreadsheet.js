@@ -1272,6 +1272,25 @@ const ExactChecklistSpreadsheet = ({
                     <span>{room.name.toUpperCase()}</span>
                   </div>
                   <div className="flex items-center gap-2">
+                    {/* ADD ITEM BUTTON - TOP LEVEL */}
+                    <button
+                      onClick={() => {
+                        console.log('🎯 TOP LEVEL ADD ITEM clicked for room:', room.name);
+                        // Find first category with subcategories
+                        const firstCategory = room.categories?.find(cat => cat.subcategories?.length > 0);
+                        if (firstCategory) {
+                          setSelectedSubCategoryId(firstCategory.subcategories[0].id);
+                          setShowAddItem(true);
+                          console.log('🎯 Opening AddItemModal with subcategory:', firstCategory.subcategories[0].id);
+                        } else {
+                          alert('Please add a category with items first!');
+                        }
+                      }}
+                      className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded transition-colors font-bold"
+                      title="Add new item to checklist"
+                    >
+                      ➕ ADD ITEM
+                    </button>
                     {/* CONNECT TO CANVA BUTTON */}
                     <button
                       onClick={() => {
