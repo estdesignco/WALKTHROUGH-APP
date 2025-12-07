@@ -80,18 +80,27 @@ def process_four_hands_excel(filepath):
     
     for sheet_name in wb.sheetnames:
         ws = wb[sheet_name]
-        headers = None
         
         for row_num, row in enumerate(ws.iter_rows(values_only=True), 1):
             if row_num == 1:
-                # Header row
-                headers = [str(h).lower().strip() if h else f'col{i}' for i, h in enumerate(row)]
+                # Skip header row
                 continue
             
-            if not row[0]:  # Skip empty rows
+            if not row or not row[0]:  # Skip empty rows
                 continue
                 
             try:
+                # Parse cost - handle both numbers and strings
+                cost_val = row[7] if len(row) > 7 else 0
+                if cost_val is None:
+                    cost_val = 0.0
+                elif isinstance(cost_val, str):
+                    # Remove any non-numeric characters except decimal point
+                    cost_val = ''.join(c for c in cost_val if c.isdigit() or c == '.')
+                    cost_val = float(cost_val) if cost_val else 0.0
+                else:
+                    cost_val = float(cost_val)
+                
                 product = {
                     'id': str(uuid4()),
                     'vendor': 'Four Hands',
@@ -103,8 +112,8 @@ def process_four_hands_excel(filepath):
                     'collection': str(row[4]).strip() if len(row) > 4 and row[4] else '',
                     'suite': str(row[5]).strip() if len(row) > 5 and row[5] else '',
                     'status': str(row[6]).strip() if len(row) > 6 and row[6] else '',
-                    'cost': float(row[7]) if len(row) > 7 and row[7] else 0.0,
-                    'price': float(row[7]) if len(row) > 7 and row[7] else 0.0,  # Using cost as price
+                    'cost': cost_val,
+                    'price': cost_val * 2.0,  # Markup for retail price
                     'image_url': '',
                     'source_sheet': sheet_name,
                     'created_at': datetime.now(timezone.utc).isoformat(),
@@ -115,7 +124,7 @@ def process_four_hands_excel(filepath):
                     products.append(product)
                     
             except Exception as e:
-                print(f"  Error processing row {row_num}: {e}")
+                # Silently skip problematic rows
                 continue
     
     wb.close()
