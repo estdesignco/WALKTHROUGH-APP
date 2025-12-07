@@ -1842,20 +1842,25 @@ const ExactChecklistSpreadsheet = ({
                                           />
                                         </td>
                                   
-                                  {/* VENDOR/SKU - EDITABLE */}
+                                  {/* VENDOR/SKU - EDITABLE WITH DROPDOWN */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
-                                    <div 
-                                      contentEditable={true}
-                                      suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
-                                      onBlur={(e) => {
-                                        const newValue = e.target.textContent;
-                                        if (newValue !== item.vendor) {
-                                          handleUpdateItemField(item.id, 'vendor', newValue);
-                                        }
-                                      }}
-                                    >
-                                      {item.vendor ? `${item.vendor}${item.sku ? ` / ${item.sku}` : ''}` : item.sku || ''}
+                                    <div className="flex flex-col gap-1">
+                                      <VendorDropdown
+                                        value={item.vendor || ''}
+                                        onChange={(newVendor) => {
+                                          if (newVendor !== item.vendor) {
+                                            handleUpdateItemField(item.id, 'vendor', newVendor);
+                                          }
+                                        }}
+                                        className="text-[#B49B7E] text-sm"
+                                      />
+                                      <input
+                                        type="text"
+                                        value={item.sku || ''}
+                                        onChange={(e) => handleUpdateItemField(item.id, 'sku', e.target.value)}
+                                        placeholder="SKU..."
+                                        className="w-full bg-transparent text-[#B49B7E] text-xs outline-none border-t border-gray-600 pt-1"
+                                      />
                                     </div>
                                   </td>
                                   
