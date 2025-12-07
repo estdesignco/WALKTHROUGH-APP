@@ -2120,7 +2120,7 @@ const ExactChecklistSpreadsheet = ({
       </div> {/* END DARK NAVY SPREADSHEET CONTAINER */}
 
       {/* Add Item Modal - FIXED */}
-      {showAddItem && selectedSubCategoryId && (
+      {showAddItem && (
         <AddItemModal
           onClose={() => {
             setShowAddItem(false);
@@ -2129,6 +2129,8 @@ const ExactChecklistSpreadsheet = ({
           onSubmit={handleAddItem}
           availableVendors={vendorTypes}
           availableStatuses={itemStatuses}
+          itemStatuses={itemStatuses}
+          vendorTypes={vendorTypes}
         />
       )}
 
