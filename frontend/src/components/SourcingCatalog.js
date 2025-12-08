@@ -325,7 +325,7 @@ const SourcingCatalog = () => {
                   Filters
                 </h3>
                 <button
-                  onClick={() => setFilters({ vendor: '', category: '', priceMin: '', priceMax: '', finish: '' })}
+                  onClick={() => setFilters({ vendor: '', category: '', priceMin: '', priceMax: '', finish: '', hasImage: false })}
                   className="text-xs text-gray-400 hover:text-white"
                 >
                   Clear All
