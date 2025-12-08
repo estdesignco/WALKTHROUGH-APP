@@ -582,7 +582,7 @@ const ProductCard = ({ product, viewMode, isFavorite, onToggleFavorite, onCopy, 
       className="bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#D4AF37] transition group"
     >
       <div className="aspect-square bg-gray-700 relative">
-        {product.image_url && !imageError ? (
+        {product.image_url && !showPlaceholder ? (
           <img
             src={product.image_url}
             alt={product.name}
