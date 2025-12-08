@@ -395,6 +395,20 @@ const SourcingCatalog = () => {
                 />
               </div>
 
+              {/* Images Only Filter */}
+              <div className="mb-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filters.hasImage}
+                    onChange={(e) => setFilters({ ...filters, hasImage: e.target.checked })}
+                    className="w-4 h-4 rounded bg-gray-700 border-gray-600 text-[#D4AF37] focus:ring-[#D4AF37] focus:ring-offset-gray-800"
+                  />
+                  <span className="text-sm text-gray-300">Products with images only</span>
+                </label>
+                <p className="text-xs text-gray-500 mt-1 ml-6">~37% of products have images</p>
+              </div>
+
               {/* Connected Vendors */}
               <div className="border-t border-gray-700 pt-4 mt-4">
                 <h4 className="text-sm font-medium mb-2">Connected Vendors</h4>
