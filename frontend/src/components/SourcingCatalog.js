@@ -686,10 +686,12 @@ const VendorCredentialsModal = ({ portals, credentials, loginStatus, onClose, on
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-        <div className="p-4 border-b border-gray-700 flex justify-between items-center">
-          <h2 className="text-xl font-bold">Vendor Portal Connections</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-lg">
+      <div className="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-[#8b7355]">
+        <div className="p-4 border-b border-[#8b7355] flex justify-between items-center" style={{
+          background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`
+        }}>
+          <h2 className="text-xl font-bold text-white">Vendor Portal Connections</h2>
+          <button onClick={onClose} className="p-2 hover:bg-black/20 rounded-lg">
             <X size={20} />
           </button>
         </div>
@@ -697,7 +699,9 @@ const VendorCredentialsModal = ({ portals, credentials, loginStatus, onClose, on
         <div className="p-4 overflow-y-auto max-h-[70vh]">
           {/* Quick Login All Button */}
           {credentials.length > 0 && (
-            <div className="mb-6 p-4 bg-gradient-to-r from-purple-900/50 to-indigo-900/50 rounded-xl border border-purple-700">
+            <div className="mb-6 p-4 rounded-xl border border-[#8b7355]" style={{
+              background: `linear-gradient(135deg, rgba(139, 115, 85, 0.3) 0%, rgba(160, 132, 92, 0.3) 50%, rgba(139, 115, 85, 0.3) 100%)`
+            }}>
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-purple-300">🚀 Quick Connect</h3>
