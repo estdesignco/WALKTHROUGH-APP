@@ -576,7 +576,11 @@ const ProductCard = ({ product, viewMode, isFavorite, onToggleFavorite, onCopy, 
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl">📦</div>
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800 p-4">
+            <div className="text-4xl mb-2">📦</div>
+            <div className="text-xs text-gray-400 text-center font-medium uppercase tracking-wide">{product.vendor}</div>
+            <div className="text-xs text-gray-500 mt-1">No Image</div>
+          </div>
         )}
         
         {/* Source badge */}
