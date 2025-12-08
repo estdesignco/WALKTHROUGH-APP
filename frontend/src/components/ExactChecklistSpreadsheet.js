@@ -31,6 +31,12 @@ const ExactChecklistSpreadsheet = ({
   const [calculatorItem, setCalculatorItem] = useState(null);
   const [calculatorCategory, setCalculatorCategory] = useState('');
   
+  // Variant picker state
+  const [showVariantPicker, setShowVariantPicker] = useState(false);
+  const [variantPickerSku, setVariantPickerSku] = useState(null);
+  const [pendingVariantItem, setPendingVariantItem] = useState(null);
+  const [pendingVariantProduct, setPendingVariantProduct] = useState(null);
+  
   // State to track checked items (for PICKED status)
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [availableCategories, setAvailableCategories] = useState([]);
