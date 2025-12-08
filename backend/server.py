@@ -18,6 +18,15 @@ from typing import List, Optional, Dict, Any
 import uuid
 import time
 from datetime import datetime, timezone
+
+# Import vendor portal management
+from vendor_portals import (
+    VendorCredentialManager, 
+    VENDOR_PORTALS, 
+    get_vendor_portal_info, 
+    get_all_vendor_portals
+)
+from vendor_scraper import get_scraper, VendorPortalScraper
 from enum import Enum
 # Playwright is optional - only used for web scraping features
 try:
