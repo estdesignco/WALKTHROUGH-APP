@@ -41,6 +41,7 @@ import MasterContactsPage from './components/MasterContactsPage';
 import MasterMaterialsPage from './components/MasterMaterialsPage';
 import CalculatorsPage from './components/CalculatorsPage';
 import SourcingCatalog from './components/SourcingCatalog';
+import VendorMirror from './components/VendorMirror';
 
 const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
 const API = `${BACKEND_URL}/api`;
