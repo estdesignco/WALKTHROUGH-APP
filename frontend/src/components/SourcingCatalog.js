@@ -187,6 +187,7 @@ const SourcingCatalog = () => {
     if (filters.priceMin && (product.cost || product.price || 0) < parseFloat(filters.priceMin)) return false;
     if (filters.priceMax && (product.cost || product.price || 0) > parseFloat(filters.priceMax)) return false;
     if (filters.finish && !product.finish_color?.toLowerCase().includes(filters.finish.toLowerCase())) return false;
+    if (filters.hasImage && !product.image_url) return false;
     return true;
   });
 
