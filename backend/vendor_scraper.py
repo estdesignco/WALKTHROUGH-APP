@@ -204,7 +204,9 @@ class VendorPortalScraper:
                 return False
             
         except Exception as e:
-            logger.error(f"Error logging into {vendor_key}: {e}")
+            logger.error(f"Error logging into {vendor_key}: {type(e).__name__}: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
             return False
     
     async def search_vendor(self, vendor_key: str, query: str, portal_config: Dict) -> List[Dict]:
