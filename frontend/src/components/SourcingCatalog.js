@@ -601,6 +601,8 @@ const VendorCredentialsModal = ({ portals, credentials, loginStatus, onClose, on
   const [accountNumber, setAccountNumber] = useState('');
   const [saving, setSaving] = useState(false);
   const [loggingIn, setLoggingIn] = useState(null);
+  const [loggingInAll, setLoggingInAll] = useState(false);
+  const [loginResults, setLoginResults] = useState(null);
 
   const handleSaveCredentials = async () => {
     if (!selectedPortal || !username || !password) return;
@@ -639,6 +641,25 @@ const VendorCredentialsModal = ({ portals, credentials, loginStatus, onClose, on
     setLoggingIn(null);
   };
 
+  const handleLoginAll = async () => {
+    setLoggingInAll(true);
+    setLoginResults(null);
+    try {
+      const res = await fetch(`${backendUrl}/api/vendor-portals/login-all`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      setLoginResults(data);
+      // Refresh login status
+      onSave();
+    } catch (error) {
+      console.error('Error logging into all vendors:', error);
+      setLoginResults({ success: false, message: 'Failed to connect to vendors' });
+    } finally {
+      setLoggingInAll(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
@@ -650,12 +671,62 @@ const VendorCredentialsModal = ({ portals, credentials, loginStatus, onClose, on
         </div>
         
         <div className="p-4 overflow-y-auto max-h-[70vh]">
+          {/* Quick Login All Button */}
+          {credentials.length > 0 && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-purple-900/50 to-indigo-900/50 rounded-xl border border-purple-700">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-purple-300">🚀 Quick Connect</h3>
+                  <p className="text-sm text-gray-400">Log into all your vendor accounts at once</p>
+                </div>
+                <button
+                  onClick={handleLoginAll}
+                  disabled={loggingInAll}
+                  className="px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-500 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {loggingInAll ? (
+                    <>
+                      <Loader2 className="animate-spin" size={18} />
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      <LogIn size={18} />
+                      Connect All ({credentials.length})
+                    </>
+                  )}
+                </button>
+              </div>
+              
+              {/* Login Results */}
+              {loginResults && (
+                <div className="mt-3 p-3 bg-gray-800 rounded-lg">
+                  <p className={`font-medium ${loginResults.success ? 'text-green-400' : 'text-red-400'}`}>
+                    {loginResults.message}
+                  </p>
+                  {loginResults.results && (
+                    <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
+                      {loginResults.results.map(r => (
+                        <div key={r.vendor_key} className="flex items-center justify-between text-sm">
+                          <span>{r.vendor_name}</span>
+                          <span className={r.success ? 'text-green-400' : 'text-red-400'}>
+                            {r.success ? '✓ Connected' : '✗ Failed'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          
           {/* Connected Vendors */}
           <div className="mb-6">
             <h3 className="font-medium mb-3">Your Vendor Accounts</h3>
             <div className="space-y-2">
               {credentials.length === 0 ? (
-                <p className="text-gray-400 text-sm">No vendor accounts connected yet</p>
+                <p className="text-gray-400 text-sm">No vendor accounts connected yet. Add your first vendor below!</p>
               ) : (
                 credentials.map(cred => {
                   const status = loginStatus.find(s => s.vendor_key === cred.vendor_key);
