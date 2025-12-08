@@ -58,9 +58,6 @@ from teams_integration import notify_status_change
 from shipping_tracker import ShippingTracker
 from canva_integration import canva_integration
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
