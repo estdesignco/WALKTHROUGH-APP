@@ -274,135 +274,120 @@ const VendorMirror = () => {
         </div>
       </div>
 
-      {/* Vendor Iframes Grid */}
+      {/* Vendor Panels - Since most vendors block iframes, we show link cards instead */}
       <div className="p-4">
         {activeVendors.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
             <p className="text-xl mb-2">No vendors selected</p>
             <p>Click "Vendors" button to select which vendor sites to display</p>
           </div>
-        ) : expandedVendor ? (
-          // Expanded single vendor view
-          <div className="h-[calc(100vh-280px)]">
-            {(() => {
-              const vendor = VENDORS.find(v => v.key === expandedVendor);
-              return (
-                <div className="h-full bg-gray-900 rounded-xl overflow-hidden border border-gray-700">
+        ) : (
+          <>
+            {/* Quick Action: Open All in Tabs */}
+            {activeSearch && (
+              <div className="mb-6 p-4 rounded-xl border border-[#D4AF37] bg-[#8b7355]/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-[#D4AF37] font-semibold">🚀 Open Search in All Vendors</h3>
+                    <p className="text-gray-400 text-sm">Click below to open "{activeSearch}" search in all {activeVendors.length} vendor sites</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      activeVendors.forEach(vendor => {
+                        const url = vendor.searchUrl.replace('{query}', encodeURIComponent(activeSearch));
+                        window.open(url, '_blank');
+                      });
+                    }}
+                    className="px-6 py-3 text-black font-semibold rounded-xl"
+                    style={{
+                      background: `linear-gradient(135deg, #8b7355 0%, #D4AF37 50%, #8b7355 100%)`
+                    }}
+                  >
+                    Open All {activeVendors.length} Tabs
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Vendor Cards Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {activeVendors.map(vendor => (
+                <div 
+                  key={vendor.key}
+                  className="bg-gray-900 rounded-xl overflow-hidden border border-gray-700 hover:border-[#D4AF37] transition group"
+                >
+                  {/* Vendor Header */}
                   <div 
-                    className="flex items-center justify-between px-4 py-2"
+                    className="px-4 py-3"
                     style={{ backgroundColor: vendor.color }}
                   >
                     <span className="font-semibold text-white">{vendor.name}</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => refreshVendor(vendor.key)}
-                        className="p-1 hover:bg-white/20 rounded"
-                        title="Refresh"
-                      >
-                        <RefreshCw size={16} />
-                      </button>
-                      <button
-                        onClick={() => openInNewTab(vendor)}
-                        className="p-1 hover:bg-white/20 rounded"
-                        title="Open in new tab"
-                      >
-                        <ExternalLink size={16} />
-                      </button>
-                      <button
-                        onClick={() => setExpandedVendor(null)}
-                        className="p-1 hover:bg-white/20 rounded"
-                        title="Minimize"
-                      >
-                        <Minimize2 size={16} />
-                      </button>
-                    </div>
                   </div>
-                  <iframe
-                    key={iframeKeys[vendor.key] || vendor.key}
-                    src={getVendorUrl(vendor)}
-                    className="w-full h-[calc(100%-40px)] bg-white"
-                    title={vendor.name}
-                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
-                  />
-                </div>
-              );
-            })()}
-          </div>
-        ) : (
-          // Grid/Columns view
-          <div 
-            className={`grid gap-4 ${
-              layout === 'grid' 
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                : 'grid-cols-1 md:grid-cols-2'
-            }`}
-            style={{ 
-              height: layout === 'columns' ? 'calc(100vh - 280px)' : 'auto'
-            }}
-          >
-            {activeVendors.map(vendor => (
-              <div 
-                key={vendor.key}
-                className={`bg-gray-900 rounded-xl overflow-hidden border border-gray-700 flex flex-col ${
-                  layout === 'columns' ? 'h-full' : 'h-[500px]'
-                }`}
-              >
-                {/* Vendor Header */}
-                <div 
-                  className="flex items-center justify-between px-3 py-2 flex-shrink-0"
-                  style={{ backgroundColor: vendor.color }}
-                >
-                  <span className="font-semibold text-white text-sm">{vendor.name}</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => refreshVendor(vendor.key)}
-                      className="p-1 hover:bg-white/20 rounded"
-                      title="Refresh"
-                    >
-                      <RefreshCw size={14} />
-                    </button>
-                    <button
-                      onClick={() => openInNewTab(vendor)}
-                      className="p-1 hover:bg-white/20 rounded"
-                      title="Open in new tab"
-                    >
-                      <ExternalLink size={14} />
-                    </button>
-                    <button
-                      onClick={() => setExpandedVendor(vendor.key)}
-                      className="p-1 hover:bg-white/20 rounded"
-                      title="Expand"
-                    >
-                      <Maximize2 size={14} />
-                    </button>
+                  
+                  {/* Vendor Actions */}
+                  <div className="p-4 space-y-3">
+                    {activeSearch ? (
+                      <>
+                        <button
+                          onClick={() => window.open(vendor.searchUrl.replace('{query}', encodeURIComponent(activeSearch)), '_blank')}
+                          className="w-full py-3 px-4 bg-[#8b7355] text-white rounded-lg hover:bg-[#a0845c] transition flex items-center justify-center gap-2"
+                        >
+                          <Search size={18} />
+                          Search "{activeSearch}"
+                        </button>
+                        <button
+                          onClick={() => window.open(vendor.homeUrl, '_blank')}
+                          className="w-full py-2 px-4 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition flex items-center justify-center gap-2 text-sm"
+                        >
+                          <ExternalLink size={16} />
+                          Browse Catalog
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => window.open(vendor.loginUrl, '_blank')}
+                          className="w-full py-3 px-4 bg-[#8b7355] text-white rounded-lg hover:bg-[#a0845c] transition flex items-center justify-center gap-2"
+                        >
+                          <ExternalLink size={18} />
+                          Login & Browse
+                        </button>
+                        <p className="text-xs text-gray-500 text-center">
+                          Opens in new tab
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
-                
-                {/* Iframe */}
-                <div className="flex-1 bg-white">
-                  <iframe
-                    key={iframeKeys[vendor.key] || vendor.key}
-                    src={getVendorUrl(vendor)}
-                    className="w-full h-full"
-                    title={vendor.name}
-                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
-                  />
+              ))}
+            </div>
+
+            {/* Usage Instructions */}
+            {!activeSearch && (
+              <div className="mt-8 p-6 bg-gray-900 rounded-xl border border-gray-700">
+                <h3 className="text-[#D4AF37] font-semibold text-lg mb-4">📖 How to Use Vendor Mirror</h3>
+                <div className="grid md:grid-cols-3 gap-6 text-gray-300">
+                  <div>
+                    <div className="text-2xl mb-2">1️⃣</div>
+                    <p className="font-medium text-white">Login to Vendors</p>
+                    <p className="text-sm text-gray-400">Click each vendor card above to open their login page. Log in with your dealer credentials.</p>
+                  </div>
+                  <div>
+                    <div className="text-2xl mb-2">2️⃣</div>
+                    <p className="font-medium text-white">Search Products</p>
+                    <p className="text-sm text-gray-400">Type what you're looking for (e.g., "velvet sofa", "brass chandelier") in the search bar above.</p>
+                  </div>
+                  <div>
+                    <div className="text-2xl mb-2">3️⃣</div>
+                    <p className="font-medium text-white">Open All Results</p>
+                    <p className="text-sm text-gray-400">Click "Open All Tabs" to see search results from ALL vendors at once in separate browser tabs.</p>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
-
-      {/* Instructions Toast */}
-      {!activeSearch && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 border border-[#D4AF37] rounded-xl px-6 py-4 shadow-xl max-w-lg text-center">
-          <p className="text-[#D4AF37] font-medium mb-1">👆 Log into each vendor first</p>
-          <p className="text-gray-400 text-sm">
-            Then search above to see results from ALL vendors at once!
-          </p>
-        </div>
-      )}
     </div>
   );
 };
