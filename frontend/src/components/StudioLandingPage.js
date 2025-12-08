@@ -148,14 +148,6 @@ const StudioLandingPage = () => {
               <span>+</span>
               <span>Full Questionnaire</span>
             </button>
-            
-            <button
-              onClick={() => navigate('/sourcing-catalog')}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 shadow-lg"
-            >
-              <span>🔍</span>
-              <span>Sourcing Catalog</span>
-            </button>
           </div>
         </div>
 
