@@ -518,16 +518,8 @@ const ProductCard = ({ product, viewMode, isFavorite, onToggleFavorite, onCopy, 
   const [imageError, setImageError] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Check if image URL is a known placeholder or mismatched vendor CDN
-  const isPlaceholderImage = (url, vendor) => {
-    if (!url) return true;
-    // If the URL contains a different vendor's domain, it might return their placeholder
-    const vendorLower = (vendor || '').toLowerCase();
-    if (url.includes('uttermost.com') && !vendorLower.includes('uttermost')) return true;
-    return false;
-  };
-
-  const showPlaceholder = imageError || isPlaceholderImage(product.image_url, product.vendor);
+  // Only show placeholder if no URL or image failed to load
+  const showPlaceholder = imageError || !product.image_url;
 
   const handleCopy = (e) => {
     e.stopPropagation();
