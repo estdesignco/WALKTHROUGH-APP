@@ -1871,9 +1871,30 @@ const ExactChecklistSpreadsheet = ({
                                                 handleUpdateItemField(item.id, 'name', newName);
                                               }
                                             }}
-                                            onProductSelect={(product) => {
-                                              // Auto-fill all fields when product is selected using batch update
+                                            onProductSelect={async (product) => {
+                                              // Auto-fill all fields when product is selected
                                               console.log('🎯 Product selected from autocomplete:', product);
+                                              
+                                              // Check if this product has variants (other finishes/colors)
+                                              try {
+                                                const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+                                                const response = await fetch(`${backendUrl}/api/product-variants/${encodeURIComponent(product.sku)}`);
+                                                const variantData = await response.json();
+                                                
+                                                if (variantData.success && variantData.variant_count > 1) {
+                                                  // Has multiple variants - show picker
+                                                  console.log('📦 Product has variants:', variantData.variant_count);
+                                                  setVariantPickerSku(product.sku);
+                                                  setPendingVariantItem(item);
+                                                  setPendingVariantProduct(product);
+                                                  setShowVariantPicker(true);
+                                                  return;
+                                                }
+                                              } catch (error) {
+                                                console.log('No variants or error checking:', error);
+                                              }
+                                              
+                                              // No variants - apply directly using batch update
                                               const updates = {
                                                 name: product.name,
                                                 vendor: product.vendor,
