@@ -2709,55 +2709,84 @@ async def get_vendor_list():
 async def get_product_variants(base_sku: str):
     """Get all variants (finishes/colors/sizes) for a base product SKU"""
     try:
-        # Extract base model number from SKU (e.g., 1010 from HVL-1010-AGB)
         import re
-        base_match = re.search(r'(\d{3,5})', base_sku)
         
-        if not base_match:
+        # Extract vendor prefix and base model number (e.g., HVL-1010-AGB -> HVL, 1010)
+        # Handle formats like: HVL-1010-AGB, MITZI-H123-456-AGB, SCH-170165
+        parts = base_sku.split('-')
+        
+        # Find the vendor prefix (letters at start) and model number
+        vendor_prefix = None
+        base_model = None
+        
+        for i, part in enumerate(parts):
+            if part.isalpha():
+                vendor_prefix = part
+            elif re.match(r'^\d+$', part):
+                base_model = part
+                break
+        
+        if not base_model:
+            # Try to find any number sequence
+            base_match = re.search(r'(\d{3,6})', base_sku)
+            if base_match:
+                base_model = base_match.group(1)
+        
+        if not base_model:
             return {"success": False, "error": "Invalid SKU format", "variants": []}
         
-        base_model = base_match.group(1)
+        # Build a more specific regex pattern
+        # Match SKUs that have the same vendor prefix and model number
+        if vendor_prefix:
+            regex_pattern = f"^{vendor_prefix}.*{base_model}.*"
+        else:
+            # For SKUs like SCH-170165, match more precisely
+            regex_pattern = f".*{base_model}.*"
         
-        # Find all products with the same base model number
-        regex_pattern = f".*{base_model}.*"
         products = await db.master_products.find(
             {"sku": {"$regex": regex_pattern, "$options": "i"}},
             {"_id": 0}
         ).to_list(50)
         
-        # Group by variant type (finish, colorway, size)
-        variants = []
+        # Filter to only include products that are actual variants (same base model)
+        # A variant should have the same model number and different finish codes
+        filtered_variants = []
+        seen_base = set()
+        
         for p in products:
+            sku = p.get('sku', '')
             # Extract finish codes from SKU
-            finish_codes = re.findall(r'-([A-Z]{2,4})(?:-|$)', p.get('sku', ''))
+            finish_codes = re.findall(r'-([A-Z]{2,4})(?:-|$)', sku)
             
-            # Get finish names from library
-            finish_names = []
-            for code in finish_codes:
-                finish = await db.finish_library.find_one({"code": code}, {"_id": 0})
-                if finish:
-                    finish_names.append(finish.get('name', code))
-                else:
-                    finish_names.append(code)
-            
-            variants.append({
-                "sku": p.get('sku'),
-                "name": p.get('name'),
-                "finish_codes": finish_codes,
-                "finish_names": finish_names,
-                "image_url": p.get('image_url', ''),
-                "price": p.get('price', 0),
-                "cost": p.get('cost', 0),
-                "dimensions": p.get('dimensions', ''),
-                "product_link": p.get('product_link', f"https://www.google.com/search?q={p.get('vendor', '')}+{p.get('sku', '')}")
-            })
+            # Only include if it has the exact model number
+            if base_model in sku:
+                # Get finish names from library
+                finish_names = []
+                for code in finish_codes:
+                    finish = await db.finish_library.find_one({"code": code}, {"_id": 0})
+                    if finish:
+                        finish_names.append(finish.get('name', code))
+                    elif len(code) <= 4 and code.isupper():
+                        finish_names.append(code)
+                
+                filtered_variants.append({
+                    "sku": sku,
+                    "name": p.get('name'),
+                    "finish_codes": finish_codes,
+                    "finish_names": finish_names,
+                    "image_url": p.get('image_url', ''),
+                    "price": p.get('price', 0),
+                    "cost": p.get('cost', 0),
+                    "dimensions": p.get('dimensions', ''),
+                    "product_link": p.get('product_link', f"https://www.google.com/search?q={p.get('vendor', '')}+{sku}")
+                })
         
         return {
             "success": True,
             "base_sku": base_sku,
             "base_model": base_model,
-            "variant_count": len(variants),
-            "variants": variants
+            "variant_count": len(filtered_variants),
+            "variants": filtered_variants
         }
     except Exception as e:
         logger.error(f"Error getting product variants: {e}")
