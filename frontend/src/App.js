@@ -338,6 +338,10 @@ const App = () => {
                       path="/sourcing-catalog" 
                       element={<SourcingCatalog />}
                     />
+                    <Route 
+                      path="/vendor-mirror" 
+                      element={<VendorMirror />}
+                    />
                   </Routes>
                 </main>
               </>
