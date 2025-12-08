@@ -471,7 +471,7 @@ const SourcingCatalog = () => {
           credentials={savedCredentials}
           loginStatus={loginStatus}
           onClose={() => setShowCredentialsModal(false)}
-          onSave={loadSavedCredentials}
+          onSave={() => { loadSavedCredentials(); loadLoginStatus(); }}
           onLogin={loginToVendor}
           backendUrl={backendUrl}
         />
