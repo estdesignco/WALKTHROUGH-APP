@@ -224,9 +224,29 @@ const SourcingCatalog = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700 sticky top-0 z-40">
+    <div className="min-h-screen bg-black text-white">
+      {/* Gold Header with Full-Width Logo - Matching Main App Style */}
+      <div className="w-full h-32" style={{ 
+        background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
+        boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+      }}>
+        <div className="flex items-center justify-center h-full relative px-8">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10 animate-pulse"></div>
+          <img 
+            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
+            alt="ESTABLISHEDDESIGN CO." 
+            className="w-full h-20 object-contain filter drop-shadow-lg"
+            style={{
+              filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.2))',
+              maxWidth: '100%'
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-transparent to-yellow-400 opacity-5 animate-pulse"></div>
+        </div>
+      </div>
+      
+      {/* Search & Controls Section */}
+      <div className="bg-gray-900 border-b border-gray-700 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-[#D4AF37]">
@@ -235,7 +255,11 @@ const SourcingCatalog = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowCredentialsModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition"
+                style={{
+                  background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
+                  border: '1px solid #d4af37'
+                }}
               >
                 <Settings size={18} />
                 <span>Vendor Logins</span>
