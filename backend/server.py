@@ -2657,11 +2657,13 @@ async def autocomplete_products(
     query: str = Query("", min_length=0, description="Search query"),
     vendor: Optional[str] = Query(None, description="Filter by vendor"),
     category: Optional[str] = Query(None, description="Filter by category"),
+    has_image: Optional[bool] = Query(None, description="Filter by image availability"),
     limit: int = Query(20, ge=1, le=100, description="Max results to return")
 ):
     """
     Search vendor products for autocomplete in the Add Item workflow.
     Returns matching products from the master_products collection.
+    Products with images are prioritized in results.
     """
     try:
         # Build search filter
@@ -2682,13 +2684,45 @@ async def autocomplete_products(
         if category:
             search_filter["category"] = {"$regex": category, "$options": "i"}
         
-        # Get products
-        cursor = db.master_products.find(
-            search_filter,
-            {"_id": 0}  # Exclude MongoDB _id
-        ).limit(limit)
+        # Filter by image availability if specified
+        if has_image is True:
+            search_filter["image_url"] = {"$ne": None, "$ne": ""}
+        elif has_image is False:
+            search_filter["$or_img"] = [{"image_url": None}, {"image_url": ""}]
+            # Rewrite filter to combine with existing $or
+            if "$or" in search_filter:
+                existing_or = search_filter.pop("$or")
+                search_filter["$and"] = [
+                    {"$or": existing_or},
+                    {"$or": [{"image_url": None}, {"image_url": ""}]}
+                ]
+            else:
+                search_filter["$or"] = [{"image_url": None}, {"image_url": ""}]
         
-        products = await cursor.to_list(limit)
+        # Remove the temp key if exists
+        search_filter.pop("$or_img", None)
+        
+        # Use aggregation to sort by image availability (products with images first)
+        pipeline = [
+            {"$match": search_filter},
+            {"$addFields": {
+                "has_image_sort": {
+                    "$cond": [
+                        {"$and": [
+                            {"$ne": ["$image_url", None]},
+                            {"$ne": ["$image_url", ""]}
+                        ]},
+                        0,  # Products with images get lower sort value (first)
+                        1   # Products without images get higher sort value (last)
+                    ]
+                }
+            }},
+            {"$sort": {"has_image_sort": 1, "name": 1}},
+            {"$limit": limit},
+            {"$project": {"_id": 0, "has_image_sort": 0}}
+        ]
+        
+        products = await db.master_products.aggregate(pipeline).to_list(limit)
         
         return {
             "success": True,
