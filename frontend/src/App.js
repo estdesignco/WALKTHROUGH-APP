@@ -333,6 +333,10 @@ const App = () => {
                       path="/calculators" 
                       element={<CalculatorsPage />}
                     />
+                    <Route 
+                      path="/sourcing-catalog" 
+                      element={<SourcingCatalog />}
+                    />
                   </Routes>
                 </main>
               </>
