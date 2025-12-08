@@ -704,13 +704,17 @@ const VendorCredentialsModal = ({ portals, credentials, loginStatus, onClose, on
             }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-purple-300">🚀 Quick Connect</h3>
+                  <h3 className="font-semibold text-[#D4AF37]">🚀 Quick Connect</h3>
                   <p className="text-sm text-gray-400">Log into all your vendor accounts at once</p>
                 </div>
                 <button
                   onClick={handleLoginAll}
                   disabled={loggingInAll}
-                  className="px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-500 disabled:opacity-50 flex items-center gap-2"
+                  className="px-4 py-2 text-white font-medium rounded-lg disabled:opacity-50 flex items-center gap-2"
+                  style={{
+                    background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
+                    boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3)'
+                  }}
                 >
                   {loggingInAll ? (
                     <>
