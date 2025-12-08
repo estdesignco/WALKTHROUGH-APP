@@ -916,6 +916,14 @@ class ItemBase(BaseModel):
     calendar_event_id: Optional[str] = ""  # Google Calendar event ID
     delivery_calendar_id: Optional[str] = ""  # Delivery event ID
     installation_calendar_id: Optional[str] = ""  # Installation event ID
+    
+    # PRODUCT VARIANT FIELDS
+    base_product_id: Optional[str] = ""  # Base product ID (before variant selection)
+    selected_variant_sku: Optional[str] = ""  # Specific variant SKU selected
+    fabric_code: Optional[str] = ""  # Fabric code for furniture (e.g., "Crypton Velvet Navy")
+    colorway: Optional[str] = ""  # Colorway for rugs (e.g., "Blue/Gray")
+    product_link: Optional[str] = ""  # Direct link to vendor product page
+    com_fabric: Optional[bool] = False  # Customer's Own Material flag
 
 class ItemCreate(ItemBase):
     subcategory_id: str
