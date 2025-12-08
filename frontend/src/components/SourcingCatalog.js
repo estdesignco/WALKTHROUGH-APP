@@ -90,9 +90,13 @@ const SourcingCatalog = () => {
   };
 
   // Search local database
-  const searchLocalDatabase = async (query) => {
+  const searchLocalDatabase = async (query, hasImageOnly = false) => {
     try {
-      const res = await fetch(`${backendUrl}/api/autocomplete/products?query=${encodeURIComponent(query)}&limit=100`);
+      let url = `${backendUrl}/api/autocomplete/products?query=${encodeURIComponent(query)}&limit=100`;
+      if (hasImageOnly) {
+        url += '&has_image=true';
+      }
+      const res = await fetch(url);
       const data = await res.json();
       if (data.success) {
         return data.products.map(p => ({
