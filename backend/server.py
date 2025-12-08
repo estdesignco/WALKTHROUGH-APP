@@ -10875,4 +10875,245 @@ async def export_ffe_to_pdf(data: dict):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to get questionnaire: {str(e)}")
 
+# =============================================================================
+# VENDOR PORTAL MANAGEMENT ENDPOINTS - Ultimate Sourcing Catalog
+# =============================================================================
+
+class VendorCredentialInput(BaseModel):
+    """Input for saving vendor credentials"""
+    vendor_key: str
+    username: str
+    password: str
+    account_number: Optional[str] = None
+    dealer_code: Optional[str] = None
+
+@api_router.get("/vendor-portals")
+async def list_vendor_portals():
+    """Get list of all supported vendor portals"""
+    portals = get_all_vendor_portals()
+    return {
+        "success": True,
+        "portals": portals,
+        "count": len(portals)
+    }
+
+@api_router.get("/vendor-portals/{vendor_key}")
+async def get_vendor_portal(vendor_key: str):
+    """Get configuration for a specific vendor portal"""
+    portal = get_vendor_portal_info(vendor_key)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Vendor portal not found")
+    return {
+        "success": True,
+        "portal": {
+            "key": vendor_key,
+            **portal
+        }
+    }
+
+@api_router.post("/vendor-credentials")
+async def save_vendor_credentials(cred: VendorCredentialInput):
+    """Save encrypted vendor credentials"""
+    try:
+        manager = VendorCredentialManager(db)
+        result = await manager.save_credential(
+            vendor_key=cred.vendor_key,
+            username=cred.username,
+            password=cred.password,
+            account_number=cred.account_number,
+            dealer_code=cred.dealer_code
+        )
+        return {
+            "success": True,
+            "message": f"Credentials saved for {cred.vendor_key}",
+            "vendor_key": cred.vendor_key
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.get("/vendor-credentials")
+async def list_vendor_credentials():
+    """List all saved vendor credentials (without passwords)"""
+    try:
+        manager = VendorCredentialManager(db)
+        credentials = await manager.get_all_credentials()
+        return {
+            "success": True,
+            "credentials": credentials,
+            "count": len(credentials)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.delete("/vendor-credentials/{vendor_key}")
+async def delete_vendor_credentials(vendor_key: str):
+    """Delete vendor credentials"""
+    try:
+        manager = VendorCredentialManager(db)
+        await manager.delete_credential(vendor_key)
+        return {"success": True, "message": f"Credentials deleted for {vendor_key}"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.post("/vendor-portals/{vendor_key}/login")
+async def login_to_vendor_portal(vendor_key: str):
+    """Log into a vendor portal using saved credentials"""
+    try:
+        # Get portal config
+        portal = get_vendor_portal_info(vendor_key)
+        if not portal:
+            raise HTTPException(status_code=404, detail="Vendor portal not found")
+        
+        # Get credentials
+        manager = VendorCredentialManager(db)
+        credentials = await manager.get_credential(vendor_key)
+        if not credentials:
+            raise HTTPException(status_code=404, detail="No credentials saved for this vendor")
+        
+        # Initialize scraper and login
+        scraper = await get_scraper()
+        success = await scraper.login_to_vendor(vendor_key, portal, credentials)
+        
+        if success:
+            await manager.update_last_login(vendor_key)
+            return {"success": True, "message": f"Successfully logged into {portal['name']}"}
+        else:
+            return {"success": False, "message": "Login failed - check credentials"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error logging into {vendor_key}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/vendor-portals/{vendor_key}/search")
+async def search_vendor_portal(vendor_key: str, query: str = Query(..., min_length=1)):
+    """Search for products on a vendor portal (must be logged in first)"""
+    try:
+        portal = get_vendor_portal_info(vendor_key)
+        if not portal:
+            raise HTTPException(status_code=404, detail="Vendor portal not found")
+        
+        scraper = await get_scraper()
+        
+        # Check if logged in
+        if vendor_key not in scraper.contexts:
+            return {
+                "success": False,
+                "error": "Not logged in to this vendor. Please login first.",
+                "products": []
+            }
+        
+        # Search
+        products = await scraper.search_vendor(vendor_key, query, portal)
+        
+        return {
+            "success": True,
+            "vendor": portal['name'],
+            "query": query,
+            "products": products,
+            "count": len(products)
+        }
+    
+    except Exception as e:
+        logger.error(f"Error searching {vendor_key}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/vendor-portals/search-all")
+async def search_all_vendor_portals(query: str = Query(..., min_length=1)):
+    """Search across all logged-in vendor portals simultaneously"""
+    try:
+        scraper = await get_scraper()
+        
+        # Get list of logged-in vendors
+        logged_in_vendors = list(scraper.contexts.keys())
+        
+        if not logged_in_vendors:
+            return {
+                "success": False,
+                "error": "Not logged into any vendors. Please login to at least one vendor first.",
+                "products": []
+            }
+        
+        # Search all vendors in parallel
+        all_products = []
+        
+        async def search_one(vendor_key):
+            portal = get_vendor_portal_info(vendor_key)
+            if portal:
+                products = await scraper.search_vendor(vendor_key, query, portal)
+                return products
+            return []
+        
+        results = await asyncio.gather(*[search_one(vk) for vk in logged_in_vendors])
+        
+        for products in results:
+            all_products.extend(products)
+        
+        return {
+            "success": True,
+            "query": query,
+            "vendors_searched": logged_in_vendors,
+            "products": all_products,
+            "count": len(all_products)
+        }
+    
+    except Exception as e:
+        logger.error(f"Error searching all portals: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/vendor-portals/{vendor_key}/product-details")
+async def get_product_details_from_portal(vendor_key: str, url: str = Query(...)):
+    """Get detailed product information from a vendor portal"""
+    try:
+        portal = get_vendor_portal_info(vendor_key)
+        if not portal:
+            raise HTTPException(status_code=404, detail="Vendor portal not found")
+        
+        scraper = await get_scraper()
+        
+        if vendor_key not in scraper.contexts:
+            return {"success": False, "error": "Not logged in to this vendor"}
+        
+        details = await scraper.get_product_details(vendor_key, url, portal)
+        
+        return {
+            "success": True,
+            "details": details
+        }
+    
+    except Exception as e:
+        logger.error(f"Error getting product details: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/vendor-portals/login-status")
+async def get_vendor_login_status():
+    """Get login status for all vendors"""
+    try:
+        scraper = await get_scraper()
+        logged_in = list(scraper.contexts.keys())
+        
+        # Get all saved credentials
+        manager = VendorCredentialManager(db)
+        all_creds = await manager.get_all_credentials()
+        
+        status = []
+        for cred in all_creds:
+            status.append({
+                "vendor_key": cred['vendor_key'],
+                "vendor_name": cred['vendor_name'],
+                "has_credentials": True,
+                "logged_in": cred['vendor_key'] in logged_in,
+                "last_login": cred.get('last_login')
+            })
+        
+        return {
+            "success": True,
+            "vendors": status,
+            "logged_in_count": len(logged_in)
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # PRODUCT CLIPPER ENDPOINTS
