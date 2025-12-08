@@ -5,6 +5,7 @@ import CanvaIntegrationModal from './CanvaIntegrationModal';
 import CalculatorPopup from './CalculatorPopup';
 import AutocompleteInput from './AutocompleteInput';
 import { InlineProductAutocomplete, VendorDropdown } from './InlineProductAutocomplete';
+import ProductVariantPicker from './ProductVariantPicker';
 import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 
