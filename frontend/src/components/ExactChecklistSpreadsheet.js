@@ -2312,6 +2312,61 @@ const ExactChecklistSpreadsheet = ({
         categoryName={calculatorCategory}
         currentCost={calculatorItem?.cost || 0}
       />
+      
+      {/* PRODUCT VARIANT PICKER */}
+      {showVariantPicker && variantPickerSku && (
+        <ProductVariantPicker
+          baseSku={variantPickerSku}
+          currentSelection={pendingVariantProduct?.sku}
+          onSelectVariant={(selectedVariant) => {
+            // Apply the selected variant to the item
+            if (pendingVariantItem) {
+              const updates = {
+                name: selectedVariant.name || pendingVariantProduct?.name,
+                vendor: pendingVariantProduct?.vendor,
+                sku: selectedVariant.sku,
+                selected_variant_sku: selectedVariant.sku,
+                cost: selectedVariant.cost || selectedVariant.price || 0,
+                finish_color: selectedVariant.finish_names?.join(', ') || '',
+              };
+              if (selectedVariant.image_url) {
+                updates.image_url = selectedVariant.image_url;
+              }
+              if (selectedVariant.dimensions) {
+                updates.size = selectedVariant.dimensions;
+              }
+              if (selectedVariant.product_link) {
+                updates.product_link = selectedVariant.product_link;
+              }
+              handleBatchUpdateItem(pendingVariantItem.id, updates);
+            }
+            // Close picker
+            setShowVariantPicker(false);
+            setVariantPickerSku(null);
+            setPendingVariantItem(null);
+            setPendingVariantProduct(null);
+          }}
+          onClose={() => {
+            // If closed without selection, still apply the base product
+            if (pendingVariantItem && pendingVariantProduct) {
+              const updates = {
+                name: pendingVariantProduct.name,
+                vendor: pendingVariantProduct.vendor,
+                sku: pendingVariantProduct.sku,
+                cost: pendingVariantProduct.cost || pendingVariantProduct.price || 0
+              };
+              if (pendingVariantProduct.image_url) {
+                updates.image_url = pendingVariantProduct.image_url;
+              }
+              handleBatchUpdateItem(pendingVariantItem.id, updates);
+            }
+            setShowVariantPicker(false);
+            setVariantPickerSku(null);
+            setPendingVariantItem(null);
+            setPendingVariantProduct(null);
+          }}
+        />
+      )}
     </div>
   );
 };
