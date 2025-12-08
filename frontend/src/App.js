@@ -219,7 +219,7 @@ const App = () => {
                     />
                     <Route 
                       path="/studio" 
-                      element={<StudioLandingPage />}
+                      element={<MainDashboard />}
                     />
                     <Route 
                       path="/projects" 
