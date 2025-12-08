@@ -2705,6 +2705,76 @@ async def get_vendor_list():
     except Exception as e:
         return {"success": False, "error": str(e), "vendors": []}
 
+@api_router.get("/product-variants/{base_sku}")
+async def get_product_variants(base_sku: str):
+    """Get all variants (finishes/colors/sizes) for a base product SKU"""
+    try:
+        # Extract base model number from SKU (e.g., 1010 from HVL-1010-AGB)
+        import re
+        base_match = re.search(r'(\d{3,5})', base_sku)
+        
+        if not base_match:
+            return {"success": False, "error": "Invalid SKU format", "variants": []}
+        
+        base_model = base_match.group(1)
+        
+        # Find all products with the same base model number
+        regex_pattern = f".*{base_model}.*"
+        products = await db.master_products.find(
+            {"sku": {"$regex": regex_pattern, "$options": "i"}},
+            {"_id": 0}
+        ).to_list(50)
+        
+        # Group by variant type (finish, colorway, size)
+        variants = []
+        for p in products:
+            # Extract finish codes from SKU
+            finish_codes = re.findall(r'-([A-Z]{2,4})(?:-|$)', p.get('sku', ''))
+            
+            # Get finish names from library
+            finish_names = []
+            for code in finish_codes:
+                finish = await db.finish_library.find_one({"code": code}, {"_id": 0})
+                if finish:
+                    finish_names.append(finish.get('name', code))
+                else:
+                    finish_names.append(code)
+            
+            variants.append({
+                "sku": p.get('sku'),
+                "name": p.get('name'),
+                "finish_codes": finish_codes,
+                "finish_names": finish_names,
+                "image_url": p.get('image_url', ''),
+                "price": p.get('price', 0),
+                "cost": p.get('cost', 0),
+                "dimensions": p.get('dimensions', ''),
+                "product_link": p.get('product_link', f"https://www.google.com/search?q={p.get('vendor', '')}+{p.get('sku', '')}")
+            })
+        
+        return {
+            "success": True,
+            "base_sku": base_sku,
+            "base_model": base_model,
+            "variant_count": len(variants),
+            "variants": variants
+        }
+    except Exception as e:
+        logger.error(f"Error getting product variants: {e}")
+        return {"success": False, "error": str(e), "variants": []}
+
+@api_router.get("/finish-library")
+async def get_finish_library():
+    """Get the finish/color library with swatches"""
+    try:
+        finishes = await db.finish_library.find({}, {"_id": 0}).to_list(100)
+        return {
+            "success": True,
+            "finishes": finishes
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e), "finishes": []}
+
 @api_router.get("/autocomplete/categories")
 async def get_category_list(vendor: Optional[str] = None):
     """Get list of all product categories, optionally filtered by vendor"""
