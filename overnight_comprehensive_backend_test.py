@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 
 # Backend URL from review request
-BASE_URL = "https://pricelistmaster.preview.emergentagent.com/api"
+BASE_URL = "https://catalog-mirror.preview.emergentagent.com/api"
 TEST_PROJECT_ID = "35db1692-4325-47dc-9b66-16bfe9b9fcf3"
 
 # Test results tracking

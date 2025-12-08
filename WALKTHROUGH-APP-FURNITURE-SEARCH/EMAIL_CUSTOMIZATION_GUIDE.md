@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://pricelistmaster.preview.emergentagent.com/email-template.html
+https://catalog-mirror.preview.emergentagent.com/email-template.html
 
 ---
 

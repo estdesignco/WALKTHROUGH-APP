@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://pricelistmaster.preview.emergentagent.com/api
+https://catalog-mirror.preview.emergentagent.com/api
 ```
 
 ---

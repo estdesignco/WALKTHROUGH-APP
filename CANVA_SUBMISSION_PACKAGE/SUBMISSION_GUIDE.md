@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://pricelistmaster.preview.emergentagent.com";
+const BACKEND_URL = "https://catalog-mirror.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

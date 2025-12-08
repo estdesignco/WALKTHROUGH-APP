@@ -7,7 +7,7 @@ import requests
 import json
 
 # Backend URL
-BACKEND_URL = "https://pricelistmaster.preview.emergentagent.com/api"
+BACKEND_URL = "https://catalog-mirror.preview.emergentagent.com/api"
 
 def test_add_item_with_test_data():
     """Test with the exact data from review request"""
