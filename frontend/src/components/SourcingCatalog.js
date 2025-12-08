@@ -139,8 +139,8 @@ const SourcingCatalog = () => {
     setSearchResults([]);
     
     try {
-      // Search local database first (instant)
-      const localResults = await searchLocalDatabase(searchQuery);
+      // Search local database first (instant) - pass hasImage filter
+      const localResults = await searchLocalDatabase(searchQuery, filters.hasImage);
       setSearchResults(localResults);
       
       // Then search vendor portals (may take longer)
@@ -164,7 +164,10 @@ const SourcingCatalog = () => {
             source: 'merged'
           };
         } else if (existingIndex < 0) {
-          mergedResults.push(portalProduct);
+          // If hasImage filter is on, only add portal products with images
+          if (!filters.hasImage || portalProduct.image_url) {
+            mergedResults.push(portalProduct);
+          }
         }
       }
       
