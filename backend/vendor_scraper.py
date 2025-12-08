@@ -73,58 +73,135 @@ class VendorPortalScraper:
             
             password_value = credentials.get('password')
             
-            # Try to find and fill username field
-            username_selector = selectors.get('username_field', 'input[type="email"], input[name="email"], input[name="username"]')
-            try:
-                await page.wait_for_selector(username_selector, timeout=10000)
-                await page.fill(username_selector, username_value)
-                logger.info(f"Filled username field")
-            except Exception as e:
-                logger.error(f"Could not find username field: {e}")
-                # Try alternative selectors
-                for alt_selector in ['input[type="email"]', 'input[name="email"]', 'input#email', 'input[name="username"]']:
-                    try:
-                        await page.fill(alt_selector, username_value)
-                        logger.info(f"Filled username with {alt_selector}")
+            logger.info(f"Attempting login with username type: {login_type}")
+            
+            # Try to find and fill username field - use multiple strategies
+            username_filled = False
+            username_selectors = [
+                selectors.get('username_field', ''),
+                'input[type="text"]:visible',
+                'input[type="email"]:visible',
+                'input[name*="account"]',
+                'input[name*="email"]',
+                'input[name*="user"]',
+                'input[placeholder*="account" i]',
+                'input[placeholder*="email" i]',
+                'input:not([type="password"]):not([type="hidden"]):not([type="submit"])'
+            ]
+            
+            for selector in username_selectors:
+                if not selector:
+                    continue
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        await element.fill(username_value)
+                        logger.info(f"Filled username with selector: {selector}")
+                        username_filled = True
                         break
-                    except:
-                        continue
+                except Exception as e:
+                    continue
             
-            # Fill password
-            password_selector = selectors.get('password_field', 'input[type="password"]')
-            try:
-                await page.fill(password_selector, password_value)
-                logger.info(f"Filled password field")
-            except:
-                await page.fill('input[type="password"]', password_value)
-            
-            await asyncio.sleep(1)
-            
-            # Click login button
-            login_selector = selectors.get('login_button', 'button[type="submit"]')
-            try:
-                await page.click(login_selector)
-            except:
-                await page.click('button[type="submit"], input[type="submit"]')
-            
-            # Wait for navigation/login to complete
-            await asyncio.sleep(3)
-            await page.wait_for_load_state('networkidle', timeout=15000)
-            
-            # Check if login was successful (look for common indicators)
-            current_url = page.url
-            page_content = await page.content()
-            
-            # Check for login failure indicators
-            if any(x in page_content.lower() for x in ['invalid', 'incorrect', 'error', 'failed to log']):
-                logger.error(f"Login failed for {vendor_key}")
+            if not username_filled:
+                logger.error("Could not find username field with any selector")
                 await context.close()
                 return False
             
-            # Store the authenticated context
-            self.contexts[vendor_key] = context
-            logger.info(f"Successfully logged into {vendor_key}")
-            return True
+            # Fill password - use multiple strategies
+            password_filled = False
+            password_selectors = [
+                selectors.get('password_field', ''),
+                'input[type="password"]',
+                'input[name*="password"]',
+                'input[placeholder*="password" i]'
+            ]
+            
+            for selector in password_selectors:
+                if not selector:
+                    continue
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        await element.fill(password_value)
+                        logger.info(f"Filled password with selector: {selector}")
+                        password_filled = True
+                        break
+                except Exception as e:
+                    continue
+            
+            if not password_filled:
+                logger.error("Could not find password field")
+                await context.close()
+                return False
+            
+            await asyncio.sleep(1)
+            
+            # Click login button - try multiple strategies
+            login_clicked = False
+            login_selectors = [
+                selectors.get('login_button', ''),
+                'button[type="submit"]',
+                'input[type="submit"]',
+                'button:has-text("Login")',
+                'button:has-text("Sign In")',
+                'button:has-text("Log In")',
+                '[data-testid*="login"]',
+                'form button'
+            ]
+            
+            for selector in login_selectors:
+                if not selector:
+                    continue
+                try:
+                    element = await page.query_selector(selector)
+                    if element:
+                        await element.click()
+                        logger.info(f"Clicked login button with selector: {selector}")
+                        login_clicked = True
+                        break
+                except Exception as e:
+                    continue
+            
+            if not login_clicked:
+                # Try pressing Enter as fallback
+                await page.keyboard.press('Enter')
+                logger.info("Pressed Enter as login fallback")
+            
+            # Wait for navigation/login to complete
+            await asyncio.sleep(3)
+            try:
+                await page.wait_for_load_state('networkidle', timeout=15000)
+            except:
+                pass  # Some sites don't fully settle
+            
+            # Check if login was successful
+            current_url = page.url
+            page_content = await page.content()
+            
+            logger.info(f"Post-login URL: {current_url}")
+            
+            # Check for login failure indicators
+            failure_indicators = ['invalid', 'incorrect', 'error', 'failed', 'wrong password', 'try again']
+            if any(x in page_content.lower() for x in failure_indicators):
+                # Check if we're still on login page
+                if 'login' in current_url.lower():
+                    logger.error(f"Login failed for {vendor_key} - still on login page")
+                    await context.close()
+                    return False
+            
+            # Check for success indicators
+            success_indicators = ['account', 'dashboard', 'welcome', 'home', 'catalog', 'products', 'logout', 'sign out']
+            is_success = any(x in page_content.lower() for x in success_indicators) or 'login' not in current_url.lower()
+            
+            if is_success:
+                # Store the authenticated context
+                self.contexts[vendor_key] = context
+                logger.info(f"Successfully logged into {vendor_key}")
+                return True
+            else:
+                logger.error(f"Login status unclear for {vendor_key}")
+                await context.close()
+                return False
             
         except Exception as e:
             logger.error(f"Error logging into {vendor_key}: {e}")
