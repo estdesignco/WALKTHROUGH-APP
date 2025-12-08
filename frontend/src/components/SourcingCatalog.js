@@ -518,6 +518,17 @@ const ProductCard = ({ product, viewMode, isFavorite, onToggleFavorite, onCopy, 
   const [imageError, setImageError] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Check if image URL is a known placeholder or mismatched vendor CDN
+  const isPlaceholderImage = (url, vendor) => {
+    if (!url) return true;
+    // If the URL contains a different vendor's domain, it might return their placeholder
+    const vendorLower = (vendor || '').toLowerCase();
+    if (url.includes('uttermost.com') && !vendorLower.includes('uttermost')) return true;
+    return false;
+  };
+
+  const showPlaceholder = imageError || isPlaceholderImage(product.image_url, product.vendor);
+
   const handleCopy = (e) => {
     e.stopPropagation();
     onCopy();
@@ -532,7 +543,7 @@ const ProductCard = ({ product, viewMode, isFavorite, onToggleFavorite, onCopy, 
         className="bg-gray-800 rounded-lg p-4 flex gap-4 cursor-pointer hover:bg-gray-750 transition"
       >
         <div className="w-24 h-24 flex-shrink-0 bg-gray-700 rounded-lg overflow-hidden">
-          {product.image_url && !imageError ? (
+          {product.image_url && !showPlaceholder ? (
             <img
               src={product.image_url}
               alt={product.name}
@@ -540,7 +551,10 @@ const ProductCard = ({ product, viewMode, isFavorite, onToggleFavorite, onCopy, 
               onError={() => setImageError(true)}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-3xl">📦</div>
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800 p-2">
+              <div className="text-2xl mb-1">📦</div>
+              <div className="text-[8px] text-gray-400 text-center font-medium uppercase tracking-wide">{product.vendor}</div>
+            </div>
           )}
         </div>
         <div className="flex-1 min-w-0">
