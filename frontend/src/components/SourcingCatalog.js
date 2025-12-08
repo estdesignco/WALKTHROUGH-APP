@@ -19,8 +19,12 @@ const SourcingCatalog = () => {
     priceMin: '',
     priceMax: '',
     finish: '',
+    hasImage: false,  // New filter for products with images only
   });
   const [showFilters, setShowFilters] = useState(true);
+  
+  // Default placeholder image for products without images
+  const DEFAULT_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMUYyOTM3Ii8+CjxyZWN0IHg9IjEyMCIgeT0iMTQwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjEyMCIgcng9IjgiIGZpbGw9IiMzNzQxNTEiLz4KPGNpcmNsZSBjeD0iMTYwIiBjeT0iMTgwIiByPSIyMCIgZmlsbD0iIzRCNTU2MyIvPgo8cGF0aCBkPSJNMTIwIDI2MEwyMDAgMjAwTDI4MCAyNjAiIHN0cm9rZT0iIzRCNTU2MyIgc3Ryb2tlLXdpZHRoPSI0IiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzIwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNkI3MjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZSBBdmFpbGFibGU8L3RleHQ+Cjwvc3ZnPg==';
   
   // Vendor portal state
   const [vendorPortals, setVendorPortals] = useState([]);
