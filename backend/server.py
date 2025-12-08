@@ -10492,8 +10492,11 @@ async def login_to_vendor_portal(vendor_key: str):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error logging into {vendor_key}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        error_msg = f"{type(e).__name__}: {str(e) or 'Unknown error'}"
+        logger.error(f"Error logging into {vendor_key}: {error_msg}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=error_msg)
 
 @api_router.get("/vendor-portals/{vendor_key}/search")
 async def search_vendor_portal(vendor_key: str, query: str = Query(..., min_length=1)):
