@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://catalog-mirror.preview.emergentagent.com";
+const BACKEND_URL = "https://product-search-hub-1.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

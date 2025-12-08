@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://catalog-mirror.preview.emergentagent.com/mobile-app
+Test it now: https://product-search-hub-1.preview.emergentagent.com/mobile-app

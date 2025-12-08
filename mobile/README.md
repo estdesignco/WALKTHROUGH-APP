@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://catalog-mirror.preview.emergentagent.com
-API_URL=https://catalog-mirror.preview.emergentagent.com/api
+BACKEND_URL=https://product-search-hub-1.preview.emergentagent.com
+API_URL=https://product-search-hub-1.preview.emergentagent.com/api
 ```
 
 ### App Configuration
