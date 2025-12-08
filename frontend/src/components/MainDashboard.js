@@ -218,7 +218,7 @@ const MainDashboard = () => {
           </button>
 
           <button
-            onClick={() => handleNavigation('/sourcing-catalog')}
+            onClick={() => handleNavigation('/vendor-mirror')}
             className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
@@ -227,7 +227,7 @@ const MainDashboard = () => {
             }}
           >
             <div className="text-2xl mb-2">🔍</div>
-            <div className="text-sm font-medium">Sourcing Catalog</div>
+            <div className="text-sm font-medium">Vendor Mirror</div>
           </button>
         </div>
 
