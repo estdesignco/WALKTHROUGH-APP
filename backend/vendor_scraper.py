@@ -53,7 +53,7 @@ class VendorPortalScraper:
             
             # Navigate to login page
             logger.info(f"Navigating to {portal_config['login_url']}")
-            await page.goto(portal_config['login_url'], wait_until='networkidle', timeout=30000)
+            await page.goto(portal_config['login_url'], wait_until='domcontentloaded', timeout=30000)
             await asyncio.sleep(2)
             
             selectors = portal_config.get('selectors', {})
