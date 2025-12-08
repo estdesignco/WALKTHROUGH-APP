@@ -2668,11 +2668,12 @@ async def autocomplete_products(
         search_filter = {}
         
         if query:
-            # Search in name, sku, and description
+            # Search in name, sku, collection, AND vendor
             search_filter["$or"] = [
                 {"name": {"$regex": query, "$options": "i"}},
                 {"sku": {"$regex": query, "$options": "i"}},
-                {"collection": {"$regex": query, "$options": "i"}}
+                {"collection": {"$regex": query, "$options": "i"}},
+                {"vendor": {"$regex": query, "$options": "i"}}
             ]
         
         if vendor:
