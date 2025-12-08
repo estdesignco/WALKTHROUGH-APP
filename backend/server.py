@@ -2,6 +2,12 @@ from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, B
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from pathlib import Path
+
+# Load environment variables FIRST before any imports that need them
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
+
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -12,14 +18,13 @@ import re
 import base64
 import subprocess
 from urllib.parse import urljoin, urlparse
-from pathlib import Path
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict, Any
 import uuid
 import time
 from datetime import datetime, timezone
 
-# Import vendor portal management
+# Import vendor portal management (AFTER loading env)
 from vendor_portals import (
     VendorCredentialManager, 
     VENDOR_PORTALS, 
