@@ -118,9 +118,9 @@ VENDOR_PORTALS = {
     },
     "hvl_group": {
         "name": "Hudson Valley Lighting Group",
-        "login_url": "https://www.?"hvlgroup.com/Auth/Login",
-        "base_url": "https://www.?"hvlgroup.com",
-        "search_url": "https://www.?"hvlgroup.com/search?q={query}",
+        "login_url": "https://www.hvlgroup.com/Auth/Login",
+        "base_url": "https://www.hvlgroup.com",
+        "search_url": "https://www.hvlgroup.com/search?q={query}",
         "login_type": "email",
         "selectors": {
             "username_field": "input[name='email'], input#email",
@@ -146,9 +146,9 @@ VENDOR_PORTALS = {
     },
     "bassett_mirror": {
         "name": "Bassett Mirror",
-        "login_url": "https://www.?"bassettmirror.com/customer/account/login/",
-        "base_url": "https://www.?"bassettmirror.com",
-        "search_url": "https://www.?"bassettmirror.com/catalogsearch/result/?q={query}",
+        "login_url": "https://www.bassettmirror.com/customer/account/login/",
+        "base_url": "https://www.bassettmirror.com",
+        "search_url": "https://www.bassettmirror.com/catalogsearch/result/?q={query}",
         "login_type": "email",
         "selectors": {
             "username_field": "input[name='login[username]']",
@@ -160,9 +160,9 @@ VENDOR_PORTALS = {
     },
     "surya": {
         "name": "Surya",
-        "login_url": "https://www.?"surya.com/customer/account/login/",
-        "base_url": "https://www.?"surya.com",
-        "search_url": "https://www.?"surya.com/catalogsearch/result/?q={query}",
+        "login_url": "https://www.surya.com/customer/account/login/",
+        "base_url": "https://www.surya.com",
+        "search_url": "https://www.surya.com/catalogsearch/result/?q={query}",
         "login_type": "email",
         "selectors": {
             "username_field": "input[name='login[username]']",
@@ -202,9 +202,9 @@ VENDOR_PORTALS = {
     },
     "global_views": {
         "name": "Global Views",
-        "login_url": "https://www.?"globalviews.com/customer/account/login/",
-        "base_url": "https://www.?"globalviews.com",
-        "search_url": "https://www.?"globalviews.com/catalogsearch/result/?q={query}",
+        "login_url": "https://www.globalviews.com/customer/account/login/",
+        "base_url": "https://www.globalviews.com",
+        "search_url": "https://www.globalviews.com/catalogsearch/result/?q={query}",
         "login_type": "email",
         "selectors": {
             "username_field": "input[name='login[username]']",
