@@ -947,6 +947,12 @@ class ItemUpdate(BaseModel):
     restock_date: Optional[datetime] = None
     lead_time_weeks: Optional[int] = None
     finish_color: Optional[str] = None
+    base_product_id: Optional[str] = None
+    selected_variant_sku: Optional[str] = None
+    fabric_code: Optional[str] = None
+    colorway: Optional[str] = None
+    product_link: Optional[str] = None
+    com_fabric: Optional[bool] = None
 
 class Item(ItemBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
