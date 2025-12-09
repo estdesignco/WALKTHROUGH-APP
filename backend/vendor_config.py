@@ -266,28 +266,25 @@ VENDOR_CONFIGS = {
     
     "gabby.com": {
         "name": "Gabby Home",
-        "login_url": "https://account.gabby.com?locale=en&region_country=US",
+        "login_url": "https://onlinestore.gabbyhome.com/gh/e/1/login",
         "login_type": "direct",
-        "extra_wait_before_login": 8000,
+        "extra_wait_before_login": 5000,
         "username_selectors": [
-            'input[type="email"]', 
-            'input[name="email"]',
-            'input[placeholder*="email" i]',
-            '#email',
+            '#username',
+            'input[name="username"]',
+            'input[type="text"][id="username"]',
         ],
         "password_selectors": [
-            'input[type="password"]', 
-            'input[name="password"]',
             '#password',
+            'input[name="password"]',
+            'input[type="password"]',
         ],
         "submit_selectors": [
-            'button[type="submit"]', 
-            'button:has-text("Sign In")',
-            'button:has-text("Log In")',
             'input[type="submit"]',
+            'button[type="submit"]',
         ],
-        "wait_after_login": 10000,
-        "wait_for_content": 8000,
+        "wait_after_login": 8000,
+        "wait_for_content": 5000,
     },
 }
 
