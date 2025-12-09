@@ -88,7 +88,7 @@ class VendorImageScraper:
         """Scrape Loloi rugs"""
         try:
             # Loloi uses Shopify
-            await page.goto(f"https://www.?"?"?"?"?i.com/search?q={sku}", timeout=15000)
+            await page.goto(f"https://www.loloirugs.com/search?q={sku}", timeout=15000)
             await page.wait_for_load_state('networkidle', timeout=10000)
             
             content = await page.content()
