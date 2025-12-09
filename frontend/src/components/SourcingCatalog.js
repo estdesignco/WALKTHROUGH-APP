@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Filter, Grid, List, X, ChevronDown, ExternalLink, Plus, Heart, Copy, Check, Loader2, LogIn, Settings } from 'lucide-react';
+import { Search, Filter, Grid, List, X, ChevronDown, ExternalLink, Plus, Heart, Copy, Check, Loader2, LogIn, Settings, ChevronRight, Home, FolderOpen } from 'lucide-react';
 
 /**
  * Ultimate Sourcing Catalog
