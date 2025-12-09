@@ -304,31 +304,43 @@ class VendorPortalScraper:
                     logger.debug(f"Error extracting Four Hands product: {e}")
                     continue
         elif 'globalviews' in base_url.lower():
-            # Global Views uses Klevu search - find images with klevu_images
-            klevu_images = await page.query_selector_all('img[src*="klevu_images"]')
-            logger.info(f"Found {len(klevu_images)} Klevu images on Global Views")
+            # Global Views uses Klevu search - get more products by clicking 36 per page
+            try:
+                dropdown = await page.wait_for_selector('.kuDropdown.kuDropItemsPerpage', timeout=5000)
+                await dropdown.click()
+                await asyncio.sleep(0.5)
+                option_36 = await page.wait_for_selector('.kuDropOption.kuLimit[data-value="36"]', timeout=3000)
+                await option_36.click()
+                await asyncio.sleep(3)
+            except:
+                pass  # Continue with default if dropdown fails
             
-            for img in klevu_images[:30]:
+            # Get all Klevu images
+            klevu_images = await page.query_selector_all('img[src*="klevu_images"], img[src*="media/catalog"]')
+            logger.info(f"Found {len(klevu_images)} product images on Global Views")
+            
+            # Also try to get product links with prices
+            product_items = await page.query_selector_all('.kuResultContent, [class*="product-item"]')
+            
+            for img in klevu_images[:50]:  # Get up to 50 products
                 try:
                     img_src = await img.get_attribute('src') or ''
                     img_alt = await img.get_attribute('alt') or ''
                     
-                    # Get parent link
-                    parent = await img.evaluate('el => el.closest("a")')
+                    # Try to get parent link
                     href = ''
-                    if parent:
-                        try:
-                            link_elem = await img.query_selector('xpath=ancestor::a')
-                            if link_elem:
-                                href = await link_elem.get_attribute('href') or ''
-                        except:
-                            pass
+                    try:
+                        parent_link = await img.evaluate('el => el.closest("a")?.href')
+                        if parent_link:
+                            href = parent_link
+                    except:
+                        pass
                     
-                    if img_src:
+                    if img_src and img_alt:  # Only add if we have image and name
                         products.append({
                             'image_url': img_src,
                             'name': img_alt.strip(),
-                            'product_link': href if href.startswith('http') else base_url + href if href else '',
+                            'product_link': href,
                             'vendor': vendor_name,
                             'source': 'live',
                             'scraped_at': datetime.now(timezone.utc).isoformat()
