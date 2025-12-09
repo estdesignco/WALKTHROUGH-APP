@@ -8,7 +8,6 @@ async def save_credentials():
     client = AsyncIOMotorClient(mongo_url)
     db = client.interior_design_db
     
-    # Get encryption key from .env
     fernet_key = None
     try:
         with open('/app/backend/.env', 'r') as f:
@@ -25,7 +24,6 @@ async def save_credentials():
     
     fernet = Fernet(fernet_key.encode())
     
-    # All vendor credentials from user's image
     vendors = [
         ("fourhands", "fourhands.com", "Four Hands", "Orders@estdesignco.com", "Momandneil1991!"),
         ("uttermost", "uttermost.com", "Uttermost", "Orders@estdesignco.com", "Zeke1919$$$$"),
@@ -36,19 +34,19 @@ async def save_credentials():
         ("loloirugs", "loloirugs.com", "Loloi Rugs", "estdesigninc@gmail.com", "momandneil"),
         ("visualcomfort", "visualcomfort.com", "Visual Comfort", "Neil@EstDesignCo.com", "Momandneil1991"),
         ("hvlgroup", "hvlgroup.com", "HVL Group", "Orders@estdesignco.com", "Momandneil1991"),
-        ("vandh", "vandh.com", "?"EstDesignCo@gmail.com", "Zeke1991$$$$"),
+        ("vandh", "vandh.com", "V and H", "EstDesignCo@gmail.com", "Zeke1991$$$$"),
         ("flowdecor", "flowdecor.com", "Flow Decor", "establisheddesignco@gmail.com", "shine"),
         ("crestview", "crestviewcollection.com", "Crestview Collection", "Orders@estdesignco.com", "Establish1234"),
         ("bassettmirror", "bassettmirror.com", "Bassett Mirror", "EstDesignCo@gmail.com", "Momandneil1991"),
         ("eichholtz", "eichholtz.com", "Eichholtz", "thegibsoncoshop@gmail.com", "Gibson5341"),
-        ("myohamerica", "myohamerica.com", "?"Neil@EstDesignCo.com", "Momandneil1991"),
+        ("myohamerica", "myohamerica.com", "MYO America", "Neil@EstDesignCo.com", "Momandneil1991"),
         ("safavieh", "safavieh.com", "Safavieh", "EST3669", "Zeke1919$$$$"),
         ("surya", "surya.com", "Surya", "Orders@estdesignco.com", "Zeke1919$$$$"),
         ("zeevlighting", "zeevlighting.com", "Zeev Lighting", "Orders@estdesignco.com", "Momandneil1991!"),
         ("hubbardtonforge", "hubbardtonforge.com", "Hubbardton Forge", "Orders@estdesignco.com", "Momandneil1991!"),
         ("hinkley", "hinkley.com", "Hinkley", "Orders@estdesignco.com", "Momandneil1991!"),
         ("elegantlighting", "elegantlighting.com", "Elegant Lighting", "Orders@estdesignco.com", "Momandneil1991!"),
-        ("gabby", "?"Orders@estdesignco.com", "Momandneil1991!"),
+        ("gabby", "gabbyhome.com", "Gabby Home", "Orders@estdesignco.com", "Momandneil1991!"),
     ]
     
     saved = 0
