@@ -290,6 +290,24 @@ const ExportsDashboard = ({ projectId }) => {
               Generate & Print
             </button>
           </div>
+
+          {/* Customer Sheets */}
+          <div className="rounded-lg border border-[#D4A574]/50 p-6" style={{
+            background: 'linear-gradient(135deg, rgba(244,114,182,0.2) 0%, rgba(0,0,0,0.9) 50%, rgba(244,114,182,0.2) 100%)'
+          }}>
+            <div className="text-center mb-4">
+              <div className="text-5xl mb-3">📋</div>
+              <h4 className="text-xl font-bold text-[#D4A574] mb-2">Customer Sheets</h4>
+              <p className="text-sm text-[#B49B7E]">Select categories to print for client close & install</p>
+            </div>
+            <button
+              onClick={() => setShowCustomerSheets(true)}
+              className="w-full bg-[#F472B6] hover:bg-[#EC4899] text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center gap-2"
+            >
+              <CheckSquare className="w-5 h-5" />
+              Select & Print
+            </button>
+          </div>
         </div>
       </div>
 
