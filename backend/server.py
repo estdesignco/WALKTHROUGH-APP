@@ -4686,17 +4686,23 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         'a[href*="account"]',
                     ])
                     
+                    modal_opened = False
                     for selector in trade_selectors:
                         try:
-                            trade_btn = await page.wait_for_selector(selector, timeout=2000)
+                            trade_btn = await page.wait_for_selector(selector, timeout=3000)
                             if trade_btn:
                                 print(f"🎯 Found Trade button: {selector} - clicking...")
                                 await trade_btn.click()
-                                await page.wait_for_timeout(3000)  # Wait for modal
-                                print("✅ Trade button clicked")
+                                await page.wait_for_timeout(5000)  # Wait longer for modal to fully load
+                                modal_opened = True
+                                print("✅ Trade button clicked, waiting for modal...")
                                 break
                         except:
                             continue
+                    
+                    # Extra wait for modal animation
+                    if modal_opened:
+                        await page.wait_for_timeout(2000)
                 
                 # STEP 2: Fill in login credentials
                 print("🔍 Step 2: Filling in login credentials...")
@@ -4712,6 +4718,9 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     'input[placeholder*="username" i]',
                     '#email',
                     '#user_login',
+                    'input[autocomplete="email"]',
+                    'input[autocomplete="username"]',
+                    'form input[type="text"]:first-of-type',
                 ]
                 
                 password_selectors = vendor_config.get('password_selectors', []) + [
@@ -4720,35 +4729,57 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     'input[id="password"]',
                     '#pass',
                     '#user_pass',
+                    'input[autocomplete="current-password"]',
                 ]
                 
-                # Fill username/email
+                # Fill username/email - try multiple times with increasing waits
                 username_filled = False
-                for selector in username_selectors:
-                    try:
-                        username_input = await page.wait_for_selector(selector, timeout=3000, state='visible')
-                        if username_input:
-                            print(f"📧 Found visible username field: {selector}")
-                            await username_input.click()
-                            await page.wait_for_timeout(300)
-                            # Clear any existing value
-                            await username_input.fill('')
-                            await page.wait_for_timeout(200)
-                            await username_input.type(credentials['username'], delay=50)
-                            await page.wait_for_timeout(500)
-                            username_filled = True
-                            print(f"✅ Filled username: {credentials['username']}")
-                            break
-                    except:
-                        continue
+                for attempt in range(3):  # Try 3 times
+                    if username_filled:
+                        break
+                    if attempt > 0:
+                        print(f"🔄 Retry attempt {attempt + 1} for username field...")
+                        await page.wait_for_timeout(2000)
+                    
+                    for selector in username_selectors:
+                        try:
+                            username_input = await page.wait_for_selector(selector, timeout=5000, state='visible')
+                            if username_input:
+                                # Check if it's really visible and interactable
+                                is_visible = await username_input.is_visible()
+                                if not is_visible:
+                                    continue
+                                    
+                                print(f"📧 Found visible username field: {selector}")
+                                await username_input.click()
+                                await page.wait_for_timeout(300)
+                                # Clear any existing value
+                                await username_input.fill('')
+                                await page.wait_for_timeout(200)
+                                await username_input.type(credentials['username'], delay=50)
+                                await page.wait_for_timeout(500)
+                                username_filled = True
+                                print(f"✅ Filled username: {credentials['username']}")
+                                break
+                        except Exception as e:
+                            continue
                 
-                # Fill password
+                # Fill password - also try to find it even if username wasn't filled (some sites work differently)
                 password_filled = False
-                if username_filled:
+                for attempt in range(2):  # Try 2 times for password
+                    if password_filled:
+                        break
+                    if attempt > 0:
+                        await page.wait_for_timeout(1000)
+                        
                     for selector in password_selectors:
                         try:
-                            password_input = await page.wait_for_selector(selector, timeout=3000, state='visible')
+                            password_input = await page.wait_for_selector(selector, timeout=5000, state='visible')
                             if password_input:
+                                is_visible = await password_input.is_visible()
+                                if not is_visible:
+                                    continue
+                                    
                                 print(f"🔑 Found visible password field: {selector}")
                                 await password_input.click()
                                 await page.wait_for_timeout(300)
