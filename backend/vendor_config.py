@@ -29,12 +29,14 @@ VENDOR_CONFIGS = {
         "wait_for_content": 3000,
     },
     
-    # ===== UTTERMOST (Magento-based) =====
+    # ===== UTTERMOST (React PWA) =====
     "uttermost.com": {
         "name": "Uttermost",
         "login_url": "https://uttermost.com/customer/account/login/",
         "login_type": "direct",
         "requires_login": True,
+        "wait_for_js": True,  # Flag to wait longer for JS rendering
+        "extra_wait_before_login": 8000,  # Extra wait for React to render
         "username_selectors": [
             'input[type="email"]',
             '#email',
@@ -62,8 +64,8 @@ VENDOR_CONFIGS = {
         "sku_selectors": ['.product.attribute.sku .value', '[itemprop="sku"]', '.sku .value'],
         "image_selectors": ['meta[property="og:image"]', '.gallery-placeholder img', '.product-image-photo'],
         "dimensions_selectors": ['.product.attribute.dimensions .value', '.additional-attributes-wrapper'],
-        "wait_after_login": 8000,
-        "wait_for_content": 5000,
+        "wait_after_login": 10000,
+        "wait_for_content": 8000,
     },
     
     # ===== GLOBAL VIEWS (Magento-based) =====
