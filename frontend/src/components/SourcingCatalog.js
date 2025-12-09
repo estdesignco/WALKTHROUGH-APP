@@ -1157,7 +1157,7 @@ const AddToProjectModal = ({ product, onClose, onSuccess, backendUrl }) => {
         description: product.description || '',
         finish_color: product.finish_color || '',
         subcategory_id: subcategoryId,
-        status: 'blank'
+        status: 'TO BE SELECTED'
       };
       
       const res = await fetch(`${backendUrl}/api/items`, {
