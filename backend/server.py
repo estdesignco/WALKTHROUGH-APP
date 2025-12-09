@@ -10073,6 +10073,311 @@ async def generate_movers_ffe(project_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# CUSTOMER SHEETS EXPORT
+@api_router.post("/exports/{project_id}/customer-sheets")
+async def generate_customer_sheets(project_id: str, data: dict = None):
+    """Generate customer handoff sheets with selected categories and rooms"""
+    try:
+        # Get selections from request body
+        selected_categories = data.get('categories', []) if data else []
+        selected_rooms = data.get('rooms', []) if data else []
+        
+        # Use the existing API to get fully populated project
+        import httpx
+        BACKEND_URL = os.environ.get('BACKEND_URL', 'http://localhost:8001')
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{BACKEND_URL}/api/projects/{project_id}?sheet_type=ffe")
+            project = response.json()
+        
+        # Category mapping for filtering
+        category_map = {
+            'tile': ['tile', 'tiles'],
+            'flooring': ['flooring', 'floor', 'floors'],
+            'appliances': ['appliances', 'appliance', 'kitchen appliances'],
+            'paint': ['paint', 'paints'],
+            'wallpaper': ['wallpaper', 'wall covering', 'wall coverings'],
+            'lighting': ['lighting', 'light', 'lights'],
+            'furniture': ['furniture', 'furnishings'],
+            'window_treatments': ['window treatments', 'window', 'windows', 'drapery', 'curtains', 'blinds', 'shades'],
+            'plumbing': ['plumbing', 'plumbing fixtures', 'fixtures'],
+            'hardware': ['hardware'],
+            'accessories': ['accessories', 'accessory', 'decor'],
+            'artwork': ['artwork', 'art', 'pictures', 'frames'],
+            'rugs': ['rugs', 'rug', 'carpets', 'carpet'],
+            'outdoor': ['outdoor', 'exterior', 'patio'],
+            'other': ['other', 'miscellaneous', 'misc']
+        }
+        
+        # Collect all selected items
+        selected_items = []
+        for room in project.get("rooms", []):
+            room_name = room.get("name", "")
+            
+            # Skip if room not selected (and rooms were specified)
+            if selected_rooms and room_name not in selected_rooms:
+                continue
+            
+            for category in room.get("categories", []):
+                cat_name = category.get("name", "").lower()
+                
+                # Check if this category matches any selected categories
+                category_selected = False
+                if not selected_categories:  # If no categories specified, include all
+                    category_selected = True
+                else:
+                    for sel_cat in selected_categories:
+                        if sel_cat in category_map:
+                            if cat_name in category_map[sel_cat] or any(kw in cat_name for kw in category_map[sel_cat]):
+                                category_selected = True
+                                break
+                
+                if not category_selected:
+                    continue
+                
+                for subcategory in category.get("subcategories", []):
+                    for item in subcategory.get("items", []):
+                        selected_items.append({
+                            "room": room_name,
+                            "category": category.get("name", ""),
+                            "subcategory": subcategory.get("name", ""),
+                            "name": item.get("name", ""),
+                            "vendor": item.get("vendor", ""),
+                            "sku": item.get("sku", ""),
+                            "quantity": item.get("quantity", 1),
+                            "size": item.get("size", ""),
+                            "finish_color": item.get("finish_color", ""),
+                            "image_url": item.get("image_url", "")
+                        })
+        
+        # Group items by category then room
+        items_by_category = {}
+        for item in selected_items:
+            cat = item['category']
+            if cat not in items_by_category:
+                items_by_category[cat] = {}
+            room = item['room']
+            if room not in items_by_category[cat]:
+                items_by_category[cat][room] = []
+            items_by_category[cat][room].append(item)
+        
+        # Build HTML
+        items_html = ""
+        for category_name, rooms in items_by_category.items():
+            items_html += f'''
+            <div class="category-section" style="page-break-before: always;">
+                <div class="category-header">{category_name.upper()}</div>
+            '''
+            
+            for room_name, room_items in rooms.items():
+                items_html += f'<div class="room-title">{room_name}</div>'
+                
+                for item in room_items:
+                    img_html = f'<img src="{item["image_url"]}" alt="{item["name"]}">' if item.get("image_url") else '<div class="no-image">No Image</div>'
+                    
+                    items_html += f'''
+                    <div class="item-card">
+                        <div class="item-image">{img_html}</div>
+                        <div class="item-details">
+                            <div class="item-name">{item['name']}</div>
+                            <div class="item-specs">
+                                <div class="spec-row"><span class="spec-label">Vendor:</span> <span class="spec-value">{item['vendor']}</span></div>
+                                <div class="spec-row"><span class="spec-label">SKU:</span> <span class="spec-value">{item['sku']}</span></div>
+                                <div class="spec-row"><span class="spec-label">Finish/Color:</span> <span class="spec-value">{item['finish_color']}</span></div>
+                                <div class="spec-row"><span class="spec-label">Size:</span> <span class="spec-value">{item['size']}</span></div>
+                                <div class="spec-row"><span class="spec-label">Quantity:</span> <span class="spec-value">{item['quantity']}</span></div>
+                            </div>
+                        </div>
+                        <div class="item-checkbox">
+                            <div class="checkbox-box"></div>
+                            <span class="checkbox-label">Verified</span>
+                        </div>
+                    </div>
+                    '''
+            
+            items_html += '</div>'
+        
+        # Get client info
+        client_name = project.get('client_info', {}).get('full_name', '')
+        project_name = project.get('name', 'Project')
+        
+        html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Sheets - {project_name}</title>
+    <style>
+        @media print {{
+            @page {{ margin: 0.5in; }}
+            .category-section {{ page-break-before: always; }}
+            .category-section:first-of-type {{ page-break-before: avoid; }}
+            .item-card {{ page-break-inside: avoid; }}
+        }}
+        body {{
+            font-family: 'Century Gothic', Arial, sans-serif;
+            margin: 20px;
+            background: white;
+            color: black;
+        }}
+        .header {{
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid black;
+        }}
+        .logo img {{
+            height: 120px;
+            filter: grayscale(100%);
+        }}
+        h1 {{
+            font-size: 28px;
+            margin: 20px 0 10px 0;
+            font-weight: bold;
+        }}
+        .client-name {{
+            font-size: 20px;
+            color: #333;
+        }}
+        .category-section {{
+            margin-top: 30px;
+        }}
+        .category-header {{
+            background: black;
+            color: white;
+            padding: 15px 20px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }}
+        .room-title {{
+            background: #e0e0e0;
+            padding: 10px 15px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0 10px 0;
+            border-left: 5px solid black;
+        }}
+        .item-card {{
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }}
+        .item-image {{
+            flex-shrink: 0;
+        }}
+        .item-image img {{
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 1px solid #ccc;
+        }}
+        .no-image {{
+            width: 100px;
+            height: 100px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #999;
+            border: 1px solid #ccc;
+        }}
+        .item-details {{
+            flex: 1;
+        }}
+        .item-name {{
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: black;
+        }}
+        .item-specs {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }}
+        .spec-row {{
+            font-size: 12px;
+        }}
+        .spec-label {{
+            font-weight: bold;
+            color: #555;
+        }}
+        .spec-value {{
+            color: black;
+        }}
+        .item-checkbox {{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }}
+        .checkbox-box {{
+            width: 30px;
+            height: 30px;
+            border: 2px solid black;
+            background: white;
+        }}
+        .checkbox-label {{
+            font-size: 10px;
+            color: #666;
+        }}
+        .footer {{
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid black;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }}
+        .signature-area {{
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+        }}
+        .signature-line {{
+            flex: 1;
+            border-top: 1px solid black;
+            padding-top: 5px;
+            text-align: center;
+            font-size: 12px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="https://product-scraper-8.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co.">
+        </div>
+        <h1>CUSTOMER PRODUCT SHEET</h1>
+        <div class="client-name">{client_name} - {project_name}</div>
+        <p style="font-size: 14px; color: #666;">Close & Install Verification Document</p>
+    </div>
+    
+    {items_html}
+    
+    <div class="signature-area">
+        <div class="signature-line">Client Signature / Date</div>
+        <div class="signature-line">Designer Signature / Date</div>
+    </div>
+    
+    <div class="footer">
+        <p>Total Items: {len(selected_items)} | Generated: {datetime.now().strftime('%B %d, %Y')}</p>
+        <p>This document confirms all items listed have been verified and approved by the client.</p>
+    </div>
+</body>
+</html>"""
+        
+        return Response(content=html, media_type="text/html")
+        
+    except Exception as e:
+        logging.error(f"Error generating customer sheets: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # CALENDAR SYNC ENDPOINTS
 @api_router.post("/calendar/google/sync/{project_id}")
 async def sync_google_calendar(project_id: str):
