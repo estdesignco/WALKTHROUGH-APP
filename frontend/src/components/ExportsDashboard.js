@@ -32,6 +32,17 @@ const ExportsDashboard = ({ projectId }) => {
     loadProjectData();
   }, [projectId]);
 
+  useEffect(() => {
+    // Initialize room selections when project loads
+    if (project && project.rooms) {
+      const roomSelections = {};
+      project.rooms.forEach(room => {
+        roomSelections[room.name || room.id] = true;
+      });
+      setCustomerSheetRooms(roomSelections);
+    }
+  }, [project]);
+
   const loadProjectData = async () => {
     try {
       const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
