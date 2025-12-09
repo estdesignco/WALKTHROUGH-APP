@@ -4813,13 +4813,34 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     if attempt > 0:
                         await page.wait_for_timeout(2000)
                         print(f"🔄 Retry attempt {attempt + 1} for password field...")
+                        # Wait more between retries
+                        await page.wait_for_timeout(3000)
                     
                     # First, try to find ANY password input on the page
                     try:
                         all_passwords = await page.query_selector_all('input[type="password"]')
                         num_passwords = len(all_passwords) if all_passwords else 0
                         print(f"🔍 Found {num_passwords} password input(s) on page")
-                        print(f"   all_passwords type: {type(all_passwords)}, truthiness: {bool(all_passwords)}")
+                        
+                        # If no password fields found, try to trigger them
+                        if num_passwords == 0:
+                            print(f"   ⚠️ No password fields - trying to trigger...")
+                            # Try clicking somewhere to trigger JS
+                            try:
+                                await page.click('body')
+                                await page.wait_for_timeout(500)
+                            except:
+                                pass
+                            # Try pressing Enter to submit email and get password field
+                            try:
+                                await page.keyboard.press('Enter')
+                                await page.wait_for_timeout(2000)
+                            except:
+                                pass
+                            # Re-check for password fields
+                            all_passwords = await page.query_selector_all('input[type="password"]')
+                            num_passwords = len(all_passwords) if all_passwords else 0
+                            print(f"   🔍 After trigger: Found {num_passwords} password input(s)")
                         
                         if num_passwords > 0 and all_passwords:
                             print(f"   Entering password loop...")
