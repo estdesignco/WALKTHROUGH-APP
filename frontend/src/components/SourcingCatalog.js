@@ -644,7 +644,10 @@ const ProductCard = ({ product, viewMode, isFavorite, onToggleFavorite, onCopy, 
         <p className="text-xs text-gray-400 truncate">{product.vendor}</p>
         <div className="flex items-center justify-between mt-2">
           <span className="text-[#D4AF37] font-semibold">
-            ${(product.cost || product.price || 0).toLocaleString()}
+            {(product.cost > 0 || product.price > 0) 
+              ? `$${(product.cost || product.price).toLocaleString()}`
+              : <span className="text-gray-500 text-xs">Price on request</span>
+            }
           </span>
           <span className="text-xs text-gray-500">{product.sku}</span>
         </div>
