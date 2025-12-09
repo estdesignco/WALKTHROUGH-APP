@@ -4867,10 +4867,6 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                         break
                                     except:
                                         pass
-                                        
-                            except Exception as pwd_err:
-                                print(f"⚠️ Password input error: {pwd_err}")
-                                continue
                         
                         if password_filled:
                             break
