@@ -4798,10 +4798,39 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     if attempt > 0:
                         await page.wait_for_timeout(2000)
                         print(f"🔄 Retry attempt {attempt + 1} for password field...")
+                    
+                    # First, try to find ANY password input on the page
+                    try:
+                        all_passwords = await page.query_selector_all('input[type="password"]')
+                        print(f"🔍 Found {len(all_passwords)} password input(s) on page")
                         
+                        for pwd_input in all_passwords:
+                            try:
+                                is_visible = await pwd_input.is_visible()
+                                if is_visible:
+                                    print(f"🔑 Found visible password input via query_selector_all")
+                                    await pwd_input.click()
+                                    await page.wait_for_timeout(300)
+                                    await pwd_input.fill('')
+                                    await page.wait_for_timeout(200)
+                                    await pwd_input.type(credentials['password'], delay=50)
+                                    await page.wait_for_timeout(500)
+                                    password_filled = True
+                                    print(f"✅ Filled password")
+                                    break
+                            except Exception as pwd_err:
+                                print(f"⚠️ Password input error: {pwd_err}")
+                                continue
+                        
+                        if password_filled:
+                            break
+                    except Exception as all_pwd_err:
+                        print(f"⚠️ query_selector_all error: {all_pwd_err}")
+                        
+                    # Then try specific selectors
                     for selector in password_selectors:
                         try:
-                            password_input = await page.wait_for_selector(selector, timeout=5000, state='visible')
+                            password_input = await page.wait_for_selector(selector, timeout=3000, state='visible')
                             if password_input:
                                 is_visible = await password_input.is_visible()
                                 if not is_visible:
