@@ -254,7 +254,7 @@ class VendorPortalScraper:
             logger.info(f"Found {len(product_cards)} product cards on Four Hands")
             
             seen_skus = set()
-            for card in product_cards[:30]:
+            for card in product_cards[:100]:  # Get up to 100 products
                 try:
                     href = await card.get_attribute('href') or ''
                     # Extract SKU from URL like /product/IBAR-273
