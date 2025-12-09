@@ -4766,11 +4766,38 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 
                 # Fill password - also try to find it even if username wasn't filled (some sites work differently)
                 password_filled = False
-                for attempt in range(2):  # Try 2 times for password
+                
+                # Some sites show password after you enter email - try pressing Tab or clicking Next
+                if username_filled and not password_filled:
+                    # Try pressing Tab to move to password field
+                    try:
+                        await page.keyboard.press('Tab')
+                        await page.wait_for_timeout(500)
+                    except:
+                        pass
+                    
+                    # Try clicking a "Next" or "Continue" button if present (multi-step login)
+                    try:
+                        next_btns = ['button:has-text("Next")', 'button:has-text("Continue")', 'button:has-text("Proceed")']
+                        for next_btn in next_btns:
+                            try:
+                                btn = await page.wait_for_selector(next_btn, timeout=2000)
+                                if btn:
+                                    await btn.click()
+                                    await page.wait_for_timeout(3000)  # Wait for password field to appear
+                                    print(f"🔄 Clicked '{next_btn}' for multi-step login")
+                                    break
+                            except:
+                                continue
+                    except:
+                        pass
+                
+                for attempt in range(3):  # Try 3 times for password
                     if password_filled:
                         break
                     if attempt > 0:
-                        await page.wait_for_timeout(1000)
+                        await page.wait_for_timeout(2000)
+                        print(f"🔄 Retry attempt {attempt + 1} for password field...")
                         
                     for selector in password_selectors:
                         try:
@@ -4809,7 +4836,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     
                     for selector in submit_selectors:
                         try:
-                            btn = await page.wait_for_selector(selector, timeout=2000, state='visible')
+                            btn = await page.wait_for_selector(selector, timeout=3000, state='visible')
                             if btn:
                                 print(f"🔘 Clicking submit button: {selector}")
                                 await btn.click()
@@ -4824,6 +4851,15 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     
                     login_successful = True
                     print("✅ LOGIN COMPLETE")
+                elif username_filled:
+                    # Even if password wasn't filled via our methods, try submitting
+                    # Some sites may use different approaches
+                    print("⚠️ Password field not found, attempting form submit anyway...")
+                    try:
+                        await page.keyboard.press('Enter')
+                        await page.wait_for_timeout(5000)
+                    except:
+                        pass
                 else:
                     print(f"⚠️ Could not fill login form (username: {username_filled}, password: {password_filled})")
                 
