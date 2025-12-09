@@ -4731,6 +4731,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         continue
                 
                 print("✅ LOGIN COMPLETE")
+                login_successful = True
                 
                 # STEP 4: Navigate to product page with logged-in session
                 print(f"🔄 Navigating to product page with wholesale session: {url}")
