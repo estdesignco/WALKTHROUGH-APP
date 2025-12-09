@@ -266,42 +266,28 @@ VENDOR_CONFIGS = {
     
     "gabby.com": {
         "name": "Gabby Home",
-        "login_url": "https://gabby.com/",
-        "login_type": "modal",
-        "extra_wait_before_login": 10000,
-        "extra_wait_after_trade_click": 5000,  # Extra wait after clicking Trade
-        "trade_button_selectors": [
-            'a:has-text("Trade")', 
-            'a:has-text("TRADE")',
-            'button:has-text("Trade")',
-            'a[href*="trade"]',
-            '.trade-link',
-            'nav a:has-text("Trade")',
-        ],
+        "login_url": "https://account.gabby.com?locale=en&region_country=US",
+        "login_type": "direct",
+        "extra_wait_before_login": 8000,
         "username_selectors": [
             'input[type="email"]', 
             'input[name="email"]',
             'input[placeholder*="email" i]',
-            'input[placeholder*="Email"]',
             '#email',
         ],
         "password_selectors": [
             'input[type="password"]', 
             'input[name="password"]',
-            'input[placeholder*="password" i]',
-            'input[placeholder*="Password"]',
             '#password',
         ],
         "submit_selectors": [
             'button[type="submit"]', 
             'button:has-text("Sign In")',
-            'button:has-text("SIGN IN")',
-            'button:has-text("Login")',
-            'button:has-text("LOG IN")',
+            'button:has-text("Log In")',
             'input[type="submit"]',
         ],
-        "wait_after_login": 12000,
-        "wait_for_content": 10000,
+        "wait_after_login": 10000,
+        "wait_for_content": 8000,
     },
 }
 
