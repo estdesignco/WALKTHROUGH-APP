@@ -303,6 +303,54 @@ class VendorPortalScraper:
                 except Exception as e:
                     logger.debug(f"Error extracting Four Hands product: {e}")
                     continue
+        elif 'globalviews' in base_url.lower():
+            # Global Views uses Magento with specific selectors
+            product_items = await page.query_selector_all('.product-item, .product-item-info')
+            logger.info(f"Found {len(product_items)} product items on Global Views")
+            
+            for item in product_items[:30]:
+                try:
+                    # Get image
+                    img = await item.query_selector('img.product-image-photo, img[src*="media/catalog"]')
+                    img_src = ''
+                    if img:
+                        img_src = await img.get_attribute('src') or await img.get_attribute('data-src') or ''
+                    
+                    # Get link
+                    link_elem = await item.query_selector('a.product-item-link, a[href*="/product/"]')
+                    href = ''
+                    name = ''
+                    if link_elem:
+                        href = await link_elem.get_attribute('href') or ''
+                        name = await link_elem.inner_text() or ''
+                    
+                    # Get price
+                    price_elem = await item.query_selector('.price')
+                    price = None
+                    if price_elem:
+                        price_text = await price_elem.inner_text()
+                        import re
+                        price_match = re.search(r'\$[\d,]+\.?\d*', price_text)
+                        if price_match:
+                            try:
+                                price = float(price_match.group().replace('$', '').replace(',', ''))
+                            except:
+                                pass
+                    
+                    if img_src:
+                        products.append({
+                            'image_url': img_src,
+                            'name': name.strip(),
+                            'price': price,
+                            'cost': price,
+                            'product_link': href,
+                            'vendor': vendor_name,
+                            'source': 'live',
+                            'scraped_at': datetime.now(timezone.utc).isoformat()
+                        })
+                except Exception as e:
+                    logger.debug(f"Error extracting Global Views product: {e}")
+                    continue
         else:
             # Generic extraction for other vendors
             images = await page.query_selector_all(image_selector)
@@ -328,6 +376,7 @@ class VendorPortalScraper:
                             'name': alt,
                             'product_link': link,
                             'vendor': vendor_name,
+                            'source': 'live',
                             'scraped_at': datetime.now(timezone.utc).isoformat()
                         })
                 except Exception as e:
