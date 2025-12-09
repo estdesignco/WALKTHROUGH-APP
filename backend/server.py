@@ -5534,7 +5534,7 @@ async def sync_canva_to_project(data: dict):
 async def scrape_product_advanced(data: dict):
     """
     Advanced product scraping endpoint
-    Uses requests + BeautifulSoup as fallback when Playwright unavailable
+    Uses Playwright FIRST for JavaScript-heavy sites, BeautifulSoup as fallback
     """
     url = data.get('url', '')
     
@@ -5543,6 +5543,39 @@ async def scrape_product_advanced(data: dict):
     
     try:
         print(f"🔍 Scraping product from: {url}")
+        
+        # TRY PLAYWRIGHT FIRST for better JS rendering
+        if PLAYWRIGHT_AVAILABLE:
+            try:
+                print("🚀 Using Playwright scraper for better extraction...")
+                playwright_result = await scrape_product_with_playwright(url)
+                
+                if playwright_result and playwright_result.get('name'):
+                    # Convert to expected format
+                    return {
+                        "success": True,
+                        "data": {
+                            "title": playwright_result.get('name'),
+                            "name": playwright_result.get('name'),
+                            "price": playwright_result.get('price') or playwright_result.get('cost'),
+                            "cost": playwright_result.get('cost') or playwright_result.get('price'),
+                            "description": playwright_result.get('description'),
+                            "image_url": playwright_result.get('image_url'),
+                            "vendor": playwright_result.get('vendor'),
+                            "sku": playwright_result.get('sku'),
+                            "dimensions": playwright_result.get('size'),
+                            "size": playwright_result.get('size'),
+                            "color": playwright_result.get('finish_color'),
+                            "finish_color": playwright_result.get('finish_color'),
+                            "link": url
+                        }
+                    }
+                else:
+                    print("⚠️ Playwright returned incomplete data, trying BeautifulSoup...")
+            except Exception as pw_error:
+                print(f"⚠️ Playwright error: {pw_error}, falling back to BeautifulSoup...")
+        
+        # FALLBACK: BeautifulSoup approach
         
         # Try BeautifulSoup approach first (more reliable in containers)
         import requests
