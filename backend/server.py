@@ -4531,17 +4531,36 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     - Comprehensive data validation and cleanup
     - Handles all modern web technologies (React, Vue, Angular, etc.)
     - AUTHENTICATED SESSIONS: Logs into wholesale sites using stored credentials
+    - VENDOR-SPECIFIC CONFIGURATIONS: Uses optimized selectors for each vendor
     """
     # Get credentials for this vendor domain
     from urllib.parse import urlparse
+    from vendor_config import get_vendor_config
+    
     domain = urlparse(url).netloc.replace('www.', '')
     
     print(f"🔍 Looking up credentials for domain: {domain}")
     
+    # Get vendor-specific configuration
+    vendor_config = get_vendor_config(domain)
+    print(f"📦 Using vendor config for: {vendor_config.get('name', domain)}")
+    
     credentials = None
     try:
-        # Look up credentials in database
+        # Look up credentials in database - try with and without www
         cred_doc = await db.vendor_credentials.find_one({"domain": domain})
+        if not cred_doc:
+            # Try alternate domain formats
+            alt_domains = [
+                domain.replace('www.', ''),
+                f"www.{domain}",
+                domain.split('.')[0] + '.com',  # e.g., fourhands.com
+            ]
+            for alt in alt_domains:
+                cred_doc = await db.vendor_credentials.find_one({"domain": alt})
+                if cred_doc:
+                    break
+        
         print(f"📋 Credential doc found: {cred_doc is not None}")
         if cred_doc:
             # Decrypt password if encrypted
@@ -4559,10 +4578,13 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             else:
                 password = cred_doc.get("password")
             
+            # Use login URL from vendor config if not in database
+            login_url = cred_doc.get("login_url") or vendor_config.get("login_url")
+            
             credentials = {
                 "username": cred_doc.get("username"),
                 "password": password,
-                "login_url": cred_doc.get("login_url")
+                "login_url": login_url
             }
             print(f"🔐 Found credentials for {domain} - Username: {credentials['username']}")
         else:
