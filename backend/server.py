@@ -2761,9 +2761,6 @@ async def autocomplete_products_by_url(url: str = Query("", description="Product
         if not url:
             return {"success": False, "error": "No URL provided", "product": None}
         
-        # Clean the URL for matching
-        url_clean = url.strip().lower()
-        
         # Try different matching strategies
         product = None
         
