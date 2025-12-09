@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, Printer, Calendar as CalendarIcon, Mail } from 'lucide-react';
+import { FileText, Download, Printer, Calendar as CalendarIcon, Mail, CheckSquare } from 'lucide-react';
 
 const ExportsDashboard = ({ projectId }) => {
   const [project, setProject] = useState(null);
@@ -8,6 +8,25 @@ const ExportsDashboard = ({ projectId }) => {
   const [teamsCalendarConnected, setTeamsCalendarConnected] = useState(false);
   const [showGoogleSheetsImport, setShowGoogleSheetsImport] = useState(false);
   const [googleSheetsUrl, setGoogleSheetsUrl] = useState('');
+  const [showCustomerSheets, setShowCustomerSheets] = useState(false);
+  const [customerSheetCategories, setCustomerSheetCategories] = useState({
+    tile: true,
+    flooring: true,
+    appliances: true,
+    paint: true,
+    wallpaper: true,
+    lighting: true,
+    furniture: true,
+    window_treatments: true,
+    plumbing: true,
+    hardware: true,
+    accessories: true,
+    artwork: true,
+    rugs: true,
+    outdoor: true,
+    other: true
+  });
+  const [customerSheetRooms, setCustomerSheetRooms] = useState({});
 
   useEffect(() => {
     loadProjectData();
