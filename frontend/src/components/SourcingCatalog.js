@@ -1024,14 +1024,53 @@ const AddToProjectModal = ({ product, onClose, onSuccess, backendUrl }) => {
   const loadProjectDetails = async (projectId) => {
     try {
       setLoading(true);
-      // Load FF&E rooms specifically
-      const res = await fetch(`${backendUrl}/api/projects/${projectId}?sheet_type=ffe`);
-      const data = await res.json();
+      // First try to load FF&E rooms specifically
+      let res = await fetch(`${backendUrl}/api/projects/${projectId}?sheet_type=ffe`);
+      let data = await res.json();
+      
+      // If no FFE rooms, load all rooms
+      if (!data.rooms || data.rooms.length === 0) {
+        res = await fetch(`${backendUrl}/api/projects/${projectId}`);
+        data = await res.json();
+      }
+      
       setSelectedProject(data);
       setStep(2);
     } catch (err) {
       console.error('Error loading project details:', err);
       setError('Failed to load project rooms');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Create a new FFE room in the project
+  const createNewRoom = async (roomName) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${backendUrl}/api/rooms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: roomName,
+          project_id: selectedProject.id,
+          sheet_type: 'ffe',
+          order_index: selectedProject.rooms?.length || 0
+        })
+      });
+      const newRoom = await res.json();
+      
+      // Update project with new room
+      setSelectedProject(prev => ({
+        ...prev,
+        rooms: [...(prev.rooms || []), { ...newRoom, categories: [] }]
+      }));
+      
+      // Auto-select the new room
+      selectRoom({ ...newRoom, categories: [] });
+    } catch (err) {
+      console.error('Error creating room:', err);
+      setError('Failed to create room');
     } finally {
       setLoading(false);
     }
