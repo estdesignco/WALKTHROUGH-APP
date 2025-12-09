@@ -150,10 +150,12 @@ const SourcingCatalog = () => {
       const mergedResults = [...localResults];
       
       for (const portalProduct of portalResults) {
-        // Check if we already have this product (same SKU AND vendor)
-        const existingIndex = mergedResults.findIndex(
-          p => p.sku === portalProduct.sku && p.vendor === portalProduct.vendor
-        );
+        // Only dedupe if both have SKUs - otherwise always add as new
+        const existingIndex = portalProduct.sku 
+          ? mergedResults.findIndex(
+              p => p.sku && p.sku === portalProduct.sku && p.vendor === portalProduct.vendor
+            )
+          : -1;  // No SKU means always add as new product
         
         if (existingIndex >= 0 && portalProduct.image_url) {
           // Update with fresh portal data
@@ -162,7 +164,7 @@ const SourcingCatalog = () => {
             ...portalProduct,
             source: 'merged'
           };
-        } else if (existingIndex < 0) {
+        } else {
           // If hasImage filter is on, only add portal products with images
           if (!filters.hasImage || portalProduct.image_url) {
             mergedResults.push(portalProduct);
