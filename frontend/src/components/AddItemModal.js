@@ -56,75 +56,79 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
   }, []);
 
   // Auto-lookup product from URL when pasting a link
+  // PRIORITY: Website data > Database data (website is always more current)
   const lookupProductFromUrl = useCallback(async (url) => {
     if (!url || !url.startsWith('http')) return;
     
     setIsLookingUpUrl(true);
-    setUrlLookupMessage('🔍 Looking up product from URL...');
+    setUrlLookupMessage('🔍 Fetching product from website...');
     
     try {
       const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
-      // First, try to match the URL against products in our database
-      const response = await fetch(`${backendUrl}/api/autocomplete/products-by-url?url=${encodeURIComponent(url)}`);
+      // ALWAYS scrape the website first for current data
+      setUrlLookupMessage('📦 Fetching from website...');
       
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.product) {
-          // Found a match in database!
-          const product = data.product;
-          setFormData(prev => ({
-            ...prev,
-            name: product.name || prev.name,
-            vendor: product.vendor || prev.vendor,
-            sku: product.sku || prev.sku,
-            cost: product.cost || product.price || prev.cost,
-            size: product.size || product.dimensions || prev.size,
-            image_url: product.image_url || prev.image_url,
-            finish_color: product.finish_color || product.color || prev.finish_color
-          }));
-          setSearchQuery(product.name || '');
-          setUrlLookupMessage(`✅ Found "${product.name}" from ${product.vendor}`);
-          setTimeout(() => setUrlLookupMessage(''), 3000);
-          return;
-        }
-      }
-      
-      // If not found in database, try to scrape it directly
-      setUrlLookupMessage('📦 Product not in database, fetching from web...');
-      
-      // Call scrape endpoint directly
       const scrapeResponse = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url })
       });
       
+      let websiteData = null;
       if (scrapeResponse.ok) {
-        const scrapeData = await scrapeResponse.json();
-        const data = scrapeData.success ? scrapeData.data : scrapeData;
-        
-        if (data && (data.name || data.title)) {
-          setFormData(prev => ({
-            ...prev,
-            name: data.name || data.title || prev.name,
-            vendor: data.vendor || prev.vendor,
-            sku: data.sku || prev.sku,
-            cost: data.cost || data.price || prev.cost,
-            size: data.size || data.dimensions || prev.size,
-            image_url: data.image_url || data.image || prev.image_url,
-            finish_color: data.color || data.finish || data.finish_color || prev.finish_color,
-            link: url
-          }));
-          setSearchQuery(data.name || data.title || '');
-          setUrlLookupMessage(`✅ Loaded "${data.name || data.title}"`);
-          setTimeout(() => setUrlLookupMessage(''), 3000);
-        } else {
-          setUrlLookupMessage('⚠️ Could not extract product data');
-          setTimeout(() => setUrlLookupMessage(''), 3000);
+        const scrapeResult = await scrapeResponse.json();
+        if (scrapeResult.success && scrapeResult.data) {
+          websiteData = scrapeResult.data;
         }
+      }
+      
+      // Also check database for any missing fields
+      let databaseData = null;
+      try {
+        const dbResponse = await fetch(`${backendUrl}/api/autocomplete/products-by-url?url=${encodeURIComponent(url)}`);
+        if (dbResponse.ok) {
+          const dbResult = await dbResponse.json();
+          if (dbResult.success && dbResult.product) {
+            databaseData = dbResult.product;
+          }
+        }
+      } catch (e) {
+        // Database lookup failed, continue with website data
+      }
+      
+      // Merge data: Website takes priority, database fills gaps
+      if (websiteData || databaseData) {
+        const mergedData = {
+          // Website data takes priority (more current)
+          name: websiteData?.name || websiteData?.title || databaseData?.name || '',
+          vendor: websiteData?.vendor || databaseData?.vendor || '',
+          sku: websiteData?.sku || databaseData?.sku || '',
+          cost: websiteData?.cost || websiteData?.price || databaseData?.cost || databaseData?.price || '',
+          size: websiteData?.size || websiteData?.dimensions || databaseData?.size || databaseData?.dimensions || '',
+          image_url: websiteData?.image_url || websiteData?.image || databaseData?.image_url || '',
+          finish_color: websiteData?.color || websiteData?.finish || websiteData?.finish_color || databaseData?.finish_color || databaseData?.color || '',
+          link: url
+        };
+        
+        setFormData(prev => ({
+          ...prev,
+          name: mergedData.name || prev.name,
+          vendor: mergedData.vendor || prev.vendor,
+          sku: mergedData.sku || prev.sku,
+          cost: mergedData.cost || prev.cost,
+          size: mergedData.size || prev.size,
+          image_url: mergedData.image_url || prev.image_url,
+          finish_color: mergedData.finish_color || prev.finish_color,
+          link: mergedData.link
+        }));
+        setSearchQuery(mergedData.name || '');
+        
+        const source = websiteData ? 'website' : 'database';
+        setUrlLookupMessage(`✅ Loaded "${mergedData.name}" from ${source}`);
+        setTimeout(() => setUrlLookupMessage(''), 3000);
       } else {
-        setUrlLookupMessage('⚠️ Failed to fetch product data');
+        setUrlLookupMessage('⚠️ Could not extract product data');
         setTimeout(() => setUrlLookupMessage(''), 3000);
       }
       
