@@ -42,7 +42,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
   useEffect(() => {
     const fetchVendors = async () => {
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
         const response = await fetch(`${backendUrl}/api/autocomplete/vendors`);
         const data = await response.json();
         if (data.success) {
