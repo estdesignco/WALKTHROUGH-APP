@@ -4818,18 +4818,54 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         
                         for pwd_input in all_passwords:
                             try:
-                                is_visible = await pwd_input.is_visible()
-                                if is_visible:
-                                    print(f"🔑 Found visible password input via query_selector_all")
-                                    await pwd_input.click()
-                                    await page.wait_for_timeout(300)
-                                    await pwd_input.fill('')
+                                # Try to interact even if not "visible" by Playwright standards
+                                # Some React components report as not visible but are interactable
+                                try:
+                                    is_visible = await pwd_input.is_visible()
+                                    print(f"   Password field visibility: {is_visible}")
+                                except:
+                                    is_visible = False
+                                
+                                # Try to fill regardless of visibility status
+                                print(f"🔑 Attempting to fill password field...")
+                                
+                                # Try focus first
+                                try:
+                                    await pwd_input.focus()
                                     await page.wait_for_timeout(200)
-                                    await pwd_input.type(credentials['password'], delay=50)
+                                except:
+                                    pass
+                                
+                                # Click to make sure it's focused
+                                try:
+                                    await pwd_input.click(force=True)  # Force click even if not visible
+                                    await page.wait_for_timeout(300)
+                                except Exception as click_err:
+                                    print(f"   Click failed: {click_err}")
+                                
+                                # Try to fill
+                                try:
+                                    await pwd_input.fill(credentials['password'])
                                     await page.wait_for_timeout(500)
-                                    password_filled = True
-                                    print(f"✅ Filled password")
-                                    break
+                                    
+                                    # Verify it was filled by getting the value
+                                    val = await pwd_input.input_value()
+                                    if val:
+                                        password_filled = True
+                                        print(f"✅ Filled password (value length: {len(val)})")
+                                        break
+                                except Exception as fill_err:
+                                    print(f"   Fill failed: {fill_err}")
+                                    # Try type as fallback
+                                    try:
+                                        await pwd_input.type(credentials['password'], delay=30)
+                                        await page.wait_for_timeout(500)
+                                        password_filled = True
+                                        print(f"✅ Typed password")
+                                        break
+                                    except:
+                                        pass
+                                        
                             except Exception as pwd_err:
                                 print(f"⚠️ Password input error: {pwd_err}")
                                 continue
@@ -4841,23 +4877,26 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         
                     # Then try specific selectors
                     for selector in password_selectors:
+                        if password_filled:
+                            break
                         try:
-                            password_input = await page.wait_for_selector(selector, timeout=3000, state='visible')
+                            password_input = await page.wait_for_selector(selector, timeout=3000)
                             if password_input:
-                                is_visible = await password_input.is_visible()
-                                if not is_visible:
-                                    continue
-                                    
-                                print(f"🔑 Found visible password field: {selector}")
-                                await password_input.click()
-                                await page.wait_for_timeout(300)
-                                await password_input.fill('')
-                                await page.wait_for_timeout(200)
-                                await password_input.type(credentials['password'], delay=50)
-                                await page.wait_for_timeout(500)
-                                password_filled = True
-                                print(f"✅ Filled password")
-                                break
+                                print(f"🔑 Found password field via selector: {selector}")
+                                try:
+                                    await password_input.click(force=True)
+                                    await page.wait_for_timeout(300)
+                                    await password_input.fill(credentials['password'])
+                                    await page.wait_for_timeout(500)
+                                    password_filled = True
+                                    print(f"✅ Filled password")
+                                except:
+                                    try:
+                                        await password_input.type(credentials['password'], delay=30)
+                                        password_filled = True
+                                        print(f"✅ Typed password")
+                                    except:
+                                        pass
                         except:
                             continue
                 
