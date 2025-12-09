@@ -1297,27 +1297,45 @@ const AddToProjectModal = ({ product, onClose, onSuccess, backendUrl }) => {
                     <Home size={16} />
                     Select a Room
                   </h3>
-                  {!selectedProject.rooms || selectedProject.rooms.length === 0 ? (
-                    <p className="text-gray-500 text-center py-4">No FF&E rooms in this project. Add rooms in the FF&E tab first.</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {selectedProject.rooms.map(room => (
-                        <button
-                          key={room.id}
-                          onClick={() => selectRoom(room)}
-                          className="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition flex items-center justify-between group"
-                        >
-                          <div>
-                            <p className="font-medium text-white">{room.name}</p>
-                            <p className="text-sm text-gray-400">
-                              {room.categories?.length || 0} categories
-                            </p>
-                          </div>
-                          <ChevronRight size={18} className="text-gray-500 group-hover:text-[#D4AF37]" />
-                        </button>
-                      ))}
+                  <div className="space-y-2">
+                    {/* Existing rooms */}
+                    {selectedProject.rooms && selectedProject.rooms.map(room => (
+                      <button
+                        key={room.id}
+                        onClick={() => selectRoom(room)}
+                        className="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition flex items-center justify-between group"
+                      >
+                        <div>
+                          <p className="font-medium text-white">{room.name}</p>
+                          <p className="text-sm text-gray-400">
+                            {room.categories?.length || 0} categories
+                            {room.sheet_type && room.sheet_type !== 'ffe' && (
+                              <span className="ml-2 text-xs text-amber-400">({room.sheet_type})</span>
+                            )}
+                          </p>
+                        </div>
+                        <ChevronRight size={18} className="text-gray-500 group-hover:text-[#D4AF37]" />
+                      </button>
+                    ))}
+                    
+                    {/* Create new room option */}
+                    <div className="pt-2 border-t border-gray-700">
+                      <button
+                        onClick={() => {
+                          const roomName = prompt('Enter room name:');
+                          if (roomName && roomName.trim()) {
+                            createNewRoom(roomName.trim());
+                          }
+                        }}
+                        className="w-full p-3 bg-gray-800 hover:bg-gray-700 rounded-lg text-left transition flex items-center justify-between group border border-dashed border-gray-600"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Plus size={18} className="text-[#D4AF37]" />
+                          <p className="font-medium text-[#D4AF37]">Create New Room</p>
+                        </div>
+                      </button>
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
               
