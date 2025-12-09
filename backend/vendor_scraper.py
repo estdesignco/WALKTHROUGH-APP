@@ -240,43 +240,82 @@ class VendorPortalScraper:
         """Extract product data from a search results page"""
         products = []
         selectors = portal_config.get('selectors', {})
+        vendor_name = portal_config.get('name', '')
+        base_url = portal_config.get('base_url', '')
         
         # Get all product images
         image_selector = selectors.get('product_image', 'img.product-image, img[data-product]')
         link_selector = selectors.get('product_link', 'a.product-link, a[href*="/product/"]')
         
-        # Extract images
-        images = await page.query_selector_all(image_selector)
-        links = await page.query_selector_all(link_selector)
-        
-        for i, img in enumerate(images[:20]):  # Limit to 20 products
-            try:
-                src = await img.get_attribute('src') or await img.get_attribute('data-src')
-                alt = await img.get_attribute('alt') or ''
-                
-                # Get corresponding link if available
-                link = ''
-                if i < len(links):
-                    link = await links[i].get_attribute('href') or ''
-                    if link and not link.startswith('http'):
-                        link = portal_config.get('base_url', '') + link
-                
-                if src:
-                    # Make sure image URL is absolute
-                    if not src.startswith('http'):
-                        src = portal_config.get('base_url', '') + src
+        # For Four Hands, the images are inside product cards/links
+        if 'fourhands' in base_url.lower():
+            # Find product links first, then get images within them
+            product_cards = await page.query_selector_all('a[href*="/product/"]')
+            logger.info(f"Found {len(product_cards)} product cards on Four Hands")
+            
+            seen_skus = set()
+            for card in product_cards[:30]:
+                try:
+                    href = await card.get_attribute('href') or ''
+                    # Extract SKU from URL like /product/IBAR-273
+                    sku_match = href.split('/product/')[-1].split('?')[0] if '/product/' in href else ''
                     
-                    products.append({
-                        'image_url': src,
-                        'name': alt,
-                        'product_link': link,
-                        'vendor': portal_config.get('name', ''),
-                        'scraped_at': datetime.now(timezone.utc).isoformat()
-                    })
-            except Exception as e:
-                logger.debug(f"Error extracting product: {e}")
-                continue
+                    if sku_match and sku_match not in seen_skus:
+                        seen_skus.add(sku_match)
+                        
+                        # Get image inside this card
+                        img = await card.query_selector('img[src*="cloudfront"]')
+                        img_src = ''
+                        img_alt = ''
+                        
+                        if img:
+                            img_src = await img.get_attribute('src') or await img.get_attribute('data-src') or ''
+                            img_alt = await img.get_attribute('alt') or ''
+                        
+                        if img_src:
+                            products.append({
+                                'sku': sku_match,
+                                'image_url': img_src,
+                                'name': img_alt or sku_match,
+                                'product_link': base_url + href if not href.startswith('http') else href,
+                                'vendor': vendor_name,
+                                'scraped_at': datetime.now(timezone.utc).isoformat()
+                            })
+                except Exception as e:
+                    logger.debug(f"Error extracting Four Hands product: {e}")
+                    continue
+        else:
+            # Generic extraction for other vendors
+            images = await page.query_selector_all(image_selector)
+            links = await page.query_selector_all(link_selector)
+            
+            for i, img in enumerate(images[:20]):
+                try:
+                    src = await img.get_attribute('src') or await img.get_attribute('data-src')
+                    alt = await img.get_attribute('alt') or ''
+                    
+                    link = ''
+                    if i < len(links):
+                        link = await links[i].get_attribute('href') or ''
+                        if link and not link.startswith('http'):
+                            link = base_url + link
+                    
+                    if src:
+                        if not src.startswith('http'):
+                            src = base_url + src
+                        
+                        products.append({
+                            'image_url': src,
+                            'name': alt,
+                            'product_link': link,
+                            'vendor': vendor_name,
+                            'scraped_at': datetime.now(timezone.utc).isoformat()
+                        })
+                except Exception as e:
+                    logger.debug(f"Error extracting product: {e}")
+                    continue
         
+        logger.info(f"Extracted {len(products)} products from {vendor_name}")
         return products
     
     async def get_product_details(self, vendor_key: str, product_url: str, portal_config: Dict) -> Dict:
