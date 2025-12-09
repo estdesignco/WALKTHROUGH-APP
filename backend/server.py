@@ -4705,16 +4705,25 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             if trade_btn:
                                 print(f"🎯 Found Trade button: {selector} - clicking...")
                                 await trade_btn.click()
-                                await page.wait_for_timeout(5000)  # Wait longer for modal to fully load
+                                
+                                # Use vendor-specific wait or default 5000ms
+                                trade_wait = vendor_config.get('extra_wait_after_trade_click', 5000)
+                                await page.wait_for_timeout(trade_wait)
                                 modal_opened = True
-                                print("✅ Trade button clicked, waiting for modal...")
+                                print(f"✅ Trade button clicked, waited {trade_wait}ms for modal...")
                                 break
                         except:
                             continue
                     
-                    # Extra wait for modal animation
+                    # Extra wait for modal animation and JS rendering
                     if modal_opened:
-                        await page.wait_for_timeout(2000)
+                        await page.wait_for_timeout(3000)
+                        # Try to wait for modal content to appear
+                        try:
+                            await page.wait_for_selector('input[type="password"]', timeout=5000)
+                            print("✅ Password field appeared in modal")
+                        except:
+                            print("⚠️ Password field not immediately visible, continuing...")
                 
                 # STEP 2: Fill in login credentials
                 print("🔍 Step 2: Filling in login credentials...")
