@@ -2751,6 +2751,83 @@ async def get_vendor_list():
     except Exception as e:
         return {"success": False, "error": str(e), "vendors": []}
 
+@api_router.get("/autocomplete/products-by-url")
+async def autocomplete_products_by_url(url: str = Query("", description="Product URL to match")):
+    """
+    Search for a product in the database by matching its URL/product_link.
+    This is used to auto-fill product data when a user pastes a product URL.
+    """
+    try:
+        if not url:
+            return {"success": False, "error": "No URL provided", "product": None}
+        
+        # Clean the URL for matching
+        url_clean = url.strip().lower()
+        
+        # Try different matching strategies
+        product = None
+        
+        # 1. Exact match on product_link
+        product = await db.master_products.find_one(
+            {"product_link": {"$regex": re.escape(url), "$options": "i"}},
+            {"_id": 0}
+        )
+        
+        if not product:
+            # 2. Try matching on link field
+            product = await db.master_products.find_one(
+                {"link": {"$regex": re.escape(url), "$options": "i"}},
+                {"_id": 0}
+            )
+        
+        if not product:
+            # 3. Extract SKU from URL and search
+            # Common URL patterns:
+            # fourhands.com/product/SKU123
+            # globalviews.com/sku/SKU-456
+            # vendor.com/products/product-name-SKU
+            import re as regex_module
+            
+            # Try to extract SKU from URL
+            sku_patterns = [
+                r'/product/([A-Z0-9\-]+)',  # /product/SKU123
+                r'/sku/([A-Z0-9\-]+)',      # /sku/SKU-456
+                r'/([A-Z]{2,4}-\d{3,}[A-Z0-9\-]*)',  # /FH-12345-BLK
+                r'[/-]([A-Z0-9]{3,15})(?:[./]|$)',  # Generic SKU pattern
+            ]
+            
+            for pattern in sku_patterns:
+                match = regex_module.search(pattern, url.upper())
+                if match:
+                    potential_sku = match.group(1)
+                    product = await db.master_products.find_one(
+                        {"sku": {"$regex": f"^{re.escape(potential_sku)}$", "$options": "i"}},
+                        {"_id": 0}
+                    )
+                    if product:
+                        break
+        
+        if product:
+            return {
+                "success": True,
+                "product": product,
+                "matched_by": "url"
+            }
+        
+        return {
+            "success": False,
+            "error": "No matching product found",
+            "product": None
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in product URL lookup: {e}")
+        return {
+            "success": False,
+            "error": str(e),
+            "product": None
+        }
+
 @api_router.get("/product-variants/{base_sku}")
 async def get_product_variants(base_sku: str):
     """Get all variants (finishes/colors/sizes) for a base product SKU"""
