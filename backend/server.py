@@ -4653,60 +4653,84 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         if credentials and credentials.get("username") and credentials.get("password"):
             try:
                 print(f"🔐 STARTING LOGIN FLOW FOR: {domain}")
-                login_url = credentials.get('login_url') or f'https://{domain}'
-                await page.goto(login_url, wait_until='networkidle')
+                
+                # Use vendor-specific login URL
+                login_url = credentials.get('login_url') or vendor_config.get('login_url') or f'https://{domain}'
+                login_type = vendor_config.get('login_type', 'modal')
+                
+                print(f"📍 Login URL: {login_url}")
+                print(f"📍 Login Type: {login_type}")
+                
+                await page.goto(login_url, wait_until='networkidle', timeout=30000)
                 await page.wait_for_timeout(3000)
                 
-                # STEP 1: Look for and click "Trade" button FIRST (opens modal on some sites)
-                print("🔍 Step 1: Looking for Trade/Wholesale button...")
-                trade_button_selectors = [
-                    'a:has-text("Trade")',
-                    'a:has-text("Wholesale")',
-                    'button:has-text("Trade")',
-                    'a:has-text("Trade Account")',
-                    'a:has-text("Trade Sign In")',
-                    'a[href*="trade"]',
-                    'a[href*="wholesale"]'
-                ]
+                # STEP 1: For modal login types, click Trade/Login button first
+                if login_type == 'modal':
+                    print("🔍 Step 1: Looking for Trade/Login button to open modal...")
+                    trade_selectors = vendor_config.get('trade_button_selectors', [
+                        'a:has-text("Trade")',
+                        'a:has-text("Wholesale")',
+                        'button:has-text("Trade")',
+                        'a:has-text("Trade Account")',
+                        'a:has-text("Trade Sign In")',
+                        'a:has-text("Login")',
+                        'a:has-text("Sign In")',
+                        'a[href*="trade"]',
+                        'a[href*="wholesale"]',
+                        'a[href*="login"]',
+                        'a[href*="account"]',
+                    ])
+                    
+                    for selector in trade_selectors:
+                        try:
+                            trade_btn = await page.wait_for_selector(selector, timeout=2000)
+                            if trade_btn:
+                                print(f"🎯 Found Trade button: {selector} - clicking...")
+                                await trade_btn.click()
+                                await page.wait_for_timeout(3000)  # Wait for modal
+                                print("✅ Trade button clicked")
+                                break
+                        except:
+                            continue
                 
-                trade_modal_opened = False
-                for selector in trade_button_selectors:
-                    try:
-                        trade_btn = await page.wait_for_selector(selector, timeout=2000)
-                        if trade_btn:
-                            print(f"🎯 Found Trade button: {selector} - clicking to open modal...")
-                            await trade_btn.click()
-                            await page.wait_for_timeout(3000)  # Wait for modal to appear
-                            trade_modal_opened = True
-                            print("✅ Trade button clicked - modal should be open")
-                            break
-                    except:
-                        continue
-                
-                # STEP 2: Now fill in login fields (either in modal or main page)
+                # STEP 2: Fill in login credentials
                 print("🔍 Step 2: Filling in login credentials...")
-                login_selectors = [
-                    'input[name="email"], input[type="email"]',
-                    'input[name="username"], input[id="username"]',
-                    'input[placeholder*="email" i]'
+                
+                # Use vendor-specific selectors with fallbacks
+                username_selectors = vendor_config.get('username_selectors', []) + [
+                    'input[name="email"]',
+                    'input[type="email"]',
+                    'input[name="username"]',
+                    'input[id="username"]',
+                    'input[id="email"]',
+                    'input[placeholder*="email" i]',
+                    'input[placeholder*="username" i]',
+                    '#email',
+                    '#user_login',
                 ]
                 
-                password_selectors = [
-                    'input[name="password"], input[type="password"]',
-                    'input[id="password"]'
+                password_selectors = vendor_config.get('password_selectors', []) + [
+                    'input[name="password"]',
+                    'input[type="password"]',
+                    'input[id="password"]',
+                    '#pass',
+                    '#user_pass',
                 ]
                 
                 # Fill username/email
                 username_filled = False
-                for selector in login_selectors:
+                for selector in username_selectors:
                     try:
-                        username_input = await page.wait_for_selector(selector, timeout=5000, state='visible')
+                        username_input = await page.wait_for_selector(selector, timeout=3000, state='visible')
                         if username_input:
-                            print(f"📧 Found visible username field")
+                            print(f"📧 Found visible username field: {selector}")
                             await username_input.click()
+                            await page.wait_for_timeout(300)
+                            # Clear any existing value
+                            await username_input.fill('')
+                            await page.wait_for_timeout(200)
+                            await username_input.type(credentials['username'], delay=50)
                             await page.wait_for_timeout(500)
-                            await username_input.type(credentials['username'], delay=100)
-                            await page.wait_for_timeout(1000)
                             username_filled = True
                             print(f"✅ Filled username: {credentials['username']}")
                             break
@@ -4714,68 +4738,92 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         continue
                 
                 # Fill password
+                password_filled = False
                 if username_filled:
                     for selector in password_selectors:
                         try:
-                            password_input = await page.wait_for_selector(selector, timeout=5000, state='visible')
+                            password_input = await page.wait_for_selector(selector, timeout=3000, state='visible')
                             if password_input:
-                                print(f"🔑 Found visible password field")
+                                print(f"🔑 Found visible password field: {selector}")
                                 await password_input.click()
+                                await page.wait_for_timeout(300)
+                                await password_input.fill('')
+                                await page.wait_for_timeout(200)
+                                await password_input.type(credentials['password'], delay=50)
                                 await page.wait_for_timeout(500)
-                                await password_input.type(credentials['password'], delay=100)
-                                await page.wait_for_timeout(1000)
+                                password_filled = True
                                 print(f"✅ Filled password")
                                 break
                         except:
                             continue
                 
                 # STEP 3: Click submit button
-                print("🔍 Step 3: Clicking submit button...")
-                login_button_selectors = [
-                    'button[type="submit"]',
-                    'input[type="submit"]',
-                    'button:has-text("SIGN IN")',
-                    'button:has-text("Sign In")',
-                    'button:has-text("Log In")',
-                    'button:has-text("Login")'
-                ]
-                
-                for selector in login_button_selectors:
-                    try:
-                        btn = await page.wait_for_selector(selector, timeout=3000, state='visible')
-                        if btn:
-                            print(f"🔘 Clicking submit button")
-                            await btn.click()
-                            await page.wait_for_timeout(8000)  # Wait for login to complete and modal to close
-                            print(f"✅ Submit clicked, waiting for login to complete...")
-                            break
-                    except:
-                        continue
-                
-                print("✅ LOGIN COMPLETE")
-                login_successful = True
+                if username_filled and password_filled:
+                    print("🔍 Step 3: Clicking submit button...")
+                    submit_selectors = vendor_config.get('submit_selectors', []) + [
+                        'button[type="submit"]',
+                        'input[type="submit"]',
+                        'button:has-text("SIGN IN")',
+                        'button:has-text("Sign In")',
+                        'button:has-text("Log In")',
+                        'button:has-text("Login")',
+                        '#send2',
+                        '#wp-submit',
+                    ]
+                    
+                    for selector in submit_selectors:
+                        try:
+                            btn = await page.wait_for_selector(selector, timeout=2000, state='visible')
+                            if btn:
+                                print(f"🔘 Clicking submit button: {selector}")
+                                await btn.click()
+                                
+                                # Wait for login to complete
+                                wait_time = vendor_config.get('wait_after_login', 8000)
+                                await page.wait_for_timeout(wait_time)
+                                print(f"✅ Submit clicked, waited {wait_time}ms for login")
+                                break
+                        except:
+                            continue
+                    
+                    login_successful = True
+                    print("✅ LOGIN COMPLETE")
+                else:
+                    print(f"⚠️ Could not fill login form (username: {username_filled}, password: {password_filled})")
                 
                 # STEP 4: Navigate to product page with logged-in session
-                print(f"🔄 Navigating to product page with wholesale session: {url}")
-                await page.goto(url, wait_until='networkidle', timeout=45000)
-                
-                # Wait for wholesale content to load and try to trigger it
-                await page.wait_for_timeout(3000)
-                
-                # Try to close any popups/modals that might be blocking
-                try:
-                    await page.click('[aria-label="Close"], .modal-close, button:has-text("Close")', timeout=2000)
-                    print("✅ Closed popup")
-                except:
-                    pass
-                
-                # Scroll to trigger lazy loading of wholesale prices
-                await page.evaluate("window.scrollTo(0, document.body.scrollHeight/2)")
-                await page.wait_for_timeout(2000)
-                
-                # Wait extra time for AJAX to load wholesale pricing
-                await page.wait_for_timeout(5000)
-                print("✅ Product page reloaded with wholesale session")
+                if login_successful:
+                    print(f"🔄 Navigating to product page with wholesale session: {url}")
+                    await page.goto(url, wait_until='networkidle', timeout=45000)
+                    
+                    # Wait for content to load
+                    content_wait = vendor_config.get('wait_for_content', 5000)
+                    await page.wait_for_timeout(content_wait)
+                    
+                    # Try to close any popups/modals that might be blocking
+                    try:
+                        close_selectors = [
+                            '[aria-label="Close"]',
+                            '.modal-close',
+                            'button:has-text("Close")',
+                            '.close-button',
+                            '[data-dismiss="modal"]',
+                        ]
+                        for close_sel in close_selectors:
+                            try:
+                                await page.click(close_sel, timeout=1000)
+                                print(f"✅ Closed popup with: {close_sel}")
+                                break
+                            except:
+                                continue
+                    except:
+                        pass
+                    
+                    # Scroll to trigger lazy loading
+                    await page.evaluate("window.scrollTo(0, document.body.scrollHeight/2)")
+                    await page.wait_for_timeout(2000)
+                    
+                    print("✅ Product page loaded with wholesale session")
                 
             except Exception as login_error:
                 print(f"⚠️ Login failed (will try scraping anyway): {login_error}")
