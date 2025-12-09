@@ -579,7 +579,10 @@ const ProductCard = ({ product, viewMode, isFavorite, onToggleFavorite, onCopy, 
           <h3 className="font-medium text-white truncate">{product.name}</h3>
           <p className="text-sm text-gray-400">{product.vendor} • {product.sku}</p>
           <p className="text-lg font-semibold text-[#D4AF37] mt-1">
-            ${(product.cost || product.price || 0).toLocaleString()}
+            {(product.cost > 0 || product.price > 0) 
+              ? `$${(product.cost || product.price).toLocaleString()}`
+              : <span className="text-gray-500 text-sm">Price on request</span>
+            }
           </p>
         </div>
         <div className="flex flex-col gap-2">
