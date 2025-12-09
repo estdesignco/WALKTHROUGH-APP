@@ -4544,9 +4544,24 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         cred_doc = await db.vendor_credentials.find_one({"domain": domain})
         print(f"📋 Credential doc found: {cred_doc is not None}")
         if cred_doc:
+            # Decrypt password if encrypted
+            password = None
+            if cred_doc.get("encrypted_password"):
+                try:
+                    fernet_key = os.environ.get('FERNET_KEY')
+                    if fernet_key:
+                        from cryptography.fernet import Fernet
+                        fernet = Fernet(fernet_key.encode())
+                        password = fernet.decrypt(cred_doc["encrypted_password"].encode()).decode()
+                except Exception as decrypt_error:
+                    print(f"⚠️ Could not decrypt password: {decrypt_error}")
+                    password = cred_doc.get("password")
+            else:
+                password = cred_doc.get("password")
+            
             credentials = {
                 "username": cred_doc.get("username"),
-                "password": cred_doc.get("password"),
+                "password": password,
                 "login_url": cred_doc.get("login_url")
             }
             print(f"🔐 Found credentials for {domain} - Username: {credentials['username']}")
