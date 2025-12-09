@@ -36,17 +36,17 @@ async def save_credentials():
         ("loloirugs", "loloirugs.com", "Loloi Rugs"),
         ("visualcomfort", "visualcomfort.com", "Visual Comfort"),
         ("hvlgroup", "hvlgroup.com", "HVL Group"),
-        ("vandh", "?"vandh", "Flow Decor"),
+        ("vandh", "?""flowdecor", "flowdecor.com", "Flow Decor"),
         ("crestview", "crestviewcollection.com", "Crestview Collection"),
         ("bassettmirror", "bassettmirror.com", "Bassett Mirror"),
         ("eichholtz", "eichholtz.com", "Eichholtz"),
-        ("myohamerica", "myohamerica.com", "?"safavieh", "safavieh.com", "Safavieh"),
+        ("myohamerica", "myohamerica.com", "?"("safavieh", "safavieh.com", "Safavieh"),
         ("surya", "surya.com", "Surya"),
         ("zeevlighting", "zeevlighting.com", "Zeev Lighting"),
         ("hubbardtonforge", "hubbardtonforge.com", "Hubbardton Forge"),
         ("hinkley", "hinkley.com", "Hinkley"),
         ("elegantlighting", "elegantlighting.com", "Elegant Lighting"),
-        ("gabby", "?"gabbyhome.com", "Gabby Home"),
+        ("gabby", "gabbyhome.com", "Gabby Home"),
     ]
     
     username = "megan@estdesignco.com"
