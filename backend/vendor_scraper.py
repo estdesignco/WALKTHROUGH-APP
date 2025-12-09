@@ -272,13 +272,32 @@ class VendorPortalScraper:
                             img_src = await img.get_attribute('src') or await img.get_attribute('data-src') or ''
                             img_alt = await img.get_attribute('alt') or ''
                         
+                        # Extract price from card text
+                        card_text = await card.inner_text()
+                        price = None
+                        import re
+                        price_match = re.search(r'\$[\d,]+\.?\d*', card_text)
+                        if price_match:
+                            price_str = price_match.group().replace('$', '').replace(',', '')
+                            try:
+                                price = float(price_str)
+                            except:
+                                pass
+                        
+                        # Extract product name from text (usually after badges like "New", "Performance Options")
+                        name_lines = [l.strip() for l in card_text.split('\n') if l.strip() and not l.strip().startswith('$') and l.strip() not in ['New', 'Performance Options', 'Hospitality', 'More Options', 'In Stock']]
+                        product_name = name_lines[0] if name_lines else img_alt or sku_match
+                        
                         if img_src:
                             products.append({
                                 'sku': sku_match,
                                 'image_url': img_src,
-                                'name': img_alt or sku_match,
+                                'name': product_name,
+                                'price': price,
+                                'cost': price,
                                 'product_link': base_url + href if not href.startswith('http') else href,
                                 'vendor': vendor_name,
+                                'source': 'live',
                                 'scraped_at': datetime.now(timezone.utc).isoformat()
                             })
                 except Exception as e:
