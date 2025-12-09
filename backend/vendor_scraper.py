@@ -304,46 +304,31 @@ class VendorPortalScraper:
                     logger.debug(f"Error extracting Four Hands product: {e}")
                     continue
         elif 'globalviews' in base_url.lower():
-            # Global Views uses Magento with specific selectors
-            product_items = await page.query_selector_all('.product-item, .product-item-info')
-            logger.info(f"Found {len(product_items)} product items on Global Views")
+            # Global Views uses Klevu search - find images with klevu_images
+            klevu_images = await page.query_selector_all('img[src*="klevu_images"]')
+            logger.info(f"Found {len(klevu_images)} Klevu images on Global Views")
             
-            for item in product_items[:30]:
+            for img in klevu_images[:30]:
                 try:
-                    # Get image
-                    img = await item.query_selector('img.product-image-photo, img[src*="media/catalog"]')
-                    img_src = ''
-                    if img:
-                        img_src = await img.get_attribute('src') or await img.get_attribute('data-src') or ''
+                    img_src = await img.get_attribute('src') or ''
+                    img_alt = await img.get_attribute('alt') or ''
                     
-                    # Get link
-                    link_elem = await item.query_selector('a.product-item-link, a[href*="/product/"]')
+                    # Get parent link
+                    parent = await img.evaluate('el => el.closest("a")')
                     href = ''
-                    name = ''
-                    if link_elem:
-                        href = await link_elem.get_attribute('href') or ''
-                        name = await link_elem.inner_text() or ''
-                    
-                    # Get price
-                    price_elem = await item.query_selector('.price')
-                    price = None
-                    if price_elem:
-                        price_text = await price_elem.inner_text()
-                        import re
-                        price_match = re.search(r'\$[\d,]+\.?\d*', price_text)
-                        if price_match:
-                            try:
-                                price = float(price_match.group().replace('$', '').replace(',', ''))
-                            except:
-                                pass
+                    if parent:
+                        try:
+                            link_elem = await img.query_selector('xpath=ancestor::a')
+                            if link_elem:
+                                href = await link_elem.get_attribute('href') or ''
+                        except:
+                            pass
                     
                     if img_src:
                         products.append({
                             'image_url': img_src,
-                            'name': name.strip(),
-                            'price': price,
-                            'cost': price,
-                            'product_link': href,
+                            'name': img_alt.strip(),
+                            'product_link': href if href.startswith('http') else base_url + href if href else '',
                             'vendor': vendor_name,
                             'source': 'live',
                             'scraped_at': datetime.now(timezone.utc).isoformat()
