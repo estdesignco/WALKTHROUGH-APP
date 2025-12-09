@@ -4814,10 +4814,13 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     # First, try to find ANY password input on the page
                     try:
                         all_passwords = await page.query_selector_all('input[type="password"]')
-                        print(f"🔍 Found {len(all_passwords)} password input(s) on page")
+                        num_passwords = len(all_passwords) if all_passwords else 0
+                        print(f"🔍 Found {num_passwords} password input(s) on page")
                         
-                        for pwd_input in all_passwords:
-                            try:
+                        if num_passwords > 0:
+                            for idx, pwd_input in enumerate(all_passwords):
+                                print(f"🔐 Processing password input {idx + 1}/{num_passwords}...")
+                                try:
                                 # Try to interact even if not "visible" by Playwright standards
                                 # Some React components report as not visible but are interactable
                                 try:
