@@ -442,6 +442,142 @@ const ExportsDashboard = ({ projectId }) => {
           </div>
         </div>
       )}
+
+      {/* CUSTOMER SHEETS MODAL */}
+      {showCustomerSheets && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1E293B] border-2 border-[#D4A574] rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-bold text-[#D4A574] mb-6">📋 Customer Sheets - Select Items to Print</h3>
+            <p className="text-[#B49B7E] mb-6">Choose which categories and rooms to include in the customer handoff document.</p>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Categories Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-xl font-bold text-[#D4C5A9]">📂 Categories</h4>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => toggleAllCategories(true)}
+                      className="text-xs bg-green-700 hover:bg-green-600 text-white px-3 py-1 rounded"
+                    >
+                      Select All
+                    </button>
+                    <button
+                      onClick={() => toggleAllCategories(false)}
+                      className="text-xs bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries({
+                    tile: '🔲 Tile',
+                    flooring: '🪵 Flooring',
+                    appliances: '🍳 Appliances',
+                    paint: '🎨 Paint',
+                    wallpaper: '🖼️ Wallpaper',
+                    lighting: '💡 Lighting',
+                    furniture: '🛋️ Furniture',
+                    window_treatments: '🪟 Window Treatments',
+                    plumbing: '🚿 Plumbing',
+                    hardware: '🔩 Hardware',
+                    accessories: '🏺 Accessories',
+                    artwork: '🖼️ Artwork',
+                    rugs: '🟫 Rugs',
+                    outdoor: '🌿 Outdoor',
+                    other: '📦 Other'
+                  }).map(([key, label]) => (
+                    <label key={key} className="flex items-center gap-2 p-2 rounded-lg bg-black/30 hover:bg-black/50 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={customerSheetCategories[key] || false}
+                        onChange={(e) => setCustomerSheetCategories(prev => ({
+                          ...prev,
+                          [key]: e.target.checked
+                        }))}
+                        className="w-4 h-4 text-[#D4A574] bg-gray-800 border-gray-600 rounded focus:ring-[#D4A574]"
+                      />
+                      <span className="text-sm text-[#D4C5A9]">{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rooms Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-xl font-bold text-[#D4C5A9]">🏠 Rooms</h4>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => toggleAllRooms(true)}
+                      className="text-xs bg-green-700 hover:bg-green-600 text-white px-3 py-1 rounded"
+                    >
+                      Select All
+                    </button>
+                    <button
+                      onClick={() => toggleAllRooms(false)}
+                      className="text-xs bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                  {Object.keys(customerSheetRooms).length > 0 ? (
+                    Object.entries(customerSheetRooms).map(([roomName, selected]) => (
+                      <label key={roomName} className="flex items-center gap-2 p-3 rounded-lg bg-black/30 hover:bg-black/50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={(e) => setCustomerSheetRooms(prev => ({
+                            ...prev,
+                            [roomName]: e.target.checked
+                          }))}
+                          className="w-4 h-4 text-[#D4A574] bg-gray-800 border-gray-600 rounded focus:ring-[#D4A574]"
+                        />
+                        <span className="text-sm text-[#D4C5A9]">🚪 {roomName}</span>
+                      </label>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-sm">No rooms available. Add rooms to your project first.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Preview Info */}
+            <div className="mt-6 p-4 bg-[#D4A574]/10 border border-[#D4A574]/30 rounded-lg">
+              <h5 className="text-[#D4A574] font-bold mb-2">📄 Document Preview</h5>
+              <p className="text-sm text-[#B49B7E]">
+                Selected: {Object.values(customerSheetCategories).filter(Boolean).length} categories, {Object.values(customerSheetRooms).filter(Boolean).length} rooms
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                The customer sheet will include: item name, vendor, finish/color, quantity, and image for each selected item.
+                This is designed to be given to clients at project close and install.
+              </p>
+            </div>
+            
+            <div className="flex gap-4 mt-6">
+              <button
+                onClick={generateCustomerSheets}
+                className="flex-1 bg-[#F472B6] hover:bg-[#EC4899] text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center gap-2"
+              >
+                <Printer className="w-5 h-5" />
+                Generate Customer Sheets
+              </button>
+              <button
+                onClick={() => setShowCustomerSheets(false)}
+                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-bold"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
