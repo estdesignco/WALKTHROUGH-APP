@@ -223,8 +223,8 @@ class VendorPortalScraper:
             search_url = portal_config.get('search_url', '').format(query=query)
             
             logger.info(f"Searching {vendor_key}: {search_url}")
-            await page.goto(search_url, wait_until='networkidle', timeout=30000)
-            await asyncio.sleep(2)
+            await page.goto(search_url, wait_until='domcontentloaded', timeout=60000)
+            await asyncio.sleep(5)  # Wait for JS to render products
             
             # Extract product data
             products = await self._extract_products(page, portal_config)
