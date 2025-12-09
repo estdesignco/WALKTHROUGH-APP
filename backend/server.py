@@ -4816,8 +4816,10 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         all_passwords = await page.query_selector_all('input[type="password"]')
                         num_passwords = len(all_passwords) if all_passwords else 0
                         print(f"🔍 Found {num_passwords} password input(s) on page")
+                        print(f"   all_passwords type: {type(all_passwords)}, truthiness: {bool(all_passwords)}")
                         
-                        if num_passwords > 0:
+                        if num_passwords > 0 and all_passwords:
+                            print(f"   Entering password loop...")
                             for idx, pwd_input in enumerate(all_passwords):
                                 print(f"🔐 Processing password input {idx + 1}/{num_passwords}...")
                                 # Try to interact even if not "visible" by Playwright standards
