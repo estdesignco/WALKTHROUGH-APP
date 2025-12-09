@@ -150,10 +150,9 @@ const SourcingCatalog = () => {
       const mergedResults = [...localResults];
       
       for (const portalProduct of portalResults) {
-        // Check if we already have this product
+        // Check if we already have this product (same SKU AND vendor)
         const existingIndex = mergedResults.findIndex(
-          p => p.sku === portalProduct.sku || 
-               (p.name && portalProduct.name && p.name.toLowerCase() === portalProduct.name.toLowerCase())
+          p => p.sku === portalProduct.sku && p.vendor === portalProduct.vendor
         );
         
         if (existingIndex >= 0 && portalProduct.image_url) {
