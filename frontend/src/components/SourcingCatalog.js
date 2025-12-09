@@ -988,114 +988,510 @@ const VendorCredentialsModal = ({ portals, credentials, loginStatus, onClose, on
   );
 };
 
-// Product Detail Modal
-const ProductDetailModal = ({ product, onClose, backendUrl }) => {
-  // Construct product link if not available
-  const productLink = product.product_link || 
-    (product.vendor === 'Four Hands' ? `https://www.fourhands.com/product/${product.sku}` : null);
+// Add to Project Modal - Select project, room, category, subcategory
+const AddToProjectModal = ({ product, onClose, onSuccess, backendUrl }) => {
+  const [step, setStep] = useState(1); // 1: project, 2: room, 3: category, 4: subcategory
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  
+  // Data
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  
+  // Load projects on mount
+  useEffect(() => {
+    loadProjects();
+  }, []);
+  
+  const loadProjects = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${backendUrl}/api/projects`);
+      const data = await res.json();
+      setProjects(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error loading projects:', err);
+      setError('Failed to load projects');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const loadProjectDetails = async (projectId) => {
+    try {
+      setLoading(true);
+      // Load FF&E rooms specifically
+      const res = await fetch(`${backendUrl}/api/projects/${projectId}?sheet_type=ffe`);
+      const data = await res.json();
+      setSelectedProject(data);
+      setStep(2);
+    } catch (err) {
+      console.error('Error loading project details:', err);
+      setError('Failed to load project rooms');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const selectRoom = (room) => {
+    setSelectedRoom(room);
+    if (room.categories && room.categories.length > 0) {
+      setStep(3);
+    } else {
+      // No categories, create item directly in a default subcategory
+      createDefaultAndAddItem(room.id, null);
+    }
+  };
+  
+  const selectCategory = (category) => {
+    setSelectedCategory(category);
+    if (category.subcategories && category.subcategories.length > 0) {
+      setStep(4);
+    } else {
+      // No subcategories, create one and add item
+      createDefaultAndAddItem(selectedRoom.id, category.id);
+    }
+  };
+  
+  const createDefaultAndAddItem = async (roomId, categoryId) => {
+    setSaving(true);
+    setError(null);
+    try {
+      let subcategoryId = null;
+      
+      // If no category, create one first
+      if (!categoryId) {
+        const catRes = await fetch(`${backendUrl}/api/categories`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'Furniture',
+            room_id: roomId,
+            order_index: 0
+          })
+        });
+        const catData = await catRes.json();
+        categoryId = catData.id;
+      }
+      
+      // Create default subcategory
+      const subRes = await fetch(`${backendUrl}/api/subcategories`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Items',
+          category_id: categoryId,
+          order_index: 0
+        })
+      });
+      const subData = await subRes.json();
+      subcategoryId = subData.id;
+      
+      // Now add the item
+      await addItemToSubcategory(subcategoryId);
+    } catch (err) {
+      console.error('Error creating default structure:', err);
+      setError('Failed to add item to project');
+      setSaving(false);
+    }
+  };
+  
+  const addItemToSubcategory = async (subcategoryId) => {
+    setSaving(true);
+    setError(null);
+    try {
+      const itemData = {
+        name: product.name || 'Unknown Product',
+        quantity: 1,
+        vendor: product.vendor || '',
+        sku: product.sku || '',
+        cost: product.cost || product.price || 0,
+        price: product.cost || product.price || 0,
+        image_url: product.image_url || '',
+        link: product.product_link || '',
+        product_link: product.product_link || '',
+        size: product.dimensions || '',
+        description: product.description || '',
+        finish_color: product.finish_color || '',
+        subcategory_id: subcategoryId,
+        status: 'blank'
+      };
+      
+      const res = await fetch(`${backendUrl}/api/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(itemData)
+      });
+      
+      if (!res.ok) {
+        throw new Error('Failed to create item');
+      }
+      
+      const data = await res.json();
+      onSuccess && onSuccess(data);
+      onClose();
+    } catch (err) {
+      console.error('Error adding item:', err);
+      setError('Failed to add item to project');
+    } finally {
+      setSaving(false);
+    }
+  };
+  
+  const handleSubcategorySelect = (subcategory) => {
+    setSelectedSubcategory(subcategory);
+    addItemToSubcategory(subcategory.id);
+  };
+  
+  // Breadcrumb navigation
+  const getBreadcrumb = () => {
+    const parts = [];
+    if (selectedProject) parts.push(selectedProject.name);
+    if (selectedRoom) parts.push(selectedRoom.name);
+    if (selectedCategory) parts.push(selectedCategory.name);
+    return parts.join(' > ');
+  };
   
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
-        <div className="p-4 border-b border-gray-700 flex justify-between items-center">
-          <h2 className="text-xl font-bold truncate">{product.name}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-lg">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-4">
+      <div className="bg-gray-800 rounded-xl max-w-lg w-full max-h-[80vh] overflow-hidden border border-[#8b7355]">
+        {/* Header */}
+        <div className="p-4 border-b border-[#8b7355] flex justify-between items-center" style={{
+          background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`
+        }}>
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Plus size={20} />
+              Add to Project
+            </h2>
+            {getBreadcrumb() && (
+              <p className="text-sm text-white/70 mt-1">{getBreadcrumb()}</p>
+            )}
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-black/20 rounded-lg text-white">
             <X size={20} />
           </button>
         </div>
         
-        <div className="p-6 overflow-y-auto">
-          <div className="flex gap-6">
-            {/* Image */}
-            <div className="w-1/2">
-              <div className="aspect-square bg-gray-700 rounded-xl overflow-hidden">
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-6xl">📦</div>
-                )}
-              </div>
+        {/* Content */}
+        <div className="p-4 overflow-y-auto max-h-[60vh]">
+          {/* Product Preview */}
+          <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg mb-4">
+            <div className="w-16 h-16 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
+              {product.image_url ? (
+                <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-2xl">📦</div>
+              )}
             </div>
-            
-            {/* Details */}
-            <div className="w-1/2 space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-white truncate">{product.name}</p>
+              <p className="text-sm text-gray-400">{product.vendor} • {product.sku}</p>
+              <p className="text-sm text-[#D4AF37] font-medium">
+                ${(product.cost || product.price || 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+          
+          {error && (
+            <div className="p-3 bg-red-900/30 border border-red-500/50 rounded-lg mb-4 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+          
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="animate-spin text-[#D4AF37]" size={32} />
+            </div>
+          ) : saving ? (
+            <div className="flex flex-col items-center justify-center py-8">
+              <Loader2 className="animate-spin text-[#D4AF37] mb-2" size={32} />
+              <p className="text-gray-400">Adding to project...</p>
+            </div>
+          ) : (
+            <>
+              {/* Step 1: Select Project */}
+              {step === 1 && (
                 <div>
-                  <p className="text-sm text-gray-400">Vendor</p>
-                  <p className="font-medium">{product.vendor}</p>
+                  <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+                    <FolderOpen size={16} />
+                    Select a Project
+                  </h3>
+                  {projects.length === 0 ? (
+                    <p className="text-gray-500 text-center py-4">No projects found. Create a project first.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {projects.map(project => (
+                        <button
+                          key={project.id}
+                          onClick={() => loadProjectDetails(project.id)}
+                          className="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition flex items-center justify-between group"
+                        >
+                          <div>
+                            <p className="font-medium text-white">{project.name}</p>
+                            <p className="text-sm text-gray-400">
+                              {project.client_info?.full_name || 'No client'}
+                            </p>
+                          </div>
+                          <ChevronRight size={18} className="text-gray-500 group-hover:text-[#D4AF37]" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Step 2: Select Room */}
+              {step === 2 && selectedProject && (
+                <div>
+                  <button
+                    onClick={() => { setStep(1); setSelectedProject(null); setSelectedRoom(null); }}
+                    className="text-sm text-[#D4AF37] hover:underline mb-3 flex items-center gap-1"
+                  >
+                    ← Back to projects
+                  </button>
+                  <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+                    <Home size={16} />
+                    Select a Room
+                  </h3>
+                  {!selectedProject.rooms || selectedProject.rooms.length === 0 ? (
+                    <p className="text-gray-500 text-center py-4">No FF&E rooms in this project. Add rooms in the FF&E tab first.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {selectedProject.rooms.map(room => (
+                        <button
+                          key={room.id}
+                          onClick={() => selectRoom(room)}
+                          className="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition flex items-center justify-between group"
+                        >
+                          <div>
+                            <p className="font-medium text-white">{room.name}</p>
+                            <p className="text-sm text-gray-400">
+                              {room.categories?.length || 0} categories
+                            </p>
+                          </div>
+                          <ChevronRight size={18} className="text-gray-500 group-hover:text-[#D4AF37]" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Step 3: Select Category */}
+              {step === 3 && selectedRoom && (
+                <div>
+                  <button
+                    onClick={() => { setStep(2); setSelectedRoom(null); setSelectedCategory(null); }}
+                    className="text-sm text-[#D4AF37] hover:underline mb-3 flex items-center gap-1"
+                  >
+                    ← Back to rooms
+                  </button>
+                  <h3 className="text-sm font-medium text-gray-400 mb-3">Select a Category</h3>
+                  <div className="space-y-2">
+                    {selectedRoom.categories.map(category => (
+                      <button
+                        key={category.id}
+                        onClick={() => selectCategory(category)}
+                        className="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition flex items-center justify-between group"
+                      >
+                        <div>
+                          <p className="font-medium text-white">{category.name}</p>
+                          <p className="text-sm text-gray-400">
+                            {category.subcategories?.length || 0} subcategories
+                          </p>
+                        </div>
+                        <ChevronRight size={18} className="text-gray-500 group-hover:text-[#D4AF37]" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Step 4: Select Subcategory */}
+              {step === 4 && selectedCategory && (
+                <div>
+                  <button
+                    onClick={() => { setStep(3); setSelectedCategory(null); setSelectedSubcategory(null); }}
+                    className="text-sm text-[#D4AF37] hover:underline mb-3 flex items-center gap-1"
+                  >
+                    ← Back to categories
+                  </button>
+                  <h3 className="text-sm font-medium text-gray-400 mb-3">Select a Subcategory</h3>
+                  <div className="space-y-2">
+                    {selectedCategory.subcategories.map(subcategory => (
+                      <button
+                        key={subcategory.id}
+                        onClick={() => handleSubcategorySelect(subcategory)}
+                        className="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition flex items-center justify-between group"
+                      >
+                        <div>
+                          <p className="font-medium text-white">{subcategory.name}</p>
+                          <p className="text-sm text-gray-400">
+                            {subcategory.items?.length || 0} items
+                          </p>
+                        </div>
+                        <Plus size={18} className="text-gray-500 group-hover:text-[#D4AF37]" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Product Detail Modal
+const ProductDetailModal = ({ product, onClose, backendUrl }) => {
+  const [showAddToProject, setShowAddToProject] = useState(false);
+  const [addedSuccess, setAddedSuccess] = useState(false);
+  
+  // Construct product link if not available
+  const productLink = product.product_link || 
+    (product.vendor === 'Four Hands' ? `https://www.fourhands.com/product/${product.sku}` : null);
+  
+  const handleAddSuccess = (item) => {
+    setAddedSuccess(true);
+    setTimeout(() => {
+      setAddedSuccess(false);
+    }, 3000);
+  };
+  
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+          <div className="p-4 border-b border-gray-700 flex justify-between items-center">
+            <h2 className="text-xl font-bold truncate">{product.name}</h2>
+            <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-lg">
+              <X size={20} />
+            </button>
+          </div>
+          
+          <div className="p-6 overflow-y-auto">
+            <div className="flex gap-6">
+              {/* Image */}
+              <div className="w-1/2">
+                <div className="aspect-square bg-gray-700 rounded-xl overflow-hidden">
+                  {product.image_url ? (
+                    <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-6xl">📦</div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Details */}
+              <div className="w-1/2 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-sm text-gray-400">Vendor</p>
+                    <p className="font-medium">{product.vendor}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm text-gray-400">SKU</p>
+                    <p className="font-medium">{product.sku}</p>
+                  </div>
                 </div>
                 
                 <div>
-                  <p className="text-sm text-gray-400">SKU</p>
-                  <p className="font-medium">{product.sku}</p>
+                  <p className="text-sm text-gray-400">Price</p>
+                  <p className="text-2xl font-bold text-[#D4AF37]">
+                    {(product.cost > 0 || product.price > 0) 
+                      ? `$${(product.cost || product.price).toLocaleString()}`
+                      : <span className="text-lg text-gray-500">Price on request</span>
+                    }
+                  </p>
                 </div>
-              </div>
-              
-              <div>
-                <p className="text-sm text-gray-400">Price</p>
-                <p className="text-2xl font-bold text-[#D4AF37]">
-                  ${(product.cost || product.price || 0).toLocaleString()}
-                </p>
-              </div>
-              
-              {(product.dimensions && product.dimensions !== 's="any">') && (
-                <div>
-                  <p className="text-sm text-gray-400">Dimensions</p>
-                  <p className="font-medium">{product.dimensions}</p>
-                </div>
-              )}
-              
-              <div className="grid grid-cols-2 gap-3">
-                {product.category && (
+                
+                {(product.dimensions && product.dimensions !== 's="any">') && (
                   <div>
-                    <p className="text-sm text-gray-400">Category</p>
-                    <p className="font-medium">{product.category}</p>
+                    <p className="text-sm text-gray-400">Dimensions</p>
+                    <p className="font-medium">{product.dimensions}</p>
                   </div>
                 )}
                 
-                {product.subcategory && (
+                <div className="grid grid-cols-2 gap-3">
+                  {product.category && (
+                    <div>
+                      <p className="text-sm text-gray-400">Category</p>
+                      <p className="font-medium">{product.category}</p>
+                    </div>
+                  )}
+                  
+                  {product.subcategory && (
+                    <div>
+                      <p className="text-sm text-gray-400">Subcategory</p>
+                      <p className="font-medium">{product.subcategory}</p>
+                    </div>
+                  )}
+                </div>
+                
+                {product.collection && (
                   <div>
-                    <p className="text-sm text-gray-400">Subcategory</p>
-                    <p className="font-medium">{product.subcategory}</p>
+                    <p className="text-sm text-gray-400">Collection</p>
+                    <p className="font-medium">{product.collection}</p>
                   </div>
                 )}
+                
+                {product.status && (
+                  <div>
+                    <p className="text-sm text-gray-400">Status</p>
+                    <p className="font-medium">{product.status}</p>
+                  </div>
+                )}
+                
+                {productLink && (
+                  <a
+                    href={productLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition text-[#D4AF37]"
+                  >
+                    <ExternalLink size={16} />
+                    View on Vendor Site
+                  </a>
+                )}
+                
+                {addedSuccess ? (
+                  <div className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2">
+                    <Check size={20} />
+                    Added to Project!
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => setShowAddToProject(true)}
+                    className="w-full py-3 bg-[#D4AF37] text-black font-semibold rounded-lg hover:bg-[#C9A032] transition flex items-center justify-center gap-2"
+                  >
+                    <Plus size={20} />
+                    Add to Project
+                  </button>
+                )}
               </div>
-              
-              {product.collection && (
-                <div>
-                  <p className="text-sm text-gray-400">Collection</p>
-                  <p className="font-medium">{product.collection}</p>
-                </div>
-              )}
-              
-              {product.status && (
-                <div>
-                  <p className="text-sm text-gray-400">Status</p>
-                  <p className="font-medium">{product.status}</p>
-                </div>
-              )}
-              
-              {productLink && (
-                <a
-                  href={productLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition text-[#D4AF37]"
-                >
-                  <ExternalLink size={16} />
-                  View on Vendor Site
-                </a>
-              )}
-              
-              <button className="w-full py-3 bg-[#D4AF37] text-black font-semibold rounded-lg hover:bg-[#C9A032] transition flex items-center justify-center gap-2">
-                <Plus size={20} />
-                Add to Project
-              </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      
+      {/* Add to Project Modal */}
+      {showAddToProject && (
+        <AddToProjectModal
+          product={product}
+          onClose={() => setShowAddToProject(false)}
+          onSuccess={handleAddSuccess}
+          backendUrl={backendUrl}
+        />
+      )}
+    </>
   );
 };
 
