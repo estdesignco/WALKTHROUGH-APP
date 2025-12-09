@@ -261,7 +261,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
     setScrapeError('');
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       const response = await fetch(`${backendUrl}/api/scrape-product`, {
         method: 'POST',
