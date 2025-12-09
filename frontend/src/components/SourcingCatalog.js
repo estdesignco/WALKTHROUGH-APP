@@ -907,6 +907,10 @@ const VendorCredentialsModal = ({ portals, credentials, loginStatus, onClose, on
 
 // Product Detail Modal
 const ProductDetailModal = ({ product, onClose, backendUrl }) => {
+  // Construct product link if not available
+  const productLink = product.product_link || 
+    (product.vendor === 'Four Hands' ? `https://www.fourhands.com/product/${product.sku}` : null);
+  
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
@@ -931,15 +935,17 @@ const ProductDetailModal = ({ product, onClose, backendUrl }) => {
             </div>
             
             {/* Details */}
-            <div className="w-1/2 space-y-4">
-              <div>
-                <p className="text-sm text-gray-400">Vendor</p>
-                <p className="font-medium">{product.vendor}</p>
-              </div>
-              
-              <div>
-                <p className="text-sm text-gray-400">SKU</p>
-                <p className="font-medium">{product.sku}</p>
+            <div className="w-1/2 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-sm text-gray-400">Vendor</p>
+                  <p className="font-medium">{product.vendor}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-gray-400">SKU</p>
+                  <p className="font-medium">{product.sku}</p>
+                </div>
               </div>
               
               <div>
@@ -949,26 +955,49 @@ const ProductDetailModal = ({ product, onClose, backendUrl }) => {
                 </p>
               </div>
               
-              {product.dimensions && (
+              {(product.dimensions && product.dimensions !== 's="any">') && (
                 <div>
                   <p className="text-sm text-gray-400">Dimensions</p>
                   <p className="font-medium">{product.dimensions}</p>
                 </div>
               )}
               
-              {product.category && (
+              <div className="grid grid-cols-2 gap-3">
+                {product.category && (
+                  <div>
+                    <p className="text-sm text-gray-400">Category</p>
+                    <p className="font-medium">{product.category}</p>
+                  </div>
+                )}
+                
+                {product.subcategory && (
+                  <div>
+                    <p className="text-sm text-gray-400">Subcategory</p>
+                    <p className="font-medium">{product.subcategory}</p>
+                  </div>
+                )}
+              </div>
+              
+              {product.collection && (
                 <div>
-                  <p className="text-sm text-gray-400">Category</p>
-                  <p className="font-medium">{product.category}</p>
+                  <p className="text-sm text-gray-400">Collection</p>
+                  <p className="font-medium">{product.collection}</p>
                 </div>
               )}
               
-              {product.product_link && (
+              {product.status && (
+                <div>
+                  <p className="text-sm text-gray-400">Status</p>
+                  <p className="font-medium">{product.status}</p>
+                </div>
+              )}
+              
+              {productLink && (
                 <a
-                  href={product.product_link}
+                  href={productLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition text-[#D4AF37]"
                 >
                   <ExternalLink size={16} />
                   View on Vendor Site
