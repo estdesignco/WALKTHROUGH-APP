@@ -169,6 +169,59 @@ const ExportsDashboard = ({ projectId }) => {
     }
   };
 
+  const generateCustomerSheets = async () => {
+    try {
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
+      
+      // Get selected categories and rooms
+      const selectedCategories = Object.entries(customerSheetCategories)
+        .filter(([_, selected]) => selected)
+        .map(([category]) => category);
+      
+      const selectedRooms = Object.entries(customerSheetRooms)
+        .filter(([_, selected]) => selected)
+        .map(([room]) => room);
+      
+      const response = await fetch(`${BACKEND_URL}/api/exports/${projectId}/customer-sheets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          categories: selectedCategories,
+          rooms: selectedRooms
+        })
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        alert('✅ Customer sheets generated!');
+        setShowCustomerSheets(false);
+      } else {
+        alert('Failed to generate customer sheets');
+      }
+    } catch (error) {
+      console.error('Error generating customer sheets:', error);
+      alert('Failed to generate customer sheets');
+    }
+  };
+
+  const toggleAllCategories = (checked) => {
+    const newCategories = {};
+    Object.keys(customerSheetCategories).forEach(cat => {
+      newCategories[cat] = checked;
+    });
+    setCustomerSheetCategories(newCategories);
+  };
+
+  const toggleAllRooms = (checked) => {
+    const newRooms = {};
+    Object.keys(customerSheetRooms).forEach(room => {
+      newRooms[room] = checked;
+    });
+    setCustomerSheetRooms(newRooms);
+  };
+
   if (loading) {
     return <div className="text-center py-12 text-[#D4C5A9]">Loading exports...</div>;
   }
