@@ -4757,10 +4757,11 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 
             except Exception as login_error:
                 print(f"⚠️ Login failed (will try scraping anyway): {login_error}")
+                login_successful = False
         
         try:
-            if not credentials:
-                # Only navigate if we didn't login (if we logged in, we already navigated)
+            if not login_successful:
+                # Only navigate if login didn't happen or failed
                 print(f"🌐 NAVIGATING TO: {url}")
                 
                 # Retry logic for blocked sites
