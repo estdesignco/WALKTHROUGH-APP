@@ -63,7 +63,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
     setUrlLookupMessage('🔍 Looking up product from URL...');
     
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
       // First, try to match the URL against products in our database
       const response = await fetch(`${backendUrl}/api/autocomplete/products-by-url?url=${encodeURIComponent(url)}`);
