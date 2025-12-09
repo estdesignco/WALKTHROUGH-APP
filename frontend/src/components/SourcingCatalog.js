@@ -258,6 +258,43 @@ const SourcingCatalog = () => {
         </div>
       </div>
       
+      {/* Quick Browse Categories - Opens vendor sites directly */}
+      <div className="bg-gray-900/80 border-b border-gray-700 px-4 py-3">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2">
+            <span className="text-sm text-gray-400 whitespace-nowrap">Browse ALL products:</span>
+            <a href="https://fourhands.com/products/seating" target="_blank" rel="noopener noreferrer" 
+               className="px-3 py-1 bg-gray-800 hover:bg-[#D4AF37] hover:text-black rounded text-sm whitespace-nowrap transition">
+              🪑 Seating
+            </a>
+            <a href="https://fourhands.com/products/tables" target="_blank" rel="noopener noreferrer"
+               className="px-3 py-1 bg-gray-800 hover:bg-[#D4AF37] hover:text-black rounded text-sm whitespace-nowrap transition">
+              🪵 Tables
+            </a>
+            <a href="https://fourhands.com/products/lighting" target="_blank" rel="noopener noreferrer"
+               className="px-3 py-1 bg-gray-800 hover:bg-[#D4AF37] hover:text-black rounded text-sm whitespace-nowrap transition">
+              💡 Lighting
+            </a>
+            <a href="https://fourhands.com/products/storage" target="_blank" rel="noopener noreferrer"
+               className="px-3 py-1 bg-gray-800 hover:bg-[#D4AF37] hover:text-black rounded text-sm whitespace-nowrap transition">
+              🗄️ Storage
+            </a>
+            <a href="https://www.globalviews.com/furniture.html" target="_blank" rel="noopener noreferrer"
+               className="px-3 py-1 bg-gray-800 hover:bg-[#D4AF37] hover:text-black rounded text-sm whitespace-nowrap transition">
+              🛋️ GV Furniture
+            </a>
+            <a href="https://www.globalviews.com/lighting.html" target="_blank" rel="noopener noreferrer"
+               className="px-3 py-1 bg-gray-800 hover:bg-[#D4AF37] hover:text-black rounded text-sm whitespace-nowrap transition">
+              ✨ GV Lighting
+            </a>
+            <a href="https://www.globalviews.com/accessories.html" target="_blank" rel="noopener noreferrer"
+               className="px-3 py-1 bg-gray-800 hover:bg-[#D4AF37] hover:text-black rounded text-sm whitespace-nowrap transition">
+              🏺 GV Accessories
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Search & Controls Section */}
       <div className="bg-gray-900 border-b border-gray-700 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4">
