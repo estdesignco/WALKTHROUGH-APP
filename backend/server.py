@@ -4661,8 +4661,13 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 print(f"📍 Login URL: {login_url}")
                 print(f"📍 Login Type: {login_type}")
                 
-                await page.goto(login_url, wait_until='networkidle', timeout=30000)
-                await page.wait_for_timeout(3000)
+                # Navigate to login page with shorter timeout - login is optional
+                try:
+                    await page.goto(login_url, wait_until='domcontentloaded', timeout=20000)
+                    await page.wait_for_timeout(2000)
+                except Exception as nav_err:
+                    print(f"⚠️ Login page navigation slow, continuing: {nav_err}")
+                    await page.wait_for_timeout(3000)
                 
                 # STEP 1: For modal login types, click Trade/Login button first
                 if login_type == 'modal':
