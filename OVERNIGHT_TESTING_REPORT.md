@@ -3,7 +3,7 @@
 
 **Testing Date**: December 2, 2024  
 **Testing Duration**: Comprehensive overnight testing session  
-**System URL**: https://productfinder-8.preview.emergentagent.com
+**System URL**: https://product-scraper-8.preview.emergentagent.com
 
 ---
 

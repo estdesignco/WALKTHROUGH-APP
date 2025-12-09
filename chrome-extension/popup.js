@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://productfinder-8.preview.emergentagent.com';
+const BACKEND_URL = 'https://product-scraper-8.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

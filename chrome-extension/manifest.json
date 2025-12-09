@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://productfinder-8.preview.emergentagent.com/*"
+    "https://product-scraper-8.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

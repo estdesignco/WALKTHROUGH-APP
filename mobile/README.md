@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://productfinder-8.preview.emergentagent.com
-API_URL=https://productfinder-8.preview.emergentagent.com/api
+BACKEND_URL=https://product-scraper-8.preview.emergentagent.com
+API_URL=https://product-scraper-8.preview.emergentagent.com/api
 ```
 
 ### App Configuration

@@ -9,7 +9,7 @@ import json
 import sys
 
 # Backend URL from environment
-BACKEND_URL = "https://productfinder-8.preview.emergentagent.com/api"
+BACKEND_URL = "https://product-scraper-8.preview.emergentagent.com/api"
 
 def test_drapery_calculator():
     """Test the drapery calculator with exact payload from review request"""
