@@ -90,13 +90,48 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         }
       }
       
-      // If not found in database, try to scrape it
+      // If not found in database, try to scrape it directly
       setUrlLookupMessage('📦 Product not in database, fetching from web...');
-      await handleLinkScraping(url);
+      
+      // Call scrape endpoint directly
+      const scrapeResponse = await fetch(`${backendUrl}/api/scrape-product`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: url })
+      });
+      
+      if (scrapeResponse.ok) {
+        const scrapeData = await scrapeResponse.json();
+        const data = scrapeData.success ? scrapeData.data : scrapeData;
+        
+        if (data && (data.name || data.title)) {
+          setFormData(prev => ({
+            ...prev,
+            name: data.name || data.title || prev.name,
+            vendor: data.vendor || prev.vendor,
+            sku: data.sku || prev.sku,
+            cost: data.cost || data.price || prev.cost,
+            size: data.size || data.dimensions || prev.size,
+            image_url: data.image_url || data.image || prev.image_url,
+            finish_color: data.color || data.finish || data.finish_color || prev.finish_color,
+            link: url
+          }));
+          setSearchQuery(data.name || data.title || '');
+          setUrlLookupMessage(`✅ Loaded "${data.name || data.title}"`);
+          setTimeout(() => setUrlLookupMessage(''), 3000);
+        } else {
+          setUrlLookupMessage('⚠️ Could not extract product data');
+          setTimeout(() => setUrlLookupMessage(''), 3000);
+        }
+      } else {
+        setUrlLookupMessage('⚠️ Failed to fetch product data');
+        setTimeout(() => setUrlLookupMessage(''), 3000);
+      }
       
     } catch (error) {
       console.error('URL lookup error:', error);
-      setUrlLookupMessage('');
+      setUrlLookupMessage('❌ Error: ' + error.message);
+      setTimeout(() => setUrlLookupMessage(''), 3000);
     } finally {
       setIsLookingUpUrl(false);
     }
