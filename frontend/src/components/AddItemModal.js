@@ -655,7 +655,8 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         categoryName=""
         currentCost={formData.cost}
       />
-    </div>
+    </div>,
+    document.body
   );
 };
 
