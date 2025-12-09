@@ -4780,11 +4780,11 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 password_filled = False
                 
                 # Some sites show password after you enter email - try pressing Tab or clicking Next
-                if username_filled and not password_filled:
+                if username_filled:
                     # Try pressing Tab to move to password field
                     try:
                         await page.keyboard.press('Tab')
-                        await page.wait_for_timeout(500)
+                        await page.wait_for_timeout(1000)
                     except:
                         pass
                     
@@ -4803,8 +4803,11 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                 continue
                     except:
                         pass
+                    
+                    # Wait for password field to appear after username entry
+                    await page.wait_for_timeout(2000)
                 
-                for attempt in range(3):  # Try 3 times for password
+                for attempt in range(5):  # Try 5 times for password (increased from 3)
                     if password_filled:
                         break
                     if attempt > 0:
