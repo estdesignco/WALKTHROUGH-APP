@@ -36,7 +36,7 @@ async def save_credentials():
         ("loloirugs", "loloirugs.com", "Loloi Rugs"),
         ("visualcomfort", "visualcomfort.com", "Visual Comfort"),
         ("hvlgroup", "hvlgroup.com", "HVL Group"),
-        ("vandh", "?"flowdecor", "flowdecor.com", "Flow Decor"),
+        ("vandh", "?"vandh", "Flow Decor"),
         ("crestview", "crestviewcollection.com", "Crestview Collection"),
         ("bassettmirror", "bassettmirror.com", "Bassett Mirror"),
         ("eichholtz", "eichholtz.com", "Eichholtz"),
@@ -46,7 +46,7 @@ async def save_credentials():
         ("hubbardtonforge", "hubbardtonforge.com", "Hubbardton Forge"),
         ("hinkley", "hinkley.com", "Hinkley"),
         ("elegantlighting", "elegantlighting.com", "Elegant Lighting"),
-        ("gabby", "?"Gabby Home"),
+        ("gabby", "?"gabbyhome.com", "Gabby Home"),
     ]
     
     username = "megan@estdesignco.com"
