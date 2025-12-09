@@ -4627,10 +4627,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         page.set_default_timeout(45000)
         
         # LOGIN if credentials are available
+        login_successful = False
         if credentials and credentials.get("username") and credentials.get("password"):
             try:
                 print(f"🔐 STARTING LOGIN FLOW FOR: {domain}")
-                await page.goto(credentials.get('login_url', f'https://{domain}'), wait_until='networkidle')
+                login_url = credentials.get('login_url') or f'https://{domain}'
+                await page.goto(login_url, wait_until='networkidle')
                 await page.wait_for_timeout(3000)
                 
                 # STEP 1: Look for and click "Trade" button FIRST (opens modal on some sites)
