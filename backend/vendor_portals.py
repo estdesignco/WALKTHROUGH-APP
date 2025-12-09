@@ -34,16 +34,16 @@ def decrypt_password(encrypted: str) -> str:
 VENDOR_PORTALS = {
     "four_hands": {
         "name": "Four Hands",
-        "login_url": "https://fourhands.com/login?returnurl=%2Fhome",
+        "login_url": "https://fourhands.com/login",
         "base_url": "https://fourhands.com",
-        "search_url": "https://fourhands.com/catalog?search={query}",
+        "search_url": "https://fourhands.com/search?q={query}",
         "login_type": "account_number",  # Uses account number instead of email
         "selectors": {
-            "username_field": "input[name='accountNumber'], input[name='username']",
-            "password_field": "input[name='password'], input[type='password']",
-            "login_button": "button[type='submit'], input[type='submit']",
-            "product_image": "img.product-image, img[data-product]",
-            "product_link": "a.product-link, a[href*='/product/']",
+            "username_field": "input[placeholder*='email' i], input[placeholder*='customer' i]",
+            "password_field": "input[type='password']",
+            "login_button": "button:has-text('Continue')",
+            "product_image": "img[src*='cloudfront']",
+            "product_link": "a[href*='/product/']",
         }
     },
     "uttermost": {
