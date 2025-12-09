@@ -166,7 +166,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
 
     setIsSearching(true);
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       let url = `${backendUrl}/api/autocomplete/products?query=${encodeURIComponent(query)}&limit=10`;
       if (selectedVendorFilter) {
         url += `&vendor=${encodeURIComponent(selectedVendorFilter)}`;
