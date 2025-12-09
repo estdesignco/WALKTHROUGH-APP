@@ -496,6 +496,45 @@ const SourcingCatalog = () => {
             ))}
           </div>
 
+          {/* View All on Vendor Links */}
+          {!isSearching && filteredResults.length > 0 && searchQuery && (
+            <div className="mt-6 p-4 bg-gray-800/50 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-400 mb-3">Want to see ALL results? Open directly on vendor sites:</h4>
+              <div className="flex flex-wrap gap-2">
+                {uniqueVendors.includes('Four Hands') && (
+                  <a 
+                    href={`https://fourhands.com/search?q=${encodeURIComponent(searchQuery)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-sm flex items-center gap-1"
+                  >
+                    🔗 View all on Four Hands
+                  </a>
+                )}
+                {uniqueVendors.includes('Global Views') && (
+                  <a 
+                    href={`https://www.globalviews.com/catalogsearch/result/?q=${encodeURIComponent(searchQuery)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-sm flex items-center gap-1"
+                  >
+                    🔗 View all on Global Views
+                  </a>
+                )}
+                {uniqueVendors.includes('Rowe') && (
+                  <a 
+                    href={`https://www.rowefurniture.com/search?q=${encodeURIComponent(searchQuery)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-sm flex items-center gap-1"
+                  >
+                    🔗 View all on Rowe
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Empty State */}
           {!isSearching && filteredResults.length === 0 && searchQuery && (
             <div className="text-center py-20">
