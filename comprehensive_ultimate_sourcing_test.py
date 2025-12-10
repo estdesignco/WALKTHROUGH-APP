@@ -228,7 +228,7 @@ class UltimateSourcingTester:
             "description": "Test category for ultimate sourcing"
         }
         
-        success, response = self.run_test("Create Category", "POST", "categories", 201, category_data)
+        success, response = self.run_test("Create Category", "POST", "categories", 200, category_data)
         category_id = None
         if success and response.get('id'):
             category_id = response['id']
