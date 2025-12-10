@@ -548,6 +548,15 @@ class VoiceNoteRequest(BaseModel):
     room_id: Optional[str] = None
     item_id: Optional[str] = None
 
+class RoomRenderRequest(BaseModel):
+    """Simple room visualization request (for generic renders)"""
+    room_type: str  # "living room", "kitchen", "bedroom", etc.
+    style: str  # "modern", "traditional", "minimalist", etc.
+    color_palette: Optional[List[str]] = None
+    features: Optional[List[str]] = None  # "fireplace", "large windows", etc.
+    dimensions: Optional[str] = None  # "20x15 feet"
+    additional_notes: Optional[str] = None
+
 # ============== ROOM RENDERING ==============
 
 @router.post("/render-room")
