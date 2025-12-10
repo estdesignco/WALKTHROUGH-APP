@@ -214,19 +214,31 @@ async def change_room_surfaces(request: dict):
         if new_ceiling:
             surface_changes.append(f"Ceiling: {new_ceiling}")
         
-        render_prompt = f"""Photorealistic interior photograph of this exact room with ONLY these changes:
+        render_prompt = f"""REAL PHOTOGRAPH - NOT CGI OR 3D RENDER - of this interior room with surface changes:
 
-ORIGINAL ROOM:
+ORIGINAL ROOM ANALYSIS:
 {room_analysis}
 
 CHANGES TO MAKE:
 {chr(10).join(surface_changes)}
 
-CRITICAL REQUIREMENTS:
-- Keep the EXACT same room layout, dimensions, and architecture
-- Keep the EXACT same camera angle and perspective
-- Keep the same windows, doors, and architectural features
-- Keep any furniture in the same positions
+CRITICAL - THIS MUST LOOK LIKE A REAL PHOTOGRAPH TAKEN WITH A CAMERA:
+- Shot with professional DSLR camera - natural lens characteristics
+- Real photography lighting with natural shadows and highlights
+- Visible material textures - wood grain, stone veins, fabric weave
+- Slight camera imperfections - minor vignette, natural color
+- Depth of field like a real interior photo
+- Magazine quality like Architectural Digest, Elle Decor, Dwell
+- NO CGI appearance, NO 3D render look, NO video game aesthetic
+- Must be INDISTINGUISHABLE from a real photograph
+
+ROOM REQUIREMENTS:
+- Keep EXACT same room layout, dimensions, architecture
+- Keep EXACT same camera angle and perspective
+- Keep same windows, doors, architectural features
+- Keep any furniture in same positions
+- Only change the specified surfaces
+- Natural lighting that matches original photo
 - Only change the specified surfaces
 - Photorealistic rendering, professional interior photography
 - Natural lighting, 8K quality"""
