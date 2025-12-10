@@ -442,7 +442,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
             metadata: {
               room_name: project.rooms[activeRoomTab]?.name,
               timestamp: new Date().toISOString(),
-              has_measurements: false
+              has_measurements: false,
+              has_gps: !!gpsLocation,
+              location: gpsLocation
             }
           });
           
