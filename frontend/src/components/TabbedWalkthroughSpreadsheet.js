@@ -575,6 +575,30 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
           </div>
           
           <div className="text-center">
+            {/* ONLINE/OFFLINE STATUS INDICATOR */}
+            <div className="mb-4 flex justify-center items-center gap-4">
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${online ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400'}`}>
+                <span className={`w-3 h-3 rounded-full ${online ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+                <span className="font-bold">{online ? '🌐 ONLINE' : '📴 OFFLINE'}</span>
+              </div>
+              {pendingCount > 0 && (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-600/20 text-yellow-400">
+                  <span className="font-bold">📤 {pendingCount} pending sync</span>
+                </div>
+              )}
+              {syncStatus === 'syncing' && (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600/20 text-blue-400">
+                  <span className="animate-spin">🔄</span>
+                  <span className="font-bold">Syncing...</span>
+                </div>
+              )}
+              {sheetType === 'ffe' && online && (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-600/20 text-purple-400">
+                  <span className="font-bold">⚡ Real-time sync active</span>
+                </div>
+              )}
+            </div>
+            
             <div className="inline-flex items-center gap-6">
               <button
                 onClick={() => setShowAddRoom(true)}
@@ -586,19 +610,21 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
               <button
                 onClick={async () => {
                   console.log('🔄 MANUAL SYNC - Reloading from server');
+                  await performSync();
                   await loadProject();
                   alert('✅ Synced with server!');
                 }}
-                className="bg-green-600 hover:bg-green-700 px-8 py-3 rounded-full text-white font-bold text-lg shadow-xl"
+                className={`px-8 py-3 rounded-full font-bold text-lg shadow-xl ${online ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600'} text-white`}
+                disabled={!online}
               >
-                🔄 SYNC
+                🔄 SYNC {pendingCount > 0 ? `(${pendingCount})` : ''}
               </button>
               
               <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-8 py-3 rounded-full" style={{
                 boxShadow: '0 0 30px rgba(212, 165, 116, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)'
               }}>
                 <span className="text-2xl font-bold text-black tracking-wider">
-                  {sheetType === 'ffe' ? 'FF&E SPREADSHEET' : 'WALKTHROUGH SPREADSHEET'}
+                  {sheetType === 'ffe' ? 'FFE SPREADSHEET' : 'WALKTHROUGH SPREADSHEET'}
                 </span>
               </div>
               
