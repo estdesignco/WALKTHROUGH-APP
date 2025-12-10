@@ -719,6 +719,67 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
 
       {/* ACTIVE ROOM CONTENT - SIMPLE SCROLLABLE */}
       <div className="p-4">
+        {/* MOBILE TOOLBAR - Voice Notes & Punch List */}
+        {activeRoom && (
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            {/* Voice Notes Button */}
+            <button
+              onClick={() => setShowVoiceNotes(!showVoiceNotes)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                showVoiceNotes 
+                  ? 'bg-[#D4A574] text-white' 
+                  : 'bg-[#D4A574]/20 text-[#D4A574] border border-[#D4A574]/30'
+              }`}
+            >
+              🎤 Voice Notes
+            </button>
+            
+            {/* Punch List Mode Button */}
+            <button
+              onClick={() => setPunchListMode(!punchListMode)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                punchListMode 
+                  ? 'bg-orange-600 text-white' 
+                  : 'bg-orange-600/20 text-orange-400 border border-orange-600/30'
+              }`}
+            >
+              📋 {punchListMode ? 'Exit Punch List' : 'Punch List Mode'}
+            </button>
+            
+            {/* GPS Status Indicator */}
+            <div className="ml-auto flex items-center gap-1 text-xs text-gray-400">
+              <span>📍</span>
+              <span>GPS Active</span>
+            </div>
+          </div>
+        )}
+        
+        {/* VOICE NOTES PANEL */}
+        {showVoiceNotes && activeRoom && (
+          <div className="mb-4">
+            <VoiceNoteRecorder 
+              projectId={projectId}
+              roomId={activeRoom.id}
+              onNoteSaved={(note) => {
+                console.log('Voice note saved:', note);
+              }}
+            />
+          </div>
+        )}
+        
+        {/* PUNCH LIST MODE INDICATOR */}
+        {punchListMode && (
+          <div className="mb-4 p-4 rounded-lg border border-orange-500/30 bg-orange-500/10">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xl">📋</span>
+              <span className="text-orange-400 font-bold">PUNCH LIST MODE ACTIVE</span>
+            </div>
+            <p className="text-gray-400 text-sm">
+              Tap items to add them to your punch list. Items with issues will be flagged for review.
+            </p>
+          </div>
+        )}
+        
         {activeRoom && activeRoom.categories?.map((category) => (
                 <div key={category.id} className="mb-6">
                   {/* CATEGORY HEADER - GREEN GRADIENT WITH BALANCED SHIMMER */}
