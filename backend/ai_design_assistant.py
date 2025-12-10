@@ -379,22 +379,31 @@ async def change_furniture_fabric(request: dict):
         analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
         item_analysis = await chat.send_message(analysis_msg)
         
-        render_prompt = f"""Photorealistic product photograph of this exact {item_description} with ONLY the fabric/material changed:
+        render_prompt = f"""REAL PHOTOGRAPH - NOT CGI - of this {item_description} with fabric changed:
 
-ORIGINAL:
+ORIGINAL FURNITURE:
 {item_analysis}
 
 CHANGE: Replace the fabric/material with {change_desc}
 
-CRITICAL:
-- Keep the EXACT same furniture shape, style, and design
-- Keep the EXACT same legs/base
-- Keep the EXACT same proportions and dimensions
-- Keep any tufting, buttons, or details
-- Only change the fabric/upholstery material and color
-- Same lighting and angle
-- Professional furniture photography
-- 8K, photorealistic"""
+CRITICAL - MUST LOOK LIKE A REAL PRODUCT PHOTOGRAPH:
+- Shot with professional camera - real lens characteristics
+- REAL fabric texture visible - weave pattern, material grain, natural folds
+- Natural lighting with realistic soft shadows
+- Like a photograph from a furniture catalog or showroom
+- The fabric should look like REAL fabric you can touch
+- Visible texture details - not smooth CGI material
+- Magazine quality product photography
+- NO CGI look, NO 3D render appearance
+- Should look like a photo of a real piece of furniture
+
+FURNITURE REQUIREMENTS:
+- Keep EXACT same furniture shape, style, design
+- Keep EXACT same legs/base
+- Keep EXACT same proportions and dimensions
+- Keep any tufting, buttons, details (update material only)
+- Only change fabric/upholstery material and color
+- Same lighting angle as original"""
 
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         images = await image_gen.generate_images(
