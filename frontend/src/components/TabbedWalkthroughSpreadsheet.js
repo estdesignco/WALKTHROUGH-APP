@@ -394,7 +394,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
     }
   };
 
-  // SIMPLE PHOTO CAPTURE
+  // SIMPLE PHOTO CAPTURE WITH GPS
   const handleTakePhoto = () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -404,6 +404,28 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
     input.onchange = async (e) => {
       const file = e.target.files[0];
       if (!file) return;
+
+      // Try to get GPS location
+      let gpsLocation = null;
+      if (navigator.geolocation) {
+        try {
+          const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0
+            });
+          });
+          gpsLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy
+          };
+          console.log('📍 GPS location captured:', gpsLocation);
+        } catch (gpsError) {
+          console.warn('📍 GPS not available:', gpsError.message);
+        }
+      }
 
       const reader = new FileReader();
       reader.onload = async (e) => {
