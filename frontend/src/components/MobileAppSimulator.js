@@ -645,8 +645,21 @@ function ContactsScreen({ project, onNavigate }) {
         >
           ← Back to Project Menu
         </button>
-        <h1 className="text-3xl font-bold text-[#D4A574] mb-2">Project Contacts</h1>
-        <p className="text-[#D4C5A9]">{contacts.length} contact(s)</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-[#D4A574] mb-2">Project Contacts</h1>
+            <p className="text-[#D4C5A9]">{contacts.length} contact(s)</p>
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${online ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400'}`}>
+              <span className={`w-2 h-2 rounded-full ${online ? 'bg-green-500' : 'bg-red-500'}`}></span>
+              <span className="text-sm font-bold">{online ? 'ONLINE' : 'OFFLINE'}</span>
+            </div>
+            {lastSynced && (
+              <span className="text-xs text-gray-400">Synced: {lastSynced.toLocaleTimeString()}</span>
+            )}
+          </div>
+        </div>
       </div>
 
       {loading ? (
