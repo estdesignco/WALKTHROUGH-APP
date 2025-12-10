@@ -22,6 +22,7 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
   const [itemStatuses, setItemStatuses] = useState([]);
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
+  const [showShippingTracker, setShowShippingTracker] = useState(false);
   
   const loadSimpleProject = async () => {
     try {
