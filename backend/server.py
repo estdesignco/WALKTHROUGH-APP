@@ -48,6 +48,7 @@ from calculator_api import router as calculator_router
 from power_features_api import router as power_features_router
 from contacts_api import router as contacts_router
 import contacts_api
+from ai_design_assistant import router as ai_router
 from moodboard_api import router as moodboard_router
 from master_database_api import router as master_database_router
 
