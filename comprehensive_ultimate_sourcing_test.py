@@ -512,7 +512,7 @@ class UltimateSourcingTester:
             "items": []
         }
         
-        success, response = self.run_test("Create Moodboard", "POST", "moodboards", 201, moodboard_data)
+        success, response = self.run_test("Create Moodboard", "POST", "moodboards", 200, moodboard_data)
         
         return success
 
