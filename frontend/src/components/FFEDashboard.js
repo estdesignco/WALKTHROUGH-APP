@@ -202,6 +202,27 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
       hideNavigation={hideNavigation}
       onAddRoom={() => setShowAddRoom(true)}
     >
+      {/* SHIPPING TRACKER TOGGLE */}
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={() => setShowShippingTracker(!showShippingTracker)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+            showShippingTracker 
+              ? 'bg-[#D4A574] text-white' 
+              : 'bg-[#D4A574]/20 text-[#D4A574] border border-[#D4A574]/30 hover:bg-[#D4A574]/30'
+          }`}
+        >
+          📦 {showShippingTracker ? 'Hide Shipping Tracker' : 'Show Shipping Tracker'}
+        </button>
+      </div>
+      
+      {/* SHIPPING TRACKER PANEL */}
+      {showShippingTracker && (
+        <div className="mb-6">
+          <ShippingTracker projectId={projectId} />
+        </div>
+      )}
+      
       {/* STATUS OVERVIEW SECTION */}
       <StatusOverview
         totalItems={getTotalItems()}
