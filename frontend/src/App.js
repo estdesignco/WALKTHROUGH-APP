@@ -43,6 +43,7 @@ import CalculatorsPage from './components/CalculatorsPage';
 import SourcingCatalog from './components/SourcingCatalog';
 import VendorMirror from './components/VendorMirror';
 import AIDesignDashboard from './components/AIDesignDashboard';
+import RoomRenderingStudio from './components/RoomRenderingStudio';
 
 const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
 const API = `${BACKEND_URL}/api`;
