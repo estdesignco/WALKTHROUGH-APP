@@ -569,12 +569,8 @@ Be extremely precise - this will be used to recreate the room exactly."""
 @router.post("/room-studio/chat-render")
 async def chat_render(request: dict):
     """
-    Natural language room rendering - just tell the AI what you want!
-    User can say things like:
-    - "Remove all the furniture"
-    - "Change the floor to hardwood"
-    - "Add a cream sectional facing the fireplace"
-    - "Transform this into a modern minimalist space"
+    Direct room rendering - AI executes EXACTLY what user asks, no suggestions.
+    User describes what they want, AI builds it - no AI ideas, just user's vision.
     """
     try:
         room_image = request.get('room_image_base64')
@@ -584,100 +580,60 @@ async def chat_render(request: dict):
         if not room_image:
             raise HTTPException(status_code=400, detail="Room image is required")
         if not user_request:
-            raise HTTPException(status_code=400, detail="Please tell me what you want to do with the room")
+            raise HTTPException(status_code=400, detail="Please describe what you want to do with this room")
         
-        # First, use GPT to analyze the room and understand the request
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"chat-render-{datetime.now().timestamp()}",
-            system_message="""You are an expert interior designer and room rendering specialist.
-            
-Your job is to:
-1. Analyze the user's room photo in detail
-2. Understand what changes they want
-3. Create a detailed prompt for photorealistic rendering
-
-IMPORTANT: The final render must look like a REAL PHOTOGRAPH, not CGI or 3D render.
-Think like a photographer shooting for Architectural Digest magazine."""
-        ).with_model("openai", "gpt-5")
+        # Direct approach: Use the user's request as the basis for rendering
+        # Don't let AI suggest or modify - just execute what user says
         
-        image_content = ImageContent(image_base64=room_image)
-        
-        # Build the analysis prompt
-        analysis_prompt = f"""Look at this room photo and the user's request.
+        # Build a direct render prompt from user's exact request
+        render_prompt = f"""PHOTOREALISTIC INTERIOR RENDERING - EXECUTE USER'S EXACT REQUEST
 
-USER REQUEST: "{user_request}"
+USER'S INSTRUCTION: "{user_request}"
 
-Please:
-1. Describe the current room in detail (architecture, dimensions, lighting, camera angle)
-2. Understand exactly what changes the user wants
-3. Create a detailed render prompt that will produce a PHOTOREALISTIC result
+RENDER THIS ROOM WITH EXACTLY WHAT THE USER ASKED FOR - NO ADDITIONS, NO SUGGESTIONS, JUST THEIR VISION.
 
-Your render prompt MUST include:
-- Exact architectural details to preserve
-- Specific changes requested
-- Emphasis on REAL PHOTOGRAPH quality (not CGI)
-- Magazine-quality lighting and materials
+PHOTOREALISM REQUIREMENTS (CRITICAL):
+- Must look like a REAL PHOTOGRAPH taken with professional DSLR camera
+- Real material textures: wood grain, fabric weave, stone veins, leather texture
+- Natural photography lighting with realistic soft shadows
+- Magazine quality like Architectural Digest, Elle Decor
+- Camera characteristics: natural depth of field, slight vignette
+- NO CGI look, NO 3D render aesthetic, NO video game graphics
+- Must be INDISTINGUISHABLE from a real professional interior photograph
 
-Respond in this JSON format:
-{{
-    "room_analysis": "detailed description of the room",
-    "understood_request": "what the user wants in plain terms", 
-    "render_prompt": "the full detailed prompt for image generation",
-    "response_to_user": "friendly message to show the user about what you're rendering"
-}}"""
+PRESERVATION REQUIREMENTS:
+- Keep the exact same room architecture and dimensions
+- Keep the same camera angle and perspective
+- Keep same windows, doors, and architectural features
+- Keep same natural lighting direction
 
-        analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
-        analysis_response = await chat.send_message(analysis_msg)
-        
-        # Parse the JSON response
-        try:
-            # Clean up response
-            response_text = analysis_response.strip()
-            if response_text.startswith("```json"):
-                response_text = response_text[7:]
-            if response_text.startswith("```"):
-                response_text = response_text[3:]
-            if response_text.endswith("```"):
-                response_text = response_text[:-3]
-            
-            parsed = json.loads(response_text)
-            render_prompt = parsed.get('render_prompt', '')
-            user_message = parsed.get('response_to_user', 'Rendering your room now...')
-            room_analysis = parsed.get('room_analysis', '')
-        except json.JSONDecodeError:
-            # If JSON parsing fails, use the whole response as a prompt
-            render_prompt = analysis_response
-            user_message = "I understand your request. Rendering now..."
-            room_analysis = ""
-        
-        # Add strong photorealism requirements to the prompt
-        final_prompt = f"""CRITICAL: Generate a REAL PHOTOGRAPH - NOT CGI, NOT 3D RENDER
+EXECUTE ONLY WHAT USER REQUESTED - NOTHING MORE, NOTHING LESS."""
 
-{render_prompt}
-
-ABSOLUTE PHOTOREALISM REQUIREMENTS:
-- Must look like shot with professional DSLR camera (Canon 5D, Sony A7)
-- Real camera characteristics: natural depth of field, slight vignette, lens blur
-- REAL material textures visible: wood grain, fabric weave, stone veins
-- Natural lighting with realistic soft shadows
-- Magazine quality: Architectural Digest, Elle Decor, House Beautiful
-- NO CGI aesthetic, NO 3D render look, NO video game graphics
-- Must be completely INDISTINGUISHABLE from a real photograph
-- Slight natural imperfections: fabric wrinkles, realistic wear"""
-
-        # Generate the image
+        # Generate the image directly with user's request
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         images = await image_gen.generate_images(
-            prompt=final_prompt,
+            prompt=render_prompt,
             model="gpt-image-1",
             number_of_images=1
         )
         
         if images and len(images) > 0:
+            # Simple, direct response - just confirm what we did
+            user_message = f"Done! I rendered exactly what you asked: \"{user_request}\""
+            
             return {
                 "success": True,
                 "message": user_message,
+                "rendered_image_base64": base64.b64encode(images[0]).decode('utf-8'),
+                "user_request": user_request
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to generate render")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Rendering failed: {str(e)}")
                 "rendered_image_base64": base64.b64encode(images[0]).decode('utf-8'),
                 "room_analysis": room_analysis,
                 "render_prompt_used": final_prompt,
