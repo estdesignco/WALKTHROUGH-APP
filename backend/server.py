@@ -7555,6 +7555,69 @@ async def get_photos_by_room(project_id: str, room_id: str):
         logging.error(f"Get photos error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get photos: {str(e)}")
 
+@api_router.get("/photos/by-room-name/{project_id}/{room_name}")
+async def get_photos_by_room_name(project_id: str, room_name: str):
+    """Get all photos for a room by name - useful for cross-sheet_type access.
+    This searches for photos in any room with matching name (walkthrough or checklist).
+    """
+    try:
+        # Find all rooms with this name in the project (regardless of sheet_type)
+        rooms = await db.rooms.find({
+            "project_id": project_id,
+            "name": {"$regex": f"^{room_name}$", "$options": "i"}  # Case-insensitive match
+        }).to_list(length=100)
+        
+        room_ids = [room["id"] for room in rooms]
+        
+        if not room_ids:
+            # Try partial match if exact match fails
+            rooms = await db.rooms.find({
+                "project_id": project_id,
+                "name": {"$regex": room_name, "$options": "i"}
+            }).to_list(length=100)
+            room_ids = [room["id"] for room in rooms]
+        
+        if not room_ids:
+            return {
+                "success": True,
+                "photos": [],
+                "count": 0,
+                "message": f"No rooms found with name: {room_name}"
+            }
+        
+        # Get all photos from these rooms
+        photos = await db.photos.find({
+            "project_id": project_id,
+            "room_id": {"$in": room_ids}
+        }).sort("uploaded_at", -1).to_list(length=None)
+        
+        # Also check by metadata room_name
+        metadata_photos = await db.photos.find({
+            "project_id": project_id,
+            "metadata.room_name": {"$regex": f"^{room_name}$", "$options": "i"}
+        }).sort("uploaded_at", -1).to_list(length=None)
+        
+        # Combine and dedupe by photo id
+        seen_ids = set()
+        combined_photos = []
+        
+        for photo in photos + metadata_photos:
+            photo.pop('_id', None)
+            if photo.get('id') not in seen_ids:
+                seen_ids.add(photo.get('id'))
+                combined_photos.append(photo)
+        
+        return {
+            "success": True,
+            "photos": combined_photos,
+            "count": len(combined_photos),
+            "matched_rooms": [r.get("name") for r in rooms]
+        }
+        
+    except Exception as e:
+        logging.error(f"Get photos by room name error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get photos: {str(e)}")
+
 @api_router.get("/photos/project/{project_id}")
 async def get_all_photos_for_project(project_id: str):
     """Get all photos for an entire project"""
