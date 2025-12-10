@@ -11400,6 +11400,7 @@ contacts_api.set_db(db)
 
 app.include_router(calculator_router)
 app.include_router(power_features_router)
+app.include_router(ai_router)
 app.include_router(moodboard_router)
 app.include_router(master_database_router)
 
