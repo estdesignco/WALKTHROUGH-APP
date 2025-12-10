@@ -273,10 +273,6 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     return carriers;
   };
 
-  // Sync state
-  const [syncStatus, setSyncStatus] = useState(null);
-  const [syncing, setSyncing] = useState(false);
-
   // Load sync status on mount
   useEffect(() => {
     const loadSyncStatus = async () => {
@@ -287,8 +283,8 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           const data = await response.json();
           setSyncStatus(data);
         }
-      } catch (error) {
-        console.warn('Failed to load sync status:', error);
+      } catch (err) {
+        console.warn('Failed to load sync status:', err);
       }
     };
     loadSyncStatus();
@@ -323,11 +319,11 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           setSyncStatus(await statusResponse.json());
         }
       } else {
-        const error = await response.json();
-        alert(`❌ Sync failed: ${error.detail || 'Unknown error'}`);
+        const errData = await response.json();
+        alert(`❌ Sync failed: ${errData.detail || 'Unknown error'}`);
       }
-    } catch (error) {
-      alert(`❌ Sync error: ${error.message}`);
+    } catch (err) {
+      alert(`❌ Sync error: ${err.message}`);
     } finally {
       setSyncing(false);
     }
