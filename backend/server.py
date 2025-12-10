@@ -1938,6 +1938,24 @@ async def update_category(category_id: str, category_update: CategoryUpdate):
         raise HTTPException(status_code=500, detail=f"Failed to update category: {str(e)}")
 
 # ROOM ENDPOINTS with 3-level auto-population
+
+@api_router.get("/rooms")
+async def list_rooms(project_id: str = None, sheet_type: str = None):
+    """List all rooms, optionally filtered by project_id and sheet_type"""
+    try:
+        query = {}
+        if project_id:
+            query["project_id"] = project_id
+        if sheet_type:
+            query["sheet_type"] = sheet_type
+        
+        rooms = await db.rooms.find(query, {"_id": 0}).sort("order_index", 1).to_list(1000)
+        return rooms
+        
+    except Exception as e:
+        logger.error(f"Error listing rooms: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to list rooms: {str(e)}")
+
 @api_router.post("/rooms", response_model=Room)
 async def create_room(room_data: RoomCreate):
     """Create a new room - auto-populate ONLY if walkthrough sheet_type"""
