@@ -269,6 +269,66 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     return carriers;
   };
 
+  // Sync state
+  const [syncStatus, setSyncStatus] = useState(null);
+  const [syncing, setSyncing] = useState(false);
+
+  // Load sync status on mount
+  useEffect(() => {
+    const loadSyncStatus = async () => {
+      if (!projectId) return;
+      try {
+        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/sync/status/${projectId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setSyncStatus(data);
+        }
+      } catch (error) {
+        console.warn('Failed to load sync status:', error);
+      }
+    };
+    loadSyncStatus();
+  }, [projectId, project]);
+
+  // Handle sync from walkthrough
+  const handleSyncFromWalkthrough = async (syncAll = false) => {
+    if (!window.confirm(
+      syncAll 
+        ? 'Sync ALL items from Walkthrough to Checklist?\n\nThis will copy all room data from your mobile walkthrough to this checklist view.'
+        : 'Sync PICKED items from Walkthrough to Checklist?\n\nThis will only copy items that were checked/picked during the walkthrough.'
+    )) {
+      return;
+    }
+
+    setSyncing(true);
+    try {
+      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/sync/walkthrough-to-checklist/${projectId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sync_all: syncAll, include_photos: true })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(`✅ Sync Complete!\n\n${result.message}\n\nNew rooms: ${result.synced_rooms}\nItems synced: ${result.synced_items}`);
+        await loadSimpleProject();
+        
+        // Refresh sync status
+        const statusResponse = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/sync/status/${projectId}`);
+        if (statusResponse.ok) {
+          setSyncStatus(await statusResponse.json());
+        }
+      } else {
+        const error = await response.json();
+        alert(`❌ Sync failed: ${error.detail || 'Unknown error'}`);
+      }
+    } catch (error) {
+      alert(`❌ Sync error: ${error.message}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="relative">
       <CompletePageLayout 
@@ -278,6 +338,76 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         hideNavigation={hideNavigation}
         onAddRoom={() => setShowAddRoom(true)}
       >
+      
+      {/* WALKTHROUGH SYNC PANEL - Critical for mobile → desktop data flow */}
+      {syncStatus && (syncStatus.walkthrough?.rooms > 0 || syncStatus.needs_sync) && (
+        <div className="mb-6 rounded-xl border border-[#D4A574]/40 overflow-hidden"
+             style={{ background: 'linear-gradient(135deg, rgba(20,20,30,0.95) 0%, rgba(30,35,45,0.9) 100%)' }}>
+          <div className="px-6 py-4 flex items-center justify-between"
+               style={{ background: 'linear-gradient(135deg, rgba(212, 165, 116, 0.15) 0%, rgba(180, 155, 126, 0.1) 100%)' }}>
+            <div className="flex items-center gap-4">
+              <span className="text-2xl">📱➡️💻</span>
+              <div>
+                <h3 className="text-[#D4A574] font-bold text-lg">Walkthrough Data Available</h3>
+                <p className="text-gray-400 text-sm">
+                  {syncStatus.walkthrough?.rooms || 0} rooms, {syncStatus.walkthrough?.picked_items || 0} picked items ready to sync
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleSyncFromWalkthrough(false)}
+                disabled={syncing}
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {syncing ? (
+                  <>
+                    <span className="animate-spin">🔄</span> Syncing...
+                  </>
+                ) : (
+                  <>
+                    ✅ Sync Picked Items
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => handleSyncFromWalkthrough(true)}
+                disabled={syncing}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {syncing ? (
+                  <>
+                    <span className="animate-spin">🔄</span> Syncing...
+                  </>
+                ) : (
+                  <>
+                    📋 Sync All Items
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+          
+          {/* Sync Status Details */}
+          <div className="px-6 py-3 flex items-center gap-8 text-sm border-t border-[#B49B7E]/20">
+            <div className="flex items-center gap-2">
+              <span className="text-[#D4A574]">📱 Walkthrough:</span>
+              <span className="text-white">{syncStatus.walkthrough?.rooms || 0} rooms</span>
+              <span className="text-gray-500">|</span>
+              <span className="text-white">{syncStatus.walkthrough?.items || 0} items</span>
+              <span className="text-gray-500">|</span>
+              <span className="text-green-400">{syncStatus.walkthrough?.picked_items || 0} picked</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[#D4A574]">💻 Checklist:</span>
+              <span className="text-white">{syncStatus.checklist?.rooms || 0} rooms</span>
+              <span className="text-gray-500">|</span>
+              <span className="text-white">{syncStatus.checklist?.items || 0} items</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* STATUS OVERVIEW SECTION */}
       <ChecklistStatusOverview
         totalItems={getTotalItems()}
