@@ -40,8 +40,8 @@ class ExhaustiveBackendTester:
         self.tests_passed = 0
         self.failed_tests = []
         
-        # Test project ID from review request
-        self.project_id = "e2f3e36d-1972-4ae4-aa61-22381aaf0bdb"
+        # Use existing project ID (review request ID doesn't exist)
+        self.project_id = "0a023173-c411-4a22-bc43-12fa8f57b174"
         
         # IDs to track created resources for cleanup
         self.created_resources = {
