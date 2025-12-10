@@ -24,7 +24,7 @@ const RoomRenderingStudio = () => {
         setRoomImageBase64(e.target.result.split(',')[1]);
         setMessages([{
           role: 'assistant',
-          content: "Great! I've loaded your room photo. Now just tell me what you want to do!\n\nExamples:\n• \"Remove all furniture and show empty room\"\n• \"Change floor to white oak hardwood\"\n• \"Add a cream sectional facing the fireplace\"\n• \"Paint walls Benjamin Moore Simply White\"\n• \"Add floor-length navy velvet drapes\"\n• \"Transform into modern minimalist with new floors, paint & furniture\"\n\nJust describe what you want!"
+          content: "📸 Photo loaded! Now tell me EXACTLY what you want.\n\nI'll build YOUR vision - no AI suggestions, just what YOU describe.\n\nExamples:\n• \"Remove all furniture\"\n• \"Change floor to white oak hardwood\"\n• \"Add a cream sectional sofa facing the window\"\n• \"Paint walls Sherwin Williams Alabaster\"\n• \"Add navy velvet drapes floor to ceiling\"\n\nBe specific - I'll render exactly what you say!"
         }]);
       };
       reader.readAsDataURL(file);
