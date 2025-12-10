@@ -460,11 +460,14 @@ Be extremely precise - this will be used to recreate the room exactly."""
         analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
         room_analysis = await chat.send_message(analysis_msg)
         
-        # Build the comprehensive render prompt
+        # Build the comprehensive render prompt - REAL PHOTO NOT CGI
         render_sections = [
-            "Create a photorealistic interior photograph with these EXACT specifications:",
+            "CRITICAL: Generate a REAL PHOTOGRAPH - NOT CGI, NOT 3D RENDER, NOT VIDEO GAME GRAPHICS",
             "",
-            "ROOM ARCHITECTURE (keep exactly):",
+            "This MUST look like an actual photograph taken with a professional camera.",
+            "It should be indistinguishable from a photo in Architectural Digest or Elle Decor.",
+            "",
+            "ROOM ARCHITECTURE (recreate exactly from original photo):",
             room_analysis,
             "",
         ]
@@ -482,7 +485,7 @@ Be extremely precise - this will be used to recreate the room exactly."""
         
         # Lighting
         if request.lighting:
-            render_sections.append("LIGHTING:")
+            render_sections.append("LIGHTING FIXTURES:")
             for light in request.lighting:
                 render_sections.append(f"- {light}")
             render_sections.append("")
@@ -494,7 +497,7 @@ Be extremely precise - this will be used to recreate the room exactly."""
         
         # Furniture
         if request.furniture:
-            render_sections.append("FURNITURE TO ADD:")
+            render_sections.append("FURNITURE TO ADD (must look like REAL purchasable products):")
             for item in request.furniture:
                 render_sections.append(f"- {item.get('type', 'furniture')}: {item.get('description', '')} - Position: {item.get('placement', 'appropriate')}")
             render_sections.append("")
@@ -505,14 +508,18 @@ Be extremely precise - this will be used to recreate the room exactly."""
             f"COLOR PALETTE: {', '.join(request.color_palette) if request.color_palette else 'harmonious with design style'}",
             f"MOOD: {request.mood or 'elegant and inviting'}",
             "",
-            "RENDERING REQUIREMENTS:",
-            "- Photorealistic quality - should look like a real photograph",
-            "- Professional architectural photography lighting",
-            "- Accurate shadows and reflections",
-            "- Proper furniture scale and proportions",
-            "- Natural, lived-in feel (not overly staged)",
-            "- 8K resolution",
-            "- Same camera angle as original photo"
+            "ABSOLUTE REQUIREMENTS FOR PHOTOREALISM:",
+            "- Must look like a REAL PHOTOGRAPH taken with a Canon 5D or Sony A7",
+            "- Real camera characteristics: natural depth of field, slight vignette, lens blur on edges",
+            "- REAL material textures: visible wood grain, fabric weave, leather texture, stone veins",
+            "- Natural lighting with realistic shadows - soft shadows under furniture",
+            "- Furniture must look like REAL products - not CGI models",
+            "- Slight imperfections: fabric wrinkles, natural wear, realistic dust",
+            "- Magazine photography quality: Architectural Digest, Elle Decor, House Beautiful",
+            "- NO CGI aesthetic, NO 3D render look, NO video game graphics",
+            "- NO plastic-looking materials, NO perfect CGI lighting",
+            "- Should fool anyone into thinking it's a real photograph",
+            "- Same camera angle and perspective as original photo"
         ])
         
         full_prompt = "\n".join(render_sections)
