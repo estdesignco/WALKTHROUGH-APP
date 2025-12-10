@@ -296,6 +296,36 @@ export const syncToServer = async (apiUrl) => {
           synced++;
           console.log(`✅ Synced item ${item.itemId}`);
         }
+      } else if (item.type === 'UPLOAD_PHOTO') {
+        const response = await fetch(`${apiUrl}/photos/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            project_id: item.projectId,
+            room_id: item.roomId,
+            photo_data: item.photo.data,
+            measurements: item.photo.measurements || [],
+            notes: item.photo.notes || ''
+          })
+        });
+        
+        if (response.ok) {
+          await clearSyncItem(item.id);
+          synced++;
+          console.log(`✅ Synced photo for room ${item.roomId}`);
+        }
+      } else if (item.type === 'ADD_MEASUREMENT') {
+        const response = await fetch(`${apiUrl}/photos/${item.photoId}/measurements`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(item.measurement)
+        });
+        
+        if (response.ok) {
+          await clearSyncItem(item.id);
+          synced++;
+          console.log(`✅ Synced measurement for photo ${item.photoId}`);
+        }
       }
     } catch (error) {
       console.error(`❌ Failed to sync item ${item.id}:`, error);
