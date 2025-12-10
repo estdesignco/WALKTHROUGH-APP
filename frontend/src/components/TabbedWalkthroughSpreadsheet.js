@@ -207,6 +207,18 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
     loadAvailableCategories();
   }, [projectId]);
 
+  // REAL-TIME SYNC FOR FFE - Auto-refresh every 30 seconds when online
+  useEffect(() => {
+    if (sheetType === 'ffe' && online) {
+      const interval = setInterval(() => {
+        console.log('🔄 FFE Real-time sync...');
+        loadProject();
+      }, 30000); // Every 30 seconds
+      
+      return () => clearInterval(interval);
+    }
+  }, [sheetType, online, projectId]);
+
   // Auto-expand all categories when project loads
   useEffect(() => {
     // Only auto-expand ONCE on initial load
