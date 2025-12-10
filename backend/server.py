@@ -7921,6 +7921,689 @@ async def delete_photo(photo_id: str):
         logging.error(f"Delete photo error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to delete photo: {str(e)}")
 
+# ================================================================================
+# VOICE NOTES ENDPOINTS
+# For capturing and managing voice notes per item/room during walkthroughs
+# ================================================================================
+
+class VoiceNoteCreate(BaseModel):
+    """Model for creating voice notes"""
+    project_id: str
+    room_id: Optional[str] = None
+    item_id: Optional[str] = None
+    audio_data: str  # Base64 encoded audio
+    duration: float  # Duration in seconds
+    file_name: Optional[str] = None
+    transcript: Optional[str] = None  # AI transcription if available
+    metadata: Optional[dict] = None
+
+class VoiceNoteUpdate(BaseModel):
+    """Model for updating voice notes"""
+    transcript: Optional[str] = None
+    metadata: Optional[dict] = None
+
+@api_router.post("/voice-notes")
+async def create_voice_note(note: VoiceNoteCreate):
+    """Upload and save a voice note"""
+    try:
+        note_id = str(uuid.uuid4())
+        
+        voice_note = {
+            "id": note_id,
+            "project_id": note.project_id,
+            "room_id": note.room_id,
+            "item_id": note.item_id,
+            "audio_data": note.audio_data,
+            "duration": note.duration,
+            "file_name": note.file_name or f"voice_note_{note_id[:8]}.webm",
+            "transcript": note.transcript,
+            "metadata": note.metadata or {},
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.voice_notes.insert_one(voice_note)
+        voice_note.pop('_id', None)
+        
+        logger.info(f"📢 Voice note saved: {note_id} for project {note.project_id}")
+        
+        return {
+            "success": True,
+            "voice_note": voice_note,
+            "message": "Voice note saved successfully"
+        }
+        
+    except Exception as e:
+        logger.error(f"Create voice note error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to save voice note: {str(e)}")
+
+@api_router.get("/voice-notes/project/{project_id}")
+async def get_project_voice_notes(project_id: str):
+    """Get all voice notes for a project"""
+    try:
+        notes = await db.voice_notes.find({
+            "project_id": project_id
+        }).sort("created_at", -1).to_list(length=500)
+        
+        for note in notes:
+            note.pop('_id', None)
+        
+        return {
+            "success": True,
+            "voice_notes": notes,
+            "count": len(notes)
+        }
+        
+    except Exception as e:
+        logger.error(f"Get project voice notes error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get voice notes: {str(e)}")
+
+@api_router.get("/voice-notes/room/{room_id}")
+async def get_room_voice_notes(room_id: str):
+    """Get all voice notes for a specific room"""
+    try:
+        notes = await db.voice_notes.find({
+            "room_id": room_id
+        }).sort("created_at", -1).to_list(length=500)
+        
+        for note in notes:
+            note.pop('_id', None)
+        
+        return {
+            "success": True,
+            "voice_notes": notes,
+            "count": len(notes)
+        }
+        
+    except Exception as e:
+        logger.error(f"Get room voice notes error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get voice notes: {str(e)}")
+
+@api_router.get("/voice-notes/item/{item_id}")
+async def get_item_voice_notes(item_id: str):
+    """Get all voice notes for a specific item"""
+    try:
+        notes = await db.voice_notes.find({
+            "item_id": item_id
+        }).sort("created_at", -1).to_list(length=500)
+        
+        for note in notes:
+            note.pop('_id', None)
+        
+        return {
+            "success": True,
+            "voice_notes": notes,
+            "count": len(notes)
+        }
+        
+    except Exception as e:
+        logger.error(f"Get item voice notes error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get voice notes: {str(e)}")
+
+@api_router.delete("/voice-notes/{note_id}")
+async def delete_voice_note(note_id: str):
+    """Delete a voice note"""
+    try:
+        result = await db.voice_notes.delete_one({"id": note_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Voice note not found")
+        
+        return {
+            "success": True,
+            "message": "Voice note deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Delete voice note error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete voice note: {str(e)}")
+
+@api_router.patch("/voice-notes/{note_id}")
+async def update_voice_note(note_id: str, updates: VoiceNoteUpdate):
+    """Update a voice note (typically for adding transcription)"""
+    try:
+        update_data = {"updated_at": datetime.now(timezone.utc).isoformat()}
+        
+        if updates.transcript is not None:
+            update_data["transcript"] = updates.transcript
+        if updates.metadata is not None:
+            update_data["metadata"] = updates.metadata
+        
+        result = await db.voice_notes.update_one(
+            {"id": note_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Voice note not found")
+        
+        # Get updated note
+        updated_note = await db.voice_notes.find_one({"id": note_id})
+        if updated_note:
+            updated_note.pop('_id', None)
+        
+        return {
+            "success": True,
+            "voice_note": updated_note,
+            "message": "Voice note updated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Update voice note error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update voice note: {str(e)}")
+
+# ================================================================================
+# GPS/LOCATION ENDPOINTS
+# For tagging photos with GPS coordinates
+# ================================================================================
+
+class LocationUpdate(BaseModel):
+    """Model for updating location data"""
+    latitude: float
+    longitude: float
+    accuracy: Optional[float] = None
+    address: Optional[str] = None  # Reverse geocoded address
+
+@api_router.patch("/photos/{photo_id}/location")
+async def update_photo_location(photo_id: str, location: LocationUpdate):
+    """Add or update GPS location for a photo"""
+    try:
+        update_data = {
+            "metadata.location": {
+                "latitude": location.latitude,
+                "longitude": location.longitude,
+                "accuracy": location.accuracy,
+                "address": location.address,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            },
+            "metadata.has_gps": True,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        result = await db.photos.update_one(
+            {"id": photo_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Photo not found")
+        
+        logger.info(f"📍 Location added to photo {photo_id}: {location.latitude}, {location.longitude}")
+        
+        return {
+            "success": True,
+            "message": "Photo location updated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Update photo location error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update photo location: {str(e)}")
+
+@api_router.get("/photos/with-location/{project_id}")
+async def get_photos_with_location(project_id: str):
+    """Get all photos for a project that have GPS location data"""
+    try:
+        photos = await db.photos.find({
+            "project_id": project_id,
+            "metadata.has_gps": True
+        }).sort("uploaded_at", -1).to_list(length=500)
+        
+        for photo in photos:
+            photo.pop('_id', None)
+        
+        return {
+            "success": True,
+            "photos": photos,
+            "count": len(photos)
+        }
+        
+    except Exception as e:
+        logger.error(f"Get photos with location error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get photos: {str(e)}")
+
+# ================================================================================
+# PUNCH LIST ENDPOINTS
+# For managing punch list items with AI suggestions
+# ================================================================================
+
+class PunchListItem(BaseModel):
+    """Model for punch list items"""
+    project_id: str
+    room_id: Optional[str] = None
+    item_id: Optional[str] = None  # Reference to checklist item if applicable
+    title: str
+    description: Optional[str] = None
+    priority: str = "medium"  # low, medium, high, urgent
+    status: str = "pending"  # pending, in_progress, completed, verified
+    assigned_to: Optional[str] = None
+    due_date: Optional[str] = None
+    photos: List[str] = []  # Photo IDs
+    voice_notes: List[str] = []  # Voice note IDs
+    ai_suggested: bool = False  # Whether this was AI-suggested
+    metadata: Optional[dict] = None
+
+@api_router.post("/punch-list")
+async def create_punch_list_item(item: PunchListItem):
+    """Create a new punch list item"""
+    try:
+        punch_id = str(uuid.uuid4())
+        
+        punch_item = {
+            "id": punch_id,
+            **item.dict(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.punch_list.insert_one(punch_item)
+        punch_item.pop('_id', None)
+        
+        logger.info(f"📋 Punch list item created: {punch_id}")
+        
+        return {
+            "success": True,
+            "punch_item": punch_item,
+            "message": "Punch list item created successfully"
+        }
+        
+    except Exception as e:
+        logger.error(f"Create punch list item error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create punch list item: {str(e)}")
+
+@api_router.get("/punch-list/project/{project_id}")
+async def get_project_punch_list(project_id: str, status: Optional[str] = None):
+    """Get all punch list items for a project"""
+    try:
+        query = {"project_id": project_id}
+        if status:
+            query["status"] = status
+        
+        items = await db.punch_list.find(query).sort("created_at", -1).to_list(length=1000)
+        
+        for item in items:
+            item.pop('_id', None)
+        
+        # Group by status
+        status_groups = {
+            "pending": [],
+            "in_progress": [],
+            "completed": [],
+            "verified": []
+        }
+        
+        for item in items:
+            item_status = item.get("status", "pending")
+            if item_status in status_groups:
+                status_groups[item_status].append(item)
+        
+        return {
+            "success": True,
+            "punch_items": items,
+            "by_status": status_groups,
+            "count": len(items),
+            "pending_count": len(status_groups["pending"]),
+            "completed_count": len(status_groups["completed"])
+        }
+        
+    except Exception as e:
+        logger.error(f"Get project punch list error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get punch list: {str(e)}")
+
+@api_router.patch("/punch-list/{item_id}")
+async def update_punch_list_item(item_id: str, updates: dict):
+    """Update a punch list item"""
+    try:
+        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+        
+        result = await db.punch_list.update_one(
+            {"id": item_id},
+            {"$set": updates}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Punch list item not found")
+        
+        updated_item = await db.punch_list.find_one({"id": item_id})
+        if updated_item:
+            updated_item.pop('_id', None)
+        
+        return {
+            "success": True,
+            "punch_item": updated_item,
+            "message": "Punch list item updated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Update punch list item error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update punch list item: {str(e)}")
+
+@api_router.delete("/punch-list/{item_id}")
+async def delete_punch_list_item(item_id: str):
+    """Delete a punch list item"""
+    try:
+        result = await db.punch_list.delete_one({"id": item_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Punch list item not found")
+        
+        return {
+            "success": True,
+            "message": "Punch list item deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Delete punch list item error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete punch list item: {str(e)}")
+
+@api_router.post("/punch-list/ai-suggest/{project_id}")
+async def ai_suggest_punch_items(project_id: str):
+    """Generate AI suggestions for punch list items based on project data"""
+    try:
+        # Get project data
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Get all items with issues or notes
+        rooms = await db.rooms.find({"project_id": project_id}).to_list(1000)
+        room_ids = [r["id"] for r in rooms]
+        
+        categories = await db.categories.find({"room_id": {"$in": room_ids}}).to_list(1000)
+        cat_ids = [c["id"] for c in categories]
+        
+        subcats = await db.subcategories.find({"category_id": {"$in": cat_ids}}).to_list(1000)
+        subcat_ids = [s["id"] for s in subcats]
+        
+        items = await db.items.find({"subcategory_id": {"$in": subcat_ids}}).to_list(1000)
+        
+        suggestions = []
+        
+        # Generate suggestions based on item status and notes
+        for item in items:
+            item_notes = item.get("notes", "")
+            item_status = item.get("status", "")
+            
+            # Suggest items that have damage notes
+            if item_notes and any(word in item_notes.lower() for word in ["damage", "scratch", "broken", "repair", "fix", "replace", "issue", "problem"]):
+                suggestions.append({
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "item_id": item.get("id"),
+                    "title": f"Check: {item.get('name', 'Unknown Item')}",
+                    "description": f"Item has notes indicating potential issues: {item_notes[:200]}",
+                    "priority": "medium",
+                    "status": "pending",
+                    "ai_suggested": True,
+                    "metadata": {"source": "notes_analysis", "original_notes": item_notes}
+                })
+            
+            # Suggest items awaiting delivery
+            if item_status in ["ORDERED", "SHIPPED"]:
+                suggestions.append({
+                    "id": str(uuid.uuid4()),
+                    "project_id": project_id,
+                    "item_id": item.get("id"),
+                    "title": f"Verify delivery: {item.get('name', 'Unknown Item')}",
+                    "description": f"Item is {item_status} - verify upon arrival and check for damage",
+                    "priority": "low",
+                    "status": "pending",
+                    "ai_suggested": True,
+                    "metadata": {"source": "status_tracking", "current_status": item_status}
+                })
+        
+        # Save suggestions to database
+        if suggestions:
+            for suggestion in suggestions:
+                suggestion["created_at"] = datetime.now(timezone.utc).isoformat()
+                suggestion["updated_at"] = datetime.now(timezone.utc).isoformat()
+            await db.punch_list.insert_many(suggestions)
+        
+        logger.info(f"🤖 Generated {len(suggestions)} AI punch list suggestions for project {project_id}")
+        
+        return {
+            "success": True,
+            "suggestions": suggestions,
+            "count": len(suggestions),
+            "message": f"Generated {len(suggestions)} AI suggestions"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"AI punch list suggestion error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate suggestions: {str(e)}")
+
+# ================================================================================
+# TEAM CHAT ENDPOINTS
+# Real-time team chat functionality with phone number identification
+# ================================================================================
+
+class ChatMessage(BaseModel):
+    """Model for chat messages"""
+    project_id: str
+    room_id: Optional[str] = None  # Optional room-specific chat
+    sender_phone: str
+    sender_name: Optional[str] = None
+    message: str
+    message_type: str = "text"  # text, image, voice, file
+    attachment_url: Optional[str] = None
+    metadata: Optional[dict] = None
+
+@api_router.post("/chat/send")
+async def send_chat_message(message: ChatMessage):
+    """Send a chat message"""
+    try:
+        message_id = str(uuid.uuid4())
+        
+        chat_message = {
+            "id": message_id,
+            **message.dict(),
+            "read_by": [message.sender_phone],  # Sender has read their own message
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.chat_messages.insert_one(chat_message)
+        chat_message.pop('_id', None)
+        
+        logger.info(f"💬 Chat message sent: {message_id} in project {message.project_id}")
+        
+        return {
+            "success": True,
+            "message": chat_message
+        }
+        
+    except Exception as e:
+        logger.error(f"Send chat message error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to send message: {str(e)}")
+
+@api_router.get("/chat/messages/{project_id}")
+async def get_chat_messages(project_id: str, room_id: Optional[str] = None, limit: int = 100, before: Optional[str] = None):
+    """Get chat messages for a project"""
+    try:
+        query = {"project_id": project_id}
+        if room_id:
+            query["room_id"] = room_id
+        if before:
+            query["created_at"] = {"$lt": before}
+        
+        messages = await db.chat_messages.find(query).sort("created_at", -1).limit(limit).to_list(length=limit)
+        
+        for msg in messages:
+            msg.pop('_id', None)
+        
+        # Reverse to get chronological order
+        messages.reverse()
+        
+        return {
+            "success": True,
+            "messages": messages,
+            "count": len(messages)
+        }
+        
+    except Exception as e:
+        logger.error(f"Get chat messages error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get messages: {str(e)}")
+
+@api_router.post("/chat/mark-read/{project_id}")
+async def mark_messages_read(project_id: str, phone: str, message_ids: List[str] = None):
+    """Mark messages as read by a user"""
+    try:
+        query = {"project_id": project_id}
+        if message_ids:
+            query["id"] = {"$in": message_ids}
+        
+        # Add phone to read_by array if not already there
+        result = await db.chat_messages.update_many(
+            query,
+            {"$addToSet": {"read_by": phone}}
+        )
+        
+        return {
+            "success": True,
+            "marked_count": result.modified_count
+        }
+        
+    except Exception as e:
+        logger.error(f"Mark messages read error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to mark messages read: {str(e)}")
+
+@api_router.get("/chat/unread/{project_id}/{phone}")
+async def get_unread_count(project_id: str, phone: str):
+    """Get count of unread messages for a user"""
+    try:
+        count = await db.chat_messages.count_documents({
+            "project_id": project_id,
+            "read_by": {"$nin": [phone]},
+            "sender_phone": {"$ne": phone}  # Don't count your own messages as unread
+        })
+        
+        return {
+            "success": True,
+            "unread_count": count
+        }
+        
+    except Exception as e:
+        logger.error(f"Get unread count error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get unread count: {str(e)}")
+
+# ================================================================================
+# SHIPPING/TRACKING ENDPOINTS
+# Real-time shipping status tracking for FFE items
+# ================================================================================
+
+class TrackingUpdate(BaseModel):
+    """Model for shipping tracking updates"""
+    carrier: str
+    tracking_number: str
+    status: str  # ordered, shipped, in_transit, out_for_delivery, delivered, exception
+    estimated_delivery: Optional[str] = None
+    last_location: Optional[str] = None
+    last_update: Optional[str] = None
+    events: List[dict] = []  # List of tracking events
+
+@api_router.patch("/items/{item_id}/tracking")
+async def update_item_tracking(item_id: str, tracking: TrackingUpdate):
+    """Update shipping/tracking info for an item"""
+    try:
+        update_data = {
+            "shipping": {
+                "carrier": tracking.carrier,
+                "tracking_number": tracking.tracking_number,
+                "status": tracking.status,
+                "estimated_delivery": tracking.estimated_delivery,
+                "last_location": tracking.last_location,
+                "last_update": tracking.last_update or datetime.now(timezone.utc).isoformat(),
+                "events": tracking.events
+            },
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Update item status based on shipping status
+        status_mapping = {
+            "ordered": "ORDERED",
+            "shipped": "SHIPPED",
+            "in_transit": "SHIPPED",
+            "out_for_delivery": "SHIPPED",
+            "delivered": "DELIVERED",
+            "exception": "EXCEPTION"
+        }
+        
+        if tracking.status in status_mapping:
+            update_data["status"] = status_mapping[tracking.status]
+        
+        result = await db.items.update_one(
+            {"id": item_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Item not found")
+        
+        logger.info(f"📦 Tracking updated for item {item_id}: {tracking.status}")
+        
+        return {
+            "success": True,
+            "message": "Tracking info updated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Update item tracking error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update tracking: {str(e)}")
+
+@api_router.get("/items/with-tracking/{project_id}")
+async def get_items_with_tracking(project_id: str):
+    """Get all items with shipping/tracking info for a project"""
+    try:
+        # Get all rooms for project
+        rooms = await db.rooms.find({"project_id": project_id}).to_list(1000)
+        room_ids = [r["id"] for r in rooms]
+        
+        categories = await db.categories.find({"room_id": {"$in": room_ids}}).to_list(1000)
+        cat_ids = [c["id"] for c in categories]
+        
+        subcats = await db.subcategories.find({"category_id": {"$in": cat_ids}}).to_list(1000)
+        subcat_ids = [s["id"] for s in subcats]
+        
+        # Get items with tracking info
+        items = await db.items.find({
+            "subcategory_id": {"$in": subcat_ids},
+            "shipping": {"$exists": True}
+        }).to_list(1000)
+        
+        for item in items:
+            item.pop('_id', None)
+        
+        # Group by shipping status
+        by_status = {}
+        for item in items:
+            status = item.get("shipping", {}).get("status", "unknown")
+            if status not in by_status:
+                by_status[status] = []
+            by_status[status].append(item)
+        
+        return {
+            "success": True,
+            "items": items,
+            "by_status": by_status,
+            "count": len(items)
+        }
+        
+    except Exception as e:
+        logger.error(f"Get items with tracking error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get items: {str(e)}")
+
 # ===== TO-DO LIST ENDPOINTS =====
 @api_router.get("/todos/{project_id}")
 async def get_todos(project_id: str):
