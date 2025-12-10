@@ -1843,18 +1843,29 @@ async def get_project(project_id: str, sheet_type: str = None):
     
     return Project(**project_data)
 
-@api_router.put("/projects/{project_id}", response_model=Project)
-async def update_project(project_id: str, project_update: ProjectCreate):
-    """Update project details including client info, project type, etc."""
+@api_router.put("/projects/{project_id}")
+async def update_project(project_id: str, project_update: ProjectUpdate):
+    """Update project details including client info, project type, etc. Supports partial updates."""
     try:
         # Check if project exists
         existing_project = await db.projects.find_one({"id": project_id})
         if not existing_project:
             raise HTTPException(status_code=404, detail="Project not found")
         
-        # Convert to dict and remove None values
-        update_data = project_update.dict(exclude_unset=True)
-        update_data["updated_at"] = datetime.utcnow()
+        # Convert to dict and remove None values for partial update
+        update_data = {k: v for k, v in project_update.dict().items() if v is not None}
+        if not update_data:
+            return {"success": True, "message": "No updates provided", "project": existing_project}
+        
+        update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+        
+        # Handle nested client_info update
+        if "client_info" in update_data and update_data["client_info"]:
+            # Merge with existing client_info instead of replacing
+            existing_client_info = existing_project.get("client_info", {})
+            if isinstance(update_data["client_info"], dict):
+                existing_client_info.update(update_data["client_info"])
+                update_data["client_info"] = existing_client_info
         
         # Update the project
         result = await db.projects.update_one(
@@ -1862,12 +1873,9 @@ async def update_project(project_id: str, project_update: ProjectCreate):
             {"$set": update_data}
         )
         
-        if result.modified_count == 0:
-            raise HTTPException(status_code=404, detail="Project not found or no changes made")
-        
         # Return updated project
-        updated_project = await db.projects.find_one({"id": project_id})
-        return Project(**updated_project)
+        updated_project = await db.projects.find_one({"id": project_id}, {"_id": 0})
+        return {"success": True, "project": updated_project}
         
     except Exception as e:
         logging.error(f"Error updating project {project_id}: {str(e)}")
