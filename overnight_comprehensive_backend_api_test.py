@@ -4,7 +4,7 @@ OVERNIGHT COMPREHENSIVE BACKEND API TESTING
 ===========================================
 
 Objective: Test ALL backend API endpoints to ensure complete functionality
-Base URL: https://product-scraper-8.preview.emergentagent.com
+Base URL: https://design-sourcer.preview.emergentagent.com
 Test Project IDs: 6dd19c44-a527-4d73-9d5f-27e70fec226e, 1b66b1d9-4e0b-4a37-a371-37130192dbc6
 
 APIs to Test:
@@ -27,7 +27,7 @@ from typing import Dict, List, Any
 
 class ComprehensiveBackendTester:
     def __init__(self):
-        self.base_url = "https://product-scraper-8.preview.emergentagent.com"
+        self.base_url = "https://design-sourcer.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
         self.test_results = []
         self.test_project_ids = [

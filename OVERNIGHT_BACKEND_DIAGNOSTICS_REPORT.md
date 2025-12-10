@@ -1,6 +1,6 @@
 # COMPREHENSIVE OVERNIGHT BACKEND DIAGNOSTICS - FINAL REPORT
 ## Test Date: 2025-10-28
-## Backend URL: https://product-scraper-8.preview.emergentagent.com/api
+## Backend URL: https://design-sourcer.preview.emergentagent.com/api
 
 ---
 
