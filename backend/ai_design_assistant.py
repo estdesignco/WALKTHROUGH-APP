@@ -130,19 +130,28 @@ Provide a detailed description I can use to regenerate this room EMPTY of furnit
         analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
         room_analysis = await chat.send_message(analysis_msg)
         
-        # Generate the cleared room
-        clear_prompt = f"""Photorealistic interior photograph of an EMPTY room based on this description:
+        # Generate the cleared room - PHOTOREALISTIC NOT CGI
+        clear_prompt = f"""REAL PHOTOGRAPH - NOT CGI OR 3D RENDER - of an empty interior room:
 
 {room_analysis}
 
-IMPORTANT:
+CRITICAL - THIS MUST LOOK LIKE A REAL PHOTOGRAPH:
+- Shot with a professional DSLR camera (Canon 5D or similar)
+- Natural imperfections - slight lens distortion, realistic shadows
+- Real photography lighting - not perfect CGI lighting
+- Visible texture in materials - wood grain, fabric weave, paint texture
+- Slight depth of field blur on edges
+- Real-world color grading like Architectural Digest or Elle Decor magazine
+- NO CGI look, NO video game aesthetic, NO 3D render appearance
+- Should be indistinguishable from a real estate listing photo
+
+ROOM REQUIREMENTS:
 - Remove ALL furniture, rugs, and decor
-- Keep the exact same room architecture, windows, doors
-- Keep the same flooring, wall color, and ceiling
-- Keep any built-in features: {', '.join(keep_elements) if keep_elements else 'fireplace if present, built-in shelves'}
-- Same lighting conditions and camera angle
-- Professional real estate photography style
-- 8K resolution, photorealistic"""
+- Keep exact same architecture, windows, doors
+- Keep same flooring, wall color, ceiling
+- Keep built-in features: {', '.join(keep_elements) if keep_elements else 'fireplace, built-in shelves if present'}
+- Same natural lighting conditions and camera angle
+- Professional interior photography quality"""
 
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         images = await image_gen.generate_images(
