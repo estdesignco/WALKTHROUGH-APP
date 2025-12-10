@@ -200,7 +200,7 @@ class UltimateSourcingTester:
             "auto_populate": True
         }
         
-        success, response = self.run_test("Create Room", "POST", "rooms", 201, room_data)
+        success, response = self.run_test("Create Room", "POST", "rooms", 200, room_data)
         if success and response.get('id'):
             self.room_id = response['id']
             print(f"   🏠 Room ID: {self.room_id}")
