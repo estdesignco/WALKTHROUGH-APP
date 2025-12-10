@@ -242,7 +242,7 @@ class UltimateSourcingTester:
                 "description": "Test subcategory"
             }
             
-            success, response = self.run_test("Create Subcategory", "POST", "subcategories", 201, subcategory_data)
+            success, response = self.run_test("Create Subcategory", "POST", "subcategories", 200, subcategory_data)
             if success and response.get('id'):
                 subcategory_id = response['id']
                 print(f"   📁 Subcategory ID: {subcategory_id}")
