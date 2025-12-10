@@ -310,7 +310,7 @@ test_plan:
     - "Contacts API"
     - "Moodboard API"
   test_all: false
-  test_priority: "backend_completed_frontend_completed"
+  test_priority: "mobile_interface_completed"
 
 agent_communication:
   - agent: "testing"
