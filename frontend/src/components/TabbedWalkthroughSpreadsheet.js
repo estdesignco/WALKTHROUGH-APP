@@ -81,6 +81,8 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
   const [showGrid, setShowGrid] = useState(false); // Grid overlay toggle
   const [compareMode, setCompareMode] = useState(false); // Side-by-side compare mode
   const [comparePhoto, setComparePhoto] = useState(null); // Second photo for comparison
+  const [punchListMode, setPunchListMode] = useState(false); // Punch List Mode toggle
+  const [showVoiceNotes, setShowVoiceNotes] = useState(false); // Voice notes panel toggle
   
   const displayProject = project;
   
