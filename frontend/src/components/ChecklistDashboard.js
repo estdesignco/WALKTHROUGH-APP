@@ -273,23 +273,6 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     return carriers;
   };
 
-  // Load sync status on mount
-  useEffect(() => {
-    const loadSyncStatus = async () => {
-      if (!projectId) return;
-      try {
-        const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/sync/status/${projectId}`);
-        if (response.ok) {
-          const data = await response.json();
-          setSyncStatus(data);
-        }
-      } catch (err) {
-        console.warn('Failed to load sync status:', err);
-      }
-    };
-    loadSyncStatus();
-  }, [projectId, project]);
-
   // Handle sync from walkthrough
   const handleSyncFromWalkthrough = async (syncAll = false) => {
     if (!window.confirm(
