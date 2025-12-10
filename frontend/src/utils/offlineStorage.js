@@ -44,10 +44,147 @@ export const initDB = () => {
         photoStore.createIndex('room_id', 'room_id', { unique: false });
       }
       
+      if (!db.objectStoreNames.contains(STORE_NAMES.CONTACTS)) {
+        const contactStore = db.createObjectStore(STORE_NAMES.CONTACTS, { keyPath: 'id' });
+        contactStore.createIndex('project_id', 'project_id', { unique: false });
+      }
+      
+      if (!db.objectStoreNames.contains(STORE_NAMES.QUESTIONNAIRE)) {
+        const questStore = db.createObjectStore(STORE_NAMES.QUESTIONNAIRE, { keyPath: 'project_id' });
+      }
+      
+      if (!db.objectStoreNames.contains(STORE_NAMES.MEASUREMENTS)) {
+        const measureStore = db.createObjectStore(STORE_NAMES.MEASUREMENTS, { keyPath: 'id' });
+        measureStore.createIndex('photo_id', 'photo_id', { unique: false });
+      }
+      
       if (!db.objectStoreNames.contains(STORE_NAMES.PENDING_SYNC)) {
         db.createObjectStore(STORE_NAMES.PENDING_SYNC, { keyPath: 'id', autoIncrement: true });
       }
     };
+  });
+};
+
+// Save contacts offline
+export const saveContactsOffline = async (contacts, projectId) => {
+  const db = await initDB();
+  const transaction = db.transaction([STORE_NAMES.CONTACTS], 'readwrite');
+  const store = transaction.objectStore(STORE_NAMES.CONTACTS);
+  
+  for (const contact of contacts) {
+    await new Promise((resolve, reject) => {
+      const request = store.put({ ...contact, project_id: projectId });
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+};
+
+// Get contacts offline
+export const getContactsOffline = async (projectId) => {
+  const db = await initDB();
+  const transaction = db.transaction([STORE_NAMES.CONTACTS], 'readonly');
+  const store = transaction.objectStore(STORE_NAMES.CONTACTS);
+  const index = store.index('project_id');
+  
+  return new Promise((resolve, reject) => {
+    const request = index.getAll(projectId);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+};
+
+// Save questionnaire offline
+export const saveQuestionnaireOffline = async (questionnaire) => {
+  const db = await initDB();
+  const transaction = db.transaction([STORE_NAMES.QUESTIONNAIRE], 'readwrite');
+  const store = transaction.objectStore(STORE_NAMES.QUESTIONNAIRE);
+  
+  return new Promise((resolve, reject) => {
+    const request = store.put(questionnaire);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+};
+
+// Get questionnaire offline
+export const getQuestionnaireOffline = async (projectId) => {
+  const db = await initDB();
+  const transaction = db.transaction([STORE_NAMES.QUESTIONNAIRE], 'readonly');
+  const store = transaction.objectStore(STORE_NAMES.QUESTIONNAIRE);
+  
+  return new Promise((resolve, reject) => {
+    const request = store.get(projectId);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+};
+
+// Save photo with measurements offline
+export const savePhotoOffline = async (photo) => {
+  const db = await initDB();
+  const transaction = db.transaction([STORE_NAMES.PHOTOS], 'readwrite');
+  const store = transaction.objectStore(STORE_NAMES.PHOTOS);
+  
+  return new Promise((resolve, reject) => {
+    const request = store.put(photo);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+};
+
+// Get photos offline
+export const getPhotosOffline = async (roomId) => {
+  const db = await initDB();
+  const transaction = db.transaction([STORE_NAMES.PHOTOS], 'readonly');
+  const store = transaction.objectStore(STORE_NAMES.PHOTOS);
+  const index = store.index('room_id');
+  
+  return new Promise((resolve, reject) => {
+    const request = index.getAll(roomId);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+};
+
+// Queue photo for sync
+export const queuePhotoSync = async (photo, projectId, roomId) => {
+  const db = await initDB();
+  const transaction = db.transaction([STORE_NAMES.PENDING_SYNC], 'readwrite');
+  const store = transaction.objectStore(STORE_NAMES.PENDING_SYNC);
+  
+  const syncItem = {
+    type: 'UPLOAD_PHOTO',
+    photo,
+    projectId,
+    roomId,
+    timestamp: Date.now()
+  };
+  
+  return new Promise((resolve, reject) => {
+    const request = store.add(syncItem);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+};
+
+// Queue measurement for sync
+export const queueMeasurementSync = async (measurement, photoId) => {
+  const db = await initDB();
+  const transaction = db.transaction([STORE_NAMES.PENDING_SYNC], 'readwrite');
+  const store = transaction.objectStore(STORE_NAMES.PENDING_SYNC);
+  
+  const syncItem = {
+    type: 'ADD_MEASUREMENT',
+    measurement,
+    photoId,
+    timestamp: Date.now()
+  };
+  
+  return new Promise((resolve, reject) => {
+    const request = store.add(syncItem);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
   });
 };
 
