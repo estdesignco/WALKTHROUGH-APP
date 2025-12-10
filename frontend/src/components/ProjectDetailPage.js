@@ -887,6 +887,16 @@ export default function ProjectDetailPage() {
                 <ExportsDashboard projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading exports...</div> },
+        { name: "AI Assistant", icon: Bot, component: (
+            <div className="ai-assistant-content">
+                <AIDesignDashboard project={project} />
+            </div>
+        ) },
+        { name: "Room Studio", icon: PaintBucket, component: (
+            <div className="room-studio-content">
+                <RoomRenderingStudio />
+            </div>
+        ) },
     ];
 
     if (isLoading) {
