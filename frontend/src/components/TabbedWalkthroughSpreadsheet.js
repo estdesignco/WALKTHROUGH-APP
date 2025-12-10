@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useOfflineSync } from '../hooks/useOfflineSync';
 import MobileAddItemModal from './MobileAddItemModal';
+import VoiceNoteRecorder from './VoiceNoteRecorder';
 import { exportProjectToCSV, exportProjectSummary, calculateProjectStats } from '../utils/exportUtils';
 import { leicaManager } from '../utils/leicaD5Manager';
 import { getRoomColor, getCategoryColor, ROOM_COLORS } from '../utils/roomColors';
