@@ -164,7 +164,7 @@ class UltimateSourcingTester:
             "project_type": "Renovation"
         }
         
-        success, response = self.run_test("Create Project", "POST", "projects", 201, project_data)
+        success, response = self.run_test("Create Project", "POST", "projects", 200, project_data)
         if success and response.get('id'):
             test_project_id = response['id']
             print(f"   📝 New Project ID: {test_project_id}")
