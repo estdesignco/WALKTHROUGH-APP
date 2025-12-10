@@ -240,7 +240,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       <div className="text-center py-12">
         <div className="text-6xl mb-4">❌</div>
         <h2 className="text-2xl font-bold text-gray-200 mb-2">Project Not Found</h2>
-        <p className="text-gray-400">The project you're looking for doesn't exist or couldn't be loaded.</p>
+        <p className="text-gray-400">The project you are looking for does not exist or could not be loaded.</p>
       </div>
     );
   }
