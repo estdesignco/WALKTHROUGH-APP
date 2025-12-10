@@ -1,7 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
+
+// Brand colors
+const COLORS = {
+  bg: '#141214',
+  bgCard: '#1a1a1a',
+  bgInput: '#252525',
+  textPrimary: '#E6D4A8',
+  textSecondary: '#A0A0A0',
+  accent: '#C39B77',
+  border: '#3a3a3a'
+};
 
 // AI Chat Assistant Component
 const AIChatAssistant = ({ projectContext }) => {
@@ -46,8 +58,8 @@ const AIChatAssistant = ({ projectContext }) => {
   };
 
   return (
-    <div className="flex flex-col h-[500px] bg-[#1E293B] rounded-lg border border-[#D4A574]/30">
-      <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-4 py-3 rounded-t-lg">
+    <div className="flex flex-col h-[500px] rounded-lg" style={{ backgroundColor: COLORS.bgCard, border: `1px solid ${COLORS.accent}` }}>
+      <div className="px-4 py-3 rounded-t-lg" style={{ backgroundColor: COLORS.accent }}>
         <h3 className="font-bold text-black">🤖 Design AI Assistant</h3>
       </div>
       
