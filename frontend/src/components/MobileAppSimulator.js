@@ -132,9 +132,9 @@ function ProjectMenuScreen({ project, onNavigate }) {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="relative z-10">
               <div className="text-5xl md:text-6xl mb-3">📖</div>
-              <div className="font-bold text-[#D4C5A9] text-2xl md:text-3xl mb-2">FF&E Bible</div>
+              <div className="font-bold text-[#D4C5A9] text-2xl md:text-3xl mb-2">FFE</div>
               <div className="text-sm md:text-base text-gray-300">Your complete inventory - Status, tracking, delivery info</div>
-              <div className="mt-3 text-sm md:text-base text-[#D4A574]">💡 Works offline with auto-sync!</div>
+              <div className="mt-3 text-sm md:text-base text-[#D4A574]">🔄 Real-time sync for jobsite use!</div>
             </div>
           </button>
 
