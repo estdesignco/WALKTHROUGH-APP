@@ -525,6 +525,7 @@ const BudgetOptimizer = ({ items = [], onOptimize }) => {
 
 // Main AI Dashboard Component
 const AIDesignDashboard = ({ project, items = [] }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('chat');
 
   const tabs = [
@@ -535,11 +536,22 @@ const AIDesignDashboard = ({ project, items = [] }) => {
   ];
 
   return (
-    <div className="bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0F172A] min-h-screen p-6">
+    <div className="min-h-screen p-6" style={{ backgroundColor: COLORS.bg }}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-[#D4A574] mb-2">✨ AI Design Assistant</h1>
-          <p className="text-[#D4C5A9]">Powered by GPT-5 & gpt-image-1</p>
+        {/* Header with Back Button */}
+        <div className="flex items-center justify-between mb-8">
+          <button 
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+            style={{ color: COLORS.accent, border: `1px solid ${COLORS.accent}` }}
+          >
+            ← Back
+          </button>
+          <div className="text-center flex-1">
+            <h1 className="text-4xl font-bold mb-2" style={{ color: COLORS.textPrimary }}>✨ AI Design Assistant</h1>
+            <p style={{ color: COLORS.textSecondary }}>Powered by GPT-5 & gpt-image-1</p>
+          </div>
+          <div className="w-20"></div>
         </div>
         
         {/* Tab Navigation */}
@@ -548,11 +560,12 @@ const AIDesignDashboard = ({ project, items = [] }) => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-3 rounded-lg font-bold transition-all ${
-                activeTab === tab.id
-                  ? 'bg-gradient-to-r from-[#D4A574] to-[#B49B7E] text-black'
-                  : 'bg-[#1E293B] text-[#D4C5A9] hover:bg-[#2E3B4B] border border-[#D4A574]/30'
-              }`}
+              className="px-6 py-3 rounded-lg font-bold transition-all"
+              style={{
+                backgroundColor: activeTab === tab.id ? COLORS.accent : COLORS.bgCard,
+                color: activeTab === tab.id ? '#000' : COLORS.textPrimary,
+                border: `1px solid ${COLORS.accent}`
+              }}
             >
               {tab.label}
             </button>
