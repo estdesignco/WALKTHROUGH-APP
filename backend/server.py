@@ -8320,28 +8320,52 @@ async def ai_suggest_punch_items(project_id: str):
     """Generate AI suggestions for punch list items based on project data"""
     try:
         # Get project data
-        project = await db.projects.find_one({"id": project_id})
+        project = await db.projects.find_one({"id": project_id}, {"_id": 0})
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
         
-        # Get all items with issues or notes
-        rooms = await db.rooms.find({"project_id": project_id}).to_list(1000)
-        room_ids = [r["id"] for r in rooms]
+        # Get all items with issues or notes - exclude _id to avoid serialization issues
+        rooms = await db.rooms.find({"project_id": project_id}, {"_id": 0}).to_list(1000)
+        if not rooms:
+            return {
+                "success": True,
+                "suggestions": [],
+                "count": 0,
+                "message": "No rooms found in project"
+            }
         
-        categories = await db.categories.find({"room_id": {"$in": room_ids}}).to_list(1000)
-        cat_ids = [c["id"] for c in categories]
+        room_ids = [r["id"] for r in rooms if "id" in r]
         
-        subcats = await db.subcategories.find({"category_id": {"$in": cat_ids}}).to_list(1000)
-        subcat_ids = [s["id"] for s in subcats]
+        categories = await db.categories.find({"room_id": {"$in": room_ids}}, {"_id": 0}).to_list(1000)
+        cat_ids = [c["id"] for c in categories if "id" in c]
         
-        items = await db.items.find({"subcategory_id": {"$in": subcat_ids}}).to_list(1000)
+        if not cat_ids:
+            return {
+                "success": True,
+                "suggestions": [],
+                "count": 0,
+                "message": "No categories found"
+            }
+        
+        subcats = await db.subcategories.find({"category_id": {"$in": cat_ids}}, {"_id": 0}).to_list(1000)
+        subcat_ids = [s["id"] for s in subcats if "id" in s]
+        
+        if not subcat_ids:
+            return {
+                "success": True,
+                "suggestions": [],
+                "count": 0,
+                "message": "No subcategories found"
+            }
+        
+        items = await db.items.find({"subcategory_id": {"$in": subcat_ids}}, {"_id": 0}).to_list(1000)
         
         suggestions = []
         
         # Generate suggestions based on item status and notes
         for item in items:
-            item_notes = item.get("notes", "")
-            item_status = item.get("status", "")
+            item_notes = item.get("notes", "") or ""
+            item_status = item.get("status", "") or ""
             
             # Suggest items that have damage notes
             if item_notes and any(word in item_notes.lower() for word in ["damage", "scratch", "broken", "repair", "fix", "replace", "issue", "problem"]):
@@ -8350,11 +8374,11 @@ async def ai_suggest_punch_items(project_id: str):
                     "project_id": project_id,
                     "item_id": item.get("id"),
                     "title": f"Check: {item.get('name', 'Unknown Item')}",
-                    "description": f"Item has notes indicating potential issues: {item_notes[:200]}",
+                    "description": f"Item has notes indicating potential issues: {str(item_notes)[:200]}",
                     "priority": "medium",
                     "status": "pending",
                     "ai_suggested": True,
-                    "metadata": {"source": "notes_analysis", "original_notes": item_notes}
+                    "metadata": {"source": "notes_analysis", "original_notes": str(item_notes)}
                 })
             
             # Suggest items awaiting delivery
@@ -8368,7 +8392,7 @@ async def ai_suggest_punch_items(project_id: str):
                     "priority": "low",
                     "status": "pending",
                     "ai_suggested": True,
-                    "metadata": {"source": "status_tracking", "current_status": item_status}
+                    "metadata": {"source": "status_tracking", "current_status": str(item_status)}
                 })
         
         # Save suggestions to database
