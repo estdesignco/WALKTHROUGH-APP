@@ -143,6 +143,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ MOBILE INTERFACE FULLY FUNCTIONAL - Complete mobile user journey tested at iPhone viewport (390x844). Home screen with Projects/Photos/Measure/Sync buttons working, project list loads correctly, project selection navigates to menu, walkthrough section accessible with room tabs and categories, ADD ROOM button opens modal, multiple ADD ITEM buttons available, checkboxes and INSTALLED columns present, SYNC functionality working, measurements section accessible. Mobile responsive design confirmed with proper touch targets."
+      - working: true
+        agent: "testing"
+        comment: "✅ ENHANCED MOBILE APP TESTING COMPLETED - All NEW FEATURES verified working: 1) FFE Label Change: Shows 'FFE' (not 'FF&E Bible') with 'Real-time sync for jobsite use!' message ✅ 2) Online/Offline Indicator: '🌐 ONLINE' visible on walkthrough spreadsheet ✅ 3) SYNC Button: Functional and clickable ✅ 4) Contacts Screen: Online/offline indicators + 'Last synced' time display ✅ 5) Room Tabs: Horizontal scrolling (5 tabs found) ✅ 6) ADD ROOM: Functional modal interface ✅ 7) ADD ITEM: Multiple buttons available (12 found) ✅ 8) Checkbox Functionality: 116 checkboxes for item checking ✅ 9) Photo Management: Interface accessible with Leica D5 integration ✅ 10) Measurements: Section accessible ✅ 11) Project Details: Shows questionnaire info with CLIENT/PROJECT sections ✅ ALL REQUESTED FEATURES WORKING ON MOBILE VIEWPORT (390x844)"
 
   - task: "Authentication System"
     implemented: true
