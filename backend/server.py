@@ -3542,6 +3542,266 @@ async def delete_subcategory(subcategory_id: str):
         logger.error(f"Error deleting subcategory {subcategory_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to delete subcategory: {str(e)}")
 
+# ================================================================================
+# WALKTHROUGH TO CHECKLIST SYNC ENDPOINTS
+# These endpoints solve the CRITICAL issue of data not transferring from 
+# mobile walkthrough to desktop checklist
+# ================================================================================
+
+class SyncRequest(BaseModel):
+    """Request model for sync operations"""
+    sync_all: bool = False  # If true, sync all items; if false, only sync PICKED items
+    include_photos: bool = True  # Include photo references in sync
+
+@api_router.post("/sync/walkthrough-to-checklist/{project_id}")
+async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncRequest = None):
+    """
+    CRITICAL ENDPOINT: Sync data from Walkthrough sheet_type to Checklist sheet_type.
+    This allows data captured during mobile walkthroughs to appear in the desktop checklist.
+    
+    The sync:
+    1. Finds all walkthrough rooms for the project
+    2. For each walkthrough room, creates/updates matching checklist room
+    3. Copies all items (or just PICKED items) to the checklist version
+    4. Preserves existing checklist data - only adds new items
+    """
+    if sync_options is None:
+        sync_options = SyncRequest()
+    
+    try:
+        logger.info(f"🔄 Starting Walkthrough → Checklist sync for project {project_id}")
+        
+        # Get all walkthrough rooms
+        walkthrough_rooms = await db.rooms.find({
+            "project_id": project_id,
+            "sheet_type": "walkthrough"
+        }).to_list(1000)
+        
+        if not walkthrough_rooms:
+            return {
+                "success": True,
+                "message": "No walkthrough rooms found to sync",
+                "synced_rooms": 0,
+                "synced_items": 0
+            }
+        
+        synced_rooms = 0
+        synced_items = 0
+        synced_details = []
+        
+        for wt_room in walkthrough_rooms:
+            wt_room_name = wt_room.get("name", "")
+            logger.info(f"📋 Processing walkthrough room: {wt_room_name}")
+            
+            # Check if a checklist room with same name exists
+            existing_checklist_room = await db.rooms.find_one({
+                "project_id": project_id,
+                "name": {"$regex": f"^{wt_room_name}$", "$options": "i"},
+                "sheet_type": "checklist"
+            })
+            
+            checklist_room_id = None
+            
+            if existing_checklist_room:
+                checklist_room_id = existing_checklist_room["id"]
+                logger.info(f"  ✅ Found existing checklist room: {checklist_room_id}")
+            else:
+                # Create new checklist room
+                checklist_room_id = str(uuid.uuid4())
+                new_checklist_room = {
+                    "id": checklist_room_id,
+                    "project_id": project_id,
+                    "name": wt_room_name,
+                    "description": f"Synced from walkthrough - {wt_room_name}",
+                    "order_index": wt_room.get("order_index", 0),
+                    "sheet_type": "checklist",
+                    "color": wt_room.get("color", "#7A5A8A"),
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+                await db.rooms.insert_one(new_checklist_room)
+                logger.info(f"  🆕 Created new checklist room: {checklist_room_id}")
+                synced_rooms += 1
+            
+            # Get walkthrough categories for this room
+            wt_categories = await db.categories.find({
+                "room_id": wt_room["id"]
+            }).to_list(1000)
+            
+            for wt_category in wt_categories:
+                wt_cat_name = wt_category.get("name", "")
+                
+                # Check for existing checklist category
+                existing_cl_category = await db.categories.find_one({
+                    "room_id": checklist_room_id,
+                    "name": {"$regex": f"^{wt_cat_name}$", "$options": "i"}
+                })
+                
+                checklist_category_id = None
+                
+                if existing_cl_category:
+                    checklist_category_id = existing_cl_category["id"]
+                else:
+                    # Create new checklist category
+                    checklist_category_id = str(uuid.uuid4())
+                    new_cl_category = {
+                        "id": checklist_category_id,
+                        "room_id": checklist_room_id,
+                        "name": wt_cat_name,
+                        "description": wt_category.get("description", ""),
+                        "order_index": wt_category.get("order_index", 0),
+                        "color": wt_category.get("color", "#5A7A5A"),
+                        "created_at": datetime.now(timezone.utc).isoformat(),
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                    await db.categories.insert_one(new_cl_category)
+                
+                # Get walkthrough subcategories
+                wt_subcategories = await db.subcategories.find({
+                    "category_id": wt_category["id"]
+                }).to_list(1000)
+                
+                for wt_subcategory in wt_subcategories:
+                    wt_subcat_name = wt_subcategory.get("name", "")
+                    
+                    # Check for existing checklist subcategory
+                    existing_cl_subcategory = await db.subcategories.find_one({
+                        "category_id": checklist_category_id,
+                        "name": {"$regex": f"^{wt_subcat_name}$", "$options": "i"}
+                    })
+                    
+                    checklist_subcategory_id = None
+                    
+                    if existing_cl_subcategory:
+                        checklist_subcategory_id = existing_cl_subcategory["id"]
+                    else:
+                        # Create new checklist subcategory
+                        checklist_subcategory_id = str(uuid.uuid4())
+                        new_cl_subcategory = {
+                            "id": checklist_subcategory_id,
+                            "category_id": checklist_category_id,
+                            "name": wt_subcat_name,
+                            "description": wt_subcategory.get("description", ""),
+                            "order_index": wt_subcategory.get("order_index", 0),
+                            "color": wt_subcategory.get("color", "#8A5A5A"),
+                            "created_at": datetime.now(timezone.utc).isoformat(),
+                            "updated_at": datetime.now(timezone.utc).isoformat()
+                        }
+                        await db.subcategories.insert_one(new_cl_subcategory)
+                    
+                    # Get walkthrough items
+                    item_query = {"subcategory_id": wt_subcategory["id"]}
+                    if not sync_options.sync_all:
+                        # Only sync items with PICKED status
+                        item_query["status"] = "PICKED"
+                    
+                    wt_items = await db.items.find(item_query).to_list(1000)
+                    
+                    for wt_item in wt_items:
+                        # Check if item already exists in checklist by name
+                        existing_cl_item = await db.items.find_one({
+                            "subcategory_id": checklist_subcategory_id,
+                            "name": wt_item.get("name", "")
+                        })
+                        
+                        if not existing_cl_item:
+                            # Create new checklist item (copy from walkthrough)
+                            new_item_id = str(uuid.uuid4())
+                            new_cl_item = {
+                                **wt_item,
+                                "id": new_item_id,
+                                "subcategory_id": checklist_subcategory_id,
+                                "synced_from_walkthrough": True,
+                                "original_walkthrough_item_id": wt_item.get("id"),
+                                "created_at": datetime.now(timezone.utc).isoformat(),
+                                "updated_at": datetime.now(timezone.utc).isoformat()
+                            }
+                            new_cl_item.pop("_id", None)  # Remove MongoDB _id if present
+                            await db.items.insert_one(new_cl_item)
+                            synced_items += 1
+            
+            synced_details.append({
+                "room": wt_room_name,
+                "categories": len(wt_categories)
+            })
+        
+        logger.info(f"✅ Walkthrough → Checklist sync complete: {synced_rooms} new rooms, {synced_items} items")
+        
+        return {
+            "success": True,
+            "message": f"Sync complete! Created {synced_rooms} new rooms, synced {synced_items} items",
+            "synced_rooms": synced_rooms,
+            "synced_items": synced_items,
+            "details": synced_details
+        }
+        
+    except Exception as e:
+        logger.error(f"Sync error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Sync failed: {str(e)}")
+
+@api_router.get("/sync/status/{project_id}")
+async def get_sync_status(project_id: str):
+    """Get the current sync status between walkthrough and checklist sheets"""
+    try:
+        # Count walkthrough rooms/items
+        wt_rooms = await db.rooms.count_documents({
+            "project_id": project_id,
+            "sheet_type": "walkthrough"
+        })
+        
+        cl_rooms = await db.rooms.count_documents({
+            "project_id": project_id,
+            "sheet_type": "checklist"
+        })
+        
+        # Get walkthrough room IDs
+        wt_room_docs = await db.rooms.find({
+            "project_id": project_id,
+            "sheet_type": "walkthrough"
+        }).to_list(1000)
+        wt_room_ids = [r["id"] for r in wt_room_docs]
+        
+        # Get checklist room IDs
+        cl_room_docs = await db.rooms.find({
+            "project_id": project_id,
+            "sheet_type": "checklist"
+        }).to_list(1000)
+        cl_room_ids = [r["id"] for r in cl_room_docs]
+        
+        # Count items
+        wt_categories = await db.categories.find({"room_id": {"$in": wt_room_ids}}).to_list(1000)
+        wt_cat_ids = [c["id"] for c in wt_categories]
+        wt_subcats = await db.subcategories.find({"category_id": {"$in": wt_cat_ids}}).to_list(1000)
+        wt_subcat_ids = [s["id"] for s in wt_subcats]
+        wt_items = await db.items.count_documents({"subcategory_id": {"$in": wt_subcat_ids}})
+        wt_picked_items = await db.items.count_documents({"subcategory_id": {"$in": wt_subcat_ids}, "status": "PICKED"})
+        
+        cl_categories = await db.categories.find({"room_id": {"$in": cl_room_ids}}).to_list(1000)
+        cl_cat_ids = [c["id"] for c in cl_categories]
+        cl_subcats = await db.subcategories.find({"category_id": {"$in": cl_cat_ids}}).to_list(1000)
+        cl_subcat_ids = [s["id"] for s in cl_subcats]
+        cl_items = await db.items.count_documents({"subcategory_id": {"$in": cl_subcat_ids}})
+        
+        return {
+            "success": True,
+            "walkthrough": {
+                "rooms": wt_rooms,
+                "items": wt_items,
+                "picked_items": wt_picked_items,
+                "room_names": [r.get("name") for r in wt_room_docs]
+            },
+            "checklist": {
+                "rooms": cl_rooms,
+                "items": cl_items,
+                "room_names": [r.get("name") for r in cl_room_docs]
+            },
+            "needs_sync": wt_picked_items > 0 and cl_items < wt_picked_items
+        }
+        
+    except Exception as e:
+        logger.error(f"Get sync status error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get sync status: {str(e)}")
+
 @api_router.delete("/projects/{project_id}")
 async def delete_project(project_id: str):
     """Delete a project and all its associated rooms, categories, subcategories, and items"""
