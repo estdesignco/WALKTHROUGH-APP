@@ -8673,6 +8673,32 @@ async def get_todos(project_id: str):
         logging.error(f"Get todos error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/contacts")
+async def get_contacts(project_id: str = None):
+    """Get contacts, optionally filtered by project_id"""
+    try:
+        query = {}
+        if project_id:
+            query["project_id"] = project_id
+        contacts = await db.contacts.find(query, {"_id": 0}).to_list(length=500)
+        return {"success": True, "contacts": contacts, "count": len(contacts)}
+    except Exception as e:
+        logging.error(f"Get contacts error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/calendar-events")
+async def get_calendar_events(project_id: str = None):
+    """Get calendar events, optionally filtered by project_id"""
+    try:
+        query = {}
+        if project_id:
+            query["project_id"] = project_id
+        events = await db.calendar_events.find(query, {"_id": 0}).sort("start_date", 1).to_list(length=500)
+        return {"success": True, "events": events, "count": len(events)}
+    except Exception as e:
+        logging.error(f"Get calendar events error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/todos")
 async def create_todo(todo: dict):
     """Create a new to-do item"""
