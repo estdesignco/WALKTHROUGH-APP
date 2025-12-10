@@ -1877,6 +1877,8 @@ async def update_project(project_id: str, project_update: ProjectUpdate):
         updated_project = await db.projects.find_one({"id": project_id}, {"_id": 0})
         return {"success": True, "project": updated_project}
         
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Error updating project {project_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to update project: {str(e)}")
