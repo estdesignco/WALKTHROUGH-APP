@@ -2,12 +2,12 @@
 AI-Powered Interior Design Assistant
 =====================================
 Features:
-1. Room Rendering/Visualization
+1. Room Rendering Studio - Full photo editing & rendering
 2. Design Suggestions & Analysis
 3. Style Analysis from Images
 4. Budget Optimization
 5. Punch List AI Suggestions
-6. Voice Notes Transcription
+6. Furniture Color/Fabric Changer
 """
 
 import os
@@ -32,13 +32,491 @@ EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', 'sk-emergent-b2811342c88B9
 
 # ============== MODELS ==============
 
-class RoomRenderRequest(BaseModel):
-    room_type: str  # "living room", "kitchen", "bedroom", etc.
-    style: str  # "modern", "traditional", "minimalist", etc.
+class RoomEditRequest(BaseModel):
+    """Request for editing a room photo"""
+    room_image_base64: str  # The original room photo
+    edit_type: str  # "clear_furniture", "change_floor", "change_paint", "add_furniture", "change_fabric", "full_render"
+    
+    # For clearing furniture
+    keep_elements: Optional[List[str]] = None  # Elements to keep (e.g., "fireplace", "built-ins")
+    
+    # For changing surfaces
+    new_floor_type: Optional[str] = None  # "hardwood oak", "marble", "tile", etc.
+    new_wall_color: Optional[str] = None  # Paint color or "wallpaper: pattern description"
+    new_ceiling: Optional[str] = None
+    
+    # For adding furniture
+    furniture_to_add: Optional[List[Dict[str, Any]]] = None  # List of furniture with descriptions
+    
+    # For fabric/color changes
+    item_to_change: Optional[str] = None  # Description of item to change
+    new_fabric_color: Optional[str] = None  # New fabric/color description
+    
+    # Style guidance
+    target_style: Optional[str] = None  # "modern", "traditional", etc.
+    additional_instructions: Optional[str] = None
+
+class FullRoomRenderRequest(BaseModel):
+    """Full room transformation request"""
+    original_room_base64: str  # Original room photo
+    
+    # What to remove
+    clear_all_furniture: bool = True
+    items_to_keep: Optional[List[str]] = None  # "fireplace", "built-in shelves", etc.
+    items_to_remove: Optional[List[str]] = None  # Specific items to remove if not clearing all
+    
+    # Surface changes
+    floor: Optional[str] = None  # "wide plank white oak hardwood", "carrara marble tile", etc.
+    walls: Optional[str] = None  # "Benjamin Moore Simply White" or "navy blue grasscloth wallpaper"
+    ceiling: Optional[str] = None  # "white coffered ceiling", "exposed beams"
+    
+    # Lighting changes
+    lighting: Optional[List[str]] = None  # ["crystal chandelier", "recessed lighting", "wall sconces"]
+    
+    # Window treatments
+    window_treatments: Optional[str] = None  # "floor-length ivory linen drapes with blackout lining"
+    
+    # Furniture to add (detailed)
+    furniture: Optional[List[Dict[str, str]]] = None  # [{"type": "sofa", "description": "cream boucle sectional", "placement": "facing fireplace"}]
+    
+    # Style
+    design_style: str = "modern"
     color_palette: Optional[List[str]] = None
-    features: Optional[List[str]] = None  # "fireplace", "large windows", etc.
-    dimensions: Optional[str] = None  # "20x15 feet"
-    additional_notes: Optional[str] = None
+    mood: Optional[str] = None  # "cozy", "luxurious", "minimalist"
+    
+    # Quality
+    render_quality: str = "high"  # "draft", "medium", "high"
+    photorealistic: bool = True
+
+class FurnitureFabricChangeRequest(BaseModel):
+    """Request to change fabric/color on furniture"""
+    furniture_image_base64: str  # Image of the furniture piece
+    current_description: str  # "gray linen sofa"
+    new_fabric: str  # "navy blue velvet"
+    new_color: Optional[str] = None  # If just changing color
+    keep_style: bool = True  # Keep the furniture style, just change material
+
+# ============== ROOM EDITING ENDPOINTS ==============
+
+@router.post("/room-studio/clear-room")
+async def clear_room_furniture(request: dict):
+    """Step 1: Remove furniture from a room photo to create empty canvas"""
+    try:
+        room_image = request.get('room_image_base64')
+        keep_elements = request.get('keep_elements', [])
+        
+        # Use GPT-5 vision to analyze the room first
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"clear-room-{datetime.now().timestamp()}",
+            system_message="You are an expert at analyzing interior spaces and describing them in detail for AI image generation."
+        ).with_model("openai", "gpt-5")
+        
+        # Analyze the room
+        image_content = ImageContent(image_base64=room_image)
+        analysis_prompt = f"""Analyze this room photo and describe:
+1. Room type and dimensions (estimated)
+2. Architectural features (windows, doors, fireplace, built-ins)
+3. Current flooring type
+4. Wall color/treatment
+5. Ceiling details
+6. Lighting (natural and fixtures)
+7. All furniture pieces present
+
+Elements to KEEP in the cleared room: {', '.join(keep_elements) if keep_elements else 'None - clear everything'}
+
+Provide a detailed description I can use to regenerate this room EMPTY of furniture but keeping the architecture."""
+
+        analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
+        room_analysis = await chat.send_message(analysis_msg)
+        
+        # Generate the cleared room
+        clear_prompt = f"""Photorealistic interior photograph of an EMPTY room based on this description:
+
+{room_analysis}
+
+IMPORTANT:
+- Remove ALL furniture, rugs, and decor
+- Keep the exact same room architecture, windows, doors
+- Keep the same flooring, wall color, and ceiling
+- Keep any built-in features: {', '.join(keep_elements) if keep_elements else 'fireplace if present, built-in shelves'}
+- Same lighting conditions and camera angle
+- Professional real estate photography style
+- 8K resolution, photorealistic"""
+
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        images = await image_gen.generate_images(
+            prompt=clear_prompt,
+            model="gpt-image-1",
+            number_of_images=1
+        )
+        
+        if images and len(images) > 0:
+            cleared_image = base64.b64encode(images[0]).decode('utf-8')
+            return {
+                "success": True,
+                "cleared_room_base64": cleared_image,
+                "room_analysis": room_analysis,
+                "prompt_used": clear_prompt
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to generate cleared room")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Room clearing failed: {str(e)}")
+
+@router.post("/room-studio/change-surfaces")
+async def change_room_surfaces(request: dict):
+    """Step 2: Change flooring, walls, ceiling in a room"""
+    try:
+        room_image = request.get('room_image_base64')
+        new_floor = request.get('floor')
+        new_walls = request.get('walls')
+        new_ceiling = request.get('ceiling')
+        
+        # Analyze current room
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"surfaces-{datetime.now().timestamp()}",
+            system_message="You are an expert interior designer specializing in surface materials and finishes."
+        ).with_model("openai", "gpt-5")
+        
+        image_content = ImageContent(image_base64=room_image)
+        
+        analysis_prompt = """Describe this room's:
+1. Exact layout and dimensions (estimate)
+2. Window and door positions
+3. Architectural features
+4. Current flooring
+5. Current wall treatment
+6. Current ceiling
+7. Lighting conditions
+8. Camera angle and perspective"""
+
+        analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
+        room_analysis = await chat.send_message(analysis_msg)
+        
+        # Build the transformation prompt
+        surface_changes = []
+        if new_floor:
+            surface_changes.append(f"Flooring: {new_floor}")
+        if new_walls:
+            surface_changes.append(f"Walls: {new_walls}")
+        if new_ceiling:
+            surface_changes.append(f"Ceiling: {new_ceiling}")
+        
+        render_prompt = f"""Photorealistic interior photograph of this exact room with ONLY these changes:
+
+ORIGINAL ROOM:
+{room_analysis}
+
+CHANGES TO MAKE:
+{chr(10).join(surface_changes)}
+
+CRITICAL REQUIREMENTS:
+- Keep the EXACT same room layout, dimensions, and architecture
+- Keep the EXACT same camera angle and perspective
+- Keep the same windows, doors, and architectural features
+- Keep any furniture in the same positions
+- Only change the specified surfaces
+- Photorealistic rendering, professional interior photography
+- Natural lighting, 8K quality"""
+
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        images = await image_gen.generate_images(
+            prompt=render_prompt,
+            model="gpt-image-1",
+            number_of_images=1
+        )
+        
+        if images and len(images) > 0:
+            return {
+                "success": True,
+                "rendered_room_base64": base64.b64encode(images[0]).decode('utf-8'),
+                "changes_applied": surface_changes,
+                "room_analysis": room_analysis
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to render surface changes")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Surface change failed: {str(e)}")
+
+@router.post("/room-studio/add-furniture")
+async def add_furniture_to_room(request: dict):
+    """Step 3: Add furniture pieces to a room"""
+    try:
+        room_image = request.get('room_image_base64')
+        furniture_list = request.get('furniture', [])
+        style = request.get('style', 'modern')
+        
+        # Analyze the room
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"furniture-{datetime.now().timestamp()}",
+            system_message="You are an expert interior designer and space planner."
+        ).with_model("openai", "gpt-5")
+        
+        image_content = ImageContent(image_base64=room_image)
+        
+        analysis_prompt = """Describe this room in detail:
+1. Room type and approximate dimensions
+2. Layout and traffic flow areas
+3. Focal points (fireplace, windows, etc.)
+4. Existing furniture (if any)
+5. Available floor space for new furniture
+6. Lighting conditions
+7. Camera angle"""
+
+        analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
+        room_analysis = await chat.send_message(analysis_msg)
+        
+        # Format furniture list
+        furniture_desc = "\n".join([
+            f"- {item.get('type', 'furniture')}: {item.get('description', '')} - Placement: {item.get('placement', 'appropriate location')}"
+            for item in furniture_list
+        ])
+        
+        render_prompt = f"""Photorealistic interior photograph of this room with the following furniture added:
+
+ROOM DESCRIPTION:
+{room_analysis}
+
+FURNITURE TO ADD:
+{furniture_desc}
+
+DESIGN STYLE: {style}
+
+CRITICAL REQUIREMENTS:
+- Keep the exact same room architecture, walls, floors, windows
+- Keep the exact same camera angle and perspective
+- Add the furniture in realistic positions with proper scale
+- Furniture should look naturally placed, not floating
+- Proper shadows and lighting on new furniture
+- Professional interior design photography quality
+- 8K resolution, photorealistic
+- Furniture should complement each other and the room"""
+
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        images = await image_gen.generate_images(
+            prompt=render_prompt,
+            model="gpt-image-1",
+            number_of_images=1
+        )
+        
+        if images and len(images) > 0:
+            return {
+                "success": True,
+                "furnished_room_base64": base64.b64encode(images[0]).decode('utf-8'),
+                "furniture_added": furniture_list,
+                "room_analysis": room_analysis
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to add furniture")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Furniture addition failed: {str(e)}")
+
+@router.post("/room-studio/change-fabric")
+async def change_furniture_fabric(request: dict):
+    """Change fabric/color on a furniture piece"""
+    try:
+        image_base64 = request.get('image_base64')
+        item_description = request.get('current_item', 'sofa')
+        new_fabric = request.get('new_fabric')
+        new_color = request.get('new_color')
+        
+        change_desc = new_fabric if new_fabric else f"{new_color} colored"
+        
+        # Analyze the furniture
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"fabric-{datetime.now().timestamp()}",
+            system_message="You are an expert at describing furniture for AI image generation."
+        ).with_model("openai", "gpt-5")
+        
+        image_content = ImageContent(image_base64=image_base64)
+        
+        analysis_prompt = f"""Describe this {item_description} in detail:
+1. Style and shape
+2. Current fabric/material
+3. Current color
+4. Any tufting, buttons, or details
+5. Legs/base style
+6. Dimensions (estimate)
+7. The background/setting"""
+
+        analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
+        item_analysis = await chat.send_message(analysis_msg)
+        
+        render_prompt = f"""Photorealistic product photograph of this exact {item_description} with ONLY the fabric/material changed:
+
+ORIGINAL:
+{item_analysis}
+
+CHANGE: Replace the fabric/material with {change_desc}
+
+CRITICAL:
+- Keep the EXACT same furniture shape, style, and design
+- Keep the EXACT same legs/base
+- Keep the EXACT same proportions and dimensions
+- Keep any tufting, buttons, or details
+- Only change the fabric/upholstery material and color
+- Same lighting and angle
+- Professional furniture photography
+- 8K, photorealistic"""
+
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        images = await image_gen.generate_images(
+            prompt=render_prompt,
+            model="gpt-image-1",
+            number_of_images=1
+        )
+        
+        if images and len(images) > 0:
+            return {
+                "success": True,
+                "updated_furniture_base64": base64.b64encode(images[0]).decode('utf-8'),
+                "original_analysis": item_analysis,
+                "change_applied": change_desc
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to change fabric")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fabric change failed: {str(e)}")
+
+@router.post("/room-studio/full-render")
+async def full_room_render(request: FullRoomRenderRequest):
+    """Complete room transformation - the full pipeline"""
+    try:
+        # Step 1: Analyze the original room thoroughly
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"full-render-{datetime.now().timestamp()}",
+            system_message="""You are a world-class interior designer and architectural visualization expert. 
+            You create incredibly detailed descriptions for photorealistic room renderings."""
+        ).with_model("openai", "gpt-5")
+        
+        image_content = ImageContent(image_base64=request.original_room_base64)
+        
+        # Comprehensive room analysis
+        analysis_prompt = """Provide an extremely detailed analysis of this room for rendering:
+
+1. ARCHITECTURE:
+   - Room type and function
+   - Exact dimensions (estimate in feet)
+   - Ceiling height
+   - Wall positions and angles
+   - Window positions, sizes, and style
+   - Door positions
+   - Any architectural features (fireplace, columns, moldings)
+
+2. CURRENT STATE:
+   - Flooring type and condition
+   - Wall treatment
+   - Ceiling details
+   - Natural lighting direction
+   - Time of day (based on light)
+
+3. CAMERA:
+   - Exact camera angle
+   - Height from floor
+   - Focal length (wide/normal)
+   - What's visible in frame
+
+Be extremely precise - this will be used to recreate the room exactly."""
+
+        analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
+        room_analysis = await chat.send_message(analysis_msg)
+        
+        # Build the comprehensive render prompt
+        render_sections = [
+            "Create a photorealistic interior photograph with these EXACT specifications:",
+            "",
+            "ROOM ARCHITECTURE (keep exactly):",
+            room_analysis,
+            "",
+        ]
+        
+        # Surface changes
+        if request.floor or request.walls or request.ceiling:
+            render_sections.append("SURFACE CHANGES:")
+            if request.floor:
+                render_sections.append(f"- Flooring: {request.floor}")
+            if request.walls:
+                render_sections.append(f"- Walls: {request.walls}")
+            if request.ceiling:
+                render_sections.append(f"- Ceiling: {request.ceiling}")
+            render_sections.append("")
+        
+        # Lighting
+        if request.lighting:
+            render_sections.append("LIGHTING:")
+            for light in request.lighting:
+                render_sections.append(f"- {light}")
+            render_sections.append("")
+        
+        # Window treatments
+        if request.window_treatments:
+            render_sections.append(f"WINDOW TREATMENTS: {request.window_treatments}")
+            render_sections.append("")
+        
+        # Furniture
+        if request.furniture:
+            render_sections.append("FURNITURE TO ADD:")
+            for item in request.furniture:
+                render_sections.append(f"- {item.get('type', 'furniture')}: {item.get('description', '')} - Position: {item.get('placement', 'appropriate')}")
+            render_sections.append("")
+        
+        # Style guidance
+        render_sections.extend([
+            f"DESIGN STYLE: {request.design_style}",
+            f"COLOR PALETTE: {', '.join(request.color_palette) if request.color_palette else 'harmonious with design style'}",
+            f"MOOD: {request.mood or 'elegant and inviting'}",
+            "",
+            "RENDERING REQUIREMENTS:",
+            "- Photorealistic quality - should look like a real photograph",
+            "- Professional architectural photography lighting",
+            "- Accurate shadows and reflections",
+            "- Proper furniture scale and proportions",
+            "- Natural, lived-in feel (not overly staged)",
+            "- 8K resolution",
+            "- Same camera angle as original photo"
+        ])
+        
+        full_prompt = "\n".join(render_sections)
+        
+        # Generate the render
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        images = await image_gen.generate_images(
+            prompt=full_prompt,
+            model="gpt-image-1",
+            number_of_images=1
+        )
+        
+        if images and len(images) > 0:
+            return {
+                "success": True,
+                "rendered_room_base64": base64.b64encode(images[0]).decode('utf-8'),
+                "room_analysis": room_analysis,
+                "render_prompt": full_prompt,
+                "settings_applied": {
+                    "floor": request.floor,
+                    "walls": request.walls,
+                    "ceiling": request.ceiling,
+                    "lighting": request.lighting,
+                    "window_treatments": request.window_treatments,
+                    "furniture_count": len(request.furniture) if request.furniture else 0,
+                    "style": request.design_style
+                },
+                "generated_at": datetime.now().isoformat()
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to generate room render")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Full render failed: {str(e)}")
 
 class DesignSuggestionRequest(BaseModel):
     room_type: str
