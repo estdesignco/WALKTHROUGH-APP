@@ -2481,6 +2481,64 @@ const ExactChecklistSpreadsheet = ({
           }}
         />
       )}
+      
+      {/* PHOTO VIEWER MODAL */}
+      {selectedPhotoView && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.95)' }}
+          onClick={() => setSelectedPhotoView(null)}
+        >
+          <div 
+            className="relative max-w-5xl max-h-[90vh] rounded-lg overflow-hidden border-2 border-[#D4A574]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button 
+              onClick={() => setSelectedPhotoView(null)}
+              className="absolute top-4 right-4 z-10 bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black transition-colors text-xl"
+            >
+              ✕
+            </button>
+            
+            {/* Photo Image */}
+            <img 
+              src={selectedPhotoView.photo_data || selectedPhotoView.url || selectedPhotoView.image_url} 
+              alt={selectedPhotoView.file_name || 'Walkthrough Photo'}
+              className="max-w-full max-h-[85vh] object-contain"
+            />
+            
+            {/* Photo Info Footer */}
+            <div 
+              className="absolute bottom-0 left-0 right-0 p-4"
+              style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.9))' }}
+            >
+              <div className="flex items-center justify-between text-white">
+                <div>
+                  <p className="text-[#D4A574] font-semibold">
+                    {selectedPhotoView.metadata?.room_name || 'Room Photo'}
+                  </p>
+                  <p className="text-gray-400 text-sm">
+                    {selectedPhotoView.file_name || 'Walkthrough capture'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  {selectedPhotoView.metadata?.has_measurements && (
+                    <span className="bg-green-600 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+                      📏 Has Measurements
+                    </span>
+                  )}
+                  {selectedPhotoView.metadata?.timestamp && (
+                    <span className="text-gray-400 text-sm">
+                      {new Date(selectedPhotoView.metadata.timestamp).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
