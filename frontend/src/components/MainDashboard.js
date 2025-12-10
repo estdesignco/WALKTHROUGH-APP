@@ -229,6 +229,33 @@ const MainDashboard = () => {
             <div className="text-2xl mb-2">🔍</div>
             <div className="text-sm font-medium">Sourcing Catalog</div>
           </button>
+          
+          {/* AI TOOLS */}
+          <button
+            onClick={() => handleNavigation('/ai-assistant')}
+            className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
+            style={{
+              background: `linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%)`,
+              border: '1px solid #a78bfa',
+              boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            <div className="text-2xl mb-2">🤖</div>
+            <div className="text-sm font-medium">AI Assistant</div>
+          </button>
+          
+          <button
+            onClick={() => handleNavigation('/room-studio')}
+            className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
+            style={{
+              background: `linear-gradient(135deg, #ec4899 0%, #f43f5e 50%, #ec4899 100%)`,
+              border: '1px solid #f472b6',
+              boxShadow: '0 4px 15px rgba(236, 72, 153, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            <div className="text-2xl mb-2">🎨</div>
+            <div className="text-sm font-medium">Room Studio</div>
+          </button>
         </div>
 
         {/* Three Main Action Buttons - NO BORDERS */}
