@@ -298,7 +298,7 @@ async def add_furniture_to_room(request: dict):
             for item in furniture_list
         ])
         
-        render_prompt = f"""Photorealistic interior photograph of this room with the following furniture added:
+        render_prompt = f"""REAL PHOTOGRAPH - NOT CGI OR 3D RENDER - of this furnished interior room:
 
 ROOM DESCRIPTION:
 {room_analysis}
@@ -308,15 +308,24 @@ FURNITURE TO ADD:
 
 DESIGN STYLE: {style}
 
-CRITICAL REQUIREMENTS:
-- Keep the exact same room architecture, walls, floors, windows
-- Keep the exact same camera angle and perspective
-- Add the furniture in realistic positions with proper scale
-- Furniture should look naturally placed, not floating
-- Proper shadows and lighting on new furniture
-- Professional interior design photography quality
-- 8K resolution, photorealistic
-- Furniture should complement each other and the room"""
+CRITICAL - THIS MUST LOOK LIKE A REAL PHOTOGRAPH TAKEN WITH A CAMERA:
+- Shot with professional DSLR - real lens characteristics, natural bokeh
+- Real photography lighting - natural shadows under furniture, realistic highlights
+- REAL furniture textures - visible fabric weave, leather grain, wood grain
+- Furniture should look like REAL products you can buy, not CGI models
+- Natural imperfections - slight wrinkles in fabric, realistic wear
+- Magazine quality - Architectural Digest, Elle Decor, House Beautiful
+- NO CGI look, NO 3D render aesthetic, NO video game appearance
+- Must be COMPLETELY INDISTINGUISHABLE from a real interior photograph
+
+ROOM REQUIREMENTS:
+- Keep exact same room architecture, walls, floors, windows
+- Keep exact same camera angle and perspective  
+- Furniture in realistic positions with proper scale
+- Furniture naturally placed on floor, not floating
+- Proper realistic shadows under and behind furniture
+- Natural lighting that wraps around furniture realistically
+- Furniture should look like it belongs in a real home"""
 
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         images = await image_gen.generate_images(
