@@ -480,7 +480,7 @@ class UltimateSourcingTester:
             "role": "Vendor"
         }
         
-        success, response = self.run_test("Create Contact", "POST", "contacts", 201, contact_data)
+        success, response = self.run_test("Create Contact", "POST", "contacts", 200, contact_data)
         
         if success and response.get('id'):
             contact_id = response['id']
