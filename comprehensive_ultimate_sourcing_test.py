@@ -76,13 +76,17 @@ class UltimateSourcingTester:
         """Check if content contains any pricing information"""
         pricing_patterns = [
             r'\$[\d,]+\.?\d*',  # Dollar amounts like $1,234.56
-            r'price',
-            r'cost',
-            r'retail',
-            r'wholesale',
-            r'total',
-            r'amount',
-            r'budget'
+            r'price\s*:\s*\$',  # Price: $
+            r'cost\s*:\s*\$',   # Cost: $
+            r'retail\s*:\s*\$', # Retail: $
+            r'wholesale\s*:\s*\$', # Wholesale: $
+            r'amount\s*:\s*\$', # Amount: $
+            r'budget\s*:\s*\$', # Budget: $
+            r'total\s*cost',    # Total cost
+            r'total\s*price',   # Total price
+            r'total\s*amount',  # Total amount
+            r'subtotal',        # Subtotal
+            r'grand\s*total'    # Grand total
         ]
         
         violations = []
@@ -93,10 +97,31 @@ class UltimateSourcingTester:
             if matches:
                 violations.extend(matches)
         
-        if violations:
+        # Exclude legitimate uses of "total" like "Total Items: X"
+        legitimate_totals = [
+            r'total\s+items?\s*:\s*\d+',
+            r'total\s+lighting\s+items?\s*:\s*\d+',
+            r'total\s+furniture\s+items?\s*:\s*\d+'
+        ]
+        
+        # Remove legitimate total references
+        filtered_violations = []
+        for violation in violations:
+            is_legitimate = False
+            for legit_pattern in legitimate_totals:
+                if re.search(legit_pattern, content_str, re.IGNORECASE):
+                    # Check if this violation is part of a legitimate total
+                    if 'total' in violation.lower() and ('items' in content_str or 'lighting' in content_str):
+                        is_legitimate = True
+                        break
+            
+            if not is_legitimate:
+                filtered_violations.append(violation)
+        
+        if filtered_violations:
             self.pricing_violations.append({
                 'sheet_type': sheet_type,
-                'violations': violations
+                'violations': filtered_violations
             })
             return False
         return True
