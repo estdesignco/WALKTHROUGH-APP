@@ -185,6 +185,10 @@ const App = () => {
             element={<MobileAppSimulator />}
           />
           <Route 
+            path="/ai-assistant" 
+            element={<AIDesignDashboard />}
+          />
+          <Route 
             path="/customer/questionnaire" 
             element={<CustomerfacingQuestionnaire />}
           />
