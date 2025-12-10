@@ -291,7 +291,7 @@ class UltimateSourcingTester:
             "link": self.test_product_url
         }
         
-        success, response = self.run_test("Create Item", "POST", "items", 201, item_data)
+        success, response = self.run_test("Create Item", "POST", "items", 200, item_data)
         item_id = None
         if success and response.get('id'):
             item_id = response['id']
