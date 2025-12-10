@@ -900,6 +900,21 @@ export default function ProjectDetailPage() {
                 <RoomRenderingStudio />
             </div>
         ) },
+        { name: "Team Chat", icon: MessageSquare, component: project ? (
+            <div className="team-chat-content">
+                <TeamChat projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading chat...</div> },
+        { name: "Punch List", icon: Clipboard, component: project ? (
+            <div className="punch-list-content">
+                <PunchList projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading punch list...</div> },
+        { name: "Shipping", icon: Truck, component: project ? (
+            <div className="shipping-content">
+                <ShippingTracker projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading shipping...</div> },
     ];
 
     if (isLoading) {
