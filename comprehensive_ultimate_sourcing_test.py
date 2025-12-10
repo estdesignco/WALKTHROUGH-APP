@@ -334,7 +334,7 @@ class UltimateSourcingTester:
         print("🔍 TESTING MASTER PRODUCTS API")
         print("="*60)
         
-        # Test search functionality
+        # Test furniture search functionality (this is the actual endpoint)
         search_params = {
             "query": "chair",
             "vendor": "Four Hands",
@@ -345,7 +345,7 @@ class UltimateSourcingTester:
         # Convert to query string
         query_string = "&".join([f"{k}={v}" for k, v in search_params.items()])
         
-        success, response = self.run_test("Search Master Products", "GET", f"master-products?{query_string}", 200)
+        success, response = self.run_test("Search Furniture Products", "GET", f"furniture/search?{query_string}", 200)
         
         if success:
             products = response if isinstance(response, list) else response.get('products', [])
