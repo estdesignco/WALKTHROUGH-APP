@@ -190,6 +190,10 @@ const App = () => {
             element={<AIDesignDashboard />}
           />
           <Route 
+            path="/room-studio" 
+            element={<RoomRenderingStudio />}
+          />
+          <Route 
             path="/customer/questionnaire" 
             element={<CustomerfacingQuestionnaire />}
           />
