@@ -4,32 +4,257 @@ import axios from 'axios';
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 const RoomRenderingStudio = () => {
-  // State for the rendering pipeline
-  const [step, setStep] = useState(1); // 1: Upload, 2: Clear, 3: Surfaces, 4: Furniture, 5: Final
-  const [originalImage, setOriginalImage] = useState(null);
-  const [originalImageBase64, setOriginalImageBase64] = useState(null);
-  const [clearedRoom, setClearedRoom] = useState(null);
-  const [surfacesChanged, setSurfacesChanged] = useState(null);
-  const [finalRender, setFinalRender] = useState(null);
+  const [roomImage, setRoomImage] = useState(null);
+  const [roomImageBase64, setRoomImageBase64] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [roomAnalysis, setRoomAnalysis] = useState(null);
-  
-  // Form state
-  const [keepElements, setKeepElements] = useState('fireplace, built-in shelves');
-  const [floorType, setFloorType] = useState('');
-  const [wallColor, setWallColor] = useState('');
-  const [ceilingType, setCeilingType] = useState('');
-  const [lightingFixtures, setLightingFixtures] = useState('');
-  const [windowTreatments, setWindowTreatments] = useState('');
-  const [furnitureList, setFurnitureList] = useState([
-    { type: '', description: '', placement: '' }
-  ]);
-  const [designStyle, setDesignStyle] = useState('modern');
-  const [colorPalette, setColorPalette] = useState('');
-  const [mood, setMood] = useState('elegant and inviting');
-  
+  const [renderedImages, setRenderedImages] = useState([]);
   const fileInputRef = useRef(null);
+  const messagesEndRef = useRef(null);
+
+  // Handle image upload
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setRoomImage(e.target.result);
+        setRoomImageBase64(e.target.result.split(',')[1]);
+        setMessages([{
+          role: 'assistant',
+          content: "Great! I've loaded your room photo. Now just tell me what you want to do with it!\n\nFor example:\n• \"Remove all the furniture and show me the empty room\"\n• \"Change the floor to white oak hardwood\"\n• \"Add a cream boucle sectional facing the fireplace\"\n• \"Change the wall color to Benjamin Moore Simply White\"\n• \"Add floor-length navy velvet drapes\"\n• \"Transform this into a modern minimalist living room with new floors, paint, and furniture\"\n\nJust describe what you want and I'll render it!"
+        }]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Send message to AI
+  const sendMessage = async () => {
+    if (!input.trim() || loading || !roomImageBase64) return;
+
+    const userMessage = input;
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setLoading(true);
+
+    try {
+      const response = await axios.post(`${API_URL}/ai/room-studio/chat-render`, {
+        room_image_base64: roomImageBase64,
+        user_request: userMessage,
+        conversation_history: messages.map(m => ({ role: m.role, content: m.content }))
+      }, { timeout: 180000 });
+
+      if (response.data.success) {
+        // Add AI response
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: response.data.message,
+          image: response.data.rendered_image_base64 ? `data:image/png;base64,${response.data.rendered_image_base64}` : null
+        }]);
+
+        // Add to rendered images gallery
+        if (response.data.rendered_image_base64) {
+          setRenderedImages(prev => [...prev, {
+            image: `data:image/png;base64,${response.data.rendered_image_base64}`,
+            prompt: userMessage,
+            timestamp: new Date().toLocaleTimeString()
+          }]);
+        }
+      }
+    } catch (error) {
+      console.error('Render error:', error);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: `Sorry, I encountered an error: ${error.response?.data?.detail || error.message}. Please try again or rephrase your request.`
+      }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Quick action buttons
+  const quickActions = [
+    "Remove all furniture and show empty room",
+    "Change the floor to wide plank white oak hardwood",
+    "Paint the walls Benjamin Moore Simply White",
+    "Add a large cream boucle sectional sofa",
+    "Add floor-length ivory linen drapes",
+    "Add a crystal chandelier",
+    "Make this a modern minimalist space",
+    "Add cozy lighting and warm textiles"
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0F172A]">
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-bold text-[#D4A574] mb-2">🎨 Room Rendering Studio</h1>
+          <p className="text-[#D4C5A9]">Upload a photo and just tell me what you want - I'll render it!</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left - Room Photo */}
+          <div className="space-y-4">
+            <div className="bg-[#1E293B] rounded-lg border border-[#D4A574]/30 p-4">
+              <h3 className="text-[#D4A574] font-bold mb-3">📸 Your Room Photo</h3>
+              
+              {roomImage ? (
+                <div className="relative">
+                  <img src={roomImage} alt="Room" className="w-full rounded-lg" />
+                  <button
+                    onClick={() => { setRoomImage(null); setRoomImageBase64(null); setMessages([]); setRenderedImages([]); }}
+                    className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm"
+                  >
+                    ✕ Remove
+                  </button>
+                </div>
+              ) : (
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-[#D4A574]/50 rounded-lg p-8 text-center cursor-pointer hover:border-[#D4A574] transition-colors"
+                >
+                  <p className="text-[#D4C5A9] text-lg mb-2">📸 Click to upload room photo</p>
+                  <p className="text-gray-500 text-sm">JPEG, PNG supported</p>
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </div>
+
+            {/* Quick Actions */}
+            {roomImage && (
+              <div className="bg-[#1E293B] rounded-lg border border-[#D4A574]/30 p-4">
+                <h3 className="text-[#D4A574] font-bold mb-3">⚡ Quick Actions</h3>
+                <div className="space-y-2">
+                  {quickActions.map((action, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setInput(action)}
+                      disabled={loading}
+                      className="w-full text-left bg-[#0F172A] text-[#D4C5A9] p-2 rounded-lg hover:bg-[#2E3B4B] text-sm border border-[#D4A574]/20 disabled:opacity-50"
+                    >
+                      {action}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Rendered Gallery */}
+            {renderedImages.length > 0 && (
+              <div className="bg-[#1E293B] rounded-lg border border-[#D4A574]/30 p-4">
+                <h3 className="text-[#D4A574] font-bold mb-3">🖼️ Your Renders ({renderedImages.length})</h3>
+                <div className="space-y-3 max-h-64 overflow-y-auto">
+                  {renderedImages.map((render, idx) => (
+                    <div key={idx} className="bg-[#0F172A] p-2 rounded-lg">
+                      <img src={render.image} alt={`Render ${idx + 1}`} className="w-full rounded mb-2" />
+                      <p className="text-gray-400 text-xs truncate">{render.prompt}</p>
+                      <a 
+                        href={render.image} 
+                        download={`render-${idx + 1}.png`}
+                        className="text-[#D4A574] text-xs hover:underline"
+                      >
+                        📥 Download
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Center & Right - Chat Interface */}
+          <div className="lg:col-span-2">
+            <div className="bg-[#1E293B] rounded-lg border border-[#D4A574]/30 h-[700px] flex flex-col">
+              {/* Chat Header */}
+              <div className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] px-4 py-3 rounded-t-lg">
+                <h3 className="font-bold text-black">🤖 Room Design AI - Just tell me what you want!</h3>
+              </div>
+
+              {/* Chat Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {!roomImage && (
+                  <div className="text-center py-12">
+                    <p className="text-[#D4A574] text-xl mb-4">👈 Upload a room photo to get started!</p>
+                    <p className="text-gray-400">Then just tell me what changes you want and I'll render it.</p>
+                  </div>
+                )}
+
+                {messages.map((msg, idx) => (
+                  <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[85%] ${msg.role === 'user' ? 'bg-[#D4A574] text-black' : 'bg-[#0F172A] text-[#D4C5A9] border border-[#D4A574]/30'} p-4 rounded-lg`}>
+                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                      {msg.image && (
+                        <div className="mt-3">
+                          <img src={msg.image} alt="Rendered" className="w-full rounded-lg border-2 border-[#D4A574]" />
+                          <a 
+                            href={msg.image} 
+                            download="room-render.png"
+                            className="inline-block mt-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold"
+                          >
+                            📥 Download This Render
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {loading && (
+                  <div className="flex justify-start">
+                    <div className="bg-[#0F172A] text-[#D4C5A9] p-4 rounded-lg border border-[#D4A574]/30">
+                      <div className="flex items-center gap-3">
+                        <div className="animate-spin w-5 h-5 border-2 border-[#D4A574] border-t-transparent rounded-full"></div>
+                        <span>Rendering your room... This takes 30-60 seconds...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Chat Input */}
+              <div className="p-4 border-t border-[#D4A574]/30">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                    placeholder={roomImage ? "Tell me what to do with this room..." : "Upload a room photo first..."}
+                    disabled={!roomImage || loading}
+                    className="flex-1 bg-[#0F172A] text-[#D4C5A9] border border-[#D4A574]/30 rounded-lg px-4 py-3 focus:outline-none focus:border-[#D4A574] disabled:opacity-50"
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!roomImage || loading || !input.trim()}
+                    className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] text-black font-bold px-6 py-3 rounded-lg disabled:opacity-50"
+                  >
+                    {loading ? '⏳' : '✨ Render'}
+                  </button>
+                </div>
+                <p className="text-gray-500 text-xs mt-2">
+                  Just describe what you want: "Change the floor to marble", "Add a velvet sofa", "Make it modern minimalist", etc.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default RoomRenderingStudio;
 
   // Handle image upload
   const handleImageUpload = (e) => {
