@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://design-sourcer.preview.emergentagent.com';
+const BACKEND_URL = 'https://designstudio-app-1.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

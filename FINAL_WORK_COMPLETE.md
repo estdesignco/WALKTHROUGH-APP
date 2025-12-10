@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://design-sourcer.preview.emergentagent.com
+https://designstudio-app-1.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://design-sourcer.preview.emergentagent.com/mobile-app
+https://designstudio-app-1.preview.emergentagent.com/mobile-app
 
 ---
 

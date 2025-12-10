@@ -42,7 +42,7 @@ interface ChecklistItem {
   sku?: string;
 }
 
-const BACKEND_URL = 'https://design-sourcer.preview.emergentagent.com';
+const BACKEND_URL = 'https://designstudio-app-1.preview.emergentagent.com';
 
 export const App = () => {
   const [projectId, setProjectId] = useState<string>('');
