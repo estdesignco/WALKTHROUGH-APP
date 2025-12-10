@@ -2,12 +2,15 @@
 // Handles storing and syncing data when offline
 
 const DB_NAME = 'InteriorDesignOfflineDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAMES = {
   PROJECTS: 'projects',
   ROOMS: 'rooms',
   ITEMS: 'items',
   PHOTOS: 'photos',
+  CONTACTS: 'contacts',
+  QUESTIONNAIRE: 'questionnaire',
+  MEASUREMENTS: 'measurements',
   PENDING_SYNC: 'pending_sync'
 };
 
