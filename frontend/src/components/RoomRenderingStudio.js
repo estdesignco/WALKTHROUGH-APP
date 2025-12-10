@@ -96,7 +96,7 @@ const RoomRenderingStudio = () => {
           </button>
           <div className="text-center flex-1">
             <h1 className="text-4xl font-bold mb-2" style={{ color: '#E6D4A8' }}>🎨 Room Rendering Studio</h1>
-            <p style={{ color: '#A0A0A0' }}>Upload a photo and just tell me what you want!</p>
+            <p style={{ color: '#A0A0A0' }}>Upload a photo, describe what you want - I build YOUR vision, not mine!</p>
           </div>
           <div className="w-20"></div>
         </div>
