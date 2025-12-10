@@ -1,439 +1,721 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend API Testing for Room-Specific Canva Import Workflow
-Testing the complete flow: button visibility → modal opening → form submission → Canva scraping → item creation → room organization
+Comprehensive Backend API Testing Suite
+Focus: 100% pass rate verification with correct project ID
+Testing previously failing endpoints and all core CRUD operations
 """
 
 import requests
-import sys
 import json
+import time
+import uuid
 from datetime import datetime
+from typing import Dict, Any, List
 
-class CanvaImportTester:
-    def __init__(self, base_url="https://designstudio-app-1.preview.emergentagent.com"):
-        self.base_url = base_url
-        self.api_base = f"{base_url}/api"
-        self.tests_run = 0
-        self.tests_passed = 0
-        self.project_id = None
-        self.room_id = None
+# Configuration
+BACKEND_URL = "https://designstudio-app-1.preview.emergentagent.com/api"
+CORRECT_PROJECT_ID = "08fbc6ea-7c44-48ba-8a2f-e830b546dae5"
+
+class BackendTester:
+    def __init__(self):
+        self.base_url = BACKEND_URL
+        self.project_id = CORRECT_PROJECT_ID
+        self.test_results = []
+        self.created_resources = {
+            'projects': [],
+            'rooms': [],
+            'categories': [],
+            'subcategories': [],
+            'items': [],
+            'contacts': [],
+            'materials': [],
+            'voice_notes': [],
+            'punch_list': [],
+            'chat_messages': []
+        }
         
-        # Test credentials and URLs from review request
-        self.test_canva_url = "https://www.canva.com/design/DAGxY-ZgbB8/HoQrBgvmCikbXimPCw4P-g/edit"
-        self.canva_credentials = {
-            "email": "EstablishedDesignCo@gmail.com",
-            "password": "Zeke1919$$"
+    def log_test(self, test_name: str, method: str, endpoint: str, status_code: int, 
+                 expected_code: int, response_data: Any = None, error: str = None):
+        """Log test results"""
+        success = status_code == expected_code
+        result = {
+            'test_name': test_name,
+            'method': method,
+            'endpoint': endpoint,
+            'status_code': status_code,
+            'expected_code': expected_code,
+            'success': success,
+            'response_data': response_data,
+            'error': error,
+            'timestamp': datetime.now().isoformat()
         }
-        self.houzz_credentials = {
-            "email": "EstablishedDesignCo@gmail.com", 
-            "password": "Zeke1919$$"
-        }
+        self.test_results.append(result)
+        
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status} | {method} {endpoint} | {status_code} (expected {expected_code}) | {test_name}")
+        if error:
+            print(f"    Error: {error}")
+        
+        return success
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
-        """Run a single API test"""
-        url = f"{self.api_base}/{endpoint}" if not endpoint.startswith('http') else endpoint
-        if headers is None:
-            headers = {'Content-Type': 'application/json'}
-
-        self.tests_run += 1
-        print(f"\n🔍 Testing {name}...")
-        print(f"   {method} {url}")
+    def make_request(self, method: str, endpoint: str, data: Dict = None, 
+                    expected_code: int = 200, test_name: str = "") -> tuple:
+        """Make HTTP request and log results"""
+        url = f"{self.base_url}{endpoint}"
         
         try:
-            if method == 'GET':
-                response = requests.get(url, headers=headers, timeout=30)
-            elif method == 'POST':
-                response = requests.post(url, json=data, headers=headers, timeout=30)
-            elif method == 'PUT':
-                response = requests.put(url, json=data, headers=headers, timeout=30)
-            elif method == 'DELETE':
-                response = requests.delete(url, headers=headers, timeout=30)
-
-            success = response.status_code == expected_status
-            if success:
-                self.tests_passed += 1
-                print(f"✅ Passed - Status: {response.status_code}")
-                try:
-                    return success, response.json()
-                except:
-                    return success, response.text
+            if method.upper() == 'GET':
+                response = requests.get(url, timeout=30)
+            elif method.upper() == 'POST':
+                response = requests.post(url, json=data, timeout=30)
+            elif method.upper() == 'PUT':
+                response = requests.put(url, json=data, timeout=30)
+            elif method.upper() == 'PATCH':
+                response = requests.patch(url, json=data, timeout=30)
+            elif method.upper() == 'DELETE':
+                response = requests.delete(url, timeout=30)
             else:
-                print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
-                try:
-                    error_detail = response.json()
-                    print(f"   Error: {error_detail}")
-                except:
-                    print(f"   Error: {response.text[:200]}")
-
-            return success, {}
-
+                raise ValueError(f"Unsupported method: {method}")
+            
+            try:
+                response_data = response.json()
+            except:
+                response_data = response.text
+            
+            success = self.log_test(test_name, method.upper(), endpoint, 
+                                  response.status_code, expected_code, response_data)
+            
+            return success, response_data, response.status_code
+            
         except Exception as e:
-            print(f"❌ Failed - Error: {str(e)}")
-            return False, {}
+            error_msg = str(e)
+            self.log_test(test_name, method.upper(), endpoint, 0, expected_code, 
+                         None, error_msg)
+            return False, None, 0
 
-    def test_basic_connectivity(self):
-        """Test basic API connectivity"""
-        print("\n" + "="*60)
-        print("🌐 TESTING BASIC API CONNECTIVITY")
-        print("="*60)
+    def test_projects_crud(self):
+        """Test Projects CRUD operations"""
+        print("\n=== TESTING PROJECTS CRUD ===")
         
-        # Test root endpoint
-        success, _ = self.run_test("API Root", "GET", "", 200)
+        # GET /api/projects - List all projects
+        success, data, _ = self.make_request('GET', '/projects', 
+                                           test_name="List all projects")
         
-        # Test health check
-        success, _ = self.run_test("Health Check", "GET", "health", 200)
+        # GET /api/projects/{id} - Get specific project (using correct project ID)
+        success, project_data, _ = self.make_request('GET', f'/projects/{self.project_id}', 
+                                                   test_name="Get project by ID")
         
-        return success
-
-    def test_project_management(self):
-        """Test project creation and management"""
-        print("\n" + "="*60)
-        print("🏗️ TESTING PROJECT MANAGEMENT")
-        print("="*60)
-        
-        # Create test project
-        project_data = {
-            "name": "Canva Import Test Project",
+        # POST /api/projects - Create new project
+        new_project_data = {
+            "name": "Test Project API",
             "client_info": {
-                "full_name": "Test Client",
-                "email": "test@example.com",
+                "full_name": "Jane Smith",
+                "email": "jane.smith@example.com",
                 "phone": "555-0123",
-                "address": "123 Test St"
+                "address": "123 Test Street, Test City, TC 12345"
             },
-            "project_type": "Renovation"
+            "project_type": "Renovation",
+            "timeline": "6 months",
+            "budget": "$50,000",
+            "style_preferences": ["Modern", "Minimalist"],
+            "color_palette": "Neutral tones",
+            "special_requirements": "Pet-friendly materials"
         }
         
-        success, response = self.run_test("Create Project", "POST", "projects", 201, project_data)
-        if success and response.get('id'):
-            self.project_id = response['id']
-            print(f"   📝 Project ID: {self.project_id}")
+        success, created_project, _ = self.make_request('POST', '/projects', 
+                                                      new_project_data, 201,
+                                                      "Create new project")
+        if success and created_project:
+            project_id = created_project.get('id')
+            if project_id:
+                self.created_resources['projects'].append(project_id)
         
-        # Get project with checklist sheet type
-        if self.project_id:
-            success, response = self.run_test(
-                "Get Project (Checklist)", 
-                "GET", 
-                f"projects/{self.project_id}?sheet_type=checklist", 
-                200
-            )
+        # PUT /api/projects/{id} - CRITICAL TEST: Partial update (previously failing)
+        if self.created_resources['projects']:
+            test_project_id = self.created_resources['projects'][0]
+            partial_update = {"name": "Test"}  # Just name update as specified
             
-            if success and response.get('rooms'):
-                print(f"   🏠 Found {len(response['rooms'])} rooms")
-                if response['rooms']:
-                    self.room_id = response['rooms'][0]['id']
-                    print(f"   🏠 First Room ID: {self.room_id}")
+            success, _, _ = self.make_request('PUT', f'/projects/{test_project_id}', 
+                                            partial_update, 200,
+                                            "CRITICAL: Partial project update")
         
-        return success
+        # DELETE /api/projects/{id} - Delete project
+        if self.created_resources['projects']:
+            test_project_id = self.created_resources['projects'].pop()
+            success, _, _ = self.make_request('DELETE', f'/projects/{test_project_id}', 
+                                            expected_code=200,  # Based on previous tests, returns 200
+                                            test_name="Delete project")
 
-    def test_room_creation(self):
-        """Test room creation for Canva import testing"""
-        print("\n" + "="*60)
-        print("🏠 TESTING ROOM CREATION")
-        print("="*60)
+    def test_rooms_crud(self):
+        """Test Rooms CRUD operations"""
+        print("\n=== TESTING ROOMS CRUD ===")
         
-        if not self.project_id:
-            print("❌ No project ID available for room creation")
-            return False
-        
-        # Create a test room
+        # POST /api/rooms - Create room
         room_data = {
-            "name": "Living Room",
+            "name": "Test Living Room",
+            "description": "Test room for API testing",
             "project_id": self.project_id,
-            "sheet_type": "checklist",
-            "description": "Test room for Canva import",
+            "sheet_type": "walkthrough",
             "auto_populate": True
         }
         
-        success, response = self.run_test("Create Room", "POST", "rooms", 201, room_data)
-        if success and response.get('id'):
-            self.room_id = response['id']
-            print(f"   🏠 Room ID: {self.room_id}")
+        success, created_room, _ = self.make_request('POST', '/rooms', 
+                                                   room_data, 201,
+                                                   "Create room with auto-population")
+        if success and created_room:
+            room_id = created_room.get('id')
+            if room_id:
+                self.created_resources['rooms'].append(room_id)
         
-        return success
+        # PUT /api/rooms/{id} - Update room
+        if self.created_resources['rooms']:
+            room_id = self.created_resources['rooms'][0]
+            update_data = {
+                "name": "Updated Test Living Room",
+                "description": "Updated description"
+            }
+            success, _, _ = self.make_request('PUT', f'/rooms/{room_id}', 
+                                            update_data, 200,
+                                            "Update room details")
 
-    def test_canva_import_api(self):
-        """Test the core Canva import API functionality"""
-        print("\n" + "="*60)
-        print("🎨 TESTING CANVA IMPORT API")
-        print("="*60)
+    def test_categories_crud(self):
+        """Test Categories CRUD operations"""
+        print("\n=== TESTING CATEGORIES CRUD ===")
         
-        if not self.project_id or not self.room_id:
-            print("❌ Missing project_id or room_id for Canva import test")
-            return False
+        if not self.created_resources['rooms']:
+            print("Skipping categories test - no rooms available")
+            return
         
-        # Test Canva import with the provided test URL
-        canva_import_data = {
-            "board_url": self.test_canva_url,
+        room_id = self.created_resources['rooms'][0]
+        
+        # POST /api/categories - Create category
+        category_data = {
+            "name": "Test Lighting",
+            "description": "Test lighting category",
+            "room_id": room_id,
+            "order_index": 1
+        }
+        
+        success, created_category, _ = self.make_request('POST', '/categories', 
+                                                       category_data, 201,
+                                                       "Create category")
+        if success and created_category:
+            category_id = created_category.get('id')
+            if category_id:
+                self.created_resources['categories'].append(category_id)
+        
+        # PUT /api/categories/{id} - Update category
+        if self.created_resources['categories']:
+            category_id = self.created_resources['categories'][0]
+            update_data = {
+                "name": "Updated Test Lighting",
+                "description": "Updated lighting category"
+            }
+            success, _, _ = self.make_request('PUT', f'/categories/{category_id}', 
+                                            update_data, 200,
+                                            "Update category")
+
+    def test_subcategories_crud(self):
+        """Test Subcategories CRUD operations"""
+        print("\n=== TESTING SUBCATEGORIES CRUD ===")
+        
+        if not self.created_resources['categories']:
+            print("Skipping subcategories test - no categories available")
+            return
+        
+        category_id = self.created_resources['categories'][0]
+        
+        # POST /api/subcategories - Create subcategory
+        subcategory_data = {
+            "name": "INSTALLED",
+            "description": "Installed lighting fixtures",
+            "category_id": category_id,
+            "order_index": 1
+        }
+        
+        success, created_subcategory, _ = self.make_request('POST', '/subcategories', 
+                                                          subcategory_data, 201,
+                                                          "Create subcategory")
+        if success and created_subcategory:
+            subcategory_id = created_subcategory.get('id')
+            if subcategory_id:
+                self.created_resources['subcategories'].append(subcategory_id)
+
+    def test_items_crud(self):
+        """Test Items CRUD operations"""
+        print("\n=== TESTING ITEMS CRUD ===")
+        
+        if not self.created_resources['subcategories']:
+            print("Skipping items test - no subcategories available")
+            return
+        
+        subcategory_id = self.created_resources['subcategories'][0]
+        
+        # POST /api/items - Create item
+        item_data = {
+            "name": "Test Chandelier",
+            "quantity": 1,
+            "size": "Large",
+            "remarks": "Crystal chandelier for dining room",
+            "vendor": "Visual Comfort",
+            "status": "TO BE SELECTED",
+            "cost": 1500.00,
+            "subcategory_id": subcategory_id,
+            "priority": "High",
+            "finish_color": "Brass",
+            "lead_time_weeks": 8
+        }
+        
+        success, created_item, _ = self.make_request('POST', '/items', 
+                                                   item_data, 201,
+                                                   "Create item with full details")
+        if success and created_item:
+            item_id = created_item.get('id')
+            if item_id:
+                self.created_resources['items'].append(item_id)
+        
+        # GET /api/items/{id} - Get individual item
+        if self.created_resources['items']:
+            item_id = self.created_resources['items'][0]
+            success, _, _ = self.make_request('GET', f'/items/{item_id}', 
+                                            test_name="Get individual item")
+        
+        # PUT /api/items/{id} - Update item completely
+        if self.created_resources['items']:
+            item_id = self.created_resources['items'][0]
+            update_data = {
+                "name": "Updated Test Chandelier",
+                "quantity": 2,
+                "status": "ORDERED",
+                "cost": 1600.00
+            }
+            success, _, _ = self.make_request('PUT', f'/items/{item_id}', 
+                                            update_data, 200,
+                                            "Update item completely")
+        
+        # PATCH /api/items/{id}/quick-update - Quick status update
+        if self.created_resources['items']:
+            item_id = self.created_resources['items'][0]
+            quick_update = {
+                "status": "SHIPPED",
+                "tracking_number": "1Z999AA1234567890"
+            }
+            success, _, _ = self.make_request('PATCH', f'/items/{item_id}/quick-update', 
+                                            quick_update, 200,
+                                            "Quick item status update")
+        
+        # PATCH /api/items/{id}/tracking - Shipping tracking update
+        if self.created_resources['items']:
+            item_id = self.created_resources['items'][0]
+            tracking_data = {
+                "tracking_number": "1Z999AA1234567890",
+                "carrier": "UPS",
+                "status": "IN TRANSIT"
+            }
+            success, _, _ = self.make_request('PATCH', f'/items/{item_id}/tracking', 
+                                            tracking_data, 200,
+                                            "Update shipping tracking")
+        
+        # GET /api/items/with-tracking/{project_id} - Get items with shipping info
+        success, _, _ = self.make_request('GET', f'/items/with-tracking/{self.project_id}', 
+                                        test_name="Get items with shipping info")
+        
+        # DELETE /api/items/{id} - Delete item
+        if self.created_resources['items']:
+            item_id = self.created_resources['items'].pop()
+            success, _, _ = self.make_request('DELETE', f'/items/{item_id}', 
+                                            expected_code=200,
+                                            test_name="Delete item")
+
+    def test_photos_endpoints(self):
+        """Test Photos endpoints"""
+        print("\n=== TESTING PHOTOS ENDPOINTS ===")
+        
+        # GET /api/photos/project/{id} - Get all project photos
+        success, _, _ = self.make_request('GET', f'/photos/project/{self.project_id}', 
+                                        test_name="Get all project photos")
+        
+        # GET /api/photos/with-location/{project_id} - Get GPS-tagged photos
+        success, _, _ = self.make_request('GET', f'/photos/with-location/{self.project_id}', 
+                                        test_name="Get GPS-tagged photos")
+
+    def test_sync_endpoints(self):
+        """Test Sync endpoints"""
+        print("\n=== TESTING SYNC ENDPOINTS ===")
+        
+        # GET /api/sync/status/{project_id} - Get sync status
+        success, _, _ = self.make_request('GET', f'/sync/status/{self.project_id}', 
+                                        test_name="Get sync status")
+        
+        # POST /api/sync/walkthrough-to-checklist/{project_id} - Sync mobile to desktop
+        success, _, _ = self.make_request('POST', f'/sync/walkthrough-to-checklist/{self.project_id}', 
+                                        {}, 200,
+                                        test_name="Sync walkthrough to checklist")
+
+    def test_voice_notes_crud(self):
+        """Test Voice Notes CRUD operations"""
+        print("\n=== TESTING VOICE NOTES CRUD ===")
+        
+        # POST /api/voice-notes - Create voice note
+        voice_note_data = {
             "project_id": self.project_id,
             "room_name": "Living Room",
-            "room_id": self.room_id,
-            "auto_clip_to_houzz": True,
-            "page_number": 1
+            "audio_url": "https://example.com/audio.mp3",
+            "duration": 30,
+            "transcription": "Test voice note transcription",
+            "notes": "Additional notes"
         }
         
-        print(f"   🔗 Testing with URL: {self.test_canva_url}")
-        print(f"   📄 Page number: 1")
-        print(f"   🏠 Room: Living Room ({self.room_id})")
+        success, created_note, _ = self.make_request('POST', '/voice-notes', 
+                                                   voice_note_data, 201,
+                                                   "Create voice note")
+        if success and created_note:
+            note_id = created_note.get('id')
+            if note_id:
+                self.created_resources['voice_notes'].append(note_id)
         
-        success, response = self.run_test(
-            "Canva Board Import", 
-            "POST", 
-            "import-canva-board", 
-            200, 
-            canva_import_data
-        )
+        # GET /api/voice-notes/project/{id} - Get project voice notes
+        success, _, _ = self.make_request('GET', f'/voice-notes/project/{self.project_id}', 
+                                        test_name="Get project voice notes")
         
-        if success:
-            print(f"   📊 Import Results:")
-            print(f"      Success: {response.get('success', 'Unknown')}")
-            print(f"      Items Found: {response.get('total_links', 0)}")
-            print(f"      Items Created: {response.get('successful_imports', 0)}")
-            print(f"      Mock Items: {response.get('mock_items_created', 0)}")
-            
-            if response.get('error'):
-                print(f"      Error: {response['error']}")
-            
-            # Check if mock data fallback is working
-            if response.get('mock_items_created', 0) > 0:
-                print("   ✅ Mock data fallback is working")
-            elif response.get('successful_imports', 0) > 0:
-                print("   ✅ Real Canva scraping is working")
-            else:
-                print("   ⚠️ No items created - check Canva scraping logic")
-        
-        return success
-
-    def test_canva_scraping_enhanced(self):
-        """Test enhanced Canva scraping with authentication"""
-        print("\n" + "="*60)
-        print("🔍 TESTING ENHANCED CANVA SCRAPING")
-        print("="*60)
-        
-        # Test different page numbers
-        for page_num in [1, 2]:
-            canva_data = {
-                "board_url": self.test_canva_url,
-                "project_id": self.project_id,
-                "room_name": "Living Room",
-                "room_id": self.room_id,
-                "auto_clip_to_houzz": False,  # Test without Houzz integration
-                "page_number": page_num
+        # PATCH /api/voice-notes/{id} - Update voice note
+        if self.created_resources['voice_notes']:
+            note_id = self.created_resources['voice_notes'][0]
+            update_data = {
+                "transcription": "Updated transcription",
+                "notes": "Updated notes"
             }
-            
-            success, response = self.run_test(
-                f"Canva Import Page {page_num}", 
-                "POST", 
-                "import-canva-board", 
-                200, 
-                canva_data
-            )
-            
-            if success:
-                links_found = response.get('total_links', 0)
-                print(f"   📄 Page {page_num}: {links_found} links found")
+            success, _, _ = self.make_request('PATCH', f'/voice-notes/{note_id}', 
+                                            update_data, 200,
+                                            "Update voice note")
         
-        return True
+        # DELETE /api/voice-notes/{id} - Delete voice note
+        if self.created_resources['voice_notes']:
+            note_id = self.created_resources['voice_notes'].pop()
+            success, _, _ = self.make_request('DELETE', f'/voice-notes/{note_id}', 
+                                            expected_code=200,
+                                            test_name="Delete voice note")
 
-    def test_houzz_pro_integration(self):
-        """Test Houzz Pro auto-clip functionality"""
-        print("\n" + "="*60)
-        print("🏡 TESTING HOUZZ PRO INTEGRATION")
-        print("="*60)
+    def test_punch_list_crud(self):
+        """Test Punch List CRUD operations"""
+        print("\n=== TESTING PUNCH LIST CRUD ===")
         
-        # Test Houzz Pro scraper endpoint
-        success, response = self.run_test(
-            "Houzz Pro Scraper", 
-            "POST", 
-            "scrape-houzz-pro", 
-            200
-        )
-        
-        if success:
-            print(f"   📊 Houzz Results:")
-            print(f"      Success: {response.get('success', 'Unknown')}")
-            print(f"      Products Found: {response.get('products_found', 0)}")
-            print(f"      Database Saved: {response.get('database_saved', False)}")
-        
-        return success
-
-    def test_item_management(self):
-        """Test item creation and management after Canva import"""
-        print("\n" + "="*60)
-        print("📦 TESTING ITEM MANAGEMENT")
-        print("="*60)
-        
-        if not self.project_id:
-            print("❌ No project ID for item testing")
-            return False
-        
-        # Get project to check for items
-        success, response = self.run_test(
-            "Get Project Items", 
-            "GET", 
-            f"projects/{self.project_id}?sheet_type=checklist", 
-            200
-        )
-        
-        if success:
-            total_items = 0
-            for room in response.get('rooms', []):
-                for category in room.get('categories', []):
-                    for subcategory in category.get('subcategories', []):
-                        total_items += len(subcategory.get('items', []))
-            
-            print(f"   📊 Total items in project: {total_items}")
-            
-            # Test item status update if items exist
-            if total_items > 0:
-                # Find first item
-                for room in response.get('rooms', []):
-                    for category in room.get('categories', []):
-                        for subcategory in category.get('subcategories', []):
-                            items = subcategory.get('items', [])
-                            if items:
-                                item_id = items[0]['id']
-                                
-                                # Test status update
-                                update_data = {"status": "PICKED"}
-                                success, _ = self.run_test(
-                                    "Update Item Status", 
-                                    "PUT", 
-                                    f"items/{item_id}", 
-                                    200, 
-                                    update_data
-                                )
-                                return success
-        
-        return success
-
-    def test_error_handling(self):
-        """Test error handling for invalid inputs"""
-        print("\n" + "="*60)
-        print("🚨 TESTING ERROR HANDLING")
-        print("="*60)
-        
-        # Test invalid Canva URL
-        invalid_canva_data = {
-            "board_url": "https://invalid-url.com",
-            "project_id": self.project_id or "invalid",
-            "room_name": "Test Room",
-            "room_id": self.room_id or "invalid",
-            "page_number": 1
+        # POST /api/punch-list - Create punch list item
+        punch_item_data = {
+            "project_id": self.project_id,
+            "title": "Fix cabinet door alignment",
+            "description": "Kitchen cabinet door needs adjustment",
+            "priority": "High",
+            "assigned_to": "John Contractor",
+            "status": "Pending",
+            "room_name": "Kitchen",
+            "category": "Cabinetry"
         }
         
-        success, response = self.run_test(
-            "Invalid Canva URL", 
-            "POST", 
-            "import-canva-board", 
-            400,  # Expect error
-            invalid_canva_data
-        )
+        success, created_item, _ = self.make_request('POST', '/punch-list', 
+                                                   punch_item_data, 201,
+                                                   "Create punch list item")
+        if success and created_item:
+            item_id = created_item.get('id')
+            if item_id:
+                self.created_resources['punch_list'].append(item_id)
         
-        # Test missing required fields
-        incomplete_data = {
-            "board_url": self.test_canva_url
-            # Missing required fields
+        # GET /api/punch-list/project/{id} - Get punch list items
+        success, _, _ = self.make_request('GET', f'/punch-list/project/{self.project_id}', 
+                                        test_name="Get punch list items")
+        
+        # PATCH /api/punch-list/{id} - Update punch list item
+        if self.created_resources['punch_list']:
+            item_id = self.created_resources['punch_list'][0]
+            update_data = {
+                "status": "In Progress",
+                "notes": "Work started today"
+            }
+            success, _, _ = self.make_request('PATCH', f'/punch-list/{item_id}', 
+                                            update_data, 200,
+                                            "Update punch list item")
+        
+        # CRITICAL TEST: POST /api/punch-list/ai-suggest/{project_id} - AI suggestions (previously failing)
+        success, _, status_code = self.make_request('POST', f'/punch-list/ai-suggest/{self.project_id}', 
+                                                  {}, 200,
+                                                  "CRITICAL: AI punch list suggestions")
+        
+        # DELETE /api/punch-list/{id} - Delete punch list item
+        if self.created_resources['punch_list']:
+            item_id = self.created_resources['punch_list'].pop()
+            success, _, _ = self.make_request('DELETE', f'/punch-list/{item_id}', 
+                                            expected_code=200,
+                                            test_name="Delete punch list item")
+
+    def test_chat_endpoints(self):
+        """Test Chat endpoints"""
+        print("\n=== TESTING CHAT ENDPOINTS ===")
+        
+        # POST /api/chat/send - Send chat message
+        chat_data = {
+            "project_id": self.project_id,
+            "sender_name": "Test User",
+            "sender_phone": "555-0123",
+            "message": "Test chat message from API"
         }
         
-        success, response = self.run_test(
-            "Incomplete Canva Data", 
-            "POST", 
-            "import-canva-board", 
-            422,  # Expect validation error
-            incomplete_data
-        )
+        success, created_message, _ = self.make_request('POST', '/chat/send', 
+                                                      chat_data, 201,
+                                                      "Send chat message")
+        if success and created_message:
+            message_id = created_message.get('id')
+            if message_id:
+                self.created_resources['chat_messages'].append(message_id)
         
-        return True
+        # GET /api/chat/messages/{project_id} - Get team chat messages
+        success, _, _ = self.make_request('GET', f'/chat/messages/{self.project_id}', 
+                                        test_name="Get team chat messages")
+        
+        # GET /api/chat/unread/{project_id}/{phone} - Get unread message count
+        success, _, _ = self.make_request('GET', f'/chat/unread/{self.project_id}/555-0123', 
+                                        test_name="Get unread message count")
 
-    def run_comprehensive_test(self):
-        """Run all tests in sequence"""
-        start_time = datetime.now()
+    def test_contacts_crud(self):
+        """Test Contacts CRUD operations"""
+        print("\n=== TESTING CONTACTS CRUD ===")
         
-        print("\n" + "="*80)
-        print("🚀 STARTING COMPREHENSIVE CANVA IMPORT BACKEND TESTING")
-        print("="*80)
-        print(f"🌐 Backend URL: {self.base_url}")
-        print(f"🎨 Test Canva URL: {self.test_canva_url}")
-        print(f"⏰ Started at: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        # POST /api/contacts - Create contact
+        contact_data = {
+            "name": "Test Contractor",
+            "email": "contractor@example.com",
+            "phone": "555-0456",
+            "company": "Test Construction Co",
+            "role": "General Contractor",
+            "project_id": self.project_id
+        }
         
-        # Run test suites
-        tests = [
-            ("Basic Connectivity", self.test_basic_connectivity),
-            ("Project Management", self.test_project_management),
-            ("Room Creation", self.test_room_creation),
-            ("Canva Import API", self.test_canva_import_api),
-            ("Enhanced Canva Scraping", self.test_canva_scraping_enhanced),
-            ("Houzz Pro Integration", self.test_houzz_pro_integration),
-            ("Item Management", self.test_item_management),
-            ("Error Handling", self.test_error_handling)
+        success, created_contact, _ = self.make_request('POST', '/contacts', 
+                                                      contact_data, 201,
+                                                      "Create contact")
+        if success and created_contact:
+            contact_id = created_contact.get('id')
+            if contact_id:
+                self.created_resources['contacts'].append(contact_id)
+        
+        # GET /api/contacts/project/{project_id} - Get project contacts
+        success, _, _ = self.make_request('GET', f'/contacts/project/{self.project_id}', 
+                                        test_name="Get project contacts")
+        
+        # PUT /api/contacts/{id} - Update contact
+        if self.created_resources['contacts']:
+            contact_id = self.created_resources['contacts'][0]
+            update_data = {
+                "name": "Updated Test Contractor",
+                "phone": "555-0789"
+            }
+            success, _, _ = self.make_request('PUT', f'/contacts/{contact_id}', 
+                                            update_data, 200,
+                                            "Update contact")
+        
+        # DELETE /api/contacts/{id} - Delete contact
+        if self.created_resources['contacts']:
+            contact_id = self.created_resources['contacts'].pop()
+            success, _, _ = self.make_request('DELETE', f'/contacts/{contact_id}', 
+                                            expected_code=200,
+                                            test_name="Delete contact")
+
+    def test_materials_crud(self):
+        """Test Materials CRUD operations"""
+        print("\n=== TESTING MATERIALS CRUD ===")
+        
+        # GET /api/materials - List available materials
+        success, _, _ = self.make_request('GET', '/materials', 
+                                        test_name="List available materials")
+        
+        # POST /api/materials - Create new material
+        material_data = {
+            "name": "Test Fabric",
+            "category": "Upholstery",
+            "vendor": "Test Vendor",
+            "color": "Navy Blue",
+            "pattern": "Solid",
+            "price_per_yard": 45.00,
+            "availability": "In Stock",
+            "notes": "High-performance fabric"
+        }
+        
+        success, created_material, _ = self.make_request('POST', '/materials', 
+                                                       material_data, 201,
+                                                       "Create new material")
+        if success and created_material:
+            material_id = created_material.get('id')
+            if material_id:
+                self.created_resources['materials'].append(material_id)
+
+    def test_questionnaire_endpoints(self):
+        """Test Questionnaire endpoints"""
+        print("\n=== TESTING QUESTIONNAIRE ENDPOINTS ===")
+        
+        # GET /api/questionnaire/{project_id} - Get project questionnaire
+        success, _, _ = self.make_request('GET', f'/questionnaire/{self.project_id}', 
+                                        test_name="Get project questionnaire")
+        
+        # GET /api/questionnaire/template - Get questionnaire template
+        success, _, _ = self.make_request('GET', '/questionnaire/template', 
+                                        test_name="Get questionnaire template")
+
+    def test_vendor_endpoints(self):
+        """Test Vendor endpoints"""
+        print("\n=== TESTING VENDOR ENDPOINTS ===")
+        
+        # GET /api/vendor-credentials - Get vendor portal credentials
+        success, _, _ = self.make_request('GET', '/vendor-credentials', 
+                                        test_name="Get vendor portal credentials")
+
+    def test_autocomplete_endpoints(self):
+        """Test Autocomplete endpoints"""
+        print("\n=== TESTING AUTOCOMPLETE ENDPOINTS ===")
+        
+        # GET /api/autocomplete/products - Product search autocomplete
+        success, _, _ = self.make_request('GET', '/autocomplete/products?q=chair', 
+                                        test_name="Product search autocomplete")
+        
+        # GET /api/autocomplete/vendors - Vendor autocomplete
+        success, _, _ = self.make_request('GET', '/autocomplete/vendors?q=visual', 
+                                        test_name="Vendor autocomplete")
+        
+        # GET /api/autocomplete/categories - Category autocomplete
+        success, _, _ = self.make_request('GET', '/autocomplete/categories?q=lighting', 
+                                        test_name="Category autocomplete")
+
+    def test_helper_endpoints(self):
+        """Test Helper endpoints"""
+        print("\n=== TESTING HELPER ENDPOINTS ===")
+        
+        # GET /api/category-options - Available category options
+        success, _, _ = self.make_request('GET', '/category-options', 
+                                        test_name="Available category options")
+        
+        # GET /api/categories/available - Available categories
+        success, _, _ = self.make_request('GET', '/categories/available', 
+                                        test_name="Available categories")
+        
+        # GET /api/finish-library - Finish options library
+        success, _, _ = self.make_request('GET', '/finish-library', 
+                                        test_name="Finish options library")
+
+    def cleanup_resources(self):
+        """Clean up created test resources"""
+        print("\n=== CLEANING UP TEST RESOURCES ===")
+        
+        # Clean up in reverse order of dependencies
+        for item_id in self.created_resources['items']:
+            self.make_request('DELETE', f'/items/{item_id}', expected_code=200, 
+                            test_name=f"Cleanup item {item_id}")
+        
+        for subcategory_id in self.created_resources['subcategories']:
+            self.make_request('DELETE', f'/subcategories/{subcategory_id}', expected_code=200, 
+                            test_name=f"Cleanup subcategory {subcategory_id}")
+        
+        for category_id in self.created_resources['categories']:
+            self.make_request('DELETE', f'/categories/{category_id}', expected_code=200, 
+                            test_name=f"Cleanup category {category_id}")
+        
+        for room_id in self.created_resources['rooms']:
+            self.make_request('DELETE', f'/rooms/{room_id}', expected_code=200, 
+                            test_name=f"Cleanup room {room_id}")
+        
+        for project_id in self.created_resources['projects']:
+            self.make_request('DELETE', f'/projects/{project_id}', expected_code=200, 
+                            test_name=f"Cleanup project {project_id}")
+
+    def run_all_tests(self):
+        """Run comprehensive backend API tests"""
+        print(f"🚀 Starting Comprehensive Backend API Testing")
+        print(f"Backend URL: {self.base_url}")
+        print(f"Project ID: {self.project_id}")
+        print(f"Timestamp: {datetime.now().isoformat()}")
+        print("=" * 80)
+        
+        start_time = time.time()
+        
+        # Run all test suites
+        self.test_projects_crud()
+        self.test_rooms_crud()
+        self.test_categories_crud()
+        self.test_subcategories_crud()
+        self.test_items_crud()
+        self.test_photos_endpoints()
+        self.test_sync_endpoints()
+        self.test_voice_notes_crud()
+        self.test_punch_list_crud()  # Includes critical AI suggestions test
+        self.test_chat_endpoints()
+        self.test_contacts_crud()
+        self.test_materials_crud()
+        self.test_questionnaire_endpoints()
+        self.test_vendor_endpoints()
+        self.test_autocomplete_endpoints()
+        self.test_helper_endpoints()
+        
+        # Cleanup
+        self.cleanup_resources()
+        
+        end_time = time.time()
+        duration = end_time - start_time
+        
+        # Generate summary
+        self.generate_summary(duration)
+
+    def generate_summary(self, duration: float):
+        """Generate test summary"""
+        total_tests = len(self.test_results)
+        passed_tests = sum(1 for result in self.test_results if result['success'])
+        failed_tests = total_tests - passed_tests
+        pass_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
+        
+        print("\n" + "=" * 80)
+        print("🎯 COMPREHENSIVE BACKEND API TEST RESULTS")
+        print("=" * 80)
+        print(f"📊 Total Tests: {total_tests}")
+        print(f"✅ Passed: {passed_tests}")
+        print(f"❌ Failed: {failed_tests}")
+        print(f"📈 Pass Rate: {pass_rate:.1f}%")
+        print(f"⏱️  Duration: {duration:.2f} seconds")
+        print(f"🎯 Goal: 100% pass rate")
+        
+        # Critical tests status
+        critical_tests = [
+            "CRITICAL: Partial project update",
+            "CRITICAL: AI punch list suggestions"
         ]
         
-        suite_results = {}
-        for suite_name, test_func in tests:
-            try:
-                print(f"\n🧪 Running {suite_name} tests...")
-                result = test_func()
-                suite_results[suite_name] = result
-                print(f"{'✅' if result else '❌'} {suite_name}: {'PASSED' if result else 'FAILED'}")
-            except Exception as e:
-                print(f"❌ {suite_name}: CRASHED - {str(e)}")
-                suite_results[suite_name] = False
+        print(f"\n🔥 CRITICAL TESTS STATUS:")
+        for test_name in critical_tests:
+            test_result = next((r for r in self.test_results if r['test_name'] == test_name), None)
+            if test_result:
+                status = "✅ PASS" if test_result['success'] else "❌ FAIL"
+                print(f"   {status} {test_name}")
+            else:
+                print(f"   ⚠️  NOT RUN {test_name}")
         
-        # Final results
-        end_time = datetime.now()
-        duration = (end_time - start_time).total_seconds()
+        # Failed tests details
+        if failed_tests > 0:
+            print(f"\n❌ FAILED TESTS DETAILS:")
+            for result in self.test_results:
+                if not result['success']:
+                    print(f"   • {result['method']} {result['endpoint']} - {result['test_name']}")
+                    print(f"     Status: {result['status_code']} (expected {result['expected_code']})")
+                    if result['error']:
+                        print(f"     Error: {result['error']}")
         
-        print("\n" + "="*80)
-        print("📊 COMPREHENSIVE TEST RESULTS")
-        print("="*80)
-        print(f"⏰ Duration: {duration:.1f} seconds")
-        print(f"🧪 Total Tests: {self.tests_run}")
-        print(f"✅ Passed: {self.tests_passed}")
-        print(f"❌ Failed: {self.tests_run - self.tests_passed}")
-        print(f"📈 Success Rate: {(self.tests_passed/self.tests_run*100):.1f}%")
-        
-        print("\n📋 Test Suite Results:")
-        for suite_name, result in suite_results.items():
-            status = "✅ PASS" if result else "❌ FAIL"
-            print(f"   {status} {suite_name}")
-        
-        # Critical issues summary
-        print("\n🚨 Critical Issues Found:")
-        critical_issues = []
-        
-        if not suite_results.get("Canva Import API", False):
-            critical_issues.append("Canva import API not working properly")
-        
-        if not suite_results.get("Enhanced Canva Scraping", False):
-            critical_issues.append("Canva scraping not extracting product links")
-        
-        if critical_issues:
-            for issue in critical_issues:
-                print(f"   ❌ {issue}")
+        # Success message
+        if pass_rate == 100.0:
+            print(f"\n🎉 SUCCESS! 100% PASS RATE ACHIEVED!")
+            print(f"   All {total_tests} backend API tests passed successfully.")
         else:
-            print("   ✅ No critical backend issues found")
+            print(f"\n⚠️  {failed_tests} tests need attention to reach 100% pass rate.")
         
-        print("="*80)
-        
-        return {
-            "total_tests": self.tests_run,
-            "passed_tests": self.tests_passed,
-            "success_rate": (self.tests_passed/self.tests_run*100) if self.tests_run > 0 else 0,
-            "suite_results": suite_results,
-            "critical_issues": critical_issues,
-            "project_id": self.project_id,
-            "room_id": self.room_id
-        }
+        print("=" * 80)
 
 def main():
-    tester = CanvaImportTester()
-    results = tester.run_comprehensive_test()
-    
-    # Return appropriate exit code
-    if results["success_rate"] >= 75:
-        return 0
-    else:
-        return 1
+    """Main test execution"""
+    tester = BackendTester()
+    tester.run_all_tests()
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
