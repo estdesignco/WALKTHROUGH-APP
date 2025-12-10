@@ -634,20 +634,6 @@ EXECUTE ONLY WHAT USER REQUESTED - NOTHING MORE, NOTHING LESS."""
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Rendering failed: {str(e)}")
-                "rendered_image_base64": base64.b64encode(images[0]).decode('utf-8'),
-                "room_analysis": room_analysis,
-                "render_prompt_used": final_prompt,
-                "generated_at": datetime.now().isoformat()
-            }
-        else:
-            return {
-                "success": True,
-                "message": "I understood your request but couldn't generate an image. Please try rephrasing.",
-                "rendered_image_base64": None
-            }
-            
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Render failed: {str(e)}")
 
 class DesignSuggestionRequest(BaseModel):
     room_type: str
