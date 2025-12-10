@@ -24,6 +24,10 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
   
+  // Sync state - for walkthrough to checklist sync
+  const [syncStatus, setSyncStatus] = useState(null);
+  const [syncing, setSyncing] = useState(false);
+  
   useEffect(() => {
     if (projectId) {
       console.log('🚀 Loading project:', projectId);
