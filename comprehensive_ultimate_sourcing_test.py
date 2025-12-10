@@ -522,17 +522,17 @@ class UltimateSourcingTester:
         print("🔄 TESTING COMPREHENSIVE API COVERAGE")
         print("="*60)
         
-        # Test status options
-        success, _ = self.run_test("Get Status Options", "GET", "status-options", 200)
+        # Test status options (actual endpoint)
+        success, _ = self.run_test("Get Item Statuses", "GET", "item-statuses", 200)
         
         # Test carrier options
         success, _ = self.run_test("Get Carrier Options", "GET", "carrier-options", 200)
         
-        # Test vendor options
-        success, _ = self.run_test("Get Vendor Options", "GET", "vendor-options", 200)
+        # Test vendor types (actual endpoint)
+        success, _ = self.run_test("Get Vendor Types", "GET", "vendor-types", 200)
         
-        # Test room templates
-        success, _ = self.run_test("Get Room Templates", "GET", "room-templates", 200)
+        # Test room colors (actual endpoint)
+        success, _ = self.run_test("Get Room Colors", "GET", "room-colors", 200)
         
         return success
 
