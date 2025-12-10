@@ -168,3 +168,6 @@ agent_communication:
     message: "Starting comprehensive end-to-end testing of Interior Design Project Management application. Will test authentication, dashboard, all project detail tabs, and export features including new Customer Sheets."
   - agent: "testing"
     message: "✅ COMPREHENSIVE END-TO-END TESTING COMPLETED SUCCESSFULLY! All major features tested and working: Authentication (no login required), Dashboard navigation (all 7 main buttons working), Project management (2 active projects found), Project detail tabs (Questionnaire, Checklist, FF&E, Exports all functional), Add Item modal with URL auto-fill (Four Hands URL tested), NEW Customer Sheets export feature working, Calculators with dropdowns functional, Master Contacts and Sourcing Catalog working. No critical issues found. Application is fully operational for interior designers."
+
+  - agent: "main"
+    message: "User requested verification that ALL spec sheet printouts (Customer Sheets, Movers FFE, Electrician Sheet, Load-In Sheets) have NO PRICING displayed. Verified in code - all export endpoints only include: item name, vendor, quantity, size, finish/color, image. No price/cost fields are exported. Now running comprehensive E2E testing."
