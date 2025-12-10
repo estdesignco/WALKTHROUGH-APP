@@ -1711,6 +1711,68 @@ const ExactChecklistSpreadsheet = ({
                 </div>
               </div>
 
+              {/* ROOM PHOTOS FOLDER - Walkthrough Photos */}
+              {isRoomExpanded && roomPhotos[room.id]?.length > 0 && (
+                <div className="mb-4 rounded-lg border border-[#D4A574]/30 overflow-hidden" 
+                     style={{ background: 'linear-gradient(135deg, rgba(20,20,30,0.95) 0%, rgba(30,30,40,0.9) 100%)' }}>
+                  {/* Photo Folder Header */}
+                  <div 
+                    className="px-4 py-2 cursor-pointer flex items-center justify-between"
+                    style={{ 
+                      background: 'linear-gradient(135deg, rgba(212, 165, 116, 0.2) 0%, rgba(180, 155, 126, 0.15) 100%)',
+                      borderBottom: expandedPhotoRooms[room.id] ? '1px solid rgba(212, 165, 116, 0.3)' : 'none'
+                    }}
+                    onClick={() => togglePhotoFolder(room.id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">📁</span>
+                      <span className="text-[#D4A574] font-semibold text-sm">
+                        WALKTHROUGH PHOTOS ({roomPhotos[room.id]?.length || 0})
+                      </span>
+                    </div>
+                    <span className="text-[#B49B7E]">
+                      {expandedPhotoRooms[room.id] ? '▼' : '▶'}
+                    </span>
+                  </div>
+                  
+                  {/* Photo Grid - Expanded View */}
+                  {expandedPhotoRooms[room.id] && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                        {roomPhotos[room.id]?.map((photo, idx) => (
+                          <div 
+                            key={photo.id || idx} 
+                            className="relative group cursor-pointer rounded-lg overflow-hidden border border-[#B49B7E]/30 hover:border-[#D4A574] transition-all hover:scale-105"
+                            style={{ aspectRatio: '1/1' }}
+                            onClick={() => setSelectedPhotoView(photo)}
+                          >
+                            <img 
+                              src={photo.photo_data || photo.url || photo.image_url} 
+                              alt={photo.file_name || `Photo ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="text-white text-2xl">🔍</span>
+                            </div>
+                            {photo.metadata?.has_measurements && (
+                              <div className="absolute top-1 right-1 bg-green-600 text-white text-xs px-1 rounded">
+                                📏
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      {roomPhotos[room.id]?.length === 0 && (
+                        <p className="text-gray-500 text-sm text-center py-4">
+                          No walkthrough photos for this room yet.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* CATEGORIES - Only show when room expanded */}
               {isRoomExpanded && (
                 <Droppable droppableId={`categories-${room.id}`} type="CATEGORY">
