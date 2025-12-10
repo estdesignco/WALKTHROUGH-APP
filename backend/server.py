@@ -8401,6 +8401,10 @@ async def ai_suggest_punch_items(project_id: str):
                 suggestion["created_at"] = datetime.now(timezone.utc).isoformat()
                 suggestion["updated_at"] = datetime.now(timezone.utc).isoformat()
             await db.punch_list.insert_many(suggestions)
+            
+            # Remove _id fields added by MongoDB for JSON serialization
+            for suggestion in suggestions:
+                suggestion.pop('_id', None)
         
         logger.info(f"🤖 Generated {len(suggestions)} AI punch list suggestions for project {project_id}")
         
