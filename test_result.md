@@ -291,10 +291,14 @@ metadata:
   test_sequence: 1
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus: 
+    - "Contacts API"
+    - "Moodboard API"
+  stuck_tasks: 
+    - "Contacts API"
+    - "Moodboard API"
   test_all: false
-  test_priority: "completed"
+  test_priority: "backend_completed_frontend_completed"
 
 agent_communication:
   - agent: "testing"
