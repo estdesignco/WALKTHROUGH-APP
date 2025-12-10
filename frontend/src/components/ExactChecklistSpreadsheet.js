@@ -58,6 +58,58 @@ const ExactChecklistSpreadsheet = ({
   const [selectedStatus, setSelectedStatus] = useState('');
   const [filteredProject, setFilteredProject] = useState(project);
   const [showCanvaModal, setShowCanvaModal] = useState(false);
+  
+  // Room photos state - for displaying walkthrough photos above each room
+  const [roomPhotos, setRoomPhotos] = useState({});
+  const [expandedPhotoRooms, setExpandedPhotoRooms] = useState({});
+  const [selectedPhotoView, setSelectedPhotoView] = useState(null);
+
+  // Load photos for all rooms from walkthrough
+  useEffect(() => {
+    const loadRoomPhotos = async () => {
+      if (!project?.id || !project?.rooms) return;
+      
+      const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+      const photosData = {};
+      
+      // Load photos for each room - check both walkthrough and checklist room photos
+      for (const room of project.rooms) {
+        try {
+          // First, try to get photos from the walkthrough version of this room
+          const response = await fetch(`${backendUrl}/api/photos/by-room-name/${project.id}/${encodeURIComponent(room.name)}`);
+          if (response.ok) {
+            const data = await response.json();
+            photosData[room.id] = data.photos || [];
+          } else {
+            // Fallback to regular room photos
+            const fallbackResponse = await fetch(`${backendUrl}/api/photos/by-room/${project.id}/${room.id}`);
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json();
+              photosData[room.id] = fallbackData.photos || [];
+            } else {
+              photosData[room.id] = [];
+            }
+          }
+        } catch (error) {
+          console.warn(`Failed to load photos for room ${room.name}:`, error);
+          photosData[room.id] = [];
+        }
+      }
+      
+      setRoomPhotos(photosData);
+      console.log('📸 Loaded room photos for checklist:', Object.keys(photosData).length, 'rooms');
+    };
+    
+    loadRoomPhotos();
+  }, [project?.id, project?.rooms?.length]);
+
+  // Toggle photo folder expansion for a room
+  const togglePhotoFolder = (roomId) => {
+    setExpandedPhotoRooms(prev => ({
+      ...prev,
+      [roomId]: !prev[roomId]
+    }));
+  };
 
   // DRAG AND DROP HANDLER for rooms, categories, and subcategories
   const handleDragEnd = async (result) => {
