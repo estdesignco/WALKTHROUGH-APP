@@ -1063,6 +1063,7 @@ class ProjectUpdate(BaseModel):
     project_type: Optional[ProjectType] = None
     timeline: Optional[str] = None
     budget: Optional[str] = None
+    status: Optional[str] = None
     style_preferences: Optional[List[str]] = None
     color_palette: Optional[str] = None
     special_requirements: Optional[str] = None
