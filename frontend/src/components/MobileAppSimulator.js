@@ -572,19 +572,52 @@ function ProjectDetailsScreen({ project, onNavigate }) {
 function ContactsScreen({ project, onNavigate }) {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [online, setOnline] = useState(navigator.onLine);
+  const [lastSynced, setLastSynced] = useState(null);
+
+  useEffect(() => {
+    const handleOnline = () => setOnline(true);
+    const handleOffline = () => setOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     if (project?.id) {
       loadContacts();
     }
-  }, [project]);
+  }, [project, online]);
 
   const loadContacts = async () => {
     try {
-      const response = await axios.get(`${API_URL}/contacts/project/${project.id}`);
-      setContacts(response.data || []);
+      if (isOnline()) {
+        // Online: Load from server and cache
+        const response = await axios.get(`${API_URL}/contacts/project/${project.id}`);
+        const serverContacts = response.data || [];
+        setContacts(serverContacts);
+        setLastSynced(new Date());
+        // Save to offline storage
+        await saveContactsOffline(serverContacts, project.id);
+        console.log('✅ Contacts synced and cached');
+      } else {
+        // Offline: Load from cache
+        const cachedContacts = await getContactsOffline(project.id);
+        setContacts(cachedContacts || []);
+        console.log('📴 Loaded contacts from offline cache');
+      }
     } catch (error) {
       console.error('Failed to load contacts:', error);
+      // Try offline cache on error
+      try {
+        const cachedContacts = await getContactsOffline(project.id);
+        setContacts(cachedContacts || []);
+      } catch (cacheError) {
+        console.error('Failed to load from cache:', cacheError);
+      }
     } finally {
       setLoading(false);
     }
