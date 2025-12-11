@@ -901,6 +901,11 @@ export default function ProjectDetailPage() {
                 <RoomRenderingStudio />
             </div>
         ) },
+        { name: "Design Tools", icon: Layout, component: project ? (
+            <div className="design-tools-hub-content">
+                <DesignToolsHub projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading design tools...</div> },
         { name: "Team Chat", icon: MessageSquare, component: project ? (
             <div className="team-chat-content">
                 <TeamChat projectId={projectId} />
