@@ -603,103 +603,31 @@ Be extremely precise - this will be used to recreate the room exactly."""
 @router.post("/room-studio/chat-render")
 async def chat_render(request: dict):
     """
-    Direct room rendering - AI executes EXACTLY what user asks, no suggestions.
-    Uses the original room photo for detailed analysis to maintain accuracy.
+    Room rendering - currently limited to text-to-image generation.
+    NOTE: True image editing requires a different AI service (not available yet).
     """
     try:
         room_image = request.get('room_image_base64')
         user_request = request.get('user_request', '')
-        conversation_history = request.get('conversation_history', [])
         
         if not room_image:
             raise HTTPException(status_code=400, detail="Room image is required")
         if not user_request:
-            raise HTTPException(status_code=400, detail="Please describe what you want to do with this room")
+            raise HTTPException(status_code=400, detail="Please describe what you want")
         
-        # CRITICAL: First, analyze the original room in EXTREME detail
-        # This ensures the generated image matches the original room
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"room-render-{datetime.now().timestamp()}",
-            system_message="""You are an expert interior photographer and designer. Your job is to describe rooms 
-in EXTREME photographic detail so an AI image generator can recreate them perfectly. 
-Focus on exact architectural elements, materials, lighting, camera angle, and dimensions."""
-        ).with_model("openai", "gpt-5")
-        
-        image_content = ImageContent(image_base64=room_image)
-        
-        # Get VERY detailed room analysis
-        analysis_prompt = """Analyze this room photo in EXTREME DETAIL for AI image recreation:
+        # HONEST LIMITATION: gpt-image-1 cannot edit photos, only generate new ones
+        # This will create an image based on the description, not edit the original
+        render_prompt = f"""PHOTOREALISTIC interior room photograph:
 
-1. ARCHITECTURE (be VERY specific):
-   - Exact room shape and dimensions (estimate in feet)
-   - Wall positions and angles
-   - Window positions, sizes, shapes, styles (mullions, frames)
-   - Door positions, styles
-   - Ceiling type (flat, coffered, vaulted, height estimate)
-   - Any architectural details (crown molding, baseboards, built-ins, fireplace)
-
-2. MATERIALS & FINISHES (describe textures):
-   - Floor material, color, pattern, direction
-   - Wall color/wallpaper, finish (matte, eggshell, etc.)
-   - Window treatments if any
-   - Ceiling color and texture
-
-3. LIGHTING (critical for matching):
-   - Natural light source direction
-   - Time of day (estimate)
-   - Light quality (warm/cool)
-   - Shadows and highlights
-   - Any artificial lighting visible
-
-4. CAMERA ANGLE (critical for matching):
-   - Approximate camera height (standing, seated level?)
-   - Angle (straight on, corner view, etc.)
-   - Distance from walls
-   - Focal length feel (wide angle, normal lens?)
-   - What's visible at edges of frame
-
-5. CURRENT FURNITURE & DECOR:
-   - List each piece with position
-   - Colors and materials
-   - Scale relative to room
-
-Provide this as a detailed, structured description I can use to regenerate this EXACT room."""
-
-        analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
-        room_analysis = await chat.send_message(analysis_msg)
-        
-        # Build a detailed render prompt using the analysis
-        render_prompt = f"""PHOTOREALISTIC INTERIOR PHOTOGRAPH - MUST MATCH THE ORIGINAL ROOM EXACTLY
-
-ORIGINAL ROOM DETAILS (MUST PRESERVE THESE EXACTLY):
-{room_analysis}
-
-USER'S MODIFICATION REQUEST: "{user_request}"
-
-CRITICAL REQUIREMENTS:
-1. This MUST look like a photograph of THE SAME ROOM shown above
-2. Keep EXACT same architecture: walls, windows, doors, ceiling, floor
-3. Keep EXACT same camera angle, perspective, and framing
-4. Keep EXACT same lighting direction and quality
-5. Keep EXACT same materials and finishes (unless user asked to change them)
-6. Only modify what the user specifically requested
-
-PHOTOREALISM (ABSOLUTELY CRITICAL):
-- Must be INDISTINGUISHABLE from a real photograph
-- Real camera characteristics: natural depth of field, slight lens characteristics
-- Real material textures visible: wood grain, fabric weave, paint texture
-- Natural shadows and highlights
-- Magazine quality like Architectural Digest photo
-- NO CGI look, NO 3D render aesthetic, NO video game graphics
-- Professional DSLR photography quality
-
-APPLY ONLY THE USER'S REQUESTED CHANGE:
 {user_request}
 
-Keep EVERYTHING else exactly as described in the original room analysis above."""
+Requirements:
+- Professional DSLR photography quality
+- Real material textures (wood grain, fabric, paint)
+- Natural lighting with realistic shadows
+- Magazine quality like Architectural Digest
+- NO CGI, NO 3D render look"""
 
-        # Generate the image
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         images = await image_gen.generate_images(
             prompt=render_prompt,
@@ -708,23 +636,19 @@ Keep EVERYTHING else exactly as described in the original room analysis above.""
         )
         
         if images and len(images) > 0:
-            # Confirm what we did
-            user_message = f"✅ Done! I rendered your room with: \"{user_request}\"\n\nThe image preserves your room's architecture, lighting, and camera angle while applying your requested change."
-            
             return {
                 "success": True,
-                "message": user_message,
+                "message": f"⚠️ Note: This is a NEW generated image based on your description, not an edit of your photo. True photo editing requires a different AI service.\n\nGenerated: \"{user_request}\"",
                 "rendered_image_base64": base64.b64encode(images[0]).decode('utf-8'),
-                "user_request": user_request,
-                "room_analysis": room_analysis  # Include for debugging
+                "user_request": user_request
             }
         else:
-            raise HTTPException(status_code=500, detail="Failed to generate render")
+            raise HTTPException(status_code=500, detail="Failed to generate image")
             
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Rendering failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
 
 class DesignSuggestionRequest(BaseModel):
     room_type: str
