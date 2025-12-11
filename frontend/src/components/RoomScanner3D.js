@@ -234,11 +234,11 @@ export default function RoomScanner3D() {
 
   // Calculate room area
   const calculateArea = () => {
-    if (walls.length < 3) return 0;
+    if (!walls || walls.length < 3) return 0;
     
     // Simple approximation for rectangular rooms
     // For complex shapes, would need proper polygon area calculation
-    const lengths = walls.map(w => w.length);
+    const lengths = walls.map(w => parseFloat(w.length) || 0);
     if (walls.length === 4) {
       // Assume rectangular
       const avgWidth = (lengths[0] + lengths[2]) / 2;
