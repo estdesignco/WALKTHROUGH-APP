@@ -922,6 +922,11 @@ export default function ProjectDetailPage() {
                 <ShippingTracker projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading shipping...</div> },
+        { name: "Trade Discounts", icon: Percent, component: project ? (
+            <div className="trade-discounts-content">
+                <TradeDiscountManager projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading discounts...</div> },
     ];
 
     if (isLoading) {
