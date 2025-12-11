@@ -252,7 +252,9 @@ export default function RoomScanner3D() {
 
   // Calculate perimeter
   const calculatePerimeter = () => {
-    return walls.reduce((sum, wall) => sum + wall.length, 0);
+    if (!walls || walls.length === 0) return 0;
+    const perimeter = walls.reduce((sum, wall) => sum + (parseFloat(wall.length) || 0), 0);
+    return perimeter;
   };
 
   // Save room scan
