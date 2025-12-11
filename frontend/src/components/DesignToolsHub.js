@@ -9,7 +9,8 @@ import {
   Smartphone,
   Monitor,
   Ruler,
-  Sparkles
+  Sparkles,
+  Box
 } from 'lucide-react';
 
 /**
@@ -19,6 +20,7 @@ import {
  * - Color Palette Extractor 
  * - AR Furniture Preview (Desktop + Mobile)
  * - Lighting Simulator
+ * - 3D Room Scanner (Desktop + Mobile)
  */
 export default function DesignToolsHub({ projectId: propProjectId }) {
   const navigate = useNavigate();
@@ -26,6 +28,17 @@ export default function DesignToolsHub({ projectId: propProjectId }) {
   const projectId = propProjectId || paramProjectId;
 
   const tools = [
+    {
+      id: 'room-scanner',
+      name: '3D Room Scanner',
+      description: 'Capture room dimensions using your phone camera - perfect for on-site measurements!',
+      icon: Box,
+      color: 'from-cyan-500 to-teal-600',
+      borderColor: '#14B8A6',
+      platforms: ['desktop', 'mobile'],
+      route: `/project/${projectId}/design-tools/room-scanner`,
+      features: ['Camera-guided scan', 'AI dimension estimation', 'Add doors & windows', 'Export floor plans']
+    },
     {
       id: 'layout-planner',
       name: 'Furniture Layout Planner',
