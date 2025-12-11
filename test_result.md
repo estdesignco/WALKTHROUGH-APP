@@ -1076,3 +1076,46 @@ The 3D Room Scanner represents a **major enhancement** to the Design Tools Suite
 **Minor Issues**: JavaScript calculation errors (non-critical) - functionality works correctly
 
 **Recommendation**: 3D Room Scanner is production-ready and provides significant value for on-site room measurements.
+
+## TRADE DISCOUNT MANAGER & SAMPLE TRACKING (December 2024)
+
+### Trade Discount Manager ✅
+- **Location**: Project Detail Page > "Trade Discounts" tab
+- **Component**: `/app/frontend/src/components/TradeDiscountManager.js`
+- **Features**:
+  - Track vendor discount percentages
+  - Tier system (Trade, Bronze, Silver, Gold, Platinum)
+  - Rep contact info (name, email, phone)
+  - Account numbers and payment terms
+  - Expiration date tracking with status indicators
+  - Category tags (Furniture, Lighting, Fabric, etc.)
+  - **Price Calculator** modal - calculate trade price from retail
+  - Export to CSV
+  - Search & filter by tier, status
+
+### Sample Tracking ✅
+- **Location**: Project Detail Page > "Samples" tab
+- **Component**: `/app/frontend/src/components/SampleTracker.js`
+- **Features**:
+  - Track fabric, material, and finish samples
+  - Sample types: Fabric, Wallcovering, Tile, Stone, Wood, Carpet, Hardware, Paint
+  - Status tracking: Requested, Shipped, Received, In Use, Returned, Overdue
+  - Link samples to rooms
+  - Return tracking with due date alerts
+  - Tracking numbers
+  - Quick actions: Mark Received, Mark Returned
+  - Export to CSV
+  - Search & filter by type, status
+
+### Backend Endpoints Added
+**Trade Discounts:**
+- `GET /api/trade-discounts`
+- `POST /api/trade-discounts`
+- `PUT /api/trade-discounts`
+- `DELETE /api/trade-discounts/{discount_id}`
+
+**Samples:**
+- `GET /api/samples`
+- `POST /api/samples`
+- `PUT /api/samples`
+- `DELETE /api/samples/{sample_id}`
