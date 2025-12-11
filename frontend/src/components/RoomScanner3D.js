@@ -799,7 +799,7 @@ export default function RoomScanner3D() {
                                 <div key={feature.id} className="flex items-center justify-between p-2 rounded bg-black/30">
                                   <span className="text-sm text-gray-300 flex items-center gap-2">
                                     {feature.type === 'door' ? '🚪' : '🪟'}
-                                    {feature.type} - {feature.width}' × {feature.height}'
+                                    {feature.type} - {feature.width}&apos; × {feature.height}&apos;
                                   </span>
                                   <button
                                     onClick={(e) => { e.stopPropagation(); removeFeature(wall.id, feature.id); }}
@@ -829,11 +829,11 @@ export default function RoomScanner3D() {
                     <p className="text-gray-400 text-sm">Sq Ft</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{calculatePerimeter().toFixed(0)}'</p>
+                    <p className="text-2xl font-bold text-white">{calculatePerimeter().toFixed(0)}&apos;</p>
                     <p className="text-gray-400 text-sm">Perimeter</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{ceilingHeight}'</p>
+                    <p className="text-2xl font-bold text-white">{ceilingHeight}&apos;</p>
                     <p className="text-gray-400 text-sm">Ceiling</p>
                   </div>
                 </div>
