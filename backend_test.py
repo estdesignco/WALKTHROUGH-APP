@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Configuration
-BACKEND_URL = "https://designstudio-app-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://designerai.preview.emergentagent.com/api"
 CORRECT_PROJECT_ID = "08fbc6ea-7c44-48ba-8a2f-e830b546dae5"
 
 class BackendTester:

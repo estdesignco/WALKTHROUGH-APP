@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://designstudio-app-1.preview.emergentagent.com/*"
+    "https://designerai.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

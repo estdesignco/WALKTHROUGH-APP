@@ -9,7 +9,7 @@ import json
 from typing import Dict, Any
 
 # Backend URL from environment
-BACKEND_URL = "https://designstudio-app-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://designerai.preview.emergentagent.com/api"
 
 # Project ID from review request
 PROJECT_ID = "5d42e515-f84b-4c3d-a4cc-6c3dcc4417a2"

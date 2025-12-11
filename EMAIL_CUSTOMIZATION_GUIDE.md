@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://designstudio-app-1.preview.emergentagent.com/email-template.html
+https://designerai.preview.emergentagent.com/email-template.html
 
 ---
 

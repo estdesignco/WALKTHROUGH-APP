@@ -429,7 +429,7 @@ The Design Studio App backend is **production-ready** with:
 
 **Test Date**: December 10, 2024  
 **Test Type**: Final verification of ALL frontend features  
-**App URL**: https://designstudio-app-1.preview.emergentagent.com  
+**App URL**: https://designerai.preview.emergentagent.com  
 **Test Result**: 100% PASS - All critical paths working perfectly
 
 ### Critical Paths Tested ✅

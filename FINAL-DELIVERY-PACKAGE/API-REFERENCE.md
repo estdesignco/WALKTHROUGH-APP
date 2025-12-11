@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://designstudio-app-1.preview.emergentagent.com/api
+https://designerai.preview.emergentagent.com/api
 ```
 
 ---
