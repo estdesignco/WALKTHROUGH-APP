@@ -105,53 +105,87 @@ async def clear_room_furniture(request: dict):
         room_image = request.get('room_image_base64')
         keep_elements = request.get('keep_elements', [])
         
-        # Use GPT-5 vision to analyze the room first
+        # Use GPT-5 vision to analyze the room in EXTREME detail
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"clear-room-{datetime.now().timestamp()}",
-            system_message="You are an expert at analyzing interior spaces and describing them in detail for AI image generation."
+            system_message="""You are an expert interior photographer. Your job is to describe rooms 
+in EXTREME photographic detail so an AI image generator can recreate them perfectly. 
+Be incredibly specific about architecture, materials, lighting, and camera angle."""
         ).with_model("openai", "gpt-5")
         
-        # Analyze the room
+        # Analyze the room in EXTREME detail
         image_content = ImageContent(image_base64=room_image)
-        analysis_prompt = f"""Analyze this room photo and describe:
-1. Room type and dimensions (estimated)
-2. Architectural features (windows, doors, fireplace, built-ins)
-3. Current flooring type
-4. Wall color/treatment
-5. Ceiling details
-6. Lighting (natural and fixtures)
-7. All furniture pieces present
+        analysis_prompt = f"""Analyze this room photo in EXTREME DETAIL for AI image recreation:
 
-Elements to KEEP in the cleared room: {', '.join(keep_elements) if keep_elements else 'None - clear everything'}
+1. ROOM ARCHITECTURE (be VERY specific):
+   - Exact room shape and estimated dimensions in feet
+   - Wall positions and angles relative to camera
+   - Window positions, sizes, shapes, styles (mullions, frame type, how many panes)
+   - Door positions and styles
+   - Ceiling type and height estimate (flat, coffered, vaulted?)
+   - Any architectural details (crown molding, baseboards, built-ins, fireplace, columns)
 
-Provide a detailed description I can use to regenerate this room EMPTY of furniture but keeping the architecture."""
+2. MATERIALS & FINISHES:
+   - Floor: material type, color, pattern/direction, finish
+   - Walls: color (be specific - warm white? cool white? cream?), finish type
+   - Ceiling: color and texture
+   - Window frames: material and color
+   - Any trim/molding colors
+
+3. LIGHTING CONDITIONS (critical for matching):
+   - Natural light: which direction is it coming from?
+   - Time of day (morning, midday, afternoon?)
+   - Light quality (warm golden? cool? neutral?)
+   - Shadow directions and intensity
+   - Any visible light fixtures
+
+4. CAMERA ANGLE & PERSPECTIVE (critical):
+   - Camera height (eye level, lower, higher?)
+   - Viewing angle (straight into room? corner view? from doorway?)
+   - Distance from nearest wall
+   - What's visible at edges of frame
+   - Lens feel (wide angle distortion? normal lens?)
+
+5. FURNITURE & ITEMS TO REMOVE:
+   - List every piece of furniture with location
+   - List all decor items, rugs, plants
+
+Elements to KEEP: {', '.join(keep_elements) if keep_elements else 'architectural features only'}
+
+Provide an EXTREMELY detailed description to recreate this EXACT room empty of furniture."""
 
         analysis_msg = UserMessage(text=analysis_prompt, file_contents=[image_content])
         room_analysis = await chat.send_message(analysis_msg)
         
-        # Generate the cleared room - PHOTOREALISTIC NOT CGI
-        clear_prompt = f"""REAL PHOTOGRAPH - NOT CGI OR 3D RENDER - of an empty interior room:
+        # Generate the cleared room - PHOTOREALISTIC matching the original
+        clear_prompt = f"""PHOTOREALISTIC PHOTOGRAPH of this EXACT room shown empty:
 
+ROOM TO RECREATE (MATCH THESE DETAILS EXACTLY):
 {room_analysis}
 
-CRITICAL - THIS MUST LOOK LIKE A REAL PHOTOGRAPH:
-- Shot with a professional DSLR camera (Canon 5D or similar)
-- Natural imperfections - slight lens distortion, realistic shadows
-- Real photography lighting - not perfect CGI lighting
-- Visible texture in materials - wood grain, fabric weave, paint texture
-- Slight depth of field blur on edges
-- Real-world color grading like Architectural Digest or Elle Decor magazine
-- NO CGI look, NO video game aesthetic, NO 3D render appearance
-- Should be indistinguishable from a real estate listing photo
+CRITICAL - THIS MUST LOOK LIKE A PHOTOGRAPH OF THE SAME ROOM:
+- Must match the EXACT architecture described above
+- Must match the EXACT camera angle and perspective
+- Must match the EXACT lighting direction and quality
+- Must match the EXACT materials and finishes
 
-ROOM REQUIREMENTS:
-- Remove ALL furniture, rugs, and decor
-- Keep exact same architecture, windows, doors
-- Keep same flooring, wall color, ceiling
+PHOTOREALISM REQUIREMENTS:
+- Shot with professional DSLR camera
+- Natural photography characteristics (slight depth of field, realistic shadows)
+- Real material textures visible (wood grain, paint texture)
+- Magazine quality like Architectural Digest photo
+- NO CGI look, NO 3D render aesthetic, NO video game graphics
+- Must be indistinguishable from a real photograph
+
+ROOM MODIFICATIONS:
+- REMOVE ALL furniture, rugs, and decor
+- Keep EXACT same architecture, windows, doors
+- Keep same flooring (show full floor now visible)
+- Keep same wall color and ceiling
 - Keep built-in features: {', '.join(keep_elements) if keep_elements else 'fireplace, built-in shelves if present'}
-- Same natural lighting conditions and camera angle
-- Professional interior photography quality"""
+- Same natural lighting conditions
+- Same camera angle exactly"""
 
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         images = await image_gen.generate_images(
