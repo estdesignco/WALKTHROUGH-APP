@@ -243,19 +243,6 @@ const MainDashboard = () => {
             <div className="text-2xl mb-2">🤖</div>
             <div className="text-sm font-medium">AI Assistant</div>
           </button>
-          
-          <button
-            onClick={() => handleNavigation('/room-studio')}
-            className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
-            style={{
-              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              border: '1px solid #d4af37',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            <div className="text-2xl mb-2">🎨</div>
-            <div className="text-sm font-medium">Room Studio</div>
-          </button>
         </div>
 
         {/* Three Main Action Buttons - NO BORDERS */}
