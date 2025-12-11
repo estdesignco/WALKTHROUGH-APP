@@ -28,6 +28,7 @@ import TeamChat from './TeamChat';
 import PunchList from './PunchList';
 import ShippingTracker from './ShippingTracker';
 import TradeDiscountManager from './TradeDiscountManager';
+import SampleTracker from './SampleTracker';
 
 import EditableQuestionnaireView from './EditableQuestionnaireView';
 
