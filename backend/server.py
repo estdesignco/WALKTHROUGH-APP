@@ -8441,6 +8441,148 @@ async def ai_suggest_punch_items(project_id: str):
         raise HTTPException(status_code=500, detail=f"Failed to generate suggestions: {str(e)}")
 
 # ================================================================================
+# 3D ROOM SCANNER ENDPOINTS
+# Save and retrieve room scan data with wall dimensions
+# ================================================================================
+
+class RoomScanWall(BaseModel):
+    """Model for a wall in a room scan"""
+    id: int
+    name: str
+    length: float
+    height: float
+    features: List[dict] = []
+
+class RoomScanData(BaseModel):
+    """Model for room scan data"""
+    project_id: str
+    name: str
+    walls: List[dict]
+    ceiling_height: float = 9.0
+    area: Optional[float] = None
+    perimeter: Optional[float] = None
+    photos: Optional[List[dict]] = []
+    scanned_at: Optional[str] = None
+    notes: Optional[str] = None
+
+@api_router.post("/room-scans")
+async def save_room_scan(scan_data: RoomScanData):
+    """Save a room scan with dimensions"""
+    try:
+        scan_id = str(uuid.uuid4())
+        
+        room_scan = {
+            "id": scan_id,
+            **scan_data.dict(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.room_scans.insert_one(room_scan)
+        room_scan.pop('_id', None)
+        
+        logger.info(f"📐 Room scan saved: {scan_id} - {scan_data.name} for project {scan_data.project_id}")
+        
+        return {
+            "success": True,
+            "scan": room_scan
+        }
+        
+    except Exception as e:
+        logger.error(f"Save room scan error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to save room scan: {str(e)}")
+
+@api_router.get("/room-scans/project/{project_id}")
+async def get_room_scans(project_id: str):
+    """Get all room scans for a project"""
+    try:
+        scans = await db.room_scans.find(
+            {"project_id": project_id}, 
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(100)
+        
+        return {
+            "success": True,
+            "scans": scans,
+            "count": len(scans)
+        }
+        
+    except Exception as e:
+        logger.error(f"Get room scans error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get room scans: {str(e)}")
+
+@api_router.get("/room-scans/{scan_id}")
+async def get_room_scan(scan_id: str):
+    """Get a specific room scan"""
+    try:
+        scan = await db.room_scans.find_one({"id": scan_id}, {"_id": 0})
+        
+        if not scan:
+            raise HTTPException(status_code=404, detail="Room scan not found")
+        
+        return {
+            "success": True,
+            "scan": scan
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Get room scan error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get room scan: {str(e)}")
+
+@api_router.patch("/room-scans/{scan_id}")
+async def update_room_scan(scan_id: str, updates: dict):
+    """Update a room scan"""
+    try:
+        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+        
+        result = await db.room_scans.update_one(
+            {"id": scan_id},
+            {"$set": updates}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Room scan not found")
+        
+        scan = await db.room_scans.find_one({"id": scan_id}, {"_id": 0})
+        
+        logger.info(f"📐 Room scan updated: {scan_id}")
+        
+        return {
+            "success": True,
+            "scan": scan
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Update room scan error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update room scan: {str(e)}")
+
+@api_router.delete("/room-scans/{scan_id}")
+async def delete_room_scan(scan_id: str):
+    """Delete a room scan"""
+    try:
+        result = await db.room_scans.delete_one({"id": scan_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Room scan not found")
+        
+        logger.info(f"📐 Room scan deleted: {scan_id}")
+        
+        return {
+            "success": True,
+            "message": "Room scan deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Delete room scan error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete room scan: {str(e)}")
+
+# ================================================================================
 # TEAM CHAT ENDPOINTS
 # Real-time team chat functionality with phone number identification
 # ================================================================================
