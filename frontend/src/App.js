@@ -198,6 +198,27 @@ const App = () => {
             path="/room-studio" 
             element={<RoomRenderingStudio />}
           />
+          {/* Design Tools Suite - Full Screen Experiences */}
+          <Route 
+            path="/project/:projectId/design-tools" 
+            element={<DesignToolsHub />}
+          />
+          <Route 
+            path="/project/:projectId/design-tools/layout-planner" 
+            element={<FurnitureLayoutPlanner />}
+          />
+          <Route 
+            path="/project/:projectId/design-tools/color-extractor" 
+            element={<ColorPaletteExtractor />}
+          />
+          <Route 
+            path="/project/:projectId/design-tools/ar-preview" 
+            element={<ARFurniturePreview />}
+          />
+          <Route 
+            path="/project/:projectId/design-tools/lighting-simulator" 
+            element={<LightingSimulator />}
+          />
           <Route 
             path="/customer/questionnaire" 
             element={<CustomerfacingQuestionnaire />}
