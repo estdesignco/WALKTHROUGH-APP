@@ -408,7 +408,7 @@ export default function RoomScanner3D() {
               fontSize="12"
               fontWeight="bold"
             >
-              {wp.wall?.name}: {wp.wall?.length}' 
+              {wp.wall?.name}: {wp.wall?.length}&apos; 
             </text>
           </g>
         ))}
