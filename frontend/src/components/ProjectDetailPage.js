@@ -898,11 +898,6 @@ export default function ProjectDetailPage() {
                 <AIDesignDashboard project={project} />
             </div>
         ) },
-        { name: "Room Studio", icon: PaintBucket, component: (
-            <div className="room-studio-content">
-                <RoomRenderingStudio />
-            </div>
-        ) },
         { name: "Design Tools", icon: Layout, component: project ? (
             <div className="design-tools-hub-content">
                 <DesignToolsHub projectId={projectId} />
