@@ -8704,6 +8704,134 @@ async def delete_trade_discount(discount_id: str):
         raise HTTPException(status_code=500, detail=f"Failed to delete discount: {str(e)}")
 
 # ================================================================================
+# SAMPLE TRACKING ENDPOINTS
+# Track fabric, material, and finish samples
+# ================================================================================
+
+class SampleData(BaseModel):
+    """Model for sample tracking data"""
+    name: str
+    vendor: str
+    type: str = "fabric"
+    sku: Optional[str] = None
+    color: Optional[str] = None
+    room: Optional[str] = None
+    status: str = "requested"
+    request_date: Optional[str] = None
+    expected_date: Optional[str] = None
+    received_date: Optional[str] = None
+    returned_date: Optional[str] = None
+    tracking_number: Optional[str] = None
+    notes: Optional[str] = None
+    image_url: Optional[str] = None
+    cost: float = 0
+    return_required: bool = False
+    return_by: Optional[str] = None
+    project_id: Optional[str] = None
+
+@api_router.get("/samples")
+async def get_samples(project_id: Optional[str] = None):
+    """Get all samples, optionally filtered by project"""
+    try:
+        query = {}
+        if project_id:
+            query["project_id"] = project_id
+            
+        samples = await db.samples.find(query, {"_id": 0}).to_list(500)
+        
+        return {
+            "success": True,
+            "samples": samples,
+            "count": len(samples)
+        }
+        
+    except Exception as e:
+        logger.error(f"Get samples error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get samples: {str(e)}")
+
+@api_router.post("/samples")
+async def create_sample(sample_data: SampleData):
+    """Create a new sample"""
+    try:
+        sample_id = str(uuid.uuid4())
+        
+        sample = {
+            "id": sample_id,
+            **sample_data.dict(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.samples.insert_one(sample)
+        sample.pop('_id', None)
+        
+        logger.info(f"📦 Sample created: {sample_id} - {sample_data.name}")
+        
+        return {
+            "success": True,
+            "sample": sample
+        }
+        
+    except Exception as e:
+        logger.error(f"Create sample error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create sample: {str(e)}")
+
+@api_router.put("/samples")
+async def update_sample(sample_data: dict):
+    """Update a sample"""
+    try:
+        sample_id = sample_data.get('id')
+        if not sample_id:
+            raise HTTPException(status_code=400, detail="Sample ID required")
+        
+        sample_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+        
+        result = await db.samples.update_one(
+            {"id": sample_id},
+            {"$set": sample_data}
+        )
+        
+        if result.matched_count == 0:
+            await db.samples.insert_one(sample_data)
+        
+        sample = await db.samples.find_one({"id": sample_id}, {"_id": 0})
+        
+        logger.info(f"📦 Sample updated: {sample_id}")
+        
+        return {
+            "success": True,
+            "sample": sample
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Update sample error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update sample: {str(e)}")
+
+@api_router.delete("/samples/{sample_id}")
+async def delete_sample(sample_id: str):
+    """Delete a sample"""
+    try:
+        result = await db.samples.delete_one({"id": sample_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Sample not found")
+        
+        logger.info(f"📦 Sample deleted: {sample_id}")
+        
+        return {
+            "success": True,
+            "message": "Sample deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Delete sample error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete sample: {str(e)}")
+
+# ================================================================================
 # TEAM CHAT ENDPOINTS
 # Real-time team chat functionality with phone number identification
 # ================================================================================
