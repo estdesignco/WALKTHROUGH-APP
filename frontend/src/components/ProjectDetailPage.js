@@ -928,6 +928,11 @@ export default function ProjectDetailPage() {
                 <TradeDiscountManager projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading discounts...</div> },
+        { name: "Samples", icon: Package, component: project ? (
+            <div className="samples-content">
+                <SampleTracker projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading samples...</div> },
     ];
 
     if (isLoading) {
