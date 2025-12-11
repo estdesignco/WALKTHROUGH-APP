@@ -8583,6 +8583,127 @@ async def delete_room_scan(scan_id: str):
         raise HTTPException(status_code=500, detail=f"Failed to delete room scan: {str(e)}")
 
 # ================================================================================
+# TRADE DISCOUNT MANAGER ENDPOINTS
+# Manage vendor discounts and trade pricing
+# ================================================================================
+
+class TradeDiscountData(BaseModel):
+    """Model for trade discount data"""
+    vendor_name: str
+    vendor_id: Optional[str] = None
+    discount_percent: float
+    tier: str = "trade"  # trade, bronze, silver, gold, platinum
+    account_number: Optional[str] = None
+    rep_name: Optional[str] = None
+    rep_email: Optional[str] = None
+    rep_phone: Optional[str] = None
+    expiration_date: Optional[str] = None
+    notes: Optional[str] = None
+    categories: List[str] = []
+    min_order: float = 0
+    terms: str = "Net 30"
+
+@api_router.get("/trade-discounts")
+async def get_trade_discounts():
+    """Get all trade discounts"""
+    try:
+        discounts = await db.trade_discounts.find({}, {"_id": 0}).to_list(500)
+        
+        return {
+            "success": True,
+            "discounts": discounts,
+            "count": len(discounts)
+        }
+        
+    except Exception as e:
+        logger.error(f"Get trade discounts error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get discounts: {str(e)}")
+
+@api_router.post("/trade-discounts")
+async def create_trade_discount(discount_data: TradeDiscountData):
+    """Create a new trade discount"""
+    try:
+        discount_id = str(uuid.uuid4())
+        
+        discount = {
+            "id": discount_id,
+            **discount_data.dict(),
+            "status": "active",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.trade_discounts.insert_one(discount)
+        discount.pop('_id', None)
+        
+        logger.info(f"💰 Trade discount created: {discount_id} - {discount_data.vendor_name}")
+        
+        return {
+            "success": True,
+            "discount": discount
+        }
+        
+    except Exception as e:
+        logger.error(f"Create trade discount error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create discount: {str(e)}")
+
+@api_router.put("/trade-discounts")
+async def update_trade_discount(discount_data: dict):
+    """Update a trade discount"""
+    try:
+        discount_id = discount_data.get('id')
+        if not discount_id:
+            raise HTTPException(status_code=400, detail="Discount ID required")
+        
+        discount_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+        
+        result = await db.trade_discounts.update_one(
+            {"id": discount_id},
+            {"$set": discount_data}
+        )
+        
+        if result.matched_count == 0:
+            # Create new if doesn't exist
+            await db.trade_discounts.insert_one(discount_data)
+        
+        discount = await db.trade_discounts.find_one({"id": discount_id}, {"_id": 0})
+        
+        logger.info(f"💰 Trade discount updated: {discount_id}")
+        
+        return {
+            "success": True,
+            "discount": discount
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Update trade discount error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update discount: {str(e)}")
+
+@api_router.delete("/trade-discounts/{discount_id}")
+async def delete_trade_discount(discount_id: str):
+    """Delete a trade discount"""
+    try:
+        result = await db.trade_discounts.delete_one({"id": discount_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Discount not found")
+        
+        logger.info(f"💰 Trade discount deleted: {discount_id}")
+        
+        return {
+            "success": True,
+            "message": "Discount deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Delete trade discount error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete discount: {str(e)}")
+
+# ================================================================================
 # TEAM CHAT ENDPOINTS
 # Real-time team chat functionality with phone number identification
 # ================================================================================
