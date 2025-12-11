@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useSearchParams, useNavigate } from "react-router-dom";
-import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText, Calculator, Users, Sparkles, Home, Package, Phone, Ruler, Bot, PaintBucket, MessageSquare, Clipboard, Truck, Layout } from "lucide-react";
+import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText, Calculator, Users, Sparkles, Home, Package, Phone, Ruler, Bot, PaintBucket, MessageSquare, Clipboard, Truck, Layout, Percent } from "lucide-react";
 import EditInput from './EditInput';
 import WalkthroughDashboard from './WalkthroughDashboard';
 import ContactSheet from './ContactSheet';
@@ -27,6 +27,7 @@ import RoomRenderingStudio from './RoomRenderingStudio';
 import TeamChat from './TeamChat';
 import PunchList from './PunchList';
 import ShippingTracker from './ShippingTracker';
+import TradeDiscountManager from './TradeDiscountManager';
 
 import EditableQuestionnaireView from './EditableQuestionnaireView';
 
