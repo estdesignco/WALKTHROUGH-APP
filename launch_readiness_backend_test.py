@@ -13,7 +13,7 @@ from typing import Dict, Any, List
 
 # Configuration
 BACKEND_URL = "https://designerai.preview.emergentagent.com/api"
-PROJECT_ID = "08fbc6ea-7c44-48ba-8a2f-e830b546dae5"  # Modern Kitchen Design project
+PROJECT_ID = "3881a2be-300c-46de-90d0-a03c6f068e1b"  # Modern Kitchen Design project
 
 class LaunchReadinessTester:
     def __init__(self):
