@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useSearchParams, useNavigate } from "react-router-dom";
-import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText, Calculator, Users, Sparkles, Home, Package, Phone, Ruler, Bot, PaintBucket, MessageSquare, Clipboard, Truck } from "lucide-react";
+import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText, Calculator, Users, Sparkles, Home, Package, Phone, Ruler, Bot, PaintBucket, MessageSquare, Clipboard, Truck, Layout } from "lucide-react";
 import EditInput from './EditInput';
 import WalkthroughDashboard from './WalkthroughDashboard';
 import ContactSheet from './ContactSheet';
@@ -15,6 +15,7 @@ import FinanceDashboard from './FinanceDashboard';
 import InstallationCalendar from './InstallationCalendar';
 import ReportsDashboard from './ReportsDashboard';
 import DesignToolsDashboard from './DesignToolsDashboard';
+import DesignToolsHub from './DesignToolsHub';
 import AutomationDashboard from './AutomationDashboard';
 import ExportsDashboard from './ExportsDashboard';
 import CalculatorDashboard from './CalculatorDashboard';
