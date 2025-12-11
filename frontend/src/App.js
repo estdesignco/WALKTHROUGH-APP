@@ -221,6 +221,10 @@ const App = () => {
             element={<LightingSimulator />}
           />
           <Route 
+            path="/project/:projectId/design-tools/room-scanner" 
+            element={<RoomScanner3D />}
+          />
+          <Route 
             path="/customer/questionnaire" 
             element={<CustomerfacingQuestionnaire />}
           />
