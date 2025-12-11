@@ -189,7 +189,15 @@ export default function DesignToolsHub({ projectId: propProjectId }) {
           <Ruler size={20} />
           Pro Tips
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+          <div className="flex gap-3">
+            <div className="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center flex-shrink-0">
+              <Box size={16} className="text-teal-400" />
+            </div>
+            <p className="text-gray-400">
+              <strong className="text-gray-300">Room Scanner:</strong> Point at corners for best dimension accuracy
+            </p>
+          </div>
           <div className="flex gap-3">
             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
               <Layout size={16} className="text-blue-400" />
