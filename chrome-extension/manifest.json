@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://designerai.preview.emergentagent.com/*"
+    "https://interiortools-1.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

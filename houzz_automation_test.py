@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 # Configuration
-API_BASE = "https://designerai.preview.emergentagent.com/api"
+API_BASE = "https://interiortools-1.preview.emergentagent.com/api"
 
 def print_header(title):
     """Print formatted test header"""

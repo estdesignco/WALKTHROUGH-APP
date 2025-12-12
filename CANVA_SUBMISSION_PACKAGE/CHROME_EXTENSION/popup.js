@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://designerai.preview.emergentagent.com';
+const BACKEND_URL = 'https://interiortools-1.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings
