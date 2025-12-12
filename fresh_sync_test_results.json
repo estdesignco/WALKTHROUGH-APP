@@ -1,0 +1,127 @@
+[
+  {
+    "test": "Create Test Project",
+    "success": true,
+    "details": "Created project: dbcbc486-d12c-4ee0-ae5f-41b13870a221",
+    "timestamp": "2025-12-12T18:25:21.293619",
+    "response_data": null
+  },
+  {
+    "test": "Create Walkthrough Room",
+    "success": true,
+    "details": "Created room with 3 items with vendor data",
+    "timestamp": "2025-12-12T18:25:21.472679",
+    "response_data": null
+  },
+  {
+    "test": "Initial Sync Status",
+    "success": true,
+    "details": "Before sync - Walkthrough: 76 items (2 picked), Checklist: 0 items",
+    "timestamp": "2025-12-12T18:25:21.526336",
+    "response_data": {
+      "success": true,
+      "walkthrough": {
+        "rooms": 1,
+        "items": 76,
+        "picked_items": 2,
+        "room_names": [
+          "Test Kitchen"
+        ]
+      },
+      "checklist": {
+        "rooms": 0,
+        "items": 0,
+        "room_names": []
+      },
+      "needs_sync": true
+    }
+  },
+  {
+    "test": "Sync Picked Items",
+    "success": true,
+    "details": "Synced 1 rooms, 2 items (PICKED only)",
+    "timestamp": "2025-12-12T18:25:21.596320",
+    "response_data": {
+      "success": true,
+      "message": "Sync complete! Created 1 new rooms, synced 2 items",
+      "synced_rooms": 1,
+      "synced_items": 2,
+      "details": [
+        {
+          "room": "Test Kitchen",
+          "categories": 8
+        }
+      ]
+    }
+  },
+  {
+    "test": "Post-Sync Status",
+    "success": true,
+    "details": "After PICKED sync - Walkthrough: 76 items (2 picked), Checklist: 2 items",
+    "timestamp": "2025-12-12T18:25:21.610221",
+    "response_data": {
+      "success": true,
+      "walkthrough": {
+        "rooms": 1,
+        "items": 76,
+        "picked_items": 2,
+        "room_names": [
+          "Test Kitchen"
+        ]
+      },
+      "checklist": {
+        "rooms": 1,
+        "items": 2,
+        "room_names": [
+          "Test Kitchen"
+        ]
+      },
+      "needs_sync": false
+    }
+  },
+  {
+    "test": "Vendor Data in Checklist",
+    "success": true,
+    "details": "Found 2 checklist items with vendor data",
+    "timestamp": "2025-12-12T18:25:21.652426",
+    "response_data": [
+      {
+        "name": "Visual Comfort Darlana Chandelier",
+        "vendor": "Visual Comfort",
+        "cost": 1679.0,
+        "link": "https://www.visualcomfort.com/chc2164pn-cg-chapman-myers-darlana-medium-wide-lantern-in-polished-nickel/"
+      },
+      {
+        "name": "48-inch Wolf Range",
+        "vendor": "Sub-Zero Wolf",
+        "cost": 12499.99,
+        "link": "https://www.subzero-wolf.com/wolf/ranges/dual-fuel-range/48-inch-dual-fuel-range-6-burners-infrared-griddle"
+      }
+    ]
+  },
+  {
+    "test": "Sync All Items",
+    "success": true,
+    "details": "Synced 0 rooms, 74 items (ALL items)",
+    "timestamp": "2025-12-12T18:25:21.784487",
+    "response_data": {
+      "success": true,
+      "message": "Sync complete! Created 0 new rooms, synced 74 items",
+      "synced_rooms": 0,
+      "synced_items": 74,
+      "details": [
+        {
+          "room": "Test Kitchen",
+          "categories": 8
+        }
+      ]
+    }
+  },
+  {
+    "test": "Cleanup Test Project",
+    "success": true,
+    "details": "Deleted test project: dbcbc486-d12c-4ee0-ae5f-41b13870a221",
+    "timestamp": "2025-12-12T18:25:21.854599",
+    "response_data": null
+  }
+]
