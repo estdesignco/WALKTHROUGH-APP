@@ -1,0 +1,86 @@
+[
+  {
+    "test": "Sync Status Endpoint",
+    "success": false,
+    "details": "No walkthrough items found. Walkthrough: 0 items, Checklist: 0 items",
+    "timestamp": "2025-12-12T18:23:15.977570",
+    "response_data": {
+      "success": true,
+      "walkthrough": {
+        "rooms": 1,
+        "items": 113,
+        "picked_items": 0,
+        "room_names": [
+          "Kitchen"
+        ]
+      },
+      "checklist": {
+        "rooms": 1,
+        "items": 113,
+        "room_names": [
+          "Kitchen"
+        ]
+      },
+      "needs_sync": false
+    }
+  },
+  {
+    "test": "Sync All Items",
+    "success": true,
+    "details": "Synced 0 rooms, 0 items",
+    "timestamp": "2025-12-12T18:23:16.047903",
+    "response_data": {
+      "success": true,
+      "message": "Sync complete! Created 0 new rooms, synced 0 items",
+      "synced_rooms": 0,
+      "synced_items": 0,
+      "details": [
+        {
+          "room": "Kitchen",
+          "categories": 8
+        }
+      ]
+    }
+  },
+  {
+    "test": "Sync Picked Items",
+    "success": true,
+    "details": "Synced 0 rooms, 0 items (PICKED only) - Expected 0 since no PICKED items",
+    "timestamp": "2025-12-12T18:23:16.113935",
+    "response_data": {
+      "success": true,
+      "message": "Sync complete! Created 0 new rooms, synced 0 items",
+      "synced_rooms": 0,
+      "synced_items": 0,
+      "details": [
+        {
+          "room": "Kitchen",
+          "categories": 8
+        }
+      ]
+    }
+  },
+  {
+    "test": "Data Integrity - Subcategories",
+    "success": true,
+    "details": "Found 2 rooms, 226 total items, 226 in subcategories",
+    "timestamp": "2025-12-12T18:23:16.180424",
+    "response_data": {
+      "rooms": 2,
+      "total_items": 226,
+      "subcategory_items": 226
+    }
+  },
+  {
+    "test": "Metadata Preservation",
+    "success": false,
+    "details": "Items: 226 total, 0 with vendor, 0 with price, 0 with links",
+    "timestamp": "2025-12-12T18:23:16.238005",
+    "response_data": {
+      "total_items": 226,
+      "items_with_vendor": 0,
+      "items_with_price": 0,
+      "items_with_links": 0
+    }
+  }
+]
