@@ -46,8 +46,8 @@ class SyncTester:
                 
                 # Check if response has expected structure
                 if 'walkthrough' in data and 'checklist' in data:
-                    walkthrough_count = data.get('walkthrough', {}).get('total_items', 0)
-                    checklist_count = data.get('checklist', {}).get('total_items', 0)
+                    walkthrough_count = data.get('walkthrough', {}).get('items', 0)
+                    checklist_count = data.get('checklist', {}).get('items', 0)
                     
                     details = f"Walkthrough: {walkthrough_count} items, Checklist: {checklist_count} items"
                     
