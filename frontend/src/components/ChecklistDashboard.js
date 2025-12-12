@@ -292,24 +292,33 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
 
   // Handle sync from walkthrough
   const handleSyncFromWalkthrough = async (syncAll = false) => {
+    console.log('🔄 Sync button clicked, syncAll:', syncAll);
+    
     if (!window.confirm(
       syncAll 
         ? 'Sync ALL items from Walkthrough to Checklist?\n\nThis will copy all room data from your mobile walkthrough to this checklist view.'
         : 'Sync PICKED items from Walkthrough to Checklist?\n\nThis will only copy items that were checked/picked during the walkthrough.'
     )) {
+      console.log('❌ Sync cancelled by user');
       return;
     }
 
     setSyncing(true);
+    const apiUrl = `${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/sync/walkthrough-to-checklist/${projectId}`;
+    console.log('📡 Calling sync API:', apiUrl);
+    
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/sync/walkthrough-to-checklist/${projectId}`, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sync_all: syncAll, include_photos: true })
       });
 
+      console.log('📥 Sync response status:', response.status);
+
       if (response.ok) {
         const result = await response.json();
+        console.log('✅ Sync result:', result);
         alert(`✅ Sync Complete!\n\n${result.message}\n\nNew rooms: ${result.synced_rooms}\nItems synced: ${result.synced_items}`);
         await loadSimpleProject();
         
@@ -320,9 +329,11 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         }
       } else {
         const errData = await response.json();
+        console.error('❌ Sync failed:', errData);
         alert(`❌ Sync failed: ${errData.detail || 'Unknown error'}`);
       }
     } catch (err) {
+      console.error('❌ Sync error:', err);
       alert(`❌ Sync error: ${err.message}`);
     } finally {
       setSyncing(false);
