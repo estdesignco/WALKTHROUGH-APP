@@ -1,0 +1,130 @@
+[
+  {
+    "test": "Setup - Add Vendor Data",
+    "success": true,
+    "details": "Added vendor data to 3 items",
+    "timestamp": "2025-12-12T18:24:25.726379",
+    "response_data": null
+  },
+  {
+    "test": "Sync Status Endpoint",
+    "success": true,
+    "details": "Walkthrough: 113 items (3 picked), Checklist: 113 items",
+    "timestamp": "2025-12-12T18:24:25.780520",
+    "response_data": {
+      "success": true,
+      "walkthrough": {
+        "rooms": 1,
+        "items": 113,
+        "picked_items": 3,
+        "room_names": [
+          "Kitchen"
+        ]
+      },
+      "checklist": {
+        "rooms": 1,
+        "items": 113,
+        "room_names": [
+          "Kitchen"
+        ]
+      },
+      "needs_sync": false
+    }
+  },
+  {
+    "test": "Sync Picked Items",
+    "success": true,
+    "details": "Synced 0 rooms, 0 items (PICKED only)",
+    "timestamp": "2025-12-12T18:24:25.802227",
+    "response_data": {
+      "success": true,
+      "message": "Sync complete! Created 0 new rooms, synced 0 items",
+      "synced_rooms": 0,
+      "synced_items": 0,
+      "details": [
+        {
+          "room": "Kitchen",
+          "categories": 8
+        }
+      ]
+    }
+  },
+  {
+    "test": "Sync All Items",
+    "success": true,
+    "details": "Synced 0 rooms, 0 items (ALL items)",
+    "timestamp": "2025-12-12T18:24:25.903673",
+    "response_data": {
+      "success": true,
+      "message": "Sync complete! Created 0 new rooms, synced 0 items",
+      "synced_rooms": 0,
+      "synced_items": 0,
+      "details": [
+        {
+          "room": "Kitchen",
+          "categories": 8
+        }
+      ]
+    }
+  },
+  {
+    "test": "Subcategory Sync Integrity",
+    "success": true,
+    "details": "Walkthrough: 113 items (113 in subcategories), Checklist: 113 items (113 in subcategories)",
+    "timestamp": "2025-12-12T18:24:25.952370",
+    "response_data": {
+      "walkthrough_items": 113,
+      "checklist_items": 113,
+      "subcategory_walkthrough": 113,
+      "subcategory_checklist": 113
+    }
+  },
+  {
+    "test": "Vendor Data Preservation",
+    "success": false,
+    "details": "Walkthrough: 3/113 items with vendor data, Checklist: 0/113 items with vendor data",
+    "timestamp": "2025-12-12T18:24:26.002943",
+    "response_data": {
+      "walkthrough_vendor_items": 3,
+      "walkthrough_total": 113,
+      "checklist_vendor_items": 0,
+      "checklist_total": 113
+    }
+  },
+  {
+    "test": "Sync Status Endpoint",
+    "success": true,
+    "details": "Walkthrough: 113 items (3 picked), Checklist: 113 items",
+    "timestamp": "2025-12-12T18:24:26.015271",
+    "response_data": {
+      "success": true,
+      "walkthrough": {
+        "rooms": 1,
+        "items": 113,
+        "picked_items": 3,
+        "room_names": [
+          "Kitchen"
+        ]
+      },
+      "checklist": {
+        "rooms": 1,
+        "items": 113,
+        "room_names": [
+          "Kitchen"
+        ]
+      },
+      "needs_sync": false
+    }
+  },
+  {
+    "test": "No Duplicate Creation",
+    "success": true,
+    "details": "Initial: 113 items, After sync: 113 items, Synced: 0 items",
+    "timestamp": "2025-12-12T18:24:26.129604",
+    "response_data": {
+      "initial_count": 113,
+      "final_count": 113,
+      "synced_items": 0
+    }
+  }
+]
