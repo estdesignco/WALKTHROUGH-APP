@@ -18,8 +18,10 @@ export default function TeamChat({
   userPhone = null,
   userName = null,
   compact = false,
-  onUnreadCountChange = null 
+  onUnreadCountChange = null,
+  onBack = null
 }) {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
