@@ -4,7 +4,6 @@ import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTo
 import EditInput from './EditInput';
 import WalkthroughDashboard from './WalkthroughDashboard';
 import ContactSheet from './ContactSheet';
-import FullscreenMoodboard from './FullscreenMoodboard';
 import CriticalPathDashboard from './CriticalPathDashboard';
 
 import ChecklistDashboard from './ChecklistDashboard';
@@ -21,7 +20,7 @@ import ExportsDashboard from './ExportsDashboard';
 import CalculatorDashboard from './CalculatorDashboard';
 import BudgetTracker from './BudgetTracker';
 import VendorContactManager from './VendorContactManager';
-import MaterialLibrary from './MaterialLibrary';
+import MaterialLibraryCatalog from './MaterialLibraryCatalog';
 import AIDesignDashboard from './AIDesignDashboard';
 import RoomRenderingStudio from './RoomRenderingStudio';
 import TeamChat from './TeamChat';
