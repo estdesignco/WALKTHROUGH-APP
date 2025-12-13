@@ -264,17 +264,34 @@ export default function TeamChat({
     );
   }
 
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
     <div 
-      className={`${compact ? 'fixed bottom-4 right-4 w-96 h-[500px] shadow-2xl z-50' : 'w-full h-full'} rounded-xl border border-[#D4A574]/30 overflow-hidden flex flex-col`}
+      className={`${compact ? 'fixed bottom-4 right-4 w-96 h-[500px] shadow-2xl z-50' : 'w-full h-full min-h-[600px]'} rounded-xl border border-[#D4A574]/30 overflow-hidden flex flex-col`}
       style={{ background: 'linear-gradient(135deg, rgba(20,20,30,0.98) 0%, rgba(30,30,40,0.95) 100%)' }}
     >
-      {/* Header */}
+      {/* Header with Back Button */}
       <div 
         className="px-4 py-3 flex items-center justify-between border-b border-[#B49B7E]/20"
         style={{ background: 'linear-gradient(135deg, rgba(212, 165, 116, 0.15) 0%, rgba(180, 155, 126, 0.1) 100%)' }}
       >
         <div className="flex items-center gap-3">
+          {!compact && (
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#D4A574]/20 text-[#D4A574] hover:bg-[#D4A574]/30 transition-colors mr-2"
+            >
+              <ArrowLeft size={18} />
+              <span className="text-sm font-medium">Back</span>
+            </button>
+          )}
           <span className="text-xl">💬</span>
           <div>
             <span className="text-[#D4A574] font-semibold">Team Chat</span>
