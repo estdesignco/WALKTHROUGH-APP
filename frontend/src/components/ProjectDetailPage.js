@@ -841,11 +841,6 @@ export default function ProjectDetailPage() {
                 <DesignToolsDashboard projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading design tools...</div> },
-        { name: "Moodboard", icon: Sparkles, component: project ? (
-            <div className="moodboard-content">
-                <FullscreenMoodboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading moodboard...</div> },
         { name: "Finance", icon: DollarSign, component: project ? (
             <div className="finance-content">
                 <FinanceDashboard projectId={projectId} />
@@ -874,7 +869,7 @@ export default function ProjectDetailPage() {
         ) : <div className="text-center text-stone-300 py-8">Loading vendors...</div> },
         { name: "Materials", icon: Package, component: project ? (
             <div className="materials-content">
-                <MaterialLibrary projectId={projectId} />
+                <MaterialLibraryCatalog projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading materials...</div> },
         { name: "Automation", icon: Zap, component: project ? (
