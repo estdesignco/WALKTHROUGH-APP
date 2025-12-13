@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
