@@ -12397,6 +12397,7 @@ async def create_project_material(material: dict):
             "price_per_unit": material.get("price_per_unit"),
             "unit": material.get("unit", "yard"),
             "swatch_url": material.get("swatch_url", ""),
+            "photo_data": material.get("photo_data", ""),  # Base64 image data
             "notes": material.get("notes", ""),
             "tags": material.get("tags", []),
             "project_id": material.get("project_id"),
