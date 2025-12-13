@@ -9100,6 +9100,62 @@ async def get_contact_roles():
     ]
     return {"roles": roles}
 
+@api_router.post("/contacts")
+async def create_contact(contact: dict):
+    """Create a new contact"""
+    try:
+        contact_doc = {
+            "id": str(uuid.uuid4()),
+            "project_id": contact.get("project_id"),
+            "name": contact.get("name", ""),
+            "phone": contact.get("phone", ""),
+            "email": contact.get("email", ""),
+            "role": contact.get("role", ""),
+            "company": contact.get("company", ""),
+            "address": contact.get("address", ""),
+            "notes": contact.get("notes", ""),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.contacts.insert_one(contact_doc)
+        contact_doc.pop('_id', None)
+        return {"success": True, "contact": contact_doc}
+    except Exception as e:
+        logging.error(f"Create contact error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/contacts/{contact_id}")
+async def update_contact(contact_id: str, updates: dict):
+    """Update a contact"""
+    try:
+        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+        result = await db.contacts.update_one(
+            {"id": contact_id},
+            {"$set": updates}
+        )
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Contact not found")
+        return {"success": True, "message": "Contact updated"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Update contact error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/contacts/{contact_id}")
+async def delete_contact(contact_id: str):
+    """Delete a contact"""
+    try:
+        result = await db.contacts.delete_one({"id": contact_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Contact not found")
+        return {"success": True, "message": "Contact deleted"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Delete contact error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/calendar-events")
 async def get_calendar_events(project_id: str = None):
     """Get calendar events, optionally filtered by project_id"""
