@@ -9078,6 +9078,28 @@ async def get_contacts(project_id: str = None):
         logging.error(f"Get contacts error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/contacts/project/{project_id}")
+async def get_contacts_by_project(project_id: str):
+    """Get contacts for a specific project"""
+    try:
+        contacts = await db.contacts.find({"project_id": project_id}, {"_id": 0}).to_list(length=500)
+        return contacts
+    except Exception as e:
+        logging.error(f"Get project contacts error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/contacts/roles")
+async def get_contact_roles():
+    """Get available contact roles"""
+    roles = [
+        "Interior Designer", "Architect", "Contractor", "Electrician", "Plumber",
+        "Painter", "Carpenter", "Furniture Maker", "Upholsterer", "Drapery Maker",
+        "Wallpaper Installer", "Tile Setter", "Flooring Installer", "HVAC Tech",
+        "AV Installer", "Security", "Landscaper", "Pool Contractor", "Client",
+        "Vendor Rep", "Sales Rep", "Warehouse", "Delivery", "Installer", "Other"
+    ]
+    return {"roles": roles}
+
 @api_router.get("/calendar-events")
 async def get_calendar_events(project_id: str = None):
     """Get calendar events, optionally filtered by project_id"""
