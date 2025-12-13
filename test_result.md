@@ -1484,3 +1484,32 @@ The Walkthrough to Checklist sync is **fully operational** and working perfectly
 - "Sync All Items" → Syncs all walkthrough items regardless of status
 
 **The user should use "Sync All Items" button to sync all walkthrough data to checklist.**
+
+---
+
+## UI IMPROVEMENTS - December 2024
+
+### Changes Made
+1. ✅ **Material Library Revamped** - New catalog-style interface with photo upload support
+   - Pinterest-style masonry grid layout
+   - Direct photo upload (base64) + URL support
+   - Category pills for quick filtering
+   - Grid/List view toggle
+   - Back button added
+
+2. ✅ **Moodboard Tab Removed** - Per user request
+
+3. ✅ **Team Chat Back Button Added** - Better navigation
+
+4. ✅ **Contacts API Fixed** - Added missing endpoints:
+   - GET /api/contacts/project/{project_id}
+   - GET /api/contacts/roles
+   - POST /api/contacts
+   - PUT /api/contacts/{contact_id}
+   - DELETE /api/contacts/{contact_id}
+
+5. ✅ **Materials API Updated** - Added photo_data field for base64 image storage
+
+### Pending Items
+- Pinterest integration (needs API key confirmation from user)
+- Further Team Chat improvements (if needed)
