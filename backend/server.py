@@ -8583,6 +8583,69 @@ async def delete_room_scan(scan_id: str):
         raise HTTPException(status_code=500, detail=f"Failed to delete room scan: {str(e)}")
 
 # ================================================================================
+# PINTEREST INTEGRATION ENDPOINTS
+# Save and manage Pinterest inspiration pins
+# ================================================================================
+
+@api_router.post("/pinterest-pins")
+async def save_pinterest_pin(pin_data: dict):
+    """Save a Pinterest pin to a project"""
+    try:
+        pin_doc = {
+            "id": str(uuid.uuid4()),
+            "project_id": pin_data.get("project_id"),
+            "pin_id": pin_data.get("pin_id"),
+            "title": pin_data.get("title", ""),
+            "image_url": pin_data.get("image_url", ""),
+            "source": pin_data.get("source", "Pinterest"),
+            "category": pin_data.get("category", ""),
+            "room": pin_data.get("room", ""),
+            "saves": pin_data.get("saves", 0),
+            "notes": pin_data.get("notes", ""),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.pinterest_pins.insert_one(pin_doc)
+        pin_doc.pop('_id', None)
+        
+        logger.info(f"📌 Pinterest pin saved: {pin_doc['title']} to project {pin_data.get('project_id')}")
+        
+        return {"success": True, "pin": pin_doc}
+    except Exception as e:
+        logger.error(f"Save Pinterest pin error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/pinterest-pins/{project_id}")
+async def get_pinterest_pins(project_id: str, room: str = None):
+    """Get saved Pinterest pins for a project"""
+    try:
+        query = {"project_id": project_id}
+        if room:
+            query["room"] = room
+        
+        pins = await db.pinterest_pins.find(query, {"_id": 0}).to_list(length=500)
+        return pins
+    except Exception as e:
+        logger.error(f"Get Pinterest pins error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/pinterest-pins/{pin_id}")
+async def delete_pinterest_pin(pin_id: str):
+    """Delete a saved Pinterest pin"""
+    try:
+        result = await db.pinterest_pins.delete_one({"$or": [{"id": pin_id}, {"pin_id": pin_id}]})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Pin not found")
+        
+        return {"success": True, "message": "Pin deleted"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Delete Pinterest pin error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ================================================================================
 # TRADE DISCOUNT MANAGER ENDPOINTS
 # Manage vendor discounts and trade pricing
 # ================================================================================
