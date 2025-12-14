@@ -681,16 +681,15 @@ class BackendTester:
         success, _, _ = self.make_request('GET', f'/chat/messages/{self.project_id}', 
                                         test_name="Get chat messages")
         
-        # POST /api/chat/messages - Send a message
+        # POST /api/chat/send - Send a message
         chat_data = {
             "project_id": self.project_id,
             "sender_name": "Design Team",
             "sender_phone": "555-123-4567",
-            "message": "Kitchen measurements completed. Ready for next phase.",
-            "timestamp": datetime.now().isoformat()
+            "message": "Kitchen measurements completed. Ready for next phase."
         }
         
-        success, created_message, _ = self.make_request('POST', '/chat/messages', 
+        success, created_message, _ = self.make_request('POST', '/chat/send', 
                                                       chat_data, 200,  # Based on previous tests
                                                       "Send chat message")
         if success and created_message:
