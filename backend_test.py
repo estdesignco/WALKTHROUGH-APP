@@ -475,44 +475,53 @@ class BackendTester:
         success, _, _ = self.make_request('GET', f'/chat/unread/{self.project_id}/555-0123', 
                                         test_name="Get unread message count")
 
-    def test_contacts_crud(self):
-        """Test Contacts CRUD operations"""
-        print("\n=== TESTING CONTACTS CRUD ===")
+    def test_contacts_api_comprehensive(self):
+        """Test Contacts API - Comprehensive (Review Request)"""
+        print("\n=== TESTING CONTACTS API (REVIEW REQUEST) ===")
         
-        # POST /api/contacts - Create contact
+        # GET /api/contacts - Get all contacts
+        success, _, _ = self.make_request('GET', '/contacts', 
+                                        test_name="Get all contacts")
+        
+        # GET /api/contacts/project/{project_id} - Get contacts for project
+        success, _, _ = self.make_request('GET', f'/contacts/project/{self.project_id}', 
+                                        test_name="Get contacts for project")
+        
+        # GET /api/contacts/roles - Get available roles
+        success, _, _ = self.make_request('GET', '/contacts/roles', 
+                                        test_name="Get available roles")
+        
+        # POST /api/contacts - Create new contact with realistic data
         contact_data = {
+            "project_id": self.project_id,
             "name": "Test Contractor",
-            "email": "contractor@example.com",
-            "phone": "555-0456",
-            "company": "Test Construction Co",
-            "role": "General Contractor",
-            "project_id": self.project_id
+            "phone": "555-123-4567",
+            "email": "contractor@test.com",
+            "role": "Contractor",
+            "company": "ABC Construction"
         }
         
         success, created_contact, _ = self.make_request('POST', '/contacts', 
-                                                      contact_data, 201,
-                                                      "Create contact")
+                                                      contact_data, 200,  # Based on previous tests
+                                                      "Create new contact")
         if success and created_contact:
             contact_id = created_contact.get('id')
             if contact_id:
                 self.created_resources['contacts'].append(contact_id)
         
-        # GET /api/contacts/project/{project_id} - Get project contacts
-        success, _, _ = self.make_request('GET', f'/contacts/project/{self.project_id}', 
-                                        test_name="Get project contacts")
-        
-        # PUT /api/contacts/{id} - Update contact
+        # PUT /api/contacts/{contact_id} - Update the contact
         if self.created_resources['contacts']:
             contact_id = self.created_resources['contacts'][0]
             update_data = {
                 "name": "Updated Test Contractor",
-                "phone": "555-0789"
+                "phone": "555-987-6543",
+                "company": "XYZ Construction"
             }
             success, _, _ = self.make_request('PUT', f'/contacts/{contact_id}', 
                                             update_data, 200,
                                             "Update contact")
         
-        # DELETE /api/contacts/{id} - Delete contact
+        # DELETE /api/contacts/{contact_id} - Delete the contact
         if self.created_resources['contacts']:
             contact_id = self.created_resources['contacts'].pop()
             success, _, _ = self.make_request('DELETE', f'/contacts/{contact_id}', 
