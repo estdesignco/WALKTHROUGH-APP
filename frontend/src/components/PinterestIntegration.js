@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Search, Grid, Heart, ExternalLink, Save, Loader2, Pin, Image as ImageIcon, X, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const API = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
@@ -8,8 +8,11 @@ const API = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/ap
 /**
  * Pinterest Integration - Browse and save pins for design inspiration
  */
-export default function PinterestIntegration({ projectId, onBack }) {
+export default function PinterestIntegration({ projectId: propProjectId, onBack }) {
   const navigate = useNavigate();
+  const { projectId: paramProjectId } = useParams();
+  const projectId = propProjectId || paramProjectId;
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [savedPins, setSavedPins] = useState([]);
