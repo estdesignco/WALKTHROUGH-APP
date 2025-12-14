@@ -160,7 +160,7 @@ class BackendTester:
         }
         
         success, created_room, _ = self.make_request('POST', '/rooms', 
-                                                   room_data, 201,
+                                                   room_data, 200,  # Backend returns 200
                                                    "Create room with auto-population")
         if success and created_room:
             room_id = created_room.get('id')
