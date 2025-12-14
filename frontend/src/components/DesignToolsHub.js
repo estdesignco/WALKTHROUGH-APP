@@ -10,7 +10,8 @@ import {
   Monitor,
   Ruler,
   Sparkles,
-  Box
+  Box,
+  Pin
 } from 'lucide-react';
 
 /**
