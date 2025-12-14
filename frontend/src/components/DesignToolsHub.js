@@ -17,6 +17,7 @@ import {
 /**
  * Design Tools Hub
  * Central dashboard for all interior design tools:
+ * - Pinterest Integration
  * - Furniture Layout Planner (Desktop)
  * - Color Palette Extractor 
  * - AR Furniture Preview (Desktop + Mobile)
