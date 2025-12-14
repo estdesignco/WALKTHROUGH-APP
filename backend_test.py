@@ -14,7 +14,7 @@ from typing import Dict, Any, List
 
 # Configuration
 BACKEND_URL = "https://interiortools-1.preview.emergentagent.com/api"
-CORRECT_PROJECT_ID = "08fbc6ea-7c44-48ba-8a2f-e830b546dae5"
+CORRECT_PROJECT_ID = "086ccb0a-2a0a-436a-8525-753f0114dbc5"  # Modern Kitchen Design from review request
 
 class BackendTester:
     def __init__(self):
