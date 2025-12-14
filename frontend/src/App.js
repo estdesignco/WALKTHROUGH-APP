@@ -50,6 +50,7 @@ import ColorPaletteExtractor from './components/ColorPaletteExtractor';
 import ARFurniturePreview from './components/ARFurniturePreview';
 import LightingSimulator from './components/LightingSimulator';
 import RoomScanner3D from './components/RoomScanner3D';
+import PinterestIntegration from './components/PinterestIntegration';
 
 const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
 const API = `${BACKEND_URL}/api`;
