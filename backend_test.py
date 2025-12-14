@@ -353,48 +353,9 @@ class BackendTester:
                                         test_name="Sync walkthrough to checklist")
 
     def test_voice_notes_crud(self):
-        """Test Voice Notes CRUD operations"""
-        print("\n=== TESTING VOICE NOTES CRUD ===")
-        
-        # POST /api/voice-notes - Create voice note
-        voice_note_data = {
-            "project_id": self.project_id,
-            "room_name": "Living Room",
-            "audio_url": "https://example.com/audio.mp3",
-            "duration": 30,
-            "transcription": "Test voice note transcription",
-            "notes": "Additional notes"
-        }
-        
-        success, created_note, _ = self.make_request('POST', '/voice-notes', 
-                                                   voice_note_data, 201,
-                                                   "Create voice note")
-        if success and created_note:
-            note_id = created_note.get('id')
-            if note_id:
-                self.created_resources['voice_notes'].append(note_id)
-        
-        # GET /api/voice-notes/project/{id} - Get project voice notes
-        success, _, _ = self.make_request('GET', f'/voice-notes/project/{self.project_id}', 
-                                        test_name="Get project voice notes")
-        
-        # PATCH /api/voice-notes/{id} - Update voice note
-        if self.created_resources['voice_notes']:
-            note_id = self.created_resources['voice_notes'][0]
-            update_data = {
-                "transcription": "Updated transcription",
-                "notes": "Updated notes"
-            }
-            success, _, _ = self.make_request('PATCH', f'/voice-notes/{note_id}', 
-                                            update_data, 200,
-                                            "Update voice note")
-        
-        # DELETE /api/voice-notes/{id} - Delete voice note
-        if self.created_resources['voice_notes']:
-            note_id = self.created_resources['voice_notes'].pop()
-            success, _, _ = self.make_request('DELETE', f'/voice-notes/{note_id}', 
-                                            expected_code=200,
-                                            test_name="Delete voice note")
+        """Test Voice Notes CRUD operations - SKIPPED (covered in review request tests)"""
+        print("\n=== TESTING VOICE NOTES CRUD - SKIPPED ===")
+        print("Voice Notes testing covered in review request section")
 
     def test_punch_list_crud(self):
         """Test Punch List CRUD operations"""
