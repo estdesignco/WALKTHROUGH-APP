@@ -226,6 +226,10 @@ const App = () => {
             element={<RoomScanner3D />}
           />
           <Route 
+            path="/project/:projectId/design-tools/pinterest" 
+            element={<PinterestIntegration />}
+          />
+          <Route 
             path="/customer/questionnaire" 
             element={<CustomerfacingQuestionnaire />}
           />
