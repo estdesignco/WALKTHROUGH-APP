@@ -632,7 +632,7 @@ class BackendTester:
         }
         
         success, created_note, _ = self.make_request('POST', '/voice-notes', 
-                                                   voice_note_data, 200,  # Based on previous tests
+                                                   voice_note_data, 200,  # Backend returns 200
                                                    "Create voice note")
         if success and created_note:
             note_id = created_note.get('id')
