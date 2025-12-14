@@ -175,10 +175,14 @@ export default function PinterestIntegration({ projectId: propProjectId, onBack 
 
   const confirmSavePin = async (room) => {
     if (!selectedPin) return;
+    if (!projectId) {
+      alert('Project ID not found. Please refresh the page.');
+      return;
+    }
     
     setSavingPin(true);
     try {
-      await axios.post(`${API}/pinterest-pins`, {
+      const response = await axios.post(`${API}/pinterest-pins`, {
         project_id: projectId,
         pin_id: selectedPin.id,
         title: selectedPin.title,
@@ -189,12 +193,13 @@ export default function PinterestIntegration({ projectId: propProjectId, onBack 
         saves: selectedPin.saves
       });
       
-      setSavedPins([...savedPins, { ...selectedPin, room }]);
+      console.log('Pin saved successfully:', response.data);
+      setSavedPins([...savedPins, { ...selectedPin, room, image_url: selectedPin.image }]);
       setShowSaveModal(false);
       setSelectedPin(null);
     } catch (error) {
       console.error('Error saving pin:', error);
-      alert('Failed to save pin');
+      alert('Failed to save pin: ' + (error.response?.data?.detail || error.message));
     } finally {
       setSavingPin(false);
     }
