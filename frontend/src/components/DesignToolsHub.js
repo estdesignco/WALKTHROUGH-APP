@@ -31,6 +31,17 @@ export default function DesignToolsHub({ projectId: propProjectId }) {
 
   const tools = [
     {
+      id: 'pinterest',
+      name: 'Pinterest Inspiration',
+      description: 'Browse Pinterest for design ideas and save your favorites to your project',
+      icon: Pin,
+      color: 'from-red-500 to-red-700',
+      borderColor: '#E60023',
+      platforms: ['desktop', 'mobile'],
+      route: `/project/${projectId}/design-tools/pinterest`,
+      features: ['Browse inspiration', 'Save to rooms', 'Category filters', 'Design ideas']
+    },
+    {
       id: 'room-scanner',
       name: '3D Room Scanner',
       description: 'Capture room dimensions using your phone camera - perfect for on-site measurements!',
