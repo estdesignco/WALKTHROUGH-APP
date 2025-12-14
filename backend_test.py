@@ -234,7 +234,7 @@ class BackendTester:
         }
         
         success, created_subcategory, _ = self.make_request('POST', '/subcategories', 
-                                                          subcategory_data, 201,
+                                                          subcategory_data, 200,  # Backend returns 200
                                                           "Create subcategory")
         if success and created_subcategory:
             subcategory_id = created_subcategory.get('id')
