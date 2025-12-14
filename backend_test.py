@@ -701,16 +701,16 @@ class BackendTester:
         """Test Design Tools APIs (Review Request)"""
         print("\n=== TESTING DESIGN TOOLS APIs (REVIEW REQUEST) ===")
         
-        # GET /api/room-scans/{project_id} - Get 3D room scans
-        success, _, _ = self.make_request('GET', f'/room-scans/{self.project_id}', 
+        # GET /api/room-scans/project/{project_id} - Get 3D room scans
+        success, _, _ = self.make_request('GET', f'/room-scans/project/{self.project_id}', 
                                         test_name="Get 3D room scans")
         
-        # GET /api/trade-discounts/{project_id} - Get trade discounts
-        success, _, _ = self.make_request('GET', f'/trade-discounts/{self.project_id}', 
+        # GET /api/trade-discounts?project_id={project_id} - Get trade discounts
+        success, _, _ = self.make_request('GET', f'/trade-discounts?project_id={self.project_id}', 
                                         test_name="Get trade discounts")
         
-        # GET /api/samples/{project_id} - Get samples
-        success, _, _ = self.make_request('GET', f'/samples/{self.project_id}', 
+        # GET /api/samples?project_id={project_id} - Get samples
+        success, _, _ = self.make_request('GET', f'/samples?project_id={self.project_id}', 
                                         test_name="Get samples")
 
     def test_sync_status_verification(self):
