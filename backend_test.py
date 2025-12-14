@@ -648,8 +648,8 @@ class BackendTester:
         """Test Mobile Features - Punch List (Review Request)"""
         print("\n=== TESTING MOBILE FEATURES - PUNCH LIST (REVIEW REQUEST) ===")
         
-        # GET /api/punch-list/{project_id} - Get punch list items
-        success, _, _ = self.make_request('GET', f'/punch-list/{self.project_id}', 
+        # GET /api/punch-list/project/{project_id} - Get punch list items
+        success, _, _ = self.make_request('GET', f'/punch-list/project/{self.project_id}', 
                                         test_name="Get punch list items")
         
         # POST /api/punch-list - Create punch list item
