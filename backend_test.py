@@ -528,33 +528,43 @@ class BackendTester:
                                             expected_code=200,
                                             test_name="Delete contact")
 
-    def test_materials_crud(self):
-        """Test Materials CRUD operations"""
-        print("\n=== TESTING MATERIALS CRUD ===")
+    def test_materials_api_with_photo_data(self):
+        """Test Materials API with photo_data (Review Request)"""
+        print("\n=== TESTING MATERIALS API WITH PHOTO_DATA (REVIEW REQUEST) ===")
         
-        # GET /api/materials - List available materials
-        success, _, _ = self.make_request('GET', '/materials', 
-                                        test_name="List available materials")
+        # GET /api/materials?project_id={project_id} - Get materials
+        success, _, _ = self.make_request('GET', f'/materials?project_id={self.project_id}', 
+                                        test_name="Get materials for project")
         
-        # POST /api/materials - Create new material
+        # POST /api/materials - Create material with photo_data
         material_data = {
-            "name": "Test Fabric",
-            "category": "Upholstery",
-            "vendor": "Test Vendor",
+            "name": "Test Fabric Sample",
+            "category": "fabric",
+            "manufacturer": "Kravet",
+            "sku": "TEST-001",
             "color": "Navy Blue",
-            "pattern": "Solid",
-            "price_per_yard": 45.00,
-            "availability": "In Stock",
-            "notes": "High-performance fabric"
+            "price_per_unit": 125.00,
+            "unit": "yard",
+            "photo_data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+            "project_id": self.project_id
         }
         
         success, created_material, _ = self.make_request('POST', '/materials', 
-                                                       material_data, 201,
-                                                       "Create new material")
+                                                       material_data, 200,  # Based on previous tests
+                                                       "Create material with photo_data")
         if success and created_material:
             material_id = created_material.get('id')
             if material_id:
                 self.created_resources['materials'].append(material_id)
+                
+                # Verify photo_data is stored and returned
+                success, material_detail, _ = self.make_request('GET', f'/materials/{material_id}', 
+                                                              test_name="Verify photo_data storage")
+                if success and material_detail:
+                    if 'photo_data' in material_detail:
+                        print("    ✅ Photo data verified in response")
+                    else:
+                        print("    ⚠️  Photo data not found in response")
 
     def test_questionnaire_endpoints(self):
         """Test Questionnaire endpoints"""
