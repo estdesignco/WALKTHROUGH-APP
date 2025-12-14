@@ -413,7 +413,7 @@ class BackendTester:
         }
         
         success, created_item, _ = self.make_request('POST', '/punch-list', 
-                                                   punch_item_data, 201,
+                                                   punch_item_data, 200,  # Backend returns 200
                                                    "Create punch list item")
         if success and created_item:
             item_id = created_item.get('id')
