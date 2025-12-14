@@ -767,7 +767,31 @@ class BackendTester:
         
         start_time = time.time()
         
-        # Run all test suites
+        # Run all test suites - REVIEW REQUEST FOCUS
+        print("\n🎯 REVIEW REQUEST TESTING - COMPREHENSIVE BACKEND FEATURES")
+        
+        # 1. CONTACTS API (Newly Added)
+        self.test_contacts_api_comprehensive()
+        
+        # 2. MATERIALS API (Updated with photo_data)
+        self.test_materials_api_with_photo_data()
+        
+        # 3. MOBILE FEATURES - Voice Notes
+        self.test_mobile_voice_notes()
+        
+        # 4. MOBILE FEATURES - Punch List
+        self.test_mobile_punch_list()
+        
+        # 5. TEAM CHAT API
+        self.test_team_chat_api()
+        
+        # 6. DESIGN TOOLS APIs
+        self.test_design_tools_apis()
+        
+        # 7. SYNC STATUS
+        self.test_sync_status_verification()
+        
+        # Additional comprehensive tests
         self.test_projects_crud()
         self.test_rooms_crud()
         self.test_categories_crud()
@@ -778,8 +802,6 @@ class BackendTester:
         self.test_voice_notes_crud()
         self.test_punch_list_crud()  # Includes critical AI suggestions test
         self.test_chat_endpoints()
-        self.test_contacts_crud()
-        self.test_materials_crud()
         self.test_questionnaire_endpoints()
         self.test_vendor_endpoints()
         self.test_autocomplete_endpoints()
