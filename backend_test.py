@@ -618,6 +618,120 @@ class BackendTester:
         success, _, _ = self.make_request('GET', '/finish-library', 
                                         test_name="Finish options library")
 
+    def test_mobile_voice_notes(self):
+        """Test Mobile Features - Voice Notes (Review Request)"""
+        print("\n=== TESTING MOBILE FEATURES - VOICE NOTES (REVIEW REQUEST) ===")
+        
+        # POST /api/voice-notes - Create voice note
+        voice_note_data = {
+            "project_id": self.project_id,
+            "room_name": "Kitchen",
+            "audio_data": "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT",
+            "duration": 15,
+            "transcription": "Kitchen cabinet measurements needed",
+            "notes": "Voice note from mobile walkthrough"
+        }
+        
+        success, created_note, _ = self.make_request('POST', '/voice-notes', 
+                                                   voice_note_data, 200,  # Based on previous tests
+                                                   "Create voice note")
+        if success and created_note:
+            note_id = created_note.get('id')
+            if note_id:
+                self.created_resources['voice_notes'].append(note_id)
+        
+        # GET /api/voice-notes/project/{project_id} - Get voice notes
+        success, _, _ = self.make_request('GET', f'/voice-notes/project/{self.project_id}', 
+                                        test_name="Get voice notes for project")
+
+    def test_mobile_punch_list(self):
+        """Test Mobile Features - Punch List (Review Request)"""
+        print("\n=== TESTING MOBILE FEATURES - PUNCH LIST (REVIEW REQUEST) ===")
+        
+        # GET /api/punch-list/{project_id} - Get punch list items
+        success, _, _ = self.make_request('GET', f'/punch-list/{self.project_id}', 
+                                        test_name="Get punch list items")
+        
+        # POST /api/punch-list - Create punch list item
+        punch_item_data = {
+            "project_id": self.project_id,
+            "title": "Cabinet door alignment issue",
+            "description": "Kitchen upper cabinet door needs adjustment",
+            "priority": "High",
+            "assigned_to": "Site Contractor",
+            "status": "Pending",
+            "room_name": "Kitchen",
+            "category": "Cabinetry",
+            "notes": "Found during walkthrough"
+        }
+        
+        success, created_item, _ = self.make_request('POST', '/punch-list', 
+                                                   punch_item_data, 200,  # Based on previous tests
+                                                   "Create punch list item")
+        if success and created_item:
+            item_id = created_item.get('id')
+            if item_id:
+                self.created_resources['punch_list'].append(item_id)
+
+    def test_team_chat_api(self):
+        """Test Team Chat API (Review Request)"""
+        print("\n=== TESTING TEAM CHAT API (REVIEW REQUEST) ===")
+        
+        # GET /api/chat/messages/{project_id} - Get messages
+        success, _, _ = self.make_request('GET', f'/chat/messages/{self.project_id}', 
+                                        test_name="Get chat messages")
+        
+        # POST /api/chat/messages - Send a message
+        chat_data = {
+            "project_id": self.project_id,
+            "sender_name": "Design Team",
+            "sender_phone": "555-123-4567",
+            "message": "Kitchen measurements completed. Ready for next phase.",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        success, created_message, _ = self.make_request('POST', '/chat/messages', 
+                                                      chat_data, 200,  # Based on previous tests
+                                                      "Send chat message")
+        if success and created_message:
+            message_id = created_message.get('id')
+            if message_id:
+                self.created_resources['chat_messages'].append(message_id)
+
+    def test_design_tools_apis(self):
+        """Test Design Tools APIs (Review Request)"""
+        print("\n=== TESTING DESIGN TOOLS APIs (REVIEW REQUEST) ===")
+        
+        # GET /api/room-scans/{project_id} - Get 3D room scans
+        success, _, _ = self.make_request('GET', f'/room-scans/{self.project_id}', 
+                                        test_name="Get 3D room scans")
+        
+        # GET /api/trade-discounts/{project_id} - Get trade discounts
+        success, _, _ = self.make_request('GET', f'/trade-discounts/{self.project_id}', 
+                                        test_name="Get trade discounts")
+        
+        # GET /api/samples/{project_id} - Get samples
+        success, _, _ = self.make_request('GET', f'/samples/{self.project_id}', 
+                                        test_name="Get samples")
+
+    def test_sync_status_verification(self):
+        """Test Sync Status Verification (Review Request)"""
+        print("\n=== TESTING SYNC STATUS VERIFICATION (REVIEW REQUEST) ===")
+        
+        # GET /api/sync/status/{project_id} - Verify sync status still works
+        success, sync_data, _ = self.make_request('GET', f'/sync/status/{self.project_id}', 
+                                                test_name="Verify sync status functionality")
+        
+        if success and sync_data:
+            print(f"    ✅ Sync status data received: {type(sync_data)}")
+            if isinstance(sync_data, dict):
+                if 'walkthrough_items' in sync_data or 'status' in sync_data:
+                    print("    ✅ Sync status contains expected fields")
+                else:
+                    print("    ⚠️  Sync status missing expected fields")
+        else:
+            print("    ❌ Sync status request failed")
+
     def cleanup_resources(self):
         """Clean up created test resources"""
         print("\n=== CLEANING UP TEST RESOURCES ===")
