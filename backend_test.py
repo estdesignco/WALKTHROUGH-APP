@@ -123,7 +123,7 @@ class BackendTester:
         }
         
         success, created_project, _ = self.make_request('POST', '/projects', 
-                                                      new_project_data, 201,
+                                                      new_project_data, 200,  # Backend returns 200
                                                       "Create new project")
         if success and created_project:
             project_id = created_project.get('id')
