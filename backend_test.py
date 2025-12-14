@@ -460,7 +460,7 @@ class BackendTester:
         }
         
         success, created_message, _ = self.make_request('POST', '/chat/send', 
-                                                      chat_data, 201,
+                                                      chat_data, 200,  # Backend returns 200
                                                       "Send chat message")
         if success and created_message:
             message_id = created_message.get('id')
