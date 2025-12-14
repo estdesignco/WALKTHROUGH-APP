@@ -625,11 +625,10 @@ class BackendTester:
         # POST /api/voice-notes - Create voice note
         voice_note_data = {
             "project_id": self.project_id,
-            "room_name": "Kitchen",
             "audio_data": "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT",
-            "duration": 15,
-            "transcription": "Kitchen cabinet measurements needed",
-            "notes": "Voice note from mobile walkthrough"
+            "duration": 15.0,
+            "transcript": "Kitchen cabinet measurements needed",
+            "file_name": "kitchen_note.wav"
         }
         
         success, created_note, _ = self.make_request('POST', '/voice-notes', 
