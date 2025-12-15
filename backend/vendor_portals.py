@@ -254,13 +254,16 @@ class VendorCredentialManager:
         """Get decrypted credentials for a vendor"""
         cred = await self.collection.find_one({"vendor_key": vendor_key})
         if not cred:
+            # Try finding by domain
+            cred = await self.collection.find_one({"domain": vendor_key})
+        if not cred:
             return None
         
         return {
-            "vendor_key": cred["vendor_key"],
-            "vendor_name": cred["vendor_name"],
-            "username": cred["username"],
-            "password": decrypt_password(cred["password_encrypted"]),
+            "vendor_key": cred.get("vendor_key", cred.get("domain", vendor_key)),
+            "vendor_name": cred.get("vendor_name", cred.get("name", "")),
+            "username": cred.get("username", ""),
+            "password": decrypt_password(cred.get("password_encrypted", cred.get("encrypted_password", ""))),
             "account_number": cred.get("account_number"),
             "dealer_code": cred.get("dealer_code"),
             "status": cred.get("status", "active")
