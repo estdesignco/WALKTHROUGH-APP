@@ -6033,57 +6033,69 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # ===== 6. FINISH/COLOR EXTRACTION =====
             print("🎨 EXTRACTING FINISH/COLOR...")
             
-            finish_strategies = [
-                # Structured data
-                '[itemProp="color"], [itemProp="material"]',
-                
-                # Common selectors
-                '.color-name, .finish-name, .material-name',
-                '[class*="color"], [class*="finish"], [class*="material"]',
-                '.product-options [class*="selected"], .variant-selected',
-                
-                # Generic areas that might contain finish/color info
-                '.product-info, .product-details, .specifications, .product-meta'
-            ]
-            
-            for strategy in finish_strategies:
+            # FIRST: Try to extract from product description text
+            # Look for finish/material keywords in the description
+            description_text = ""
+            desc_selectors = ['.product-description', '.description', '[class*="description"]', '[class*="Description"]', 'p']
+            for sel in desc_selectors:
                 try:
-                    elements = await page.query_selector_all(strategy)
-                    for element in elements:
-                        finish_text = await element.text_content()
-                        if finish_text:
-                            # Clean text and validate
-                            cleaned = finish_text.strip()
-                            # Remove common prefixes
-                            cleaned = re.sub(r'^(Color|Finish|Material):\s*', '', cleaned, flags=re.IGNORECASE)
-                            
-                            if 2 <= len(cleaned) <= 50 and not any(skip in cleaned.lower() for skip in ['select', 'choose', 'option', 'email', 'subscribe', 'newsletter', 'sign up', 'password', 'login', 'required']):
-                                result['finish_color'] = cleaned
-                                print(f"✅ FINISH/COLOR: {result['finish_color']}")
-                                break
-                    
-                    if result['finish_color']:
-                        break
+                    desc_elements = await page.query_selector_all(sel)
+                    for el in desc_elements:
+                        text = await el.text_content()
+                        if text and len(text) > 50:
+                            description_text += " " + text
                 except:
                     continue
             
-            # Regex fallback for finish/color
-            if not result['finish_color']:
+            # Extract finish/material from description
+            if description_text:
                 import re
+                # Look for specific material/finish mentions
                 finish_patterns = [
-                    r'(?:Color|Finish|Material)[:\s]*([A-Za-z\s]{2,30})',
-                    r'Available in ([A-Za-z\s]{2,30})',
-                    r'Finish: ([A-Za-z\s]{2,30})'
+                    r'(?:in a|with a|features? a?|finished in)\s+([a-zA-Z\s]+(?:finish|brass|bronze|gold|silver|chrome|nickel|iron|wood|oak|walnut|marble|stone|leather|fabric|velvet|linen))',
+                    r'(antique\s+\w+)\s+finish',
+                    r'(\w+\s+brass|\w+\s+bronze|\w+\s+gold|\w+\s+silver)',
+                    r'(black|white|gray|grey|brown|beige|cream|ivory|natural)\s+(?:marble|stone|wood|oak|finish)',
+                    r'(?:Color|Finish|Material)[:\s]+([A-Za-z\s]{3,40}?)(?:\.|,|\n|$)',
                 ]
                 
                 for pattern in finish_patterns:
-                    match = re.search(pattern, all_text, re.IGNORECASE)
+                    match = re.search(pattern, description_text, re.IGNORECASE)
                     if match:
                         finish_candidate = match.group(1).strip()
-                        if 2 <= len(finish_candidate) <= 50:
-                            result['finish_color'] = finish_candidate
-                            print(f"✅ REGEX FINISH: {result['finish_color']}")
+                        # Clean up
+                        finish_candidate = re.sub(r'\s+', ' ', finish_candidate)
+                        if 3 <= len(finish_candidate) <= 50:
+                            result['finish_color'] = finish_candidate.title()
+                            print(f"✅ FINISH/COLOR FROM DESCRIPTION: {result['finish_color']}")
                             break
+            
+            # SECOND: Check for explicit finish/color selectors
+            if not result.get('finish_color'):
+                finish_selectors = [
+                    '.color-name', '.finish-name', '.material-name',
+                    '[data-finish]', '[data-color]', '[data-material]',
+                    '.selected-color', '.selected-finish',
+                    '.product-color', '.product-finish'
+                ]
+                
+                for selector in finish_selectors:
+                    try:
+                        elements = await page.query_selector_all(selector)
+                        for element in elements:
+                            finish_text = await element.text_content()
+                            if finish_text:
+                                cleaned = finish_text.strip()
+                                # Skip generic terms
+                                skip_terms = ['select', 'choose', 'option', 'email', 'subscribe', 'specifications', 'details', 'description', 'download', 'assembly']
+                                if 3 <= len(cleaned) <= 50 and not any(skip in cleaned.lower() for skip in skip_terms):
+                                    result['finish_color'] = cleaned
+                                    print(f"✅ FINISH/COLOR: {result['finish_color']}")
+                                    break
+                        if result.get('finish_color'):
+                            break
+                    except:
+                        continue
             
             # ===== FINAL VALIDATION AND CLEANUP =====
             print("🔧 VALIDATING AND CLEANING RESULTS...")
