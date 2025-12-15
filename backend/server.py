@@ -5337,38 +5337,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 
             except Exception as login_error:
                 print(f"⚠️ Login failed (will try scraping anyway): {login_error}")
-                login_successful = False
-        
         try:
-            if not login_successful:
-                # Only navigate if login didn't happen or failed
-                print(f"🌐 NAVIGATING TO: {url}")
-                
-                # Retry logic for blocked sites
-                max_retries = 3
-                for attempt in range(max_retries):
-                    try:
-                        print(f"🔄 ATTEMPT {attempt + 1}/{max_retries}")
-                        
-                        # Add random delay to avoid rate limiting
-                        if attempt > 0:
-                            import random
-                            delay = random.uniform(2, 5)
-                            print(f"⏱️ RETRY DELAY: {delay:.1f}s")
-                            await asyncio.sleep(delay)
-                        
-                        # Navigate with advanced wait strategy
-                        await page.goto(url, wait_until='domcontentloaded', timeout=60000)
-                        break
-                        
-                    except Exception as nav_error:
-                        print(f"❌ NAVIGATION ATTEMPT {attempt + 1} FAILED: {str(nav_error)}")
-                        if attempt == max_retries - 1:
-                            raise nav_error
-                        continue
-            else:
-                # Already navigated after login, just note it
-                print("✅ Using logged-in session, product page already loaded")
             
             # Multi-stage loading strategy for modern sites
             print("⏳ WAITING FOR DYNAMIC CONTENT...")
