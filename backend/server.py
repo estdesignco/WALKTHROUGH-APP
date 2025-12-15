@@ -6028,7 +6028,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             # Remove common prefixes
                             cleaned = re.sub(r'^(Color|Finish|Material):\s*', '', cleaned, flags=re.IGNORECASE)
                             
-                            if 2 <= len(cleaned) <= 50 and not any(skip in cleaned.lower() for skip in ['select', 'choose', 'option']):
+                            if 2 <= len(cleaned) <= 50 and not any(skip in cleaned.lower() for skip in ['select', 'choose', 'option', 'email', 'subscribe', 'newsletter', 'sign up', 'password', 'login', 'required']):
                                 result['finish_color'] = cleaned
                                 print(f"✅ FINISH/COLOR: {result['finish_color']}")
                                 break
