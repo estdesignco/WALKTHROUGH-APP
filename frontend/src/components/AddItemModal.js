@@ -322,12 +322,20 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) return;
+    console.log('🚀 FORM SUBMITTED! formData:', JSON.stringify(formData, null, 2));
+    
+    if (!formData.name.trim()) {
+      console.log('❌ Name is empty!');
+      alert('Please enter an item name');
+      return;
+    }
 
     try {
+      console.log('📤 Calling onSubmit...');
       await onSubmit(formData);
+      console.log('✅ onSubmit completed');
     } catch (err) {
-      console.error('Error submitting item:', err);
+      console.error('💥 Error submitting item:', err);
       alert('Error adding item: ' + err.message);
     }
   };
