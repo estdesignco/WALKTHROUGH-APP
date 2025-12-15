@@ -6,14 +6,15 @@ Updated with aggressive waits and site-specific settings for ALL vendors.
 VENDOR_CONFIGS = {
     "fourhands.com": {
         "name": "Four Hands",
-        "login_url": "https://fourhands.com/login?returnurl=%2fhome",
+        "login_url": "https://fourhands.com/login",
         "login_type": "direct",
-        "extra_wait_before_login": 5000,
+        "extra_wait_before_login": 8000,
         "username_selectors": ['input[type="text"]', 'input[name="username"]', 'input[name="accountNumber"]', '#username', '#accountNumber'],
         "password_selectors": ['input[type="password"]', '#password', 'input[name="password"]'],
         "submit_selectors": ['button[type="submit"]', 'input[type="submit"]', 'button:has-text("Sign In")', 'button:has-text("Login")'],
-        "wait_after_login": 8000,
-        "wait_for_content": 5000,
+        "wait_after_login": 15000,
+        "wait_for_content": 10000,
+        "slow_site": True,
     },
     
     "uttermost.com": {
