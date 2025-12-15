@@ -5259,15 +5259,15 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                 try:
                                     await password_input.click(force=True)
                                     await page.wait_for_timeout(300)
-                                    await password_input.fill(credentials['password'])
+                                    await password_input.press_sequentially(credentials['password'], delay=30)
                                     await page.wait_for_timeout(500)
                                     password_filled = True
-                                    print(f"✅ Filled password")
+                                    print(f"✅ Filled password via press_sequentially")
                                 except:
                                     try:
-                                        await password_input.type(credentials['password'], delay=30)
+                                        await password_input.fill(credentials['password'])
                                         password_filled = True
-                                        print(f"✅ Typed password")
+                                        print(f"✅ Filled password via fill")
                                     except:
                                         pass
                         except:
