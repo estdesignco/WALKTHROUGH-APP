@@ -677,16 +677,25 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
               Cancel
             </button>
             <button
-              type="submit"
-              onClick={() => console.log('🔘 BUTTON CLICKED! formData.name:', formData.name)}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log('🔘 BUTTON CLICKED!');
+                if (!formData.name.trim()) {
+                  alert('Please enter an item name');
+                  return;
+                }
+                // Manually call handleSubmit
+                handleSubmit(e);
+              }}
               className={`px-6 py-2 rounded-lg transition-colors font-bold shadow-lg ${
                 formData.name.trim() 
                   ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] hover:from-[#E5C048] hover:to-[#C9A73F] text-black cursor-pointer'
                   : 'bg-gray-600 text-gray-400 cursor-not-allowed'
               }`}
-              disabled={loading}
+              disabled={loading || !formData.name.trim()}
             >
-              {loading ? '✓ Creating...' : formData.name.trim() ? '+ ADD ITEM' : '⚠️ Enter Name First'}
+              {loading ? '✓ Creating...' : '+ ADD ITEM'}
             </button>
           </div>
         </form>
