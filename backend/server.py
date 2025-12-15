@@ -5583,41 +5583,47 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     '[class*="amount"]'
                 ]
             
-            for strategy in price_strategies:
-                try:
-                    elements = await page.query_selector_all(strategy)
-                    for element in elements:
-                        # Get text content
-                        price_text = await element.text_content()
-                        if not price_text:
-                            continue
+                for strategy in price_strategies:
+                    try:
+                        elements = await page.query_selector_all(strategy)
+                        for element in elements:
+                            # Get text content
+                            price_text = await element.text_content()
+                            if not price_text:
+                                continue
+                                
+                            # Advanced price pattern matching
+                            import re
+                            price_patterns = [
+                                r'\$\s*([0-9,]+\.?[0-9]*)',  # $1,234.56
+                                r'([0-9,]+\.?[0-9]*)\s*\$',  # 1,234.56$
+                                r'USD\s*([0-9,]+\.?[0-9]*)', # USD 1,234.56
+                                r'([0-9,]+\.?[0-9]*)\s*USD', # 1,234.56 USD
+                                r'(?:Price|Cost|MSRP):\s*\$?([0-9,]+\.?[0-9]*)',
+                                r'([0-9,]+\.[0-9]{2})',      # Decimal currency format
+                                r'([0-9,]+)',                # Just numbers as last resort
+                            ]
                             
-                        # Advanced price pattern matching
-                        import re
-                        price_patterns = [
-                            r'\$\s*([0-9,]+\.?[0-9]*)',  # $1,234.56
-                            r'([0-9,]+\.?[0-9]*)\s*\$',  # 1,234.56$
-                            r'USD\s*([0-9,]+\.?[0-9]*)', # USD 1,234.56
-                            r'([0-9,]+\.?[0-9]*)\s*USD', # 1,234.56 USD
-                            r'(?:Price|Cost|MSRP):\s*\$?([0-9,]+\.?[0-9]*)',
-                            r'([0-9,]+\.[0-9]{2})',      # Decimal currency format
-                            r'([0-9,]+)',                # Just numbers as last resort
-                        ]
-                        
-                        for pattern in price_patterns:
-                            match = re.search(pattern, price_text)
-                            if match:
-                                try:
-                                    price_val = float(match.group(1).replace(',', ''))
-                                    # Validate reasonable price range for furniture
-                                    if 10 <= price_val <= 100000:
-                                        result['cost'] = price_val
-                                        result['price'] = price_val  # Store as float, not string
-                                        print(f"✅ PRICE EXTRACTED: ${price_val:.2f}")
-                                        break
-                                except:
-                                    continue
-                        
+                            for pattern in price_patterns:
+                                match = re.search(pattern, price_text)
+                                if match:
+                                    try:
+                                        price_val = float(match.group(1).replace(',', ''))
+                                        # Validate reasonable price range for furniture
+                                        if 10 <= price_val <= 100000:
+                                            result['cost'] = price_val
+                                            result['price'] = price_val  # Store as float, not string
+                                            print(f"✅ PRICE EXTRACTED: ${price_val:.2f}")
+                                            break
+                                    except:
+                                        continue
+                            
+                            if result.get('price'):
+                                break
+                    except:
+                        continue
+                    if result.get('price'):
+                        break
                         if result['cost']:
                             break
                     
