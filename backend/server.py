@@ -5490,28 +5490,98 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # ===== 2. ADVANCED PRICE DETECTION =====
             print("💰 EXTRACTING PRICE INFORMATION...")
             
+            # Vendor-specific price selectors (most reliable)
+            vendor_price_selectors = {
+                'uttermost.com': [
+                    '.product-price', '.price', '.cost',
+                    '[class*="ProductPrice"]', '[class*="price"]',
+                    '.price-value', '#product-price',
+                    'span.price', 'span.cost', 'div.price',
+                    '[data-price]', '[data-cost]'
+                ],
+                'hvlgroup.com': [
+                    '.product-price', '.price', '.cost',
+                    '[class*="Price"]', '[class*="price"]',
+                    '.price-value', '#Price', 
+                    'span.price', 'span.cost', 'div.price',
+                    '[data-price]', '[data-retail]'
+                ],
+                'fourhands.com': [
+                    '.product-price-value', '.price-value', '.price',
+                    '[class*="price"]', '.pricing'
+                ]
+            }
+            
+            # Check vendor-specific selectors first
+            domain_key = None
+            for key in vendor_price_selectors:
+                if key in domain:
+                    domain_key = key
+                    break
+            
+            if domain_key:
+                print(f"🔍 Using vendor-specific price selectors for {domain_key}")
+                for selector in vendor_price_selectors[domain_key]:
+                    try:
+                        elements = await page.query_selector_all(selector)
+                        for element in elements:
+                            price_text = await element.text_content()
+                            if price_text:
+                                import re
+                                match = re.search(r'\$\s*([0-9,]+\.?[0-9]*)', price_text)
+                                if match:
+                                    price_val = float(match.group(1).replace(',', ''))
+                                    if 10 <= price_val <= 100000:
+                                        result['cost'] = price_val
+                                        result['price'] = price_val
+                                        print(f"✅ VENDOR PRICE EXTRACTED: ${price_val:.2f} from {selector}")
+                                        break
+                        if result.get('price'):
+                            break
+                    except Exception as e:
+                        continue
+            
+            # If still no price, look in page text for price patterns
+            if not result.get('price'):
+                all_text = await page.inner_text('body')
+                import re
+                # Look for price patterns like $123.45 or $1,234.00
+                price_matches = re.findall(r'\$\s*([0-9,]+\.[0-9]{2})', all_text)
+                if price_matches:
+                    for price_str in price_matches:
+                        try:
+                            price_val = float(price_str.replace(',', ''))
+                            if 10 <= price_val <= 100000:
+                                result['cost'] = price_val
+                                result['price'] = price_val
+                                print(f"✅ TEXT PRICE EXTRACTED: ${price_val:.2f}")
+                                break
+                        except:
+                            continue
+            
             # Comprehensive price extraction with validation
-            price_strategies = [
-                # Schema.org structured data
-                '[itemProp="price"], [property="product:price:amount"]',
-                
-                # Modern e-commerce patterns
-                '[data-testid*="price"], [data-test*="price"]',
-                '[data-price], [data-cost], [data-amount]',
-                
-                # Traditional price selectors
-                '.price-current, .current-price, .sale-price',
-                '.product-price, .item-price, .price',
-                '.pricing .price, .cost, .price-display',
-                
-                # Vendor-specific patterns (adaptive)
-                f'[class*="{domain.split(".")[0]}"][class*="price"]',
-                
-                # Generic money indicators
-                '[class*="price"]:not([class*="old"]):not([class*="was"])',
-                '[class*="cost"]:not([class*="shipping"])',
-                '[class*="amount"]'
-            ]
+            if not result.get('price'):
+                price_strategies = [
+                    # Schema.org structured data
+                    '[itemProp="price"], [property="product:price:amount"]',
+                    
+                    # Modern e-commerce patterns
+                    '[data-testid*="price"], [data-test*="price"]',
+                    '[data-price], [data-cost], [data-amount]',
+                    
+                    # Traditional price selectors
+                    '.price-current, .current-price, .sale-price',
+                    '.product-price, .item-price, .price',
+                    '.pricing .price, .cost, .price-display',
+                    
+                    # Vendor-specific patterns (adaptive)
+                    f'[class*="{domain.split(".")[0]}"][class*="price"]',
+                    
+                    # Generic money indicators
+                    '[class*="price"]:not([class*="old"]):not([class*="was"])',
+                    '[class*="cost"]:not([class*="shipping"])',
+                    '[class*="amount"]'
+                ]
             
             for strategy in price_strategies:
                 try:
