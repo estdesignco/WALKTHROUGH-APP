@@ -6108,9 +6108,8 @@ async def scrape_product_advanced(data: dict):
     try:
         print(f"🔍 Scraping product from: {url}")
         
-        # TEMPORARY: Skip Playwright due to login timeout issues
-        # Will use BeautifulSoup for now
-        USE_PLAYWRIGHT = False
+        # Use Playwright for JS-rendered sites
+        USE_PLAYWRIGHT = True
         
         # TRY PLAYWRIGHT FIRST for better JS rendering
         if PLAYWRIGHT_AVAILABLE and USE_PLAYWRIGHT:
