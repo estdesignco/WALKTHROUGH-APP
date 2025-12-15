@@ -5274,6 +5274,19 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     
                     login_successful = True
                     print("✅ LOGIN COMPLETE")
+                    
+                    # Verify login actually worked by checking current URL
+                    current_url = page.url
+                    if 'sign-in' in current_url.lower() or 'login' in current_url.lower():
+                        # Still on login page - check for error messages
+                        page_text = await page.inner_text('body')
+                        if 'error' in page_text.lower() or 'invalid' in page_text.lower() or 'incorrect' in page_text.lower():
+                            print("⚠️ Login appears to have failed - error message detected")
+                            login_successful = False
+                        else:
+                            print(f"⚠️ Still on login page: {current_url}")
+                    else:
+                        print(f"✅ Successfully redirected after login to: {current_url}")
                 elif username_filled:
                     # Even if password wasn't filled via our methods, try submitting
                     # Some sites may use different approaches
