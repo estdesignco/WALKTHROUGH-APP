@@ -2001,3 +2001,21 @@ The Walkthrough to Checklist sync is **fully operational** and working perfectly
 - **Date**: December 14, 2024
 - **Agent**: testing
 - **Message**: "COMPREHENSIVE FRONTEND TESTING COMPLETED - PARTIAL PASS. Dashboard and backend APIs working perfectly. CRITICAL ISSUE: Projects stuck in 'Loading projects...' state preventing access to project-level features. Backend API verified working (returns 5 projects including Modern Kitchen Design). Frontend loading mechanism needs investigation. All requested features (Materials, Contacts, Team Chat, Punch List, Design Tools, Trade Discounts, Samples, Checklist) cannot be tested until project loading is fixed. Recommend debugging frontend API response handling and loading timeouts."
+
+## VENDOR SCRAPER FIX - December 15, 2024
+
+### Current Status
+- All 22 vendor credentials restored and verified in database
+- Backend syntax error fixed
+- Vendor config updated for Uttermost
+
+### Vendors to Test
+1. Uttermost - https://uttermost.com/karnes-drink-table-50340
+2. HVL Group - Need real product URL
+3. Four Hands - Need real product URL
+4. All other vendors
+
+### Critical Test: Add Item Modal
+- Must verify scraping works from frontend
+- Must get product name, price, SKU, image
+
