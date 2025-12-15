@@ -6301,7 +6301,7 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
         
         # Launch browser with advanced stealth settings
         executable_paths = [
-            '/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell',
+            '/pw-browsers/chromium_headless_shell-1200/chrome-linux/headless_shell',
             '/pw-browsers/chromium-1091/chrome-linux/chrome',
             None
         ]
