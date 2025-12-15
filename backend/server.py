@@ -5281,10 +5281,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         # Still on login page - check for error messages
                         page_text = await page.inner_text('body')
                         if 'error' in page_text.lower() or 'invalid' in page_text.lower() or 'incorrect' in page_text.lower():
-                            print("⚠️ Login appears to have failed - error message detected")
+                            print(f"⚠️ LOGIN FAILED for {domain} - credentials may be incorrect")
+                            print("   Please verify your credentials at the vendor's website")
                             login_successful = False
                         else:
                             print(f"⚠️ Still on login page: {current_url}")
+                            login_successful = False
                     else:
                         print(f"✅ Successfully redirected after login to: {current_url}")
                 elif username_filled:
