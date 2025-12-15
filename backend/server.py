@@ -4965,13 +4965,10 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         # Enhanced timeout settings
         page.set_default_timeout(30000)
         
-        # SKIP LOGIN - Go directly to product page
-        # User indicated they will already be logged in on their browser
-        # The backend scraper runs in a separate session so it can't access user's cookies anyway
+        # First, try direct access to product page
         login_successful = False
-        print(f"⏩ SKIPPING LOGIN - Going directly to product page: {url}")
+        print(f"🌐 NAVIGATING TO PRODUCT PAGE: {url}")
         
-        # Navigate directly to product page
         try:
             await page.goto(url, wait_until='domcontentloaded', timeout=45000)
             print(f"✅ Navigated to product page")
@@ -4986,7 +4983,76 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         except:
             pass
         
-        await page.wait_for_timeout(3000)  # Extra time for JS rendering
+        await page.wait_for_timeout(3000)
+        
+        # Check if we got a 404 or login-required page
+        page_text = await page.inner_text('body')
+        page_title = await page.title()
+        
+        is_blocked = any(x in page_text.lower() for x in ['page not found', '404', 'not found', 'access denied'])
+        is_login_required = any(x in page_text.lower() for x in ['sign in', 'log in', 'login required', 'please login'])
+        
+        if (is_blocked or is_login_required) and credentials and credentials.get("username") and credentials.get("password"):
+            print(f"🔐 PAGE REQUIRES LOGIN - Attempting authentication for {domain}...")
+            
+            # Get login URL from vendor config
+            login_url = vendor_config.get('login_url') or f'https://{domain}/login'
+            
+            try:
+                await page.goto(login_url, wait_until='domcontentloaded', timeout=30000)
+                await page.wait_for_timeout(5000)
+                
+                # Fill login form
+                username_selectors = vendor_config.get('username_selectors', ['#email', 'input[type="email"]', 'input[name="email"]', 'input[name="username"]'])
+                password_selectors = vendor_config.get('password_selectors', ['#password', 'input[type="password"]', 'input[name="password"]'])
+                
+                # Try to fill username
+                for selector in username_selectors:
+                    try:
+                        username_input = await page.query_selector(selector)
+                        if username_input:
+                            await username_input.fill(credentials['username'])
+                            print(f"✅ Filled username")
+                            break
+                    except:
+                        continue
+                
+                # Try to fill password
+                for selector in password_selectors:
+                    try:
+                        pwd_input = await page.query_selector(selector)
+                        if pwd_input:
+                            await pwd_input.press_sequentially(credentials['password'], delay=30)
+                            print(f"✅ Filled password")
+                            break
+                    except:
+                        continue
+                
+                # Submit login
+                submit_selectors = vendor_config.get('submit_selectors', ['button[type="submit"]', 'button:has-text("Login")', 'button:has-text("Sign In")'])
+                for selector in submit_selectors:
+                    try:
+                        submit_btn = await page.query_selector(selector)
+                        if submit_btn:
+                            await submit_btn.click()
+                            print(f"✅ Submitted login form")
+                            break
+                    except:
+                        continue
+                
+                # Wait for login to complete
+                await page.wait_for_timeout(10000)
+                
+                # Navigate back to product page
+                await page.goto(url, wait_until='domcontentloaded', timeout=45000)
+                await page.wait_for_timeout(5000)
+                
+                login_successful = True
+                print(f"✅ LOGIN COMPLETE - Returned to product page")
+                
+            except Exception as login_err:
+                print(f"⚠️ Login attempt failed: {login_err}")
+        
         try:
             
             # Multi-stage loading strategy for modern sites
