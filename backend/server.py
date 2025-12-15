@@ -5552,9 +5552,25 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     if element:
                         sku_text = await element.text_content()
                         if sku_text:
-                            # Clean up the SKU text
-                            cleaned_sku = re.sub(r'[^\w\-]', ' ', sku_text).strip()
-                            if len(cleaned_sku) >= 3:
+                            # Clean up the SKU text - remove social media garbage
+                            cleaned_sku = sku_text.strip()
+                            # Remove common junk text
+                            junk_patterns = [
+                                r'share.*', r'pinterest.*', r'facebook.*', r'linkedin.*', 
+                                r'twitter.*', r'email.*', r'print.*', r'copy.*link.*',
+                                r'save.*', r'wishlist.*', r'compare.*'
+                            ]
+                            for junk in junk_patterns:
+                                cleaned_sku = re.sub(junk, '', cleaned_sku, flags=re.IGNORECASE)
+                            
+                            # Extract just the SKU part
+                            sku_match = re.search(r'^(SKU\s*[:#]?\s*)?([A-Za-z0-9\-_]+)', cleaned_sku, re.IGNORECASE)
+                            if sku_match:
+                                cleaned_sku = sku_match.group(2).strip()
+                            else:
+                                cleaned_sku = re.sub(r'[^\w\-]', ' ', cleaned_sku).strip().split()[0] if cleaned_sku else ''
+                            
+                            if 3 <= len(cleaned_sku) <= 30:
                                 result['sku'] = cleaned_sku
                                 print(f"✅ SKU FOUND: {result['sku']}")
                                 break
