@@ -5624,13 +5624,6 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         continue
                     if result.get('price'):
                         break
-                        if result['cost']:
-                            break
-                    
-                    if result['cost']:
-                        break
-                except:
-                    continue
             
             # Regex fallback on full page text for price
             if not result['cost']:
