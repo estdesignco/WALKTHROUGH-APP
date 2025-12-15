@@ -677,6 +677,10 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
             </button>
             <button
               type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                handleSubmit(e);
+              }}
               className="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] hover:from-[#E5C048] hover:to-[#C9A73F] text-black px-6 py-2 rounded-lg transition-colors font-bold disabled:opacity-50 shadow-lg"
               disabled={loading || !formData.name.trim()}
             >
