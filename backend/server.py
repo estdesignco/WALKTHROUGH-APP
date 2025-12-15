@@ -4903,7 +4903,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         
         # Use the correct browser executable path
         browser = await p.chromium.launch(
-            executable_path='/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell',
+            executable_path='/pw-browsers/chromium_headless_shell-1200/chrome-linux/headless_shell',
             headless=True, 
             args=browser_args
         )
