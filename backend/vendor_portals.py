@@ -271,9 +271,9 @@ class VendorCredentialManager:
         creds = await self.collection.find({}).to_list(100)
         return [
             {
-                "vendor_key": c["vendor_key"],
-                "vendor_name": c["vendor_name"],
-                "username": c["username"],
+                "vendor_key": c.get("vendor_key", c.get("domain", "")),
+                "vendor_name": c.get("vendor_name", c.get("name", "")),
+                "username": c.get("username", ""),
                 "status": c.get("status", "active"),
                 "last_login": c.get("last_login")
             }
