@@ -679,6 +679,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
               type="submit"
               onClick={(e) => {
                 e.preventDefault();
+                alert('Button clicked! Name: ' + formData.name);
                 console.log('🔘 Button clicked! formData.name:', formData.name, 'searchQuery:', searchQuery);
                 handleSubmit(e);
               }}
