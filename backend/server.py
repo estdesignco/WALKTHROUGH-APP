@@ -5219,7 +5219,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                 
                                 # Try to fill
                                 try:
-                                    await pwd_input.fill(credentials['password'])
+                                    # Use press_sequentially for better handling of special characters like $
+                                    await pwd_input.press_sequentially(credentials['password'], delay=30)
                                     await page.wait_for_timeout(500)
                                     
                                     # Verify it was filled by getting the value
@@ -5229,14 +5230,16 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                         print(f"✅ Filled password (value length: {len(val)})")
                                         break
                                 except Exception as fill_err:
-                                    print(f"   Fill failed: {fill_err}")
-                                    # Try type as fallback
+                                    print(f"   press_sequentially failed: {fill_err}")
+                                    # Try fill as fallback
                                     try:
-                                        await pwd_input.type(credentials['password'], delay=30)
+                                        await pwd_input.fill(credentials['password'])
                                         await page.wait_for_timeout(500)
-                                        password_filled = True
-                                        print(f"✅ Typed password")
-                                        break
+                                        val = await pwd_input.input_value()
+                                        if val:
+                                            password_filled = True
+                                            print(f"✅ Filled password via fill()")
+                                            break
                                     except:
                                         pass
                         
