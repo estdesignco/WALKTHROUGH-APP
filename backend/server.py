@@ -91,6 +91,33 @@ async def startup_event():
         logger.info(f"Vendor products seeded: {product_count} products available")
     except Exception as e:
         logger.error(f"Error seeding vendor products: {e}")
+    
+    # Ensure vendor credentials exist
+    try:
+        cred_count = await db.vendor_credentials.count_documents({})
+        if cred_count == 0:
+            logger.warning("No vendor credentials found - seeding from backup...")
+            from cryptography.fernet import Fernet
+            fernet_key = os.environ.get('FERNET_KEY')
+            if fernet_key:
+                fernet = Fernet(fernet_key.encode())
+                # Core vendor credentials
+                vendors = [
+                    ("fourhands", "fourhands.com", "Four Hands", "81887", "momandneil"),
+                    ("uttermost", "uttermost.com", "Uttermost", "Orders@estdesignco.com", "Zeke1919$$$$"),
+                    ("globalviews", "globalviews.com", "Global Views", "orders@estdesignco.com", "Zeke1991$$$$"),
+                    ("hvlgroup", "hvlgroup.com", "HVL Group", "establisheddesignco@gmail.com", "Momandneil1991!"),
+                ]
+                for v in vendors:
+                    encrypted = fernet.encrypt(v[4].encode()).decode()
+                    await db.vendor_credentials.update_one(
+                        {"domain": v[1]},
+                        {"$set": {"vendor_key": v[0], "domain": v[1], "name": v[2], "username": v[3], "encrypted_password": encrypted}},
+                        upsert=True
+                    )
+                logger.info(f"Seeded {len(vendors)} core vendor credentials")
+    except Exception as e:
+        logger.error(f"Error seeding vendor credentials: {e}")
 
 # CORS Configuration
 CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*').split(',')
