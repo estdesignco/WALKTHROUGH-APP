@@ -4963,60 +4963,30 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         page = await context.new_page()
         
         # Enhanced timeout settings
-        page.set_default_timeout(45000)
+        page.set_default_timeout(30000)
         
-        # LOGIN if credentials are available
+        # SKIP LOGIN - Go directly to product page
+        # User indicated they will already be logged in on their browser
+        # The backend scraper runs in a separate session so it can't access user's cookies anyway
         login_successful = False
-        if credentials and credentials.get("username") and credentials.get("password"):
-            try:
-                print(f"🔐 STARTING LOGIN FLOW FOR: {domain}")
-                
-                # Use vendor-specific login URL
-                login_url = credentials.get('login_url') or vendor_config.get('login_url') or f'https://{domain}'
-                login_type = vendor_config.get('login_type', 'modal')
-                
-                print(f"📍 Login URL: {login_url}")
-                print(f"📍 Login Type: {login_type}")
-                
-                # Navigate to login page with shorter timeout - login is optional
-                try:
-                    await page.goto(login_url, wait_until='domcontentloaded', timeout=30000)
-                    await page.wait_for_timeout(2000)
-                except Exception as nav_err:
-                    print(f"⚠️ Login page navigation slow, continuing: {nav_err}")
-                    await page.wait_for_timeout(3000)
-                
-                # Wait extra time for JS-heavy sites (React, Vue, etc)
-                extra_wait = vendor_config.get('extra_wait_before_login', 0)
-                if extra_wait > 0:
-                    print(f"⏳ Waiting {extra_wait}ms for JavaScript to render...")
-                    await page.wait_for_timeout(extra_wait)
-                    
-                    # Also wait for network to settle
-                    try:
-                        await page.wait_for_load_state('networkidle', timeout=10000)
-                    except:
-                        pass
-                
-                # STEP 1: For modal login types, click Trade/Login button first
-                if login_type == 'modal':
-                    print("🔍 Step 1: Looking for Trade/Login button to open modal...")
-                    trade_selectors = vendor_config.get('trade_button_selectors', [
-                        'a:has-text("Trade")',
-                        'a:has-text("Wholesale")',
-                        'button:has-text("Trade")',
-                        'a:has-text("Trade Account")',
-                        'a:has-text("Trade Sign In")',
-                        'a:has-text("Login")',
-                        'a:has-text("Sign In")',
-                        'a[href*="trade"]',
-                        'a[href*="wholesale"]',
-                        'a[href*="login"]',
-                        'a[href*="account"]',
-                    ])
-                    
-                    modal_opened = False
-                    for selector in trade_selectors:
+        print(f"⏩ SKIPPING LOGIN - Going directly to product page: {url}")
+        
+        # Navigate directly to product page
+        try:
+            await page.goto(url, wait_until='domcontentloaded', timeout=45000)
+            print(f"✅ Navigated to product page")
+        except Exception as nav_err:
+            print(f"⚠️ Navigation warning: {nav_err}")
+        
+        # Wait for page content to load
+        await page.wait_for_timeout(5000)
+        
+        try:
+            await page.wait_for_load_state('networkidle', timeout=15000)
+        except:
+            pass
+        
+        await page.wait_for_timeout(3000)  # Extra time for JS rendering
                         try:
                             trade_btn = await page.wait_for_selector(selector, timeout=3000)
                             if trade_btn:
