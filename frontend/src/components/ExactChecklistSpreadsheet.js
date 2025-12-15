@@ -690,7 +690,7 @@ const ExactChecklistSpreadsheet = ({
       }
     } catch (error) {
       console.error('❌ Error adding checklist item:', error);
-      console.error(`Failed to add item: ${error.message}`);
+      alert(`Failed to add item: ${error.message}`);
     }
   };
 
