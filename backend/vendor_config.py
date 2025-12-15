@@ -19,11 +19,18 @@ VENDOR_CONFIGS = {
     "uttermost.com": {
         "name": "Uttermost",
         "login_url": "https://uttermost.com/",
-        "login_type": "direct",
-        "extra_wait_before_login": 10000,  # React app needs time
-        "username_selectors": ['input[type="email"]', 'input[name="email"]', '#email'],
+        "login_type": "modal",
+        "extra_wait_before_login": 5000,  # Wait for page to load
+        "trade_button_selectors": [
+            'text=Sign In',
+            'a:has-text("Sign In")',
+            'button:has-text("Sign In")',
+            '[data-testid="sign-in"]',
+            '.sign-in-link'
+        ],
+        "username_selectors": ['input[type="email"]', 'input[name="email"]', '#email', 'input[placeholder*="email"]'],
         "password_selectors": ['input[type="password"]', '#password', 'input[name="password"]'],
-        "submit_selectors": ['button:has-text("SIGN IN")', 'button:has-text("Sign In")', 'button[type="submit"]'],
+        "submit_selectors": ['button:has-text("SIGN IN")', 'button:has-text("Sign In")', 'button[type="submit"]', 'input[type="submit"]'],
         "wait_after_login": 10000,
         "wait_for_content": 8000,
     },
