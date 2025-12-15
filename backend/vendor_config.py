@@ -19,45 +19,13 @@ VENDOR_CONFIGS = {
     "uttermost.com": {
         "name": "Uttermost",
         "login_url": "https://uttermost.com/sign-in",
-        "login_type": "direct",  # Changed to direct - go straight to sign-in page
-        "extra_wait_before_login": 10000,  # Wait longer for React app to fully load
-        "username_selectors": [
-            'input[name="email"]',
-            'input[type="email"]',
-            'input[placeholder*="Email"]',
-            'input[placeholder*="email"]',
-            '#email',
-            'form input[type="email"]',
-            'div[class*="signIn"] input[type="email"]'
-        ],
-        "password_selectors": [
-            'input[name="password"]',
-            'input[type="password"]',
-            '#password',
-            'input[placeholder*="Password"]',
-            'form input[type="password"]',
-            'div[class*="signIn"] input[type="password"]'
-        ],
-        "submit_selectors": [
-            'button[type="submit"]',
-            'button:has-text("Sign In")',
-            'button:has-text("SIGN IN")',
-            'button:has-text("Log In")',
-            'form button[type="button"]',
-            'button[class*="submit"]'
-        ],
-        "wait_after_login": 15000,  # Wait longer for login to complete
-        "wait_for_content": 10000,  # Wait for product page to load with prices
-        "price_selectors": [
-            '[class*="price"]',
-            '[class*="Price"]',
-            'span[class*="money"]',
-            '.product-price',
-            '.wholesale-price',
-            '.trade-price',
-            '[data-price]',
-            'p:has-text("$")'
-        ],
+        "login_type": "direct",
+        "extra_wait_before_login": 8000,
+        "username_selectors": ['#email', 'input[type="email"]', 'input[name="email"]'],
+        "password_selectors": ['input[type="password"]', '#password', 'input[name="password"]'],
+        "submit_selectors": ['button[type="submit"]', 'button:has-text("LOGIN")', 'button:has-text("Log In")'],
+        "wait_after_login": 12000,
+        "wait_for_content": 8000,
     },
     
     "globalviews.com": {
