@@ -678,14 +678,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
             </button>
             <button
               type="submit"
-              onClick={(e) => {
-                console.log('Button clicked, formData:', formData);
-                if (!formData.name.trim()) {
-                  e.preventDefault();
-                  alert('Please enter an item name first');
-                  return;
-                }
-              }}
+              onClick={() => console.log('🔘 BUTTON CLICKED! formData.name:', formData.name)}
               className={`px-6 py-2 rounded-lg transition-colors font-bold shadow-lg ${
                 formData.name.trim() 
                   ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] hover:from-[#E5C048] hover:to-[#C9A73F] text-black cursor-pointer'
