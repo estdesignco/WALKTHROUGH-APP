@@ -11639,7 +11639,7 @@ async def generate_electrician_sheet(project_id: str):
             img {{ max-width: 200px; max-height: 200px; border: 1px solid black; }}
             .notes-box {{ background: white; border: 2px dashed black; padding: 10px; margin-top: 10px; min-height: 60px; }}
         </style></head><body>
-        <div class="logo"><img src="https://interiortools-1.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
+        <div class="logo"><img src="https://ux-revival-1.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
         <h1>ELECTRICIAN INSTALLATION SHEET</h1>
         <h2>{project.get('name', 'Project')} - {project.get('client_info', {}).get('full_name', '')}</h2>
         <p style="text-align: center;"><strong>Total Lighting Items:</strong> {len(lighting_items)}</p>
@@ -11697,7 +11697,7 @@ async def generate_load_in_sheets(project_id: str):
             .item-name {{ font-size: 28px; font-weight: bold; color: black; margin-bottom: 10px; }}
             .item-qty {{ font-size: 22px; color: black; }}
         </style></head><body>
-        <div class="logo"><img src="https://interiortools-1.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
+        <div class="logo"><img src="https://ux-revival-1.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
         {pages_html}</body></html>"""
         
         return Response(content=html, media_type="text/html")
@@ -11760,7 +11760,7 @@ async def generate_movers_ffe(project_id: str):
             .room-header-row {{ background: black !important; }}
             .room-header-row td {{ color: white; font-weight: bold; font-size: 18px; padding: 15px; text-align: center; }}
         </style></head><body>
-        <div class="logo"><img src="https://interiortools-1.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
+        <div class="logo"><img src="https://ux-revival-1.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
         <h1>MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
         <p style="text-align: center;"><strong>Total Items:</strong> {row_num - 1}</p>
         <table><thead><tr><th>IMAGE</th><th>ROOM</th><th>ITEM</th><th>VENDOR</th><th>QTY</th><th>CHECKED</th></tr></thead>
@@ -12051,7 +12051,7 @@ async def generate_customer_sheets(project_id: str, data: dict = None):
 <body>
     <div class="header">
         <div class="logo">
-            <img src="https://interiortools-1.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co.">
+            <img src="https://ux-revival-1.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co.">
         </div>
         <h1>CUSTOMER PRODUCT SHEET</h1>
         <div class="client-name">{client_name} - {project_name}</div>

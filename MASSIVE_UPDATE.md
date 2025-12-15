@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://interiortools-1.preview.emergentagent.com/mobile-app
+Test it now: https://ux-revival-1.preview.emergentagent.com/mobile-app

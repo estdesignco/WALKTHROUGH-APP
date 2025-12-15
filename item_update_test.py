@@ -11,7 +11,7 @@ import json
 
 def test_item_update_api():
     """Test the item update API with cost, quantity, size, and remarks"""
-    base_url = "https://interiortools-1.preview.emergentagent.com/api"
+    base_url = "https://ux-revival-1.preview.emergentagent.com/api"
     
     print("🔥 TESTING ITEM UPDATE API - PRIORITY FROM REVIEW REQUEST")
     print("="*60)
