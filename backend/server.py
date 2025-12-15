@@ -5143,8 +5143,28 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         
                         if num_passwords > 0 and all_passwords:
                             print(f"   Entering password loop...")
-                            for idx, pwd_input in enumerate(all_passwords):
-                                print(f"🔐 Processing password input {idx + 1}/{num_passwords}...")
+                            
+                            # Sort password inputs by Y position - login form should be at top
+                            pwd_with_positions = []
+                            for pwd_input in all_passwords:
+                                try:
+                                    box = await pwd_input.bounding_box()
+                                    if box:
+                                        pwd_with_positions.append((pwd_input, box['y']))
+                                except:
+                                    pwd_with_positions.append((pwd_input, 9999))  # Put at end if no box
+                            
+                            # Sort by Y position (ascending - top first)
+                            pwd_with_positions.sort(key=lambda x: x[1])
+                            
+                            for idx, (pwd_input, y_pos) in enumerate(pwd_with_positions):
+                                print(f"🔐 Processing password input {idx + 1}/{num_passwords} at Y={y_pos}...")
+                                
+                                # Skip if Y position is too low (footer/newsletter)
+                                if y_pos > 800:
+                                    print(f"   Skipping - likely footer input (y={y_pos})")
+                                    continue
+                                    
                                 # Try to interact even if not "visible" by Playwright standards
                                 # Some React components report as not visible but are interactable
                                 try:
