@@ -634,9 +634,23 @@ const ExactChecklistSpreadsheet = ({
           }
         }
       }
+      
+      // If still no subcategory, try to find ANY subcategory
+      if (!subcategoryId) {
+        for (const room of project.rooms) {
+          for (const category of room.categories || []) {
+            if (category.subcategories?.length > 0) {
+              subcategoryId = category.subcategories[0].id;
+              console.log(`🔍 Auto-selected first available subcategory: ${category.subcategories[0].name}`);
+              break;
+            }
+          }
+          if (subcategoryId) break;
+        }
+      }
 
       if (!subcategoryId) {
-        console.error('Please expand a category first to add items to it.');
+        alert('Please add a room and category first before adding items.');
         return;
       }
 
