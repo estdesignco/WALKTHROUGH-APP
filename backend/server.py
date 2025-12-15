@@ -5552,21 +5552,29 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # ===== 2. ADVANCED PRICE DETECTION =====
             print("💰 EXTRACTING PRICE INFORMATION...")
             
+            # CRITICAL: Look for ALL price elements on the page first
+            # Get page text to find any dollar amounts
+            all_text = await page.inner_text('body')
+            
+            # Find ALL dollar amounts on page
+            import re
+            all_prices = re.findall(r'\$\s*([\d,]+\.?\d*)', all_text)
+            print(f"   Found {len(all_prices)} dollar amounts on page: {all_prices[:10]}")
+            
             # Vendor-specific price selectors (most reliable)
             vendor_price_selectors = {
                 'uttermost.com': [
-                    '.product-price', '.price', '.cost',
+                    # Uttermost specific - wholesale/trade price usually first
+                    '[class*="price"]:not([class*="retail"]):not([class*="suggested"])',
+                    '.price', '.cost', '.product-price',
+                    'span:has-text("$")', 'div:has-text("$")',
                     '[class*="ProductPrice"]', '[class*="price"]',
-                    '.price-value', '#product-price',
-                    'span.price', 'span.cost', 'div.price',
-                    '[data-price]', '[data-cost]'
                 ],
                 'hvlgroup.com': [
                     '.product-price', '.price', '.cost',
                     '[class*="Price"]', '[class*="price"]',
                     '.price-value', '#Price', 
                     'span.price', 'span.cost', 'div.price',
-                    '[data-price]', '[data-retail]'
                 ],
                 'fourhands.com': [
                     '.product-price-value', '.price-value', '.price',
