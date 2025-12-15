@@ -110,14 +110,20 @@ VENDOR_CONFIGS = {
     
     "hvlgroup.com": {
         "name": "HVL Group",
-        "login_url": "https://www.hvlgroup.com/Auth/Login?returnUrl=%2F",
+        "login_url": "https://www.hvlgroup.com/Auth/Login",
         "login_type": "direct",
-        "extra_wait_before_login": 5000,
-        "username_selectors": ['#Email', 'input[name="Email"]', 'input[type="email"]', 'input[name="email"]'],
-        "password_selectors": ['#Password', 'input[name="Password"]', 'input[type="password"]'],
-        "submit_selectors": ['button[type="submit"]', 'input[type="submit"]', 'button:has-text("Login")', 'button:has-text("Sign In")'],
+        "username_selectors": ['#Email', 'input[name="Email"]', 'input[type="email"]', 'input[placeholder="Email"]'],
+        "password_selectors": ['#Password', 'input[name="Password"]', 'input[type="password"]', 'input[placeholder="Password"]'],
+        "submit_selectors": [
+            'button:has-text("Login")', 
+            'button:has-text("LOG IN")', 
+            'input[type="submit"]', 
+            'button[type="submit"]',
+            '.login-button',
+            'form button'
+        ],
         "wait_after_login": 8000,
-        "wait_for_content": 5000,
+        "price_selectors": ['.price', '.product-price', '[class*="Price"]', '[class*="price"]']
     },
     
     "vandh.com": {
