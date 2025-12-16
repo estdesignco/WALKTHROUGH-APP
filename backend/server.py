@@ -5537,10 +5537,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     # Remove excessive whitespace and clean up
                     result[key] = ' '.join(value.split())
                     
-                    # Remove common garbage text
-                    garbage_terms = ['loading...', 'please wait', 'error', 'undefined', 'null', 'n/a']
-                    if any(term in result[key].lower() for term in garbage_terms):
-                        result[key] = None
+                    # Remove common garbage text - BUT NOT FROM URLs!
+                    # URLs may contain query params like "&m=undefined" which are valid
+                    if key not in ['image_url', 'link']:
+                        garbage_terms = ['loading...', 'please wait', 'error occurred', 'undefined', 'null', 'n/a']
+                        if any(term in result[key].lower() for term in garbage_terms):
+                            result[key] = None
             
             # Count successful extractions
             extracted_fields = sum(1 for v in result.values() if v is not None)
