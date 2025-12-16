@@ -4847,7 +4847,68 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     - Multiple extraction strategies with fallback mechanisms
     - Comprehensive data validation and cleanup
     - Handles all modern web technologies (React, Vue, Angular, etc.)
+    - AUTHENTICATED SESSIONS: Logs into wholesale sites using stored credentials
+    - VENDOR-SPECIFIC CONFIGURATIONS: Uses optimized selectors for each vendor
     """
+    # Get credentials for this vendor domain
+    from urllib.parse import urlparse
+    from vendor_config import get_vendor_config
+    
+    domain = urlparse(url).netloc.replace('www.', '')
+    
+    print(f"🔍 Looking up credentials for domain: {domain}")
+    
+    # Get vendor-specific configuration
+    vendor_config = get_vendor_config(domain)
+    print(f"📦 Using vendor config for: {vendor_config.get('name', domain)}")
+    
+    credentials = None
+    try:
+        # Look up credentials in database - try with and without www
+        cred_doc = await db.vendor_credentials.find_one({"domain": domain})
+        if not cred_doc:
+            # Try alternate domain formats
+            alt_domains = [
+                domain.replace('www.', ''),
+                f"www.{domain}",
+                domain.split('.')[0] + '.com',  # e.g., fourhands.com
+            ]
+            for alt in alt_domains:
+                cred_doc = await db.vendor_credentials.find_one({"domain": alt})
+                if cred_doc:
+                    break
+        
+        print(f"📋 Credential doc found: {cred_doc is not None}")
+        if cred_doc:
+            # Decrypt password if encrypted
+            password = None
+            if cred_doc.get("encrypted_password"):
+                try:
+                    fernet_key = os.environ.get('FERNET_KEY')
+                    if fernet_key:
+                        from cryptography.fernet import Fernet
+                        fernet = Fernet(fernet_key.encode())
+                        password = fernet.decrypt(cred_doc["encrypted_password"].encode()).decode()
+                except Exception as decrypt_error:
+                    print(f"⚠️ Could not decrypt password: {decrypt_error}")
+                    password = cred_doc.get("password")
+            else:
+                password = cred_doc.get("password")
+            
+            # Use login URL from vendor config if not in database
+            login_url = cred_doc.get("login_url") or vendor_config.get("login_url")
+            
+            credentials = {
+                "username": cred_doc.get("username"),
+                "password": password,
+                "login_url": login_url
+            }
+            print(f"🔐 Found credentials for {domain} - Username: {credentials['username']}")
+        else:
+            print(f"❌ NO credentials found for {domain}")
+    except Exception as e:
+        print(f"⚠️ Could not fetch credentials: {e}")
+    
     async with async_playwright() as p:
         # Enhanced browser configuration for blocked sites
         browser_args = [
@@ -4867,10 +4928,11 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         ]
         
+        # Use the correct browser executable path
         browser = await p.chromium.launch(
+            executable_path='/pw-browsers/chromium_headless_shell-1200/chrome-linux/headless_shell',
             headless=True, 
-            args=browser_args,
-            executable_path='/pw-browsers/chromium_headless_shell-1200/chrome-linux/headless_shell'
+            args=browser_args
         )
         
         # Enhanced context with anti-detection measures
@@ -4901,33 +4963,218 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         page = await context.new_page()
         
         # Enhanced timeout settings
-        page.set_default_timeout(45000)
+        page.set_default_timeout(30000)
+        
+        # STEALTH MODE: Remove webdriver detection
+        await page.add_init_script("""
+            // Override webdriver property
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            
+            // Override plugins to look more like a real browser
+            Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
+            
+            // Override languages
+            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+            
+            // Override Chrome-specific properties
+            window.chrome = { runtime: {} };
+            
+            // Override permissions query
+            const originalQuery = window.navigator.permissions.query;
+            window.navigator.permissions.query = (parameters) => (
+                parameters.name === 'notifications' ?
+                    Promise.resolve({ state: Notification.permission }) :
+                    originalQuery(parameters)
+            );
+        """)
+        
+        # First, try direct access to product page
+        login_successful = False
+        print(f"🌐 NAVIGATING TO PRODUCT PAGE: {url}")
+        
+        # WHOLESALE VENDORS THAT ALWAYS REQUIRE LOGIN FOR PRICES
+        # These vendors show product pages publicly but hide prices until logged in
+        wholesale_vendors_requiring_login = [
+            'uttermost.com', 'fourhands.com', 'hvlgroup.com', 'visualcomfort.com',
+            'bernhardt.com', 'globalviews.com', 'reginaandrew.com', 'loloirugs.com',
+            'flowdecor.com', 'eichholtz.com', 'surya.com', 'hinkley.com',
+            'hubbardtonforge.com', 'elegantlighting.com', 'gabby.com', 'vandh.com',
+            'bassettmirror.com', 'crestviewcollection.com', 'safavieh.com', 'myohamerica.com',
+            'zeevlighting.com', 'rowefurniture.com'
+        ]
+        
+        needs_login_for_prices = any(v in domain for v in wholesale_vendors_requiring_login)
+        
+        # LOGIN FIRST for wholesale vendors that hide prices
+        if needs_login_for_prices and credentials and credentials.get("username") and credentials.get("password"):
+            print(f"🔐 WHOLESALE VENDOR DETECTED - Logging in FIRST to get prices for {domain}...")
+            
+            login_url = vendor_config.get('login_url') or f'https://{domain}/login'
+            
+            try:
+                await page.goto(login_url, wait_until='domcontentloaded', timeout=30000)
+                await page.wait_for_timeout(5000)
+                
+                # Fill login form
+                username_selectors = vendor_config.get('username_selectors', ['#email', 'input[type="email"]', 'input[name="email"]', 'input[name="username"]'])
+                password_selectors = vendor_config.get('password_selectors', ['#password', 'input[type="password"]', 'input[name="password"]'])
+                
+                # Try to fill username
+                for selector in username_selectors:
+                    try:
+                        username_input = await page.query_selector(selector)
+                        if username_input:
+                            await username_input.fill(credentials['username'])
+                            print(f"✅ Filled username: {credentials['username']}")
+                            break
+                    except:
+                        continue
+                
+                # Try to fill password - MUST WAIT FOR FIELD TO BE VISIBLE
+                await page.wait_for_timeout(2000)  # Extra wait for React to render
+                password_filled = False
+                for selector in password_selectors:
+                    try:
+                        print(f"   Trying password selector: {selector}")
+                        pwd_input = await page.query_selector(selector)
+                        if pwd_input:
+                            # Check if visible
+                            is_visible = await pwd_input.is_visible()
+                            print(f"   Password field found, visible={is_visible}")
+                            if is_visible:
+                                await pwd_input.click()  # Focus the field first
+                                await page.wait_for_timeout(500)
+                                await pwd_input.fill(credentials['password'])
+                                print(f"✅ Filled password (length: {len(credentials['password'])})")
+                                password_filled = True
+                                break
+                    except Exception as pwd_err:
+                        print(f"   ⚠️ Password selector {selector} error: {pwd_err}")
+                        continue
+                
+                if not password_filled:
+                    print(f"⚠️ Could not fill password - no selector worked")
+                
+                # Submit login
+                submit_selectors = vendor_config.get('submit_selectors', ['button[type="submit"]', 'button:has-text("Login")', 'button:has-text("Sign In")', 'button:has-text("LOG IN")'])
+                for selector in submit_selectors:
+                    try:
+                        submit_btn = await page.query_selector(selector)
+                        if submit_btn:
+                            await submit_btn.click()
+                            print(f"✅ Submitted login form")
+                            break
+                    except:
+                        continue
+                
+                # Wait for login to complete
+                await page.wait_for_timeout(10000)
+                login_successful = True
+                print(f"✅ PRE-LOGIN COMPLETE for {domain}")
+                
+            except Exception as login_err:
+                print(f"⚠️ Pre-login attempt failed: {login_err}")
+        
+        # Now navigate to product page (logged in if wholesale vendor)
+        try:
+            await page.goto(url, wait_until='domcontentloaded', timeout=45000)
+            print(f"✅ Navigated to product page" + (" (LOGGED IN)" if login_successful else " (PUBLIC)"))
+        except Exception as nav_err:
+            print(f"⚠️ Navigation warning: {nav_err}")
+        
+        # Wait for page content to load
+        await page.wait_for_timeout(5000)
         
         try:
-            print(f"🌐 NAVIGATING TO: {url}")
+            await page.wait_for_load_state('networkidle', timeout=15000)
+        except:
+            pass
+        
+        await page.wait_for_timeout(3000)
+        
+        # Check if we got a 404 or login-required page (fallback for non-wholesale vendors)
+        page_text = await page.inner_text('body')
+        page_title = await page.title()
+        
+        is_blocked = any(x in page_text.lower() for x in ['page not found', '404', 'not found', 'access denied'])
+        is_login_required = any(x in page_text.lower() for x in ['sign in', 'log in', 'login required', 'please login'])
+        
+        if (is_blocked or is_login_required) and not login_successful and credentials and credentials.get("username") and credentials.get("password"):
+            print(f"🔐 PAGE REQUIRES LOGIN - Attempting authentication for {domain}...")
             
-            # Retry logic for blocked sites
-            max_retries = 3
-            for attempt in range(max_retries):
-                try:
-                    print(f"🔄 ATTEMPT {attempt + 1}/{max_retries}")
-                    
-                    # Add random delay to avoid rate limiting
-                    if attempt > 0:
-                        import random
-                        delay = random.uniform(2, 5)
-                        print(f"⏱️ RETRY DELAY: {delay:.1f}s")
-                        await asyncio.sleep(delay)
-                    
-                    # Navigate with advanced wait strategy
-                    await page.goto(url, wait_until='domcontentloaded', timeout=60000)
-                    break
-                    
-                except Exception as nav_error:
-                    print(f"❌ NAVIGATION ATTEMPT {attempt + 1} FAILED: {str(nav_error)}")
-                    if attempt == max_retries - 1:
-                        raise nav_error
-                    continue
+            # Get login URL from vendor config
+            login_url = vendor_config.get('login_url') or f'https://{domain}/login'
+            
+            try:
+                await page.goto(login_url, wait_until='domcontentloaded', timeout=30000)
+                await page.wait_for_timeout(5000)
+                
+                # Fill login form
+                username_selectors = vendor_config.get('username_selectors', ['#email', 'input[type="email"]', 'input[name="email"]', 'input[name="username"]'])
+                password_selectors = vendor_config.get('password_selectors', ['#password', 'input[type="password"]', 'input[name="password"]'])
+                
+                # Try to fill username
+                for selector in username_selectors:
+                    try:
+                        username_input = await page.query_selector(selector)
+                        if username_input:
+                            await username_input.fill(credentials['username'])
+                            print(f"✅ Filled username")
+                            break
+                    except:
+                        continue
+                
+                # Try to fill password - MUST WAIT FOR FIELD TO BE VISIBLE
+                await page.wait_for_timeout(2000)  # Extra wait for React to render
+                password_filled = False
+                for selector in password_selectors:
+                    try:
+                        print(f"   Trying password selector: {selector}")
+                        pwd_input = await page.query_selector(selector)
+                        if pwd_input:
+                            # Check if visible
+                            is_visible = await pwd_input.is_visible()
+                            print(f"   Password field found, visible={is_visible}")
+                            if is_visible:
+                                await pwd_input.click()  # Focus the field first
+                                await page.wait_for_timeout(500)
+                                await pwd_input.fill(credentials['password'])
+                                print(f"✅ Filled password (length: {len(credentials['password'])})")
+                                password_filled = True
+                                break
+                    except Exception as pwd_err:
+                        print(f"   ⚠️ Password selector {selector} error: {pwd_err}")
+                        continue
+                
+                if not password_filled:
+                    print(f"⚠️ Could not fill password - no selector worked")
+                
+                # Submit login
+                submit_selectors = vendor_config.get('submit_selectors', ['button[type="submit"]', 'button:has-text("Login")', 'button:has-text("Sign In")'])
+                for selector in submit_selectors:
+                    try:
+                        submit_btn = await page.query_selector(selector)
+                        if submit_btn:
+                            await submit_btn.click()
+                            print(f"✅ Submitted login form")
+                            break
+                    except:
+                        continue
+                
+                # Wait for login to complete
+                await page.wait_for_timeout(10000)
+                
+                # Navigate back to product page
+                await page.goto(url, wait_until='domcontentloaded', timeout=45000)
+                await page.wait_for_timeout(5000)
+                
+                login_successful = True
+                print(f"✅ LOGIN COMPLETE - Returned to product page")
+                
+            except Exception as login_err:
+                print(f"⚠️ Login attempt failed: {login_err}")
+        
+        try:
             
             # Multi-stage loading strategy for modern sites
             print("⏳ WAITING FOR DYNAMIC CONTENT...")
@@ -4957,18 +5204,19 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             except:
                 print("⚠️ Product elements timeout - proceeding with available content")
             
-            # Initialize result structure
+            # Initialize result structure - matches Item schema exactly
             result = {
                 'name': None,
                 'vendor': None,
-                'cost': None,
-                'price': None,
+                'cost': None,  # Will be float
+                'price': None,  # Will be float (not string)
                 'image_url': None,
                 'finish_color': None,
                 'size': None,
                 'description': None,
                 'sku': None,
-                'availability': None
+                'availability': None,
+                'link': url  # Add the URL as the link field
             }
             
             print("🧠 STARTING AI-POWERED EXTRACTION...")
@@ -4988,6 +5236,9 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'reginaandrew.com': 'Regina Andrew',
                 'bernhardt.com': 'Bernhardt',
                 'loloi.com': 'Loloi Rugs',
+                'loloirugs.com': 'Loloi Rugs',
+                'jaipurliving.com': 'Jaipur Living',
+                'povison.com': 'Povison',
                 'vandh.com': 'Vandh',
                 'visualcomfort.com': 'Visual Comfort',
                 'hvlgroup.com': 'HVL Group',
@@ -5021,6 +5272,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     result['vendor'] = vendor_name
                     print(f"✅ VENDOR IDENTIFIED: {vendor_name}")
                     break
+            
+            # Fallback: extract vendor from domain name if not matched
+            if not result['vendor']:
+                vendor_name = domain.replace('www.', '').replace('.com', '').replace('.co', '').title()
+                result['vendor'] = vendor_name
+                print(f"✅ VENDOR FALLBACK: {vendor_name} (from domain)")
             
             # ===== 1. INTELLIGENT PRODUCT NAME EXTRACTION =====
             print("🔍 EXTRACTING PRODUCT NAME...")
@@ -5074,7 +5331,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # ===== 2. ADVANCED PRICE DETECTION =====
             print("💰 EXTRACTING PRICE INFORMATION...")
             
-            # FIRST: Try JSON-LD structured data (most reliable for Bernhardt, etc.)
+            # STRATEGY 0: JSON-LD Structured Data (MOST RELIABLE SOURCE)
+            print("📌 Checking JSON-LD for price...")
             try:
                 json_ld_scripts = await page.locator('script[type="application/ld+json"]').all_text_contents()
                 import json
@@ -5082,89 +5340,171 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     try:
                         data = json.loads(script_content)
                         if isinstance(data, dict):
-                            # Check for direct price in offers
+                            # Check for direct price
                             if 'offers' in data and isinstance(data['offers'], dict):
                                 price_val = data['offers'].get('price')
                                 if price_val:
+                                    result['price'] = float(price_val)
                                     result['cost'] = float(price_val)
-                                    result['price'] = f"${float(price_val):.2f}"
-                                    print(f"✅ JSON-LD PRICE: {result['price']}")
-                            # Also get image from JSON-LD
-                            if not result.get('image_url') and 'image' in data:
+                                    print(f"✅ JSON-LD PRICE FOUND: ${result['price']}")
+                            
+                            # Also extract image if not already found
+                            if not result['image_url'] and 'image' in data:
                                 img = data['image']
-                                result['image_url'] = img if isinstance(img, str) else (img[0] if isinstance(img, list) and img else None)
-                                if result['image_url']:
-                                    print(f"✅ JSON-LD IMAGE: {result['image_url'][:60]}...")
+                                img_url = img if isinstance(img, str) else (img[0] if isinstance(img, list) and img else None)
+                                if img_url and not img_url.endswith('.svg'):
+                                    result['image_url'] = img_url
+                                    print(f"✅ JSON-LD IMAGE FOUND: {img_url[:60]}...")
+                            
+                            if result['price']:
+                                break
                     except:
                         continue
             except Exception as e:
                 print(f"⚠️ JSON-LD extraction error: {e}")
             
-            # Comprehensive price extraction with validation (fallback)
-            price_strategies = [
-                # Schema.org structured data
-                '[itemProp="price"], [property="product:price:amount"]',
-                
-                # Modern e-commerce patterns
-                '[data-testid*="price"], [data-test*="price"]',
-                '[data-price], [data-cost], [data-amount]',
-                
-                # Traditional price selectors
-                '.price-current, .current-price, .sale-price',
-                '.product-price, .item-price, .price',
-                '.pricing .price, .cost, .price-display',
-                
-                # Vendor-specific patterns (adaptive)
-                f'[class*="{domain.split(".")[0]}"][class*="price"]',
-                
-                # Generic money indicators
-                '[class*="price"]:not([class*="old"]):not([class*="was"])',
-                '[class*="cost"]:not([class*="shipping"])',
-                '[class*="amount"]'
-            ]
+            # CRITICAL: Look for ALL price elements on the page first
+            # Get page text to find any dollar amounts
+            all_text = await page.inner_text('body')
             
-            for strategy in price_strategies:
-                try:
-                    elements = await page.query_selector_all(strategy)
-                    for element in elements:
-                        # Get text content
-                        price_text = await element.text_content()
-                        if not price_text:
-                            continue
-                            
-                        # Advanced price pattern matching
-                        import re
-                        price_patterns = [
-                            r'\$\s*([0-9,]+\.?[0-9]*)',  # $1,234.56
-                            r'([0-9,]+\.?[0-9]*)\s*\$',  # 1,234.56$
-                            r'USD\s*([0-9,]+\.?[0-9]*)', # USD 1,234.56
-                            r'([0-9,]+\.?[0-9]*)\s*USD', # 1,234.56 USD
-                            r'(?:Price|Cost|MSRP):\s*\$?([0-9,]+\.?[0-9]*)',
-                            r'([0-9,]+\.[0-9]{2})',      # Decimal currency format
-                            r'([0-9,]+)',                # Just numbers as last resort
-                        ]
-                        
-                        for pattern in price_patterns:
-                            match = re.search(pattern, price_text)
-                            if match:
-                                try:
+            # Find ALL dollar amounts on page
+            import re
+            all_prices = re.findall(r'\$\s*([\d,]+\.?\d*)', all_text)
+            print(f"   Found {len(all_prices)} dollar amounts on page: {all_prices[:10]}")
+            
+            # Vendor-specific price selectors (most reliable)
+            vendor_price_selectors = {
+                'uttermost.com': [
+                    # Uttermost specific - wholesale/trade price usually first
+                    '[class*="price"]:not([class*="retail"]):not([class*="suggested"])',
+                    '.price', '.cost', '.product-price',
+                    'span:has-text("$")', 'div:has-text("$")',
+                    '[class*="ProductPrice"]', '[class*="price"]',
+                ],
+                'hvlgroup.com': [
+                    '.product-price', '.price', '.cost',
+                    '[class*="Price"]', '[class*="price"]',
+                    '.price-value', '#Price', 
+                    'span.price', 'span.cost', 'div.price',
+                ],
+                'fourhands.com': [
+                    '.product-price-value', '.price-value', '.price',
+                    '[class*="price"]', '.pricing'
+                ]
+            }
+            
+            # Check vendor-specific selectors first
+            domain_key = None
+            for key in vendor_price_selectors:
+                if key in domain:
+                    domain_key = key
+                    break
+            
+            if domain_key:
+                print(f"🔍 Using vendor-specific price selectors for {domain_key}")
+                for selector in vendor_price_selectors[domain_key]:
+                    try:
+                        elements = await page.query_selector_all(selector)
+                        for element in elements:
+                            price_text = await element.text_content()
+                            if price_text:
+                                import re
+                                match = re.search(r'\$\s*([0-9,]+\.?[0-9]*)', price_text)
+                                if match:
                                     price_val = float(match.group(1).replace(',', ''))
-                                    # Validate reasonable price range for furniture
                                     if 10 <= price_val <= 100000:
                                         result['cost'] = price_val
-                                        result['price'] = f"${price_val:.2f}"
-                                        print(f"✅ PRICE EXTRACTED: {result['price']}")
+                                        result['price'] = price_val
+                                        print(f"✅ VENDOR PRICE EXTRACTED: ${price_val:.2f} from {selector}")
                                         break
-                                except:
-                                    continue
-                        
-                        if result['cost']:
+                        if result.get('price'):
                             break
+                    except Exception as e:
+                        continue
+            
+            # If still no price, look in page text for price patterns
+            if not result.get('price'):
+                all_text = await page.inner_text('body')
+                import re
+                # Look for price patterns like $123.45 or $1,234.00
+                price_matches = re.findall(r'\$\s*([0-9,]+\.[0-9]{2})', all_text)
+                if price_matches:
+                    for price_str in price_matches:
+                        try:
+                            price_val = float(price_str.replace(',', ''))
+                            if 10 <= price_val <= 100000:
+                                result['cost'] = price_val
+                                result['price'] = price_val
+                                print(f"✅ TEXT PRICE EXTRACTED: ${price_val:.2f}")
+                                break
+                        except:
+                            continue
+            
+            # Comprehensive price extraction with validation
+            if not result.get('price'):
+                price_strategies = [
+                    # Schema.org structured data
+                    '[itemProp="price"], [property="product:price:amount"]',
                     
-                    if result['cost']:
+                    # Modern e-commerce patterns
+                    '[data-testid*="price"], [data-test*="price"]',
+                    '[data-price], [data-cost], [data-amount]',
+                    
+                    # Traditional price selectors
+                    '.price-current, .current-price, .sale-price',
+                    '.product-price, .item-price, .price',
+                    '.pricing .price, .cost, .price-display',
+                    
+                    # Vendor-specific patterns (adaptive)
+                    f'[class*="{domain.split(".")[0]}"][class*="price"]',
+                    
+                    # Generic money indicators
+                    '[class*="price"]:not([class*="old"]):not([class*="was"])',
+                    '[class*="cost"]:not([class*="shipping"])',
+                    '[class*="amount"]'
+                ]
+            
+                for strategy in price_strategies:
+                    try:
+                        elements = await page.query_selector_all(strategy)
+                        for element in elements:
+                            # Get text content
+                            price_text = await element.text_content()
+                            if not price_text:
+                                continue
+                                
+                            # Advanced price pattern matching
+                            import re
+                            price_patterns = [
+                                r'\$\s*([0-9,]+\.?[0-9]*)',  # $1,234.56
+                                r'([0-9,]+\.?[0-9]*)\s*\$',  # 1,234.56$
+                                r'USD\s*([0-9,]+\.?[0-9]*)', # USD 1,234.56
+                                r'([0-9,]+\.?[0-9]*)\s*USD', # 1,234.56 USD
+                                r'(?:Price|Cost|MSRP):\s*\$?([0-9,]+\.?[0-9]*)',
+                                r'([0-9,]+\.[0-9]{2})',      # Decimal currency format
+                                r'([0-9,]+)',                # Just numbers as last resort
+                            ]
+                            
+                            for pattern in price_patterns:
+                                match = re.search(pattern, price_text)
+                                if match:
+                                    try:
+                                        price_val = float(match.group(1).replace(',', ''))
+                                        # Validate reasonable price range for furniture
+                                        if 10 <= price_val <= 100000:
+                                            result['cost'] = price_val
+                                            result['price'] = price_val  # Store as float, not string
+                                            print(f"✅ PRICE EXTRACTED: ${price_val:.2f}")
+                                            break
+                                    except:
+                                        continue
+                            
+                            if result.get('price'):
+                                break
+                    except:
+                        continue
+                    if result.get('price'):
                         break
-                except:
-                    continue
             
             # Regex fallback on full page text for price
             if not result['cost']:
@@ -5176,98 +5516,99 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         price_val = float(match.group(1).replace(',', ''))
                         if 10 <= price_val <= 100000:
                             result['cost'] = price_val
-                            result['price'] = f"${price_val:.2f}"
-                            print(f"✅ REGEX PRICE: {result['price']}")
+                            result['price'] = price_val  # Store as float
+                            print(f"✅ REGEX PRICE: ${price_val:.2f}")
                             break
                     except:
                         continue
             
-            # ===== 3. INTELLIGENT IMAGE EXTRACTION =====
-            print("🖼️ EXTRACTING PRODUCT IMAGES...")
+            # ===== 3. SUPER POWERFUL IMAGE EXTRACTION =====
+            print("🖼️ EXTRACTING PRODUCT IMAGE WITH MULTIPLE STRATEGIES...")
             
-            # Skip if we already have a good image from JSON-LD
-            skip_image_extraction = result.get('image_url') and not result['image_url'].endswith('.svg')
-            if skip_image_extraction:
+            # STRATEGY 1: META TAGS (Most Reliable - Always correct!)
+            # Only if we don't already have an image from JSON-LD
+            if not result['image_url']:
+                print("📌 Strategy 1: Checking Open Graph meta tags...")
+                try:
+                    og_image = await page.locator('meta[property="og:image"]').first.get_attribute('content', timeout=2000)
+                    if og_image and not og_image.endswith('.svg') and 'logo' not in og_image.lower():
+                        print(f"✅ Found OG:IMAGE: {og_image[:80]}")
+                        result['image_url'] = og_image
+                except:
+                    print("⚠️ No og:image found")
+            else:
                 print(f"📌 Already have image from JSON-LD: {result['image_url'][:60]}...")
             
-            # Enhanced image extraction with site-specific strategies
-            image_strategies = []
-            
-            # SITE-SPECIFIC OPTIMIZATIONS
-            if 'fourhands.com' in domain:
-                image_strategies.extend([
-                    '.product-media img:first-child',
-                    '.product-gallery img:first-child',
-                    '.ProductGallery img:first-child',
-                    'img[src*="/products/"]',
-                    '.hero-image img'
-                ])
-            elif 'wayfair.com' in domain:
-                image_strategies.extend([
-                    '[data-testid="product-media"] img:first-child',
-                    '.ProductMediaContainer img:first-child',
-                    '[data-testid="media-gallery"] img:first-child',
-                    '.Media-gallery img:first-child'
-                ])
-            elif 'cb2.com' in domain:
-                image_strategies.extend([
-                    '.product-images img:first-child',
-                    '.carousel-image img:first-child',
-                    '.hero-product-image img'
-                ])
-            elif 'westelm.com' in domain:
-                image_strategies.extend([
-                    '.product-images img:first-child',
-                    '.carousel-image img:first-child',
-                    '.hero-product-image img'
-                ])
-            elif 'restorationhardware.com' in domain or 'rh.com' in domain:
-                image_strategies.extend([
-                    '.product-media img:first-child',
-                    '.product-carousel img:first-child'
-                ])
-            
-            # UNIVERSAL HIGH-PRIORITY STRATEGIES
-            image_strategies.extend([
-                # Structured data
-                'img[itemProp="image"], img[property="og:image"]',
-                
-                # Modern e-commerce patterns
-                '[data-testid*="image"] img:first-child',
-                '[data-test*="image"] img:first-child',
-                
-                # Traditional product images
-                '.product-image img:first-child, .product-gallery img:first-child',
-                '.hero-image img, .main-image img, .primary-image img',
-                
-                # Generic product images
-                'img[class*="product"]:not([class*="thumb"]):not([class*="small"])',
-                'img[alt*="product" i]:not([alt*="thumbnail" i])',
-                'img[src*="product"]:not([src*="thumb"]):not([src*="small"])',
-                
-                # Data attributes for lazy loading
-                'img[data-src*="product"], img[data-lazy-src]',
-                
-                # Fallback strategies
-                'img[width][height]:not([width="1"]):not([height="1"])'
-            ])
-            
-            best_image = None
-            best_score = 0
-            
-            for strategy in image_strategies:
+            # STRATEGY 2: Twitter Card (Backup meta tag)
+            if not result['image_url']:
+                print("📌 Strategy 2: Checking Twitter Card meta tags...")
                 try:
-                    images = await page.query_selector_all(strategy)
-                    for img in images[:5]:  # Check top 5 images per strategy
-                        src = await img.get_attribute('src')
-                        data_src = await img.get_attribute('data-src')
-                        data_lazy = await img.get_attribute('data-lazy-src')
-                        alt = await img.get_attribute('alt') or ""
-                        
-                        # Try different src attributes
-                        image_url = src or data_src or data_lazy
-                        if not image_url:
+                    twitter_image = await page.locator('meta[name="twitter:image"]').first.get_attribute('content', timeout=2000)
+                    if twitter_image and not twitter_image.endswith('.svg'):
+                        print(f"✅ Found TWITTER:IMAGE: {twitter_image[:80]}")
+                        result['image_url'] = twitter_image
+                except:
+                    print("⚠️ No twitter:image found")
+            
+            # STRATEGY 3: JSON-LD Structured Data
+            if not result['image_url']:
+                print("📌 Strategy 3: Checking JSON-LD structured data...")
+                try:
+                    json_ld = await page.locator('script[type="application/ld+json"]').all_text_contents()
+                    import json
+                    for script_content in json_ld:
+                        try:
+                            data = json.loads(script_content)
+                            if isinstance(data, dict) and 'image' in data:
+                                img_url = data['image'] if isinstance(data['image'], str) else data['image'][0]
+                                if img_url and not img_url.endswith('.svg'):
+                                    print(f"✅ Found JSON-LD IMAGE: {img_url[:80]}")
+                                    result['image_url'] = img_url
+                                    break
+                        except:
                             continue
+                except:
+                    print("⚠️ No JSON-LD image found")
+            
+            # STRATEGY 4: Wait for gallery images to load and score them
+            if not result['image_url']:
+                print("📌 Strategy 4: Waiting for gallery images to load...")
+                await page.wait_for_timeout(3000)  # Wait longer for React/JS images
+                
+                # Site-specific selectors
+                if 'fourhands.com' in domain:
+                    image_strategies = [
+                        'picture source[type="image/jpeg"]',  # Modern picture elements
+                        'picture img',
+                        'img[src*="cdn.shopify.com"][src*="products"]',
+                        '[class*="Gallery"] img',
+                        '[class*="ProductImage"] img',
+                        'main img[src*="cloudfront"]',
+                    ]
+                else:
+                    image_strategies = [
+                        'img[itemProp="image"]',
+                        '.product-image img',
+                        '.main-image img',
+                        '[data-testid*="image"] img',
+                    ]
+            
+                best_image = None
+                best_score = 0
+                
+                for strategy in image_strategies:
+                    try:
+                        images = await page.query_selector_all(strategy)
+                        for img in images[:10]:  # Check top 10 images per strategy
+                            src = await img.get_attribute('src')
+                            data_src = await img.get_attribute('data-src')
+                            data_lazy = await img.get_attribute('data-lazy-src')
+                            alt = await img.get_attribute('alt') or ""
+                            
+                            # Try different src attributes
+                            image_url = src or data_src or data_lazy
+                            if not image_url:
+                                continue
                         
                         # Fix relative URLs
                         if image_url.startswith('//'):
@@ -5294,6 +5635,14 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             pass
                         
                         # Positive scoring - Enhanced
+                        # Bonus for being in main/gallery containers (PRIORITIZE GALLERY IMAGES)
+                        try:
+                            parent_class = await img.evaluate('el => el.parentElement?.className || ""')
+                            if any(keyword in parent_class.lower() for keyword in ['gallery', 'main-image', 'hero', 'primary', 'featured', 'productimage']):
+                                score += 50  # HUGE bonus for gallery images
+                        except:
+                            pass
+                        
                         if any(keyword in alt.lower() for keyword in ['product', 'main', 'hero', 'primary', 'detail']):
                             score += 12
                         if any(keyword in image_url.lower() for keyword in ['product', 'main', 'hero', 'large', 'detail', '1920', '1080', 'full']):
@@ -5307,13 +5656,44 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             'bat.bing.com', 'tracking', 'analytics', 'pixel', 'beacon',
                             'googletagmanager', 'facebook.com/tr', 'doubleclick',
                             'amazon-adsystem', 'googlesyndication', 'googleadservices',
-                            '1x1', 'transparent.gif', 'blank.gif'
+                            '1x1', 'transparent.gif', 'blank.gif', 'wordmark', 'brand-logo',
+                            'header-logo', 'footer-logo', 'site-logo', 'company-logo',
+                            'swatch', 'finish', 'color-option', 'material-option', 'thumbnail',
+                            'nav', 'menu', 'button', 'badge', 'overlay'
                         ]
                         
+                        # NUCLEAR penalties - NEVER select logos/SVGs/swatches
+                        if image_url.endswith('.svg'):  # SVGs are NEVER product images
+                            score -= 1000
+                        if 'wordmark' in image_url.lower() or 'logo' in image_url.lower():
+                            score -= 1000
+                        
+                        # Strong penalties for excluded patterns
                         if any(keyword in image_url.lower() for keyword in exclusion_keywords):
-                            score -= 25
-                        if any(keyword in alt.lower() for keyword in ['logo', 'brand', 'icon', 'advertisement']):
-                            score -= 15
+                            score -= 100  # Very strong penalty
+                        if any(keyword in alt.lower() for keyword in ['logo', 'brand', 'icon', 'advertisement', 'wordmark', 'swatch', 'finish', 'option']):
+                            score -= 100  # Very strong penalty
+                        
+                        # Check if image is too small (likely a logo/icon/swatch)
+                        try:
+                            width = await img.get_attribute('width')
+                            height = await img.get_attribute('height')
+                            if width and height:
+                                w, h = int(width), int(height)
+                                if w < 200 or h < 200:  # Too small to be main product image
+                                    score -= 50
+                                elif w < 100 or h < 100:  # Definitely too small
+                                    score -= 100
+                        except:
+                            pass
+                        
+                        # Check CSS classes for finish/swatch indicators
+                        try:
+                            css_class = await img.get_attribute('class') or ''
+                            if any(keyword in css_class.lower() for keyword in ['swatch', 'finish', 'option', 'variant', 'thumb', 'nav']):
+                                score -= 100
+                        except:
+                            pass
                         
                         # Site-specific optimizations
                         if 'fourhands.com' in domain:
@@ -5338,25 +5718,25 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             best_image = image_url
                             best_score = score
                             print(f"🏆 NEW BEST IMAGE (score: {score}): {image_url[:60]}...")
-                            
-                except:
-                    continue
+                    except:
+                        continue
+                
+                if best_image:
+                    result['image_url'] = best_image
+                    print(f"✅ IMAGE FOUND FROM STRATEGY 4: {best_image[:80]}...")
             
-            if best_image and not skip_image_extraction:
-                result['image_url'] = best_image
-                print(f"✅ IMAGE FOUND: {best_image[:80]}...")
-            else:
-                # FALLBACK: Try to find ANY reasonable image
-                print("🔄 FALLBACK IMAGE SEARCH...")
+            # FINAL FALLBACK: Only if NO image found from any strategy
+            if not result['image_url']:
+                print("🔄 FINAL FALLBACK: Searching for any reasonable image...")
                 try:
                     all_images = await page.query_selector_all('img')
                     for img in all_images[:20]:  # Check first 20 images
                         src = await img.get_attribute('src')
                         if src and len(src) > 10:
-                            # Basic quality check
-                            if not any(bad in src.lower() for bad in ['logo', 'icon', 'tracking', 'pixel', '1x1']):
+                            # Basic quality check - STRICT filtering
+                            if not any(bad in src.lower() for bad in ['logo', 'icon', 'tracking', 'pixel', '1x1', 'wordmark', '.svg']):
                                 result['image_url'] = src if src.startswith('http') else urljoin(url, src)
-                                print(f"🎯 FALLBACK IMAGE: {result['image_url'][:60]}...")
+                                print(f"🎯 FALLBACK IMAGE FOUND: {result['image_url'][:60]}...")
                                 break
                 except:
                     print("⚠️ FALLBACK IMAGE SEARCH FAILED")
@@ -5395,12 +5775,26 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     if element:
                         sku_text = await element.text_content()
                         if sku_text:
-                            # Clean up the SKU text - only keep the first code-like word
-                            cleaned_sku = re.sub(r'[^\w\-]', ' ', sku_text).strip()
-                            # Extract first valid SKU-like token (alphanumeric with optional dashes)
-                            sku_match = re.search(r'^(?:SKU\s*)?([A-Za-z0-9\-_]+)', cleaned_sku, re.IGNORECASE)
+                            # Clean up the SKU text - remove social media garbage
+                            cleaned_sku = sku_text.strip()
+                            # Remove common junk text
+                            junk_patterns = [
+                                r'share.*', r'pinterest.*', r'facebook.*', r'linkedin.*', 
+                                r'twitter.*', r'email.*', r'print.*', r'copy.*link.*',
+                                r'save.*', r'wishlist.*', r'compare.*'
+                            ]
+                            for junk in junk_patterns:
+                                cleaned_sku = re.sub(junk, '', cleaned_sku, flags=re.IGNORECASE)
+                            
+                            # Extract just the SKU part
+                            sku_match = re.search(r'^(SKU\s*[:#]?\s*)?([A-Za-z0-9\-_]+)', cleaned_sku, re.IGNORECASE)
                             if sku_match:
-                                result['sku'] = sku_match.group(1)
+                                cleaned_sku = sku_match.group(2).strip()
+                            else:
+                                cleaned_sku = re.sub(r'[^\w\-]', ' ', cleaned_sku).strip().split()[0] if cleaned_sku else ''
+                            
+                            if 3 <= len(cleaned_sku) <= 30:
+                                result['sku'] = cleaned_sku
                                 print(f"✅ SKU FOUND: {result['sku']}")
                                 break
                 except:
@@ -5408,14 +5802,33 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             
             # Regex fallback for SKU
             if not result['sku']:
-                for pattern in sku_patterns:
-                    match = re.search(pattern, all_text + url, re.IGNORECASE)
+                # PRIORITY: Extract SKU from URL first (most reliable for many vendors)
+                url_sku_patterns = [
+                    r'product/([A-Za-z0-9\-_]+)',  # fourhands.com/product/251240-001
+                    r'/([A-Z]?\d{5,}[A-Za-z0-9\-_]*)',  # /R22952 or /251240-001
+                ]
+                for pattern in url_sku_patterns:
+                    match = re.search(pattern, url, re.IGNORECASE)
                     if match:
                         sku_candidate = match.group(1)
-                        if len(sku_candidate) >= 3:
+                        # Validate - must look like a product code
+                        if len(sku_candidate) >= 5 and any(c.isdigit() for c in sku_candidate):
                             result['sku'] = sku_candidate
-                            print(f"✅ REGEX SKU: {result['sku']}")
+                            print(f"✅ URL-BASED SKU: {result['sku']}")
                             break
+                
+                # Only use page text if URL didn't have SKU
+                if not result['sku']:
+                    skip_words = ['number', 'model', 'code', 'item', 'product', 'sku']
+                    for pattern in sku_patterns:
+                        match = re.search(pattern, all_text, re.IGNORECASE)
+                        if match:
+                            sku_candidate = match.group(1)
+                            # Skip generic words that aren't actual SKUs
+                            if sku_candidate.lower() not in skip_words and len(sku_candidate) >= 3:
+                                result['sku'] = sku_candidate
+                                print(f"✅ REGEX SKU: {result['sku']}")
+                                break
             
             # ===== 5. ADVANCED DIMENSIONS/SIZE EXTRACTION =====
             print("📏 EXTRACTING DIMENSIONS...")
@@ -5478,57 +5891,69 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # ===== 6. FINISH/COLOR EXTRACTION =====
             print("🎨 EXTRACTING FINISH/COLOR...")
             
-            finish_strategies = [
-                # Structured data
-                '[itemProp="color"], [itemProp="material"]',
-                
-                # Common selectors
-                '.color-name, .finish-name, .material-name',
-                '[class*="color"], [class*="finish"], [class*="material"]',
-                '.product-options [class*="selected"], .variant-selected',
-                
-                # Generic areas that might contain finish/color info
-                '.product-info, .product-details, .specifications, .product-meta'
-            ]
-            
-            for strategy in finish_strategies:
+            # FIRST: Try to extract from product description text
+            # Look for finish/material keywords in the description
+            description_text = ""
+            desc_selectors = ['.product-description', '.description', '[class*="description"]', '[class*="Description"]', 'p']
+            for sel in desc_selectors:
                 try:
-                    elements = await page.query_selector_all(strategy)
-                    for element in elements:
-                        finish_text = await element.text_content()
-                        if finish_text:
-                            # Clean text and validate
-                            cleaned = finish_text.strip()
-                            # Remove common prefixes
-                            cleaned = re.sub(r'^(Color|Finish|Material):\s*', '', cleaned, flags=re.IGNORECASE)
-                            
-                            if 2 <= len(cleaned) <= 50 and not any(skip in cleaned.lower() for skip in ['select', 'choose', 'option']):
-                                result['finish_color'] = cleaned
-                                print(f"✅ FINISH/COLOR: {result['finish_color']}")
-                                break
-                    
-                    if result['finish_color']:
-                        break
+                    desc_elements = await page.query_selector_all(sel)
+                    for el in desc_elements:
+                        text = await el.text_content()
+                        if text and len(text) > 50:
+                            description_text += " " + text
                 except:
                     continue
             
-            # Regex fallback for finish/color
-            if not result['finish_color']:
+            # Extract finish/material from description
+            if description_text:
                 import re
+                # Look for specific material/finish mentions
                 finish_patterns = [
-                    r'(?:Color|Finish|Material)[:\s]*([A-Za-z\s]{2,30})',
-                    r'Available in ([A-Za-z\s]{2,30})',
-                    r'Finish: ([A-Za-z\s]{2,30})'
+                    r'(?:in a|with a|features? a?|finished in)\s+([a-zA-Z\s]+(?:finish|brass|bronze|gold|silver|chrome|nickel|iron|wood|oak|walnut|marble|stone|leather|fabric|velvet|linen))',
+                    r'(antique\s+\w+)\s+finish',
+                    r'(\w+\s+brass|\w+\s+bronze|\w+\s+gold|\w+\s+silver)',
+                    r'(black|white|gray|grey|brown|beige|cream|ivory|natural)\s+(?:marble|stone|wood|oak|finish)',
+                    r'(?:Color|Finish|Material)[:\s]+([A-Za-z\s]{3,40}?)(?:\.|,|\n|$)',
                 ]
                 
                 for pattern in finish_patterns:
-                    match = re.search(pattern, all_text, re.IGNORECASE)
+                    match = re.search(pattern, description_text, re.IGNORECASE)
                     if match:
                         finish_candidate = match.group(1).strip()
-                        if 2 <= len(finish_candidate) <= 50:
-                            result['finish_color'] = finish_candidate
-                            print(f"✅ REGEX FINISH: {result['finish_color']}")
+                        # Clean up
+                        finish_candidate = re.sub(r'\s+', ' ', finish_candidate)
+                        if 3 <= len(finish_candidate) <= 50:
+                            result['finish_color'] = finish_candidate.title()
+                            print(f"✅ FINISH/COLOR FROM DESCRIPTION: {result['finish_color']}")
                             break
+            
+            # SECOND: Check for explicit finish/color selectors
+            if not result.get('finish_color'):
+                finish_selectors = [
+                    '.color-name', '.finish-name', '.material-name',
+                    '[data-finish]', '[data-color]', '[data-material]',
+                    '.selected-color', '.selected-finish',
+                    '.product-color', '.product-finish'
+                ]
+                
+                for selector in finish_selectors:
+                    try:
+                        elements = await page.query_selector_all(selector)
+                        for element in elements:
+                            finish_text = await element.text_content()
+                            if finish_text:
+                                cleaned = finish_text.strip()
+                                # Skip generic terms
+                                skip_terms = ['select', 'choose', 'option', 'email', 'subscribe', 'specifications', 'details', 'description', 'download', 'assembly']
+                                if 3 <= len(cleaned) <= 50 and not any(skip in cleaned.lower() for skip in skip_terms):
+                                    result['finish_color'] = cleaned
+                                    print(f"✅ FINISH/COLOR: {result['finish_color']}")
+                                    break
+                        if result.get('finish_color'):
+                            break
+                    except:
+                        continue
             
             # ===== FINAL VALIDATION AND CLEANUP =====
             print("🔧 VALIDATING AND CLEANING RESULTS...")
