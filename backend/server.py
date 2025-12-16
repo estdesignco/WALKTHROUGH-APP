@@ -5395,10 +5395,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     if element:
                         sku_text = await element.text_content()
                         if sku_text:
-                            # Clean up the SKU text
+                            # Clean up the SKU text - only keep the first code-like word
                             cleaned_sku = re.sub(r'[^\w\-]', ' ', sku_text).strip()
-                            if len(cleaned_sku) >= 3:
-                                result['sku'] = cleaned_sku
+                            # Extract first valid SKU-like token (alphanumeric with optional dashes)
+                            sku_match = re.search(r'^(?:SKU\s*)?([A-Za-z0-9\-_]+)', cleaned_sku, re.IGNORECASE)
+                            if sku_match:
+                                result['sku'] = sku_match.group(1)
                                 print(f"✅ SKU FOUND: {result['sku']}")
                                 break
                 except:
