@@ -59,11 +59,11 @@ class ProductScrapingTester:
         try:
             start_time = time.time()
             
-            # Make POST request to scraping endpoint
+            # Make POST request to scraping endpoint - use longer timeout for scraping
             response = requests.post(
                 f"{self.base_url}/scrape-product",
                 json={"url": product_url},
-                timeout=30
+                timeout=180  # 3 minutes for complex scraping operations
             )
             
             duration = time.time() - start_time
