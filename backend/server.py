@@ -5185,8 +5185,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # ===== 3. INTELLIGENT IMAGE EXTRACTION =====
             print("🖼️ EXTRACTING PRODUCT IMAGES...")
             
-            # Enhanced image extraction with site-specific strategies
-            image_strategies = []
+            # Skip if we already have a good image from JSON-LD
+            if result.get('image_url') and not result['image_url'].endswith('.svg'):
+                print(f"📌 Already have image from JSON-LD: {result['image_url'][:60]}...")
+            else:
+                # Enhanced image extraction with site-specific strategies
+                image_strategies = []
             
             # SITE-SPECIFIC OPTIMIZATIONS
             if 'fourhands.com' in domain:
