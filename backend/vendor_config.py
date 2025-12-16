@@ -22,11 +22,14 @@ VENDOR_CONFIGS = {
         "login_url": "https://uttermost.com/sign-in",
         "login_type": "direct",
         "extra_wait_before_login": 8000,
-        "username_selectors": ['#email-login', '#email', 'input[name="email"]', 'input[type="email"]'],
-        "password_selectors": ['#login-password', '#Password', 'input[type="password"]', 'input[name="password"]'],
-        "submit_selectors": ['button[type="submit"]:has-text("Login")', 'button:has-text("Login")', 'button[type="submit"]:has-text("Sign In")', 'button:has-text("LOGIN")'],
+        # NOTE: Uttermost has TWO login forms - use the VISIBLE ones: #email and #Password
+        "username_selectors": ['#email', '#email-login', 'input[name="email"]', 'input[type="email"]'],
+        "password_selectors": ['#Password', '#login-password', 'input[type="password"]', 'input[name="password"]'],
+        "submit_selectors": ['button:has-text("Login")', 'button[type="submit"]:has-text("Login")', 'button[type="submit"]'],
         "wait_after_login": 15000,
         "wait_for_content": 10000,
+        # WARNING: Uttermost has aggressive bot detection - login may fail even with correct credentials
+        "bot_detection_risk": True,
     },
     
     "globalviews.com": {
