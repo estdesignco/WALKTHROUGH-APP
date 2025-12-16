@@ -22,11 +22,11 @@ VENDOR_CONFIGS = {
         "login_url": "https://uttermost.com/sign-in",
         "login_type": "direct",
         "extra_wait_before_login": 8000,
-        "username_selectors": ['#email', 'input[type="email"]', 'input[name="email"]'],
-        "password_selectors": ['input[type="password"]', '#password', 'input[name="password"]'],
-        "submit_selectors": ['button[type="submit"]', 'button:has-text("LOGIN")', 'button:has-text("Log In")'],
-        "wait_after_login": 12000,
-        "wait_for_content": 8000,
+        "username_selectors": ['#email-login', '#email', 'input[name="email"]', 'input[type="email"]'],
+        "password_selectors": ['#login-password', '#Password', 'input[type="password"]', 'input[name="password"]'],
+        "submit_selectors": ['button[type="submit"]:has-text("Login")', 'button:has-text("Login")', 'button[type="submit"]:has-text("Sign In")', 'button:has-text("LOGIN")'],
+        "wait_after_login": 15000,
+        "wait_for_content": 10000,
     },
     
     "globalviews.com": {
