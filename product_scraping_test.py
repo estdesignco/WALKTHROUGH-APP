@@ -152,15 +152,20 @@ class ProductScrapingTester:
         print("\n=== TESTING API ENDPOINT AVAILABILITY ===")
         
         try:
-            # Test with a simple request to see if endpoint exists
+            # Test with a simple request to see if endpoint exists - use longer timeout for scraping
             response = requests.post(
                 f"{self.base_url}/scrape-product",
                 json={"url": "https://example.com"},
-                timeout=10
+                timeout=120  # 2 minutes for scraping operations
             )
             
             if response.status_code in [200, 400, 422]:  # Any of these means endpoint exists
                 print("✅ API endpoint /api/scrape-product is available")
+                try:
+                    data = response.json()
+                    print(f"    Response: {data}")
+                except:
+                    print(f"    Response text: {response.text[:200]}...")
                 return True
             else:
                 print(f"❌ API endpoint returned unexpected status: {response.status_code}")
