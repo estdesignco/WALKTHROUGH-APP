@@ -5074,7 +5074,33 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # ===== 2. ADVANCED PRICE DETECTION =====
             print("💰 EXTRACTING PRICE INFORMATION...")
             
-            # Comprehensive price extraction with validation
+            # FIRST: Try JSON-LD structured data (most reliable for Bernhardt, etc.)
+            try:
+                json_ld_scripts = await page.locator('script[type="application/ld+json"]').all_text_contents()
+                import json
+                for script_content in json_ld_scripts:
+                    try:
+                        data = json.loads(script_content)
+                        if isinstance(data, dict):
+                            # Check for direct price in offers
+                            if 'offers' in data and isinstance(data['offers'], dict):
+                                price_val = data['offers'].get('price')
+                                if price_val:
+                                    result['cost'] = float(price_val)
+                                    result['price'] = f"${float(price_val):.2f}"
+                                    print(f"✅ JSON-LD PRICE: {result['price']}")
+                            # Also get image from JSON-LD
+                            if not result.get('image_url') and 'image' in data:
+                                img = data['image']
+                                result['image_url'] = img if isinstance(img, str) else (img[0] if isinstance(img, list) and img else None)
+                                if result['image_url']:
+                                    print(f"✅ JSON-LD IMAGE: {result['image_url'][:60]}...")
+                    except:
+                        continue
+            except Exception as e:
+                print(f"⚠️ JSON-LD extraction error: {e}")
+            
+            # Comprehensive price extraction with validation (fallback)
             price_strategies = [
                 # Schema.org structured data
                 '[itemProp="price"], [property="product:price:amount"]',
