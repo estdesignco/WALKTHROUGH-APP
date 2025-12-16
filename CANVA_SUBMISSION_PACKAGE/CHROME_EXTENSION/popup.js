@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://ux-revival-1.preview.emergentagent.com';
+const BACKEND_URL = 'https://scraper-rescue-2.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

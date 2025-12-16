@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://ux-revival-1.preview.emergentagent.com/*"
+    "https://scraper-rescue-2.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

@@ -71,7 +71,7 @@ def test_send_questionnaire_email():
         
         # VERIFICATION 2: Check backend logs for public URL
         print(f"\n🔍 VERIFICATION 2: Checking backend logs for public URL...")
-        print(f"   Expected URL pattern: https://ux-revival-1.preview.emergentagent.com/customer/questionnaire")
+        print(f"   Expected URL pattern: https://scraper-rescue-2.preview.emergentagent.com/customer/questionnaire")
         print(f"   NOT expected: localhost")
         
         # Read backend logs
@@ -88,7 +88,7 @@ def test_send_questionnaire_email():
             print(log_output)
             
             # Check if public URL is in logs
-            if "https://ux-revival-1.preview.emergentagent.com" in log_output:
+            if "https://scraper-rescue-2.preview.emergentagent.com" in log_output:
                 print("✅ VERIFICATION 2 PASSED: Backend logs show correct public URL")
             elif "localhost" in log_output:
                 print("❌ VERIFICATION 2 FAILED: Backend logs show localhost instead of public URL")

@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://ux-revival-1.preview.emergentagent.com/email-template.html
+https://scraper-rescue-2.preview.emergentagent.com/email-template.html
 
 ---
 
