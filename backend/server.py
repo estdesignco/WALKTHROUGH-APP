@@ -5092,13 +5092,26 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         
         # Now navigate to product page (logged in if wholesale vendor)
         try:
-            await page.goto(url, wait_until='domcontentloaded', timeout=45000)
-            print(f"✅ Navigated to product page" + (" (LOGGED IN)" if login_successful else " (PUBLIC)"))
+            response = await page.goto(url, wait_until='domcontentloaded', timeout=45000)
+            print(f"✅ Navigated to product page (status: {response.status if response else 'unknown'})" + (" (LOGGED IN)" if login_successful else " (PUBLIC)"))
         except Exception as nav_err:
             print(f"⚠️ Navigation warning: {nav_err}")
         
         # Wait for page content to load
         await page.wait_for_timeout(5000)
+        
+        # Check for Cloudflare challenge and wait for it to resolve
+        page_title = await page.title()
+        if 'just a moment' in page_title.lower() or 'checking your browser' in page_title.lower():
+            print("🛡️ Cloudflare challenge detected - waiting for resolution...")
+            for i in range(6):  # Wait up to 30 seconds for challenge
+                await page.wait_for_timeout(5000)
+                page_title = await page.title()
+                if 'just a moment' not in page_title.lower():
+                    print(f"✅ Cloudflare challenge resolved after {(i+1)*5}s")
+                    break
+            else:
+                print("⚠️ Cloudflare challenge did not resolve - site may be blocking automated access")
         
         try:
             await page.wait_for_load_state('networkidle', timeout=15000)
