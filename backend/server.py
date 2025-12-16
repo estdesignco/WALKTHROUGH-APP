@@ -5802,14 +5802,33 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             
             # Regex fallback for SKU
             if not result['sku']:
-                for pattern in sku_patterns:
-                    match = re.search(pattern, all_text + url, re.IGNORECASE)
+                # PRIORITY: Extract SKU from URL first (most reliable for many vendors)
+                url_sku_patterns = [
+                    r'product/([A-Za-z0-9\-_]+)',  # fourhands.com/product/251240-001
+                    r'/([A-Z]?\d{5,}[A-Za-z0-9\-_]*)',  # /R22952 or /251240-001
+                ]
+                for pattern in url_sku_patterns:
+                    match = re.search(pattern, url, re.IGNORECASE)
                     if match:
                         sku_candidate = match.group(1)
-                        if len(sku_candidate) >= 3:
+                        # Validate - must look like a product code
+                        if len(sku_candidate) >= 5 and any(c.isdigit() for c in sku_candidate):
                             result['sku'] = sku_candidate
-                            print(f"✅ REGEX SKU: {result['sku']}")
+                            print(f"✅ URL-BASED SKU: {result['sku']}")
                             break
+                
+                # Only use page text if URL didn't have SKU
+                if not result['sku']:
+                    skip_words = ['number', 'model', 'code', 'item', 'product', 'sku']
+                    for pattern in sku_patterns:
+                        match = re.search(pattern, all_text, re.IGNORECASE)
+                        if match:
+                            sku_candidate = match.group(1)
+                            # Skip generic words that aren't actual SKUs
+                            if sku_candidate.lower() not in skip_words and len(sku_candidate) >= 3:
+                                result['sku'] = sku_candidate
+                                print(f"✅ REGEX SKU: {result['sku']}")
+                                break
             
             # ===== 5. ADVANCED DIMENSIONS/SIZE EXTRACTION =====
             print("📏 EXTRACTING DIMENSIONS...")
