@@ -5210,12 +5210,43 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # ===== 2. ADVANCED PRICE DETECTION =====
             print("💰 EXTRACTING PRICE INFORMATION...")
             
+            # STRATEGY 0: JSON-LD Structured Data (MOST RELIABLE SOURCE)
+            print("📌 Checking JSON-LD for price...")
+            try:
+                json_ld_scripts = await page.locator('script[type="application/ld+json"]').all_text_contents()
+                import json
+                for script_content in json_ld_scripts:
+                    try:
+                        data = json.loads(script_content)
+                        if isinstance(data, dict):
+                            # Check for direct price
+                            if 'offers' in data and isinstance(data['offers'], dict):
+                                price_val = data['offers'].get('price')
+                                if price_val:
+                                    result['price'] = float(price_val)
+                                    result['cost'] = float(price_val)
+                                    print(f"✅ JSON-LD PRICE FOUND: ${result['price']}")
+                            
+                            # Also extract image if not already found
+                            if not result['image_url'] and 'image' in data:
+                                img = data['image']
+                                img_url = img if isinstance(img, str) else (img[0] if isinstance(img, list) and img else None)
+                                if img_url and not img_url.endswith('.svg'):
+                                    result['image_url'] = img_url
+                                    print(f"✅ JSON-LD IMAGE FOUND: {img_url[:60]}...")
+                            
+                            if result['price']:
+                                break
+                    except:
+                        continue
+            except Exception as e:
+                print(f"⚠️ JSON-LD extraction error: {e}")
+            
             # CRITICAL: Look for ALL price elements on the page first
             # Get page text to find any dollar amounts
             all_text = await page.inner_text('body')
             
             # Find ALL dollar amounts on page
-            import re
             all_prices = re.findall(r'\$\s*([\d,]+\.?\d*)', all_text)
             print(f"   Found {len(all_prices)} dollar amounts on page: {all_prices[:10]}")
             
