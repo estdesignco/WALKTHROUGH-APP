@@ -4965,6 +4965,29 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         # Enhanced timeout settings
         page.set_default_timeout(30000)
         
+        # STEALTH MODE: Remove webdriver detection
+        await page.add_init_script("""
+            // Override webdriver property
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            
+            // Override plugins to look more like a real browser
+            Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
+            
+            // Override languages
+            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+            
+            // Override Chrome-specific properties
+            window.chrome = { runtime: {} };
+            
+            // Override permissions query
+            const originalQuery = window.navigator.permissions.query;
+            window.navigator.permissions.query = (parameters) => (
+                parameters.name === 'notifications' ?
+                    Promise.resolve({ state: Notification.permission }) :
+                    originalQuery(parameters)
+            );
+        """)
+        
         # First, try direct access to product page
         login_successful = False
         print(f"🌐 NAVIGATING TO PRODUCT PAGE: {url}")
