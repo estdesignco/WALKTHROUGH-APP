@@ -4960,12 +4960,22 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'Sec-Fetch-Site': 'none'
             }
         )
+        
+        # Apply playwright-stealth for better bot detection bypass
+        try:
+            from playwright_stealth import Stealth
+            stealth = Stealth()
+            await stealth.apply_stealth_async(context)
+            print("✅ Applied playwright-stealth")
+        except Exception as stealth_err:
+            print(f"⚠️ Could not apply stealth: {stealth_err}")
+        
         page = await context.new_page()
         
         # Enhanced timeout settings
-        page.set_default_timeout(30000)
+        page.set_default_timeout(45000)
         
-        # STEALTH MODE: Remove webdriver detection
+        # STEALTH MODE: Additional anti-detection measures
         await page.add_init_script("""
             // Override webdriver property
             Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
