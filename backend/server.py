@@ -5405,14 +5405,18 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             print("🖼️ EXTRACTING PRODUCT IMAGE WITH MULTIPLE STRATEGIES...")
             
             # STRATEGY 1: META TAGS (Most Reliable - Always correct!)
-            print("📌 Strategy 1: Checking Open Graph meta tags...")
-            try:
-                og_image = await page.locator('meta[property="og:image"]').first.get_attribute('content', timeout=2000)
-                if og_image and not og_image.endswith('.svg') and 'logo' not in og_image.lower():
-                    print(f"✅ Found OG:IMAGE: {og_image[:80]}")
-                    result['image_url'] = og_image
-            except:
-                print("⚠️ No og:image found")
+            # Only if we don't already have an image from JSON-LD
+            if not result['image_url']:
+                print("📌 Strategy 1: Checking Open Graph meta tags...")
+                try:
+                    og_image = await page.locator('meta[property="og:image"]').first.get_attribute('content', timeout=2000)
+                    if og_image and not og_image.endswith('.svg') and 'logo' not in og_image.lower():
+                        print(f"✅ Found OG:IMAGE: {og_image[:80]}")
+                        result['image_url'] = og_image
+                except:
+                    print("⚠️ No og:image found")
+            else:
+                print(f"📌 Already have image from JSON-LD: {result['image_url'][:60]}...")
             
             # STRATEGY 2: Twitter Card (Backup meta tag)
             if not result['image_url']:
