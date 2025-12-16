@@ -11,8 +11,8 @@ import time
 from datetime import datetime
 from typing import Dict, Any, List
 
-# Configuration
-BACKEND_URL = "https://scraper-rescue-2.preview.emergentagent.com/api"
+# Configuration - Use local backend for testing since external URL times out
+BACKEND_URL = "http://localhost:8001/api"
 
 class ProductScrapingTester:
     def __init__(self):
