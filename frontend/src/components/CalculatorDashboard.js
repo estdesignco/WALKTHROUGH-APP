@@ -555,7 +555,7 @@ const CalculatorDashboard = ({ projectId }) => {
         {activeCalculator === 'flooring' && (
           <div style={styles.form}>
             <h3 style={styles.formTitle}>⬜ Tile/Flooring Calculator</h3>
-            <p style={styles.formSubtitle}>Calculate tiles needed with waste factor</p>
+            <p style={styles.formSubtitle}>Calculate tiles needed with waste factor and total cost</p>
             
             <div style={styles.formRow}>
               <div style={styles.formGroup}>
@@ -565,6 +565,7 @@ const CalculatorDashboard = ({ projectId }) => {
                   value={flooringData.room_length}
                   onChange={(e) => setFlooringData({...flooringData, room_length: parseFloat(e.target.value)})}
                   style={styles.input}
+                  placeholder="12"
                 />
               </div>
               <div style={styles.formGroup}>
@@ -574,27 +575,60 @@ const CalculatorDashboard = ({ projectId }) => {
                   value={flooringData.room_width}
                   onChange={(e) => setFlooringData({...flooringData, room_width: parseFloat(e.target.value)})}
                   style={styles.input}
+                  placeholder="10"
+                />
+              </div>
+            </div>
+
+            {/* Tile Size - Preset or Custom */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Tile Size Preset</label>
+              <select
+                value={`${flooringData.tile_length}x${flooringData.tile_width}`}
+                onChange={(e) => {
+                  if (e.target.value === 'custom') return;
+                  const [l, w] = e.target.value.split('x').map(Number);
+                  setFlooringData({...flooringData, tile_length: l, tile_width: w});
+                }}
+                style={styles.select}
+              >
+                <option value="4x4">4" x 4"</option>
+                <option value="6x6">6" x 6"</option>
+                <option value="8x8">8" x 8"</option>
+                <option value="12x12">12" x 12"</option>
+                <option value="12x24">12" x 24"</option>
+                <option value="18x18">18" x 18"</option>
+                <option value="24x24">24" x 24"</option>
+                <option value="6x36">6" x 36" (Plank)</option>
+                <option value="6x48">6" x 48" (Long Plank)</option>
+                <option value="custom">Custom Size (enter below)</option>
+              </select>
+            </div>
+
+            <div style={styles.formRow}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Tile Length (inches)</label>
+                <input
+                  type="number"
+                  value={flooringData.tile_length}
+                  onChange={(e) => setFlooringData({...flooringData, tile_length: parseFloat(e.target.value)})}
+                  style={styles.input}
+                  placeholder="12"
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Tile Width (inches)</label>
+                <input
+                  type="number"
+                  value={flooringData.tile_width}
+                  onChange={(e) => setFlooringData({...flooringData, tile_width: parseFloat(e.target.value)})}
+                  style={styles.input}
+                  placeholder="12"
                 />
               </div>
             </div>
 
             <div style={styles.formRow}>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Tile Size (inches)</label>
-                <select
-                  value={`${flooringData.tile_length}x${flooringData.tile_width}`}
-                  onChange={(e) => {
-                    const [l, w] = e.target.value.split('x').map(Number);
-                    setFlooringData({...flooringData, tile_length: l, tile_width: w});
-                  }}
-                  style={styles.select}
-                >
-                  <option value="12x12">12" x 12"</option>
-                  <option value="18x18">18" x 18"</option>
-                  <option value="24x24">24" x 24"</option>
-                  <option value="6x36">6" x 36" (Plank)</option>
-                </select>
-              </div>
               <div style={styles.formGroup}>
                 <label style={styles.label}>Waste Factor (%)</label>
                 <input
@@ -603,6 +637,17 @@ const CalculatorDashboard = ({ projectId }) => {
                   onChange={(e) => setFlooringData({...flooringData, waste_factor: parseFloat(e.target.value) / 100})}
                   style={styles.input}
                   placeholder="10"
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Cost Per Sq Ft ($)</label>
+                <input
+                  type="number"
+                  value={flooringData.cost_per_sqft}
+                  onChange={(e) => setFlooringData({...flooringData, cost_per_sqft: e.target.value})}
+                  style={styles.input}
+                  placeholder="5.99"
+                  step="0.01"
                 />
               </div>
             </div>
