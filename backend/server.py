@@ -4969,9 +4969,79 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         login_successful = False
         print(f"🌐 NAVIGATING TO PRODUCT PAGE: {url}")
         
+        # WHOLESALE VENDORS THAT ALWAYS REQUIRE LOGIN FOR PRICES
+        # These vendors show product pages publicly but hide prices until logged in
+        wholesale_vendors_requiring_login = [
+            'uttermost.com', 'fourhands.com', 'hvlgroup.com', 'visualcomfort.com',
+            'bernhardt.com', 'globalviews.com', 'reginaandrew.com', 'loloirugs.com',
+            'flowdecor.com', 'eichholtz.com', 'surya.com', 'hinkley.com',
+            'hubbardtonforge.com', 'elegantlighting.com', 'gabby.com', 'vandh.com',
+            'bassettmirror.com', 'crestviewcollection.com', 'safavieh.com', 'myohamerica.com',
+            'zeevlighting.com', 'rowefurniture.com'
+        ]
+        
+        needs_login_for_prices = any(v in domain for v in wholesale_vendors_requiring_login)
+        
+        # LOGIN FIRST for wholesale vendors that hide prices
+        if needs_login_for_prices and credentials and credentials.get("username") and credentials.get("password"):
+            print(f"🔐 WHOLESALE VENDOR DETECTED - Logging in FIRST to get prices for {domain}...")
+            
+            login_url = vendor_config.get('login_url') or f'https://{domain}/login'
+            
+            try:
+                await page.goto(login_url, wait_until='domcontentloaded', timeout=30000)
+                await page.wait_for_timeout(5000)
+                
+                # Fill login form
+                username_selectors = vendor_config.get('username_selectors', ['#email', 'input[type="email"]', 'input[name="email"]', 'input[name="username"]'])
+                password_selectors = vendor_config.get('password_selectors', ['#password', 'input[type="password"]', 'input[name="password"]'])
+                
+                # Try to fill username
+                for selector in username_selectors:
+                    try:
+                        username_input = await page.query_selector(selector)
+                        if username_input:
+                            await username_input.fill(credentials['username'])
+                            print(f"✅ Filled username: {credentials['username']}")
+                            break
+                    except:
+                        continue
+                
+                # Try to fill password
+                for selector in password_selectors:
+                    try:
+                        pwd_input = await page.query_selector(selector)
+                        if pwd_input:
+                            await pwd_input.press_sequentially(credentials['password'], delay=30)
+                            print(f"✅ Filled password")
+                            break
+                    except:
+                        continue
+                
+                # Submit login
+                submit_selectors = vendor_config.get('submit_selectors', ['button[type="submit"]', 'button:has-text("Login")', 'button:has-text("Sign In")', 'button:has-text("LOG IN")'])
+                for selector in submit_selectors:
+                    try:
+                        submit_btn = await page.query_selector(selector)
+                        if submit_btn:
+                            await submit_btn.click()
+                            print(f"✅ Submitted login form")
+                            break
+                    except:
+                        continue
+                
+                # Wait for login to complete
+                await page.wait_for_timeout(10000)
+                login_successful = True
+                print(f"✅ PRE-LOGIN COMPLETE for {domain}")
+                
+            except Exception as login_err:
+                print(f"⚠️ Pre-login attempt failed: {login_err}")
+        
+        # Now navigate to product page (logged in if wholesale vendor)
         try:
             await page.goto(url, wait_until='domcontentloaded', timeout=45000)
-            print(f"✅ Navigated to product page")
+            print(f"✅ Navigated to product page" + (" (LOGGED IN)" if login_successful else " (PUBLIC)"))
         except Exception as nav_err:
             print(f"⚠️ Navigation warning: {nav_err}")
         
@@ -4985,14 +5055,14 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         
         await page.wait_for_timeout(3000)
         
-        # Check if we got a 404 or login-required page
+        # Check if we got a 404 or login-required page (fallback for non-wholesale vendors)
         page_text = await page.inner_text('body')
         page_title = await page.title()
         
         is_blocked = any(x in page_text.lower() for x in ['page not found', '404', 'not found', 'access denied'])
         is_login_required = any(x in page_text.lower() for x in ['sign in', 'log in', 'login required', 'please login'])
         
-        if (is_blocked or is_login_required) and credentials and credentials.get("username") and credentials.get("password"):
+        if (is_blocked or is_login_required) and not login_successful and credentials and credentials.get("username") and credentials.get("password"):
             print(f"🔐 PAGE REQUIRES LOGIN - Attempting authentication for {domain}...")
             
             # Get login URL from vendor config
