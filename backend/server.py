@@ -5030,16 +5030,30 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     except:
                         continue
                 
-                # Try to fill password
+                # Try to fill password - MUST WAIT FOR FIELD TO BE VISIBLE
+                await page.wait_for_timeout(2000)  # Extra wait for React to render
+                password_filled = False
                 for selector in password_selectors:
                     try:
+                        print(f"   Trying password selector: {selector}")
                         pwd_input = await page.query_selector(selector)
                         if pwd_input:
-                            await pwd_input.press_sequentially(credentials['password'], delay=30)
-                            print(f"✅ Filled password")
-                            break
-                    except:
+                            # Check if visible
+                            is_visible = await pwd_input.is_visible()
+                            print(f"   Password field found, visible={is_visible}")
+                            if is_visible:
+                                await pwd_input.click()  # Focus the field first
+                                await page.wait_for_timeout(500)
+                                await pwd_input.fill(credentials['password'])
+                                print(f"✅ Filled password (length: {len(credentials['password'])})")
+                                password_filled = True
+                                break
+                    except Exception as pwd_err:
+                        print(f"   ⚠️ Password selector {selector} error: {pwd_err}")
                         continue
+                
+                if not password_filled:
+                    print(f"⚠️ Could not fill password - no selector worked")
                 
                 # Submit login
                 submit_selectors = vendor_config.get('submit_selectors', ['button[type="submit"]', 'button:has-text("Login")', 'button:has-text("Sign In")', 'button:has-text("LOG IN")'])
@@ -5110,16 +5124,30 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     except:
                         continue
                 
-                # Try to fill password
+                # Try to fill password - MUST WAIT FOR FIELD TO BE VISIBLE
+                await page.wait_for_timeout(2000)  # Extra wait for React to render
+                password_filled = False
                 for selector in password_selectors:
                     try:
+                        print(f"   Trying password selector: {selector}")
                         pwd_input = await page.query_selector(selector)
                         if pwd_input:
-                            await pwd_input.press_sequentially(credentials['password'], delay=30)
-                            print(f"✅ Filled password")
-                            break
-                    except:
+                            # Check if visible
+                            is_visible = await pwd_input.is_visible()
+                            print(f"   Password field found, visible={is_visible}")
+                            if is_visible:
+                                await pwd_input.click()  # Focus the field first
+                                await page.wait_for_timeout(500)
+                                await pwd_input.fill(credentials['password'])
+                                print(f"✅ Filled password (length: {len(credentials['password'])})")
+                                password_filled = True
+                                break
+                    except Exception as pwd_err:
+                        print(f"   ⚠️ Password selector {selector} error: {pwd_err}")
                         continue
+                
+                if not password_filled:
+                    print(f"⚠️ Could not fill password - no selector worked")
                 
                 # Submit login
                 submit_selectors = vendor_config.get('submit_selectors', ['button[type="submit"]', 'button:has-text("Login")', 'button:has-text("Sign In")'])
