@@ -197,16 +197,35 @@ const CalculatorDashboard = ({ projectId }) => {
   };
 
   const calculateFlooring = async () => {
+    // Validate required fields
+    if (!flooringData.room_length || !flooringData.room_width) {
+      alert('Please enter Room Length and Room Width');
+      return;
+    }
+    if (!flooringData.tile_length || !flooringData.tile_width) {
+      alert('Please enter Tile Size');
+      return;
+    }
+    
     setLoading(true);
     try {
       const res = await axios.post(`${API}/calculators/flooring`, flooringData);
       
+      // Calculate square footage with waste
+      const roomSqFt = res.data.room_square_footage || (flooringData.room_length * flooringData.room_width);
+      const wasteFactor = flooringData.waste_factor || 0.10;
+      const totalSqFtNeeded = roomSqFt * (1 + wasteFactor);
+      
+      // Add tile size info to results
+      res.data.tile_size = `${flooringData.tile_length}" x ${flooringData.tile_width}"`;
+      res.data.total_sqft_with_waste = totalSqFtNeeded.toFixed(2);
+      
       // Add cost calculation if cost_per_sqft is provided
-      if (flooringData.cost_per_sqft && res.data.room_square_footage) {
+      if (flooringData.cost_per_sqft) {
         const costPerSqft = parseFloat(flooringData.cost_per_sqft);
-        const totalCost = costPerSqft * res.data.room_square_footage;
-        res.data.cost_per_sqft = costPerSqft.toFixed(2);
-        res.data.total_flooring_cost = totalCost.toFixed(2);
+        const totalCost = costPerSqft * totalSqFtNeeded;
+        res.data.cost_per_sqft = `$${costPerSqft.toFixed(2)}`;
+        res.data.total_flooring_cost = `$${totalCost.toFixed(2)}`;
       }
       
       setResults(res.data);
