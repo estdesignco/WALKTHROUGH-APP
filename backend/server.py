@@ -6140,7 +6140,7 @@ async def sync_canva_to_project(data: dict):
 async def scrape_product_advanced(data: dict):
     """
     Advanced product scraping endpoint
-    Uses Playwright FIRST for JavaScript-heavy sites, BeautifulSoup as fallback
+    FIRST checks master_products database (price sheets), then falls back to web scraping
     """
     url = data.get('url', '')
     
@@ -6148,7 +6148,67 @@ async def scrape_product_advanced(data: dict):
         raise HTTPException(status_code=400, detail="URL is required")
     
     try:
-        print(f"🔍 Scraping product from: {url}")
+        print(f"🔍 Looking up product from: {url}")
+        
+        # ===== STEP 1: TRY MASTER_PRODUCTS DATABASE FIRST (Price Sheets) =====
+        # Extract SKU from URL for lookup
+        import re
+        url_lower = url.lower()
+        
+        # Extract potential SKU patterns from URL
+        sku_patterns = [
+            r'/product/([A-Za-z0-9\-_]+)',  # fourhands.com/product/251240-001
+            r'/([A-Z]?\d{4,}[A-Za-z0-9\-_]*)',  # Generic SKU pattern
+            r'-([a-z]?\d{4,}[a-z0-9\-]*)(?:\?|$)',  # SKU at end of URL
+            r'sku[=:]([A-Za-z0-9\-_]+)',  # sku=XXX or sku:XXX
+        ]
+        
+        extracted_sku = None
+        for pattern in sku_patterns:
+            match = re.search(pattern, url, re.IGNORECASE)
+            if match:
+                extracted_sku = match.group(1)
+                break
+        
+        if extracted_sku:
+            print(f"📦 Extracted SKU from URL: {extracted_sku}")
+            
+            # Look up in master_products database
+            db_product = await db.master_products.find_one(
+                {"$or": [
+                    {"sku": {"$regex": extracted_sku, "$options": "i"}},
+                    {"sku": extracted_sku.upper()},
+                    {"sku": extracted_sku.lower()},
+                ]},
+                {"_id": 0}
+            )
+            
+            if db_product:
+                print(f"✅ FOUND IN DATABASE: {db_product.get('name')} - ${db_product.get('price')}")
+                return {
+                    "success": True,
+                    "source": "database",
+                    "data": {
+                        "title": db_product.get('name'),
+                        "name": db_product.get('name'),
+                        "price": db_product.get('price'),
+                        "cost": db_product.get('price'),
+                        "description": db_product.get('description'),
+                        "image_url": db_product.get('image_url'),
+                        "vendor": db_product.get('vendor'),
+                        "sku": db_product.get('sku'),
+                        "dimensions": db_product.get('dimensions') or db_product.get('size'),
+                        "size": db_product.get('dimensions') or db_product.get('size'),
+                        "color": db_product.get('finish') or db_product.get('color'),
+                        "finish_color": db_product.get('finish') or db_product.get('color'),
+                        "link": url
+                    }
+                }
+            else:
+                print(f"⚠️ SKU {extracted_sku} not found in database, falling back to web scrape...")
+        
+        # ===== STEP 2: WEB SCRAPING FALLBACK =====
+        print(f"🌐 Scraping product from web: {url}")
         
         # Use Playwright for JS-rendered sites
         USE_PLAYWRIGHT = True
