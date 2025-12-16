@@ -5980,6 +5980,11 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             extracted_fields = sum(1 for v in result.values() if v is not None)
             extraction_rate = (extracted_fields / len(result)) * 100
             
+            # Add note for bot-detection vendors where price couldn't be scraped
+            if any(v in domain for v in bot_detection_vendors) and not result.get('cost'):
+                result['price_note'] = 'Price requires manual entry (login blocked by vendor)'
+                print(f"⚠️ Bot detection vendor - price must be entered manually")
+            
             print(f"🎯 EXTRACTION COMPLETE: {extracted_fields}/{len(result)} fields ({extraction_rate:.1f}%)")
             print(f"📋 RESULTS SUMMARY:")
             for key, value in result.items():
