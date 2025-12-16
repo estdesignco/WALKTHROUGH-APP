@@ -211,14 +211,38 @@ const CalculatorDashboard = ({ projectId }) => {
     try {
       const res = await axios.post(`${API}/calculators/flooring`, flooringData);
       
-      // Calculate square footage with waste
-      const roomSqFt = res.data.room_square_footage || (flooringData.room_length * flooringData.room_width);
-      const wasteFactor = flooringData.waste_factor || 0.10;
-      const totalSqFtNeeded = roomSqFt * (1 + wasteFactor);
+      // Calculate square footage
+      const floorSqFt = flooringData.room_length * flooringData.room_width;
+      let totalSqFt = floorSqFt;
       
-      // Add tile size info to results
+      // If wall height is provided, calculate wall area too
+      let wallSqFt = 0;
+      if (flooringData.wall_height && flooringData.wall_height > 0) {
+        // Wall area = perimeter × height
+        const perimeter = 2 * (flooringData.room_length + flooringData.room_width);
+        wallSqFt = perimeter * flooringData.wall_height;
+        totalSqFt = wallSqFt; // For wall tiling, use wall area
+        res.data.calculation_type = 'Wall Tiling';
+        res.data.wall_height = `${flooringData.wall_height} ft`;
+        res.data.wall_square_footage = wallSqFt.toFixed(2);
+        res.data.perimeter = `${perimeter.toFixed(2)} ft`;
+      } else {
+        res.data.calculation_type = 'Floor Tiling';
+        totalSqFt = floorSqFt;
+      }
+      
+      // Apply waste factor
+      const wasteFactor = flooringData.waste_factor || 0.10;
+      const totalSqFtNeeded = totalSqFt * (1 + wasteFactor);
+      
+      // Calculate tiles needed
+      const tileSqFt = (flooringData.tile_length * flooringData.tile_width) / 144; // Convert sq inches to sq feet
+      const tilesNeeded = Math.ceil(totalSqFtNeeded / tileSqFt);
+      
+      // Add to results
       res.data.tile_size = `${flooringData.tile_length}" x ${flooringData.tile_width}"`;
       res.data.total_sqft_with_waste = totalSqFtNeeded.toFixed(2);
+      res.data.tiles_needed = tilesNeeded;
       
       // Add cost calculation if cost_per_sqft is provided
       if (flooringData.cost_per_sqft) {
