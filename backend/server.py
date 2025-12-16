@@ -6173,12 +6173,19 @@ async def scrape_product_advanced(data: dict):
         if extracted_sku:
             print(f"📦 Extracted SKU from URL: {extracted_sku}")
             
-            # Look up in master_products database
+            # Clean up SKU for database lookup - try multiple formats
+            # Some vendors use prefixes like *, R, etc.
+            sku_clean = re.sub(r'^[^a-zA-Z0-9]+', '', extracted_sku)  # Remove leading non-alphanumeric
+            sku_numbers = re.sub(r'[^0-9]', '', extracted_sku)  # Just numbers
+            
+            # Look up in master_products database with multiple format attempts
             db_product = await db.master_products.find_one(
                 {"$or": [
-                    {"sku": {"$regex": extracted_sku, "$options": "i"}},
+                    {"sku": {"$regex": f"^\\*?{sku_clean}$", "$options": "i"}},  # With or without * prefix
+                    {"sku": {"$regex": f"^[A-Z]?{sku_numbers}$", "$options": "i"}},  # Just numbers with optional letter
+                    {"sku": {"$regex": extracted_sku, "$options": "i"}},  # Direct match
                     {"sku": extracted_sku.upper()},
-                    {"sku": extracted_sku.lower()},
+                    {"sku": f"*{sku_numbers}"},  # Uttermost format with asterisk
                 ]},
                 {"_id": 0}
             )
