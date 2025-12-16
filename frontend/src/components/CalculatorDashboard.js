@@ -574,7 +574,7 @@ const CalculatorDashboard = ({ projectId }) => {
         {activeCalculator === 'flooring' && (
           <div style={styles.form}>
             <h3 style={styles.formTitle}>⬜ Tile/Flooring Calculator</h3>
-            <p style={styles.formSubtitle}>Calculate tiles needed with waste factor and total cost</p>
+            <p style={styles.formSubtitle}>Calculate tiles needed for floors or walls with waste factor and total cost</p>
             
             <div style={styles.formRow}>
               <div style={styles.formGroup}>
@@ -595,6 +595,16 @@ const CalculatorDashboard = ({ projectId }) => {
                   onChange={(e) => setFlooringData({...flooringData, room_width: parseFloat(e.target.value)})}
                   style={styles.input}
                   placeholder="10"
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Wall Height (feet) <span style={{color: '#888', fontSize: '11px'}}>- for walls only</span></label>
+                <input
+                  type="number"
+                  value={flooringData.wall_height || ''}
+                  onChange={(e) => setFlooringData({...flooringData, wall_height: e.target.value ? parseFloat(e.target.value) : null})}
+                  style={styles.input}
+                  placeholder="8 (optional)"
                 />
               </div>
             </div>
