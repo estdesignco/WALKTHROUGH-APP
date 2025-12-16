@@ -5247,6 +5247,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             all_text = await page.inner_text('body')
             
             # Find ALL dollar amounts on page
+            import re
             all_prices = re.findall(r'\$\s*([\d,]+\.?\d*)', all_text)
             print(f"   Found {len(all_prices)} dollar amounts on page: {all_prices[:10]}")
             
