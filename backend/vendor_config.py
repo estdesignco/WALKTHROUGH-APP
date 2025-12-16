@@ -42,6 +42,8 @@ VENDOR_CONFIGS = {
         "submit_selectors": ['#send2', 'button[type="submit"]', 'button:has-text("Sign In")'],
         "wait_after_login": 8000,
         "wait_for_content": 5000,
+        # WARNING: This vendor has aggressive Cloudflare protection that blocks automated access
+        "cloudflare_protected": True,
     },
     
     "rowefurniture.com": {
