@@ -4993,15 +4993,20 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         print(f"🌐 NAVIGATING TO PRODUCT PAGE: {url}")
         
         # WHOLESALE VENDORS THAT ALWAYS REQUIRE LOGIN FOR PRICES
-        # These vendors show product pages publicly but hide prices until logged in
+        # NOTE: Uttermost removed - their bot detection blocks automated login
+        # The scraper will get all other data but price must be entered manually
         wholesale_vendors_requiring_login = [
-            'uttermost.com', 'fourhands.com', 'hvlgroup.com', 'visualcomfort.com',
+            'fourhands.com', 'hvlgroup.com', 'visualcomfort.com',
             'bernhardt.com', 'globalviews.com', 'reginaandrew.com', 'loloirugs.com',
             'flowdecor.com', 'eichholtz.com', 'surya.com', 'hinkley.com',
             'hubbardtonforge.com', 'elegantlighting.com', 'gabby.com', 'vandh.com',
             'bassettmirror.com', 'crestviewcollection.com', 'safavieh.com', 'myohamerica.com',
             'zeevlighting.com', 'rowefurniture.com'
         ]
+        
+        # Vendors where automated login is BLOCKED by bot detection
+        # These still work for product info but price requires manual entry
+        bot_detection_vendors = ['uttermost.com']
         
         needs_login_for_prices = any(v in domain for v in wholesale_vendors_requiring_login)
         
