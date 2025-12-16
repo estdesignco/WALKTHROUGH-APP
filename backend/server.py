@@ -5342,7 +5342,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     continue
             
-            if best_image:
+            if best_image and not skip_image_extraction:
                 result['image_url'] = best_image
                 print(f"✅ IMAGE FOUND: {best_image[:80]}...")
             else:
