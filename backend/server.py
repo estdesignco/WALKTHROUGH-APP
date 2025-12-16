@@ -4867,7 +4867,11 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         ]
         
-        browser = await p.chromium.launch(headless=True, args=browser_args)
+        browser = await p.chromium.launch(
+            headless=True, 
+            args=browser_args,
+            executable_path='/pw-browsers/chromium_headless_shell-1200/chrome-linux/headless_shell'
+        )
         
         # Enhanced context with anti-detection measures
         import random
