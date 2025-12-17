@@ -6212,9 +6212,34 @@ async def scrape_product_advanced(data: dict):
                     }
                 }
             else:
-                print(f"⚠️ SKU {extracted_sku} not found in database, falling back to web scrape...")
+                print(f"⚠️ SKU {extracted_sku} not found in database, trying portal scraper...")
         
-        # ===== STEP 2: WEB SCRAPING FALLBACK =====
+        # ===== STEP 2: TRY VENDOR PORTAL SCRAPER (LOGGED-IN SESSIONS) =====
+        # This uses persistent logged-in sessions for better data extraction
+        from urllib.parse import urlparse
+        domain = urlparse(url).netloc.lower().replace('www.', '')
+        
+        try:
+            scraper = await get_scraper()
+            vendor_key = domain.replace('.com', '').replace('.', '')
+            
+            # Check if we have a logged-in session for this vendor
+            if scraper.is_logged_in(vendor_key):
+                print(f"✅ Using logged-in session for {vendor_key}")
+                portal = get_vendor_portal_info(vendor_key)
+                if portal:
+                    portal_result = await scraper.get_product_details(vendor_key, url, portal)
+                    if portal_result and portal_result.get('name'):
+                        print(f"✅ Portal scraper found: {portal_result.get('name')} - ${portal_result.get('price')}")
+                        return {
+                            "success": True,
+                            "source": "portal",
+                            "data": portal_result
+                        }
+        except Exception as portal_err:
+            print(f"⚠️ Portal scraper error: {portal_err}")
+        
+        # ===== STEP 3: WEB SCRAPING FALLBACK =====
         print(f"🌐 Scraping product from web: {url}")
         
         # Use Playwright for JS-rendered sites
