@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://scraper-rescue-2.preview.emergentagent.com
+https://designer-scraper.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://scraper-rescue-2.preview.emergentagent.com/mobile-app
+https://designer-scraper.preview.emergentagent.com/mobile-app
 
 ---
 

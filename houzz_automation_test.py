@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 # Configuration
-API_BASE = "https://scraper-rescue-2.preview.emergentagent.com/api"
+API_BASE = "https://designer-scraper.preview.emergentagent.com/api"
 
 def print_header(title):
     """Print formatted test header"""

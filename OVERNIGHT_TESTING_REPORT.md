@@ -3,7 +3,7 @@
 
 **Testing Date**: December 2, 2024  
 **Testing Duration**: Comprehensive overnight testing session  
-**System URL**: https://scraper-rescue-2.preview.emergentagent.com
+**System URL**: https://designer-scraper.preview.emergentagent.com
 
 ---
 

@@ -110,7 +110,7 @@ async def test_pricing_api():
     
     import aiohttp
     
-    base_url = "https://scraper-rescue-2.preview.emergentagent.com/api/furniture"
+    base_url = "https://designer-scraper.preview.emergentagent.com/api/furniture"
     
     try:
         async with aiohttp.ClientSession() as session:

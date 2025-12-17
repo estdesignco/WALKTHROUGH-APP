@@ -335,7 +335,7 @@ async def test_catalog_api():
     
     import aiohttp
     
-    base_url = "https://scraper-rescue-2.preview.emergentagent.com/api/furniture"
+    base_url = "https://designer-scraper.preview.emergentagent.com/api/furniture"
     
     try:
         async with aiohttp.ClientSession() as session:
@@ -371,7 +371,7 @@ async def main():
         
         print(f"\n🎉 SUCCESS! Furniture catalog system populated and tested")
         print(f"\n🔗 NEXT STEPS:")
-        print(f"1. Refresh: https://scraper-rescue-2.preview.emergentagent.com/furniture-search")
+        print(f"1. Refresh: https://designer-scraper.preview.emergentagent.com/furniture-search")
         print(f"2. Product count should now show {count} instead of 17")
         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
         print(f"4. Test all category filters (SEATING, LIGHTING, etc.)")

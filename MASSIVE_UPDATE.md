@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://scraper-rescue-2.preview.emergentagent.com/mobile-app
+Test it now: https://designer-scraper.preview.emergentagent.com/mobile-app

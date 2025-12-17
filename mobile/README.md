@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://scraper-rescue-2.preview.emergentagent.com
-API_URL=https://scraper-rescue-2.preview.emergentagent.com/api
+BACKEND_URL=https://designer-scraper.preview.emergentagent.com
+API_URL=https://designer-scraper.preview.emergentagent.com/api
 ```
 
 ### App Configuration

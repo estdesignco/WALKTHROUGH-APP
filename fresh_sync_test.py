@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://scraper-rescue-2.preview.emergentagent.com/api"
+BASE_URL = "https://designer-scraper.preview.emergentagent.com/api"
 
 class FreshSyncTester:
     def __init__(self):

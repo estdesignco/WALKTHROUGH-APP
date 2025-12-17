@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Configuration
-BACKEND_URL = "https://scraper-rescue-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://designer-scraper.preview.emergentagent.com/api"
 CORRECT_PROJECT_ID = "983ec9a0-eeba-430b-8519-a1971a61768b"  # Modern Kitchen Design (actual ID)
 
 class BackendTester:

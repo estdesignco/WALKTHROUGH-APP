@@ -191,7 +191,7 @@ async def main():
     if updated_count > 0:
         print(f"\n🎉 SUCCESS! Fixed {updated_count} products")
         print(f"\n🔗 NEXT STEPS:")
-        print(f"1. Refresh: https://scraper-rescue-2.preview.emergentagent.com/furniture-search")
+        print(f"1. Refresh: https://designer-scraper.preview.emergentagent.com/furniture-search")
         print(f"2. Images should now display properly (base64 format)")
         print(f"3. Clicking 'VIEW' should go to real vendor pages")
         print(f"4. Test searching and filtering functionality")

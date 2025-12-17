@@ -13,7 +13,7 @@ import pymongo
 from pymongo import MongoClient
 
 # Configuration
-BACKEND_URL = "https://scraper-rescue-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://designer-scraper.preview.emergentagent.com/api"
 MONGO_URL = "mongodb://localhost:27017"
 DB_NAME = "interiorsync"
 
