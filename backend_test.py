@@ -206,7 +206,17 @@ class ProductScrapingTester:
             if response.status_code == 200:
                 data = response.json()
                 
-                if isinstance(data, list):
+                # Handle wrapped response format
+                if data.get("success") and "vendors" in data:
+                    vendors = data["vendors"]
+                    vendor_count = len(vendors)
+                    
+                    if vendor_count >= 15:
+                        self.log_result(test_name, True, f"Found {vendor_count} vendors: {', '.join(vendors[:10])}{'...' if vendor_count > 10 else ''}", data)
+                    else:
+                        self.log_result(test_name, False, f"Expected at least 15 vendors, found {vendor_count}", data)
+                elif isinstance(data, list):
+                    # Handle direct array response
                     vendor_count = len(data)
                     
                     if vendor_count >= 15:
@@ -215,7 +225,7 @@ class ProductScrapingTester:
                     else:
                         self.log_result(test_name, False, f"Expected at least 15 vendors, found {vendor_count}", data)
                 else:
-                    self.log_result(test_name, False, "Expected array response", data)
+                    self.log_result(test_name, False, "Unexpected response format", data)
             else:
                 self.log_result(test_name, False, f"HTTP {response.status_code}: {response.text}")
                 
