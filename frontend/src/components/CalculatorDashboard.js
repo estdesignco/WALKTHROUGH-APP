@@ -365,32 +365,33 @@ const CalculatorDashboard = ({ projectId }) => {
 
       {/* Calculator Forms */}
       <div style={styles.calculatorContent}>
-        {/* WALLPAPER CALCULATOR */}
+        {/* WALLPAPER CALCULATOR - BY ROOM SIZE */}
         {activeCalculator === 'wallpaper' && (
           <div style={styles.form}>
             <h3 style={styles.formTitle}>📐 Wallpaper Calculator</h3>
-            <p style={styles.formSubtitle}>Calculate wallpaper needed for Double Roll, Mural, or By-Yard</p>
+            <p style={styles.formSubtitle}>Calculate by ROOM SIZE - Double Rolls & Yards needed</p>
             
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Wallpaper Type</label>
-              <select
-                value={wallpaperData.wallpaper_type}
-                onChange={(e) => setWallpaperData({...wallpaperData, wallpaper_type: e.target.value})}
-                style={styles.select}
-              >
-                <option value="double_roll">Double Roll</option>
-                <option value="mural">Mural</option>
-                <option value="by_yard">By Yard</option>
-              </select>
+            {/* ROOM DIMENSIONS */}
+            <div style={{...styles.formGroup, marginBottom: '8px'}}>
+              <label style={{...styles.label, fontWeight: 'bold', color: '#d4af37'}}>📏 Room Dimensions</label>
             </div>
-
             <div style={styles.formRow}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Wall Width (feet)</label>
+                <label style={styles.label}>Room Length (feet)</label>
                 <input
                   type="number"
-                  value={wallpaperData.wall_width}
-                  onChange={(e) => setWallpaperData({...wallpaperData, wall_width: parseFloat(e.target.value)})}
+                  value={wallpaperData.room_length}
+                  onChange={(e) => setWallpaperData({...wallpaperData, room_length: e.target.value})}
+                  style={styles.input}
+                  placeholder="15"
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Room Width (feet)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.room_width}
+                  onChange={(e) => setWallpaperData({...wallpaperData, room_width: e.target.value})}
                   style={styles.input}
                   placeholder="12"
                 />
@@ -400,13 +401,46 @@ const CalculatorDashboard = ({ projectId }) => {
                 <input
                   type="number"
                   value={wallpaperData.wall_height}
-                  onChange={(e) => setWallpaperData({...wallpaperData, wall_height: parseFloat(e.target.value)})}
+                  onChange={(e) => setWallpaperData({...wallpaperData, wall_height: e.target.value})}
                   style={styles.input}
                   placeholder="9"
                 />
               </div>
             </div>
 
+            {/* DEDUCTIONS */}
+            <div style={{...styles.formGroup, marginTop: '16px', marginBottom: '8px'}}>
+              <label style={{...styles.label, fontWeight: 'bold', color: '#d4af37'}}>🚪 Deductions</label>
+            </div>
+            <div style={styles.formRow}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}># of Doors</label>
+                <input
+                  type="number"
+                  value={wallpaperData.num_doors}
+                  onChange={(e) => setWallpaperData({...wallpaperData, num_doors: parseInt(e.target.value) || 0})}
+                  style={styles.input}
+                  placeholder="2"
+                  min="0"
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}># of Windows</label>
+                <input
+                  type="number"
+                  value={wallpaperData.num_windows}
+                  onChange={(e) => setWallpaperData({...wallpaperData, num_windows: parseInt(e.target.value) || 0})}
+                  style={styles.input}
+                  placeholder="3"
+                  min="0"
+                />
+              </div>
+            </div>
+
+            {/* WALLPAPER SPECS */}
+            <div style={{...styles.formGroup, marginTop: '16px', marginBottom: '8px'}}>
+              <label style={{...styles.label, fontWeight: 'bold', color: '#d4af37'}}>🎨 Wallpaper Specs</label>
+            </div>
             <div style={styles.formRow}>
               <div style={styles.formGroup}>
                 <label style={styles.label}>Roll Width (inches)</label>
@@ -423,27 +457,39 @@ const CalculatorDashboard = ({ projectId }) => {
                 <input
                   type="number"
                   value={wallpaperData.pattern_repeat}
-                  onChange={(e) => setWallpaperData({...wallpaperData, pattern_repeat: parseFloat(e.target.value)})}
+                  onChange={(e) => setWallpaperData({...wallpaperData, pattern_repeat: parseFloat(e.target.value) || 0})}
                   style={styles.input}
-                  placeholder="24"
+                  placeholder="0 (no pattern)"
                 />
               </div>
             </div>
 
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
-                {wallpaperData.wallpaper_type === 'by_yard' ? 'Cost Per Yard ($)' : 'Cost Per Double Roll ($)'} - Optional
-              </label>
-              <input
-                type="number"
-                value={wallpaperData.cost_per_unit}
-                onChange={(e) => setWallpaperData({...wallpaperData, cost_per_unit: e.target.value})}
-                style={styles.input}
-                placeholder="125.00"
-              />
+            {/* COST */}
+            <div style={{...styles.formGroup, marginTop: '16px', marginBottom: '8px'}}>
+              <label style={{...styles.label, fontWeight: 'bold', color: '#d4af37'}}>💰 Pricing (Optional)</label>
             </div>
-
+            <div style={styles.formRow}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Cost Per Double Roll ($)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.cost_per_roll}
+                  onChange={(e) => setWallpaperData({...wallpaperData, cost_per_roll: e.target.value})}
+                  style={styles.input}
+                  placeholder="125.00"
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Cost Per Yard ($)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.cost_per_yard}
+                  onChange={(e) => setWallpaperData({...wallpaperData, cost_per_yard: e.target.value})}
+                  style={styles.input}
+                  placeholder="45.00"
+                />
+              </div>
+            </div>
 
             <button onClick={calculateWallpaper} disabled={loading} style={styles.calculateButton}>
               {loading ? '⏳ Calculating...' : '🧮 Calculate Wallpaper'}
