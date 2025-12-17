@@ -163,17 +163,28 @@ class ProductScrapingTester:
             if response.status_code == 200:
                 data = response.json()
                 
-                if isinstance(data, list):
+                # Handle wrapped response format
+                if data.get("success") and "products" in data:
+                    products = data["products"]
                     # Should return 3 products with "Sherise" in name from Uttermost
-                    sherise_products = [item for item in data if "Sherise" in item.get("name", "")]
+                    sherise_products = [item for item in products if "Sherise" in item.get("name", "")]
                     uttermost_products = [item for item in sherise_products if item.get("vendor") == "Uttermost"]
                     
                     if len(uttermost_products) >= 1:  # At least 1 Sherise product from Uttermost
+                        self.log_result(test_name, True, f"Found {len(uttermost_products)} Sherise products from Uttermost (total: {data.get('count', 0)})", data)
+                    else:
+                        self.log_result(test_name, False, f"Expected Sherise products from Uttermost, found {len(uttermost_products)}", data)
+                elif isinstance(data, list):
+                    # Handle direct array response
+                    sherise_products = [item for item in data if "Sherise" in item.get("name", "")]
+                    uttermost_products = [item for item in sherise_products if item.get("vendor") == "Uttermost"]
+                    
+                    if len(uttermost_products) >= 1:
                         self.log_result(test_name, True, f"Found {len(uttermost_products)} Sherise products from Uttermost", data)
                     else:
                         self.log_result(test_name, False, f"Expected Sherise products from Uttermost, found {len(uttermost_products)}", data)
                 else:
-                    self.log_result(test_name, False, "Expected array response", data)
+                    self.log_result(test_name, False, "Unexpected response format", data)
             else:
                 self.log_result(test_name, False, f"HTTP {response.status_code}: {response.text}")
                 
