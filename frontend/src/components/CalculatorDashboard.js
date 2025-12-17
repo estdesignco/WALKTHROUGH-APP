@@ -73,29 +73,85 @@ const CalculatorDashboard = ({ projectId }) => {
 
   const calculateWallpaper = async () => {
     // Validate required fields
-    if (!wallpaperData.wall_width || !wallpaperData.wall_height) {
-      alert('Please enter Wall Width and Wall Height');
-      return;
-    }
-    if (!wallpaperData.roll_width) {
-      alert('Please enter Roll Width');
+    if (!wallpaperData.room_length || !wallpaperData.room_width || !wallpaperData.wall_height) {
+      alert('Please enter Room Length, Room Width, and Wall Height');
       return;
     }
     
     setLoading(true);
     try {
-      const res = await axios.post(`${API}/calculators/wallpaper`, wallpaperData);
+      // Calculate locally for instant results
+      const roomLength = parseFloat(wallpaperData.room_length);
+      const roomWidth = parseFloat(wallpaperData.room_width);
+      const wallHeight = parseFloat(wallpaperData.wall_height);
+      const rollWidth = parseFloat(wallpaperData.roll_width) || 27; // inches
+      const rollLength = parseFloat(wallpaperData.roll_length) || 33; // feet (double roll)
+      const patternRepeat = parseFloat(wallpaperData.pattern_repeat) || 0;
+      const numDoors = parseInt(wallpaperData.num_doors) || 0;
+      const numWindows = parseInt(wallpaperData.num_windows) || 0;
       
-      // Add cost calculation if cost_per_unit is provided
-      if (wallpaperData.cost_per_unit) {
-        const costPerUnit = parseFloat(wallpaperData.cost_per_unit);
-        if (res.data.rolls_needed) {
-          res.data.total_cost = (costPerUnit * res.data.rolls_needed).toFixed(2);
-        } else if (res.data.yards_needed) {
-          res.data.total_cost = (costPerUnit * res.data.yards_needed).toFixed(2);
-        }
-        res.data.cost_per_unit = costPerUnit.toFixed(2);
+      // Calculate total wall perimeter (all 4 walls)
+      const perimeter = 2 * (roomLength + roomWidth);
+      
+      // Total wall area in sq ft
+      const totalWallArea = perimeter * wallHeight;
+      
+      // Deduct for doors (standard door ~21 sq ft = 3ft x 7ft)
+      const doorDeduction = numDoors * 21;
+      
+      // Deduct for windows (standard window ~15 sq ft = 3ft x 5ft)
+      const windowDeduction = numWindows * 15;
+      
+      // Net wall area
+      const netWallArea = Math.max(totalWallArea - doorDeduction - windowDeduction, 0);
+      
+      // Convert roll width from inches to feet
+      const rollWidthFeet = rollWidth / 12;
+      
+      // Usable coverage per double roll (sq ft)
+      // Double roll = roll_length ft long x roll_width in wide
+      let usableCoveragePerRoll = rollLength * rollWidthFeet;
+      
+      // Adjust for pattern repeat (reduces usable area by ~15% for patterns)
+      if (patternRepeat > 0) {
+        const repeatFactor = 0.85; // 15% waste for pattern matching
+        usableCoveragePerRoll *= repeatFactor;
       }
+      
+      // Calculate double rolls needed (round up)
+      const doubleRollsNeeded = Math.ceil(netWallArea / usableCoveragePerRoll);
+      
+      // Calculate yards needed (1 double roll ≈ 11 yards of wallpaper)
+      // Formula: roll_length (33ft) / 3 = 11 yards per double roll
+      const yardsPerRoll = rollLength / 3;
+      const totalYardsNeeded = Math.ceil(doubleRollsNeeded * yardsPerRoll);
+      
+      // Calculate costs
+      let totalCostRolls = null;
+      let totalCostYards = null;
+      
+      if (wallpaperData.cost_per_roll) {
+        totalCostRolls = (parseFloat(wallpaperData.cost_per_roll) * doubleRollsNeeded).toFixed(2);
+      }
+      if (wallpaperData.cost_per_yard) {
+        totalCostYards = (parseFloat(wallpaperData.cost_per_yard) * totalYardsNeeded).toFixed(2);
+      }
+      
+      const res = {
+        data: {
+          room_dimensions: `${roomLength}' x ${roomWidth}' x ${wallHeight}'h`,
+          total_wall_area: totalWallArea.toFixed(1),
+          deductions: `${numDoors} doors, ${numWindows} windows (${(doorDeduction + windowDeduction).toFixed(0)} sq ft)`,
+          net_wall_area: netWallArea.toFixed(1),
+          coverage_per_roll: usableCoveragePerRoll.toFixed(1),
+          double_rolls_needed: doubleRollsNeeded,
+          yards_needed: totalYardsNeeded,
+          cost_per_roll: wallpaperData.cost_per_roll || 'N/A',
+          cost_per_yard: wallpaperData.cost_per_yard || 'N/A',
+          total_cost_rolls: totalCostRolls ? `$${totalCostRolls}` : 'Enter cost per roll',
+          total_cost_yards: totalCostYards ? `$${totalCostYards}` : 'Enter cost per yard'
+        }
+      };
       
       setResults(res.data);
     } catch (error) {
