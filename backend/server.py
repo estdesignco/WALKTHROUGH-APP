@@ -13139,8 +13139,10 @@ async def login_to_all_vendor_portals():
         }
     
     except Exception as e:
-        logger.error(f"Error logging into all portals: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error logging into all portals: {e}\n{error_trace}")
+        raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {str(e) or 'Unknown error'}")
 
 
 app.include_router(api_router)
