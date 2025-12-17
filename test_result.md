@@ -2733,3 +2733,36 @@ The Product Scraping API demonstrates **strong functionality** with:
 
 **Critical Finding**: The Add Item Modal product scraping feature is **fully functional** and ready for production use. Users can successfully paste vendor URLs and get auto-populated product data for the major vendors tested.
 
+
+## PRODUCT SCRAPER FIX - December 17, 2024
+
+### Root Cause Found
+The database `master_products` collection was **EMPTY** (0 documents). The JSON files in `/app/backend/data/products/` existed but were never seeded into MongoDB.
+
+### Fix Applied
+Ran the database seeder to populate `master_products` collection with 26,658 products from 15 vendors:
+- Four Hands: 9,662 products
+- Uttermost: 2,936 + 102 additional
+- Bernhardt: 1,309 products
+- Loloi: 1,991 products
+- Hudson Valley Lighting: 2,177 products
+- Troy Lighting: 1,416 products
+- And 9 more vendors...
+
+### Verified Working
+1. **Uttermost scrape**: ✅ Returns from database with price ($254 for Adara Mirror)
+2. **Four Hands scrape**: ✅ Returns from database with price ($909.1 for Lucille Bench)
+3. **Bernhardt scrape**: ✅ Falls back to web scraping, gets price ($6,304 for Axiom Bed)
+4. **Sourcing Catalog search**: ✅ Shows 100+ products from database with images and prices
+
+### Data Gaps to Note
+- **Global Views**: NOT in database (user's price sheets don't include this vendor)
+- **Surya**: NOT in database
+- Some specific products may not be in the price sheets (e.g., "Uttermost Enterprise Desk R22952")
+
+### Testing Request
+Test the complete Add Item Modal flow:
+1. Navigate to a project checklist
+2. Click Add Item
+3. Paste an Uttermost URL
+4. Verify form auto-fills with name, price, SKU, dimensions
