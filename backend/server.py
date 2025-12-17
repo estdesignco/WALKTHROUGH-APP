@@ -6139,8 +6139,10 @@ async def sync_canva_to_project(data: dict):
 @api_router.post("/scrape-product")
 async def scrape_product_advanced(data: dict):
     """
-    Advanced product scraping endpoint
-    FIRST checks master_products database (price sheets), then falls back to web scraping
+    Product scraping endpoint - HYBRID MODEL
+    1. ALWAYS scrape the website first for images, dimensions, links, name, SKU
+    2. Then lookup database ONLY for price (user's wholesale price sheets)
+    3. Combine both: scraped data + database price
     """
     url = data.get('url', '')
     
@@ -6148,75 +6150,31 @@ async def scrape_product_advanced(data: dict):
         raise HTTPException(status_code=400, detail="URL is required")
     
     try:
-        print(f"🔍 Looking up product from: {url}")
-        
-        # ===== STEP 1: TRY MASTER_PRODUCTS DATABASE FIRST (Price Sheets) =====
-        # Extract SKU from URL for lookup
+        print(f"🔍 SCRAPING product from: {url}")
         import re
-        url_lower = url.lower()
-        
-        # Extract potential SKU patterns from URL
-        sku_patterns = [
-            r'/product/([A-Za-z0-9\-_]+)',  # fourhands.com/product/251240-001
-            r'/([A-Z]?\d{4,}[A-Za-z0-9\-_]*)',  # Generic SKU pattern
-            r'-([a-z]?\d{4,}[a-z0-9\-]*)(?:\?|$)',  # SKU at end of URL
-            r'sku[=:]([A-Za-z0-9\-_]+)',  # sku=XXX or sku:XXX
-        ]
-        
-        extracted_sku = None
-        for pattern in sku_patterns:
-            match = re.search(pattern, url, re.IGNORECASE)
-            if match:
-                extracted_sku = match.group(1)
-                break
-        
-        if extracted_sku:
-            print(f"📦 Extracted SKU from URL: {extracted_sku}")
-            
-            # Clean up SKU for database lookup - try multiple formats
-            # Some vendors use prefixes like *, R, etc.
-            sku_clean = re.sub(r'^[^a-zA-Z0-9]+', '', extracted_sku)  # Remove leading non-alphanumeric
-            sku_numbers = re.sub(r'[^0-9]', '', extracted_sku)  # Just numbers
-            
-            # Look up in master_products database with multiple format attempts
-            db_product = await db.master_products.find_one(
-                {"$or": [
-                    {"sku": {"$regex": f"^\\*?{sku_clean}$", "$options": "i"}},  # With or without * prefix
-                    {"sku": {"$regex": f"^[A-Z]?{sku_numbers}$", "$options": "i"}},  # Just numbers with optional letter
-                    {"sku": {"$regex": extracted_sku, "$options": "i"}},  # Direct match
-                    {"sku": extracted_sku.upper()},
-                    {"sku": f"*{sku_numbers}"},  # Uttermost format with asterisk
-                ]},
-                {"_id": 0}
-            )
-            
-            if db_product:
-                print(f"✅ FOUND IN DATABASE: {db_product.get('name')} - ${db_product.get('price')}")
-                return {
-                    "success": True,
-                    "source": "database",
-                    "data": {
-                        "title": db_product.get('name'),
-                        "name": db_product.get('name'),
-                        "price": db_product.get('price'),
-                        "cost": db_product.get('price'),
-                        "description": db_product.get('description'),
-                        "image_url": db_product.get('image_url'),
-                        "vendor": db_product.get('vendor'),
-                        "sku": db_product.get('sku'),
-                        "dimensions": db_product.get('dimensions') or db_product.get('size'),
-                        "size": db_product.get('dimensions') or db_product.get('size'),
-                        "color": db_product.get('finish') or db_product.get('color'),
-                        "finish_color": db_product.get('finish') or db_product.get('color'),
-                        "link": url
-                    }
-                }
-            else:
-                print(f"⚠️ SKU {extracted_sku} not found in database, trying portal scraper...")
-        
-        # ===== STEP 2: TRY VENDOR PORTAL SCRAPER (LOGGED-IN SESSIONS) =====
-        # This uses persistent logged-in sessions for better data extraction
         from urllib.parse import urlparse
+        
+        # Initialize scraped data container
+        scraped_data = {
+            "name": None,
+            "title": None,
+            "image_url": None,
+            "sku": None,
+            "size": None,
+            "dimensions": None,
+            "finish_color": None,
+            "color": None,
+            "vendor": None,
+            "description": None,
+            "price": None,
+            "cost": None,
+            "link": url
+        }
+        
+        # ===== STEP 1: ALWAYS SCRAPE THE WEBSITE FIRST =====
+        # Get images, dimensions, name, SKU from the actual website
+        print(f"🌐 Scraping website for product data...")
+        
         domain = urlparse(url).netloc.lower().replace('www.', '')
         
         try:
