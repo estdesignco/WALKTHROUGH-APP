@@ -8,20 +8,19 @@ const CalculatorDashboard = ({ projectId }) => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // WALLPAPER CALCULATOR STATE
+  // WALLPAPER CALCULATOR STATE - BY ROOM SIZE
   const [wallpaperData, setWallpaperData] = useState({
     wallpaper_type: 'double_roll',
-    wall_width: '',
-    wall_height: '',
-    door_widths: [],
-    door_heights: [],
-    window_widths: [],
-    window_heights: [],
-    pattern_repeat: 0,
-    roll_width: 27,  // Standard wallpaper roll width in inches
-    roll_length: 33,
-    fabric_width: 54,
-    cost_per_unit: ''  // Cost per double roll OR yard
+    room_length: '',      // Room length in feet
+    room_width: '',       // Room width in feet
+    wall_height: '',      // Wall height in feet
+    num_doors: 0,         // Number of standard doors to deduct
+    num_windows: 0,       // Number of standard windows to deduct
+    pattern_repeat: 0,    // Pattern repeat in inches
+    roll_width: 27,       // Standard wallpaper roll width in inches
+    roll_length: 33,      // Double roll length in feet (standard is 33ft)
+    cost_per_roll: '',    // Cost per double roll
+    cost_per_yard: ''     // Cost per yard (for by-yard type)
   });
 
   // DRAPERY CALCULATOR STATE
