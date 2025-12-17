@@ -40,7 +40,7 @@ import PowerFeaturesDashboard from './components/PowerFeaturesDashboard';
 import MasterContactsPage from './components/MasterContactsPage';
 import MasterMaterialsPage from './components/MasterMaterialsPage';
 import CalculatorsPage from './components/CalculatorsPage';
-import SourcingCatalog from './components/SourcingCatalog';
+// REMOVED: SourcingCatalog - too many missing images
 import VendorMirror from './components/VendorMirror';
 import AIDesignDashboard from './components/AIDesignDashboard';
 import RoomRenderingStudio from './components/RoomRenderingStudio';
@@ -380,10 +380,7 @@ const App = () => {
                       path="/calculators" 
                       element={<CalculatorsPage />}
                     />
-                    <Route 
-                      path="/sourcing-catalog" 
-                      element={<SourcingCatalog />}
-                    />
+                    {/* REMOVED: Sourcing Catalog - too many missing images */}
                     <Route 
                       path="/vendor-mirror" 
                       element={<VendorMirror />}
