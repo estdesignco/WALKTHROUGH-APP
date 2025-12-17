@@ -287,8 +287,24 @@ class ProductScrapingTester:
             if response.status_code == 200:
                 data = response.json()
                 
-                if isinstance(data, list) and len(data) > 0:
-                    # Check for products from different vendors
+                # Handle wrapped response format
+                if data.get("success") and "products" in data:
+                    products = data["products"]
+                    if len(products) > 0:
+                        # Check for products from different vendors
+                        vendors_found = set()
+                        for product in products:
+                            if product.get("vendor"):
+                                vendors_found.add(product.get("vendor"))
+                        
+                        if len(vendors_found) >= 3:  # At least 3 different vendors
+                            self.log_result(test_name, True, f"Database seeded with products from {len(vendors_found)} vendors: {', '.join(list(vendors_found)[:5])}", {"product_count": len(products), "vendors": list(vendors_found)})
+                        else:
+                            self.log_result(test_name, False, f"Insufficient vendor diversity, found vendors: {list(vendors_found)}", data)
+                    else:
+                        self.log_result(test_name, False, "No products found in database", data)
+                elif isinstance(data, list) and len(data) > 0:
+                    # Handle direct array response
                     vendors_found = set()
                     for product in data:
                         if product.get("vendor"):
