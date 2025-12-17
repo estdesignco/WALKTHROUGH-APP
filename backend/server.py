@@ -6207,134 +6207,150 @@ async def scrape_product_advanced(data: dict):
             import requests
             from bs4 import BeautifulSoup
         
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'none',
-            'Sec-Fetch-User': '?1',
-            'Cache-Control': 'max-age=0',
-            'Referer': 'https://www.google.com/',
-        }
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1',
+                'Sec-Fetch-Dest': 'document',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-Site': 'none',
+                'Sec-Fetch-User': '?1',
+                'Cache-Control': 'max-age=0',
+                'Referer': 'https://www.google.com/',
+            }
+            
+            try:
+                session = requests.Session()
+                response = session.get(url, headers=headers, timeout=20, allow_redirects=True)
+                response.raise_for_status()
+                
+                soup = BeautifulSoup(response.text, 'html.parser')
+                
+                # Try multiple selectors for title
+                title_selectors = [
+                    'h1[class*="product"]', 'h1[class*="title"]', 'h1[itemprop="name"]',
+                    '[class*="product-title"]', '[class*="product-name"]', 'h1'
+                ]
+                for selector in title_selectors:
+                    el = soup.select_one(selector)
+                    if el and el.get_text(strip=True):
+                        scraped_data["name"] = el.get_text(strip=True)
+                        scraped_data["title"] = el.get_text(strip=True)
+                        break
+                
+                # Try multiple selectors for price (from website - may be retail)
+                price_selectors = [
+                    '[class*="price"]', '[itemprop="price"]', '[data-price]',
+                    '.price', '#price', '[class*="cost"]'
+                ]
+                for selector in price_selectors:
+                    el = soup.select_one(selector)
+                    if el:
+                        price_text = el.get_text(strip=True)
+                        price_match = re.search(r'\$?([\d,]+\.?\d*)', price_text)
+                        if price_match:
+                            scraped_data["price"] = float(price_match.group(1).replace(',', ''))
+                            break
+                
+                # Try to find product image
+                img_selectors = [
+                    '[class*="product"] img', '[class*="gallery"] img',
+                    '[itemprop="image"]', 'img[class*="main"]', 'img[class*="product"]'
+                ]
+                for selector in img_selectors:
+                    el = soup.select_one(selector)
+                    if el and el.get('src'):
+                        img_src = el.get('src')
+                        if img_src.startswith('//'):
+                            img_src = 'https:' + img_src
+                        elif img_src.startswith('/'):
+                            parsed = urlparse(url)
+                            img_src = f"{parsed.scheme}://{parsed.netloc}{img_src}"
+                        scraped_data["image_url"] = img_src
+                        break
+                
+                # Try to find SKU
+                sku_selectors = [
+                    '[class*="sku"]', '[itemprop="sku"]', '[data-sku]',
+                    '[class*="product-id"]', '[class*="item-number"]'
+                ]
+                for selector in sku_selectors:
+                    el = soup.select_one(selector)
+                    if el and el.get_text(strip=True):
+                        scraped_data["sku"] = el.get_text(strip=True)
+                        break
+                
+                # Extract vendor from domain
+                scraped_data["vendor"] = domain.split('.')[0].title()
+                
+                # Try meta tags for missing info
+                if not scraped_data["name"]:
+                    og_title = soup.select_one('meta[property="og:title"]')
+                    if og_title:
+                        scraped_data["name"] = og_title.get('content')
+                        scraped_data["title"] = og_title.get('content')
+                
+                if not scraped_data["image_url"]:
+                    og_image = soup.select_one('meta[property="og:image"]')
+                    if og_image:
+                        scraped_data["image_url"] = og_image.get('content')
+                
+                print(f"✅ BeautifulSoup scraped: {scraped_data.get('name', 'Unknown')}")
+            except Exception as bs_error:
+                print(f"⚠️ BeautifulSoup error: {bs_error}")
         
-        session = requests.Session()
-        response = session.get(url, headers=headers, timeout=20, allow_redirects=True)
-        response.raise_for_status()
-        
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # Extract product info using common patterns
-        product_info = {
-            "title": None,
-            "price": None,
-            "description": None,
-            "image_url": None,
-            "vendor": None,
-            "sku": None,
-            "dimensions": None,
-            "material": None
-        }
-        
-        # Try multiple selectors for title
-        title_selectors = [
-            'h1[class*="product"]', 'h1[class*="title"]', 'h1[itemprop="name"]',
-            '[class*="product-title"]', '[class*="product-name"]', 'h1'
-        ]
-        for selector in title_selectors:
-            el = soup.select_one(selector)
-            if el and el.get_text(strip=True):
-                product_info["title"] = el.get_text(strip=True)
-                break
-        
-        # Try multiple selectors for price
-        price_selectors = [
-            '[class*="price"]', '[itemprop="price"]', '[data-price]',
-            '.price', '#price', '[class*="cost"]'
-        ]
-        for selector in price_selectors:
-            el = soup.select_one(selector)
-            if el:
-                price_text = el.get_text(strip=True)
-                # Extract numeric price
-                import re
-                price_match = re.search(r'\$?[\d,]+\.?\d*', price_text)
-                if price_match:
-                    product_info["price"] = price_match.group()
+        # ===== STEP 2: LOOKUP DATABASE FOR WHOLESALE PRICE ONLY =====
+        # Database has user's price sheets - use for wholesale pricing
+        extracted_sku = scraped_data.get('sku')
+        if not extracted_sku:
+            # Try to extract SKU from URL
+            sku_patterns = [
+                r'/product/([A-Za-z0-9\-_]+)',
+                r'/([A-Z]?\d{4,}[A-Za-z0-9\-_]*)',
+                r'-([a-z]?\d{4,}[a-z0-9\-]*)(?:\?|$)',
+            ]
+            for pattern in sku_patterns:
+                match = re.search(pattern, url, re.IGNORECASE)
+                if match:
+                    extracted_sku = match.group(1)
                     break
         
-        # Try multiple selectors for description
-        desc_selectors = [
-            '[class*="description"]', '[itemprop="description"]',
-            '[class*="product-detail"]', '.description', '#description'
-        ]
-        for selector in desc_selectors:
-            el = soup.select_one(selector)
-            if el and el.get_text(strip=True):
-                product_info["description"] = el.get_text(strip=True)[:500]
-                break
+        db_price = None
+        if extracted_sku:
+            sku_clean = re.sub(r'^[^a-zA-Z0-9]+', '', extracted_sku)
+            sku_numbers = re.sub(r'[^0-9]', '', extracted_sku)
+            
+            db_product = await db.master_products.find_one(
+                {"$or": [
+                    {"sku": {"$regex": f"^\\*?{sku_clean}$", "$options": "i"}},
+                    {"sku": {"$regex": f"^[A-Z]?{sku_numbers}$", "$options": "i"}},
+                    {"sku": {"$regex": extracted_sku, "$options": "i"}},
+                    {"sku": extracted_sku.upper()},
+                    {"sku": f"*{sku_numbers}"},
+                ]},
+                {"_id": 0}
+            )
+            
+            if db_product:
+                db_price = db_product.get('price')
+                print(f"💰 Found wholesale price in database: ${db_price}")
+                # Use database price as wholesale cost
+                if db_price:
+                    scraped_data["cost"] = db_price
+                    scraped_data["price"] = db_price
         
-        # Try to find product image
-        img_selectors = [
-            '[class*="product"] img', '[class*="gallery"] img',
-            '[itemprop="image"]', 'img[class*="main"]', 'img[class*="product"]'
-        ]
-        for selector in img_selectors:
-            el = soup.select_one(selector)
-            if el and el.get('src'):
-                img_src = el.get('src')
-                if img_src.startswith('//'):
-                    img_src = 'https:' + img_src
-                elif img_src.startswith('/'):
-                    from urllib.parse import urlparse
-                    parsed = urlparse(url)
-                    img_src = f"{parsed.scheme}://{parsed.netloc}{img_src}"
-                product_info["image_url"] = img_src
-                break
+        # ===== STEP 3: RETURN COMBINED DATA =====
+        print(f"✅ Final product data: {scraped_data.get('name')} - ${scraped_data.get('cost') or scraped_data.get('price') or 'N/A'}")
         
-        # Try to find SKU
-        sku_selectors = [
-            '[class*="sku"]', '[itemprop="sku"]', '[data-sku]',
-            '[class*="product-id"]', '[class*="item-number"]'
-        ]
-        for selector in sku_selectors:
-            el = soup.select_one(selector)
-            if el and el.get_text(strip=True):
-                product_info["sku"] = el.get_text(strip=True)
-                break
+        return {
+            "success": True,
+            "source": "scraped" if not db_price else "hybrid",
+            "data": scraped_data
+        }
         
-        # Extract vendor from domain
-        from urllib.parse import urlparse
-        domain = urlparse(url).netloc.replace('www.', '')
-        product_info["vendor"] = domain.split('.')[0].title()
-        
-        # Try meta tags for missing info
-        if not product_info["title"]:
-            og_title = soup.select_one('meta[property="og:title"]')
-            if og_title:
-                product_info["title"] = og_title.get('content')
-        
-        if not product_info["description"]:
-            og_desc = soup.select_one('meta[property="og:description"]')
-            if og_desc:
-                product_info["description"] = og_desc.get('content')
-        
-        if not product_info["image_url"]:
-            og_image = soup.select_one('meta[property="og:image"]')
-            if og_image:
-                product_info["image_url"] = og_image.get('content')
-        
-        print(f"✅ Scraped product: {product_info.get('title', 'Unknown')}")
-        
-        return {"success": True, "data": product_info}
-        
-    except requests.RequestException as e:
-        logging.error(f"❌ Request error scraping {url}: {str(e)}")
-        raise HTTPException(status_code=400, detail=f"Failed to fetch URL: {str(e)}")
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
