@@ -6239,6 +6239,8 @@ async def scrape_product_advanced(data: dict):
                 from selenium.webdriver.chrome.options import Options
                 from selenium.webdriver.chrome.service import Service
                 from selenium.webdriver.common.by import By
+                from webdriver_manager.chrome import ChromeDriverManager
+                from webdriver_manager.core.os_manager import ChromeType
                 import time
                 
                 chrome_options = Options()
@@ -6255,7 +6257,8 @@ async def scrape_product_advanced(data: dict):
                 chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
                 chrome_options.add_experimental_option('useAutomationExtension', False)
                 
-                driver = webdriver.Chrome(options=chrome_options)
+                service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+                driver = webdriver.Chrome(service=service, options=chrome_options)
                 driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
                     'source': '''
                         Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
