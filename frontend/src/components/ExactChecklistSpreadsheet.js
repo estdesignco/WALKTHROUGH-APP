@@ -1921,39 +1921,6 @@ const ExactChecklistSpreadsheet = ({
                                 </div>
                               </td>
                             </tr>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>COST</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>STATUS</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-20 rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>IMAGE</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-24 rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>PRODUCT LINK</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>REMARKS</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-12 rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>DELETE</th>
-                                </tr>
-                              </thead>
-                              <tbody>
                                 {/* ITEMS UNDER THIS SUBCATEGORY */}
                                 {subcategory.items?.map((item, itemIndex) => (
                                       <tr key={item.id} style={{ 
