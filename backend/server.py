@@ -6229,7 +6229,10 @@ async def scrape_product_advanced(data: dict):
         cloudflare_sites = ['globalviews.com', 'surya.com']
         is_cloudflare_site = any(site in domain for site in cloudflare_sites)
         
-        if not scraped_data.get('name') and is_cloudflare_site:
+        # Check if we got actual product data (not just domain name)
+        has_real_data = scraped_data.get('name') and scraped_data.get('name') != domain and 'www.' not in (scraped_data.get('name') or '').lower()
+        
+        if not has_real_data and is_cloudflare_site:
             print(f"🛡️ Cloudflare-protected site detected, trying undetected-chromedriver...")
             try:
                 import undetected_chromedriver as uc
