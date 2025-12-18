@@ -38,6 +38,10 @@ const ExactChecklistSpreadsheet = ({
   const [pendingVariantItem, setPendingVariantItem] = useState(null);
   const [pendingVariantProduct, setPendingVariantProduct] = useState(null);
   
+  // Smart Alternatives state
+  const [showAlternatives, setShowAlternatives] = useState(false);
+  const [alternativesItem, setAlternativesItem] = useState(null);
+  
   // State to track checked items (for PICKED status)
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [availableCategories, setAvailableCategories] = useState([]);
