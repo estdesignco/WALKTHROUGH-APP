@@ -839,7 +839,7 @@ export default function ProjectDetailPage() {
         ) : <div className="text-center text-stone-300 py-8">Loading calendar...</div> },
         { name: "Deliveries", icon: Truck, component: project ? (
             <div className="deliveries-content">
-                <DeliveryScheduler project={project} onClose={() => {}} onUpdate={fetchProject} />
+                <DeliveryScheduler project={project} onClose={() => {}} onUpdate={() => window.location.reload()} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading deliveries...</div> },
         { name: "Contacts", icon: Users, component: project ? (
