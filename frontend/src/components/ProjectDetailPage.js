@@ -19,6 +19,8 @@ import AutomationDashboard from './AutomationDashboard';
 import ExportsDashboard from './ExportsDashboard';
 import CalculatorDashboard from './CalculatorDashboard';
 import BudgetTracker from './BudgetTracker';
+import PDFReportGenerator from './PDFReportGenerator';
+import DeliveryScheduler from './DeliveryScheduler';
 import VendorContactManager from './VendorContactManager';
 import MaterialLibraryCatalog from './MaterialLibraryCatalog';
 import AIDesignDashboard from './AIDesignDashboard';
