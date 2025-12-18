@@ -1796,6 +1796,34 @@ const ExactFFESpreadsheet = ({
           </div>
         </div>
       )}
+
+      {/* PHOTO VIEWER MODAL */}
+      {selectedPhotoView && (
+        <div 
+          className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedPhotoView(null)}
+        >
+          <div className="relative max-w-5xl max-h-[90vh]">
+            <button
+              onClick={() => setSelectedPhotoView(null)}
+              className="absolute -top-4 -right-4 bg-red-600 hover:bg-red-700 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold z-10"
+            >
+              ×
+            </button>
+            <img 
+              src={selectedPhotoView.photo_data || selectedPhotoView.url || selectedPhotoView.image_url} 
+              alt={selectedPhotoView.file_name || 'Photo'} 
+              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+            {selectedPhotoView.notes && (
+              <div className="mt-2 text-center text-[#D4A574] bg-black/80 px-4 py-2 rounded">
+                {selectedPhotoView.notes}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
