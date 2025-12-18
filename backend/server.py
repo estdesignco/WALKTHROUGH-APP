@@ -5014,9 +5014,9 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             'zeevlighting.com', 'rowefurniture.com'
         ]
         
-        # Vendors where automated login is BLOCKED by bot detection
-        # These still work for product info but price requires manual entry
-        bot_detection_vendors = ['uttermost.com']
+        # Vendors where automated login is BLOCKED by bot detection (Cloudflare, etc.)
+        # These still work for product info but price requires manual entry or database
+        bot_detection_vendors = ['uttermost.com', 'globalviews.com', 'surya.com']
         
         needs_login_for_prices = any(v in domain for v in wholesale_vendors_requiring_login)
         
