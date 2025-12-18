@@ -5103,16 +5103,38 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         
         # Check for Cloudflare challenge and wait for it to resolve
         page_title = await page.title()
-        if 'just a moment' in page_title.lower() or 'checking your browser' in page_title.lower():
+        page_content = await page.content()
+        
+        is_cloudflare = ('just a moment' in page_title.lower() or 
+                        'checking your browser' in page_title.lower() or
+                        'cloudflare' in page_content.lower() or
+                        'cf-browser-verification' in page_content.lower())
+        
+        if is_cloudflare:
             print("🛡️ Cloudflare challenge detected - waiting for resolution...")
-            for i in range(6):  # Wait up to 30 seconds for challenge
+            # Try to interact like a human - move mouse, scroll
+            try:
+                await page.mouse.move(500, 300)
+                await page.wait_for_timeout(1000)
+                await page.mouse.move(700, 400)
+                await page.evaluate("window.scrollTo(0, 100)")
+            except:
+                pass
+            
+            for i in range(12):  # Wait up to 60 seconds for challenge
                 await page.wait_for_timeout(5000)
                 page_title = await page.title()
-                if 'just a moment' not in page_title.lower():
+                if 'just a moment' not in page_title.lower() and 'checking' not in page_title.lower():
                     print(f"✅ Cloudflare challenge resolved after {(i+1)*5}s")
+                    # Re-navigate to product page after challenge
+                    try:
+                        await page.goto(url, wait_until='domcontentloaded', timeout=30000)
+                        await page.wait_for_timeout(3000)
+                    except:
+                        pass
                     break
             else:
-                print("⚠️ Cloudflare challenge did not resolve - site may be blocking automated access")
+                print("⚠️ Cloudflare challenge did not resolve after 60s - trying anyway...")
         
         try:
             await page.wait_for_load_state('networkidle', timeout=15000)
