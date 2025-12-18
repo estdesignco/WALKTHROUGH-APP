@@ -2585,6 +2585,24 @@ const ExactChecklistSpreadsheet = ({
           </div>
         </div>
       )}
+
+      {/* SMART ALTERNATIVES MODAL */}
+      {showAlternatives && alternativesItem && (
+        <SmartAlternatives
+          item={alternativesItem}
+          onClose={() => {
+            setShowAlternatives(false);
+            setAlternativesItem(null);
+          }}
+          onSelectAlternative={(alt) => {
+            // Update the item with the alternative's info
+            console.log('Selected alternative:', alt);
+            // Could auto-fill the item fields here
+            setShowAlternatives(false);
+            setAlternativesItem(null);
+          }}
+        />
+      )}
     </div>
   );
 };
