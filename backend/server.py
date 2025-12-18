@@ -2706,6 +2706,93 @@ async def delete_item(item_id: str):
     return {"message": "Item deleted successfully"}
 
 # ==========================================
+# SMART PRODUCT ALTERNATIVES
+# ==========================================
+
+@api_router.get("/smart-alternatives")
+async def get_smart_alternatives(
+    query: str = Query("", description="Search query based on item name/category"),
+    base_price: Optional[float] = Query(None, description="Current item price for comparison"),
+    price_range: str = Query("all", description="Price filter: all, lower, similar, higher"),
+    vendor: Optional[str] = Query(None, description="Filter by specific vendor"),
+    exclude_id: Optional[str] = Query(None, description="Exclude specific item ID"),
+    limit: int = Query(12, ge=1, le=50)
+):
+    """
+    Find smart product alternatives from our catalog.
+    Searches master_products database for similar items based on name/category.
+    """
+    try:
+        # Build search filter
+        search_filter = {}
+        
+        if query:
+            # Extract keywords and search
+            keywords = query.lower().split()
+            # Filter out common words
+            stop_words = ['the', 'a', 'an', 'for', 'and', 'or', 'in', 'on', 'at', 'to', 'new', 'item']
+            keywords = [k for k in keywords if k not in stop_words and len(k) > 2]
+            
+            if keywords:
+                # Build regex pattern to match any keyword
+                regex_patterns = [{"name": {"$regex": k, "$options": "i"}} for k in keywords[:5]]
+                search_filter["$or"] = regex_patterns
+        
+        # Price range filtering
+        if base_price and price_range != "all":
+            if price_range == "lower":
+                search_filter["price"] = {"$lt": base_price, "$gt": 0}
+            elif price_range == "similar":
+                # Within 20% of base price
+                low = base_price * 0.8
+                high = base_price * 1.2
+                search_filter["price"] = {"$gte": low, "$lte": high}
+            elif price_range == "higher":
+                search_filter["price"] = {"$gt": base_price}
+        
+        # Vendor filter
+        if vendor:
+            search_filter["vendor"] = {"$regex": vendor, "$options": "i"}
+        
+        # Exclude specific item
+        if exclude_id:
+            search_filter["id"] = {"$ne": exclude_id}
+        
+        # Query database
+        products = await db.master_products.find(
+            search_filter,
+            {"_id": 0}
+        ).limit(limit * 2).to_list(limit * 2)  # Get extra to filter
+        
+        # Sort by relevance (prefer items with images and prices)
+        def score_product(p):
+            score = 0
+            if p.get('image_url'): score += 10
+            if p.get('price'): score += 5
+            if p.get('dimensions'): score += 2
+            return score
+        
+        products.sort(key=score_product, reverse=True)
+        
+        # Return top results
+        alternatives = products[:limit]
+        
+        return {
+            "success": True,
+            "query": query,
+            "count": len(alternatives),
+            "alternatives": alternatives
+        }
+        
+    except Exception as e:
+        logging.error(f"Smart alternatives error: {e}")
+        return {
+            "success": False,
+            "error": str(e),
+            "alternatives": []
+        }
+
+# ==========================================
 # PRODUCT AUTOCOMPLETE FROM VENDOR DATA
 # ==========================================
 
