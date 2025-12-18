@@ -2272,25 +2272,10 @@ const ExactChecklistSpreadsheet = ({
                                   </td>
                                 </tr>
                                 ))}
-                                {/* INLINE ADD ITEM ROW */}
-                                <tr className="hover:bg-[#1a1a2a]">
-                                  <td colSpan="12" className="border border-[#B49B7E]/30 px-2 py-1">
-                                    <button
-                                      onClick={() => {
-                                        setSelectedSubCategoryId(subcategory.id);
-                                        setShowAddItem(true);
-                                      }}
-                                      className="text-[#D4A574] hover:text-[#E8D4B8] text-xs flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity"
-                                    >
-                                      <span>➕</span>
-                                      <span>Add item to {subcategory.name}</span>
-                                    </button>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
                           </React.Fragment>
                         ))}
+                          </tbody>
+                        </table>
 
                         {/* ADD CATEGORY AND ADD ITEM BUTTONS - SECTION FOOTER */}
                         <div className="mb-4 flex gap-3">
