@@ -36,6 +36,11 @@ const ExactFFESpreadsheet = ({
   });
   
   const [expandedImage, setExpandedImage] = useState(null);  // For image modal
+  
+  // Room photos state - for displaying walkthrough photos
+  const [roomPhotos, setRoomPhotos] = useState({});
+  const [expandedPhotoRooms, setExpandedPhotoRooms] = useState({});
+  const [selectedPhotoView, setSelectedPhotoView] = useState(null);
 
   // FILTER STATE - MAKE IT ACTUALLY WORK
   const [filteredProject, setFilteredProject] = useState(project);
