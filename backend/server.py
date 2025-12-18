@@ -6247,8 +6247,9 @@ async def scrape_product_advanced(data: dict):
                 options.add_argument('--disable-dev-shm-usage')
                 options.add_argument('--disable-gpu')
                 options.add_argument('--window-size=1920,1080')
+                options.binary_location = '/usr/bin/chromium'
                 
-                driver = uc.Chrome(options=options, use_subprocess=True)
+                driver = uc.Chrome(options=options, use_subprocess=True, browser_executable_path='/usr/bin/chromium')
                 driver.set_page_load_timeout(60)
                 
                 try:
