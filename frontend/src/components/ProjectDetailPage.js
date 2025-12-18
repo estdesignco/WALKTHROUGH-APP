@@ -958,7 +958,16 @@ export default function ProjectDetailPage() {
             </div>
 
             <div className="space-y-4">
-                <h1 className="text-6xl font-bold" style={{color: '#8B7355'}}>{project.name}</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-6xl font-bold" style={{color: '#8B7355'}}>{project.name}</h1>
+                    <button
+                        onClick={() => setShowPDFReport(true)}
+                        className="px-4 py-2 bg-[#D4A574] hover:bg-[#B49B7E] text-white rounded-lg flex items-center gap-2 font-medium transition-colors"
+                    >
+                        <FileText className="w-5 h-5" />
+                        Export PDF Report
+                    </button>
+                </div>
                 <p className="text-stone-300 mt-1 text-lg">{project.client_info?.full_name || project.client_name} - {project.client_info?.address || project.address}</p>
             </div>
 
