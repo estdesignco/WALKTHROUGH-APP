@@ -6223,9 +6223,87 @@ async def scrape_product_advanced(data: dict):
                     })
                     print(f"✅ Playwright scraped: {scraped_data.get('name')}")
             except Exception as pw_error:
-                print(f"⚠️ Playwright error: {pw_error}, trying BeautifulSoup...")
+                print(f"⚠️ Playwright error: {pw_error}, trying alternatives...")
         
-        # FALLBACK: BeautifulSoup approach if Playwright didn't get data
+        # CLOUDFLARE BYPASS: Use undetected-chromedriver for protected sites
+        cloudflare_sites = ['globalviews.com', 'surya.com']
+        is_cloudflare_site = any(site in domain for site in cloudflare_sites)
+        
+        if not scraped_data.get('name') and is_cloudflare_site:
+            print(f"🛡️ Cloudflare-protected site detected, trying undetected-chromedriver...")
+            try:
+                import undetected_chromedriver as uc
+                from selenium.webdriver.common.by import By
+                from selenium.webdriver.support.ui import WebDriverWait
+                from selenium.webdriver.support import expected_conditions as EC
+                import time
+                
+                options = uc.ChromeOptions()
+                options.add_argument('--headless=new')
+                options.add_argument('--no-sandbox')
+                options.add_argument('--disable-dev-shm-usage')
+                options.add_argument('--disable-gpu')
+                options.add_argument('--window-size=1920,1080')
+                
+                driver = uc.Chrome(options=options, use_subprocess=True)
+                driver.set_page_load_timeout(60)
+                
+                try:
+                    driver.get(url)
+                    time.sleep(10)  # Wait for Cloudflare to pass
+                    
+                    # Check if we got past Cloudflare
+                    page_source = driver.page_source
+                    if 'just a moment' not in page_source.lower():
+                        print(f"✅ Cloudflare bypassed!")
+                        
+                        # Extract product name
+                        try:
+                            name_el = driver.find_element(By.CSS_SELECTOR, 'h1')
+                            scraped_data['name'] = name_el.text.strip()
+                            scraped_data['title'] = scraped_data['name']
+                            print(f"✅ UC NAME: {scraped_data['name']}")
+                        except:
+                            pass
+                        
+                        # Extract image
+                        try:
+                            img_el = driver.find_element(By.CSS_SELECTOR, 'img[class*="product"], img[class*="gallery"], .product-image img')
+                            scraped_data['image_url'] = img_el.get_attribute('src')
+                            print(f"✅ UC IMAGE: {scraped_data['image_url'][:60]}...")
+                        except:
+                            pass
+                        
+                        # Extract price
+                        try:
+                            price_el = driver.find_element(By.CSS_SELECTOR, '[class*="price"]')
+                            price_text = price_el.text
+                            import re
+                            price_match = re.search(r'\$?([\d,]+\.?\d*)', price_text)
+                            if price_match:
+                                scraped_data['price'] = float(price_match.group(1).replace(',', ''))
+                                scraped_data['cost'] = scraped_data['price']
+                                print(f"✅ UC PRICE: ${scraped_data['price']}")
+                        except:
+                            pass
+                        
+                        # Extract SKU
+                        try:
+                            sku_el = driver.find_element(By.CSS_SELECTOR, '[class*="sku"], [class*="item-number"]')
+                            scraped_data['sku'] = sku_el.text.strip()
+                            print(f"✅ UC SKU: {scraped_data['sku']}")
+                        except:
+                            pass
+                        
+                        scraped_data['vendor'] = domain.split('.')[0].title()
+                    else:
+                        print(f"⚠️ Cloudflare still blocking after UC attempt")
+                finally:
+                    driver.quit()
+            except Exception as uc_error:
+                print(f"⚠️ Undetected-chromedriver error: {uc_error}")
+        
+        # FALLBACK: BeautifulSoup approach if still no data
         if not scraped_data.get('name'):
             import requests
             from bs4 import BeautifulSoup
