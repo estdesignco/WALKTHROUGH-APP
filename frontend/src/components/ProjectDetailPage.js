@@ -837,6 +837,11 @@ export default function ProjectDetailPage() {
                 <InstallationCalendar projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading calendar...</div> },
+        { name: "Deliveries", icon: Truck, component: project ? (
+            <div className="deliveries-content">
+                <DeliveryScheduler project={project} onClose={() => {}} onUpdate={fetchProject} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading deliveries...</div> },
         { name: "Contacts", icon: Users, component: project ? (
             <div className="contacts-content">
                 <ContactSheet projectId={projectId} />
