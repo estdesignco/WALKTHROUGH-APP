@@ -12986,6 +12986,193 @@ async def save_clipped_product_to_app(data: dict):
 
 
 # =============================================================================
+# DELIVERY SCHEDULER ENDPOINTS
+# =============================================================================
+
+@api_router.get("/deliveries/{project_id}")
+async def get_deliveries(project_id: str):
+    """Get all deliveries for a project"""
+    try:
+        deliveries = await db.deliveries.find(
+            {"project_id": project_id},
+            {"_id": 0}
+        ).sort("scheduled_date", 1).to_list(100)
+        return {"success": True, "deliveries": deliveries}
+    except Exception as e:
+        return {"success": False, "error": str(e), "deliveries": []}
+
+@api_router.post("/deliveries")
+async def create_delivery(data: dict):
+    """Create a new delivery"""
+    try:
+        from datetime import datetime
+        delivery = {
+            "id": str(uuid.uuid4()),
+            "project_id": data.get("project_id"),
+            "vendor": data.get("vendor"),
+            "scheduled_date": data.get("scheduled_date"),
+            "time_window": data.get("time_window", "morning"),
+            "location": data.get("location", "job_site"),
+            "items": data.get("items", []),
+            "notes": data.get("notes", ""),
+            "status": "scheduled",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.deliveries.insert_one(delivery)
+        return {"success": True, "delivery": {k: v for k, v in delivery.items() if k != "_id"}}
+    except Exception as e:
+        logging.error(f"Error creating delivery: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/deliveries/{delivery_id}")
+async def update_delivery(delivery_id: str, data: dict):
+    """Update delivery status"""
+    try:
+        update_data = {}
+        if "status" in data:
+            update_data["status"] = data["status"]
+        if "scheduled_date" in data:
+            update_data["scheduled_date"] = data["scheduled_date"]
+        if "notes" in data:
+            update_data["notes"] = data["notes"]
+        
+        await db.deliveries.update_one(
+            {"id": delivery_id},
+            {"$set": update_data}
+        )
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# =============================================================================
+# PDF REPORT GENERATION
+# =============================================================================
+
+@api_router.post("/reports/generate-pdf")
+async def generate_pdf_report(data: dict):
+    """Generate PDF report for project"""
+    from fastapi.responses import Response
+    
+    try:
+        project_id = data.get("project_id")
+        report_type = data.get("report_type", "full")
+        include_images = data.get("include_images", True)
+        include_pricing = data.get("include_pricing", True)
+        room_ids = data.get("room_ids", [])
+        
+        # Get project data
+        project = await db.projects.find_one({"id": project_id}, {"_id": 0})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Build HTML report
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>{project.get('name', 'Project')} - Report</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 40px; color: #333; }}
+                h1 {{ color: #8B7355; border-bottom: 2px solid #D4A574; padding-bottom: 10px; }}
+                h2 {{ color: #B49B7E; margin-top: 30px; }}
+                h3 {{ color: #666; }}
+                table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
+                th, td {{ border: 1px solid #ddd; padding: 10px; text-align: left; }}
+                th {{ background-color: #8B7355; color: white; }}
+                tr:nth-child(even) {{ background-color: #f9f9f9; }}
+                .room-header {{ background-color: #D4A574; color: white; padding: 15px; margin-top: 30px; }}
+                .category-header {{ background-color: #B49B7E; color: white; padding: 10px; margin-top: 20px; }}
+                .total {{ font-weight: bold; background-color: #f0f0f0; }}
+                .status-picked {{ color: green; }}
+                .status-ordered {{ color: blue; }}
+                .status-delivered {{ color: purple; }}
+                img {{ max-width: 80px; max-height: 80px; }}
+                .footer {{ margin-top: 50px; text-align: center; color: #888; font-size: 12px; }}
+            </style>
+        </head>
+        <body>
+            <h1>{project.get('name', 'Project Report')}</h1>
+            <p><strong>Client:</strong> {project.get('client_name', 'N/A')}</p>
+            <p><strong>Generated:</strong> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
+        """
+        
+        total_cost = 0
+        total_items = 0
+        
+        for room in project.get('rooms', []):
+            if room_ids and room.get('id') not in room_ids:
+                continue
+                
+            html_content += f'<div class="room-header"><h2>{room.get("name", "Room")}</h2></div>'
+            
+            for category in room.get('categories', []):
+                html_content += f'<div class="category-header"><h3>{category.get("name", "Category")}</h3></div>'
+                
+                html_content += '''
+                <table>
+                    <tr>
+                        <th>Item</th>
+                        <th>Vendor/SKU</th>
+                        <th>Qty</th>
+                        <th>Size</th>
+                '''
+                if include_pricing:
+                    html_content += '<th>Cost</th>'
+                html_content += '<th>Status</th></tr>'
+                
+                for subcategory in category.get('subcategories', []):
+                    for item in subcategory.get('items', []):
+                        total_items += 1
+                        item_cost = float(item.get('cost', 0) or 0)
+                        item_qty = int(item.get('quantity', 1) or 1)
+                        line_total = item_cost * item_qty
+                        total_cost += line_total
+                        
+                        status_class = f"status-{(item.get('status', '') or '').lower().replace(' ', '-')}"
+                        
+                        html_content += f'''
+                        <tr>
+                            <td>{item.get('name', 'N/A')}</td>
+                            <td>{item.get('vendor', '')} {item.get('sku', '')}</td>
+                            <td>{item_qty}</td>
+                            <td>{item.get('size', '') or item.get('dimensions', '')}</td>
+                        '''
+                        if include_pricing:
+                            html_content += f'<td>${line_total:,.2f}</td>'
+                        html_content += f'<td class="{status_class}">{item.get("status", "N/A")}</td></tr>'
+        
+        # Summary
+        html_content += f'''
+            <h2>Summary</h2>
+            <table>
+                <tr><td><strong>Total Items</strong></td><td>{total_items}</td></tr>
+        '''
+        if include_pricing:
+            html_content += f'<tr class="total"><td><strong>Total Cost</strong></td><td><strong>${total_cost:,.2f}</strong></td></tr>'
+        
+        html_content += '''
+            </table>
+            <div class="footer">
+                <p>Generated by Interior Design Project Manager</p>
+            </div>
+        </body>
+        </html>
+        '''
+        
+        # Return as HTML (can be printed to PDF by browser)
+        return Response(
+            content=html_content,
+            media_type="text/html",
+            headers={
+                "Content-Disposition": f'attachment; filename="{project.get("name", "Report")}.html"'
+            }
+        )
+        
+    except Exception as e:
+        logging.error(f"Error generating report: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# =============================================================================
 # VENDOR PORTAL MANAGEMENT ENDPOINTS - Ultimate Sourcing Catalog
 # =============================================================================
 
