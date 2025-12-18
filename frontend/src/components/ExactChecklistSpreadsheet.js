@@ -2278,15 +2278,27 @@ const ExactChecklistSpreadsheet = ({
                                     </div>
                                   </td>
                                   
-                                  {/* DELETE BUTTON */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-center w-12">
-                                    <button
-                                      onClick={() => handleDeleteItem(item.id)}
-                                      className="text-red-400 hover:text-red-300 text-sm"
-                                      title="Delete Item"
-                                    >
-                                      🗑️
-                                    </button>
+                                  {/* DELETE & ALTERNATIVES BUTTONS */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-center w-20">
+                                    <div className="flex items-center justify-center gap-2">
+                                      <button
+                                        onClick={() => {
+                                          setAlternativesItem({...item, category_name: category.name});
+                                          setShowAlternatives(true);
+                                        }}
+                                        className="text-[#D4A574] hover:text-[#E8D4B8] text-sm"
+                                        title="Find Alternatives"
+                                      >
+                                        ✨
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteItem(item.id)}
+                                        className="text-red-400 hover:text-red-300 text-sm"
+                                        title="Delete Item"
+                                      >
+                                        🗑️
+                                      </button>
+                                    </div>
                                   </td>
                                 </tr>
                                 ))}
