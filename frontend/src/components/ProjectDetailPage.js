@@ -1003,6 +1003,14 @@ export default function ProjectDetailPage() {
             <div className="py-4">
                 {tabs.find(tab => tab.name === activeTab)?.component}
             </div>
+
+            {/* PDF Report Generator Modal */}
+            {showPDFReport && project && (
+                <PDFReportGenerator 
+                    project={project} 
+                    onClose={() => setShowPDFReport(false)} 
+                />
+            )}
         </div>
     );
 }
