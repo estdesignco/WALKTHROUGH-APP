@@ -56,6 +56,10 @@ export default function ProjectDetailPage() {
     const [editedProject, setEditedProject] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     
+    // PDF Report and Delivery Scheduler modals
+    const [showPDFReport, setShowPDFReport] = useState(false);
+    const [showDeliveryScheduler, setShowDeliveryScheduler] = useState(false);
+    
     // Update URL when tab changes
     const handleTabChange = (tabName) => {
         setActiveTab(tabName);
