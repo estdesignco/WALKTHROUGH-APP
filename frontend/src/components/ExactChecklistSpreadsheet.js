@@ -2248,9 +2248,19 @@ const ExactChecklistSpreadsheet = ({
                                     </div>
                                   </td>
                                   
-                                  {/* DELETE & ALTERNATIVES BUTTONS */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-center w-20">
-                                    <div className="flex items-center justify-center gap-2">
+                                  {/* ACTION BUTTONS: Add, Alternatives, Delete */}
+                                  <td className="border border-[#B49B7E] px-1 py-1 text-center w-20">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedSubCategoryId(subcategory.id);
+                                          setShowAddItem(true);
+                                        }}
+                                        className="text-green-400 hover:text-green-300 text-sm font-bold"
+                                        title="Add New Item"
+                                      >
+                                        +
+                                      </button>
                                       <button
                                         onClick={() => {
                                           setAlternativesItem({...item, category_name: category.name});
