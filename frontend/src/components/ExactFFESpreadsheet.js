@@ -1682,6 +1682,25 @@ const ExactFFESpreadsheet = ({
                                                         ))
                                                       ))}
                                                       
+                                                      {/* INLINE ADD ITEM ROW */}
+                                                      <tr className="hover:bg-[#1a1a2a]">
+                                                        <td colSpan="14" className="border border-[#B49B7E]/30 px-2 py-1">
+                                                          <button
+                                                            onClick={() => {
+                                                              const firstSubcategory = category.subcategories?.[0];
+                                                              if (firstSubcategory) {
+                                                                setSelectedSubCategoryId(firstSubcategory.id);
+                                                              }
+                                                              setShowAddItem(true);
+                                                            }}
+                                                            className="text-[#D4A574] hover:text-[#E8D4B8] text-xs flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity"
+                                                          >
+                                                            <span>➕</span>
+                                                            <span>Add item to {category.name}</span>
+                                                          </button>
+                                                        </td>
+                                                      </tr>
+                                                      
                                                       {/* BUTTONS ROW - LEFT ALIGNED WITH GOLD COLOR */}
                                                       <tr>
                                                         <td colSpan="7" className="border border-[#B49B7E] px-6 py-2 bg-slate-900">
