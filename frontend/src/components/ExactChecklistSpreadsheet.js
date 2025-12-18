@@ -1869,55 +1869,58 @@ const ExactChecklistSpreadsheet = ({
                     {/* CHECKLIST TABLE - Only show when category expanded */}
                     {isCategoryExpanded && (
                       <>
-                        {category.subcategories?.map((subcategory) => (
+                        {/* SINGLE TABLE FOR ALL SUBCATEGORIES - NO NESTED TABLES */}
+                        <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10">
+                          <thead>
+                            <tr>
+                              <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-8" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>✓</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>ITEM</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>VENDOR/SKU</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-12" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>QTY</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>SIZE</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>FINISH</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-20" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>COST</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>STATUS</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>IMAGE</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>LINK</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>REMARKS</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>+</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                        {category.subcategories?.map((subcategory, subIndex) => (
                           <React.Fragment key={subcategory.id || subcategory.name}>
-                            {/* TABLE WITH SUBCATEGORY NAME IN HEADER */}
-                            <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10">
-                              <thead>
-                                <tr>
-                                  <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-8 rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>✓</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>
+                            {/* SUBCATEGORY HEADER ROW */}
+                            <tr style={{ background: 'linear-gradient(135deg, rgba(180, 155, 126, 0.3) 0%, rgba(212, 165, 116, 0.2) 100%)' }}>
+                              <td colSpan="12" className="border border-[#B49B7E] px-3 py-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[#D4A574] font-bold text-sm">
                                     {subcategory.name.toUpperCase()}
+                                  </span>
+                                  <div className="flex items-center gap-2">
                                     <button
                                       onClick={() => {
-                                        if (window.confirm(`Delete subcategory "${subcategory.name}" and all its items?`)) {
+                                        setSelectedSubCategoryId(subcategory.id);
+                                        setShowAddItem(true);
+                                      }}
+                                      className="text-[#D4A574] hover:text-white text-xs px-2 py-1 rounded bg-[#D4A574]/20 hover:bg-[#D4A574]/40"
+                                    >
+                                      + Add Item
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        if (window.confirm(`Delete "${subcategory.name}" and all its items?`)) {
                                           handleDeleteSubcategory(subcategory.id);
                                         }
                                       }}
-                                      className="ml-2 text-[#B49B7E] hover:text-red-200 text-xs"
-                                      title={`Delete ${subcategory.name} subcategory`}
+                                      className="text-red-400 hover:text-red-300 text-xs"
                                     >
                                       🗑️
                                     </button>
-                                  </th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>VENDOR/SKU</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16 rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>QTY</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>SIZE</th>
-                                  <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
-                                    background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
-                                    boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>FINISH/COLOR</th>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
                                   <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white rounded" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 25%, #8B4444CC 50%, #8B4444 75%, #8B4444EE 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
