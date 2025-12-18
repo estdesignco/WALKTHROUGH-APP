@@ -52,6 +52,47 @@ const ExactFFESpreadsheet = ({
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedCarrier, setSelectedCarrier] = useState('');
+  
+  // Load photos for all rooms from walkthrough
+  useEffect(() => {
+    const loadRoomPhotos = async () => {
+      if (!project?.id || !project?.rooms) return;
+      
+      const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+      const photosData = {};
+      
+      for (const room of project.rooms) {
+        try {
+          const response = await fetch(`${backendUrl}/api/photos/by-room-name/${project.id}/${encodeURIComponent(room.name)}`);
+          if (response.ok) {
+            const data = await response.json();
+            photosData[room.id] = data.photos || [];
+          } else {
+            const fallbackResponse = await fetch(`${backendUrl}/api/photos/by-room/${project.id}/${room.id}`);
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json();
+              photosData[room.id] = fallbackData.photos || [];
+            } else {
+              photosData[room.id] = [];
+            }
+          }
+        } catch (error) {
+          console.warn(`Failed to load photos for room ${room.name}:`, error);
+          photosData[room.id] = [];
+        }
+      }
+      
+      setRoomPhotos(photosData);
+      console.log('📸 FF&E: Loaded room photos:', Object.keys(photosData).length, 'rooms');
+    };
+
+    loadRoomPhotos();
+  }, [project?.id, project?.rooms]);
+  
+  // Toggle photo folder
+  const togglePhotoFolder = (roomId) => {
+    setExpandedPhotoRooms(prev => ({ ...prev, [roomId]: !prev[roomId] }));
+  };
 
   // ACTUAL API CALLS - WITH PROPER ERROR HANDLING
   const handleStatusChange = async (itemId, newStatus) => {
