@@ -6547,8 +6547,11 @@ async def scrape_product_advanced(data: dict):
                 {"_id": 0}
             )
             
+            print(f"  Trying exact matches: *{sku_clean_upper}, {sku_clean_upper}")
+            
             # If no exact match, try case-insensitive search
             if not db_product:
+                print(f"  No exact match, trying regex...")
                 db_product = await db.master_products.find_one(
                     {"sku": {"$regex": f"\\*?{sku_clean_upper}$", "$options": "i"}},
                     {"_id": 0}
@@ -6556,7 +6559,18 @@ async def scrape_product_advanced(data: dict):
             
             if db_product:
                 db_price = db_product.get('price')
-                print(f"💰 Found wholesale price in database: ${db_price}")
+                print(f"💰 Found wholesale price in database: ${db_price} for {db_product.get('name')}")
+                # Also fill in name and other fields from DB if not scraped
+                if not scraped_data.get('name') and db_product.get('name'):
+                    scraped_data['name'] = db_product.get('name')
+                    scraped_data['title'] = db_product.get('name')
+                if not scraped_data.get('sku'):
+                    scraped_data['sku'] = db_product.get('sku')
+                if not scraped_data.get('dimensions') and db_product.get('dimensions'):
+                    scraped_data['dimensions'] = db_product.get('dimensions')
+                    scraped_data['size'] = db_product.get('dimensions')
+            else:
+                print(f"❌ SKU {sku_clean_upper} not found in database")
                 # Use database price as wholesale cost
                 if db_price:
                     scraped_data["cost"] = db_price
