@@ -1,0 +1,144 @@
+{
+  "summary": {
+    "total_tests": 16,
+    "passed": 12,
+    "failed": 4,
+    "success_rate": 75.0,
+    "critical_failures": [],
+    "deployment_ready": true
+  },
+  "failed_tests": [
+    "POST /calculators/tile",
+    "POST /calculators/paint",
+    "AI Assistant",
+    "PDF Generation"
+  ],
+  "passed_tests": [
+    "Health Check",
+    "GET /projects",
+    "GET /projects/{id}",
+    "POST /calculators/wallpaper",
+    "GET /budget/{project_id}",
+    "GET /deliveries/{project_id}",
+    "GET /autocomplete/products",
+    "GET /autocomplete/vendors",
+    "GET /smart-alternatives",
+    "GET /contacts",
+    "GET /materials",
+    "POST /scrape-product"
+  ],
+  "detailed_results": [
+    {
+      "test": "Health Check",
+      "success": true,
+      "details": "API is responding",
+      "timestamp": "2025-12-19T06:22:43.936677",
+      "response_data": null
+    },
+    {
+      "test": "GET /projects",
+      "success": true,
+      "details": "Retrieved 3 projects",
+      "timestamp": "2025-12-19T06:22:44.033190",
+      "response_data": null
+    },
+    {
+      "test": "GET /projects/{id}",
+      "success": true,
+      "details": "Project details retrieved",
+      "timestamp": "2025-12-19T06:22:44.103065",
+      "response_data": null
+    },
+    {
+      "test": "POST /calculators/wallpaper",
+      "success": true,
+      "details": "Wallpaper calculation successful",
+      "timestamp": "2025-12-19T06:22:44.143980",
+      "response_data": null
+    },
+    {
+      "test": "POST /calculators/tile",
+      "success": false,
+      "details": "Status: 404",
+      "timestamp": "2025-12-19T06:22:44.185717",
+      "response_data": null
+    },
+    {
+      "test": "POST /calculators/paint",
+      "success": false,
+      "details": "Status: 422",
+      "timestamp": "2025-12-19T06:22:44.229774",
+      "response_data": null
+    },
+    {
+      "test": "GET /budget/{project_id}",
+      "success": true,
+      "details": "Budget data retrieved",
+      "timestamp": "2025-12-19T06:22:44.270587",
+      "response_data": null
+    },
+    {
+      "test": "GET /deliveries/{project_id}",
+      "success": true,
+      "details": "Retrieved 2 deliveries",
+      "timestamp": "2025-12-19T06:22:44.310940",
+      "response_data": null
+    },
+    {
+      "test": "GET /autocomplete/products",
+      "success": true,
+      "details": "Retrieved 4 suggestions",
+      "timestamp": "2025-12-19T06:22:44.374970",
+      "response_data": null
+    },
+    {
+      "test": "GET /autocomplete/vendors",
+      "success": true,
+      "details": "Retrieved 2 vendors",
+      "timestamp": "2025-12-19T06:22:44.410606",
+      "response_data": null
+    },
+    {
+      "test": "GET /smart-alternatives",
+      "success": true,
+      "details": "Smart alternatives working",
+      "timestamp": "2025-12-19T06:22:44.447834",
+      "response_data": null
+    },
+    {
+      "test": "GET /contacts",
+      "success": true,
+      "details": "Retrieved 3 contacts",
+      "timestamp": "2025-12-19T06:22:44.487726",
+      "response_data": null
+    },
+    {
+      "test": "GET /materials",
+      "success": true,
+      "details": "Materials catalog retrieved",
+      "timestamp": "2025-12-19T06:22:44.568203",
+      "response_data": null
+    },
+    {
+      "test": "POST /scrape-product",
+      "success": true,
+      "details": "Product scraped successfully",
+      "timestamp": "2025-12-19T06:23:33.713087",
+      "response_data": null
+    },
+    {
+      "test": "AI Assistant",
+      "success": false,
+      "details": "No working AI endpoint found",
+      "timestamp": "2025-12-19T06:23:33.852874",
+      "response_data": null
+    },
+    {
+      "test": "PDF Generation",
+      "success": false,
+      "details": "No working PDF endpoint found",
+      "timestamp": "2025-12-19T06:23:34.041717",
+      "response_data": null
+    }
+  ]
+}
