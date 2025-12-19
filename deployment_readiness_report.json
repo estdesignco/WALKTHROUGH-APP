@@ -1,0 +1,178 @@
+{
+  "deployment_approved": true,
+  "summary": {
+    "total_tests": 20,
+    "passed": 15,
+    "failed": 5,
+    "critical_failures": 0,
+    "success_rate": 75.0
+  },
+  "critical_failures": [],
+  "failed_tests": [
+    "Drapery Calculator",
+    "AI Chat",
+    "AI Design Suggestions",
+    "Product Scraping",
+    "PDF Generation"
+  ],
+  "passed_tests": [
+    "API Health Check",
+    "GET /projects",
+    "GET /projects/{id}",
+    "GET /budget/{project_id}",
+    "GET /deliveries/{project_id}",
+    "Product Autocomplete",
+    "Vendor Autocomplete",
+    "Smart Alternatives",
+    "Wallpaper Calculator",
+    "Paint Calculator",
+    "Flooring Calculator",
+    "Hardware Calculator",
+    "Lighting Calculator",
+    "Contacts Management",
+    "Materials Catalog"
+  ],
+  "detailed_results": [
+    {
+      "test": "API Health Check",
+      "success": true,
+      "details": "Backend is responding",
+      "is_critical": true,
+      "timestamp": "2025-12-19T06:24:42.464058"
+    },
+    {
+      "test": "GET /projects",
+      "success": true,
+      "details": "Retrieved 3 projects",
+      "is_critical": true,
+      "timestamp": "2025-12-19T06:24:42.567282"
+    },
+    {
+      "test": "GET /projects/{id}",
+      "success": true,
+      "details": "Project details retrieved",
+      "is_critical": true,
+      "timestamp": "2025-12-19T06:24:42.632510"
+    },
+    {
+      "test": "GET /budget/{project_id}",
+      "success": true,
+      "details": "Budget data retrieved",
+      "is_critical": true,
+      "timestamp": "2025-12-19T06:24:42.674052"
+    },
+    {
+      "test": "GET /deliveries/{project_id}",
+      "success": true,
+      "details": "Retrieved 2 deliveries",
+      "is_critical": true,
+      "timestamp": "2025-12-19T06:24:42.710097"
+    },
+    {
+      "test": "Product Autocomplete",
+      "success": true,
+      "details": "Retrieved 4 suggestions",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:42.781766"
+    },
+    {
+      "test": "Vendor Autocomplete",
+      "success": true,
+      "details": "Retrieved 2 vendors",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:42.818650"
+    },
+    {
+      "test": "Smart Alternatives",
+      "success": true,
+      "details": "Smart alternatives working",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:42.859372"
+    },
+    {
+      "test": "Wallpaper Calculator",
+      "success": true,
+      "details": "Calculation successful",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:42.898086"
+    },
+    {
+      "test": "Paint Calculator",
+      "success": true,
+      "details": "Calculation successful",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:42.936057"
+    },
+    {
+      "test": "Flooring Calculator",
+      "success": true,
+      "details": "Calculation successful",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:42.973490"
+    },
+    {
+      "test": "Drapery Calculator",
+      "success": false,
+      "details": "Status: 422",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:43.010772"
+    },
+    {
+      "test": "Hardware Calculator",
+      "success": true,
+      "details": "Calculation successful",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:43.046121"
+    },
+    {
+      "test": "Lighting Calculator",
+      "success": true,
+      "details": "Calculation successful",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:43.080714"
+    },
+    {
+      "test": "Contacts Management",
+      "success": true,
+      "details": "Retrieved 3 contacts",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:43.116721"
+    },
+    {
+      "test": "Materials Catalog",
+      "success": true,
+      "details": "Materials catalog accessible",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:43.155907"
+    },
+    {
+      "test": "AI Chat",
+      "success": false,
+      "details": "Status: 422",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:43.192309"
+    },
+    {
+      "test": "AI Design Suggestions",
+      "success": false,
+      "details": "Status: 422",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:24:43.229310"
+    },
+    {
+      "test": "Product Scraping",
+      "success": false,
+      "details": "Request timed out (scraping is slow but may work)",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:25:28.301626"
+    },
+    {
+      "test": "PDF Generation",
+      "success": false,
+      "details": "No working PDF endpoint found",
+      "is_critical": false,
+      "timestamp": "2025-12-19T06:25:28.518775"
+    }
+  ],
+  "timestamp": "2025-12-19T06:25:28.519841"
+}
