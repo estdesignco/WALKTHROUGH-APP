@@ -6529,14 +6529,19 @@ async def scrape_product_advanced(data: dict):
         if extracted_sku:
             sku_clean = re.sub(r'^[^a-zA-Z0-9]+', '', extracted_sku)
             sku_numbers = re.sub(r'[^0-9]', '', extracted_sku)
+            sku_upper = extracted_sku.upper()
+            
+            print(f"🔍 DB lookup for SKU: {extracted_sku} (clean: {sku_clean})")
             
             db_product = await db.master_products.find_one(
                 {"$or": [
-                    {"sku": {"$regex": f"^\\*?{sku_clean}$", "$options": "i"}},
-                    {"sku": {"$regex": f"^[A-Z]?{sku_numbers}$", "$options": "i"}},
-                    {"sku": {"$regex": extracted_sku, "$options": "i"}},
-                    {"sku": extracted_sku.upper()},
-                    {"sku": f"*{sku_numbers}"},
+                    {"sku": f"*{sku_upper}"},  # *R50276 format
+                    {"sku": f"*{sku_clean}"},  # *R50276 with clean
+                    {"sku": sku_upper},  # R50276
+                    {"sku": sku_clean},  # R50276 clean
+                    {"sku": {"$regex": f"^\\*?{sku_clean}$", "$options": "i"}},  # Optional asterisk prefix
+                    {"sku": {"$regex": f"\\*?{sku_upper}$", "$options": "i"}},  # Match at end
+                    {"sku": {"$regex": extracted_sku, "$options": "i"}},  # Contains SKU
                 ]},
                 {"_id": 0}
             )
