@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://designer-scraper.preview.emergentagent.com
+https://designpulse-5.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://designer-scraper.preview.emergentagent.com/mobile-app
+https://designpulse-5.preview.emergentagent.com/mobile-app
 
 ---
 

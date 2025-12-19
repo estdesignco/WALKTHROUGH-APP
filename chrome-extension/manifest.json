@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://designer-scraper.preview.emergentagent.com/*"
+    "https://designpulse-5.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

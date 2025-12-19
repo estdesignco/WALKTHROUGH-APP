@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://designer-scraper.preview.emergentagent.com';
+const BACKEND_URL = 'https://designpulse-5.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

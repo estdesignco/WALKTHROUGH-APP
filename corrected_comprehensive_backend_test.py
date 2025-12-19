@@ -12,7 +12,7 @@ import uuid
 import time
 
 class CorrectedComprehensiveSystemTester:
-    def __init__(self, base_url="https://designer-scraper.preview.emergentagent.com"):
+    def __init__(self, base_url="https://designpulse-5.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_base = f"{base_url}/api"
         self.tests_run = 0

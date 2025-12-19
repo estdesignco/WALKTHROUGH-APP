@@ -10,7 +10,7 @@ import time
 from typing import Dict, Any, List
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://designer-scraper.preview.emergentagent.com/api"
+BACKEND_URL = "https://designpulse-5.preview.emergentagent.com/api"
 
 class ProductScrapingTester:
     def __init__(self):

@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://designer-scraper.preview.emergentagent.com"
+BACKEND_URL = "https://designpulse-5.preview.emergentagent.com"
 
 def test_houzz_automation_final():
     """Final test with extended timeout"""

@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://designer-scraper.preview.emergentagent.com/api
+https://designpulse-5.preview.emergentagent.com/api
 ```
 
 ---
