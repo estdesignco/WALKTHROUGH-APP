@@ -402,6 +402,27 @@ textarea:focus {
   outline: none !important;
 }
 
+/* Remove the "cell in cell" effect for checklist/FFE table inputs */
+/* These inputs should be transparent and borderless to blend into table cells */
+table td input[type="text"],
+table td input[type="number"],
+table td select,
+.checklist-table-input,
+.inline-table-input {
+  background-color: transparent !important;
+  border: none !important;
+  color: inherit !important;
+  padding: 0 !important;
+}
+
+table td input[type="text"]:focus,
+table td input[type="number"]:focus,
+table td select:focus {
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+}
+
 /* Buttons - muted theme */
 button {
   background-color: #4A4A4A;
