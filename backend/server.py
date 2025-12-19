@@ -6560,6 +6560,10 @@ async def scrape_product_advanced(data: dict):
             if db_product:
                 db_price = db_product.get('price')
                 print(f"💰 Found wholesale price in database: ${db_price} for {db_product.get('name')}")
+                # SET THE PRICE from database
+                if db_price:
+                    scraped_data['price'] = db_price
+                    scraped_data['cost'] = db_price
                 # Also fill in name and other fields from DB if not scraped
                 if not scraped_data.get('name') and db_product.get('name'):
                     scraped_data['name'] = db_product.get('name')
