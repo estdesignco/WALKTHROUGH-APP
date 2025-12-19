@@ -6530,21 +6530,29 @@ async def scrape_product_advanced(data: dict):
             sku_clean = re.sub(r'^[^a-zA-Z0-9]+', '', extracted_sku)
             sku_numbers = re.sub(r'[^0-9]', '', extracted_sku)
             sku_upper = extracted_sku.upper()
+            sku_clean_upper = sku_clean.upper()
             
-            print(f"🔍 DB lookup for SKU: {extracted_sku} (clean: {sku_clean})")
+            print(f"🔍 DB lookup for SKU: {extracted_sku} (clean_upper: {sku_clean_upper})")
             
+            # Try exact matches first (most efficient)
             db_product = await db.master_products.find_one(
                 {"$or": [
-                    {"sku": f"*{sku_upper}"},  # *R50276 format
-                    {"sku": f"*{sku_clean}"},  # *R50276 with clean
-                    {"sku": sku_upper},  # R50276
-                    {"sku": sku_clean},  # R50276 clean
-                    {"sku": {"$regex": f"^\\*?{sku_clean}$", "$options": "i"}},  # Optional asterisk prefix
-                    {"sku": {"$regex": f"\\*?{sku_upper}$", "$options": "i"}},  # Match at end
-                    {"sku": {"$regex": extracted_sku, "$options": "i"}},  # Contains SKU
+                    {"sku": f"*{sku_clean_upper}"},  # *R50276 format (most common)
+                    {"sku": sku_clean_upper},  # R50276
+                    {"sku": f"*{sku_upper}"},  # *R50276 with original
+                    {"sku": sku_upper},  # Original uppercase
+                    {"sku": sku_clean},  # Clean original case
+                    {"sku": extracted_sku},  # Exact original
                 ]},
                 {"_id": 0}
             )
+            
+            # If no exact match, try case-insensitive search
+            if not db_product:
+                db_product = await db.master_products.find_one(
+                    {"sku": {"$regex": f"\\*?{sku_clean_upper}$", "$options": "i"}},
+                    {"_id": 0}
+                )
             
             if db_product:
                 db_price = db_product.get('price')
