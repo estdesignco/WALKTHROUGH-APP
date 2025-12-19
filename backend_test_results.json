@@ -1,0 +1,190 @@
+{
+  "summary": {
+    "total_tests": 22,
+    "passed": 12,
+    "failed": 10,
+    "success_rate": 54.54545454545454
+  },
+  "failed_tests": [
+    "GET /project/{id}",
+    "POST /scrape-product",
+    "POST /pdf-report",
+    "GET /calculators/wallpaper",
+    "GET /calculators/tile",
+    "GET /calculators/paint",
+    "GET /calculators/drapery",
+    "GET /calculators/hardware",
+    "GET /calculators/lighting",
+    "POST /ai-assistant"
+  ],
+  "passed_tests": [
+    "Health Check",
+    "GET /projects",
+    "PUT /projects/{id}",
+    "GET /budget/{project_id}",
+    "POST /budget",
+    "GET /deliveries/{project_id}",
+    "POST /deliveries",
+    "GET /smart-alternatives",
+    "GET /autocomplete/products",
+    "GET /autocomplete/vendors",
+    "GET /contacts",
+    "GET /materials"
+  ],
+  "detailed_results": [
+    {
+      "test": "Health Check",
+      "success": true,
+      "details": "API is responding",
+      "timestamp": "2025-12-19T06:20:53.461464",
+      "response_data": null
+    },
+    {
+      "test": "GET /projects",
+      "success": true,
+      "details": "Retrieved 3 projects",
+      "timestamp": "2025-12-19T06:20:53.554905",
+      "response_data": null
+    },
+    {
+      "test": "GET /project/{id}",
+      "success": false,
+      "details": "Status: 404",
+      "timestamp": "2025-12-19T06:20:53.592360",
+      "response_data": null
+    },
+    {
+      "test": "PUT /projects/{id}",
+      "success": true,
+      "details": "Project updated successfully",
+      "timestamp": "2025-12-19T06:20:53.632291",
+      "response_data": null
+    },
+    {
+      "test": "GET /budget/{project_id}",
+      "success": true,
+      "details": "Budget data retrieved",
+      "timestamp": "2025-12-19T06:20:53.670393",
+      "response_data": null
+    },
+    {
+      "test": "POST /budget",
+      "success": true,
+      "details": "Budget item created",
+      "timestamp": "2025-12-19T06:20:53.738102",
+      "response_data": null
+    },
+    {
+      "test": "GET /deliveries/{project_id}",
+      "success": true,
+      "details": "Retrieved 2 deliveries",
+      "timestamp": "2025-12-19T06:20:53.781936",
+      "response_data": null
+    },
+    {
+      "test": "POST /deliveries",
+      "success": true,
+      "details": "Delivery created successfully",
+      "timestamp": "2025-12-19T06:20:53.831467",
+      "response_data": null
+    },
+    {
+      "test": "POST /scrape-product",
+      "success": false,
+      "details": "Error: HTTPSConnectionPool(host='designpulse-5.preview.emergentagent.com', port=443): Read timed out. (read timeout=30)",
+      "timestamp": "2025-12-19T06:21:23.888525",
+      "response_data": null
+    },
+    {
+      "test": "GET /smart-alternatives",
+      "success": true,
+      "details": "Smart alternatives retrieved",
+      "timestamp": "2025-12-19T06:21:23.954353",
+      "response_data": null
+    },
+    {
+      "test": "GET /autocomplete/products",
+      "success": true,
+      "details": "Retrieved 4 product suggestions",
+      "timestamp": "2025-12-19T06:21:24.031076",
+      "response_data": null
+    },
+    {
+      "test": "GET /autocomplete/vendors",
+      "success": true,
+      "details": "Retrieved 2 vendors",
+      "timestamp": "2025-12-19T06:21:24.071563",
+      "response_data": null
+    },
+    {
+      "test": "POST /pdf-report",
+      "success": false,
+      "details": "Status: 404",
+      "timestamp": "2025-12-19T06:21:24.108726",
+      "response_data": null
+    },
+    {
+      "test": "GET /calculators/wallpaper",
+      "success": false,
+      "details": "Status: 405",
+      "timestamp": "2025-12-19T06:21:24.146308",
+      "response_data": null
+    },
+    {
+      "test": "GET /calculators/tile",
+      "success": false,
+      "details": "Endpoint not found",
+      "timestamp": "2025-12-19T06:21:24.181836",
+      "response_data": null
+    },
+    {
+      "test": "GET /calculators/paint",
+      "success": false,
+      "details": "Status: 405",
+      "timestamp": "2025-12-19T06:21:24.217904",
+      "response_data": null
+    },
+    {
+      "test": "GET /calculators/drapery",
+      "success": false,
+      "details": "Status: 405",
+      "timestamp": "2025-12-19T06:21:24.256501",
+      "response_data": null
+    },
+    {
+      "test": "GET /calculators/hardware",
+      "success": false,
+      "details": "Status: 405",
+      "timestamp": "2025-12-19T06:21:24.299340",
+      "response_data": null
+    },
+    {
+      "test": "GET /calculators/lighting",
+      "success": false,
+      "details": "Status: 405",
+      "timestamp": "2025-12-19T06:21:24.346291",
+      "response_data": null
+    },
+    {
+      "test": "GET /contacts",
+      "success": true,
+      "details": "Retrieved 3 contacts",
+      "timestamp": "2025-12-19T06:21:24.381537",
+      "response_data": null
+    },
+    {
+      "test": "GET /materials",
+      "success": true,
+      "details": "Retrieved materials catalog",
+      "timestamp": "2025-12-19T06:21:24.418206",
+      "response_data": null
+    },
+    {
+      "test": "POST /ai-assistant",
+      "success": false,
+      "details": "Status: 404",
+      "timestamp": "2025-12-19T06:21:24.454785",
+      "response_data": null
+    }
+  ]
+}
