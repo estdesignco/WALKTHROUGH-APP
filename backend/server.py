@@ -5466,6 +5466,43 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     pass
             
+            # SPECIAL FALLBACK: For sites with JS-heavy rendering (like Uttermost Revelation)
+            # Extract product name from URL slug if nothing else works
+            if not result['name']:
+                try:
+                    # Try to get name from page title
+                    page_title = await page.title()
+                    if page_title and len(page_title) > 5 and 'uttermost' in page_title.lower():
+                        # Remove site name from title
+                        clean_title = page_title.split('|')[0].split('-')[0].strip()
+                        if clean_title and len(clean_title) > 3:
+                            result['name'] = clean_title
+                            print(f"✅ NAME FROM TITLE: {result['name']}")
+                    
+                    # If still no name, extract from URL slug
+                    if not result['name']:
+                        from urllib.parse import urlparse
+                        path = urlparse(url).path
+                        # Get last part of path and clean it up
+                        slug = path.rstrip('/').split('/')[-1]
+                        if slug:
+                            # Remove SKU pattern at end (like -r50276)
+                            import re
+                            name_part = re.sub(r'-[a-z]?\d{4,6}$', '', slug, flags=re.I)
+                            # Convert slug to title case
+                            name = name_part.replace('-', ' ').replace('_', ' ').title()
+                            if name and len(name) > 3:
+                                result['name'] = name
+                                print(f"✅ NAME FROM URL: {result['name']}")
+                                
+                                # Also extract SKU from URL
+                                sku_match = re.search(r'[/-]([A-Za-z]?\d{4,6})$', url)
+                                if sku_match and not result['sku']:
+                                    result['sku'] = sku_match.group(1).upper()
+                                    print(f"✅ SKU FROM URL: {result['sku']}")
+                except Exception as url_extract_err:
+                    print(f"⚠️ URL extraction error: {url_extract_err}")
+            
             # ===== 2. ADVANCED PRICE DETECTION =====
             print("💰 EXTRACTING PRICE INFORMATION...")
             
