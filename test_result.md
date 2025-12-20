@@ -172,11 +172,12 @@ Full comprehensive testing of all features for deployment readiness:
 - Test AI features - AI endpoints have validation issues
 
 ## Known Issues
-1. Uttermost Revelation products not in database (user's XLSX files not available)
-2. Cloudflare-protected sites (Global Views, Surya) cannot be scraped
-3. **NEW:** AI chat features need validation debugging (422 errors)
-4. **NEW:** PDF generation endpoint missing or misconfigured
-5. **NEW:** Drapery calculator has validation issues
+1. **Calculator Response Format** - 4 calculators return correct data but in unexpected format (non-critical)
+2. **Paint Colors Autocomplete** - Uses 'q' parameter instead of 'query' (minor fix needed)
+3. **Checklist Endpoints** - No working checklist endpoint found (feature gap)
+4. **PDF Generation** - No working PDF endpoint found (feature gap)
+5. Uttermost Revelation products not in database (user's XLSX files not available)
+6. Cloudflare-protected sites (Global Views, Surya) cannot be scraped
 
 ## Testing Status
 - ✅ **BACKEND TESTING COMPLETED** - Core business functions operational
