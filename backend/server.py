@@ -1967,6 +1967,20 @@ async def update_category(category_id: str, category_update: CategoryUpdate):
 
 # ROOM ENDPOINTS with 3-level auto-population
 
+@api_router.get("/rooms/{room_id}")
+async def get_room_by_id(room_id: str):
+    """Get a single room by ID with all its nested data"""
+    try:
+        room = await db.rooms.find_one({"id": room_id}, {"_id": 0})
+        if not room:
+            raise HTTPException(status_code=404, detail="Room not found")
+        return room
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting room {room_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get room: {str(e)}")
+
 @api_router.get("/rooms")
 async def list_rooms(project_id: str = None, sheet_type: str = None):
     """List all rooms, optionally filtered by project_id and sheet_type"""
