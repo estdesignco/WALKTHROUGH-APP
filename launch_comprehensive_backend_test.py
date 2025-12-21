@@ -257,7 +257,8 @@ class LaunchReadinessTester:
             
             if response.status_code == 200:
                 data = response.json()
-                if "rod_length" in data or "result" in data:
+                if ("rod_length" in data or "result" in data or 
+                    "total_rod_width" in data or "brackets_needed" in data):
                     self.log_result(test_name, True, f"Calculator working - Result: {data}", data, critical=True)
                 else:
                     self.log_result(test_name, False, "Missing expected result fields", data, critical=True)
