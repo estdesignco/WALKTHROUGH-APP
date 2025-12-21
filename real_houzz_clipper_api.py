@@ -290,7 +290,7 @@ async def main():
     
     print("="*80)
     print(f"🎉 TEST COMPLETE!")
-    print(f"🔗 View: https://designpulse-5.preview.emergentagent.com/furniture-search")
+    print(f"🔗 View: https://vendor-import.preview.emergentagent.com/furniture-search")
     print("="*80 + "\n")
     
     client.close()

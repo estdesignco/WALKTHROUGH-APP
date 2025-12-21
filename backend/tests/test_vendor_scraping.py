@@ -15,7 +15,7 @@ from datetime import datetime
 sys.path.append('/app/backend')
 
 # Test configuration
-BACKEND_URL = "https://designpulse-5.preview.emergentagent.com/api"
+BACKEND_URL = "https://vendor-import.preview.emergentagent.com/api"
 
 class VendorScrapingTester:
     def __init__(self):

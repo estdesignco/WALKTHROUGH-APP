@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://designpulse-5.preview.emergentagent.com/mobile-app
+Test it now: https://vendor-import.preview.emergentagent.com/mobile-app

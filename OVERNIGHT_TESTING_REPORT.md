@@ -3,7 +3,7 @@
 
 **Testing Date**: December 2, 2024  
 **Testing Duration**: Comprehensive overnight testing session  
-**System URL**: https://designpulse-5.preview.emergentagent.com
+**System URL**: https://vendor-import.preview.emergentagent.com
 
 ---
 

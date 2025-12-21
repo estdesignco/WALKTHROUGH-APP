@@ -6,7 +6,7 @@ Test script to trigger 422 validation errors
 import requests
 import json
 
-BACKEND_URL = "https://designpulse-5.preview.emergentagent.com/api"
+BACKEND_URL = "https://vendor-import.preview.emergentagent.com/api"
 
 def test_missing_required_fields():
     """Test with missing required fields"""

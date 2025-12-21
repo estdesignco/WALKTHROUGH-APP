@@ -1,6 +1,6 @@
 # COMPREHENSIVE OVERNIGHT BACKEND DIAGNOSTICS - FINAL REPORT
 ## Test Date: 2025-10-28
-## Backend URL: https://designpulse-5.preview.emergentagent.com/api
+## Backend URL: https://vendor-import.preview.emergentagent.com/api
 
 ---
 
