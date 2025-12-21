@@ -6854,7 +6854,10 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
                                 print(f"🔑 Found password field: {selector}")
                                 await password_input.click()
                                 await page.wait_for_timeout(500)
-                                await password_input.type("Zeke1919$$", delay=150)
+                                # Use credentials from environment or database - DO NOT HARDCODE
+                                canva_password = os.environ.get('CANVA_PASSWORD', '')
+                                if canva_password:
+                                    await password_input.type(canva_password, delay=150)
                                 await page.wait_for_timeout(1000)
                                 password_filled = True
                                 break
