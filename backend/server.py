@@ -6804,7 +6804,10 @@ async def extract_links_from_canva_board(board_url: str, page_number: Optional[i
                                 print(f"📧 Found email field: {selector}")
                                 await email_input.click()
                                 await page.wait_for_timeout(500)
-                                await email_input.type("EstablishedDesignCo@gmail.com", delay=100)
+                                # Use credentials from environment or database - DO NOT HARDCODE
+                                canva_email = os.environ.get('CANVA_EMAIL', '')
+                                if canva_email:
+                                    await email_input.type(canva_email, delay=100)
                                 await page.wait_for_timeout(1000)
                                 email_filled = True
                                 break
