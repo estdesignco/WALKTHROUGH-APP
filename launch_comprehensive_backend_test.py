@@ -412,7 +412,9 @@ class LaunchReadinessTester:
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("name") == "Launch Test Project - Updated":
+                # Check for successful update in different response formats
+                if (data.get("name") == "Launch Test Project - Updated" or 
+                    (data.get("success") and data.get("project", {}).get("name") == "Launch Test Project - Updated")):
                     self.log_result(test_name, True, f"Project updated successfully", data, critical=True)
                 else:
                     self.log_result(test_name, False, "Project update failed", data, critical=True)
