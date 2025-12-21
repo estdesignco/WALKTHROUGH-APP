@@ -2845,8 +2845,17 @@ async def autocomplete_products(
             else:
                 search_filter["$or"] = [{"image_url": None}, {"image_url": ""}]
         
-        # Remove the temp key if exists
+        # Remove the temp keys if exist
         search_filter.pop("$or_img", None)
+        
+        # Handle vendor filter - combine with main $or if present
+        if "$or_vendor" in search_filter:
+            vendor_or = search_filter.pop("$or_vendor")
+            if "$and" not in search_filter:
+                search_filter["$and"] = []
+            if "$or" in search_filter:
+                search_filter["$and"].append({"$or": search_filter.pop("$or")})
+            search_filter["$and"].append({"$or": vendor_or})
         
         # Use aggregation to sort by image availability (products with images first)
         pipeline = [
