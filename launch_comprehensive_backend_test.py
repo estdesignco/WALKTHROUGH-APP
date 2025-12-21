@@ -602,7 +602,7 @@ class LaunchReadinessTester:
             print(f"POST {url}")
             print(f"Payload: {json.dumps(payload, indent=2)}")
             
-            response = requests.post(url, json=payload, timeout=60)  # Longer timeout for AI
+            response = requests.post(url, json=payload, timeout=30)  # Reduced timeout for AI
             
             if response.status_code == 200:
                 data = response.json()
