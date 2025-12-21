@@ -127,13 +127,13 @@ class LaunchReadinessTester:
                         name_match = test_case['name_contains'].lower() in name.lower() if test_case['name_contains'] else True
                         
                         if price_match and vendor_match and name_match:
-                            self.log_result(test_name, True, f"Found: {name} - ${price} from {vendor}", found_product, critical=True)
+                            self.log_result(test_name, True, f"Found: {name} - ${price} from {vendor_field}", found_product, critical=True)
                         else:
                             issues = []
                             if not price_match:
                                 issues.append(f"Price mismatch: expected ${test_case['expected_price']}, got ${price}")
                             if not vendor_match:
-                                issues.append(f"Vendor mismatch: expected {test_case['vendor']}, got {vendor}")
+                                issues.append(f"Vendor mismatch: expected {test_case['vendor']}, got {vendor_field}")
                             if not name_match:
                                 issues.append(f"Name mismatch: expected to contain '{test_case['name_contains']}'")
                             self.log_result(test_name, False, "; ".join(issues), found_product, critical=True)
