@@ -120,7 +120,10 @@ class LaunchReadinessTester:
                         
                         # Check price match (allow small variance)
                         price_match = abs(price - test_case['expected_price']) < 10.0
-                        vendor_match = test_case['vendor'].lower() in vendor.lower() if test_case['vendor'] else True
+                        
+                        # Check vendor field - try both 'vendor' and 'vendor_name' fields
+                        vendor_field = found_product.get("vendor") or found_product.get("vendor_name", "")
+                        vendor_match = test_case['vendor'].lower() in vendor_field.lower() if test_case['vendor'] else True
                         name_match = test_case['name_contains'].lower() in name.lower() if test_case['name_contains'] else True
                         
                         if price_match and vendor_match and name_match:
