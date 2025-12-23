@@ -6332,9 +6332,11 @@ async def scrape_product_advanced(data: dict):
         # Check if input is just a SKU (no http, no slashes, no dots except in numbers)
         is_sku_only = not url.startswith('http') and '/' not in url and ('.' not in url or re.match(r'^[\w-]+$', url))
         
+        vendor_hint = data.get('vendor', '').lower()
+        
         if is_sku_only:
-            # INPUT IS A SKU - Skip web scraping, go straight to database lookup
-            print(f"📦 Input is a SKU: {url} - Looking up in database...")
+            # INPUT IS A SKU - First check database, then scrape if not found
+            print(f"📦 Input is a SKU: {url} - Looking up in database first...")
             sku_upper = url.strip().upper()
             
             # Try exact match first
@@ -6377,15 +6379,40 @@ async def scrape_product_advanced(data: dict):
                     "product": scraped_data
                 }
             else:
-                print(f"❌ SKU {sku_upper} not found in database")
-                return {
-                    "success": False,
-                    "source": "database",
-                    "error": f"SKU {sku_upper} not found in database",
-                    "data": scraped_data
+                # NOT IN DATABASE - Try to construct URL and scrape the website
+                print(f"⚠️ SKU {sku_upper} not found in database - attempting web scrape...")
+                
+                # Map vendor hints to their websites
+                vendor_urls = {
+                    'fourhands': f'https://www.fourhands.com/search?q={sku_upper}',
+                    'four hands': f'https://www.fourhands.com/search?q={sku_upper}',
+                    'uttermost': f'https://www.quoizel.com/search?text={sku_upper}',
+                    'bassett': f'https://www.quoizel.com/search?text={sku_upper}',
+                    'gabby': f'https://www.gabbyhome.com/search?q={sku_upper}',
+                    'worlds away': f'https://quoizel.com/search?text={sku_upper}',
+                    'worldsaway': f'https://quoizel.com/search?text={sku_upper}',
+                    'villa': f'https://quoizel.com/search?text={sku_upper}',
+                    'hvl': f'https://quoizel.com/search?text={sku_upper}',
+                    'surya': f'https://www.quoizel.com/search?text={sku_upper}',
+                    'loloi': f'https://www.quoizel.com/search?text={sku_upper}',
                 }
+                
+                # Try to find a vendor URL
+                scrape_url = None
+                for v_key, v_url in vendor_urls.items():
+                    if v_key in vendor_hint:
+                        scrape_url = v_url
+                        break
+                
+                # Default search URL if no vendor hint
+                if not scrape_url:
+                    scrape_url = f'https://www.google.com/search?q={sku_upper}+furniture+price'
+                
+                # Update URL to scrape
+                url = scrape_url
+                print(f"🌐 Attempting to scrape: {url}")
         
-        # ===== STEP 1: SCRAPE THE WEBSITE (only for actual URLs) =====
+        # ===== STEP 1: SCRAPE THE WEBSITE =====
         # Get images, dimensions, name, SKU from the actual website
         print(f"🌐 Scraping website for product data...")
         
