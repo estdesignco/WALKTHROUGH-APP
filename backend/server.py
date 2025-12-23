@@ -6560,48 +6560,63 @@ async def scrape_product_advanced(data: dict):
         # ===== STEP 2: LOOKUP DATABASE FOR WHOLESALE PRICE ONLY =====
         # Database has user's price sheets - use for wholesale pricing
         extracted_sku = scraped_data.get('sku')
+        
+        # If URL is just a SKU (no http/domain), use it directly
         if not extracted_sku:
-            # Try to extract SKU from URL
-            sku_patterns = [
-                r'/product/([A-Za-z0-9\-_]+)',
-                r'/([A-Z]?\d{4,}[A-Za-z0-9\-_]*)',
-                r'-([a-z]?\d{4,}[a-z0-9\-]*)(?:\?|$)',
-            ]
-            for pattern in sku_patterns:
-                match = re.search(pattern, url, re.IGNORECASE)
-                if match:
-                    extracted_sku = match.group(1)
-                    break
+            # Check if URL itself is a SKU (no slashes, looks like product code)
+            if '/' not in url and '.' not in url:
+                extracted_sku = url.strip().upper()
+                print(f"📦 URL is a SKU: {extracted_sku}")
+            else:
+                # Try to extract SKU from URL
+                sku_patterns = [
+                    r'/product/([A-Za-z0-9\-_]+)',
+                    r'/([A-Z]?\d{4,}[A-Za-z0-9\-_]*)',
+                    r'-([a-z]?\d{4,}[a-z0-9\-]*)(?:\?|$)',
+                    r'([A-Z]{1,5}-?\d{3,}[A-Z0-9-]*)',  # SKU patterns like R50276, SCH-170165
+                    r'(\d{6,})',  # Numeric SKUs
+                ]
+                for pattern in sku_patterns:
+                    match = re.search(pattern, url, re.IGNORECASE)
+                    if match:
+                        extracted_sku = match.group(1)
+                        break
         
         db_price = None
+        db_product = None
+        
         if extracted_sku:
             sku_clean = re.sub(r'^[^a-zA-Z0-9]+', '', extracted_sku)
-            sku_numbers = re.sub(r'[^0-9]', '', extracted_sku)
             sku_upper = extracted_sku.upper()
             sku_clean_upper = sku_clean.upper()
             
-            print(f"🔍 DB lookup for SKU: {extracted_sku} (clean_upper: {sku_clean_upper})")
+            print(f"🔍 DB lookup for SKU: {extracted_sku} (clean: {sku_clean_upper})")
             
-            # Try exact matches first (most efficient)
+            # Try exact match first (most common case)
             db_product = await db.master_products.find_one(
-                {"$or": [
-                    {"sku": f"*{sku_clean_upper}"},  # *R50276 format (most common)
-                    {"sku": sku_clean_upper},  # R50276
-                    {"sku": f"*{sku_upper}"},  # *R50276 with original
-                    {"sku": sku_upper},  # Original uppercase
-                    {"sku": sku_clean},  # Clean original case
-                    {"sku": extracted_sku},  # Exact original
-                ]},
+                {"sku": sku_clean_upper},
                 {"_id": 0}
             )
             
-            print(f"  Trying exact matches: *{sku_clean_upper}, {sku_clean_upper}")
+            # Try with original case
+            if not db_product:
+                db_product = await db.master_products.find_one(
+                    {"sku": sku_upper},
+                    {"_id": 0}
+                )
             
-            # If no exact match, try case-insensitive search
+            # Try case-insensitive regex
             if not db_product:
                 print(f"  No exact match, trying regex...")
                 db_product = await db.master_products.find_one(
-                    {"sku": {"$regex": f"\\*?{sku_clean_upper}$", "$options": "i"}},
+                    {"sku": {"$regex": f"^{re.escape(sku_clean_upper)}$", "$options": "i"}},
+                    {"_id": 0}
+                )
+            
+            # Try partial match (SKU contains the search term)
+            if not db_product:
+                db_product = await db.master_products.find_one(
+                    {"sku": {"$regex": re.escape(sku_clean_upper), "$options": "i"}},
                     {"_id": 0}
                 )
             
