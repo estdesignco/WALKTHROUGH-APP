@@ -6329,7 +6329,63 @@ async def scrape_product_advanced(data: dict):
             "link": url
         }
         
-        # ===== STEP 1: ALWAYS SCRAPE THE WEBSITE FIRST =====
+        # Check if input is just a SKU (no http, no slashes, no dots except in numbers)
+        is_sku_only = not url.startswith('http') and '/' not in url and ('.' not in url or re.match(r'^[\w-]+$', url))
+        
+        if is_sku_only:
+            # INPUT IS A SKU - Skip web scraping, go straight to database lookup
+            print(f"📦 Input is a SKU: {url} - Looking up in database...")
+            sku_upper = url.strip().upper()
+            
+            # Try exact match first
+            db_product = await db.master_products.find_one(
+                {"sku": sku_upper},
+                {"_id": 0}
+            )
+            
+            # Try case-insensitive
+            if not db_product:
+                db_product = await db.master_products.find_one(
+                    {"sku": {"$regex": f"^{re.escape(sku_upper)}$", "$options": "i"}},
+                    {"_id": 0}
+                )
+            
+            # Try partial match
+            if not db_product:
+                db_product = await db.master_products.find_one(
+                    {"sku": {"$regex": re.escape(sku_upper), "$options": "i"}},
+                    {"_id": 0}
+                )
+            
+            if db_product:
+                print(f"✅ Found in database: {db_product.get('name')} - ${db_product.get('price')}")
+                scraped_data.update({
+                    "name": db_product.get('name'),
+                    "title": db_product.get('name'),
+                    "sku": db_product.get('sku'),
+                    "price": db_product.get('price'),
+                    "cost": db_product.get('price'),
+                    "vendor": db_product.get('vendor_name') or db_product.get('vendor'),
+                    "dimensions": db_product.get('dimensions'),
+                    "size": db_product.get('dimensions'),
+                })
+                
+                return {
+                    "success": True,
+                    "source": "database",
+                    "data": scraped_data,
+                    "product": scraped_data
+                }
+            else:
+                print(f"❌ SKU {sku_upper} not found in database")
+                return {
+                    "success": False,
+                    "source": "database",
+                    "error": f"SKU {sku_upper} not found in database",
+                    "data": scraped_data
+                }
+        
+        # ===== STEP 1: SCRAPE THE WEBSITE (only for actual URLs) =====
         # Get images, dimensions, name, SKU from the actual website
         print(f"🌐 Scraping website for product data...")
         
