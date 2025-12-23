@@ -5377,7 +5377,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             print(f"📊 PAGE ANALYSIS: {len(page_content):,} chars HTML, {len(all_text):,} chars text")
             
             # ===== VENDOR DETECTION FIRST =====
-            domain = url.split('/')[2].lower()
+            try:
+                from urllib.parse import urlparse
+                parsed = urlparse(url)
+                domain = parsed.netloc.lower().replace('www.', '')
+            except:
+                domain = url.split('/')[2].lower() if len(url.split('/')) > 2 else ''
             vendor_mapping = {
                 'fourhands.com': 'Four Hands',
                 'uttermost.com': 'Uttermost', 
