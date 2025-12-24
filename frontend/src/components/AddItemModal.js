@@ -109,6 +109,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
           size: websiteData?.size || websiteData?.dimensions || databaseData?.size || databaseData?.dimensions || '',
           image_url: websiteData?.image_url || websiteData?.image || databaseData?.image_url || '',
           finish_color: websiteData?.color || websiteData?.finish || websiteData?.finish_color || databaseData?.finish_color || databaseData?.color || '',
+          finish_image: websiteData?.finish_image || databaseData?.finish_image || '',  // Swatch image
           link: url
         };
         
@@ -121,6 +122,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
           size: mergedData.size || prev.size,
           image_url: mergedData.image_url || prev.image_url,
           finish_color: mergedData.finish_color || prev.finish_color,
+          finish_image: mergedData.finish_image || prev.finish_image,
           link: mergedData.link
         }));
         setSearchQuery(mergedData.name || '');
