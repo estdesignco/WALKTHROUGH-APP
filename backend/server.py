@@ -6216,22 +6216,35 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # VENDOR-SPECIFIC: Jaipur Living
             elif 'jaipurliving.com' in domain:
                 import re
-                # Jaipur shows Color: Ivory / Blue format
-                color_match = re.search(r'Color[:\s]+([A-Za-z\s\/\-]+?)(?:\n|$|Size|Quantity)', all_text, re.IGNORECASE)
+                # Jaipur uses product codes for colors (MJL01, MJL02)
+                # Try to extract color from product name or visible text
+                color_match = re.search(r'Color[:\s]+([A-Za-z\s\/\-]+?)(?:\n|$|Size|Quantity|Select)', all_text, re.IGNORECASE)
                 if color_match:
                     color = color_match.group(1).strip()
-                    # Clean up
                     color = re.sub(r'\s+', ' ', color)
-                    if len(color) > 2 and len(color) < 50:
+                    if len(color) > 2 and len(color) < 50 and not color.startswith('MJL'):
                         result['finish_color'] = color
                         print(f"✅ JAIPUR COLOR: {result['finish_color']}")
                 
-                # Also try Material
+                # Try Material (usually Wool, Cotton, etc.)
                 if not result.get('finish_color'):
                     material_match = re.search(r'Material[:\s]+([A-Za-z\s\/\-,]+?)(?:\n|$|Construction)', all_text, re.IGNORECASE)
                     if material_match:
-                        result['finish_color'] = material_match.group(1).strip()[:50]
-                        print(f"✅ JAIPUR MATERIAL: {result['finish_color']}")
+                        material = material_match.group(1).strip()[:50]
+                        if len(material) > 2:
+                            result['finish_color'] = material
+                            print(f"✅ JAIPUR MATERIAL: {result['finish_color']}")
+                
+                # Extract from product name (often contains color hints)
+                if not result.get('finish_color') and result.get('name'):
+                    # Common rug colors
+                    common_colors = ['ivory', 'blue', 'red', 'green', 'beige', 'tan', 'gold', 'silver', 'brown', 'black', 'white', 'gray', 'grey', 'navy', 'rust', 'teal', 'coral', 'sand', 'charcoal', 'slate', 'terracotta', 'sage', 'olive', 'cream']
+                    name_lower = result['name'].lower()
+                    for color in common_colors:
+                        if color in name_lower:
+                            result['finish_color'] = color.title()
+                            print(f"✅ JAIPUR COLOR FROM NAME: {result['finish_color']}")
+                            break
             
             # VENDOR-SPECIFIC: Loloi Rugs
             elif 'loloirugs.com' in domain or 'lfrbrands.com' in domain:
