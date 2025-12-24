@@ -5644,6 +5644,13 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         for element in elements:
                             price_text = await element.text_content()
                             if price_text:
+                                # CRITICAL: Skip CSS/JS media queries that contain numbers like @media (min-width:1261px)
+                                if '@media' in price_text or 'min-width' in price_text or 'max-width' in price_text:
+                                    continue
+                                # Skip if text is mostly CSS/JS code
+                                if '{' in price_text and '}' in price_text:
+                                    continue
+                                    
                                 import re
                                 match = re.search(r'\$\s*([0-9,]+\.?[0-9]*)', price_text)
                                 if match:
