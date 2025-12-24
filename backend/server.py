@@ -5167,14 +5167,25 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 await page.goto(login_url, wait_until='domcontentloaded', timeout=30000)
                 await page.wait_for_timeout(5000)
                 
-                # Fill login form
+                # Check if there's a specific login form selector
+                login_form_selector = vendor_config.get('login_form_selector')
+                login_form = None
+                if login_form_selector:
+                    login_form = await page.query_selector(login_form_selector)
+                    if login_form:
+                        print(f"📝 Found login form: {login_form_selector}")
+                
+                # Fill login form - use form context if available
                 username_selectors = vendor_config.get('username_selectors', ['#email', 'input[type="email"]', 'input[name="email"]', 'input[name="username"]'])
                 password_selectors = vendor_config.get('password_selectors', ['#password', 'input[type="password"]', 'input[name="password"]'])
                 
-                # Try to fill username
+                # Try to fill username (within form context if available)
                 for selector in username_selectors:
                     try:
-                        username_input = await page.query_selector(selector)
+                        if login_form:
+                            username_input = await login_form.query_selector(selector)
+                        else:
+                            username_input = await page.query_selector(selector)
                         if username_input:
                             await username_input.fill(credentials['username'])
                             print(f"✅ Filled username: {credentials['username']}")
@@ -5188,7 +5199,10 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 for selector in password_selectors:
                     try:
                         print(f"   Trying password selector: {selector}")
-                        pwd_input = await page.query_selector(selector)
+                        if login_form:
+                            pwd_input = await login_form.query_selector(selector)
+                        else:
+                            pwd_input = await page.query_selector(selector)
                         if pwd_input:
                             # Check if visible
                             is_visible = await pwd_input.is_visible()
@@ -5207,14 +5221,17 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 if not password_filled:
                     print(f"⚠️ Could not fill password - no selector worked")
                 
-                # Submit login
+                # Submit login (within form context if available)
                 submit_selectors = vendor_config.get('submit_selectors', ['button[type="submit"]', 'button:has-text("Login")', 'button:has-text("Sign In")', 'button:has-text("LOG IN")'])
                 for selector in submit_selectors:
                     try:
-                        submit_btn = await page.query_selector(selector)
+                        if login_form:
+                            submit_btn = await login_form.query_selector(selector.replace('form[action="/login"] ', ''))
+                        else:
+                            submit_btn = await page.query_selector(selector)
                         if submit_btn:
                             await submit_btn.click()
-                            print(f"✅ Submitted login form")
+                            print(f"✅ Submitted login form via {selector}")
                             break
                     except:
                         continue
