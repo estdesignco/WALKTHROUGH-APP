@@ -6680,9 +6680,19 @@ async def scrape_product_advanced(data: dict):
                         extracted_sku = match.group(1)
                         break
         
-        db_price = None
-        db_product = None
+        # ⚠️ DATABASE PRICE OVERRIDE DISABLED
+        # The database was overwriting correctly scraped prices with old/incorrect values
+        # Per user request: scraper must work independently WITHOUT database
+        # Database can be re-enabled after web scraping is verified working
         
+        db_price = None  # DISABLED
+        db_product = None  # DISABLED
+        
+        # ===== DATABASE LOOKUP DISABLED =====
+        # The following block was overwriting correct web-scraped prices
+        # with outdated database values. Example: Rowe Sylvie Sectional
+        # Web scrape found $6,570.50 (correct) but DB returned $1,261 (wrong)
+        """
         if extracted_sku:
             sku_clean = re.sub(r'^[^a-zA-Z0-9]+', '', extracted_sku)
             sku_upper = extracted_sku.upper()
@@ -6696,27 +6706,7 @@ async def scrape_product_advanced(data: dict):
                 {"_id": 0}
             )
             
-            # Try with original case
-            if not db_product:
-                db_product = await db.master_products.find_one(
-                    {"sku": sku_upper},
-                    {"_id": 0}
-                )
-            
-            # Try case-insensitive regex
-            if not db_product:
-                print(f"  No exact match, trying regex...")
-                db_product = await db.master_products.find_one(
-                    {"sku": {"$regex": f"^{re.escape(sku_clean_upper)}$", "$options": "i"}},
-                    {"_id": 0}
-                )
-            
-            # Try partial match (SKU contains the search term)
-            if not db_product:
-                db_product = await db.master_products.find_one(
-                    {"sku": {"$regex": re.escape(sku_clean_upper), "$options": "i"}},
-                    {"_id": 0}
-                )
+            # ... more DB lookups ...
             
             if db_product:
                 db_price = db_product.get('price')
@@ -6725,28 +6715,18 @@ async def scrape_product_advanced(data: dict):
                 if db_price:
                     scraped_data['price'] = db_price
                     scraped_data['cost'] = db_price
-                # Also fill in name and other fields from DB if not scraped
-                if not scraped_data.get('name') and db_product.get('name'):
-                    scraped_data['name'] = db_product.get('name')
-                    scraped_data['title'] = db_product.get('name')
-                if not scraped_data.get('sku'):
-                    scraped_data['sku'] = db_product.get('sku')
-                if not scraped_data.get('dimensions') and db_product.get('dimensions'):
-                    scraped_data['dimensions'] = db_product.get('dimensions')
-                    scraped_data['size'] = db_product.get('dimensions')
-            else:
-                print(f"❌ SKU {sku_clean_upper} not found in database")
-                # Use database price as wholesale cost
-                if db_price:
-                    scraped_data["cost"] = db_price
-                    scraped_data["price"] = db_price
+        """
         
-        # ===== STEP 3: RETURN COMBINED DATA =====
-        print(f"✅ Final product data: {scraped_data.get('name')} - ${scraped_data.get('cost') or scraped_data.get('price') or 'N/A'}")
+        if extracted_sku:
+            print(f"📌 Extracted SKU from URL: {extracted_sku} (database lookup DISABLED)")
+            scraped_data['sku'] = extracted_sku.upper()
+        
+        # ===== STEP 3: RETURN WEB-SCRAPED DATA ONLY =====
+        print(f"✅ Final product data (WEB SCRAPE ONLY): {scraped_data.get('name')} - ${scraped_data.get('cost') or scraped_data.get('price') or 'N/A'}")
         
         return {
             "success": True,
-            "source": "scraped" if not db_price else "hybrid",
+            "source": "scraped",
             "data": scraped_data
         }
         
