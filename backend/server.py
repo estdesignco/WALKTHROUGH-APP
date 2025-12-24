@@ -6274,6 +6274,53 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     except:
                         continue
             
+            # ===== 6b. FINISH/SWATCH IMAGE EXTRACTION =====
+            print("🎨 EXTRACTING FINISH/SWATCH IMAGE...")
+            
+            # Look for swatch/finish images
+            swatch_selectors = [
+                'img[class*="swatch"]', 'img[class*="finish"]', 'img[class*="material"]',
+                'img[alt*="swatch" i]', 'img[alt*="finish" i]', 'img[alt*="material" i]',
+                '[class*="swatch"] img', '[class*="finish"] img', '[class*="material"] img',
+                '[class*="color-option"] img', '[class*="color-selector"] img',
+                # Four Hands specific
+                'img[src*="finish"]', 'img[src*="swatch"]', 'img[src*="material"]',
+            ]
+            
+            for selector in swatch_selectors:
+                try:
+                    imgs = await page.query_selector_all(selector)
+                    for img in imgs:
+                        src = await img.get_attribute('src')
+                        alt = await img.get_attribute('alt') or ''
+                        if src and len(src) > 10:
+                            # Make sure it's a valid image URL
+                            if not src.endswith('.svg') and 'logo' not in src.lower():
+                                result['finish_image'] = src if src.startswith('http') else urljoin(url, src)
+                                print(f"✅ FINISH IMAGE: {result['finish_image'][:60]}...")
+                                break
+                    if result.get('finish_image'):
+                        break
+                except:
+                    continue
+            
+            # If no swatch image found but we have finish_color, try to find an image matching the finish name
+            if not result.get('finish_image') and result.get('finish_color'):
+                try:
+                    finish_name_clean = result['finish_color'].lower().replace(' ', '')
+                    all_imgs = await page.query_selector_all('img')
+                    for img in all_imgs[:30]:
+                        src = await img.get_attribute('src') or ''
+                        alt = await img.get_attribute('alt') or ''
+                        # Check if image alt or src contains the finish name
+                        if finish_name_clean in alt.lower().replace(' ', '') or finish_name_clean in src.lower().replace(' ', ''):
+                            if not src.endswith('.svg') and 'logo' not in src.lower():
+                                result['finish_image'] = src if src.startswith('http') else urljoin(url, src)
+                                print(f"✅ FINISH IMAGE (name match): {result['finish_image'][:60]}...")
+                                break
+                except:
+                    pass
+            
             # ===== FINAL VALIDATION AND CLEANUP =====
             print("🔧 VALIDATING AND CLEANING RESULTS...")
             
