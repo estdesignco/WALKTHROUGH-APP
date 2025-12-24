@@ -51,10 +51,12 @@ VENDOR_CONFIGS = {
         "login_url": "https://www.rowefurniture.com/login",
         "login_type": "direct",
         "extra_wait_before_login": 5000,
-        "username_selectors": ['input[type="email"]', 'input[name="email"]', '#Email', '#email'],
-        "password_selectors": ['input[type="password"]', 'input[name="password"]', '#Password', '#password'],
-        "submit_selectors": ['button[type="submit"]', 'input[type="submit"]', 'button:has-text("Sign In")', 'button:has-text("Log In")'],
-        "wait_after_login": 8000,
+        # IMPORTANT: Use form-specific selectors to avoid clicking wrong form
+        "login_form_selector": 'form[action="/login"]',
+        "username_selectors": ['input[name="Email"]', 'input[type="email"]'],
+        "password_selectors": ['input[name="Password"]', 'input[type="password"]'],
+        "submit_selectors": ['form[action="/login"] button[type="submit"]', 'button:has-text("Log in")'],
+        "wait_after_login": 10000,
         "wait_for_content": 5000,
     },
     
