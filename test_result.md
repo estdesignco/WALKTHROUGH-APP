@@ -180,7 +180,113 @@ backend:
         comment: "Project and item data persistence verified. Data matches original input and survives retrieval."
 
 frontend:
-  # Frontend testing not performed per instructions
+  - task: "Home Page Navigation"
+    implemented: true
+    working: true
+    file: "MainDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ All navigation buttons working: Master Contacts, Master Materials, Calculators, New Client, Email New Client, Full Questionnaire. Page loads correctly with projects visible."
+
+  - task: "Master Contacts System"
+    implemented: true
+    working: true
+    file: "MasterContactsPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ Navigation successful, Add Contact form working, contact creation completed successfully. Search and filter functionality present."
+
+  - task: "Master Materials System"
+    implemented: true
+    working: false
+    file: "MasterMaterialsPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ Navigation successful but material creation fails with 500 Internal Server Error. Backend ObjectId serialization issue detected in logs."
+
+  - task: "Calculators System"
+    implemented: true
+    working: true
+    file: "CalculatorsPage.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ Navigation successful, wallpaper calculator found and functional with input fields and calculate button working."
+
+  - task: "Project Creation"
+    implemented: true
+    working: true
+    file: "MainDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ New Client button navigates correctly to customer page. Projects are visible on dashboard with proper client information."
+
+  - task: "FF&E Dashboard Navigation"
+    implemented: true
+    working: true
+    file: "FFEDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ FF&E tab navigation successful. Project detail page loads with FF&E tab accessible. Backend API responding correctly (200 OK)."
+
+  - task: "FF&E Add Item Modal"
+    implemented: true
+    working: false
+    file: "AddItemModal.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ Add Item button not found in FF&E dashboard. Modal functionality not accessible through UI. URL scraping and finish/color features not testable."
+
+  - task: "FF&E Shipping Tracker"
+    implemented: true
+    working: false
+    file: "ShippingTracker.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ Shipping Tracker button not found in FF&E dashboard. Toggle functionality not accessible."
+
+  - task: "Data Persistence"
+    implemented: true
+    working: false
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ Projects not visible after page refresh. Data persistence failing on frontend reload."
 
 metadata:
   created_by: "testing_agent"
