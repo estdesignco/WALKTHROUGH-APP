@@ -1,379 +1,380 @@
 #!/usr/bin/env python3
 """
-Product Scraping API Testing Suite
-Tests the product scraping functionality with database lookup and web fallback
+Comprehensive Backend Testing for Interior Design Application
+Testing all critical API endpoints as requested in review.
 """
 
 import requests
 import json
-import time
-from typing import Dict, Any, List
+import sys
+from datetime import datetime
+import uuid
 
-# Backend URL from frontend .env
-BACKEND_URL = "https://vendor-import.preview.emergentagent.com/api"
+# Backend URL from environment
+BACKEND_URL = "https://designready.preview.emergentagent.com"
 
-class ProductScrapingTester:
+class BackendTester:
     def __init__(self):
         self.results = []
-        self.total_tests = 0
-        self.passed_tests = 0
-        self.failed_tests = 0
-        
-    def log_result(self, test_name: str, success: bool, details: str = "", response_data: Any = None):
+        self.session = requests.Session()
+        self.session.headers.update({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        })
+    
+    def log_result(self, test_name, success, details, response_data=None):
         """Log test result"""
-        self.total_tests += 1
-        if success:
-            self.passed_tests += 1
-            status = "✅ PASS"
-        else:
-            self.failed_tests += 1
-            status = "❌ FAIL"
-            
         result = {
-            "test": test_name,
-            "status": status,
-            "details": details,
-            "response_data": response_data
+            'test': test_name,
+            'success': success,
+            'details': details,
+            'timestamp': datetime.now().isoformat(),
+            'response_data': response_data
         }
         self.results.append(result)
-        print(f"{status}: {test_name}")
-        if details:
-            print(f"   Details: {details}")
-        if not success and response_data:
+        
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status} {test_name}: {details}")
+        if response_data and not success:
             print(f"   Response: {response_data}")
-        print()
-
-    def test_uttermost_database_lookup(self):
-        """Test Uttermost product scraping with database lookup"""
-        test_name = "Uttermost Database Lookup - Sherise Oval Mirror"
-        
+    
+    def test_health_check(self):
+        """Test 1: Health Check"""
         try:
-            url = f"{BACKEND_URL}/scrape-product"
-            payload = {"url": "https://uttermost.com/sherise-oval-mirror-01101"}
+            response = self.session.get(f"{BACKEND_URL}/api/health", timeout=10)
             
-            print(f"Testing: {test_name}")
-            print(f"POST {url}")
-            print(f"Payload: {payload}")
-            
-            response = requests.post(url, json=payload, timeout=30)
+            if response.status_code == 200:
+                self.log_result("Health Check", True, f"Status: {response.status_code}", response.json())
+            else:
+                self.log_result("Health Check", False, f"Status: {response.status_code}", response.text)
+                
+        except Exception as e:
+            self.log_result("Health Check", False, f"Exception: {str(e)}")
+    
+    def test_product_scraper_database_lookups(self):
+        """Test 2: Product Scraper - Database Lookups"""
+        test_skus = [
+            {"url": "SCH-170165", "expected_vendor": "Gabby"},
+            {"url": "01101 B", "expected_vendor": "Uttermost"},
+            {"url": "100009-004", "expected_vendor": "Four Hands"}
+        ]
+        
+        for sku_data in test_skus:
+            try:
+                payload = {"url": sku_data["url"]}
+                response = self.session.post(f"{BACKEND_URL}/api/scrape-product", 
+                                           json=payload, timeout=15)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get("source") == "database" and data.get("price"):
+                        self.log_result(f"Database Lookup - {sku_data['url']}", True, 
+                                      f"Found in database with price: ${data.get('price', 'N/A')}")
+                    else:
+                        self.log_result(f"Database Lookup - {sku_data['url']}", False, 
+                                      f"Expected database source with price, got: {data}")
+                else:
+                    self.log_result(f"Database Lookup - {sku_data['url']}", False, 
+                                  f"Status: {response.status_code}", response.text)
+                    
+            except Exception as e:
+                self.log_result(f"Database Lookup - {sku_data['url']}", False, f"Exception: {str(e)}")
+    
+    def test_product_scraper_web_scraping(self):
+        """Test 3: Product Scraper - Web Scraping"""
+        try:
+            payload = {"url": "https://www.fourhands.com/product/some-product"}
+            response = self.session.post(f"{BACKEND_URL}/api/scrape-product", 
+                                       json=payload, timeout=30)
             
             if response.status_code == 200:
                 data = response.json()
-                
-                # Check expected response structure
-                expected_fields = ["success", "source", "data"]
-                if all(field in data for field in expected_fields):
-                    
-                    if data.get("success") and data.get("source") == "database":
-                        product_data = data.get("data", {})
-                        
-                        # Verify expected product details
-                        expected_name = "Sherise Oval Mirror, Bronze"
-                        expected_price = 179.0
-                        expected_sku = "01101 B"
-                        expected_vendor = "Uttermost"
-                        
-                        checks = []
-                        checks.append(("Name", product_data.get("name") == expected_name, f"Expected: {expected_name}, Got: {product_data.get('name')}"))
-                        checks.append(("Price", product_data.get("price") == expected_price, f"Expected: {expected_price}, Got: {product_data.get('price')}"))
-                        checks.append(("SKU", product_data.get("sku") == expected_sku, f"Expected: {expected_sku}, Got: {product_data.get('sku')}"))
-                        checks.append(("Vendor", product_data.get("vendor") == expected_vendor, f"Expected: {expected_vendor}, Got: {product_data.get('vendor')}"))
-                        
-                        failed_checks = [check for check in checks if not check[1]]
-                        
-                        if not failed_checks:
-                            self.log_result(test_name, True, "Database lookup successful with correct product data", data)
-                        else:
-                            details = "; ".join([f"{check[0]}: {check[2]}" for check in failed_checks])
-                            self.log_result(test_name, False, f"Product data mismatch - {details}", data)
-                    else:
-                        self.log_result(test_name, False, f"Expected database source, got: {data.get('source')}", data)
+                if data.get("source") == "web_scraping":
+                    self.log_result("Web Scraping Test", True, "Successfully scraped web URL")
                 else:
-                    missing_fields = [field for field in expected_fields if field not in data]
-                    self.log_result(test_name, False, f"Missing response fields: {missing_fields}", data)
+                    self.log_result("Web Scraping Test", False, f"Expected web_scraping source, got: {data}")
             else:
-                self.log_result(test_name, False, f"HTTP {response.status_code}: {response.text}")
+                self.log_result("Web Scraping Test", False, f"Status: {response.status_code}", response.text)
                 
-        except requests.exceptions.Timeout:
-            self.log_result(test_name, False, "Request timeout (30s)")
         except Exception as e:
-            self.log_result(test_name, False, f"Exception: {str(e)}")
-
-    def test_four_hands_database_lookup(self):
-        """Test Four Hands product scraping with database lookup"""
-        test_name = "Four Hands Database Lookup - Mavery Armless Dining Chair"
+            self.log_result("Web Scraping Test", False, f"Exception: {str(e)}")
+    
+    def test_master_contacts_crud(self):
+        """Test 4: Master Contacts CRUD Operations"""
+        created_contact_id = None
         
+        # CREATE Contact
         try:
-            url = f"{BACKEND_URL}/scrape-product"
-            payload = {"url": "https://fourhands.com/product/100046-003"}
+            contact_data = {
+                "name": "Test Contact",
+                "phone": "555-111-2222", 
+                "email": "test@test.com",
+                "company": "Test Co",
+                "role": "Contractor"
+            }
             
-            print(f"Testing: {test_name}")
-            print(f"POST {url}")
-            print(f"Payload: {payload}")
+            response = self.session.post(f"{BACKEND_URL}/api/master/contacts", 
+                                       json=contact_data, timeout=10)
             
-            response = requests.post(url, json=payload, timeout=30)
+            if response.status_code in [200, 201]:
+                data = response.json()
+                created_contact_id = data.get("id")
+                self.log_result("Master Contacts - CREATE", True, f"Created contact with ID: {created_contact_id}")
+            else:
+                self.log_result("Master Contacts - CREATE", False, f"Status: {response.status_code}", response.text)
+                
+        except Exception as e:
+            self.log_result("Master Contacts - CREATE", False, f"Exception: {str(e)}")
+        
+        # LIST Contacts
+        try:
+            response = self.session.get(f"{BACKEND_URL}/api/master/contacts", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                
-                if data.get("success") and data.get("source") == "database":
-                    product_data = data.get("data", {})
-                    
-                    # Verify expected product details
-                    expected_name = "Mavery Armless Dining Chair-Sierra Espresso"
-                    expected_price = 408.6
-                    expected_vendor = "Four Hands"
-                    
-                    checks = []
-                    checks.append(("Name", product_data.get("name") == expected_name, f"Expected: {expected_name}, Got: {product_data.get('name')}"))
-                    checks.append(("Price", product_data.get("price") == expected_price, f"Expected: {expected_price}, Got: {product_data.get('price')}"))
-                    checks.append(("Vendor", product_data.get("vendor") == expected_vendor, f"Expected: {expected_vendor}, Got: {product_data.get('vendor')}"))
-                    
-                    failed_checks = [check for check in checks if not check[1]]
-                    
-                    if not failed_checks:
-                        self.log_result(test_name, True, "Database lookup successful with correct product data", data)
-                    else:
-                        details = "; ".join([f"{check[0]}: {check[2]}" for check in failed_checks])
-                        self.log_result(test_name, False, f"Product data mismatch - {details}", data)
-                else:
-                    self.log_result(test_name, False, f"Expected database source, got: {data.get('source')}", data)
+                contact_count = len(data) if isinstance(data, list) else len(data.get("contacts", []))
+                self.log_result("Master Contacts - LIST", True, f"Retrieved {contact_count} contacts")
             else:
-                self.log_result(test_name, False, f"HTTP {response.status_code}: {response.text}")
+                self.log_result("Master Contacts - LIST", False, f"Status: {response.status_code}", response.text)
                 
-        except requests.exceptions.Timeout:
-            self.log_result(test_name, False, "Request timeout (30s)")
         except Exception as e:
-            self.log_result(test_name, False, f"Exception: {str(e)}")
-
-    def test_product_autocomplete(self):
-        """Test product autocomplete search"""
-        test_name = "Product Autocomplete - Sherise Search"
+            self.log_result("Master Contacts - LIST", False, f"Exception: {str(e)}")
         
+        # DELETE Contact (if created successfully)
+        if created_contact_id:
+            try:
+                response = self.session.delete(f"{BACKEND_URL}/api/master/contacts/{created_contact_id}", 
+                                             timeout=10)
+                
+                if response.status_code in [200, 204]:
+                    self.log_result("Master Contacts - DELETE", True, f"Deleted contact {created_contact_id}")
+                else:
+                    self.log_result("Master Contacts - DELETE", False, f"Status: {response.status_code}", response.text)
+                    
+            except Exception as e:
+                self.log_result("Master Contacts - DELETE", False, f"Exception: {str(e)}")
+    
+    def test_project_specific_contacts(self):
+        """Test 5: Project-Specific Contacts"""
+        # CREATE Project Contact
         try:
-            url = f"{BACKEND_URL}/autocomplete/products"
-            params = {"query": "Sherise", "limit": 5}
+            contact_data = {
+                "project_id": "test-project",
+                "name": "Project Contact",
+                "phone": "555-333-4444",
+                "role": "Designer"
+            }
             
-            print(f"Testing: {test_name}")
-            print(f"GET {url}")
-            print(f"Params: {params}")
+            response = self.session.post(f"{BACKEND_URL}/api/contacts", 
+                                       json=contact_data, timeout=10)
             
-            response = requests.get(url, params=params, timeout=10)
+            if response.status_code in [200, 201]:
+                self.log_result("Project Contacts - CREATE", True, "Created project contact")
+            else:
+                self.log_result("Project Contacts - CREATE", False, f"Status: {response.status_code}", response.text)
+                
+        except Exception as e:
+            self.log_result("Project Contacts - CREATE", False, f"Exception: {str(e)}")
+        
+        # GET Project Contacts
+        try:
+            response = self.session.get(f"{BACKEND_URL}/api/contacts/project/test-project", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                
-                # Handle wrapped response format
-                if data.get("success") and "products" in data:
-                    products = data["products"]
-                    # Should return 3 products with "Sherise" in name from Uttermost
-                    sherise_products = [item for item in products if "Sherise" in item.get("name", "")]
-                    uttermost_products = [item for item in sherise_products if item.get("vendor") == "Uttermost"]
-                    
-                    if len(uttermost_products) >= 1:  # At least 1 Sherise product from Uttermost
-                        self.log_result(test_name, True, f"Found {len(uttermost_products)} Sherise products from Uttermost (total: {data.get('count', 0)})", data)
-                    else:
-                        self.log_result(test_name, False, f"Expected Sherise products from Uttermost, found {len(uttermost_products)}", data)
-                elif isinstance(data, list):
-                    # Handle direct array response
-                    sherise_products = [item for item in data if "Sherise" in item.get("name", "")]
-                    uttermost_products = [item for item in sherise_products if item.get("vendor") == "Uttermost"]
-                    
-                    if len(uttermost_products) >= 1:
-                        self.log_result(test_name, True, f"Found {len(uttermost_products)} Sherise products from Uttermost", data)
-                    else:
-                        self.log_result(test_name, False, f"Expected Sherise products from Uttermost, found {len(uttermost_products)}", data)
-                else:
-                    self.log_result(test_name, False, "Unexpected response format", data)
+                contact_count = len(data) if isinstance(data, list) else len(data.get("contacts", []))
+                self.log_result("Project Contacts - GET", True, f"Retrieved {contact_count} project contacts")
             else:
-                self.log_result(test_name, False, f"HTTP {response.status_code}: {response.text}")
+                self.log_result("Project Contacts - GET", False, f"Status: {response.status_code}", response.text)
                 
         except Exception as e:
-            self.log_result(test_name, False, f"Exception: {str(e)}")
-
-    def test_vendor_autocomplete(self):
-        """Test vendor autocomplete to verify 15 vendors"""
-        test_name = "Vendor Autocomplete - 15 Vendors Check"
+            self.log_result("Project Contacts - GET", False, f"Exception: {str(e)}")
         
+        # GET Contact Roles
         try:
-            url = f"{BACKEND_URL}/autocomplete/vendors"
-            
-            print(f"Testing: {test_name}")
-            print(f"GET {url}")
-            
-            response = requests.get(url, timeout=10)
+            response = self.session.get(f"{BACKEND_URL}/api/contacts/roles", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                
-                # Handle wrapped response format
-                if data.get("success") and "vendors" in data:
-                    vendors = data["vendors"]
-                    vendor_count = len(vendors)
-                    
-                    if vendor_count >= 15:
-                        self.log_result(test_name, True, f"Found {vendor_count} vendors: {', '.join(vendors[:10])}{'...' if vendor_count > 10 else ''}", data)
-                    else:
-                        self.log_result(test_name, False, f"Expected at least 15 vendors, found {vendor_count}", data)
-                elif isinstance(data, list):
-                    # Handle direct array response
-                    vendor_count = len(data)
-                    
-                    if vendor_count >= 15:
-                        vendor_names = [vendor.get("name", "Unknown") for vendor in data]
-                        self.log_result(test_name, True, f"Found {vendor_count} vendors: {', '.join(vendor_names[:10])}{'...' if vendor_count > 10 else ''}", data)
-                    else:
-                        self.log_result(test_name, False, f"Expected at least 15 vendors, found {vendor_count}", data)
-                else:
-                    self.log_result(test_name, False, "Unexpected response format", data)
+                roles_count = len(data) if isinstance(data, list) else len(data.get("roles", []))
+                self.log_result("Contact Roles - GET", True, f"Retrieved {roles_count} available roles")
             else:
-                self.log_result(test_name, False, f"HTTP {response.status_code}: {response.text}")
+                self.log_result("Contact Roles - GET", False, f"Status: {response.status_code}", response.text)
                 
         except Exception as e:
-            self.log_result(test_name, False, f"Exception: {str(e)}")
-
-    def test_web_fallback_scraping(self):
-        """Test web fallback scraping for unknown URL"""
-        test_name = "Web Fallback Scraping - Unknown Product URL"
+            self.log_result("Contact Roles - GET", False, f"Exception: {str(e)}")
+    
+    def test_project_management(self):
+        """Test 6: Project Management"""
+        created_project_id = None
         
+        # LIST Projects
         try:
-            # Use a URL that shouldn't be in database to test web scraping fallback
-            url = f"{BACKEND_URL}/scrape-product"
-            payload = {"url": "https://uttermost.com/karnes-drink-table-50340"}
-            
-            print(f"Testing: {test_name}")
-            print(f"POST {url}")
-            print(f"Payload: {payload}")
-            
-            response = requests.post(url, json=payload, timeout=60)  # Longer timeout for web scraping
+            response = self.session.get(f"{BACKEND_URL}/api/projects", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                
-                if data.get("success"):
-                    source = data.get("source", "unknown")
-                    product_data = data.get("data", {})
-                    
-                    # Check if we got product data regardless of source
-                    if product_data.get("name") and product_data.get("vendor"):
-                        self.log_result(test_name, True, f"Scraping successful (source: {source}), got product: {product_data.get('name')}", data)
-                    else:
-                        self.log_result(test_name, False, "Missing essential product data (name/vendor)", data)
-                else:
-                    self.log_result(test_name, False, f"Scraping failed: {data.get('error', 'Unknown error')}", data)
+                project_count = len(data) if isinstance(data, list) else len(data.get("projects", []))
+                self.log_result("Projects - LIST", True, f"Retrieved {project_count} projects")
             else:
-                self.log_result(test_name, False, f"HTTP {response.status_code}: {response.text}")
+                self.log_result("Projects - LIST", False, f"Status: {response.status_code}", response.text)
                 
-        except requests.exceptions.Timeout:
-            self.log_result(test_name, False, "Request timeout (60s) - web scraping may be slow")
         except Exception as e:
-            self.log_result(test_name, False, f"Exception: {str(e)}")
-
-    def test_database_seeding_verification(self):
-        """Verify database has been seeded with vendor products"""
-        test_name = "Database Seeding Verification"
+            self.log_result("Projects - LIST", False, f"Exception: {str(e)}")
         
+        # CREATE Project
         try:
-            # Test multiple vendor autocomplete to verify seeding
-            url = f"{BACKEND_URL}/autocomplete/products"
-            params = {"query": "", "limit": 50}  # Get sample of products
+            project_data = {
+                "name": f"Test Project {uuid.uuid4().hex[:8]}",
+                "client_info": {
+                    "full_name": "Test Client",
+                    "email": "testclient@example.com",
+                    "phone": "555-999-8888",
+                    "address": "123 Test Street, Test City, TS 12345"
+                },
+                "project_type": "Renovation",
+                "timeline": "3 months",
+                "budget": "$50,000"
+            }
             
-            print(f"Testing: {test_name}")
-            print(f"GET {url}")
-            print(f"Params: {params}")
+            response = self.session.post(f"{BACKEND_URL}/api/projects", 
+                                       json=project_data, timeout=15)
             
-            response = requests.get(url, params=params, timeout=10)
+            if response.status_code in [200, 201]:
+                data = response.json()
+                created_project_id = data.get("id")
+                self.log_result("Projects - CREATE", True, f"Created project with ID: {created_project_id}")
+            else:
+                self.log_result("Projects - CREATE", False, f"Status: {response.status_code}", response.text)
+                
+        except Exception as e:
+            self.log_result("Projects - CREATE", False, f"Exception: {str(e)}")
+        
+        # GET Specific Project with FFE Data
+        if created_project_id:
+            try:
+                response = self.session.get(f"{BACKEND_URL}/api/projects/{created_project_id}?sheet_type=ffe", 
+                                          timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    self.log_result("Projects - GET FFE", True, f"Retrieved project FFE data")
+                else:
+                    self.log_result("Projects - GET FFE", False, f"Status: {response.status_code}", response.text)
+                    
+            except Exception as e:
+                self.log_result("Projects - GET FFE", False, f"Exception: {str(e)}")
+    
+    def test_calculator_endpoints(self):
+        """Test 7: Calculator Endpoints"""
+        # Wallpaper Calculator
+        try:
+            wallpaper_data = {
+                "wall_width": 12,
+                "wall_height": 8,
+                "roll_type": "double_roll"
+            }
+            
+            response = self.session.post(f"{BACKEND_URL}/api/calculators/wallpaper", 
+                                       json=wallpaper_data, timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                
-                # Handle wrapped response format
-                if data.get("success") and "products" in data:
-                    products = data["products"]
-                    if len(products) > 0:
-                        # Check for products from different vendors
-                        vendors_found = set()
-                        for product in products:
-                            if product.get("vendor"):
-                                vendors_found.add(product.get("vendor"))
-                        
-                        if len(vendors_found) >= 3:  # At least 3 different vendors
-                            self.log_result(test_name, True, f"Database seeded with products from {len(vendors_found)} vendors: {', '.join(list(vendors_found)[:5])}", {"product_count": len(products), "vendors": list(vendors_found)})
-                        else:
-                            self.log_result(test_name, False, f"Insufficient vendor diversity, found vendors: {list(vendors_found)}", data)
-                    else:
-                        self.log_result(test_name, False, "No products found in database", data)
-                elif isinstance(data, list) and len(data) > 0:
-                    # Handle direct array response
-                    vendors_found = set()
-                    for product in data:
-                        if product.get("vendor"):
-                            vendors_found.add(product.get("vendor"))
-                    
-                    if len(vendors_found) >= 3:  # At least 3 different vendors
-                        self.log_result(test_name, True, f"Database seeded with products from {len(vendors_found)} vendors: {', '.join(list(vendors_found)[:5])}", {"product_count": len(data), "vendors": list(vendors_found)})
-                    else:
-                        self.log_result(test_name, False, f"Insufficient vendor diversity, found vendors: {list(vendors_found)}", data)
+                if isinstance(data.get("rolls_needed"), (int, float)):
+                    self.log_result("Wallpaper Calculator", True, f"Calculated {data.get('rolls_needed')} rolls needed")
                 else:
-                    self.log_result(test_name, False, "No products found in database", data)
+                    self.log_result("Wallpaper Calculator", False, f"Expected numerical result, got: {data}")
             else:
-                self.log_result(test_name, False, f"HTTP {response.status_code}: {response.text}")
+                self.log_result("Wallpaper Calculator", False, f"Status: {response.status_code}", response.text)
                 
         except Exception as e:
-            self.log_result(test_name, False, f"Exception: {str(e)}")
-
+            self.log_result("Wallpaper Calculator", False, f"Exception: {str(e)}")
+        
+        # Paint Calculator
+        try:
+            paint_data = {
+                "room_length": 15,
+                "room_width": 12,
+                "room_height": 9,
+                "coats": 2
+            }
+            
+            response = self.session.post(f"{BACKEND_URL}/api/calculators/paint", 
+                                       json=paint_data, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data.get("gallons_needed"), (int, float)):
+                    self.log_result("Paint Calculator", True, f"Calculated {data.get('gallons_needed')} gallons needed")
+                else:
+                    self.log_result("Paint Calculator", False, f"Expected numerical result, got: {data}")
+            else:
+                self.log_result("Paint Calculator", False, f"Status: {response.status_code}", response.text)
+                
+        except Exception as e:
+            self.log_result("Paint Calculator", False, f"Exception: {str(e)}")
+    
+    def test_items_with_tracking(self):
+        """Test 8: Items with Tracking (Shipping Sync)"""
+        try:
+            # Use a test project ID
+            test_project_id = "test-project"
+            response = self.session.get(f"{BACKEND_URL}/api/items/with-tracking/{test_project_id}", 
+                                      timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                items_count = len(data) if isinstance(data, list) else len(data.get("items", []))
+                self.log_result("Items with Tracking", True, f"Retrieved {items_count} items with tracking")
+            else:
+                self.log_result("Items with Tracking", False, f"Status: {response.status_code}", response.text)
+                
+        except Exception as e:
+            self.log_result("Items with Tracking", False, f"Exception: {str(e)}")
+    
     def run_all_tests(self):
-        """Run all product scraping tests"""
-        print("=" * 80)
-        print("PRODUCT SCRAPING API TESTING SUITE")
-        print("=" * 80)
-        print()
+        """Run all backend tests"""
+        print(f"\n🚀 Starting Comprehensive Backend Testing")
+        print(f"Backend URL: {BACKEND_URL}")
+        print(f"Timestamp: {datetime.now().isoformat()}")
+        print("=" * 60)
         
-        # Test database seeding first
-        self.test_database_seeding_verification()
+        # Run all tests
+        self.test_health_check()
+        self.test_product_scraper_database_lookups()
+        self.test_product_scraper_web_scraping()
+        self.test_master_contacts_crud()
+        self.test_project_specific_contacts()
+        self.test_project_management()
+        self.test_calculator_endpoints()
+        self.test_items_with_tracking()
         
-        # Test vendor autocomplete
-        self.test_vendor_autocomplete()
+        # Summary
+        print("\n" + "=" * 60)
+        print("📊 TEST SUMMARY")
+        print("=" * 60)
         
-        # Test product autocomplete
-        self.test_product_autocomplete()
+        passed = sum(1 for r in self.results if r['success'])
+        failed = sum(1 for r in self.results if not r['success'])
+        total = len(self.results)
         
-        # Test database lookups
-        self.test_uttermost_database_lookup()
-        self.test_four_hands_database_lookup()
+        print(f"Total Tests: {total}")
+        print(f"✅ Passed: {passed}")
+        print(f"❌ Failed: {failed}")
+        print(f"Success Rate: {(passed/total*100):.1f}%")
         
-        # Test web fallback
-        self.test_web_fallback_scraping()
-        
-        # Print summary
-        print("=" * 80)
-        print("TEST SUMMARY")
-        print("=" * 80)
-        print(f"Total Tests: {self.total_tests}")
-        print(f"Passed: {self.passed_tests}")
-        print(f"Failed: {self.failed_tests}")
-        print(f"Success Rate: {(self.passed_tests/self.total_tests*100):.1f}%")
-        print()
-        
-        # Print failed tests details
-        if self.failed_tests > 0:
-            print("FAILED TESTS:")
-            print("-" * 40)
+        if failed > 0:
+            print(f"\n🔍 FAILED TESTS:")
             for result in self.results:
-                if "❌ FAIL" in result["status"]:
-                    print(f"❌ {result['test']}")
-                    print(f"   {result['details']}")
-                    print()
+                if not result['success']:
+                    print(f"   ❌ {result['test']}: {result['details']}")
         
-        return self.passed_tests == self.total_tests
+        return self.results
 
 if __name__ == "__main__":
-    tester = ProductScrapingTester()
-    success = tester.run_all_tests()
+    tester = BackendTester()
+    results = tester.run_all_tests()
     
-    if success:
-        print("🎉 ALL TESTS PASSED! Product scraping API is working correctly.")
-    else:
-        print("⚠️  SOME TESTS FAILED. Check the details above.")
-    
-    exit(0 if success else 1)
+    # Exit with error code if any tests failed
+    failed_count = sum(1 for r in results if not r['success'])
+    sys.exit(failed_count)
