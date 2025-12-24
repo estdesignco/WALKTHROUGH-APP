@@ -6170,42 +6170,81 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # ===== 6. FINISH/COLOR EXTRACTION =====
             print("🎨 EXTRACTING FINISH/COLOR...")
             
-            # FIRST: Try to extract from product description text
-            # Look for finish/material keywords in the description
-            description_text = ""
-            desc_selectors = ['.product-description', '.description', '[class*="description"]', '[class*="Description"]', 'p']
-            for sel in desc_selectors:
-                try:
-                    desc_elements = await page.query_selector_all(sel)
-                    for el in desc_elements:
-                        text = await el.text_content()
-                        if text and len(text) > 50:
-                            description_text += " " + text
-                except:
-                    continue
-            
-            # Extract finish/material from description
-            if description_text:
+            # VENDOR-SPECIFIC: Four Hands has specific format
+            if 'fourhands.com' in domain:
+                # Four Hands format: "Finish\nRustic Wormwood Oak" or "Colors\nRustic Wormwood Oak"
                 import re
-                # Look for specific material/finish mentions
-                finish_patterns = [
-                    r'(?:in a|with a|features? a?|finished in)\s+([a-zA-Z\s]+(?:finish|brass|bronze|gold|silver|chrome|nickel|iron|wood|oak|walnut|marble|stone|leather|fabric|velvet|linen))',
-                    r'(antique\s+\w+)\s+finish',
-                    r'(\w+\s+brass|\w+\s+bronze|\w+\s+gold|\w+\s+silver)',
-                    r'(black|white|gray|grey|brown|beige|cream|ivory|natural)\s+(?:marble|stone|wood|oak|finish)',
-                    r'(?:Color|Finish|Material)[:\s]+([A-Za-z\s]{3,40}?)(?:\.|,|\n|$)',
-                ]
+                finish_match = re.search(r'Finish\s*\n?\s*([A-Za-z\s]+?)(?:\n|\$|Add to Cart)', all_text, re.IGNORECASE)
+                if finish_match:
+                    result['finish_color'] = finish_match.group(1).strip()
+                    print(f"✅ FOUR HANDS FINISH: {result['finish_color']}")
                 
-                for pattern in finish_patterns:
-                    match = re.search(pattern, description_text, re.IGNORECASE)
-                    if match:
-                        finish_candidate = match.group(1).strip()
-                        # Clean up
-                        finish_candidate = re.sub(r'\s+', ' ', finish_candidate)
-                        if 3 <= len(finish_candidate) <= 50:
-                            result['finish_color'] = finish_candidate.title()
-                            print(f"✅ FINISH/COLOR FROM DESCRIPTION: {result['finish_color']}")
-                            break
+                if not result.get('finish_color'):
+                    color_match = re.search(r'Colors?\s*\n?\s*([A-Za-z\s]+?)(?:\n|Materials)', all_text, re.IGNORECASE)
+                    if color_match:
+                        result['finish_color'] = color_match.group(1).strip()
+                        print(f"✅ FOUR HANDS COLOR: {result['finish_color']}")
+                
+                # Also extract material for Four Hands
+                if not result.get('finish_color'):
+                    material_match = re.search(r'Materials?\s*\n?\s*([A-Za-z\s]+?)(?:\n|Weight)', all_text, re.IGNORECASE)
+                    if material_match:
+                        result['finish_color'] = material_match.group(1).strip()
+                        print(f"✅ FOUR HANDS MATERIAL: {result['finish_color']}")
+            
+            # VENDOR-SPECIFIC: Rowe Furniture
+            elif 'rowefurniture.com' in domain:
+                import re
+                # Look for fabric/finish selection
+                fabric_match = re.search(r'(?:Fabric|Finish|Color)[:\s]+([A-Za-z0-9\s\-]+?)(?:\n|$|\|)', all_text, re.IGNORECASE)
+                if fabric_match:
+                    result['finish_color'] = fabric_match.group(1).strip()
+                    print(f"✅ ROWE FINISH: {result['finish_color']}")
+            
+            # VENDOR-SPECIFIC: Uttermost
+            elif 'uttermost.com' in domain:
+                import re
+                finish_match = re.search(r'(?:Finish|Color|Material)[:\s]+([A-Za-z\s]+?)(?:\n|$|,)', all_text, re.IGNORECASE)
+                if finish_match:
+                    result['finish_color'] = finish_match.group(1).strip()
+                    print(f"✅ UTTERMOST FINISH: {result['finish_color']}")
+            
+            # GENERIC: Try to extract from product description text
+            if not result.get('finish_color'):
+                description_text = ""
+                desc_selectors = ['.product-description', '.description', '[class*="description"]', '[class*="Description"]', 'p']
+                for sel in desc_selectors:
+                    try:
+                        desc_elements = await page.query_selector_all(sel)
+                        for el in desc_elements:
+                            text = await el.text_content()
+                            if text and len(text) > 50:
+                                description_text += " " + text
+                    except:
+                        continue
+                
+                # Extract finish/material from description
+                if description_text:
+                    import re
+                    # Look for specific material/finish mentions
+                    finish_patterns = [
+                        r'(?:in a|with a|features? a?|finished in)\s+([a-zA-Z\s]+(?:finish|brass|bronze|gold|silver|chrome|nickel|iron|wood|oak|walnut|marble|stone|leather|fabric|velvet|linen))',
+                        r'(antique\s+\w+)\s+finish',
+                        r'(\w+\s+brass|\w+\s+bronze|\w+\s+gold|\w+\s+silver)',
+                        r'(black|white|gray|grey|brown|beige|cream|ivory|natural)\s+(?:marble|stone|wood|oak|finish)',
+                        r'(?:Color|Finish|Material)[:\s]+([A-Za-z\s]{3,40}?)(?:\.|,|\n|$)',
+                    ]
+                    
+                    for pattern in finish_patterns:
+                        match = re.search(pattern, description_text, re.IGNORECASE)
+                        if match:
+                            finish_candidate = match.group(1).strip()
+                            # Clean up
+                            finish_candidate = re.sub(r'\s+', ' ', finish_candidate)
+                            if 3 <= len(finish_candidate) <= 50:
+                                result['finish_color'] = finish_candidate.title()
+                                print(f"✅ FINISH/COLOR FROM DESCRIPTION: {result['finish_color']}")
+                                break
             
             # SECOND: Check for explicit finish/color selectors
             if not result.get('finish_color'):
