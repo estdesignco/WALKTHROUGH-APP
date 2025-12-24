@@ -222,9 +222,23 @@ export default function ShippingTracker({ projectId }) {
                     <span className="flex items-center gap-1">
                       {getCarrierLogo(item.shipping?.carrier)} {item.shipping?.carrier}
                     </span>
-                    <span className="font-mono text-xs">
-                      {item.shipping?.tracking_number}
-                    </span>
+                    {item.shipping?.tracking_number && (
+                      getTrackingUrl(item.shipping?.carrier, item.shipping?.tracking_number) ? (
+                        <a 
+                          href={getTrackingUrl(item.shipping?.carrier, item.shipping?.tracking_number)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="font-mono text-xs text-[#D4A574] hover:text-[#E5B585] underline"
+                        >
+                          {item.shipping?.tracking_number}
+                        </a>
+                      ) : (
+                        <span className="font-mono text-xs">
+                          {item.shipping?.tracking_number}
+                        </span>
+                      )
+                    )}
                   </div>
                 </div>
                 
