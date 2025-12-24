@@ -6576,6 +6576,7 @@ async def scrape_product_advanced(data: dict):
                         "size": playwright_result.get('size'),
                         "dimensions": playwright_result.get('size'),
                         "finish_color": playwright_result.get('finish_color'),
+                        "finish_image": playwright_result.get('finish_image'),  # Swatch image for Materials Library
                         "color": playwright_result.get('finish_color'),
                         "vendor": playwright_result.get('vendor'),
                         "description": playwright_result.get('description'),
