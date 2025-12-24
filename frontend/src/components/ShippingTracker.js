@@ -117,7 +117,8 @@ export default function ShippingTracker({ projectId }) {
       'LaserShip': `https://www.lasership.com/track/${trackingNumber}`,
     };
     
-    return trackingUrls[carrier] || null;
+    // If carrier not in list, return a generic Google tracking search
+    return trackingUrls[carrier] || `https://www.google.com/search?q=${encodeURIComponent(carrier + ' tracking ' + trackingNumber)}`;
   };
 
   const filteredItems = filter === 'all' 
