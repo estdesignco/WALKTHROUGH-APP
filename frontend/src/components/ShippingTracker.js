@@ -73,12 +73,23 @@ export default function ShippingTracker({ projectId }) {
 
   // Carrier tracking URLs - for clickable tracking links
   const getTrackingUrl = (carrier, trackingNumber) => {
+    // Handle special Zenith format - if tracking number contains full URL or lookup ID
+    if (carrier === 'Zenith' || carrier?.toLowerCase()?.includes('zenith')) {
+      // If it's already a full URL, use it directly
+      if (trackingNumber?.startsWith('http')) {
+        return trackingNumber;
+      }
+      // If it looks like a Zenith tracking ID (SHP...), construct the URL
+      // Zenith uses format: https://secure.zenithcompanies.com/tracking/{uuid}/lookup/{trackingNumber}
+      // Since we don't have the UUID, we'll use a search-style URL
+      return `https://secure.zenithcompanies.com/tracking/?search=${trackingNumber}`;
+    }
+    
     const trackingUrls = {
       'FedEx': `https://www.fedex.com/apps/fedextrack/?tracknumbers=${trackingNumber}`,
       'UPS': `https://www.ups.com/track?tracknum=${trackingNumber}`,
       'USPS': `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}`,
       'DHL': `https://www.dhl.com/us-en/home/tracking.html?tracking-id=${trackingNumber}`,
-      'Zenith': `https://secure.zenithcompanies.com/tracking/${trackingNumber}`,
       'Brooks': `https://www.brooksdelivery.com/track/${trackingNumber}`,
       'Sunbelt': `https://sunbeltdelivery.com/track/${trackingNumber}`,
       'R+L Carriers': `https://www.rlcarriers.com/tracking/${trackingNumber}`,
