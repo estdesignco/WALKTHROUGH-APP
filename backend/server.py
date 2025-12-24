@@ -5619,6 +5619,16 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'fourhands.com': [
                     '.product-price-value', '.price-value', '.price',
                     '[class*="price"]', '.pricing'
+                ],
+                'rowefurniture.com': [
+                    # Rowe Furniture - look for specific price display elements
+                    '.product-price', '.current-price', '.sale-price',
+                    '[data-price]', '[data-cost]',
+                    '.price-value', '.price-amount',
+                    'span.price', 'div.price', '.pdp-price',
+                    '[class*="price"]:not([class*="compare"])',
+                    # Also check for total/configurator prices
+                    '.total-price', '.configured-price', '.cart-price',
                 ]
             }
             
