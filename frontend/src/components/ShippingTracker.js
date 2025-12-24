@@ -73,31 +73,50 @@ export default function ShippingTracker({ projectId }) {
 
   // Carrier tracking URLs - for clickable tracking links
   const getTrackingUrl = (carrier, trackingNumber) => {
-    // Handle special Zenith format - if tracking number contains full URL or lookup ID
+    if (!trackingNumber) return null;
+    
+    // Handle if tracking number is already a full URL
+    if (trackingNumber?.startsWith('http')) {
+      return trackingNumber;
+    }
+    
+    // Handle special Zenith format
     if (carrier === 'Zenith' || carrier?.toLowerCase()?.includes('zenith')) {
-      // If it's already a full URL, use it directly
-      if (trackingNumber?.startsWith('http')) {
-        return trackingNumber;
-      }
-      // If it looks like a Zenith tracking ID (SHP...), construct the URL
-      // Zenith uses format: https://secure.zenithcompanies.com/tracking/{uuid}/lookup/{trackingNumber}
-      // Since we don't have the UUID, we'll use a search-style URL
       return `https://secure.zenithcompanies.com/tracking/?search=${trackingNumber}`;
     }
     
     const trackingUrls = {
+      // Major Carriers
       'FedEx': `https://www.fedex.com/apps/fedextrack/?tracknumbers=${trackingNumber}`,
       'UPS': `https://www.ups.com/track?tracknum=${trackingNumber}`,
       'USPS': `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}`,
       'DHL': `https://www.dhl.com/us-en/home/tracking.html?tracking-id=${trackingNumber}`,
+      
+      // Furniture/White Glove Delivery
       'Brooks': `https://www.brooksdelivery.com/track/${trackingNumber}`,
       'Sunbelt': `https://sunbeltdelivery.com/track/${trackingNumber}`,
-      'R+L Carriers': `https://www.rlcarriers.com/tracking/${trackingNumber}`,
-      'XPO Logistics': `https://www.xpo.com/tracking/${trackingNumber}`,
-      'Old Dominion': `https://www.odfl.com/Freight-Tracking/${trackingNumber}`,
-      'Estes Express': `https://www.estes-express.com/resources/shipment-tracking?search=${trackingNumber}`,
-      'Saia LTL': `https://www.saia.com/track/${trackingNumber}`,
+      'Zenith': `https://secure.zenithcompanies.com/tracking/?search=${trackingNumber}`,
+      
+      // LTL Freight Carriers
+      'R+L Carriers': `https://www2.rlcarriers.com/freight/shipping/shipment-tracing?pro=${trackingNumber}`,
+      'XPO Logistics': `https://track.xpo.com/track/results?trackingId=${trackingNumber}`,
+      'Old Dominion': `https://www.odfl.com/Freight-Tracking/?referenceNumbers=${trackingNumber}`,
+      'Estes Express': `https://www.estes-express.com/myestes/shipment-tracking/?search=${trackingNumber}`,
+      'Saia LTL': `https://www.saia.com/track/details?pro=${trackingNumber}`,
+      'ABF Freight': `https://arcb.com/tools/tracking.html?probill=${trackingNumber}`,
+      'TForce Freight': `https://www.tforcefreight.com/ltl/apps/Tracking?type=PRO&PRO=${trackingNumber}`,
+      'Yellow Freight': `https://my.yrc.com/dynamic/national/servlet?ESSION=guest&trackingnumber=${trackingNumber}`,
+      'Roadrunner': `https://www.rrts.com/tools/tracking?pro=${trackingNumber}`,
+      'Central Transport': `https://www.centraltransportint.com/tracking/?proNumbers=${trackingNumber}`,
+      'Southeastern Freight': `https://www.sefl.com/tools/track-shipment/?pro=${trackingNumber}`,
+      'Averitt Express': `https://www.averittexpress.com/power-tools/track/?tracking=${trackingNumber}`,
+      'Holland': `https://www.hollandregional.com/tracking/?pro=${trackingNumber}`,
+      
+      // Parcel/Small Package
+      'OnTrac': `https://www.ontrac.com/trackingres.asp?tracking_number=${trackingNumber}`,
+      'LaserShip': `https://www.lasership.com/track/${trackingNumber}`,
     };
+    
     return trackingUrls[carrier] || null;
   };
 
