@@ -296,13 +296,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Paint Calculator parameter fix"
-    - "Other Calculators schema verification"
-    - "Scraper timeout optimization"
+    - "FF&E Add Item Modal"
+    - "FF&E Shipping Tracker"
+    - "Master Materials System backend error"
+    - "Data Persistence on refresh"
   stuck_tasks:
-    - "Paint Calculator"
-    - "Other Calculators (Drapery, Upholstery, Tile, Carpet)"
-  test_all: false
+    - "FF&E Add Item Modal"
+    - "Data Persistence"
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
