@@ -6500,6 +6500,7 @@ async def scrape_product_advanced(data: dict):
             "size": None,
             "dimensions": None,
             "finish_color": None,
+            "finish_image": None,  # Swatch image for Materials Library
             "color": None,
             "vendor": None,
             "description": None,
