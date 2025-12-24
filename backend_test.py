@@ -271,9 +271,9 @@ class BackendTester:
         # Wallpaper Calculator
         try:
             wallpaper_data = {
+                "wallpaper_type": "double_roll",
                 "wall_width": 12,
-                "wall_height": 8,
-                "roll_type": "double_roll"
+                "wall_height": 8
             }
             
             response = self.session.post(f"{BACKEND_URL}/api/calculators/wallpaper", 
