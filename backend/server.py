@@ -5758,6 +5758,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     except:
                         continue
             
+            # LAST RESORT: Use JSON-LD price if no visible price found
+            if not result['cost'] and json_ld_price:
+                result['cost'] = json_ld_price
+                result['price'] = json_ld_price
+                print(f"⚠️ FALLBACK TO JSON-LD PRICE: ${json_ld_price:.2f} (no visible price found - may need login)")
+            
             # ===== 3. SUPER POWERFUL IMAGE EXTRACTION =====
             print("🖼️ EXTRACTING PRODUCT IMAGE WITH MULTIPLE STRATEGIES...")
             
