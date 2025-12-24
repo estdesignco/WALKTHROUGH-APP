@@ -99,7 +99,7 @@ export default function ShippingTracker({ projectId }) {
       
       // LTL Freight Carriers
       'R+L Carriers': `https://www2.rlcarriers.com/freight/shipping/shipment-tracing?pro=${trackingNumber}`,
-      'XPO Logistics': `https://track.xpo.com/track/results?trackingId=${trackingNumber}`,
+      'XPO Logistics': `https://www.xpo.com/track/?id=${trackingNumber}`,
       'Old Dominion': `https://www.odfl.com/Freight-Tracking/?referenceNumbers=${trackingNumber}`,
       'Estes Express': `https://www.estes-express.com/myestes/shipment-tracking/?search=${trackingNumber}`,
       'Saia LTL': `https://www.saia.com/track/details?pro=${trackingNumber}`,
