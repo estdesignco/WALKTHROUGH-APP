@@ -239,7 +239,7 @@ CARRIER_OPTIONS = [
     {'name': 'FedEx', 'color': '#FF6600', 'tracking_url': 'https://www.fedex.com/apps/fedextrack/?tracknumbers='},
     {'name': 'UPS', 'color': '#8B4513', 'tracking_url': 'https://www.ups.com/track?tracknum='},
     {'name': 'Brooks', 'color': '#4682B4', 'tracking_url': 'https://www.brooksdelivery.com/track/'},
-    {'name': 'Zenith', 'color': '#20B2AA', 'tracking_url': 'https://zenithdelivery.com/tracking/'},
+    {'name': 'Zenith', 'color': '#20B2AA', 'tracking_url': 'https://secure.zenithcompanies.com/tracking/'},
     {'name': 'Sunbelt', 'color': '#DC143C', 'tracking_url': 'https://sunbeltdelivery.com/track/'},
     {'name': 'R+L Carriers', 'color': '#8A2BE2', 'tracking_url': 'https://www.rlcarriers.com/tracking/'},
     {'name': 'Yellow Freight', 'color': '#FFD700', 'tracking_url': 'https://my.yrc.com/dynamic/national/servlet'},
