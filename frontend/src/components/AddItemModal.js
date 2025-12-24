@@ -343,6 +343,35 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
       console.log('📤 Calling onSubmit...');
       await onSubmit(formData);
       console.log('✅ onSubmit completed');
+      
+      // Add finish/color to Materials Library if checkbox is checked
+      const addToMaterialsCheckbox = document.getElementById('add-to-materials');
+      if (formData.finish_color && addToMaterialsCheckbox?.checked) {
+        try {
+          const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
+          const materialData = {
+            name: formData.finish_color,
+            category: 'finish',
+            manufacturer: formData.vendor || '',
+            vendor: formData.vendor || '',
+            sku: formData.sku ? `${formData.sku}-FINISH` : '',
+            color: formData.finish_color,
+            photo_url: formData.finish_image || '',
+            notes: `From product: ${formData.name}`,
+            tags: ['scraped', 'auto-added', formData.vendor || ''].filter(Boolean).join(',')
+          };
+          
+          await fetch(`${backendUrl}/api/master/materials`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(materialData)
+          });
+          console.log('📚 Added finish to Materials Library:', formData.finish_color);
+        } catch (materialErr) {
+          console.warn('⚠️ Could not add to Materials Library:', materialErr);
+          // Don't fail the whole operation if materials library fails
+        }
+      }
     } catch (err) {
       console.error('💥 Error submitting item:', err);
       alert('Error adding item: ' + err.message);
