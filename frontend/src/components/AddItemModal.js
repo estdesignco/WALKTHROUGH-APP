@@ -561,13 +561,39 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Finish/Color
                 </label>
-                <input
-                  type="text"
-                  value={formData.finish_color}
-                  onChange={(e) => setFormData({ ...formData, finish_color: e.target.value })}
-                  className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
-                  placeholder="e.g., Chrome"
-                />
+                <div className="flex items-center gap-2">
+                  {/* Finish/Color Swatch Image */}
+                  {formData.finish_image && (
+                    <div className="w-10 h-10 rounded border border-gray-500 overflow-hidden flex-shrink-0">
+                      <img 
+                        src={formData.finish_image} 
+                        alt={formData.finish_color || 'Finish swatch'} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <input
+                    type="text"
+                    value={formData.finish_color}
+                    onChange={(e) => setFormData({ ...formData, finish_color: e.target.value })}
+                    className="flex-1 bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                    placeholder="e.g., Chrome"
+                  />
+                </div>
+                {/* Add to Materials Library toggle */}
+                {formData.finish_color && (
+                  <div className="flex items-center mt-2">
+                    <input
+                      type="checkbox"
+                      id="add-to-materials"
+                      defaultChecked={true}
+                      className="w-4 h-4 text-amber-600 bg-gray-700 border-gray-600 rounded mr-2"
+                    />
+                    <label htmlFor="add-to-materials" className="text-xs text-gray-400">
+                      Add to Materials Library
+                    </label>
+                  </div>
+                )}
               </div>
             </div>
 
