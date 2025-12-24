@@ -67,9 +67,10 @@ class BackendTester:
                 
                 if response.status_code == 200:
                     data = response.json()
-                    if data.get("source") == "database" and data.get("price"):
+                    if data.get("source") == "database" and data.get("data", {}).get("price"):
+                        price = data.get("data", {}).get("price")
                         self.log_result(f"Database Lookup - {sku_data['url']}", True, 
-                                      f"Found in database with price: ${data.get('price', 'N/A')}")
+                                      f"Found in database with price: ${price}")
                     else:
                         self.log_result(f"Database Lookup - {sku_data['url']}", False, 
                                       f"Expected database source with price, got: {data}")
