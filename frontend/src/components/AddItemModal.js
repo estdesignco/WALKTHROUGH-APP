@@ -16,7 +16,8 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
     link: '',
     tracking_number: '',
     image_url: '',
-    finish_color: ''
+    finish_color: '',
+    finish_image: ''  // Swatch image for the finish/color
   });
 
   const [isScraping, setIsScraping] = useState(false);
